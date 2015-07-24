@@ -1,98 +1,76 @@
-!cfile diffumorris.f90
-!************************************************************************************
-!                             S P H E R A 6.0.0 
-!
-!                      Smoothed Particle Hydrodynamics Code
-!
-!************************************************************************************
-!
-! File name     : diffumorris
-!
-! Last updating : September 20, 2011
-!
-! Improvement traceback:
-!
-! ..  E.Bon, A. Di Monaco, S. Falappi  Initial development of the code
-! 00  Agate/Guandalini  28/08/07       Graphic windows calls removed
-! 01  Agate/Flamini     08/10/07       Check of entire code
-! 02  Agate/Guandalini  2008           Check and review entire code
-!
-!************************************************************************************
-! Module purpose : Module to 
-! 
-! Calling routine: inter_EqCont_2d, inter_EqCont_3d
-!
-! Called routines: 
-!
-!************************************************************************************
-!
+!----------------------------------------------------------------------------------------------------------------------------------
+! SPHERA (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
+! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-; SPHERA has been authored for RSE SpA by 
+!    Andrea Amicarelli, Antonio Di Monaco, Sauro Manenti, Elia Bon, Daria Gatti, Giordano Agate, Stefano Falappi, 
+!    Barbara Flamini, Roberto Guandalini, David Zuccalà).
+! Main numerical developments of SPHERA: 
+!    Amicarelli et al. (2015,CAF), Amicarelli et al. (2013,IJNME), Manenti et al. (2012,JHE), Di Monaco et al. (2011,EACFM). 
+! Email contact: andrea.amicarelli@rse-web.it
+
+! This file is part of SPHERA.
+! SPHERA is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! SPHERA is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
+!----------------------------------------------------------------------------------------------------------------------------------
+
+!----------------------------------------------------------------------------------------------------------------------------------
+! Program unit: diffumorris
+! Description:  
+!----------------------------------------------------------------------------------------------------------------------------------
+
 subroutine diffumorris (npi,npj,npartint,dervol,factdiff,rvw)
-!
-!.. assign modules
-use GLOBAL_MODULE
-use AdM_USER_TYPE
-use ALLOC_MODULE
-!
-!.. Implicit Declarations ..
- implicit none
-!
-!.. Formal Arguments ..
- integer(4)       :: npi,npj,npartint
- double precision :: dervol,factdiff,rvw
-!
-!.. Local Scalars ..
-! double precision        :: gradd
-! double precision        :: dvar(3),cuei,eta
- double precision        :: anuitilde,rhotilde,amassj,coei,coej
-! double precision        :: coeffveli,coeffvelj,dist,distj,disti
-! double precision        :: dvi(3),dvj(3)
-!
-!.. Executable Statements ..
-!
-! coeffvelj = (Dsqrt(pg(npj)%dv(1)*pg(npj)%dv(1)+pg(npj)%dv(3)*pg(npj)%dv(3)))
-! coeffveli = (Dsqrt(pg(npi)%dv(1)*pg(npi)%dv(1)+pg(npi)%dv(3)*pg(npi)%dv(3)))
-! coej=two*pg(npj)%coefdif * coeffvelj
-! coei=two*pg(npi)%coefdif * coeffveli
-
- pg(npj)%coefdif = med(pg(npj)%imed)%codif
- pg(npi)%coefdif = med(pg(npi)%imed)%codif
- 
- coej = pg(npj)%coefdif
- coei = pg(npi)%coefdif
-
-!! Schema armonico
- amassj    = pg(npj)%mass
- anuitilde = 4.0d0 * (coei * coej) / (coei + coej + 0.00001d0)
- rhotilde  = pg(npj)%dens
-
- if (pg(npi)%visc == med(2)%numx .or. pg(npj)%visc == med(2)%numx) then
+!------------------------
+! Modules
+!------------------------ 
+use Static_allocation_module
+use Hybrid_allocation_module
+use Dynamic_allocation_module
+!------------------------
+! Declarations
+!------------------------
+implicit none
+integer(4) :: npi,npj,npartint
+double precision :: dervol,factdiff,rvw,anuitilde,rhotilde,amassj,coei,coej
+!------------------------
+! Explicit interfaces
+!------------------------
+!------------------------
+! Allocations
+!------------------------
+!------------------------
+! Initializations
+!------------------------
+!------------------------
+! Statements
+!------------------------
+pg(npj)%coefdif = med(pg(npj)%imed)%codif
+pg(npi)%coefdif = med(pg(npi)%imed)%codif
+coej = pg(npj)%coefdif
+coei = pg(npi)%coefdif
+amassj = pg(npj)%mass
+anuitilde = 4.0d0 * (coei * coej) / (coei + coej + 0.00001d0)
+rhotilde  = pg(npj)%dens
+if ((pg(npi)%visc==med(2)%numx).or.(pg(npj)%visc==med(2)%numx)) then
    anuitilde = zero
- end if
- 
- if ( pg(npj)%vel_type /= "std" ) then          !non part fix o altro
-    rhotilde  = pg(npi)%dens
-    amassj    = pg(npi)%mass
-    anuitilde = zero
- end if
-
-!.. formula utilizzata nel nov 2005 da rapporto Bon/Gatti/Zuccala/DiMonaco/Gallati
-! factdiff = amassj * anuitilde / rhotilde
-!! eta      = 0.01d0 * hh
-! gradd    = gradmod / (rij+eta)
-! rvw      =-gradd * dervol
-
-! disti = pg(npi)%coord(1) * pg(npi)%coord(1) + pg(npi)%coord(3) * pg(npi)%coord(3)
-! distj = pg(npj)%coord(1) * pg(npj)%coord(1) + pg(npj)%coord(3) * pg(npj)%coord(3)
-! dist  = distj - disti
-! cuei  = -two * gradd * dist * amassj / pg(npj)%dens
-
-!.. formula utilizzata nel nov 2007 come da letteratura
- factdiff = amassj * anuitilde / rhotilde
-! eta     = 0.01d0 * hh * hh
- rvw     = -dervol * PartKernel(2,npartint) * &
-            (rag(1,npartint)*rag(1,npartint) + rag(2,npartint)*rag(2,npartint) + rag(3,npartint)*rag(3,npartint)) 
-
+end if
+if ((pg(npj)%vel_type/="std")) then 
+   rhotilde = pg(npi)%dens
+   amassj = pg(npi)%mass
+   anuitilde = zero
+end if
+factdiff = amassj * anuitilde / rhotilde
+rvw = - dervol * PartKernel(2,npartint) * (rag(1,npartint) * rag(1,npartint)   &
+      + rag(2,npartint) * rag(2,npartint) + rag(3,npartint) * rag(3,npartint)) 
+!------------------------
+! Deallocations
+!------------------------
 return
 end subroutine diffumorris
-!---split
 

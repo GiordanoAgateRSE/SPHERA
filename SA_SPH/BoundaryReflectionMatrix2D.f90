@@ -1,59 +1,62 @@
-!cfile BoundaryReflectionMatrix2D.f90
-!************************************************************************************
-!                             S P H E R A 6.0.0 
-!
-!                      Smoothed Particle Hydrodynamics Code
-!
-!************************************************************************************
-!
-! File name     : BoundaryReflectionMatrix2D
-!
-! Last updating : September 20, 2011
-!
-! Improvement traceback:
-!
-! ..  E.Bon, A. Di Monaco, S. Falappi  Initial development of the code
-! 00  Agate/Guandalini  28/08/07       Graphic windows calls removed
-! 01  Agate/Flamini     08/10/07       Check of entire code
-! 02  Agate/Guandalini  2008           Check and review entire code
-!
-!************************************************************************************
-! Module purpose : Module for generation of generalized reflection matrix
-!
-! Calling routine: DefineBoundarySideGeometry2D
-!
-! Called routines: 
-!
-!************************************************************************************
-!
-subroutine BoundaryReflectionMatrix2D (T, R, PsiS, PsiN)
+!----------------------------------------------------------------------------------------------------------------------------------
+! SPHERA (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
+! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-; SPHERA has been authored for RSE SpA by 
+!    Andrea Amicarelli, Antonio Di Monaco, Sauro Manenti, Elia Bon, Daria Gatti, Giordano Agate, Stefano Falappi, 
+!    Barbara Flamini, Roberto Guandalini, David Zuccalà).
+! Main numerical developments of SPHERA: 
+!    Amicarelli et al. (2015,CAF), Amicarelli et al. (2013,IJNME), Manenti et al. (2012,JHE), Di Monaco et al. (2011,EACFM). 
+! Email contact: andrea.amicarelli@rse-web.it
 
-!Generates the generalised reflection matrix R(1 To SPACEDIM, 1 To SPACEDIM) on the base of
-!the cosine matrix T(1 To SPACEDIM, 1 To SPACEDIM) and the parameters PsiS, PsiN
-!
-!.. assign modules
-use GLOBAL_MODULE
-use AdM_USER_TYPE
-!
-!.. Implicit Declarations ..
+! This file is part of SPHERA.
+! SPHERA is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! SPHERA is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
+!----------------------------------------------------------------------------------------------------------------------------------
+
+!----------------------------------------------------------------------------------------------------------------------------------
+! Program unit: BoundaryReflectionMatrix2D                                
+! Description: Generation of the generalised reflection matrix R, based on the cosine matrix T and the parameters PsiS and PsiN.
+!              (Di Monaco et al., 2011, EACFM)                        
+!----------------------------------------------------------------------------------------------------------------------------------
+
+subroutine BoundaryReflectionMatrix2D(T,R,PsiS,PsiN)
+!------------------------
+! Modules
+!------------------------ 
+use Static_allocation_module
+use Hybrid_allocation_module
+!------------------------
+! Declarations
+!------------------------
 implicit none
-!
-!.. Formal Arguments ..
-double precision   :: PsiS, PsiN 
-double precision,dimension(1:SPACEDIM, 1:SPACEDIM)  :: T
-double precision,dimension(1:SPACEDIM, 1:SPACEDIM)  :: R
-!
-!.. Executable Statements ..
-!
-
-
-R(1, 1) = PsiS * T(1, 1) * T(1, 1) + PsiN * T(3, 1) * T(3, 1) 
-R(1, 3) = (PsiS - PsiN) * T(1, 1) * T(3, 1)
-R(3, 1) = R(1, 3)
-R(3, 3) = PsiS * T(3, 1) * T(3, 1) + PsiN * T(1, 1) * T(1, 1)
-!
+double precision :: PsiS,PsiN 
+double precision,dimension(1:SPACEDIM,1:SPACEDIM) :: T,R
+!------------------------
+! Explicit interfaces
+!------------------------
+!------------------------
+! Allocations
+!------------------------
+!------------------------
+! Initializations
+!------------------------
+!------------------------
+! Statements
+!------------------------
+R(1,1) = PsiS * T(1,1) * T(1,1) + PsiN * T(3,1) * T(3,1) 
+R(1,3) = (PsiS - PsiN) * T(1,1) * T(3,1)
+R(3,1) = R(1,3)
+R(3,3) = PsiS * T(3,1) * T(3,1) + PsiN * T(1,1) * T(1,1)
+!------------------------
+! Deallocations
+!------------------------
 return
-!
 end subroutine BoundaryReflectionMatrix2D
-!---split
 

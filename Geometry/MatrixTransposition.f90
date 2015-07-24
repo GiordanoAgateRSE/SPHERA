@@ -1,55 +1,62 @@
-!cfile MatrixTransposition.f90
-!************************************************************************************
-!                             S P H E R A 6.0.0 
-!
-!                      Smoothed Particle Hydrodynamics Code
-!
-!************************************************************************************
-!
-! File name     : MatrixTransposition
-!
-! Last updating : September 20, 2011
-!
-! Improvement traceback:
-!
-! ..  E.Bon, A. Di Monaco, S. Falappi  Initial development of the code
-! 00  Agate/Guandalini  28/08/07       Graphic windows calls removed
-! 01  Agate/Flamini     08/10/07       Check of entire code
-! 02  Agate/Guandalini  2008           Check and review entire code
-!
-!************************************************************************************
-! Module purpose : Module that Returns in AAT(n, m) the transponse of AA(m, n)
-!
-! Calling routine: BoundaryMassForceMatrix3D, BoundaryPressureGradientMatrix3D
-!
-! Called routines: 
-!
-!************************************************************************************
-!
-subroutine MatrixTransposition (AA, AAT, m, n )
-!Returns in AAT(n, m) the transponse of AA(m, n)
-!
-!.. Implicit Declarations ..
-  implicit none
-!
-!.. Formal Arguments ..
-integer(4),      intent(IN)   :: m
-integer(4),      intent(IN)   :: n
-double precision,intent(IN),   dimension(m,n) :: AA
-double precision,intent(INOUT),dimension(n,m) :: AAT
-!
-!.. Local Scalars ..
-integer(4) :: i,j
-!
-!.. Executable Statements ..
-!
- do i = 1, n
-    do j = 1, m
-        AAT(i, j) = AA(j, i)
-    end do
- end do
+!----------------------------------------------------------------------------------------------------------------------------------
+! SPHERA (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
+! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-; SPHERA has been authored for RSE SpA by 
+!    Andrea Amicarelli, Antonio Di Monaco, Sauro Manenti, Elia Bon, Daria Gatti, Giordano Agate, Stefano Falappi, 
+!    Barbara Flamini, Roberto Guandalini, David Zuccalà).
+! Main numerical developments of SPHERA: 
+!    Amicarelli et al. (2015,CAF), Amicarelli et al. (2013,IJNME), Manenti et al. (2012,JHE), Di Monaco et al. (2011,EACFM). 
+! Email contact: andrea.amicarelli@rse-web.it
 
+! This file is part of SPHERA.
+! SPHERA is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! SPHERA is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
+!----------------------------------------------------------------------------------------------------------------------------------
+
+!----------------------------------------------------------------------------------------------------------------------------------
+! Program unit: MatrixTransposition   
+! Description: Returns in AAT(n,m) the transposed matrix of AA(m, n).     
+!----------------------------------------------------------------------------------------------------------------------------------
+
+subroutine MatrixTransposition(AA,AAT,m,n) 
+!------------------------
+! Modules
+!------------------------ 
+!------------------------
+! Declarations
+!------------------------
+implicit none
+integer(4),intent(IN) :: m,n
+double precision,intent(IN),dimension(m,n) :: AA
+double precision,intent(INOUT),dimension(n,m) :: AAT
+integer(4) :: i,j
+!------------------------
+! Explicit interfaces
+!------------------------
+!------------------------
+! Allocations
+!------------------------
+!------------------------
+! Initializations
+!------------------------
+!------------------------
+! Statements
+!------------------------
+do i=1,n
+    do j=1,m
+        AAT(i,j) = AA(j,i)
+    end do
+end do
+!------------------------
+! Deallocations
+!------------------------
 return
 end subroutine MatrixTransposition
-!---split
 

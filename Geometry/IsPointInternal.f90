@@ -1,47 +1,73 @@
-!cfile IsPointInternal.f90
-!************************************************************************************
-!                             S P H E R A 6.0.0 
-!
-!                      Smoothed Particle Hydrodynamics Code
-!
-!************************************************************************************
-Logical Function IsPointInternal ( fk, csi )
+!----------------------------------------------------------------------------------------------------------------------------------
+! SPHERA (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
+! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-; SPHERA has been authored for RSE SpA by 
+!    Andrea Amicarelli, Antonio Di Monaco, Sauro Manenti, Elia Bon, Daria Gatti, Giordano Agate, Stefano Falappi, 
+!    Barbara Flamini, Roberto Guandalini, David Zuccalà).
+! Main numerical developments of SPHERA: 
+!    Amicarelli et al. (2015,CAF), Amicarelli et al. (2013,IJNME), Manenti et al. (2012,JHE), Di Monaco et al. (2011,EACFM). 
+! Email contact: andrea.amicarelli@rse-web.it
 
-!Checks wheather a point with local normal coordinates csi() is
-!internal to the face whose code is fk (=1 triangle, =2 parallelogram)
+! This file is part of SPHERA.
+! SPHERA is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! SPHERA is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
+!----------------------------------------------------------------------------------------------------------------------------------
 
-!.. assign modules
-use GLOBAL_MODULE
-!
-!.. Implicit Declarations ..
+!----------------------------------------------------------------------------------------------------------------------------------
+! Program unit: IsPointInternal  
+! Description: Checking wheather a point with local normal coordinates csi() is internal to a given face, whose code  
+!              is fk (=1 triangle, =2 parallelogram).
+!----------------------------------------------------------------------------------------------------------------------------------
+
+Logical Function IsPointInternal(fk,csi)
+!------------------------
+! Modules
+!------------------------ 
+use Static_allocation_module
+!------------------------
+! Declarations
+!------------------------
 implicit none
-!
-!.. Local Scalars ..
-integer(4) :: i
-integer(4) :: fk
-!
-!.. Local Arrays ..
+integer(4) :: i,fk
 double precision, dimension(1:SPACEDIM) :: csi
-!
-!.. Executable statements ..
-!
- IsPointInternal = .FALSE.
-!
- if ( fk == 1 ) then            !triangle
-   do i = 1, 3
-     if ( csi(i) < zero ) return
-     if ( csi(i) > one ) return
+!------------------------
+! Explicit interfaces
+!------------------------
+!------------------------
+! Allocations
+!------------------------
+!------------------------
+! Initializations
+!------------------------
+IsPointInternal = .FALSE.
+!------------------------
+! Statements
+!------------------------
+if (fk==1) then            
+! Triangle
+   do i=1,3
+     if (csi(i)<zero) return
+     if (csi(i)>one) return
    end do
    IsPointInternal = .TRUE.
- else if ( fk == 2 ) then        !parallelogram
-   do i = 1, 2
-     if ( csi(i) < zero ) return
-     if ( csi(i) > one ) return
-   end do
-   IsPointInternal = .TRUE.
- end if
-!
+   else if (fk==2) then
+! Quadrilateral 
+      do i=1,2
+         if (csi(i)<zero) return
+         if (csi(i)>one) return
+      end do
+      IsPointInternal = .TRUE.
+end if
+!------------------------
+! Deallocations
+!------------------------
 return
-End Function IsPointInternal
-!---split
+end Function IsPointInternal
 

@@ -1,52 +1,68 @@
-!cfile CellIndices.f90
-!************************************************************************************
-!                             S P H E R A 6.0.0 
-!
-!                      Smoothed Particle Hydrodynamics Code
-!
-!************************************************************************************
-  integer(4) function CellIndices (nc, i, j, k)
+!----------------------------------------------------------------------------------------------------------------------------------
+! SPHERA (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
+! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-; SPHERA has been authored for RSE SpA by 
+!    Andrea Amicarelli, Antonio Di Monaco, Sauro Manenti, Elia Bon, Daria Gatti, Giordano Agate, Stefano Falappi, 
+!    Barbara Flamini, Roberto Guandalini, David Zuccalà).
+! Main numerical developments of SPHERA: 
+!    Amicarelli et al. (2015,CAF), Amicarelli et al. (2013,IJNME), Manenti et al. (2012,JHE), Di Monaco et al. (2011,EACFM). 
+! Email contact: andrea.amicarelli@rse-web.it
 
-!.Returns indices i, j, k, of the cell nc
-!..in a 3D box frame with ni, nj, nk, cells on each side
-!
-!.. assign modules
-  use GLOBAL_MODULE
-  use AdM_USER_TYPE
-!
-!.. Implicit Declarations ..
-  implicit none
-!
-!.. Formal Arguments ..
-  integer(4),intent(IN)  :: nc
-  integer(4),intent(OUT) :: i,j,k
-!
-!.. Local Scalars ..
-  integer(4) :: ncij, nucellsij,ni,nj   !,nk
-!
-!.. Executable Statements ..
-!
-  ni = Grid%ncd(1)
-  nj = Grid%ncd(2)
-!  nk = Grid%ncd(3)
-!
-  nucellsij = ni * nj
-!
-!.. grid index in the Z direction
-!
-  k = int((nc - 1) / nucellsij) + 1
-  ncij = nc - nucellsij * (k - 1)
-!
-!.. grid index in the Y direction
-!
-  j = int((ncij - 1) / ni) + 1
-!
-!.. grid index in the X direction
-!
-  i = ncij - ni * (j - 1)
-!
-  CellIndices = ncij
-!
-  End function CellIndices
-!---split
+! This file is part of SPHERA.
+! SPHERA is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! SPHERA is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
+!----------------------------------------------------------------------------------------------------------------------------------
+
+!----------------------------------------------------------------------------------------------------------------------------------
+! Program unit: CellIndices            
+! Description: To return the indices (i,j,k) of the cell (nc) in a 3D domain with ni*nj*nk cells.
+!----------------------------------------------------------------------------------------------------------------------------------
+
+integer(4) function CellIndices(nc,i,j,k)
+!------------------------
+! Modules
+!------------------------ 
+use Static_allocation_module
+use Hybrid_allocation_module
+!------------------------
+! Declarations
+!------------------------
+implicit none
+integer(4),intent(IN) :: nc
+integer(4),intent(OUT) :: i,j,k
+integer(4) :: ncij, nucellsij,ni,nj 
+!------------------------
+! Explicit interfaces
+!------------------------
+!------------------------
+! Allocations
+!------------------------
+!------------------------
+! Initializations
+!------------------------
+!------------------------
+! Statements
+!------------------------
+ni = Grid%ncd(1)
+nj = Grid%ncd(2)
+nucellsij = ni * nj
+! Grid index in the z-direction
+k = int((nc - 1) / nucellsij) + 1
+ncij = nc - nucellsij * (k - 1)
+! Grid index in the y-direction
+j = int((ncij - 1) / ni) + 1
+! Grid index in the x-direction
+i = ncij - ni * (j - 1)
+CellIndices = ncij
+!------------------------
+! Deallocations
+!------------------------
+end function CellIndices
 

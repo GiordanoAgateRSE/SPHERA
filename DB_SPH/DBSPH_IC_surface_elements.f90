@@ -1,47 +1,62 @@
-!AA601 the whole subroutine
-!cfile BC_wall_elements.f90
-!************************************************************************************
-!                          S P H E R A 5.0.3 
-!
-!                Smoothed Particle Hydrodinamics Code
-!
-!************************************************************************************
-!
-! Subroutine : DBSPH_IC_surface_elements
-!
-! Creation   : Amicarelli A., 16Jan15; Main features (see Purpose)
-!
-!************************************************************************************
-! Purpose            : Initialization of wall surface elements for DBSPH
-! Calling procedures : gest_input
-! Called procedures  : /
-!************************************************************************************
+!----------------------------------------------------------------------------------------------------------------------------------
+! SPHERA (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
+! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-; SPHERA has been authored for RSE SpA by 
+!    Andrea Amicarelli, Antonio Di Monaco, Sauro Manenti, Elia Bon, Daria Gatti, Giordano Agate, Stefano Falappi, 
+!    Barbara Flamini, Roberto Guandalini, David Zuccalà).
+! Main numerical developments of SPHERA: 
+!    Amicarelli et al. (2015,CAF), Amicarelli et al. (2013,IJNME), Manenti et al. (2012,JHE), Di Monaco et al. (2011,EACFM). 
+! Email contact: andrea.amicarelli@rse-web.it
+
+! This file is part of SPHERA.
+! SPHERA is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! SPHERA is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
+!----------------------------------------------------------------------------------------------------------------------------------
+
+!----------------------------------------------------------------------------------------------------------------------------------
+! Program unit: DBSPH_IC_surface_elements
+! Description: Initialization of wall surface elements (Amicarelli et al., 2013, IJNME).           
+!----------------------------------------------------------------------------------------------------------------------------------
 
 subroutine DBSPH_IC_surface_elements
-
+!------------------------
 ! Modules
-use FILES_ENTITIES
-use GLOBAL_MODULE
-use AdM_USER_TYPE
-use ALLOC_MODULE
-use DIAGNOSTIC_MODULE
-
+!------------------------ 
+use I_O_file_module
+use Static_allocation_module
+use Hybrid_allocation_module
+use Dynamic_allocation_module
+use I_O_diagnostic_module
+!------------------------
 ! Declarations
+!------------------------
 implicit none
 integer(4) :: alloc_stat,i,j
 integer(4),external :: ParticleCellNumber
-
-! Interface blocks
-
+!------------------------
+! Explicit interfaces
+!------------------------
+!------------------------
 ! Allocations
-
+!------------------------
+!------------------------
 ! Initializations
-
+!------------------------
+!------------------------
 ! Statements
+!------------------------
 if (.not.allocated(pg_w)) then
    allocate(pg_w(DBSPH%n_w+DBSPH%n_inlet+DBSPH%n_outlet),STAT=alloc_stat) 
    if (alloc_stat/=0) then
-      write(nout,*) 'Allocation of pg_w in DBSPH_IC_surface_elements failed; the program terminates here.'
+      write(nout,*) 'Allocation of pg_w in DBSPH_IC_surface_elements failed;', &
+                    ' the program terminates here.'
       call diagnostic (arg1=5,arg2=340)
       stop ! Stop the main program
       else
@@ -65,21 +80,24 @@ if (.not.allocated(pg_w)) then
          pg_w(:)%mass = 0.d0 
          pg_w(:)%k_d = 0.d0
          pg_w(:)%volume = 0.d0
-         write (nout,*) "Allocation of pg_w in DBSPH_IC_surface_elements successfully completed."
+         write (nout,*) "Allocation of pg_w in DBSPH_IC_surface_elements ",    &
+                        "successfully completed."
    endif   
 endif 
 !$omp parallel do default(none) shared(DBSPH,pg_w,Med,pg,ncord) private(i)
 do i=1,DBSPH%n_w 
-!AA601!!! sub start
    if (ncord==3) then
-      pg_w(i)%coord(:) = ( DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(i)%vert_list(1))%pos(:) + &
-                           DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(i)%vert_list(2))%pos(:) + &
-                           DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(i)%vert_list(3))%pos(:) ) / 3.d0
+      pg_w(i)%coord(:) = 
+      (DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(i)%vert_list(1))%pos(:) +&
+      DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(i)%vert_list(2))%pos(:) + &
+      DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(i)%vert_list(3))%pos(:))  &
+         / 3.d0
       else
-         pg_w(i)%coord(:) = ( DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(i)%vert_list(1))%pos(:) + &
-                              DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(i)%vert_list(2))%pos(:) + &
-                              DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(i)%vert_list(3))%pos(:) + &
-                              DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(i)%vert_list(4))%pos(:) ) / 4.d0    
+         pg_w(i)%coord(:) = 
+(DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(i)%vert_list(1))%pos(:) +      &
+DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(i)%vert_list(2))%pos(:) +       &
+DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(i)%vert_list(3))%pos(:) +       &
+DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(i)%vert_list(4))%pos(:) ) / 4.d0    
    endif
    pg_w(i)%cella = ParticleCellNumber(pg_w(i)%coord)
    pg_w(i)%vel(:) = 0.d0
@@ -91,7 +109,7 @@ do i=1,DBSPH%n_w
    pg_w(i)%adjacent_faces(:) = 0
 end do
 !$omp end parallel do
-!Initializing fictitious surface elements representing DBSPH inlet sections
+! Initializing fictitious surface elements representing DB-SPH inlet sections
 !$omp parallel do default(none) shared(DBSPH,pg_w,Med,pg) private(i,j)
 do i=(DBSPH%n_w+1),(DBSPH%n_w+DBSPH%n_inlet)
    j= i-DBSPH%n_w  
@@ -106,10 +124,10 @@ do i=(DBSPH%n_w+1),(DBSPH%n_w+DBSPH%n_inlet)
    pg_w(i)%adjacent_faces(:) = 0
 end do
 !$omp end parallel do
-!Initializing fictitious surface elements representing DBSPH outlet sections
+! Initializing fictitious surface elements representing DB-SPH outlet sections
 !$omp parallel do default(none) shared(DBSPH,pg_w,Med,pg) private(i,j)
 do i=(DBSPH%n_w+DBSPH%n_inlet+1),(DBSPH%n_w+DBSPH%n_inlet+DBSPH%n_outlet)
-   j= i-(DBSPH%n_w+DBSPH%n_inlet)  
+   j= i - (DBSPH%n_w + DBSPH%n_inlet)  
    pg_w(i)%coord(:) = DBSPH%outlet_sections(j,1:3)
    pg_w(i)%cella = ParticleCellNumber(pg_w(i)%coord)
    pg_w(i)%vel(:) = 0.d0
@@ -121,9 +139,9 @@ do i=(DBSPH%n_w+DBSPH%n_inlet+1),(DBSPH%n_w+DBSPH%n_inlet+DBSPH%n_outlet)
    pg_w(i)%adjacent_faces(:) = 0
 end do
 !$omp end parallel do
+!------------------------
 ! Deallocations
-
+!------------------------
 return
 end subroutine DBSPH_IC_surface_elements
-!end of the subroutine
 

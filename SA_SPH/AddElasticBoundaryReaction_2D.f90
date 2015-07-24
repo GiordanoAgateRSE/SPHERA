@@ -1,106 +1,102 @@
-!cfile AddElasticBoundaryReaction_2D.f90
-!************************************************************************************
-!                             S P H E R A 6.0.0 
-!
-!                      Smoothed Particle Hydrodynamics Code
-!
-!************************************************************************************
-!
-! File name     : AddElasticBoundaryReaction_2D
-!
-! Last updating : September 20, 2011
-!
-! Improvement traceback:
-!
-! ..  E.Bon, A. Di Monaco, S. Falappi  Initial development of the code
-! 00  Agate/Guandalini  28/08/07       Graphic windows calls removed
-! 01  Agate/Flamini     08/10/07       Check of entire code
-! 02  Agate/Guandalini  2008           Check and review entire code
-!
-!************************************************************************************
-! Module purpose : Module to compute the boundary integral IntWdS
-!
-! Calling routine: Loop_Irre_2D
-!
-! Called routines: 
-!
-!************************************************************************************
-!
-subroutine AddElasticBoundaryReaction_2D (npi, Ncbs, BoundReaction)
+!----------------------------------------------------------------------------------------------------------------------------------
+! SPHERA (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
+! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-; SPHERA has been authored for RSE SpA by 
+!    Andrea Amicarelli, Antonio Di Monaco, Sauro Manenti, Elia Bon, Daria Gatti, Giordano Agate, Stefano Falappi, 
+!    Barbara Flamini, Roberto Guandalini, David Zuccalà).
+! Main numerical developments of SPHERA: 
+!    Amicarelli et al. (2015,CAF), Amicarelli et al. (2013,IJNME), Manenti et al. (2012,JHE), Di Monaco et al. (2011,EACFM). 
+! Email contact: andrea.amicarelli@rse-web.it
 
-! Adds supplementariìy normal boundary reaction to reinforce insufficient
-! pressure gradient in case of few neighbouring particles and presence of
-! normal component of mass force (gravity)
-! The normal reaction is computed with the formula R=(c0^2/d) ln(zi/d) [for zi<d],
-! stemming from the compressible reaction of the fluid, where:
-! c0^2 = E/ro0 is the square celerity of the fluid;
-! zi is the distance of the particle Pi from the boundary face
-! d is a reference distance from which the reaction is added
+! This file is part of SPHERA.
+! SPHERA is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! SPHERA is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
+!----------------------------------------------------------------------------------------------------------------------------------
 
-!.. assign modules
-use GLOBAL_MODULE
-use AdM_USER_TYPE
-use ALLOC_MODULE
-!
-!.. Implicit Declarations ..
+!----------------------------------------------------------------------------------------------------------------------------------
+! Program unit: AddElasticBoundaryReaction_2D                                
+! Description: To add supplementariìy normal boundary reaction to support eventual insufficient pressure gradient boundary term. 
+!              in case of few neighbouring particles and presence of normal component of mass force (gravity).
+!              The normal reaction is computed with the formula R=(c0^2/d) ln(zi/d) [for zi<d], stemming from the compressible 
+!              reaction of the fluid, where:
+!                 c0^2 = E/ro0 is the square of the sound speed within the fluid;
+!                 zi is the distance of the particle Pi from the boundary face;
+!                 d is a reference distance from which the reaction is added.
+!              Check that the elastic boundary reaction never works.
+!              To compute the boundary integral IntWdS 
+!              (Di Monaco et al., 2011, EACFM).                        
+!----------------------------------------------------------------------------------------------------------------------------------
+
+subroutine AddElasticBoundaryReaction_2D(npi,Ncbs,BoundReaction)
+!------------------------
+! Modules
+!------------------------ 
+use Static_allocation_module
+use Hybrid_allocation_module
+use Dynamic_allocation_module
+!------------------------
+! Declarations
+!------------------------
 implicit none
-!
-!.. Local Parameters ..
-integer(4),      intent(IN)    :: npi, Ncbs
+integer(4),intent(IN) :: npi,Ncbs
 double precision,intent(INOUT),dimension(1:SPACEDIM) :: BoundReaction
-!
-!.. Local Parameters ..
 double precision,parameter :: ymincoeff = 0.25d0
 double precision,parameter :: reafactor = 1.0d0
-!
-!.. Local Scalars ..
-integer(4) :: sd, icbs, iside, nt, ibdt, ibdp, mate
-double precision :: xpi, ypi, ypimin, celer02, vin, normreact
-!
-!.. Executable Statements ..
-!
-  mate = pg(npi)%imed
-  ypimin = ymincoeff * Domain%dd
-  celer02 = Med(mate)%eps / Med(mate)%den0
-!
-  ibdt = BoundaryDataPointer(3,npi)
-  do icbs = 1, Ncbs
-!
-    ibdp = ibdt + icbs - 1
-    iside = BoundaryDataTab(ibdp)%CloBoNum
-    nt = BoundarySide(iside)%stretch
-!
-    if (Tratto(nt)%tipo == "fixe" .or. Tratto(nt)%tipo == "tapi") then
-!
+integer(4) :: sd,icbs,iside,nt,ibdt,ibdp,mate
+double precision :: xpi,ypi,ypimin,celer02,vin,normreact
+!------------------------
+! Explicit interfaces
+!------------------------
+!------------------------
+! Allocations
+!------------------------
+!------------------------
+! Initializations
+!------------------------
+mate = pg(npi)%imed
+ypimin = ymincoeff * Domain%dd
+celer02 = Med(mate)%eps / Med(mate)%den0
+ibdt = BoundaryDataPointer(3,npi)
+!------------------------
+! Statements
+!------------------------
+do icbs=1,Ncbs
+   ibdp = ibdt + icbs - 1
+   iside = BoundaryDataTab(ibdp)%CloBoNum
+   nt = BoundarySide(iside)%stretch
+   if (Tratto(nt)%tipo=="fixe".or.Tratto(nt)%tipo=="tapi") then
       xpi = BoundaryDataTab(ibdp)%LocXYZ(1)
       ypi = BoundaryDataTab(ibdp)%LocXYZ(2)
-!
-      if (ypi < ypimin) then
-!
-        if (xpi > zero .and. xpi < BoundarySide(iside)%Length) then  !La proiezione normale della particella npi sul piano
-                                                                     ! del lato "iside" è interna al lato "iside"
-          vin = zero
-          do sd = 1, SPACEDIM
-            vin = vin + pg(npi)%var(sd) * BoundarySide(iside)%T(sd, 3)
-          end do
-          if (vin < zero) then
-!            normreact = -reafactor * celer02 * DLog(ypi / ypimin) / ypimin
-            normreact = -reafactor * celer02 * DLog((Domain%h + ypi - ypimin) / Domain%h) / Domain%h
-            do sd = 1, SPACEDIM
-              BoundReaction(sd) = BoundReaction(sd) + normreact * BoundarySide(iside)%T(sd, 3)
-            end do
-          end if
-        end if
-      end if
-    end if
-  end do
-!
-!prova!
-!  BoundReaction = floor(BoundReaction * azzeramento) / azzeramento
-!  where (dabs(BoundReaction) < arrotondamento) BoundReaction = zero
-!prova!
-!
+      if (ypi<ypimin) then
+         if (xpi>zero.and.xpi<BoundarySide(iside)%Length) then  
+! The projection of the particle position, which is normal to the plane of the 
+! side "iside", is internal to "iside".
+            vin = zero
+            do sd=1,SPACEDIM
+               vin = vin + pg(npi)%var(sd) * BoundarySide(iside)%T(sd,3)
+            enddo
+            if (vin<zero) then
+               normreact = -reafactor * celer02 * DLog((Domain%h + ypi -       &
+                  ypimin) / Domain%h) / Domain%h
+               do sd=1 SPACEDIM
+                  BoundReaction(sd) = BoundReaction(sd) + normreact *          &
+                     BoundarySide(iside)%T(sd,3)
+               enddo
+            endif
+         endif
+      endif
+   endif
+enddo
+!------------------------
+! Deallocations
+!------------------------
 return 
 end subroutine AddElasticBoundaryReaction_2D
-!---split
 

@@ -1,50 +1,80 @@
-!cfile GetToken.f90
-!************************************************************************************
-!                             S P H E R A 6.0.0 
-!
-!                      Smoothed Particle Hydrodynamics Code
-!
-!************************************************************************************
+!----------------------------------------------------------------------------------------------------------------------------------
+! SPHERA (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
+! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-; SPHERA has been authored for RSE SpA by 
+!    Andrea Amicarelli, Antonio Di Monaco, Sauro Manenti, Elia Bon, Daria Gatti, Giordano Agate, Stefano Falappi, 
+!    Barbara Flamini, Roberto Guandalini, David Zuccalà).
+! Main numerical developments of SPHERA: 
+!    Amicarelli et al. (2015,CAF), Amicarelli et al. (2013,IJNME), Manenti et al. (2012,JHE), Di Monaco et al. (2011,EACFM). 
+! Email contact: andrea.amicarelli@rse-web.it
+
+! This file is part of SPHERA.
+! SPHERA is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! SPHERA is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
+!----------------------------------------------------------------------------------------------------------------------------------
+
+!----------------------------------------------------------------------------------------------------------------------------------
+! Program unit: GetToken                                           
+! Description: 
+!----------------------------------------------------------------------------------------------------------------------------------
+
 character(80) function GetToken(ainp,itok,ioerr)
+!------------------------
+! Modules
+!------------------------ 
+!------------------------
+! Declarations
+!------------------------
 implicit none
-!
+integer(4) :: itok,ioerr
 character(*) :: ainp
-integer(4)   :: itok, ioerr
-integer(4)   :: n
-!
-integer(4)   :: number_token
-integer(4), dimension(2,20) :: index_token
-logical      :: blank 
-!
- number_token = 0
- index_token  = 0
- blank        = .TRUE.
-
- do n = 1, len_trim(ainp)
- 
-   !if ( ainp(n:n) == "!" ) exit  !Commento dopo i dati
-    if ( blank .AND. (ainp(n:n) /= " ") ) then
-       number_token = number_token + 1
-       index_token(1,number_token) = n
-       index_token(2,number_token) = n
-       blank = .FALSE.
-    else if ( .NOT.blank .AND. (ainp(n:n) /= " ") ) then
-       index_token(2,number_token) = n
-    else if ( ainp(n:n) == " " ) then 
-       blank = .TRUE.
-    end if
-
- end do
-
- if ( itok <= number_token ) then
-    ioerr = 0
-    GetToken = ainp( index_token(1,itok):index_token(2,itok) )
- else
-    ioerr = itok
-    GetToken = ""
- end if
-!
+logical :: blank
+integer(4) :: n,number_token
+integer(4),dimension(2,20) :: index_token
+!------------------------
+! Explicit interfaces
+!------------------------
+!------------------------
+! Allocations
+!------------------------
+!------------------------
+! Initializations
+!------------------------
+number_token = 0
+index_token  = 0
+blank = .TRUE.
+!------------------------
+! Statements
+!------------------------
+do n=1,len_trim(ainp)
+   if ((blank).and.(ainp(n:n)/=" ")) then
+      number_token = number_token + 1
+      index_token(1,number_token) = n
+      index_token(2,number_token) = n
+      blank = .FALSE.
+      elseif ((.not.blank).and.(ainp(n:n)/=" ")) then
+         index_token(2,number_token) = n
+         elseif (ainp(n:n)==" ") then 
+         blank = .TRUE.
+   endif
+end do
+if (itok<=number_token) then
+   ioerr = 0
+   GetToken = ainp(index_token(1,itok):index_token(2,itok))
+   else
+   ioerr = itok
+   GetToken = ""
+endif
+!------------------------
+! Deallocations
+!------------------------
 return
 end function GetToken
-!---split
 

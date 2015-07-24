@@ -1,78 +1,81 @@
-!cfile defcolpartzero.f90
-!************************************************************************************
-!                             S P H E R A 6.0.0 
-!
-!                      Smoothed Particle Hydrodynamics Code
-!
-!************************************************************************************
-!
-! File name     : defcolpartzero
-!
-! Last updating : September 20, 2011
-!
-! Improvement traceback:
-!
-! ..  E.Bon, A. Di Monaco, S. Falappi  Initial development of the code
-! 00  Agate/Guandalini  28/08/07       Graphic windows calls removed
-! 01  Agate/Flamini     08/10/07       Check of entire code
-! 02  Agate/Guandalini  2008           Check and review entire code
-!
-!************************************************************************************
-! Module purpose : Module for particle color definition as from input file
-!
-! Calling routine: GenerateSourceParticles_2D, GenerateSourceParticles_3D
-!                  SetParticles
-!
-! Called routines: 
-!
-!************************************************************************************
-!
+!----------------------------------------------------------------------------------------------------------------------------------
+! SPHERA (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
+! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-; SPHERA has been authored for RSE SpA by 
+!    Andrea Amicarelli, Antonio Di Monaco, Sauro Manenti, Elia Bon, Daria Gatti, Giordano Agate, Stefano Falappi, 
+!    Barbara Flamini, Roberto Guandalini, David Zuccalà).
+! Main numerical developments of SPHERA: 
+!    Amicarelli et al. (2015,CAF), Amicarelli et al. (2013,IJNME), Manenti et al. (2012,JHE), Di Monaco et al. (2011,EACFM). 
+! Email contact: andrea.amicarelli@rse-web.it
+
+! This file is part of SPHERA.
+! SPHERA is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! SPHERA is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
+!----------------------------------------------------------------------------------------------------------------------------------
+
+!----------------------------------------------------------------------------------------------------------------------------------
+! Program unit: defcolpartzero                   
+! Description:  On the particle colours for visualization purposes.               
+!----------------------------------------------------------------------------------------------------------------------------------
+
 subroutine defcolpartzero (ir,partz,pg)
-!* definisce colore particella nello stato zero
-!
-!.. assign modules
-use GLOBAL_MODULE
-use AdM_USER_TYPE
-!
-!.. Implicit Declarations ..
+!------------------------
+! Modules
+!------------------------ 
+use Static_allocation_module
+use Hybrid_allocation_module
+!------------------------
+! Declarations
+!------------------------
 implicit none
-!
-!.. Formal Arguments ..
-integer(4),       intent(IN)                         :: ir
-type (TyZone),    intent(IN),   dimension(NPartZone) :: partz
-type (TyParticle),intent(INOUT)                      :: pg
-!
-!.. Local Scalars ..
-integer(4)       :: nbande, numbanda
+integer(4),intent(IN) :: ir
+type (TyZone),intent(IN),dimension(NPartZone) :: partz
+type (TyParticle),intent(INOUT) :: pg
+integer(4) :: nbande, numbanda
 double precision :: aldx
-!
-!.. Local Arrays ..
-integer(4), dimension(5) :: iclnumb
-!
-!.. Executable Statements ..
-!
- iclnumb(1)=1
- iclnumb(2)=2
- iclnumb(3)=4
- iclnumb(4)=5
- iclnumb(5)=6
-
- if ( partz(ir)%bend == "u")then        ! color uniform
-    pg%icol = partz(ir)%icol
-
- else if ( partz(ir)%bend == "o")then   ! color optional (solo su opzione esterna)
-    pg%icol = partz(ir)%icol
-
- else if(partz(ir)%bend == "b")then     ! bande verticali
-    nbande = partz(ir)%icol
-    aldx   =( partz(ir)%coordMM(1,2)-partz(ir)%coordMM(1,1))/nbande
-    numbanda = int((pg%coord(1)-partz(ir)%coordMM(1,1))/aldx)+1
-    numbanda = min(nbande,numbanda)
-    numbanda = max(0,numbanda)
-    pg%icol = iclnumb(numbanda)
- end if
-
+integer(4),dimension(5) :: iclnumb
+!------------------------
+! Explicit interfaces
+!------------------------
+!------------------------
+! Allocations
+!------------------------
+!------------------------
+! Initializations
+!------------------------
+iclnumb(1)=1
+iclnumb(2)=2
+iclnumb(3)=4
+iclnumb(4)=5
+iclnumb(5)=6
+!------------------------
+! Statements
+!------------------------
+if (partz(ir)%bend=="u") then        
+! Uniform color 
+   pg%icol = partz(ir)%icol
+   elseif (partz(ir)%bend=="o")then   
+! Colour based on external option 
+      pg%icol = partz(ir)%icol
+      elseif(partz(ir)%bend=="b") then
+! Vertical strips 
+         nbande = partz(ir)%icol
+         aldx = (partz(ir)%coordMM(1,2) - partz(ir)%coordMM(1,1)) / nbande
+         numbanda = int((pg%coord(1) - partz(ir)%coordMM(1,1)) / aldx) + 1
+         numbanda = min(nbande,numbanda)
+         numbanda = max(0,numbanda)
+         pg%icol = iclnumb(numbanda)
+endif
+!------------------------
+! Deallocations
+!------------------------
 return
 end subroutine defcolpartzero
-!---split
 

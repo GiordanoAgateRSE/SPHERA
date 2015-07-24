@@ -1,97 +1,90 @@
-!cfile LocalNormalCoordinates.f90
-!************************************************************************************
-!                             S P H E R A 6.0.0 
-!
-!                      Smoothed Particle Hydrodynamics Code
-!
-!************************************************************************************
-!
-! File name     : LocalNormalCoordinates
-!
-! Last updating : September 20, 2011
-!
-! Improvement traceback:
-!
-! ..  E.Bon, A. Di Monaco, S. Falappi  Initial development of the code
-! 00  Agate/Guandalini  28/08/07       Graphic windows calls removed
-! 01  Agate/Flamini     08/10/07       Check of entire code
-! 02  Agate/Guandalini  2008           Check and review entire code
-!
-!************************************************************************************
-! Module purpose : Module that Given the local coordinates PX(1 to 2) of a point P
-!                  laing on the plane of the boundary face nf, the procedure
-!                  computes in csi(1 to 3) the normal coordinates of the point Q
-!                  corresponding to P in the inverse linear tranformation
-!
-! Calling routine: AddElasticBoundaryReaction_3D, ComputeBoundaryVolumeIntegrals_P0,
-!                  FindCloseBoundaryFaces3D, CancelOutgoneParticles_3D, IsParticleInternal3D
-! 
-! Called routines: 
-!
-!************************************************************************************
-!
+!----------------------------------------------------------------------------------------------------------------------------------
+! SPHERA (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
+! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-; SPHERA has been authored for RSE SpA by 
+!    Andrea Amicarelli, Antonio Di Monaco, Sauro Manenti, Elia Bon, Daria Gatti, Giordano Agate, Stefano Falappi, 
+!    Barbara Flamini, Roberto Guandalini, David Zuccalà).
+! Main numerical developments of SPHERA: 
+!    Amicarelli et al. (2015,CAF), Amicarelli et al. (2013,IJNME), Manenti et al. (2012,JHE), Di Monaco et al. (2011,EACFM). 
+! Email contact: andrea.amicarelli@rse-web.it
+
+! This file is part of SPHERA.
+! SPHERA is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! SPHERA is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
+!----------------------------------------------------------------------------------------------------------------------------------
+
+!----------------------------------------------------------------------------------------------------------------------------------
+! Program unit: LocalNormalCoordinates  
+! Description: Given the local coordinates PX(1 to 2) of a point P laying on the plane of the boundary face nf, the procedure
+!              assigns to csi(1 to 3) the normal coordinates of the point Q corresponding to P in the inverse linear tranformation.  
+!----------------------------------------------------------------------------------------------------------------------------------
+
 subroutine LocalNormalCoordinates ( PX, csi, nf )
-!Given the local coordinates PX(1 to 2) of a point P laing on the plane
-!of the boundary face nf, the procedure
-!computes in csi(1 to 3) the normal coordinates of the point Q
-!corresponding to P in the inverse linear tranformation
-!
-!.. assign modules
-use GLOBAL_MODULE
-use AdM_User_Type
-use ALLOC_MODULE
-!
-!.. Implicit Declarations ..
-  implicit none
-!
-!.. Formal Arguments ..
-double precision,intent(IN),   dimension(1:SPACEDIM) :: PX
+!------------------------
+! Modules
+!------------------------ 
+use Static_allocation_module
+use Hybrid_allocation_module
+use Dynamic_allocation_module
+!------------------------
+! Declarations
+!------------------------
+implicit none
+integer(4),intent(IN) :: nf
+double precision,intent(IN), dimension(1:SPACEDIM) :: PX
 double precision,intent(INOUT),dimension(1:SPACEDIM) :: csi
-integer(4),      intent(IN)                          :: nf
-!
-!.. Local Scalars ..
-integer(4)       :: i, j, k, nodes, fkod
-double precision :: AA, BB, CC, DueArea, UsuDueArea, xj, yj, xk, yk
-!
-!.. Local Arrays ..
+integer(4) :: i,j,k,nodes,fkod
+double precision :: AA,BB,CC,DueArea,UsuDueArea,xj,yj,xk,yk
 integer(4), dimension(3)   :: iseg = (/ 2,3,1 /)
-integer(4), dimension(2,3) :: mainod ! = (/ 1,1, 2,3, 3,4 /) ! modifica per compatibilita xlf90
-!
-!.. Executable Statements ..
-!
-! modifica per compatibilita xlf90
-  mainod(1, 1) = 1
-  mainod(1, 2) = 2
-  mainod(1, 3) = 3
-  mainod(2, 1) = 1
-  mainod(2, 2) = 3
-  mainod(2, 3) = 4
-! fine modifica
-!
-  nodes = 4
-  if ( BoundaryFace(nf)%Node(4)%name <= 0 ) nodes = 3
-  fkod = nodes - 2                    !=1 (triangolo), =2 (parallelogramma)
-  DueArea = (3 - fkod) * BoundaryFace(nf)%Area
-  UsuDueArea = one / DueArea
-  do i = 1, 2
-    j = iseg(i)
-    k = iseg(j)
-    xj = BoundaryFace(nf)%Node(mainod(fkod, j))%LX(1)
-    yj = BoundaryFace(nf)%Node(mainod(fkod, j))%LX(2)
-    xk = BoundaryFace(nf)%Node(mainod(fkod, k))%LX(1)
-    yk = BoundaryFace(nf)%Node(mainod(fkod, k))%LX(2)
-!
-    AA = xj * yk - xk * yj
-    BB = yj - yk
-    CC = xk - xj
-!
-    csi(i) = (AA + BB * PX(1) + CC * PX(2)) * UsuDueArea
-  end do
-!
-  csi(3) = one - (csi(1) + csi(2))
-!
+integer(4), dimension(2,3) :: mainod 
+!------------------------
+! Explicit interfaces
+!------------------------
+!------------------------
+! Allocations
+!------------------------
+!------------------------
+! Initializations
+!------------------------
+! Modification for compatibility xlf90 (IBM compiler): start
+mainod(1,1) = 1
+mainod(1,2) = 2
+mainod(1,3) = 3
+mainod(2,1) = 1
+mainod(2,2) = 3
+mainod(2,3) = 4
+! Modification for compatibility xlf90 (IBM compiler): end
+nodes = 4
+if (BoundaryFace(nf)%Node(4)%name<=0) nodes = 3
+fkod = nodes - 2                    ! = 1 (triangle), =2 (quadrilateral)
+DueArea = (3 - fkod) * BoundaryFace(nf)%Area
+UsuDueArea = one / DueArea
+!------------------------
+! Statements
+!------------------------
+do i=1,2
+   j = iseg(i)
+   k = iseg(j)
+   xj = BoundaryFace(nf)%Node(mainod(fkod,j))%LX(1)
+   yj = BoundaryFace(nf)%Node(mainod(fkod,j))%LX(2)
+   xk = BoundaryFace(nf)%Node(mainod(fkod,k))%LX(1)
+   yk = BoundaryFace(nf)%Node(mainod(fkod,k))%LX(2)
+   AA = xj * yk - xk * yj
+   BB = yj - yk
+   CC = xk - xj
+   csi(i) = (AA + BB * PX(1) + CC * PX(2)) * UsuDueArea
+end do
+csi(3) = one - (csi(1) + csi(2))
+!------------------------
+! Deallocations
+!------------------------
 return
 end subroutine LocalNormalCoordinates
-
-!---split
 

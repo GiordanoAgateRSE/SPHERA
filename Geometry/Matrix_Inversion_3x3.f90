@@ -1,66 +1,75 @@
-!AA501b the whole subroutine
-!AA504 sub
-!cfile Body_dynamics.f90
-!************************************************************************************
-!                             S P H E R A 6.0.0 
+!----------------------------------------------------------------------------------------------------------------------------------
+! SPHERA (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
+! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-; SPHERA has been authored for RSE SpA by 
+!    Andrea Amicarelli, Antonio Di Monaco, Sauro Manenti, Elia Bon, Daria Gatti, Giordano Agate, Stefano Falappi, 
+!    Barbara Flamini, Roberto Guandalini, David Zuccalà).
+! Main numerical developments of SPHERA: 
+!    Amicarelli et al. (2015,CAF), Amicarelli et al. (2013,IJNME), Manenti et al. (2012,JHE), Di Monaco et al. (2011,EACFM). 
+! Email contact: andrea.amicarelli@rse-web.it
 
-!
-!                      Smoothed Particle Hydrodynamics Code
-!
-!************************************************************************************
-!
-! Module name     : Matrix_Inversion_3x3
-!
-!AA504 sub start
-! Versions: 
-! 01  Amicarelli      19Jul12       (creation) 
-! 02  Amicarelli      08apr14       (v5.04) treatment of bad conditioned matrices      
-!AA504 sub end
-!
-!************************************************************************************
-! Module purpose : computation of the inverse (inv) of a provided 3x3 matrix (mat)
-!
-! Calling routine: RHS_body_dynamics
-!
-! Called routines: /
-!
-!************************************************************************************
+! This file is part of SPHERA.
+! SPHERA is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! SPHERA is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
+!----------------------------------------------------------------------------------------------------------------------------------
 
-!AA504 sub
+!----------------------------------------------------------------------------------------------------------------------------------
+! Program unit: Matrix_Inversion_3x3  
+! Description: Computation of the inverse (inv) of a provided 3x3 matrix (mat).   
+!----------------------------------------------------------------------------------------------------------------------------------
+
 subroutine Matrix_Inversion_3x3(mat,inv,test)
-
+!------------------------
+! Modules
+!------------------------ 
+!------------------------
 ! Declarations
- implicit none
- double precision,intent(IN) :: mat(3,3) 
- double precision,intent(INOUT) :: inv(3,3)
-!AA504
-! integer(4),intent(inout),optional :: test  
- integer(4),intent(inout) :: test  
- double precision :: det
-
+!------------------------
+implicit none
+double precision,intent(IN) :: mat(3,3) 
+double precision,intent(INOUT) :: inv(3,3)
+integer(4),intent(inout) :: test  
+double precision :: det
+!------------------------
+! Explicit interfaces
+!------------------------
+!------------------------
+! Allocations
+!------------------------
+!------------------------
+! Initializations
+!------------------------
+!------------------------
 ! Statements
- det = mat(1,1)*mat(2,2)*mat(3,3) + mat(2,1)*mat(3,2)*mat(1,3) + mat(3,1)*mat(1,2)*mat(2,3) &
-      -mat(1,1)*mat(3,2)*mat(2,3) - mat(3,1)*mat(2,2)*mat(1,3) - mat(2,1)*mat(1,2)*mat(3,3)
-!AA504 start
- if (det.ne.0) then
- test = 1
-!AA504 end
- inv(1,1) = mat(2,2)*mat(3,3) - mat(2,3)*mat(3,2)
- inv(1,2) = mat(1,3)*mat(3,2) - mat(1,2)*mat(3,3)
- inv(1,3) = mat(1,2)*mat(2,3) - mat(1,3)*mat(2,2)
- inv(2,1) = mat(2,3)*mat(3,1) - mat(2,1)*mat(3,3)
- inv(2,2) = mat(1,1)*mat(3,3) - mat(1,3)*mat(3,1)
- inv(2,3) = mat(1,3)*mat(2,1) - mat(1,1)*mat(2,3)
- inv(3,1) = mat(2,1)*mat(3,2) - mat(2,2)*mat(3,1)
- inv(3,2) = mat(1,2)*mat(3,1) - mat(1,1)*mat(3,2)
- inv(3,3) = mat(1,1)*mat(2,2) - mat(1,2)*mat(2,1)
- inv(:,:) = inv(:,:) / det
-!AA504
- else
- test = 0
- endif
-
+!------------------------
+det = mat(1,1) * mat(2,2) * mat(3,3) + mat(2,1) * mat(3,2) * mat(1,3) +        &
+      mat(3,1) * mat(1,2) * mat(2,3) - mat(1,1) * mat(3,2) * mat(2,3) -        &
+      mat(3,1) * mat(2,2) * mat(1,3) - mat(2,1) * mat(1,2) * mat(3,3)
+if (det/=0.d0) then
+   test = 1
+   inv(1,1) = mat(2,2) * mat(3,3) - mat(2,3) * mat(3,2)
+   inv(1,2) = mat(1,3) * mat(3,2) - mat(1,2) * mat(3,3)
+   inv(1,3) = mat(1,2) * mat(2,3) - mat(1,3) * mat(2,2)   
+   inv(2,1) = mat(2,3) * mat(3,1) - mat(2,1) * mat(3,3)
+   inv(2,2) = mat(1,1) * mat(3,3) - mat(1,3) * mat(3,1)
+   inv(2,3) = mat(1,3) * mat(2,1) - mat(1,1) * mat(2,3)
+   inv(3,1) = mat(2,1) * mat(3,2) - mat(2,2) * mat(3,1)
+   inv(3,2) = mat(1,2) * mat(3,1) - mat(1,1) * mat(3,2)
+   inv(3,3) = mat(1,1) * mat(2,2) - mat(1,2) * mat(2,1)
+   inv(:,:) = inv(:,:) / det
+   else
+      test = 0
+endif
+!------------------------
+! Deallocations
+!------------------------
 return
 end subroutine Matrix_Inversion_3x3
-!---split
 

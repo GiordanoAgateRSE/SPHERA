@@ -1,135 +1,124 @@
-!cfile IsParticleInternal3D.f90
-!************************************************************************************
-!                             S P H E R A 6.0.0 
-!
-!                      Smoothed Particle Hydrodynamics Code
-!
-!************************************************************************************
-!
-! File name     : IsParticleInternal3D
-!
-! Last updating : September 20, 2011
-!
-! Improvement traceback:
-!
-! ..  E.Bon, A. Di Monaco, S. Falappi  Initial development of the code
-! 00  Agate/Guandalini  28/08/07       Graphic windows calls removed
-! 01  Agate/Flamini     08/10/07       Check of entire code
-! 02  Agate/Guandalini  2008           Check and review entire code
-!
-!************************************************************************************
-! Module purpose : Module check if a particle is internal to the domain 3D
-!
-! Calling routine: SetParticles
-!
-! Called routines: LocalNormalCoordinates
-!                  IsPointInternal
-!
-!************************************************************************************
-!
-Logical Function IsParticleInternal3D ( mib, PX, IsopraS )
-!
-!Checks if point Px() is internal to the perimeter mib;
-!in the affirmative returns 'true'; otherwise returns 'false'
-!The perimeter can be both convex and concave !!
-!
-!.. assign modules
-use GLOBAL_MODULE
-use AdM_USER_TYPE
-use ALLOC_MODULE
-!
-!.. Implicit Declarations ..
-  implicit none
-!
-!.. Local Parameters ..
-integer(4),parameter       :: intxy = 3
+!----------------------------------------------------------------------------------------------------------------------------------
+! SPHERA (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
+! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-; SPHERA has been authored for RSE SpA by 
+!    Andrea Amicarelli, Antonio Di Monaco, Sauro Manenti, Elia Bon, Daria Gatti, Giordano Agate, Stefano Falappi, 
+!    Barbara Flamini, Roberto Guandalini, David Zuccalà).
+! Main numerical developments of SPHERA: 
+!    Amicarelli et al. (2015,CAF), Amicarelli et al. (2013,IJNME), Manenti et al. (2012,JHE), Di Monaco et al. (2011,EACFM). 
+! Email contact: andrea.amicarelli@rse-web.it
+
+! This file is part of SPHERA.
+! SPHERA is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! SPHERA is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
+!----------------------------------------------------------------------------------------------------------------------------------
+
+!----------------------------------------------------------------------------------------------------------------------------------
+! Program unit: IsParticleInternal3D
+! Description: To check whether a particle is internal to the 3D domain or not. It checks if point Px() is internal to the 
+!              perimeter mib. It returns 'true' (positive check) or 'false'. The perimeter can be both convex or concave. 
+!----------------------------------------------------------------------------------------------------------------------------------
+
+Logical Function IsParticleInternal3D (mib,PX,IsopraS)
+!------------------------
+! Modules
+!------------------------ 
+use Static_allocation_module
+use Hybrid_allocation_module
+use Dynamic_allocation_module
+!------------------------
+! Declarations
+!------------------------
+implicit none
+integer(4),parameter :: intxy = 3
 double precision,parameter :: eps = 0.001d0
-!
-!.. Formal Arguments ..
-integer(4),      intent(IN)   :: mib
+integer(4), intent(IN) :: mib
 double precision,intent(IN),dimension(SPACEDIM) :: PX
-integer(4),      intent(IN)   :: IsopraS
-!
-!.. Local Scalars ..
-integer(4)       :: kf, nf, i, j, sd, nnodes, norig
-integer(4)       :: Nints, IntSotto, IntSopra, fkod
+integer(4), intent(IN) :: IsopraS
+integer(4) :: kf,nf,i,j,sd,nnodes,norig,Nints,IntSotto,IntSopra,fkod
 double precision :: tpar
 double precision,dimension(SPACEDIM) :: P1, Pint, LPint
-double precision,dimension(3)        :: csi
-
-!Dynamic Array
+double precision,dimension(3) :: csi
 double precision,dimension(Tratto(mib)%numvertices) :: XYInts
-!
-!.. External Routines ..
 logical, external :: IsPointInternal
-!
-!.. Executable Statements ..
-!
- Nints    = 0
- IntSotto = 0
- IntSopra = 0
- IntSopra = IsopraS
- IsParticleInternal3D = .FALSE.
-
- do kf = Tratto(mib)%iniface, Tratto(mib)%iniface + Tratto(mib)%numvertices - 1
-
-    nf     = BFaceList(kf)
-    nnodes = 4
-    if ( BoundaryFace(nf)%Node(4)%name <= 0 ) nnodes = 3
-    norig  = nnodes                                      !nodo origine del sistema locale
-
-    do sd = 1, SPACEDIM
-       P1(sd) = Vertice(sd,BoundaryFace(nf)%Node(norig)%name)
-    end do
-    tpar = zero
-    do sd = 1, SPACEDIM
-       tpar = tpar + BoundaryFace(nf)%T(sd, 3) * (P1(sd) - PX(sd))
-    end do
-
-    if ( Abs(BoundaryFace(nf)%T(3, 3)) > eps ) then
-
-        tpar = tpar / BoundaryFace(nf)%T(3, 3)
-
-        do sd = 1, SPACEDIM                          !Pint()= coordinate globali del punto di intersezione
-           Pint(sd) = PX(sd)
-        end do
-        Pint(3) = Pint(3) + tpar
-
-        LPint = zero
-        do sd = 1, PLANEDIM                          !LPint()= coordinate locali del punto di intersezione
-           LPint(sd) = zero
-           do j = 1, SPACEDIM
-              LPint(sd) = LPint(sd) + BoundaryFace(nf)%T(j, sd) * (Pint(j) - P1(j))
-           end do
-        end do
-
-        call LocalNormalCoordinates ( LPint, csi, nf )
-
-        fkod = nnodes - 2
-        if ( IsPointInternal ( fkod, csi ) ) then    !Il punto di intersezione è interno alla faccia;
-                                                     !cioè la faccia interseca la verticale per Px.
-                                                     !Memorizza coordinata z di intersezione
-            Nints = Nints + 1
-            XYInts(Nints) = Pint(3)
-        end if
-    end if
-
- end do
-
- if ( Nints > 0 ) then
-    do i = 1, Nints
-       if ( XYInts(i) <= PX(intxy) ) then
-          IntSotto = IntSotto + 1
-       Else
-          IntSopra = IntSopra + 1
-       end if
-    end do
-    if ( Mod(IntSotto,2) == 1 .AND. Mod(IntSopra,2) == 1 ) then
-        IsParticleInternal3D = .TRUE.
-    end if
- end if
-
+!------------------------
+! Explicit interfaces
+!------------------------
+!------------------------
+! Allocations
+!------------------------
+!------------------------
+! Initializations
+!------------------------
+Nints = 0
+IntSotto = 0
+IntSopra = 0
+IntSopra = IsopraS
+IsParticleInternal3D = .FALSE.
+!------------------------
+! Statements
+!------------------------
+do kf=Tratto(mib)%iniface,(Tratto(mib)%iniface+Tratto(mib)%numvertices-1)
+   nf = BFaceList(kf)
+   nnodes = 4
+   if (BoundaryFace(nf)%Node(4)%name<=0) nnodes = 3
+! Node, which is the origin of the local system 
+   norig = nnodes 
+   do sd=1,SPACEDIM
+      P1(sd) = Vertice(sd,BoundaryFace(nf)%Node(norig)%name)
+   end do
+   tpar = zero
+   do sd=1,SPACEDIM
+      tpar = tpar + BoundaryFace(nf)%T(sd,3) * (P1(sd) - PX(sd))
+   end do
+   if (Abs(BoundaryFace(nf)%T(3,3))>eps) then
+      tpar = tpar / BoundaryFace(nf)%T(3,3)
+! Pint: global coordinates of the intersection point
+      do sd=1,SPACEDIM 
+         Pint(sd) = PX(sd)
+      end do
+      Pint(3) = Pint(3) + tpar
+      LPint = zero
+! LPint: local coordinates of the intersection point
+      do sd=1,PLANEDIM
+         LPint(sd) = zero
+         do j=1,SPACEDIM
+            LPint(sd) = LPint(sd) + BoundaryFace(nf)%T(j,sd) * (Pint(j) -      &
+                        P1(j))
+         end do
+      end do
+      call LocalNormalCoordinates(LPint,csi,nf)
+      fkod = nnodes - 2
+! The intersection point is internal to the face; i.e. the face intersepts 
+! the vertical line passing for Px. It saves the coordinate z of intersection.
+      if (IsPointInternal(fkod,csi)) then    
+         Nints = Nints + 1
+         XYInts(Nints) = Pint(3)
+      end if
+   end if
+end do
+if (Nints>0) then
+   do i=1,Nints
+      if (XYInts(i)<=PX(intxy)) then
+         IntSotto = IntSotto + 1
+         else
+            IntSopra = IntSopra + 1
+      end if
+   end do
+   if ((Mod(IntSotto,2)==1).AND.(Mod(IntSopra,2)==1)) then
+      IsParticleInternal3D = .TRUE.
+   end if
+end if
+!------------------------
+! Deallocations
+!------------------------
 return
-End Function IsParticleInternal3D
-!---split
+end Function IsParticleInternal3D
 

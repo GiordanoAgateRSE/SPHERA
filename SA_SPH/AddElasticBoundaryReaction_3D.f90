@@ -1,171 +1,159 @@
-!cfile AddElasticBoundaryReaction_3D.f90
-!************************************************************************************
-!                             S P H E R A 6.0.0 
-!
-!                      Smoothed Particle Hydrodynamics Code
-!
-!************************************************************************************
-!
-! File name     : AddElasticBoundaryReaction_3D
-!
-! Last updating : September 20, 2011
-!
-! Improvement traceback:
-!
-! ..  E.Bon, A. Di Monaco, S. Falappi  Initial development of the code
-! 00  Agate/Guandalini  28/08/07       Graphic windows calls removed
-! 01  Agate/Flamini     08/10/07       Check of entire code
-! 02  Agate/Guandalini  2008           Check and review entire code
-!
-!************************************************************************************
-! Module purpose : Module to compute the boundary integral IntWdS
-!
-! Calling routine: AddBoundaryContribution_to_CE3D
-!                  AddBoundaryContributions_to_ME3D
-!
-! Called routines: 
-!
-!************************************************************************************
-!
-subroutine AddElasticBoundaryReaction_3D (npi, Ncbf, BoundReaction)
+!----------------------------------------------------------------------------------------------------------------------------------
+! SPHERA (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
+! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-; SPHERA has been authored for RSE SpA by 
+!    Andrea Amicarelli, Antonio Di Monaco, Sauro Manenti, Elia Bon, Daria Gatti, Giordano Agate, Stefano Falappi, 
+!    Barbara Flamini, Roberto Guandalini, David Zuccalà).
+! Main numerical developments of SPHERA: 
+!    Amicarelli et al. (2015,CAF), Amicarelli et al. (2013,IJNME), Manenti et al. (2012,JHE), Di Monaco et al. (2011,EACFM). 
+! Email contact: andrea.amicarelli@rse-web.it
 
-! Adds supplementari normal boundary reaction to reinforce insufficient
-! pressure gradient in case of few neighbouring particles and presence of
-! normal component of mass force (gravity)
-! The normal reaction is computed with the formula R=(c0^2/d) ln(zi/d) [for zi<d],
-! stemming from the compressible reaction of the fluid, where:
-! c0^2 = E/ro0 is the square celerity of the fluid;
-! zi is the distance of the particle Pi from the boundary face
-! d is a reference distance from which the reaction is added
+! This file is part of SPHERA.
+! SPHERA is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! SPHERA is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
+!----------------------------------------------------------------------------------------------------------------------------------
 
-!.. assign modules
-use GLOBAL_MODULE
-use AdM_USER_TYPE
-use ALLOC_MODULE
-!
-!.. Implicit Declarations ..
+!----------------------------------------------------------------------------------------------------------------------------------
+! Program unit: AddElasticBoundaryReaction_3D                                
+! Description: To add supplementariìy normal boundary reaction to support eventual insufficient pressure gradient boundary term. 
+!              in case of few neighbouring particles and presence of normal component of mass force (gravity).
+!              The normal reaction is computed with the formula R=(c0^2/d) ln(zi/d) [for zi<d], stemming from the compressible 
+!              reaction of the fluid, where:
+!                 c0^2 = E/ro0 is the square of the sound speed within the fluid;
+!                 zi is the distance of the particle Pi from the boundary face;
+!                 d is a reference distance from which the reaction is added.
+!              Check that the elastic boundary reaction never works.
+!              (Di Monaco et al., 2011, EACFM).                        
+!----------------------------------------------------------------------------------------------------------------------------------
+
+subroutine AddElasticBoundaryReaction_3D(npi,Ncbf,BoundReaction)
+!------------------------
+! Modules
+!------------------------ 
+use Static_allocation_module
+use Hybrid_allocation_module
+use Dynamic_allocation_module
+!------------------------
+! Declarations
+!------------------------
 implicit none
-!
-!.. Local Parameters ..
-integer(4),      intent(IN)    :: npi, Ncbf
+integer(4),intent(IN) :: npi, Ncbf
 double precision,intent(INOUT),dimension(1:SPACEDIM) :: BoundReaction
-!
-!.. Local Parameters ..
 double precision,parameter :: zmincoeff = 0.25d0
 double precision,parameter :: reafactor = 1.0d0
-!
-!.. Local Scalars ..
-integer(4) :: sd, icbf, iface, nt, ibdt, ibdp, mate, fkod
-integer(4) :: ne, NCloseEdgeF
-double precision :: zi, zimin, celer02, vin, normreact
-double precision :: scaprod, edgelen2, tau, edgedist2
-!
-!.. Local Arrays ..
-double precision,dimension(1:SPACEDIM)   :: PXLoc, csi
-double precision,dimension(1:SPACEDIM)   :: XQ, QP, QPcosdir
-logical, dimension(1:Domain%MAXCLOSEBOUNDFACES) :: ReaFace
-!
-! External functions and subrotuines
-logical, external    :: IsPointInternal
-!
-!.. Executable Statements ..
-!
-  BoundReaction = zero
-  mate = pg(npi)%imed
-  zimin = zmincoeff * Domain%dd
-  celer02 = Med(mate)%eps / Med(mate)%den0
-!
-  ibdt = BoundaryDataPointer(3,npi)
-  do icbf = 1, Ncbf
-!
-    ibdp = ibdt + icbf - 1
-    iface = BoundaryDataTab(ibdp)%CloBoNum
-    nt = BoundaryFace(iface)%stretch
-!
-    ReaFace(icbf) = .false.
-!
-    if (Tratto(nt)%tipo == "fixe" .or. Tratto(nt)%tipo == "tapi") then
-!
+integer(4) :: sd,icbf,iface,nt,ibdt,ibdp,mate,fkod,ne,NCloseEdgeF
+double precision :: zi,zimin,celer02,vin,normreact 
+double precision :: scaprod,edgelen2,tau,edgedist2
+logical,dimension(1:Domain%MAXCLOSEBOUNDFACES) :: ReaFace
+double precision,dimension(1:SPACEDIM) :: PXLoc,csi,XQ,QP,QPcosdir
+logical,external :: IsPointInternal
+!------------------------
+! Explicit interfaces
+!------------------------
+!------------------------
+! Allocations
+!------------------------
+!------------------------
+! Initializations
+!------------------------
+BoundReaction = zero
+mate = pg(npi)%imed
+zimin = zmincoeff * Domain%dd
+celer02 = Med(mate)%eps / Med(mate)%den0
+ibdt = BoundaryDataPointer(3,npi)
+!------------------------
+! Statements
+!------------------------
+do icbf=1,Ncbf
+   ibdp = ibdt + icbf - 1
+   iface = BoundaryDataTab(ibdp)%CloBoNum
+   nt = BoundaryFace(iface)%stretch
+   ReaFace(icbf) = .false.
+   if (Tratto(nt)%tipo=="fixe".or.Tratto(nt)%tipo=="tapi") then
       PXLoc(:) = BoundaryDataTab(ibdp)%LocXYZ(:)
       zi = PXLoc(3)
-!
-      if (zi < zimin) then
-!
-        call LocalNormalCoordinates (PXLoc, csi, iface)
-        fkod = BoundaryFace(iface)%nodes - 2
-!
-        if (IsPointInternal(fkod, csi)) then    !La proiezione normale della particella npi sul piano
-                                                ! della faccia "iface" è interna alla faccia "iface"
-          vin = zero
-          do sd = 1,SPACEDIM
-            vin = vin + pg(npi)%var(sd) * BoundaryFace(iface)%T(sd, 3)
-          end do
-          if (vin < zero) then
-!!!            normreact = -reafactor * celer02 * DLog(zi / zimin) / zimin
-            normreact = -reafactor * celer02 * DLog((Domain%h + zi - zimin) / Domain%h) / Domain%h
-            BoundReaction(:) = BoundReaction(:) + normreact * BoundaryFace(iface)%T(:, 3)
-          end if
-          ReaFace(icbf) = .true.
-        else
-          ReaFace(icbf) = .false.
-        end if
-      end if
-    end if
-  end do
-!
-!.. Reazione da eventuali spigoli (edges) vicini
-  do ne = 1, NumBEdges
-    !.. Verifica se la particella è vicina ad almeno una delle facce comuni allo spigolo ne
-    NCloseEdgeF = 0
-    
-    ibdt = BoundaryDataPointer(3,npi)
-    do icbf = 1, Ncbf
-!
+      if (zi<zimin) then
+         call LocalNormalCoordinates (PXLoc, csi, iface)
+         fkod = BoundaryFace(iface)%nodes - 2
+         if (IsPointInternal(fkod, csi)) then 
+! The projection of the particle position, which is normal to the plane of the 
+! face "iface", is internal to "iface".
+            vin = zero
+            do sd=1,SPACEDIM
+               vin = vin + pg(npi)%var(sd) * BoundaryFace(iface)%T(sd,3)
+            enddo
+            if (vin<zero) then
+               normreact = -reafactor * celer02 * DLog((Domain%h + zi - zimin) &
+                  / Domain%h) / Domain%h
+               BoundReaction(:) = BoundReaction(:) + normreact *               &
+                  BoundaryFace(iface)%T(:, 3)
+            endif
+            ReaFace(icbf) = .true.
+            else
+               ReaFace(icbf) = .false.
+         endif
+      endif
+   endif
+enddo
+! Reaction from possible close edges
+do ne=1,NumBEdges
+! To check if the particle is close to at least one of the faces to which the 
+! side belongs 
+   NCloseEdgeF = 0
+   ibdt = BoundaryDataPointer(3,npi)
+   do icbf=1,Ncbf
       ibdp = ibdt + icbf - 1
       iface = BoundaryDataTab(ibdp)%CloBoNum
-      if (iface == BoundaryConvexEdge(ne)%face(1) .and. .Not. ReaFace(icbf)) then
-        NCloseEdgeF = NCloseEdgeF + 1
-      else if (iface == BoundaryConvexEdge(ne)%face(2) .and. .Not. ReaFace(icbf)) then
-        NCloseEdgeF = NCloseEdgeF + 1
-      end if
-    end do
-    if (NCloseEdgeF /= 2) return
-    
-    !..Distanza zi della particella npi dallo spigolo ne
-    scaprod = zero
-    do sd = 1,SPACEDIM
-      scaprod = scaprod + (pg(npi)%Coord(sd) - BoundaryConvexEdge(ne)%node(1)%GX(sd)) * BoundaryConvexEdge(ne)%component(sd)
-    end do
-    edgelen2 = BoundaryConvexEdge(ne)%length * BoundaryConvexEdge(ne)%length
-    tau = scaprod / edgelen2
-    if (tau >= zero .and. tau <= one) then
+      if ((iface==BoundaryConvexEdge(ne)%face(1)).and.(.Not. ReaFace(icbf)))   &
+         then
+         NCloseEdgeF = NCloseEdgeF + 1
+         elseif ((iface==BoundaryConvexEdge(ne)%face(2)).and.                  &
+            (.not.ReaFace(icbf))) then
+            NCloseEdgeF = NCloseEdgeF + 1
+      endif
+   enddo
+   if (NCloseEdgeF/=2) return
+! Distance "zi" between the particle "npi" and the side "ne"
+   scaprod = zero
+   do sd=1,SPACEDIM
+      scaprod = scaprod + (pg(npi)%Coord(sd) -                                 &
+         BoundaryConvexEdge(ne)%node(1)%GX(sd)) *                              &
+         BoundaryConvexEdge(ne)%component(sd)
+   enddo
+   edgelen2 = BoundaryConvexEdge(ne)%length * BoundaryConvexEdge(ne)%length
+   tau = scaprod / edgelen2
+   if ((tau>=zero).and.(tau<=one)) then
       edgedist2 = zero
-      XQ(:) = BoundaryConvexEdge(ne)%node(1)%GX(:) + BoundaryConvexEdge(ne)%component(:) * tau
+      XQ(:) = BoundaryConvexEdge(ne)%node(1)%GX(:) +                           &
+         BoundaryConvexEdge(ne)%component(:) * tau
       QP(:) = pg(npi)%Coord(:) - XQ(:)
-      do sd = 1,SPACEDIM
-        edgedist2 = edgedist2 + QP(sd) * QP(sd)
-      end do
+      do sd=1,SPACEDIM
+         edgedist2 = edgedist2 + QP(sd) * QP(sd)
+      enddo
       zi = Dsqrt(edgedist2)
-      if (zi < zimin) then
-        vin = zero
-        QPcosdir(:) = QP(:) / zi
-        do sd = 1,SPACEDIM
-          vin = vin + pg(npi)%var(sd) * QPcosdir(sd)
-        end do
-        if (vin < zero) then
-          normreact = -reafactor * celer02 * DLog(zi / zimin) / zimin
-          BoundReaction(:) = BoundReaction(:) +  normreact * QPcosdir(:)
-        end if
-      end if
-    end if
-  end do
-!
-!prova!
-!  BoundReaction = floor(BoundReaction * azzeramento) / azzeramento
-!  where (dabs(BoundReaction) < arrotondamento) BoundReaction = zero
-!prova!
-!
+      if (zi<zimin) then
+         vin = zero
+         QPcosdir(:) = QP(:) / zi
+         do sd=1,SPACEDIM
+            vin = vin + pg(npi)%var(sd) * QPcosdir(sd)
+         enddo
+         if (vin<zero) then
+            normreact = -reafactor * celer02 * DLog(zi / zimin) / zimin
+            BoundReaction(:) = BoundReaction(:) +  normreact * QPcosdir(:)
+         endif
+      endif
+   endif
+enddo
+!------------------------
+! Deallocations
+!------------------------
 return 
 end subroutine AddElasticBoundaryReaction_3D
-!---split
 

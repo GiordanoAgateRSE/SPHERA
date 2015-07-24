@@ -1,100 +1,85 @@
-!cfile viscomon.f90
+!----------------------------------------------------------------------------------------------------------------------------------
+! SPHERA (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
+! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-; SPHERA has been authored for RSE SpA by 
+!    Andrea Amicarelli, Antonio Di Monaco, Sauro Manenti, Elia Bon, Daria Gatti, Giordano Agate, Stefano Falappi, 
+!    Barbara Flamini, Roberto Guandalini, David Zuccalà).
+! Main numerical developments of SPHERA: 
+!    Amicarelli et al. (2015,CAF), Amicarelli et al. (2013,IJNME), Manenti et al. (2012,JHE), Di Monaco et al. (2011,EACFM). 
+! Email contact: andrea.amicarelli@rse-web.it
 
-!************************************************************************************
-!                             S P H E R A 6.0.0 
-!
-!                      Smoothed Particle Hydrodynamics Code
-!
-!************************************************************************************
-!
-! File name     : viscomon
-!
-! Last updating : September 20, 2011
-!
-! Improvement traceback:
-!
-! ..  E.Bon, A. Di Monaco, S. Falappi  Initial development of the code
-! 00  Agate/Guandalini  28/08/07       Graphic windows calls removed
-! 01  Agate/Flamini     08/10/07       Check of entire code
-! 02  Agate/Guandalini  2008           Check and review entire code
-!AA504
-! 03  Amicarelli        08Apr14        (v5.04) Modifications for Monaghan's viscosisty (active also for separating elements) and 
-!                                      neglection of the molecular viscosity depending on the velocity divergence (momentum equation)
-!
-!************************************************************************************
-! Module purpose : Module to 
-! 
-! Calling routine: inter_EqMoto
-!
-! Called routines: 
+! This file is part of SPHERA.
+! SPHERA is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! SPHERA is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
+!----------------------------------------------------------------------------------------------------------------------------------
 
-!
-!************************************************************************************
-!
+!----------------------------------------------------------------------------------------------------------------------------------
+! Program unit: viscomon 
+! Description: Monaghan (2005) artificial viscosity term. It is also active for separating particles. Volume viscosity term 
+!              is neglected in the momentum equation.     
+!----------------------------------------------------------------------------------------------------------------------------------
+
 subroutine viscomon (npi,npj,npartint,dervel,rvwalfa,rvwbeta)
-
-!
-!.. assign modules
-use GLOBAL_MODULE
-use AdM_USER_TYPE
-use ALLOC_MODULE
-!
-!.. Implicit Declarations ..
+!------------------------
+! Modules
+!------------------------ 
+use Static_allocation_module
+use Hybrid_allocation_module
+use Dynamic_allocation_module
+!------------------------
+! Declarations
+!------------------------
 implicit none
-!
-!.. Formal Arguments ..
-integer(4),      intent(IN)  :: npi
-integer(4),      intent(IN)  :: npj
-integer(4),      intent(IN)  :: npartint
-double precision,intent(IN)  :: dervel(3)
-double precision,intent(OUT) :: rvwalfa(3), rvwbeta(3)
-!
-!.. Local Scalars ..
+integer(4), intent(IN)  :: npi,npj,npartint
+double precision,intent(IN) :: dervel(3)
+double precision,intent(OUT) :: rvwalfa(3),rvwbeta(3)
 double precision :: celtilde,rhotilde,amassj,vrij,TermMon
-!
-!.. Executable Statements ..
-!
- vrij = -dervel(1) * rag(1,npartint) - dervel(2) * rag(2,npartint) - dervel(3) * rag(3,npartint)
-!
-!AA504 removed part: Monaghan's term is always active even if particle detach themselves 
-   if ( pg(npj)%vel_type /= "std" ) then          !non part fix o altro
-     amassj   = pg(npi)%mass
-     rhotilde = two * pg(npi)%dens
-     celtilde = Med(pg(npi)%imed)%celerita + Med(pg(npi)%imed)%celerita
+!------------------------
+! Explicit interfaces
+!------------------------
+!------------------------
+! Allocations
+!------------------------
+!------------------------
+! Initializations
+!------------------------
+!------------------------
+! Statements
+!------------------------
+vrij = - dervel(1) * rag(1,npartint) - dervel(2) * rag(2,npartint) - dervel(3) &
+       * rag(3,npartint)
+! AA504 removed part: Monaghan's term is always active even if particle are 
+! separating 
+if (pg(npj)%vel_type/="std") then
+   amassj   = pg(npi)%mass
+   rhotilde = two * pg(npi)%dens
+   celtilde = Med(pg(npi)%imed)%celerita + Med(pg(npi)%imed)%celerita
    else
-     amassj   = pg(npj)%mass
-     rhotilde = pg(npi)%dens + pg(npj)%dens
-!........................................... 2011 mar 15
-     if (esplosione) then  !introdotto per stabilita' flushing
-       celtilde = pg(npi)%Csound + pg(npj)%Csound
-     else
-       celtilde = Med(pg(npi)%imed)%celerita + Med(pg(npj)%imed)%celerita
-     end if
-!........................................... 2011 mar 15
-   end if
-!
-!.. formula utilizzata nel nov 2007 come da letteratura
-   TermMon = Med(pg(npi)%imed)%alfaMon * celtilde * Domain%h / rhotilde
-
-!AA504 Molecular viscosity term depending on velocity divergence (compressible flows) can be neglected (and may causes several problems when activated)
-   rvwalfa(1:3) = amassj * TermMon * &
-                  vrij * rag(1:3,npartint) * PartKernel(2,npartint)
-
-!.. rvwbeta e' da verificare
-!   rvwbeta(1:3)= - amassj * two * Med(pg(npi)%imed)%betaMon * vrij*vrij * squareh / rhotilde & 
-!                 * (PartKernel(2,npartint)/PartKernel(1,npartint)*(PartKernel(2,npartint)/PartKernel(1,npartint)))
-   rvwbeta(1:3) = zero
-
-!
-!$$$$$$$$$$$$$$$$!prova_arrotondamento
-!if (it_corrente == 2 .and. npi > 16900 .and. npi < 17200) then
-!  write (99,*) ' it = ',it_corrente,' n. particella = ',npi,npj
-!  write (99,'(a,4d23.15)') ' viscomon   vrij,amassj,rhotilde,celtilde ',vrij,amassj,rhotilde,celtilde
-!  write (99,'(a,3d23.15)') ' viscomon   rvwalfa ',rvwalfa
-!end if
-!$$$$$$$$$$$$$$$$!prova_arrotondamento
-!
+      amassj = pg(npj)%mass
+      rhotilde = pg(npi)%dens + pg(npj)%dens
+      if (esplosione) then  
+         celtilde = pg(npi)%Csound + pg(npj)%Csound
+         else
+         celtilde = Med(pg(npi)%imed)%celerita + Med(pg(npj)%imed)%celerita
+      end if
+end if
+TermMon = Med(pg(npi)%imed)%alfaMon * celtilde * Domain%h / rhotilde
+! Volume viscosity term (compressible flows)
+! can be neglected and may causes several problems when activated
+rvwalfa(1:3) = amassj * TermMon * vrij * rag(1:3,npartint) *                   &
+               PartKernel(2,npartint)
+! beta_Monaghan is not validated
+rvwbeta(1:3) = zero
+!------------------------
+! Deallocations
+!------------------------
 return
 end subroutine viscomon
-!---split
 

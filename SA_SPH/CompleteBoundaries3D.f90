@@ -1,79 +1,74 @@
-!cfile CompleteBoundaries3D.f90
-!************************************************************************************
-!                             S P H E R A 6.0.0 
-!
-!                      Smoothed Particle Hydrodynamics Code
-!
-!************************************************************************************
-!
-! File name     : CompleteBoundaries3D
-!
-! Last updating : September 20, 2011
-!
-! Improvement traceback:
-!
-! ..  E.Bon, A. Di Monaco, S. Falappi  Initial development of the code
-! 00  Agate/Guandalini  28/08/07       Graphic windows calls removed
-! 01  Agate/Flamini     08/10/07       Check of entire code
-! 02  Agate/Guandalini  2008           Check and review entire code
-!
-!************************************************************************************
-! Module purpose : Module to Compute and store complemetary data starting
-!                  from assigned data
-!
-! Calling routine: Gest_Input
-!
-! Called routines: 
-!
-!************************************************************************************
-!
+!----------------------------------------------------------------------------------------------------------------------------------
+! SPHERA (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
+! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-; SPHERA has been authored for RSE SpA by 
+!    Andrea Amicarelli, Antonio Di Monaco, Sauro Manenti, Elia Bon, Daria Gatti, Giordano Agate, Stefano Falappi, 
+!    Barbara Flamini, Roberto Guandalini, David Zuccalà).
+! Main numerical developments of SPHERA: 
+!    Amicarelli et al. (2015,CAF), Amicarelli et al. (2013,IJNME), Manenti et al. (2012,JHE), Di Monaco et al. (2011,EACFM). 
+! Email contact: andrea.amicarelli@rse-web.it
+
+! This file is part of SPHERA.
+! SPHERA is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! SPHERA is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
+!----------------------------------------------------------------------------------------------------------------------------------
+
+!----------------------------------------------------------------------------------------------------------------------------------
+! Program unit: CompleteBoundaries3D                                  
+! Description: (Di Monaco et al., 2011, EACFM)                        
+!----------------------------------------------------------------------------------------------------------------------------------
+
 subroutine CompleteBoundaries3D
-!Computes and stores complemetary data starting from assigned data
-!
-!.. assign modules
-use GLOBAL_MODULE
-use AdM_User_Type
-use ALLOC_MODULE
-!
-!.. Implicit Declarations ..
+!------------------------
+! Modules
+!------------------------ 
+use Static_allocation_module
+use Hybrid_allocation_module
+use Dynamic_allocation_module
+!------------------------
+! Declarations
+!------------------------
 implicit none
-!
-!.. Local Scalars ..
-integer(4) :: Kf, Nt, Nf
-!
-!.. Executable Statements ..
-!
-!Boundary face list
-!
- Kf = 0
- BFaceList(1:NumFacce) = 0
-!
-  do Nt = 1, NumTratti
-!
-    Tratto(Nt)%inivertex   = 0
-    Tratto(Nt)%numvertices = 0
-!
-    do Nf = 1, NumFacce
-!
-        if ( BoundaryFace(Nf)%stretch == Nt ) then
-!
-            Kf = Kf + 1
-            if ( Tratto(Nt)%iniface == 0 ) then !Stores initial face index
-               Tratto(Nt)%iniface = Kf
-!write(97,"(a,i5,a,i5)") "tratto",nt,"  iniface=",tratto(nt)%iniface
-            end if
-            BFaceList(Kf) = Nf
-!write(97,"(a,i5,a,i5)")  "BFaceList=(",kf,") =",Nf
-            Tratto(Nt)%numvertices = Tratto(Nt)%numvertices + 1
-        end if
-!
-    end do
-!write(97,"(a,i5,a,i5)") "tratto",nt,"  numvertices=",tratto(nt)%numvertices
- end do
-!
-!write(97,*) "Tratto%NumVertices"
-!write(97,"(10i8)") Tratto(1:NumTratti)%NumVertices
+integer(4) :: Kf,Nt,Nf
+!------------------------
+! Explicit interfaces
+!------------------------
+!------------------------
+! Allocations
+!------------------------
+!------------------------
+! Initializations
+!------------------------
+Kf = 0
+BFaceList(1:NumFacce) = 0
+!------------------------
+! Statements
+!------------------------
+do Nt=1,NumTratti
+   Tratto(Nt)%inivertex = 0
+   Tratto(Nt)%numvertices = 0
+   do Nf=1,NumFacce
+      if (BoundaryFace(Nf)%stretch==Nt) then
+         Kf = Kf + 1
+         if (Tratto(Nt)%iniface==0) then 
+! To store the initial face index
+            Tratto(Nt)%iniface = Kf
+         endif
+         BFaceList(Kf) = Nf
+         Tratto(Nt)%numvertices = Tratto(Nt)%numvertices + 1
+      endif
+   enddo
+enddo
+!------------------------
+! Deallocations
+!------------------------
 return
 end subroutine CompleteBoundaries3D
-!---split
 

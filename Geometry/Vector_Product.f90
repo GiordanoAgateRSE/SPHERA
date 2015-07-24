@@ -1,63 +1,63 @@
-!cfile Vector_Product.f90
-!************************************************************************************
-!                             S P H E R A 6.0.0 
-!
-!                      Smoothed Particle Hydrodynamics Code
-!
-!************************************************************************************
-!
-! File name     : Vector_Product
-!
-! Last updating : September 20, 2011
-!
-! Improvement traceback:
-!
-! ..  E.Bon, A. Di Monaco, S. Falappi  Initial development of the code
-! 00  Agate/Guandalini  28/08/07       Graphic windows calls removed
-! 01  Agate/Flamini     08/10/07       Check of entire code
-! 02  Agate/Guandalini  2008           Check and review entire code
-!
-!************************************************************************************
-! Module purpose : Module to Compute and return in ww(1 to SPACEDIM) the components
-!                  of the vector product of vectors uu(1 to SPACEDIM) and
-!                  vv(1 to SPACEDIM)
-!
-!AA501b modified
-!AA601 sub
-! Calling routine: DefineLocalSystemVersors,RHS_body_dynamics,area_triangle
-!
-! Called routines: 
-!
-!************************************************************************************
-!
-subroutine Vector_Product ( uu, VV, ww, SPACEDIM )
-!Computes and returns in ww(1 to SPACEDIM) the components of the vector product
-!of vectors uu(1 to SPACEDIM) and vv(1 to SPACEDIM)
-!
-!.. Implicit Declarations ..
-  implicit none
-!
-!.. Formal Arguments ..
-integer(4),      intent(IN)                        :: SPACEDIM
-double precision,intent(IN),   dimension(SPACEDIM) :: uu
-double precision,intent(IN),   dimension(SPACEDIM) :: VV
+!----------------------------------------------------------------------------------------------------------------------------------
+! SPHERA (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
+! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-; SPHERA has been authored for RSE SpA by 
+!    Andrea Amicarelli, Antonio Di Monaco, Sauro Manenti, Elia Bon, Daria Gatti, Giordano Agate, Stefano Falappi, 
+!    Barbara Flamini, Roberto Guandalini, David Zuccalà).
+! Main numerical developments of SPHERA: 
+!    Amicarelli et al. (2015,CAF), Amicarelli et al. (2013,IJNME), Manenti et al. (2012,JHE), Di Monaco et al. (2011,EACFM). 
+! Email contact: andrea.amicarelli@rse-web.it
+
+! This file is part of SPHERA.
+! SPHERA is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! SPHERA is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
+!----------------------------------------------------------------------------------------------------------------------------------
+
+!----------------------------------------------------------------------------------------------------------------------------------
+! Program unit: Vector_Product    
+! Description: To return in ww the cross product of vectors uu and vv.           
+!----------------------------------------------------------------------------------------------------------------------------------
+
+subroutine Vector_Product(uu,VV,ww,SPACEDIM)
+!------------------------
+! Modules
+!------------------------ 
+!------------------------
+! Declarations
+!------------------------
+implicit none
+integer(4),intent(IN) :: SPACEDIM
+double precision,intent(IN),dimension(SPACEDIM) :: uu,VV
 double precision,intent(INOUT),dimension(SPACEDIM) :: ww
-!
-!.. Local Scalars ..
-integer(4) :: i, j, k
-!
-!.. Local Arrays ..
-integer(4), dimension(3) :: iseg = (/ 2,3,1 /)
-!
-!.. Executable Statements ..
-!
- do i = 1, SPACEDIM
+integer(4) :: i,j,k
+integer(4),dimension(3) :: iseg=(/2,3,1/)
+!------------------------
+! Explicit interfaces
+!------------------------
+!------------------------
+! Allocations
+!------------------------
+!------------------------
+! Initializations
+!------------------------
+!------------------------
+! Statements
+!------------------------
+do i=1,SPACEDIM
    j = iseg(i)
    k = iseg(j)
    ww(i) = uu(j) * VV(k) - uu(k) * VV(j)
- end do
-!
+end do
+!------------------------
+! Deallocations
+!------------------------
 return
 end subroutine Vector_Product
-!---split
 

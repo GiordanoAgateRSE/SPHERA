@@ -1,127 +1,125 @@
-!cfile ReadInputVertices.f90
-!************************************************************************************
-!                             S P H E R A 6.0.0 
-!
-!                      Smoothed Particle Hydrodynamics Code
-!
-!************************************************************************************
-subroutine ReadInputVertices ( NumberEntities,Vertice, &
-                               ainp,comment,nrighe,ier,prtopt,ninp,nout )
+!----------------------------------------------------------------------------------------------------------------------------------
+! SPHERA (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
+! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-; SPHERA has been authored for RSE SpA by 
+!    Andrea Amicarelli, Antonio Di Monaco, Sauro Manenti, Elia Bon, Daria Gatti, Giordano Agate, Stefano Falappi, 
+!    Barbara Flamini, Roberto Guandalini, David Zuccalà).
+! Main numerical developments of SPHERA: 
+!    Amicarelli et al. (2015,CAF), Amicarelli et al. (2013,IJNME), Manenti et al. (2012,JHE), Di Monaco et al. (2011,EACFM). 
+! Email contact: andrea.amicarelli@rse-web.it
 
-use GLOBAL_MODULE                              
-use AdM_USER_TYPE
+! This file is part of SPHERA.
+! SPHERA is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! SPHERA is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
+!----------------------------------------------------------------------------------------------------------------------------------
 
+!----------------------------------------------------------------------------------------------------------------------------------
+! Program unit: ReadInputVertices                              
+! Description:                        
+!----------------------------------------------------------------------------------------------------------------------------------
+
+subroutine ReadInputVertices(NumberEntities,Vertice,ainp,comment,nrighe,ier,   &
+                             prtopt,ninp,nout)
+!------------------------
+! Modules
+!------------------------ 
+use Static_allocation_module                              
+use Hybrid_allocation_module
+!------------------------
+! Declarations
+!------------------------
 implicit none
-
-integer(4),      dimension(20)                    :: NumberEntities
+logical(4) :: prtopt
+integer(4) :: nrighe,ier,ninp,nout
+integer(4),dimension(20) :: NumberEntities
 double precision,dimension(1:SPACEDIM,NumVertici) :: Vertice
-
-integer(4)    :: nrighe,ier, ninp,nout
-logical(4)    :: prtopt
-character( 1) :: comment
+character(1) :: comment
 character(80) :: ainp
-
-integer(4)    :: n,i,icord,ioerr
-character(8)  :: label
-double precision, dimension(3) :: values1
-
-character(80), external :: lcase, GetToken
-logical,       external :: ReadCheck
-
-!
-!.. in case of restart the cards are not read
-!
-  if (restart) then
-    do while ( TRIM(lcase(ainp)) /= "##### end vertices #####" )
-      call ReadRiga ( ainp,comment,nrighe,ioerr,ninp )
-      if ( .NOT.ReadCheck (ioerr,ier,nrighe,ainp,"VERTICES DATA",ninp,nout) ) return
-    end do
-    return
-  end if
-!
- call ReadRiga ( ainp,comment,nrighe,ioerr,ninp )
- if ( .NOT.ReadCheck (ioerr,ier,nrighe,ainp,"VERTICES DATA",ninp,nout) ) return
-
- if ( ncord > 0 .AND. nout > 0 .AND. prtopt ) then
-    write (nout,"(1x,a)") "List of vertices:"
- end if
-
- do while ( TRIM(lcase(ainp)) /= "##### end vertices #####" )
-
-    select case ( TRIM(Domain%tipo) )
-!
-!AA406 sub
-       case ( "semi","bsph" ) 
-!
-          read ( ainp,*,iostat=ioerr ) i, values1(1:NumberEntities(1))
-
-! arrotondamento a 1.0d-5
-!if ( ncord > 0 ) then
-!write (*,'(i10,2f15.10)') i,values1(1:NumberEntities(1))
-!values1(1:NumberEntities(1)) = real((nint(values1(1:NumberEntities(1)) * 1.d5)) / 1e5)
-!values1(1:NumberEntities(1)) = (anint(values1(1:NumberEntities(1)) * 1.0d5)) / 1.0d5
-!write (*,'(i10,2f15.10)') NumberEntities(1),values1(1:NumberEntities(1))
-!end if
-!
-
-          write (label,"(i8)") i
-          if ( .NOT.ReadCheck (ioerr,ier,nrighe,ainp,"VERTEX n."//label,ninp,nout) ) return
-!if ( i > 8 ) i = i - 3420
-          NumberEntities(7) = max(i,NumberEntities(7))
-
-          if ( ncord > 0 ) then
-             do n = 1, NumberEntities(1)
-                icord = icoordp(n,ncord-1)
-                if ( NumberEntities(7) == 1 ) then
-                   Domain%coord(icord,1) = values1(n)
-                   Domain%coord(icord,2) = values1(n)
-                end if
-                Vertice(icord,i) = values1(n)
-                Domain%coord(icord,1) = min(values1(n),Domain%coord(icord,1))
-                Domain%coord(icord,2) = max(values1(n),Domain%coord(icord,2))
-             end do
-          end if
-
-       case default
-
-          if ( nout > 0 ) then
-             write (nout,*) "Unknown Domain Type: ",Domain%tipo
-          end if
-          ier = 2
-          return
-
-
-    end select
-
-    if ( ncord > 0 .AND. nout > 0 .AND. prtopt ) then
-       write (nout,"(i6,1p,3(2x,a,e12.4))") &
-       i,(xyzlabel(icoordp(n,ncord-1)),Vertice(icoordp(n,ncord-1),i),n=1,ncord)
-    end if
-
-    call ReadRiga ( ainp,comment,nrighe,ioerr,ninp )
-    if ( .NOT.ReadCheck (ioerr,ier,nrighe,ainp,"VERTICES DATA",ninp,nout) ) return
-
- end do
-
- if ( ncord > 0 .AND. nout > 0 ) then
-
-!   write (nout,*)
-!   write (nout,"(1x,a)") "List of vertices:"
-!   do n = 1, NumberEntities(7)
-!      write (nout,"(i6,1p,3(2x,a,e12.4))") &
-!      n,(xyzlabel(icoordp(i,ncord-1)),Vertice(icoordp(i,ncord-1),n),i=1,ncord)
-!   end do
-
-    do n = 1, NumberEntities(1)
-       icord = icoordp(n,ncord-1)
-       write (nout,"(1x,a,a,1p,e12.4)") xyzlabel(icord)," coordinate min. ",Domain%coord(icord,1)
-       write (nout,"(1x,a,a,1p,e12.4)") xyzlabel(icord)," coordinate max. ",Domain%coord(icord,2)
-    end do
-    write (nout,"(1x,a)") " "
-
- end if
-
+integer(4) :: n,i,icord,ioerr
+double precision,dimension(3) :: values1
+character(8) :: label
+logical,external :: ReadCheck
+character(80),external :: lcase, GetToken
+!------------------------
+! Explicit interfaces
+!------------------------
+!------------------------
+! Allocations
+!------------------------
+!------------------------
+! Initializations
+!------------------------
+!------------------------
+! Statements
+!------------------------
+! In case of restart, input data are not read
+if (restart) then
+   do while (TRIM(lcase(ainp))/="##### end vertices #####")
+      call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
+      if (.NOT.ReadCheck (ioerr,ier,nrighe,ainp,"VERTICES DATA",ninp,nout))    &
+         return
+   enddo
+  return
+endif
+call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
+if (.NOT.ReadCheck (ioerr,ier,nrighe,ainp,"VERTICES DATA",ninp,nout)) return
+if ((ncord>0).and.(nout>0).and.(prtopt)) then
+   write(nout,"(1x,a)") "List of vertices:"
+endif
+do while (TRIM(lcase(ainp))/="##### end vertices #####")
+   select case (TRIM(Domain%tipo))
+      case ("semi","bsph") 
+         read (ainp,*,iostat=ioerr) i, values1(1:NumberEntities(1))
+         write(label,"(i8)") i
+         if (.NOT.ReadCheck (ioerr,ier,nrighe,ainp,"VERTEX n."//label,ninp,    &
+            nout)) return
+         NumberEntities(7) = max(i,NumberEntities(7))
+         if (ncord>0) then
+            do n=1,NumberEntities(1)
+               icord = icoordp(n,ncord-1)
+               if (NumberEntities(7)==1) then
+                  Domain%coord(icord,1) = values1(n)
+                  Domain%coord(icord,2) = values1(n)
+               endif
+               Vertice(icord,i) = values1(n)
+               Domain%coord(icord,1) = min(values1(n),Domain%coord(icord,1))
+               Domain%coord(icord,2) = max(values1(n),Domain%coord(icord,2))
+            enddo
+         endif
+      case default
+         if (nout>0) then
+            write(nout,*) "Unknown Domain Type: ",Domain%tipo
+         endif
+         ier = 2
+         return
+   end select
+   if ((ncord>0).and.(nout>0).and.(prtopt)) then
+      write(nout,"(i6,1p,3(2x,a,e12.4))") i,(xyzlabel(icoordp(n,ncord-1)),     &
+         Vertice(icoordp(n,ncord-1),i),n=1,ncord)
+   endif
+   call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
+   if (.NOT.ReadCheck (ioerr,ier,nrighe,ainp,"VERTICES DATA",ninp,nout)) return
+enddo
+if ((ncord>0).and.(nout>0)) then
+   do n=1,NumberEntities(1)
+      icord = icoordp(n,ncord-1)
+      write(nout,"(1x,a,a,1p,e12.4)") xyzlabel(icord)," coordinate min. ",     &
+         Domain%coord(icord,1)
+      write(nout,"(1x,a,a,1p,e12.4)") xyzlabel(icord)," coordinate max. ",     &
+         Domain%coord(icord,2)
+   enddo
+   write(nout,"(1x,a)") " "
+endif
+!------------------------
+! Deallocations
+!------------------------
 return
 end subroutine ReadInputVertices
-!---split
 

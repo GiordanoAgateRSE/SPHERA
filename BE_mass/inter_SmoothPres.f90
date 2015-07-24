@@ -1,140 +1,107 @@
-!cfile inter_SmoothPres.f90
-!************************************************************************************
-!                             S P H E R A 6.0.0 
-!
-!                      Smoothed Particle Hydrodynamics Code
-!
-!************************************************************************************
-!
-! File name     : inter_SmoothPres
-!
-! Last updating : September 20, 2011
-!
-! Improvement traceback:
-!
-! 00  Agate/Guandalini  28/08/07       Graphic windows calls removed
-! 01  Agate/Flamini     08/10/07       Check of entire code
-! 02  Agate/Guandalini  2008           Check and review entire code
-!
-!************************************************************************************
-! Module purpose : Module to calculate the corrective term of the pressure
-!
-! Calling routine: Loop_Irre_2D, Loop_Irre_3D
-!
-! Called routines: 
-!
-!************************************************************************************
-!
+!----------------------------------------------------------------------------------------------------------------------------------
+! SPHERA (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
+! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-; SPHERA has been authored for RSE SpA by 
+!    Andrea Amicarelli, Antonio Di Monaco, Sauro Manenti, Elia Bon, Daria Gatti, Giordano Agate, Stefano Falappi, 
+!    Barbara Flamini, Roberto Guandalini, David Zuccalà).
+! Main numerical developments of SPHERA: 
+!    Amicarelli et al. (2015,CAF), Amicarelli et al. (2013,IJNME), Manenti et al. (2012,JHE), Di Monaco et al. (2011,EACFM). 
+! Email contact: andrea.amicarelli@rse-web.it
+
+! This file is part of SPHERA.
+! SPHERA is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! SPHERA is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
+!----------------------------------------------------------------------------------------------------------------------------------
+
+!----------------------------------------------------------------------------------------------------------------------------------
+! Program unit: inter_SmoothPres
+! Description: To calculate a corrective term for pressure. 
+!----------------------------------------------------------------------------------------------------------------------------------
+
 subroutine inter_SmoothPres
-! ex inter7
-!
-!.. assign modules
-use GLOBAL_MODULE
-use AdM_USER_TYPE
-use ALLOC_MODULE
-!
-!.. Implicit Declarations ..
-  implicit none
-!
-!.. Local Scalars ..
-integer(4)       :: npi,npj,contj,npartint,ii
+!------------------------
+! Modules
+!------------------------ 
+use Static_allocation_module
+use Hybrid_allocation_module
+use Dynamic_allocation_module
+!------------------------
+! Declarations
+!------------------------
+implicit none
+integer(4) :: npi,npj,contj,npartint,ii
 double precision :: unity,presi,presj,rhoj,amassj,pesoj,appo1,appo2,TetaP1
-!
-!.. Executable Statements ..
-!
+!------------------------
+! Explicit interfaces
+!------------------------
+!------------------------
+! Allocations
+!------------------------
+!------------------------
+! Initializations
+!------------------------
+!------------------------
+! Statements
+!------------------------
 !$omp parallel do default(none) &
-!$omp private(npi,ii,unity,appo1,appo2,contj,npartint,npj,presi,rhoj,presj,amassj,pesoj) &
-!$omp shared(nag,pg,Med,Domain,nPartIntorno,NMAXPARTJ,PartIntorno,PartKernel,indarrayFlu,Array_Flu)
-!
-!.. loops on all the particles
-!
-!!!!!!  do npi = 1,nag
-!!!!!!!
-!!!!!!    if (pg(npi)%cella == 0 .or. pg(npi)%vel_type /= "std" .or. pg(npi)%state == "sol") cycle
-!$$$$$
-  do ii = 1,indarrayFlu
-    npi = Array_Flu(ii)
-!$$$$$
-!
-!* azzeramento quantita generali
-    unity = zero
-    appo1 = zero
-    appo2 = zero
-!
-    do contj = 1, nPartIntorno(npi)
-!
+!$omp private(npi,ii,unity,appo1,appo2,contj,npartint,npj,presi,rhoj,presj)    &
+!$omp private(amassj,pesoj)                                                    &
+!$omp shared(nag,pg,Med,Domain,nPartIntorno,NMAXPARTJ,PartIntorno,PartKernel)  &
+!$omp shared(indarrayFlu,Array_Flu)
+! Loop over all the particles
+do ii=1,indarrayFlu
+   npi = Array_Flu(ii)
+   unity = zero
+   appo1 = zero
+   appo2 = zero
+   do contj=1,nPartIntorno(npi)
       npartint = (npi-1)* NMAXPARTJ + contj
       npj = PartIntorno(npartint)
-!
-      if ( pg(npj)%vel_type /= "std" ) cycle          !non part fix o altro
-!
-      presi  = pg(npi)%pres
-      rhoj   = pg(npj)%dens    
-      presj  = pg(npj)%pres    
+      if (pg(npj)%vel_type/="std") cycle
+      presi = pg(npi)%pres
+      rhoj = pg(npj)%dens    
+      presj = pg(npj)%pres    
       amassj = pg(npj)%mass
-!
-!.. calcola i pesi
       pesoj = amassj * PartKernel(4,npartint) / rhoj
-!
       unity = unity + pesoj  
-!
       appo1 = appo1 + (presj - presi) * pesoj  
-      appo2 = appo2 - Domain%grav(3)*Med(pg(npi)%imed)%den0 * (pg(npj)%coord(3) - pg(npi)%coord(3)) * pesoj     !aggiunto SaMa
-!
-    end do
-!
-!--------------- SaMa -----------------
-    if (Domain%Psurf /= 's') then
+      appo2 = appo2 - Domain%grav(3) * Med(pg(npi)%imed)%den0 *                &
+              (pg(npj)%coord(3) - pg(npi)%coord(3)) * pesoj     
+   end do
+   if (Domain%Psurf/='s') then
       pg(npi)%vpres = appo1
-    else if (unity > 0.8d0) then
-      pg(npi)%vpres = appo1
-    else
-      pg(npi)%vpres = appo1 + appo2
-    end if
-!
-    pg(npi)%uni = unity
-!--------------- SaMa -----------------
-!
-  end do
-!
+      else if (unity>0.8d0) then
+         pg(npi)%vpres=appo1
+         else
+            pg(npi)%vpres = appo1 + appo2
+   end if
+   pg(npi)%uni = unity
+end do
 !$omp end parallel do
-!
-!  call cpu_time(cpu_loop1a)
-!  call cpu_time(cpu_loop2a)
-!
-!$omp parallel do default(none) private(npi,ii,TetaP1) shared(nag,Pg,Med,Domain,dt,indarrayFlu,Array_Flu,esplosione)
-!
-!.. applies the correction to all the particles
-!
-!!!!!!         do npi = 1,nag
-!!!!!!!
-!!!!!!           if (pg(npi)%cella == 0 .or. pg(npi)%vel_type /= "std" .or. pg(npi)%state == "sol") cycle
-!$$$$$
-  do ii = 1,indarrayFlu
-    npi = Array_Flu(ii)
-!$$$$$
-!
-    if (esplosione) then
-!.. con Csound al posto di Celerita e' circa uguale
+do ii = 1,indarrayFlu
+   npi = Array_Flu(ii)
+   if (esplosione) then
       TetaP1 = Domain%TetaP * pg(npi)%Csound * dt / Domain%h
-    else
-! calcolo TetaP adeguato al passo temporale
-      TetaP1 = Domain%TetaP * Med(pg(npi)%imed)%Celerita * dt / Domain%h
-    end if
-
-!
-!    if (pg(npi)%densass == 0) then
-!.. updates the pressure 
-    pg(npi)%pres = pg(npi)%pres + TetaP1 * pg(npi)%vpres / pg(npi)%uni
-!
-!.. updates the density depending on the local pressure, reference medium density and the comprimibility eps
-    pg(npi)%dens = Med(pg(npi)%imed)%den0 * (one + pg(npi)%pres / Med(pg(npi)%imed)%eps)
-!    end if
-  end do
-
+      else
+! Computation of TetaP depending on the time step
+         TetaP1 = Domain%TetaP * Med(pg(npi)%imed)%Celerita * dt / Domain%h
+   end if
+   pg(npi)%pres = pg(npi)%pres + TetaP1 * pg(npi)%vpres / pg(npi)%uni
+! To update density depending on pressure
+   pg(npi)%dens = Med(pg(npi)%imed)%den0 * (one + pg(npi)%pres /               &
+                  Med(pg(npi)%imed)%eps)
+end do
 !$omp end parallel do
-!
+!------------------------
+! Deallocations
+!------------------------
 return
 end subroutine inter_SmoothPres
-!---split
 
