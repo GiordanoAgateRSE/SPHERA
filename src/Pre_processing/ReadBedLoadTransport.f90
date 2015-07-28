@@ -107,26 +107,6 @@ do while (TRIM(lcase(ainp)) /= "##### end bed load transport #####")
       if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"Z_MIN_DT,Z_MAX_DT",ninp,nout)) &
          return       
    endif
-   if (ID_erosion_criterion>1) then
-      write(nscr,"(1x,a)") " "
-      write(nout,"(1x,a)") " "
-      write(nscr,"(1x,a)")                                                     &
-         " >>WARNING! - The erosion module Shields/Mohr is not available."
-      write(nout,"(1x,a)")                                                     &
-         " >>WARNING! - The erosion module Shields/Mohr is not available."
-      ier = 6
-      return
-   endif
-   if (ID_erosion_criterion==1) then
-      write(nscr,"(1x,a)") " "
-      write(nout,"(1x,a)") " "
-      write(nscr,"(1x,a)")                                                     &
-" >>WARNING! - The erosion module Shields-VanRijn-Seminara in the simulation are not available."
-      write(nout,"(1x,a)")                                                     &
-" >>WARNING! - The erosion module Shields-VanRijn-Seminara in the simulation are not available."
-      ier = 12
-      return
-   endif
 ! Writing input parameters (first part)
    if ((ncord>0).and.(nout > 0)) then
       select case (ID_erosion_criterion)

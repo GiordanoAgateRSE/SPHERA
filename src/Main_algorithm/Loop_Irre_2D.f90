@@ -87,8 +87,8 @@ it_print = it_start
 it_memo = it_start
 it_rest = it_start
 call etime(time_aux,time_aux_2)
-ti(1) = dfloat(time_aux_2)
-ti(2) = dfloat(time()) 
+ti(1) = dble(time_aux_2)
+ti(2) = dble(time()) 
 ! Variable to count the particles, which are not "sol"
 indarrayFlu = 0
 do npi=1,nag
@@ -266,8 +266,8 @@ ITERATION_LOOP: do while (it<Domain%itmax)
       enddo
    endif
    call etime(time_aux,time_aux_2)
-   ti_iter(1) = dfloat(time_aux_2)
-   ti_iter(2) = dfloat(time())
+   ti_iter(1) = dble(time_aux_2)
+   ti_iter(2) = dble(time())
    if ((Domain%time_split==0).and.(Domain%time_stage==1)) then 
 ! Erosion criterium + continuity equation RHS  
       call start_and_stop(2,12)
@@ -803,8 +803,8 @@ ITERATION_LOOP: do while (it<Domain%itmax)
 ! Post-processing
    if (Domain%time_split==0) dtvel = dt
    call etime(time_aux,time_aux_2)
-   tf_iter(1) = dfloat(time_aux_2)
-   tf_iter(2) = dfloat(time())
+   tf_iter(1) = dble(time_aux_2)
+   tf_iter(2) = dble(time())
    tot_iter = tot_iter + tf_iter - ti_iter
    if (nout>0) then
       call print_results(it_eff,it_print,'loop__')
@@ -908,8 +908,8 @@ if (vtkconv) then
    call result_converter ('fine__')
 endif
 call etime(time_aux,time_aux_2)
-tf(1) = dfloat(time_aux_2)
-tf(2) = dfloat(time())
+tf(1) = dble(time_aux_2)
+tf(2) = dble(time())
 if (nout>0) then
    write (nout,*) " "
    write (nout,'(a)')                                                          &

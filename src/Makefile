@@ -1,10 +1,15 @@
 # Variables to be updated 
 VERSION = 7_2
 DATE = 27Jul15
-#    gfortran ifort
+#    run, debug
+EXECUTION = debug
+#    -O1 (run), -O0 -g -fbacktrace -C (gfortran debug),
+#    -O0 -g -traceback -C -check bounds -debug all (ifort debug)
+COMPILATION_FLAGS = -O0 -g -fbacktrace -C   
+#    gfortran, ifort
 COMPILER = gfortran
-#    -fopenmp -openmp  
-OMP_FLAG = -fopenmp
+#    -fopenmp, -openmp, (blank for debug)  
+OMP_FLAG =    
 SOURCES = \
 ./Modules/Static_allocation_module.f90 \
 ./Modules/Hybrid_allocation_module.f90 \
@@ -39,7 +44,7 @@ $(wildcard ./Time_Integration/*.f90)
 # Other variables
 MAIN_FILE_ROOT = ./Main_algorithm/sphera
 EXE_DIR = ../bin/
-CODE = $(EXE_DIR)SPHERA_v_$(VERSION)_$(DATE)
+CODE = $(EXE_DIR)SPHERA_v_$(VERSION)_$(DATE)_$(COMPILER)_$(EXECUTION)
 OBJECTS = $(patsubst %.f90,%.o,$(SOURCES))
 # Targets
 #    Correct sequence for compiling+linking:
@@ -50,10 +55,10 @@ all: compiling linking removing
 #    would not be available yet
 compiling: $(SOURCES)
 %.f90: %.o
-	$(COMPILER) $@ -o $< $(OMP_FLAG) -O1 -c 
+	$(COMPILER) $@ -o $< $(OMP_FLAG) $(COMPILATION_FLAGS) -c 
 linking: $(OBJECTS)
 	touch $(CODE).x
-	$(COMPILER) $(MAIN_FILE_ROOT).f90 $^ -o $(CODE).x $(OMP_FLAG) -O1
+	$(COMPILER) $(MAIN_FILE_ROOT).f90 $^ -o $(CODE).x $(OMP_FLAG) $(COMPILATION_FLAGS)
 	rm -f $(MAIN_FILE_ROOT).o
 removing: $(OBJECTS)
 	rm -f $^
