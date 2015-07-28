@@ -35,10 +35,10 @@ use I_O_language_module
 !------------------------
 implicit none
 integer(4) :: nout
-double precision, dimension(2) :: ti,tf
+double precision :: ti,tf
 logical,save :: first=.true.
-double precision :: telat, tcput, tcpup, telap
-double precision,save :: tcpus, telas
+double precision :: telat, tcput, tcpup
+double precision,save :: tcpus,telas
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -52,19 +52,15 @@ double precision,save :: tcpus, telas
 ! Statements
 !------------------------
 if (first) then
-   tcpus = ti(1)
-   telas = ti(2) 
-   tcpup = ti(1)
-   telap = ti(2)
+   tcpus = ti
+   tcpup = ti
 end if
 first = .false.
-tcput = tf(1)
-telat = tf(2) - telas
+tcput = tf
+telat = tf - telas
 write(nout,1001) " "
-write(nout,1001) cpulbl,tcput,totlbl,tf(1)-ti(1),przlbl
-write(nout,1001) elalbl,max(1.0d0,telat),totlbl,max(1.0d0,tf(2)-ti(2)),przlbl
-tcpup = tf(1)
-telap = tf(2)
+write(nout,1001) cpulbl,tcput,totlbl,tf-ti,przlbl
+tcpup = tf
 !------------------------
 ! Deallocations
 !------------------------

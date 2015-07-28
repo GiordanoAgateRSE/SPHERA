@@ -3,9 +3,9 @@ VERSION = 7_2
 DATE = 27Jul15
 #    run, debug
 EXECUTION = debug
-#    -O1 (run), -O0 -g -fbacktrace -C (gfortran debug),
-#    -O0 -g -traceback -C -check bounds -debug all (ifort debug)
-COMPILATION_FLAGS = -O0 -g -fbacktrace -C   
+#    -O1 (run), -g -O0 -fbacktrace -C (gfortran debug),
+#    -g -O0 -traceback -C -check bounds -debug all (ifort debug)
+COMPILATION_FLAGS = -g -O0 -fbacktrace -C   
 #    gfortran, ifort
 COMPILER = gfortran
 #    -fopenmp, -openmp, (blank for debug)  
@@ -47,23 +47,23 @@ EXE_DIR = ../bin/
 CODE = $(EXE_DIR)SPHERA_v_$(VERSION)_$(DATE)_$(COMPILER)_$(EXECUTION)
 OBJECTS = $(patsubst %.f90,%.o,$(SOURCES))
 # Targets
-#    Correct sequence for compiling+linking:
-#       make touching
+#    Correct sequence for compile+link:
+#       make touch
 #       make 
-all: compiling linking removing 
+all: compile link remove 
 #    "compiling" cannot be launched together with "touching" as ".o" files
 #    would not be available yet
-compiling: $(SOURCES)
+compile: $(SOURCES)
 %.f90: %.o
 	$(COMPILER) $@ -o $< $(OMP_FLAG) $(COMPILATION_FLAGS) -c 
-linking: $(OBJECTS)
+link: $(OBJECTS)
 	touch $(CODE).x
 	$(COMPILER) $(MAIN_FILE_ROOT).f90 $^ -o $(CODE).x $(OMP_FLAG) $(COMPILATION_FLAGS)
 	rm -f $(MAIN_FILE_ROOT).o
-removing: $(OBJECTS)
+remove: $(OBJECTS)
 	rm -f $^
 	rm -f *.mod
-touching:
+touch:
 	touch $(OBJECTS)
 clean: 
 	rm -f $(CODE).x 

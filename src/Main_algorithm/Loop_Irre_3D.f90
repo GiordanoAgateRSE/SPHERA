@@ -44,9 +44,8 @@ integer(4) :: jgridi,kgridi,machine_Julian_day,machine_hour,machine_minute
 integer(4) :: machine_second
 real :: time_aux_2
 double precision :: pretot,BCtorodivV,DtPreviousStep,TetaV1,xmax,ymax,zmax
-double precision :: appo1,appo2,appo3,dtvel
+double precision :: appo1,appo2,appo3,dtvel,ti,tf,ti_iter,tf_iter,tot_iter
 real :: time_aux(2)
-double precision,dimension(2) :: ti,tf,ti_iter,tf_iter,tot_iter
 double precision,dimension(1:SPACEDIM) :: tpres,tdiss,tvisc,BoundReaction
 character(len=lencard) :: nomsub = "Loop_Irre_3D"
 integer(4),external :: ParticleCellNumber,CellIndices,CellNumber
@@ -86,8 +85,7 @@ it_print = it_start
 it_memo = it_start
 it_rest = it_start
 call etime(time_aux,time_aux_2)
-ti(1) = dble(time_aux_2)
-ti(2) = dble(time()) 
+ti = dble(time_aux_2)
 ! Variable to count the particles, which are not "sol"
 indarrayFlu = 0
 do npi=1,nag
@@ -262,8 +260,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
       enddo
    endif
    call etime(time_aux,time_aux_2)
-   ti_iter(1) = dble(time_aux_2)
-   ti_iter(2) = dble(time())
+   ti_iter = dble(time_aux_2)
    if ((Domain%time_split==0).and.(Domain%time_stage==1)) then 
 ! Erosion criterium + continuity equation RHS   
       call start_and_stop(2,12)
@@ -804,8 +801,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
    endif
    if (Domain%time_split==0) dtvel = dt
    call etime(time_aux,time_aux_2)
-   tf_iter(1) = dble(time_aux_2)
-   tf_iter(2) = dble(time())
+   tf_iter = dble(time_aux_2)
    tot_iter = tot_iter + tf_iter - ti_iter
    if (nout>0) then
       call print_results (it_eff, it_print, 'loop__')
@@ -913,8 +909,7 @@ if (vtkconv) then
    call result_converter ('fine__')
 endif
 call etime(time_aux,time_aux_2)
-tf(1) = dble(time_aux_2)
-tf(2) = dble(time())
+tf = dble(time_aux_2)
 if (nout>0) then
    write (nout,*) " "
    write (nout,'(a)')                                                          &
@@ -974,9 +969,8 @@ if (nout>0) then
 "----------------------------------------------------------------------------------------"
    write (nout,*) " "
    write (nout,*) "Number of steps:          ",it_eff
-   write (nout,*) "Total CPU steps time:     ",tot_iter(1)
-   write (nout,*) "Total Elapsed steps time: ",tot_iter(2)
-   write (nout,*) "Average CPU time for step:",tot_iter(1)/it_eff
+   write (nout,*) "Wall-clock time:          ",tot_iter
+   write (nout,*) "Average CPU time for step:",tot_iter/it_eff
    write (nout,*) " "
    write (nout,'(a)')                                                          &
 "----------------------------------------------------------------------------------------"

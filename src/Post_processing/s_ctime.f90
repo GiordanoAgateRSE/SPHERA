@@ -34,7 +34,9 @@ subroutine s_ctime(nout)
 !------------------------
 implicit none
 integer(4) :: nout
+integer(8) :: time
 character(24) :: str
+character(80) :: time_string
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -47,7 +49,8 @@ character(24) :: str
 !------------------------
 ! Statements
 !------------------------
-str = ctime(time())
+call ctime(time,time_string)
+str = time_string
 write (nout,'(a,a)') 's_ctime routine --> ',str
 !------------------------
 ! Deallocations
