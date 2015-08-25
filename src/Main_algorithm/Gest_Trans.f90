@@ -375,7 +375,7 @@ write (nout,'(1x,a)') " "
 write (nout,'(1x,a)') "   end allocation step. "
 write (nout,'(1x,a)') " "
 ! Writing the cell number and particles within the cell 
-if ( Domain%ioutopt<0) then
+if (Domain%ioutopt<0) then
    write (nout,*) 
    write (nout,*) "Number of cells           NCELLS= ",grid%nmax
    write (nout,*) 
@@ -390,7 +390,7 @@ if ( Domain%ioutopt<0) then
 endif
 write (nout,*) 
 write (nout,*) 
-call s_ctime( nout )
+call s_ctime(nout)
 write (nout,*) 
 write (nscr,*) "Transient loop begins..."
 write (nout,*) "Transient loop begins..."
@@ -400,7 +400,7 @@ if ((Domain%imemo_fr>0).OR.(Domain%memo_fr>zero)) then
    open (nres,file=nomefile(2),status="unknown",access="sequential"            &
       ,form="unformatted")
    else
-      nres = - nres
+      nres = -nres
 endif
 if ((Domain%ipllb_fr>0).OR.(Domain%pllb_fr>zero)) then
    open (nplb,file=nomefile(4),status="unknown",access="sequential",           &

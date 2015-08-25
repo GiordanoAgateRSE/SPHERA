@@ -34,9 +34,14 @@ subroutine s_ctime(nout)
 !------------------------
 implicit none
 integer(4) :: nout
-integer(8) :: time
-character(24) :: str
-character(80) :: time_string
+integer(4),dimension(8) :: dat_array
+character(LEN=8) :: dat
+character(LEN=10) :: ct
+character(LEN=5) :: zone
+character(LEN=160) :: date_exec
+character(LEN=3),dimension(12) :: mesi
+data mesi/"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov",   &
+   "Dec"/
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -49,12 +54,12 @@ character(80) :: time_string
 !------------------------
 ! Statements
 !------------------------
-call ctime(time,time_string)
-str = time_string
-write (nout,'(a,a)') 's_ctime routine --> ',str
+call DATE_AND_TIME(dat,ct,zone,dat_array)
+date_exec = mesi(dat_array(2))//" "//dat(7:8)//", "//dat(1:4)//          &
+            " at "//ct(1:2)//":"//ct(3:4)//":"//ct(5:10)//" "//zone//" GMT"
+write(nout,'(a)') trim(date_exec)
 !------------------------
 ! Deallocations
 !------------------------
 return
 end subroutine s_ctime
-

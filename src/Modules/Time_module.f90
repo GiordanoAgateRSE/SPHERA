@@ -29,7 +29,7 @@ module Time_module
 use Static_allocation_module
 integer(4),parameter :: redcard = 20 ! Reduced length of strings
 integer(4),parameter :: numb_subr = 21 ! Number of subroutine to count + 1
-integer(4) ::  ifiout
+integer(4) :: ifiout
 integer(4),dimension(numb_subr) :: tot_call
 double precision, dimension(numb_subr,2) :: tot_times
 character(LEN=40), dimension(numb_subr) :: tot_routines

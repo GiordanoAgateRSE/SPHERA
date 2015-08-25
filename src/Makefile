@@ -1,6 +1,5 @@
 # Variables to be updated 
 VERSION = 7_2
-DATE = 27Jul15
 #    run, debug
 EXECUTION = debug
 #    -O1 (run), -g -O0 -fbacktrace -C (gfortran debug),
@@ -44,7 +43,7 @@ $(wildcard ./Time_Integration/*.f90)
 # Other variables
 MAIN_FILE_ROOT = ./Main_algorithm/sphera
 EXE_DIR = ../bin/
-CODE = $(EXE_DIR)SPHERA_v_$(VERSION)_$(DATE)_$(COMPILER)_$(EXECUTION)
+CODE = $(EXE_DIR)SPHERA_v_$(VERSION)_$(COMPILER)_$(EXECUTION)
 OBJECTS = $(patsubst %.f90,%.o,$(SOURCES))
 # Targets
 #    Correct sequence for compile+link:

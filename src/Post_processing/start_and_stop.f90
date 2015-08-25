@@ -36,16 +36,15 @@ use I_O_file_module
 !------------------------
 implicit none
 integer(4), intent(in) :: iset,itot
-integer(4) :: is_cwd,i,hours,days,minutes,seconds,ishost
-double precision :: appo
+integer :: HOSTNM,GETCWD,count_i,counts_per_second,count_maximum
+integer(4) :: i,hours,days,minutes,seconds,ishost,string_index,string_size
 integer(4), dimension(8) :: dat_array
-character(LEN=1024) :: pwd_name,sphera_dir
-character(LEN=256) :: exe_name  !text, 
+double precision :: time_increment
+character(LEN=256) :: exe_name,string_aux 
 character(LEN=8) :: dat
 character(LEN=5) :: zone
 character(LEN=10) :: ct
 character(LEN=3),dimension(12) :: mesi
-integer :: HOSTNM,GETCWD
 double precision,external :: omp_get_wtime
 data mesi/"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov",   &
    "Dec"/
@@ -69,7 +68,8 @@ select case(iset)
    case (0)
       tot_times = zero
       tot_call = 0
-      call cpu_time(tot_times(numb_subr,1))
+      call system_clock(count=count_i)
+      tot_times(numb_subr,1) = dfloat(count_i)
       call DATE_AND_TIME(dat,ct,zone,dat_array)
       date_exec = mesi(dat_array(2))//" "//dat(7:8)//", "//dat(1:4)//          &
                 " at "//ct(1:2)//":"//ct(3:4)//":"//ct(5:10)//" "//zone//" GMT"
@@ -78,33 +78,31 @@ select case(iset)
       read (ct(1:2),'(i2)') itime_struct%ihr
       read (ct(3:4),'(i2)') itime_struct%imin
       read (ct(5:6),'(i2)') itime_struct%isec
-! Getting the machine name 
-      ishost = hostnm(host_name)
-! Getting the path of the working directory
-      is_cwd = getcwd(pwd_name)
-! Getting SPHERA_DIR environmental variable 
-      call getenv ("SPHERA_DIR",sphera_dir)
-      is_cwd = len_trim(sphera_dir)
 ! Reading the name of SPHERA executable file
       call getarg (0,exe_name)
       exe_name = adjustl(exe_name)
+      string_index = index(exe_name,"SPHERA_v_")
+      string_size = len(exe_name)
+      string_aux = exe_name(string_index:string_size) 
+      exe_name = string_aux
+      exe_name = trim(exe_name)
 ! Headings in log file 
       write(nout,*)
       write(nout,'(a,a)') " >>> SPHERA execution started the ",TRIM(date_exec)
       write(nout,*)
       write(nout,'(a,a)') " >>> SPHERA execution module :",TRIM(exe_name)
       write(nout,*)
-      write(nout,'(a,a)') " >>> SPHERA execution machine :",TRIM(host_name)
-      write(nout,*)
-      write(nout,'(a,a)') " >>> Project working directory :",TRIM(pwd_name)
-      write(nout,*)
       write(nout,'(a,a)') " >>> Case identifier :",TRIM(nomecaso)
 ! Detection of the current time
    case (1)
 ! End the execution by assessing the computational time &
 ! and the phisical/elapsed time statistics.
-      call cpu_time(appo)
-      tot_times(numb_subr,2) = appo - tot_times(numb_subr,1)
+      call system_clock(count=count_i,count_rate=counts_per_second,            &
+         count_max=count_maximum)
+      tot_times(numb_subr,2) = dfloat(count_i) - tot_times(numb_subr,1)
+      if (tot_times(numb_subr,2).lt.0.d0) tot_times(numb_subr,2) =             &
+         tot_times(numb_subr,2) + dfloat(count_maximum)   
+      tot_times(numb_subr,2) = tot_times(numb_subr,2)/dfloat(counts_per_second)
       call DATE_AND_TIME(dat,ct,zone,dat_array)
       date_exec = mesi(dat_array(2))//" "//dat(7:8)//", "//dat(1:4)//          &
                 " at "//ct(1:2)//":"//ct(3:4)//":"//ct(5:10)//" "//zone//" GMT"
@@ -146,12 +144,17 @@ select case(iset)
    case (2)
       tot_call(itot) = tot_call(itot) + 1
       tot_call(numb_subr) = tot_call(numb_subr) + 1
-      call cpu_time(appo)
-      tot_times(itot,1) = appo
+      call system_clock(count=count_i)
+      tot_times(itot,1) = dfloat(count_i)
 ! To assess the incremental time for the different subroutines
    case (3)
-      call cpu_time(appo)
-      tot_times(itot,2) = tot_times(itot,2) + (appo - tot_times(itot,1))
+      call system_clock(count=count_i,count_rate=counts_per_second,            &
+         count_max=count_maximum)
+      time_increment = dfloat(count_i) - tot_times(itot,1)
+      if (time_increment.lt.0.d0) time_increment = time_increment +            &
+         dfloat(count_maximum)   
+      time_increment = time_increment / dfloat(counts_per_second)
+      tot_times(itot,2) = tot_times(itot,2) + time_increment
 ! To end the execution of the binary restart file converter
 end select
 !------------------------

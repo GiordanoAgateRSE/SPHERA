@@ -1,0 +1,470 @@
+version.subversion   ! 
+                     ! SPHERA main input file: template and comments
+##### TITLE #####
+title                ! title (of the test case, string)
+##### END TITLE #####
+
+##### DOMAIN #####
+! Input parameters for spatial resolution and boundary treatment scheme
+D BC_string   ! D(spatial dimensionality)=2(2D),3(3D); BC_string(Boundary 
+              ! treatment scheme)=semi(SA-SPH),dbsph(DB-SPH)
+dx h/dx r     ! The third parameter ("r") is optional and provides a white noise
+              ! to the IC particle positions
+##### END DOMAIN #####
+
+##### VERTICES #####
+! Input parameters for the boundary vertices of the fluid domain  
+! The DB-SPH boundary treatment scheme requires the 
+! vertices of the parallelepiped domain as a "contour" and the "fictitious 
+! air reservoirs" 
+! The SA-SPH boundary treatment scheme requires the vertices of the wall 
+! frontiers
+! In absence of a declared origin, the first vertex is fictitious, equal to the 
+! and does not belong to any boundary (only useful for Paraview) 
+1 Vertex_x Vertex_y Vertex_z              ! (first vertex data) 
+! ...                                     ! (other vertices)
+Last_vertex_ID Vertex_x Vertex_y Vertex_z ! (last vertex data) 
+##### END VERTICES #####
+
+! If (D==2D): start
+##### LINES #####
+! 2D input parameters for the boundary lines of the fluid domain
+! 2D boundary lines for wall frontiers, inlet/outlet sections, fluid reservoirs.
+! In case of DB-SPH boundary treatment scheme, the code requires the lines of 
+! the parallelepiped domain as a "perimeter" and the "air reservoirs".
+! In case of SA-SPH boundary treatment scheme, the code requires the 
+! lines of the boundaries
+1 line_1_vertex_1 ... line_1_vertex last line_1_Boundary_ID
+                                           ! first line data
+...                                        ! other records
+line_last_ID line_last_vertex_1 ... line_last_vertex_last line_last_Boundary_ID
+##### END LINES #####
+! If (D==2D): end
+! If (D==3D): start
+##### FACES #####
+! 3D input parameters for the boundary faces of the fluid domain
+! 3D boundary faces for wall frontiers, inlet/outlet sections, fluid reservoirs.
+! In case of DB-SPH boundary treatment scheme, the code requires the faces of 
+! the parallelepiped domain as a "perimeter" and the "air reservoirs".
+! In case of SA-SPH boundary treatment scheme, the code requires the 
+! the boundary faces
+! Vertex list clockwise (normal vector exiting the frontier/domain; 
+! view from the semi-space of the normal vector): not the best convention
+! The last vertex ID is 0 in case of triangular faces
+! SA-SPH boundary normal vectors and reservoir face normal vectors point inward
+! (clockwise list of points if looking from outside the fluid domain). For 
+! "perimeter" boundaries: the vertices have to be adjacent, but there is no rule
+! about the vertex order (better anticlockwise).
+1 face_1_vertex_1 ... face_1_vertex last face_1_Boundary_ID
+                                           ! first face data
+...                                        ! other records
+face_last_ID face_last_vertex_1 ... face_last_vertex_last face_last_Boundary_ID
+##### END FACES #####
+! If (D==3D): end
+
+##### BOUNDARIES #####
+! Input parameters for the fluid domain boundaries delimited by 
+! lines(2D)/faces(3D)
+! In case of DB-SPH boundary treatment scheme, the parallelepiped domain 
+! (mandatory) is formally represented by a fictitious SA-SPH frontier, which  
+! is only used to generate the background positioning grid.
+! 1st boundary
+Boundary_name               !
+Boundary_ID                 !
+Boundary_type               ! Boundary_type = fixed(wall frontier),perimeter
+                            ! (fluid reservoir),source(inlet section),open, 
+                            ! tapis (not recommended)
+! If (Boundary_type=="fixed"): start
+Shear_stress_coefficient    ! Shear_stress_coefficient=1.0(no-slip),           
+                            ! 0.(free-slip)
+RGBColor                    ! 
+! If (Boundary_type=="fixed"): end
+! If (Boundary_type=="perimeter"): start
+fluid_ID                    !
+colour_pattern colour_ID    ! colour_pattern=uniform,bends; colour_ID=009EA8
+! if (motion_type=std): start
+motion_type IC_velocity_x IC_velocity_y IC_velocity_z slip_condition
+                            ! motion_type=std; slip_condition=0.0
+! if (motion_type=std): end
+! if (motion_type=law): start
+motion_type n_records       ! motion_type=law; n_records(number of records for 
+                            ! the imposed kinematics)
+time_1 u_1 v_1 w_1 1
+...
+time_n_records u_n_records v_n_records w_n_records n_records
+                            ! (list of records for the imposed 
+                            ! 3D translational kinematics: time, vector 
+                            ! velocity, record_ID)                            
+! if (motion_type=law): end
+IC_pressure_type IC_pressure_value
+                            ! IC_pressure_type=pa(uniform pressure),qp
+                            ! (hydrostatic conditions),pl(hydrostatic pressure 
+                            ! based on the maximum level of an assigned fluid;
+                            ! IC_pressure_value=(uniform pressure value for pa),
+                            ! (free surface height for qp), (equivalent free 
+                            ! surface level of the on-going fluid for pl)
+IC_reservoir_type Car_top_zone
+                            ! IC_reservoir_type=1(vertices and faces),2(from 
+                            ! Cartesian topography); Car_top_zone = boundary ID 
+                            ! of underlying topography(influence only if 
+                            ! IC_reservoir_type==2)
+! If (IC_reservoir_type==2): start
+dx_CartTopog H_res          ! dx_CartTopog(spatial resolution of the Cartesian 
+                            ! topography); H_res(height of the reservoir free 
+                            ! surface)
+ID_first_vertex ID_last_vertex
+                            ! ID_first_vertex,ID_last_vertex(ID of the first and
+                            ! and the last vertices of the reference topography)
+n_circum nag_aux            ! n_circum(number of vertices circumscribing 
+                            ! the horizontal projection of the reservoir)=3,4; 
+                            ! nag_aux(rough overestimation of the number of 
+                            ! fluid particles in the reservoir)
+circum_1_x circum_1_y       ! First point of the 2D figure circumscribing the 
+                            ! horizontal projection of the reservoir
+...                         ! other point/s of the 2D figure above                     
+circum_last_x circum_last_y ! last point of the 2D figure above
+dam_zone_ID n_circum_dam
+                            ! dam_zone_ID; dam_zone_n_vertices(number of 
+                            ! vertices of the 2D figure circumscribing the 
+                            ! horizontal projection of the 
+                            ! dam zone)=3,4
+circum_dam_1_x circum_dam_1_y
+                            ! First point of the 2D figure circumscribing the 
+                            ! horizontal projection of the dam zone
+...                         ! other point/s of the 2D figure above                     
+circum_dam_last_x circum_dam_last_y
+                            ! last point of the 2D figure above
+! If (IC_reservoir_type==2): end
+! If (Boundary_type=="perimeter"): end
+! If (Boundary_type=="open"): start
+RGBColor
+! If (Boundary_type=="open"): end
+! If (Boundary_type=="source"): start
+flowrate 0.                 ! flowrate(inlet velocity * inlet area); 0.
+pa IC_pressure              !
+RGBColor 
+! If (Boundary_type=="source"): end
+
+! ...                       ! other boundaries
+! n-th boundary
+! ...                       ! Data of the last boundary
+##### END BOUNDARIES #####
+
+##### DBSPH #####
+! Input parameters for the DB-SPH boundary treatment scheme
+dx_f/dx_w MUSCL_boundary_flag k_w   ! dx_f/dx_w(ratio between the fluid particle
+                                    ! size and the wall element size); 
+                                    ! MUSCL_boundary_flag(logical flag to 
+                                    ! activate boundary terms for MUSCL); k_w
+                                    ! (semi-particle depth coefficient)
+n_monitor_points n_monitor_regions  ! n_monitor_points; n_monitor_regions=0,1(to
+                                    ! estimate the Force along x-direction)
+! if (n_monitor_points>0): start
+ID_wall_element_monitor_1 ... ID_wall_element_monitor_n
+! if (n_monitor_points>0): end
+! if (n_monitor_regions>0): start
+xmin,xmax,ymin,xmax,zmin,zmax       ! (monitoring region vertices) 
+! if (n_monitor_regions>0): end
+imposed_kinematics_records flag_in-built_monitors
+                                    ! imposed_kinematics_records(number of 
+                                    ! records, which describe a possible imposed
+                                    ! kinematics; 
+                                    ! flag_in-built_monitors(logical): flag for 
+                                    ! in-built motion of control lines and 
+                                    ! DB-SPH frontiers
+! if (imposed_kinematics_records==1): start
+time_1 velocity_x_1 velocity_x_2 velocity_x_3
+! ...                               ! other possible  records
+time_last velocity_x_last velocity_x_last velocity_x_last
+                                    ! (records for the imposed translational 
+                                    ! kinematics to frontiers)
+! if (imposed_kinematics_records==1): end
+n_inlet n_outlet                    ! n_inlet(number of inlet sections)
+                                    ! n_outlet(number of outlet sections)
+! if (n_inlet>1): start
+x_inlet_1 y_inlet_1 z_inlet_1 n_x_inlet_1 n_y_inlet_1 n_z_inlet_1 velocity_x_inlet_1 velocity_y_inlet_1 velocity_z_inlet_1 L_inlet_1
+...                                 ! (other possible records)
+x_inlet_last y_inlet_last z_inlet_last n_x_inlet_last n_y_inlet_last n_z_inlet_last velocity_x_inlet_last velocity_y_inlet_last velocity_z_inlet_last L_inlet_last
+                                    ! inlet section data: position, normal, 
+                                    ! velocity, length.
+! if (n_inlet>1): end
+! if (n_outlet>1): start
+x_outlet_1 y_outlet_1 z_outlet_1 n_x_outlet_1 n_y_outlet_1 n_z_outlet_1 velocity_x_outlet_1 velocity_y_outlet_1 velocity_z_outlet_1 L_outlet_1
+...                                 ! (other possible records)
+x_outlet_last y_outlet_last z_outlet_last n_x_outlet_last n_y_outlet_last n_z_outlet_last L_outlet_last p_outlet_last
+                                    ! outlet section data: position, normal, 
+                                    ! length, pressure
+! if (n_outlet>1): end
+##### END DBSPH #####
+
+##### BED LOAD TRANSPORT #####
+! Input parameters for bed-load transport (blt) scheme
+erosion_criterion_ID ID_main_fluid ID granular 
+                                    ! erosion_criterion_ID=0(no bed-load 
+                                    ! transport),1(Shields-Seminara),2(Shields 
+                                    ! without blt-fixed bed interactions),3
+                                    ! (Mohr-Coulomb, not recommended); 
+                                    ! ID_main_fluid(medium of 
+                                    ! the main fluid); ID granular
+                                    ! (medium of the blt layer)
+! if (erosion_criterion_ID>0): start
+velocity_fixed_bed erosion_flag     ! velocity_fixed_bed(velocity threshold
+                                    ! -e.g. equal to velocity scale/100- to 
+                                    ! detect the fixed bed); erosion_flag=0
+                                    ! (activated far from fronts); 1(inactive),
+                                    ! 2(active everywhere)
+viscosity_blt_formula deposition_at_frontiers Gamma_slope_flag
+                                    ! viscosity_blt_formula(in the bed-load 
+                                    ! transport layer)=1(Chauchat-Médale 2010 
+                                    ! CMAME),2(Chezy-like),3(diluted viscosity),
+                                    ! 4(lambda(Bn));deposition_at_frontiers=1
+                                    ! (imposed),0(not imposed); Gamma_slope_flag
+                                    ! =1(Gamma slope angle computed),0(null)
+n_monitor_lines dt_out erosion_convergence_criterion n_max_iterations
+                                    ! n_monitor_lines(number of monitoring lines
+                                    ! aligned with x- or y-axis); dt_out(writing
+                                    ! time step); erosion_convergence_criterion
+                                    ! (convergence criterion for the erosion 
+                                    ! criterion); n_max_iterations(maximum 
+                                    ! number of iterations for the erosion 
+                                    ! criterion)
+Chezy_friction_coefficient          ! Chezy_friction_coefficient(default=0.005)
+x_min_dt x_max_dt
+y_min_dt y_max_dt
+z_min_dt z_max_dt                   ! Vertices of the parallelepiped, within 
+                                    ! which the mixture particles can influence 
+                                    ! the time step estimation
+line_ID                             ! monitoring line ID for blt 
+x_line y_line                       ! monitoring line is defined by variable or
+                                    ! fixed (-999.) x- and y-coordinates
+! if (erosion_criterion_ID>0): end
+##### end BED LOAD TRANSPORT #####
+
+##### medium #####
+! Input parameters for the fluids 
+fluid_type                          ! fluid_type=liquid,granular
+fluid_ID                            !
+! If (fluid_type==liquid): start
+density bulk_modulus
+! If (fluid_type==liquid): end
+! If (fluid_type==granular): start
+solid_phase_density solid_phase_bulk_modulus
+                                    !
+! If (fluid_type==granular): end
+Monaghan_alpha Monaghan_beta        ! Monaghan alpha (artificial viscosity), 
+                                    ! Monaghan beta (=0, artificial viscosity)
+diffusion_coefficient settling velocity coefficient
+                                    ! null recommended values (i.e. inactive 
+                                    ! parameters)
+0. 0. 0.                            
+! If (fluid_type==liquid): start                                    
+dynamic_viscosity                   !
+roughness_coefficient               ! null recommended values (i.e. inactive 
+                                    ! parameter)
+! If (fluid_type==liquid): end
+! if ((fluid_type==granular).and.(erosion_criterion_ID==1)): start
+delta                               ! delta(internal friction angle in degrees, 
+                                    ! even if the code works in radians)       
+effective_porosity d_50 d_90        !
+! if ((fluid_type==granular).and.(erosion_criterion_ID==1)): end
+! if ((fluid_type==granular).and.(erosion_criterion_ID>1)): start
+! Alternative to the reference blt scheme
+cohesion viscosity_max tuned_viscosity
+                                    ! cohesion; viscosity_max,tuned_viscosity (
+                                    ! tuning parameters for viscosity) 
+delta                               ! delta(internal friction angle in degrees, 
+                                    ! even if the code works in radians)                                        
+roughness_coefficient d_50 erosion_model
+                                    ! roughness_coefficient; d_50; erosion_model
+                                    ! =shields,mohr
+max_step_still                      ! max_step_still(number of time steps during
+                                    ! which mixture particles are kept still)               
+! if ((fluid_type==granular).and.(erosion_criterion_ID>1)): end
+##### end medium #####
+
+##### BODY DYNAMICS #####
+! Input parameters for the scheme on body transport in fluid flows
+n_bodies dx/dx_body imping_body_grav
+                                    ! n_bodies(number of transported solid 
+                                    ! bodies); dx/dx_body(ratio between fluid 
+                                    ! particle size and body particle size); 
+                                    ! imping_body_grav=0(gravity always 
+                                    ! active, recommended value),1(gravity 
+                                    ! inactive until the first impact 
+                                    ! body-fluid)
+! if (n_bodies>0): start
+ID_first_body n_elem                ! ID_first_body=1; n_elem(number of 
+                                    ! elements of the body)
+body_mass                           !
+pos_CM_x pos_CM_y pos_CM_z          ! pos_CM(position of the centre of mass at 
+                                    ! t=0)
+Ic_flag                             ! Ic_flag=0,1(mass moment of inertia is 
+                                    ! imposed)
+! if(Ic_flag==1): start
+Ic(1,1) Ic(1,2) Ic(1,3)             !
+Ic(2,1) Ic(2,2) Ic(2,3)             ! 
+Ic(3,1) Ic(3,2) Ic(3,3)             ! 
+! if(Ic_flag==1): end
+alfa_x alfa_y alfa_z                ! alfa(rotation angles of the body axis with
+                                    ! respect to the reference system axis at 
+                                    ! t=0)
+pos_rotC_x pos_rotC_y pos_rotC_z    ! pos_rotC(centre of rotation just to 
+                                    ! configure the initial orientation in the 
+                                    ! global reference system)  
+vel_CM_x vel_CM_y vel_CM_z          ! vel_CM(velocity of the centre of mass at 
+                                    ! t=0)
+omega_x omega_y omega_z             ! omega(angular velocity of the body at t=0)
+imposed_kinematics_flag n_records   ! imposed_kinematics_flag=0,1(kinematics is
+                                    ! imposed); n_records(number of records, 
+                                    ! which desrcibe the imposed kinematics)
+first_ID_element                    ! first_ID_element=1(of body 1)
+L_x L_y L_z                         ! L_x,L_y,L_z(side lengths of the element)
+pos_CM_elem_x pos_CM_elem_y pos_CM_elem_z
+                                    ! pos_CM_elem(position of the centre of mass
+                                    ! of the element at t=0)
+alfa_elem_x alfa_elem_y alfa_elem_z ! alfa_elem(rotation angles of the body axis 
+                                    ! with respect to the reference system axis  
+                                    ! at t=0)
+face_xmin_flag face_xmax_flag face_ymin_flag face_ymax_flag face_zmin_flag face_zmax_flag
+                                    ! (integer flags to activate the normal 
+                                    ! vectors of surface body particles only 
+                                    ! if face_..._flag=1; x/y/z_min/max 
+                                    ! indicates the 6 faces of the element 
+                                    ! -parallelepiped-) 
+xmin xmax ymin ymax zmin zmax       ! (spatial limits -in the global reference
+                                    ! system before the initial rotation- to 
+                                    ! deactivate particle masses if((x>=xmin).       
+                                    ! or.(x<=xmax).or.(y>=ymin).or.(y<=ymax).or.
+                                    ! (z>=zmin).or(z<=zmax)) foor boolean 
+                                    ! operations on elements/body)
+...                                 ! (other element records)
+...                                 ! (last element record)
+!
+...                                 ! (other body records)
+!
+...                                 ! (last body record)
+! if (n_bodies>0): end
+##### end BODY DYNAMICS #####
+
+##### RUN PARAMETERS #####
+! Input parameters for time integration, partial smoothing and memory management
+final_time final_time_step          ! (the run stops when reaching either the 
+                                    ! final time or the final time step)
+CFL Leapfrog_flag scheme_order factor dt_alfa_Mon 
+                                    ! CFL, Leapfrog_flag=1(Leapfrog time 
+                                    ! integration scheme),0(explicit RK time 
+                                    ! integration schemes); scheme_order(time 
+                                    ! integration scheme order, but for Leapfrog
+                                    ! is "1"); factor(=0., weighting factor to 
+                                    ! estimate dt); dt_alfa_Mon(logical flag 
+                                    ! making Monaghan artificial viscosity 
+                                    ! coefficient to influence dt)
+teta_p, teta_u var                  ! teta_p,teta_u(coefficients for partial
+                                    ! smoothing of pressure and velocity); var=A
+COEFNMAXPARTI COEFNMAXPARTJ body_part_reorder
+                                    ! COEFNMAXPARTI:max0(max number of fluid 
+                                    ! particles)=COEFNMAXPARTI*nag; 
+                                    ! COEFNMAXPARTJ:maxb(max number of 
+                                    ! neighbours)=COEFNMAXPARTJ*(4h/dx)^D;
+                                    ! body_part_reorder(DB-SPH)=0(fixed 
+                                    ! frontiers),1(mobile frontiers)
+MAXCLOSEBOUNDFACES MAXNUMCONVEXEDGES
+                                    ! MAXCLOSEBOUNDFACES(max number of 
+                                    ! neighbouring boundary face per fluid 
+                                    ! particle); MAXNUMCONVEXEDGES(max number 
+                                    ! of edges) 
+GCBFVecDim                          ! GCBFVecDim(rough overestimation of the 
+                                    ! number of Grid Cell - Boundary Face 
+                                    ! intersections  (SA-SPH)
+density_thresholds_flag             ! density_thresholds_flag=0(default, no 
+                                    ! density limiters),1(density limiters for 
+                                    ! debug)
+##### end RUN PARAMETERS #####
+
+##### general physical properties #####
+! Input parameters for gravity and reference pressure
+! 3D case: start
+gravity_acceleration_x gravity_acceleration_y gravity_acceleration_z
+! 3D case: stop
+! 2D case: start
+gravity_acceleration_x gravity_acceleration_z
+! 2D case: stop
+reference_pressure                  !  
+##### end general physical properties #####
+
+!##### restart #####
+! (this section is not active)
+!##### end restart #####
+
+##### output regulation #####
+! Post-processing parameters for .txt files. The first two words (and the 
+! possible fourth) of each line are keywords.
+results time dt_out                 ! dt_out(writing time step)
+restart time dt_restart             ! dt_restart(=99999., restart time step)
+print partial log_file_frequency    ! log_file_frequency (log file writing time 
+                                    ! step in terms of time step number) 
+control time dt_out_mon             ! dt_out_mon(writing time step for 
+                                    ! monitoring elements)
+level time dt_out_FS medium fluid_ID
+                                    ! dt_out_FS(writing time step for free 
+                                    ! surface post-processing); fluid_ID 
+! if (IC_source_type==2): start        
+depth dt_out dt_out_depth           ! dt_out_depth(writing time step for 2D 
+                                    ! fields of water depth (h) and specific 
+                                    ! flow rate components (q_x=u_m*h,q_y=v_m*h))
+! if (IC_source_type==2): end
+##### end output regulation #####
+
+##### draw options #####
+! Post-processing parameters for Paraview file formats. The first two words  
+! of each line are keywords.
+vtkconverter any dt_out_PV          ! dt_out_PV(writing time step for Paraview 
+                                    ! .vtu files)
+##### end draw options #####
+
+##### control points #####
+! Input parameters for monitoring points
+x_monitor_point_1 y_monitor_point_1 z_monitor_point_1
+...                                  ! (other monitoring points)
+x_monitor_point_n y_monitor_point_n z_monitor_point_n
+##### end control points #####
+
+##### control lines #####
+! Input parameters for monitoring lines
+line_1_label
+! if(D==2D): start
+edge_1_line_1_x edge_1_line_1_z 
+edge_2_line_1_x edge_2_line_1_z
+! if(D==2D): end
+! if(D==3D): start
+edge_1_line_1_x edge_1_line_1_y edge_1_line_1_z 
+edge_2_line_1_x edge_1_line_1_y edge_2_line_1_z
+! if(D==3D): end
+line_1_number_of_discretization_points
+...                                 ! (other possible monitoring line records)
+##### end control lines #####
+
+##### control sections #####
+! (this section is not active)
+##### end control sections #####
+
+##### section flow rate #####
+! Input parameters on monitoring sections for the flow rate 
+n_sect dt_out n_fluid_types         ! n_sect(number of the flow rate monitoring 
+                                    ! sections; dt_out(writing time step for 
+                                    ! flow rates); n_fluid_types(number of fluid
+                                    ! types (the first ID fluid types are 
+                                    ! selected)
+first_section_ID                    ! first_section_ID=1
+n_vertices                          ! n_vertices(number of vertices describing a
+                                    ! monitoring section for the flow rate (3 or
+                                    ! 4) of the first section
+vertex_1_x vertex_1_y vertex_1_z
+vertex_2_x vertex_2_y vertex_2_z
+vertex_3_x vertex_3_y vertex_3_z
+vertex_4_x vertex_4_y vertex_4_z 
+                                    ! vertices of the first section (in case of 
+                                    ! 3 vertices do not mind about the fourth 
+                                    ! point)
+...                                 ! other possible section records
+##### end section flow rate #####

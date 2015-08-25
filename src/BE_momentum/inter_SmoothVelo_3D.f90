@@ -64,11 +64,11 @@ endif
 !------------------------
 ! Body particle contributions to pressure smoothing
 if (n_bodies>0) then
-   call start_and_stop(3,14)
+   call start_and_stop(3,7)
    call start_and_stop(2,19)
    call body_to_smoothing_vel(dervel_mat,unity_vec)
    call start_and_stop(3,19)
-   call start_and_stop(2,14)
+   call start_and_stop(2,7)
 endif
 !$omp parallel do default(none)                                                &
 !$omp private(ii,npi,contj,npartint,npj,rhoi,rhoj,amassj,dervel,moddervel)     &
