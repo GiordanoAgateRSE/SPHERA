@@ -57,7 +57,7 @@ line_last_ID line_last_vertex_1 ... line_last_vertex_last line_last_Boundary_ID
 ! about the vertex order (better anticlockwise).
 1 face_1_vertex_1 ... face_1_vertex last face_1_Boundary_ID
                                            ! first face data
-...                                        ! other records
+...                                        ! other records 
 face_last_ID face_last_vertex_1 ... face_last_vertex_last face_last_Boundary_ID
 ##### END FACES #####
 ! If (D==3D): end
