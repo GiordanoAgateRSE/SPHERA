@@ -132,7 +132,8 @@ type TyParticle
    integer(4)       :: icol ! Colour 
    integer(4)       :: imed ! Fluid ID                          
    integer(4)       :: FS ! Free Surface (0,3: no free surface; 1,2: free 
-                          ! surface) (2,3: deactivated for Shep evolution)                            
+                          ! surface) (2,3: deactivated for Shep evolution) 
+   integer(4)       :: laminar_flag ! Laminar flag (for bed-load transport)                           
    double precision :: densass                        
    double precision :: mass ! Mass                          
    double precision :: dens ! Density                          
@@ -662,6 +663,8 @@ type DBSPH_der_type
                                 ! inlet BC)
    integer(4)        :: n_outlet ! Number of outlet sections (to impose 
                                  ! DBSPH outlet BC)
+   integer(4)        :: ply_n_face_vert ! Number of vertices for each surface 
+                                        ! mesh face in the .ply input files 
    double precision  :: dx_dxw ! Ratio between the fluid and the 
                                ! semi-particle sizes
    double precision  :: k_w ! Coefficient to compute semi-particle volumes

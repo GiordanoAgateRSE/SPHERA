@@ -188,10 +188,10 @@ do
    do j=(old_size_vert+1),(old_size_vert+n_vertices)
       read (unit_DBSPH_mesh,*) DBSPH%surf_mesh%vertices(j)%pos(:)
    enddo
-! Allocate or resize DBSPH%surf_mesh%faces on the maximum number of n_faces*2 
+! Allocate or resize DBSPH%surf_mesh%faces on the maximum number of faces
 ! (worst case with all quadrilateral faces)
    if (.not.allocated(DBSPH%surf_mesh%faces)) then
-      if (ncord==3) then
+      if ((ncord==3).and.(DBSPH%ply_n_face_vert==4)) then
          allocate(DBSPH%surf_mesh%faces(2*n_faces),STAT=alloc_stat)
          else
             allocate(DBSPH%surf_mesh%faces(n_faces),STAT=alloc_stat)
@@ -204,7 +204,7 @@ do
          stop 
       endif
       if (.not.allocated(aux_der_type_faces)) then
-         if (ncord==3) then
+         if ((ncord==3).and.(DBSPH%ply_n_face_vert==4)) then
              allocate(aux_der_type_faces(2*n_faces),STAT=alloc_stat)
             else
              allocate(aux_der_type_faces(n_faces),STAT=alloc_stat)
@@ -220,7 +220,7 @@ do
       old_size_face = 0
       else
          old_size_face = size(DBSPH%surf_mesh%faces)
-         if (ncord==3) then
+         if ((ncord==3).and.(DBSPH%ply_n_face_vert==4)) then
             new_size_face = old_size_face + 2 *n_faces
             else
                new_size_face = old_size_face + n_faces
@@ -265,29 +265,45 @@ do
 ! Read the face vertices: start
   k=old_size_face+1
    do j=1,n_faces
-      read(unit_DBSPH_mesh,*) face_vert_num,aux_face_vert(:)
+      read(unit_DBSPH_mesh,*) face_vert_num,aux_face_vert(1:DBSPH%ply_n_face_vert)
 ! Assignation of vertices with eventual conversion of any quadrilateral 
 ! into 2 triangles; computation of area and normal 
       if (ncord==3) then
-         DBSPH%surf_mesh%faces(k)%vert_list(1:3) = old_size_vert +             &
-                                                   aux_face_vert(1:3) + 1
-         DBSPH%surf_mesh%faces(k+1)%vert_list(1) = old_size_vert +             &
-                                                   aux_face_vert(1) + 1
-         DBSPH%surf_mesh%faces(k+1)%vert_list(2:3)= old_size_vert +            &
-                                                    aux_face_vert(3:4) + 1
-         DBSPH%surf_mesh%faces(k)%vert_list(4) = 0
-         k = k+2
+         if (DBSPH%ply_n_face_vert==4) then
+            DBSPH%surf_mesh%faces(k)%vert_list(1:3) = old_size_vert +          &
+                                                      aux_face_vert(1:3) + 1
+            DBSPH%surf_mesh%faces(k+1)%vert_list(1) = old_size_vert +          &
+                                                      aux_face_vert(1) + 1
+            DBSPH%surf_mesh%faces(k+1)%vert_list(2:3)= old_size_vert +         &
+                                                       aux_face_vert(3:4) + 1
+            DBSPH%surf_mesh%faces(k)%vert_list(4) = 0
+            k = k+2
 ! Computation of area and normal 
-         call area_triangle(                                                   &
-         DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(k-2)%vert_list(1))%pos,&
-         DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(k-2)%vert_list(2))%pos,& 
-         DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(k-2)%vert_list(3))%pos,&
-            DBSPH%surf_mesh%faces(k-2)%area,DBSPH%surf_mesh%faces(k-2)%normal)
-         call area_triangle(                                                   &
-         DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(k-1)%vert_list(1))%pos,&
-         DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(k-1)%vert_list(2))%pos,&
-         DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(k-1)%vert_list(3))%pos,&
-         DBSPH%surf_mesh%faces(k-1)%area,DBSPH%surf_mesh%faces(k-1)%normal)
+            call area_triangle(                                                &
+DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(k-2)%vert_list(1))%pos,         &
+DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(k-2)%vert_list(2))%pos,         & 
+DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(k-2)%vert_list(3))%pos,         &
+               DBSPH%surf_mesh%faces(k-2)%area,                                &
+               DBSPH%surf_mesh%faces(k-2)%normal)
+            call area_triangle(                                                &
+DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(k-1)%vert_list(1))%pos,         &
+DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(k-1)%vert_list(2))%pos,         &
+DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(k-1)%vert_list(3))%pos,         &
+               DBSPH%surf_mesh%faces(k-1)%area,                                &
+               DBSPH%surf_mesh%faces(k-1)%normal)
+            else
+               DBSPH%surf_mesh%faces(k)%vert_list(1:3) = old_size_vert +       &
+                                                         aux_face_vert(1:3) + 1
+               DBSPH%surf_mesh%faces(k)%vert_list(4) = 0
+               k = k+1
+! Computation of area and normal 
+               call area_triangle(                                             &
+DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(k-1)%vert_list(1))%pos,         &
+DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(k-1)%vert_list(2))%pos,         &
+DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(k-1)%vert_list(3))%pos,         &
+                  DBSPH%surf_mesh%faces(k-1)%area,                             &
+                  DBSPH%surf_mesh%faces(k-1)%normal)             
+         endif
          else
             DBSPH%surf_mesh%faces(k)%vert_list(1:4) = old_size_vert +          &
                                                       aux_face_vert(1:4) + 1
@@ -316,7 +332,7 @@ DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(k-1)%vert_list(1))%pos          &
    endif
 ! Read the face vertices: end   
 ! Resize DBSPH%surf_mesh%faces on the actual number of faces 
-   if (ncord==3) then
+   if ((ncord==3).and.(DBSPH%ply_n_face_vert==4)) then
       new_size_face = size(DBSPH%surf_mesh%faces) - (k - old_size_face - 1 - 2 &
                       * n_faces)   
       else

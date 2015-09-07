@@ -145,9 +145,11 @@ face_loop: do icbf = 1,Ncbf
 ! Explosion
          endif
          if (cinvisci>zero) then
-            cinviscmult = two * cinvisci * IntdWrm1dV *                        &
-               Tratto(stretch)%ShearCoeff
-            ViscoShear(:) = ViscoShear(:) + cinviscmult * dvij(:)
+            if (pg(npi)%laminar_flag==1) then
+               cinviscmult = two * cinvisci * IntdWrm1dV *                     &
+                             Tratto(stretch)%ShearCoeff
+               ViscoShear(:) = ViscoShear(:) + cinviscmult * dvij(:)
+            endif
          endif
       endif
       elseif (stretchtype=="velo") then 
@@ -218,6 +220,8 @@ enddo face_loop
 ! work properly (it is erased at the moment)
 ! It seems useless at this stage to comment all the other lines involved as 
 ! they are sparse and do not cause relevant computational time.
+! AA!!! test
+tvisc(:) = tvisc(:) - ViscoShear(:)
 !  tvisc(:) = tvisc(:) - ViscoShear(:)
 ! Contribution for specific internal energy
 if (esplosione) then

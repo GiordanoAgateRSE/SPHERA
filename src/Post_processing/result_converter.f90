@@ -373,6 +373,16 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
       write(unitvtk,'(a)') '      </DataArray>'
    endif 
    if (Granular_flows_options%ID_erosion_criterion>=1) then
+! laminar_flag
+      write(unitvtk,'(a)')                                                     &
+         '      <DataArray type="Int32" Name="laminar_flag" format="ascii" >'
+      do i=1,numpoints,16
+         k1 = i
+         k2 = k1 + 15
+         if (k2>numpoints) k2 = numpoints
+         write(unitvtk,'(8x,16(1x,i8))') (pg(finger(k))%laminar_flag,k = k1,k2)
+      enddo
+      write(unitvtk,'(a)') '      </DataArray>'   
 ! sigma_prime
       write(unitvtk,'(a)') '      <DataArray type="Float32" Name="sigma_prime" format="ascii" >'
       do i=1,numpoints,16

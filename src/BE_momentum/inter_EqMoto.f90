@@ -44,9 +44,10 @@ double precision :: rhoi,rhoj,amassj,pi,pj,alpha,veln,velti,veltj,deltan,pre
 double precision :: coeff,secinv,nupa,nu,modderveln,moddervelt,moddervel
 double precision :: dvtdn,denorm,rij_su_h,ke_coef,kacl_coef,rij_su_h_quad
 double precision :: vol_Shep,Ww_Shep,rijtemp,rijtemp2
-double precision :: gradmod,gradmodwacl,wu,denom
+double precision :: gradmod,gradmodwacl,wu,denom,absv_pres_grav_inner
+double precision :: absv_Morris_inner,Morris_inner_weigth
 double precision,dimension(3) :: dervel,dervelmorr,appopres,appodiss,rvw
-double precision,dimension(3) :: rvwalfa,rvwbeta,ragtemp
+double precision,dimension(3) :: rvwalfa,rvwbeta,ragtemp,rvw_sum
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -65,6 +66,7 @@ dervelmorr(:) = zero
 deltan = 1.d+07
 ke_coef = Domain%coefke / Domain%h
 kacl_coef = Domain%coefkacl / Domain%h
+rvw_sum(:) = zero
 !------------------------
 ! Statements
 !------------------------
@@ -209,12 +211,23 @@ do contj=1,nPartIntorno(npi)
    tdiss(:) = tdiss(:) + appodiss(:)   
    call viscomorris (npi,npj,npartint,dervel,rvw)
    tvisc(:) = tvisc(:) + rvw(:)
+   rvw_sum(:) = rvw_sum(:) + rvw(:)
 ! Momentum equation: end
    if (esplosione) &
       pg(npi)%dEdT = pg(npi)%dEdT + half * (dervel(1) * (appopres(1) +         &
                      appodiss(1)) + dervel(2) * (appopres(2) + appodiss(2)) +  &
                      dervel(3) * (appopres(3) + appodiss(3)))
-end do
+enddo
+if (pg(npi)%visc>0.d0) then
+   absv_pres_grav_inner = dsqrt(dot_product(tpres,tpres)) + GI
+   absv_Morris_inner = dsqrt(dot_product(rvw_sum,rvw_sum))
+   Morris_inner_weigth = absv_Morris_inner / absv_pres_grav_inner * 100.d0
+   if (Morris_inner_weigth>5.d0) then
+      pg(npi)%laminar_flag = 1
+      else
+         pg(npi)%laminar_flag = 0
+   endif
+endif
 ! Boundary contributions (DB-SPH)
 if ((Domain%tipo=="bsph").and.(DBSPH%n_w > 0)) then
    do contj=1,nPartIntorno_fw(npi)

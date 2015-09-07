@@ -42,6 +42,7 @@ character(1),intent(inout) :: comment
 logical :: MUSCL_boundary_flag,in_built_monitors
 integer(4) :: ioerr,n_monitor_points,n_monitor_regions,i,alloc_stat            
 integer(4) :: dealloc_stat,n_kinematics_records,j,n_inlet,n_outlet
+integer(4) :: ply_n_face_vert
 double precision :: dx_dxw,k_w
 integer(4),allocatable,dimension(:) :: monitor_IDs
 double precision,dimension(:) :: monitor_region(6)           
@@ -122,10 +123,10 @@ do while (TRIM(lcase(ainp))/="##### end dbsph #####")
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DBSPH_KINEMATICS_RECORDS",  &
             ninp,nout)) return            
       enddo
-      call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
-      read(ainp,*,iostat=ioerr) n_inlet,n_outlet
-      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DBSPH_INLET_OUTLET",ninp,nout))&
-         return 
+      call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+      read(ainp,*,iostat=ioerr) n_inlet,n_outlet,ply_n_face_vert
+      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                                &
+         "DBSPH_INLET_OUTLET_PLY_N_FACE_VERT",ninp,nout)) return 
       if (n_inlet>0) then
          if (.not.allocated(DBSPH%inlet_sections)) then
             allocate (DBSPH%inlet_sections(n_inlet,10),STAT=alloc_stat)
@@ -215,7 +216,9 @@ do while (TRIM(lcase(ainp))/="##### end dbsph #####")
          write(nout,"(1x,a,1p,6(g12.4))")                                      &
 "x(m),y(m),z(m),n_x,n_y,n_z,length(m),pres(Pa)............: ",                 &
             DBSPH%outlet_sections(i,:)        
-      enddo       
+      enddo   
+      write(nout,"(1x,a,i12)")                                                 &
+"ply_n_face_vert:................",ply_n_face_vert    
       write(nout,"(1x,a)")  " "
 ! Assignment of the DB-SPH parameters 
       DBSPH%dx_dxw = dx_dxw
@@ -240,6 +243,7 @@ do while (TRIM(lcase(ainp))/="##### end dbsph #####")
       DBSPH%in_built_monitors = in_built_monitors
       DBSPH%n_inlet = n_inlet   
       DBSPH%n_outlet = n_outlet
+      DBSPH%ply_n_face_vert = ply_n_face_vert
    endif
    if (allocated(monitor_IDs)) then
       deallocate (monitor_IDs,STAT=dealloc_stat)

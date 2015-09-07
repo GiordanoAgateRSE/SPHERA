@@ -38,13 +38,17 @@ use Dynamic_allocation_module
 implicit none
 integer(4) :: npartint,i,j,npi,npj,Ncb,Nfzn,aux,nbi,npk,k,nbj,nbk
 integer(4) :: n_interactions,aux2,aux3,test,aux_locx_min,aux_locx_max,aux_int
+! AA!!! test
+integer(4) :: aux_scal_test
 double precision :: c2,k_masses,r_per,r_par,temp_dden,temp_acc,alfa_boun
 double precision :: aux_impact_vel,aux4,pres_mir
 double precision :: f_pres(3),temp(3),r_par_vec(3),f_coll_bp_bp(3)          
 double precision :: f_coll_bp_boun(3),dvar(3),pos_aux(3),normal_plane(3)
 double precision :: u_rel(3),x_rel(3),aux_acc(3),aux_vec(3),aux_vec2(3)
 double precision :: loc_pos(3),aux_locx_vert(3)
+! AA!!! test
 double precision :: aux_mat(3,3)
+integer(4),dimension(:),allocatable :: inter_front
 double precision,dimension(:,:),allocatable :: Force_mag_sum,r_per_min
 double precision,dimension(:,:),allocatable :: aux_gravity
 double precision,dimension(:,:,:),allocatable :: Force,Moment
@@ -63,6 +67,8 @@ allocate(Moment(n_bodies,aux,3))
 allocate(Force_mag_sum(n_bodies,aux))
 allocate(r_per_min(n_bodies,aux))
 allocate(aux_gravity(n_bodies,3))
+! AA!!! test 
+allocate(inter_front(n_bodies))
 !------------------------
 ! Initializations
 !------------------------
@@ -71,6 +77,10 @@ Moment = 0.d0
 Force_mag_sum = 0.d0
 r_per_min = 1000000.d0
 aux2 = 0
+! AA!!! test start
+inter_front(:) = 0
+aux_scal_test = 0
+! AA!!! test end
 !------------------------
 ! Statements
 !------------------------
@@ -218,6 +228,13 @@ do npi=1,n_body_part
                   aux_mat(:,1) = BoundaryFace(j)%T(:,1)
                   aux_mat(:,2) = BoundaryFace(j)%T(:,2)
                   aux_mat(:,3) = BoundaryFace(j)%T(:,3)
+                  if (BoundaryFace(j)%nodes==4) then
+                     call reference_system_change(bp_arr(npi)%pos,             &
+                        BoundaryFace(j)%Node(4)%GX,aux_mat,loc_pos)
+                     elseif (BoundaryFace(j)%nodes==3) then
+                        call reference_system_change(bp_arr(npi)%pos,          &
+                           BoundaryFace(j)%Node(3)%GX,aux_mat,loc_pos)
+                  endif
                   call reference_system_change(bp_arr(npi)%pos,                &
                      BoundaryFace(j)%Node(4)%GX,aux_mat,loc_pos)
                   call point_inout_polygone(loc_pos(1:2),                      &
@@ -262,12 +279,19 @@ do npi=1,n_body_part
                            min(r_per,r_per_min(bp_arr(npi)%body,n_bodies+j))
                         if (Gamma_boun(r_per,Domain%h)<=0.d0)                  &
                            impact_vel(aux2,n_bodies+j) = 0.d0
+! AA!!! test
+                        aux_scal_test = aux_scal_test + 1                            
                         endif
                      endif
                   endif  
                endif
             end do 
          endif
+! AA!!! test start
+         inter_front(bp_arr(npi)%body) = max(inter_front(bp_arr(npi)%body),    &
+                                         aux_scal_test) 
+         aux_scal_test = 0
+! AA!!! test end
 ! 2D case
          if (ncord==2) then
             do j=1,NumBSides
@@ -386,9 +410,10 @@ do npi=1,n_body_part
 enddo     
 ! Loop over the transported bodies (global contributions from body-body and 
 ! boundary-body impacts; computation of Ic and its inverse)
+! AA!!!test sub for inter_front
 !$omp parallel do default(none) private(i,j,k_masses,alfa_boun,aux_int)        &
 !$omp shared(n_bodies,body_arr,ncord,it_start,it_corrente,aux,r_per_min,Domain)&
-!$omp shared(Force_mag_sum,Force,Moment)
+!$omp shared(Force_mag_sum,Force,Moment,inter_front)
 do i=1,n_bodies
    if (body_arr(i)%imposed_kinematics==0) then
 ! Forces and torques/moments
@@ -403,6 +428,8 @@ do i=1,n_bodies
             if (Force_mag_sum(i,j)>0.d0) then
                alfa_boun = (Gamma_boun(r_per_min(i,j),Domain%h) /              &
                            r_per_min(i,j) * k_masses) / Force_mag_sum(i,j)
+! AA!!! test                           
+               if (j>n_bodies) alfa_boun = alfa_boun / inter_front(i)
                Force(i,j,:) = Force(i,j,:) * alfa_boun
                body_arr(i)%Force(:) = body_arr(i)%Force(:) + Force(i,j,:)
                Moment(i,j,:) = Moment(i,j,:) * alfa_boun
@@ -472,6 +499,8 @@ deallocate(Moment)
 deallocate(Force_mag_sum)
 deallocate(r_per_min)
 deallocate(aux_gravity)
+! AA!!! test
+deallocate(inter_front)
 return
 end subroutine RHS_body_dynamics
 

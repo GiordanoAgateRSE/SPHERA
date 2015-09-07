@@ -1,12 +1,12 @@
 # Variables to be updated 
-VERSION = 7_2
+VERSION = 8_0_AA
 #    run, debug
 EXECUTION = debug
 #    -O1 (run), -g -O0 -fbacktrace -C (gfortran debug),
 #    -g -O0 -traceback -C -check bounds -debug all (ifort debug)
-COMPILATION_FLAGS = -g -O0 -fbacktrace -C   
+COMPILATION_FLAGS = -g -O0 -traceback -C -check bounds -debug all
 #    gfortran, ifort
-COMPILER = gfortran
+COMPILER = ifort
 #    -fopenmp, -openmp, (blank for debug)  
 OMP_FLAG =    
 SOURCES = \
