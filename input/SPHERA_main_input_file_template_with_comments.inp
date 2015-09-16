@@ -30,7 +30,7 @@ title                ! title (of the test case, string)
 ##### DOMAIN #####
 ! Input parameters for spatial resolution and boundary treatment scheme
 D BC_string   ! D(spatial dimensionality)=2(2D),3(3D); BC_string(Boundary 
-              ! treatment scheme)=semi(SA-SPH),dbsph(DB-SPH)
+              ! treatment scheme)=semi(SA-SPH),bsph(DB-SPH)
 dx h/dx r     ! The third parameter ("r") is optional and provides a white noise
               ! to the IC particle positions
 ##### END DOMAIN #####
@@ -42,7 +42,7 @@ dx h/dx r     ! The third parameter ("r") is optional and provides a white noise
 ! air reservoirs" 
 ! The SA-SPH boundary treatment scheme requires the vertices of the wall 
 ! frontiers
-! In absence of a declared origin, the first vertex is fictitious, equal to the 
+! In absence of a declared origin, the first vertex is fictitious,  
 ! and does not belong to any boundary (only useful for Paraview) 
 1 Vertex_x Vertex_y Vertex_z              ! (first vertex data) 
 ! ...                                     ! (other vertices)
@@ -307,6 +307,8 @@ max_step_still                      ! max_step_still(number of time steps during
 
 ##### BODY DYNAMICS #####
 ! Input parameters for the scheme on body transport in fluid flows
+! Bodies with imposed kinematics are listed after all the bodies with computed 
+! kinematics 
 n_bodies dx/dx_body imping_body_grav
                                     ! n_bodies(number of transported solid 
                                     ! bodies); dx/dx_body(ratio between fluid 
