@@ -265,7 +265,8 @@ do
 ! Read the face vertices: start
   k=old_size_face+1
    do j=1,n_faces
-      read(unit_DBSPH_mesh,*) face_vert_num,aux_face_vert(1:DBSPH%ply_n_face_vert)
+      read(unit_DBSPH_mesh,*) face_vert_num,                                   &
+         aux_face_vert(1:DBSPH%ply_n_face_vert)
 ! Assignation of vertices with eventual conversion of any quadrilateral 
 ! into 2 triangles; computation of area and normal 
       if (ncord==3) then

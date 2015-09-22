@@ -39,6 +39,7 @@ use I_O_diagnostic_module
 !------------------------
 implicit none
 integer(4) :: j
+double precision :: vel_aux(3),omega_aux(3),rel_pos(3)
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -57,15 +58,31 @@ if (DBSPH%n_w>0) then
    do j=1,DBSPH%n_kinematics_records
       if (DBSPH%kinematics(j,1)>=tempo) then
          if (DBSPH%kinematics(j,1)==tempo) then
-            pg_w(1)%vel(:) = DBSPH%kinematics(j,2:4)
+            vel_aux(:) = DBSPH%kinematics(j,2:4)
+            omega_aux(:) = DBSPH%kinematics(j,5:7)
             else
-               pg_w(1)%vel(:) = DBSPH%kinematics(j-1,2:4) +                    &
-                                (DBSPH%kinematics(j,2:4) -                     &
-                                DBSPH%kinematics(j-1,2:4)) /                   &
-                                (DBSPH%kinematics(j,1) -                       &
-                                DBSPH%kinematics(j-1,1))                       &
-                                * (tempo - DBSPH%kinematics(j-1,1))
+               vel_aux(:) = DBSPH%kinematics(j-1,2:4) +                        &
+                            (DBSPH%kinematics(j,2:4) -                         &
+                            DBSPH%kinematics(j-1,2:4)) /                       &
+                            (DBSPH%kinematics(j,1) -                           &
+                            DBSPH%kinematics(j-1,1)) * (tempo -                &
+                            DBSPH%kinematics(j-1,1)) 
+               omega_aux(:) = DBSPH%kinematics(j-1,5:7) +                      &
+                              (DBSPH%kinematics(j,5:7) -                       &
+                              DBSPH%kinematics(j-1,5:7)) /                     &
+                              (DBSPH%kinematics(j,1) -                         &
+                              DBSPH%kinematics(j-1,1)) * (tempo -              &
+                              DBSPH%kinematics(j-1,1))                  
          endif
+!$omp parallel do default(none)                                                &
+!$omp shared(DBSPH,pg_w)                                                       &
+!$omp private(npi,rel_pos,vel_aux)
+         do npi=1,DBSPH%n_w
+            rel_pos = pg_w(npi)%pos(:) - DBSPH%rotation_centre(:)          
+            call Vector_Product(omega_aux,rel_pos,pg_w(npi)%vel(:),3)
+            pg_w(npi)%vel(:) = pg_w(npi)%vel(:) + vel_aux(:)
+         enddo
+!$omp end parallel do
          exit
       endif
    enddo

@@ -669,6 +669,8 @@ type DBSPH_der_type
                                ! semi-particle sizes
    double precision  :: k_w ! Coefficient to compute semi-particle volumes
                             ! (DB-SPH equations)
+   double precision  :: rotation_centre(3) ! centre of rotation for 
+                                           ! DB-SPH frontiers
    double precision  :: monitor_region(6) ! (xmin,xmax,ymin,xmax,zmin,zmax)
                                           ! to detect the monitoring region
 ! IDs of the monitoring points

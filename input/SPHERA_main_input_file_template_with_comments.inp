@@ -188,17 +188,19 @@ ID_wall_element_monitor_1 ... ID_wall_element_monitor_n
 ! if (n_monitor_regions>0): start
 xmin,xmax,ymin,xmax,zmin,zmax       ! (monitoring region vertices) 
 ! if (n_monitor_regions>0): end
-imposed_kinematics_records flag_in-built_monitors
+imposed_kinematics_records flag_in-built_monitors rotation_centre_x rotation_centre_y rotation_centre_z
                                     ! imposed_kinematics_records(number of 
                                     ! records, which describe a possible imposed
                                     ! kinematics; 
                                     ! flag_in-built_monitors(logical): flag for 
                                     ! in-built motion of control lines and 
+                                    ! DB-SPH frontiers;
+                                    ! rotation_centre: centre of rotation for 
                                     ! DB-SPH frontiers
 ! if (imposed_kinematics_records==1): start
-time_1 velocity_x_1 velocity_x_2 velocity_x_3
+time_1 velocity_x_1 velocity_x_1 velocity_x_1 omega_x_1 omega_y_1 omega_z_1 
 ! ...                               ! other possible  records
-time_last velocity_x_last velocity_x_last velocity_x_last
+time_last velocity_x_last velocity_x_last velocity_x_last omega_x_last omega_y_last omega_z_last
                                     ! (records for the imposed translational 
                                     ! kinematics to frontiers)
 ! if (imposed_kinematics_records==1): end

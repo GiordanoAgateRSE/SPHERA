@@ -199,310 +199,15 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
    tempo = tempo + dt
    if (nscr>0) write (nscr,"(a,i8,a,g13.6,a,g12.4,a,i8,a,i5)") " it= ",it,     &
       "   time= ",tempo,"  dt= ",dt,"    npart= ",nag,"   out= ",num_out
-1100 continue
-   if (Domain%time_split==0) then
+   do while ((stage_flag.eqv.(.false.)).or.((Domain%RKscheme>1).and.           &
+      (Domain%time_stage>1)))
+      if (Domain%time_split==0) then
 ! Explicit RK schemes 
 ! SPH parameters 
-      call start_and_stop(2,10)
-      if ((Domain%tipo=="semi").and.(Domain%time_stage<2)) call CalcVarLength
-      call start_and_stop(3,10)
-! To evaluate the close boundaries and integrals
-! for the current particle in every loop and storing them in the general 
-! storage array.
-! Computation and storage of the boundary integrals
-      if (Domain%tipo=="semi") then
-         call start_and_stop(2,11)
-         call ComputeBoundaryDataTab
-         call start_and_stop(3,11)
-         endif
-   endif
-! Possible imposed velocities
-! Stop particles belonging to a rigid block and moving with a fixed 
-! velocity.
-! One may loop over particles instead of over zones
-   if (Domain%tipo=="semi") then
-      do ir = 1,NPartZone 
-         if (Partz(ir)%move/="fix") cycle
-! It assigns the movement with an imposed kinematics ("npointv" velocity data)
-         if (Partz(ir)%npointv>1) then
-            call vellaw(Partz(ir)%vlaw,Partz(ir)%vel,Partz(ir)%npointv)
-            write(nout,"(f12.4,a,i2,a,3e12.4)") tempo,"  zona",ir,"  vel."     &
-               ,Partz(ir)%vel
-! As an alternative, one may loop over particles 
-            do npi=Partz(ir)%limit(1),Partz(ir)%limit(2) 
-               if (pg(npi)%cella==0) cycle
-               pg(npi)%var(:) = Partz(ir)%vel(:)
-               if (tempo>=pg(npi)%tstop) then
-                  pg(npi)%vstart(:) = zero
-                  pg(npi)%vel(:) = zero
-                  else
-                     pg(npi)%vstart(:) = Partz(ir)%vel(:)
-                     pg(npi)%vel(:) = Partz(ir)%vel(:)
-               endif
-            enddo
-! Fixed value of velocity (npointv = 1)
-            elseif (Partz(ir)%npointv==1) then
-! As an alternative, one may loop over particles 
-               do npi=Partz(ir)%limit(1),Partz(ir)%limit(2) 
-                  if (pg(npi)%cella==0) cycle
-                  pg(npi)%var(:) = Partz(ir)%vel(:)
-                  if (tempo>=pg(npi)%tstop) then
-                     pg(npi)%vstart(:) = zero
-                     pg(npi)%vel(:)    = zero
-                     else
-                        pg(npi)%vel(:) = Partz(ir)%vel(:)
-                  endif
-               enddo
-         endif
-      enddo
-   endif
-   if ((Domain%time_split==0).and.(Domain%time_stage==1)) then 
-! Erosion criterium + continuity equation RHS   
-      call start_and_stop(2,12)
-      if ((erosione).and.(.not.esplosione)) then  
-! Detection of the mixture particle status ("flu" or "sol") 
-         if (Granular_flows_options%ID_erosion_criterion>1) then
-! Erosion criterion
-            if (index(modelloerosione,"shields")>0) then
-! Shields criterion
-!$omp parallel do default(none) shared(pg,nag) private(npi) 
-               do npi=1,nag
-                  call Shields(npi) 
-               enddo
-!$omp end parallel do
-               elseif (index(modelloerosione,"mohr")>0) then
-! To compute the second invariant of the rate-strain tensor and density 
-! derivatives
-                  call inter_EqCont_2D 
-! Mohr-Coulomb criterion
-                  call MohrC
-            endif
-         endif
-! To update the auxiliary vector, which counts the particles with a status 
-! different from "sol" 
-         indarrayFlu = 0
-         do npi=1,nag
-            if (pg(npi)%cella==0.or.pg(npi)%vel_type/="std") cycle
-            if (pg(npi)%state=="flu") then
-               indarrayFlu = indarrayFlu + 1
-! Checking not to overpass array sizes and possible resizing
-               if (indarrayFlu>PARTICLEBUFFER) then
-                  call diagnostic (arg1=9,arg2=2,arg3=nomsub)
-               endif
-               Array_Flu(indarrayFlu) = npi
-            endif
-         enddo
-         else
-! No erosion criterion  
-            indarrayFlu = 0
-            do npi=1,nag
-               if (pg(npi)%cella==0.or.pg(npi)%vel_type/="std") cycle
-               indarrayFlu = indarrayFlu + 1
-! Checking not to overpass array sizes. Possible resizing.
-               if (indarrayFlu>PARTICLEBUFFER) then
-                  call diagnostic (arg1=9,arg2=2,arg3=nomsub)
-               endif
-               Array_Flu(indarrayFlu) = npi
-            enddo
-      endif
-   endif 
-! Momentum equation 
-   Ncbf_Max = 0
-   call start_and_stop(2,6)
-!$omp parallel do default(none)                                                &
-!$omp private(npi,ii,tpres,tdiss,tvisc,ncbf,boundreaction)                     &
-!$omp shared(nag,pg,Domain,BoundaryDataPointer,Ncbf_Max,indarrayFlu,Array_Flu) &
-!$omp shared(it)
-! Loop over particles
-   do ii = 1,indarrayFlu
-      npi = Array_Flu(ii)
-      call inter_EqMoto (npi,tpres,tdiss,tvisc)  
-! Searching for the boundary faces, which are the nearest the npi-th current 
-! particle
-      if ((Domain%time_stage==1).or.(Domain%time_split==1)) then 
-         pg(npi)%kodvel = 0
-         pg(npi)%velass = zero
-      endif
-      if (Domain%tipo=="semi") Ncbf = BoundaryDataPointer(1,npi)
-      if ((Ncbf>0).and.(Domain%tipo=="semi")) then
-         Ncbf_Max = max(Ncbf_Max, Ncbf)
-         call AddBoundaryContributions_to_ME3D(npi,Ncbf,tpres,tdiss,tvisc)
-         if (pg(npi)%kodvel==0) then
-            BoundReaction = zero
-            call AddElasticBoundaryReaction_3D(npi,Ncbf,BoundReaction)
-            pg(npi)%acc(:) = tpres(:) + tdiss(:) + tvisc(:) + Domain%grav(:) + &
-                             BoundReaction(:)
-            else
-               pg(npi)%acc(:) = zero
-         endif
-         else
-            if (Domain%tipo=="semi") then
-               pg(npi)%acc(:) = tpres(:) + tdiss(:) + tvisc(:) + Domain%grav(:)
-               else 
-                  if (Domain%tipo=="bsph") then
-                     pg(npi)%acc(:) = (tpres(:) + tdiss(:) + tvisc(:)) /       &
-                                      pg(npi)%Gamma + Domain%grav(:)
-                  endif
-            endif
-      endif
-   enddo
-!$omp end parallel do
-   if (Ncbf_Max>Domain%MAXCLOSEBOUNDFACES) then
-      write (nout,"(a,i5,a,i5)") "Increase parameter MAXCLOSEBOUNDFACES from", &
-         Domain%MAXCLOSEBOUNDFACES," to ",Ncbf_Max
-      call diagnostic (arg1=9,arg2=3,arg3=nomsub)
-   endif
-! Time integration for body dynamics
-   if (n_bodies>0) then
-      call start_and_stop(3,6)
-      call start_and_stop(2,19)
-      call RHS_body_dynamics
-      call start_and_stop(3,19)
-      call start_and_stop(2,6)
-   endif
-! Time integration scheme for momentum and energy equations 
-   if (Domain%time_split==0) then   
-! Explicit RK schemes
-      call start_and_stop(3,6)
-! Velocity smoothing, trajectory equation, BC, neighboring parameters (start)
-      elseif (Domain%time_split==1) then   
-! dt computation 
-         dtvel = half * (dt + DtPreviousStep) 
-!$omp parallel do default(none)                                                &
-!$omp private(npi,ii)                                                          &
-!$omp shared(nag,Pg,dtvel,indarrayFlu,Array_Flu)
-         do ii=1,indarrayFlu
-            npi = Array_Flu(ii)
-! kodvel = 0: the particle is internal to the domain. 
-            if (pg(npi)%kodvel==0) then 
-               pg(npi)%vel(:) = pg(npi)%vel(:) + dtvel * pg(npi)%acc(:)
-! kodvel = 1: the particle has a critical flux condition. The vertical 
-! velocity component is assigned.
-               elseif (pg(npi)%kodvel==1) then                                                    
-                  pg(npi)%vel(:) = pg(npi)%vel(:) + dtvel * pg(npi)%acc(:)                            
-                  pg(npi)%vel(3) = pg(npi)%velass(3)
-! kodvel = 2: the particle has an assigned normal velocity or source 
-! condition. All the velocity components are assigned.
-                 elseif (pg(npi)%kodvel==2) then                                                    
-                    pg(npi)%vel(:) = pg(npi)%velass(:)                                                
-            endif 
-         enddo
-!$omp end parallel do
-         call start_and_stop(3,6)
-! Energy equation: start
-         if (esplosione) then
-            do ii = 1,indarrayFlu
-              npi = Array_Flu(ii)
-              pg(npi)%IntEn = pg(npi)%IntEn + dtvel * pg(npi)%dEdT
-            enddo
-         endif
-! Energy equation: end
-! Time integration for body dynamics
-         if (n_bodies>0) then
-            call start_and_stop(2,19)
-            call time_integration_body_dynamics(dtvel)
-            call start_and_stop(3,19)
-         endif
-! Partial smoothing for velocity: start 
-         call start_and_stop(2,7)
-         call inter_SmoothVelo_3D
-!$omp parallel do default(none) private(npi,ii,TetaV1)                         &
-!$omp shared(nag,Pg,Med,Domain,dt,indarrayFlu,Array_Flu,esplosione)
-! Loop over all the active particles
-         do ii=1,indarrayFlu
-            npi = Array_Flu(ii)
-            if (esplosione) then
-               TetaV1 = Domain%TetaV * pg(npi)%Csound * dt / Domain%h
-               else
-! TetaV depending on the time step
-                  TetaV1 = Domain%TetaV * Med(pg(npi)%imed)%Celerita * dt /    &
-                           Domain%h
-            endif
-            if (esplosione) pg(npi)%IntEn = pg(npi)%IntEn + TetaV1 *           &
-                                            pg(npi)%Envar
-            if (pg(npi)%kodvel==0) then                                            
-! The particle is inside the domain and far from boundaries
-               pg(npi)%var(:) = pg(npi)%vel(:) + TetaV1 * pg(npi)%var(:)      
-               pg(npi)%vel(:) = pg(npi)%var(:)                                        
-               else
-! The particle is close to a "source", "level" or "normal velocity boundary
-! (kodvel = 1 or = 2): the final velocity is kept unmodified
-                  pg(npi)%var(:) = pg(npi)%vel(:)                                         
-            endif                                                                 
-         enddo
-!$omp end parallel do
-         call start_and_stop(3,7)
-! Partial smoothing for velocity: end
-! Diffusion coefficient: start (input option not recommended)
-         if (diffusione) then
-            call start_and_stop(2,15)
-!$omp parallel do default(none) private(npi,ii,appo1,appo2,appo3)              &
-!$omp shared(nag,pg,Med,indarrayFlu,Array_Flu)
-            do ii = 1,indarrayFlu
-               npi = Array_Flu(ii)
-               if ((pg(npi)%VolFra==VFmx).and.                                 &
-                  (pg(npi)%visc==Med(pg(npi)%imed)%mumx/pg(npi)%dens)) then
-                  pg(npi)%coefdif = zero
-                  else
-                     call inter_CoefDif (npi)
-                     if (pg(npi)%uni>zero) pg(npi)%veldif = pg(npi)%veldif     &
-                                                            / pg(npi)%uni 
-                     appo1 = (pg(npi)%veldif(1) - pg(npi)%var(1)) *            &
-                             (pg(npi)%veldif(1) - pg(npi)%var(1))
-                     appo2 = (pg(npi)%veldif(2) - pg(npi)%var(2)) *            &
-                             (pg(npi)%veldif(2) - pg(npi)%var(2))
-                     appo3 = (pg(npi)%veldif(3) - pg(npi)%var(3)) *            &
-                             (pg(npi)%veldif(3) - pg(npi)%var(3))
-                     pg(npi)%coefdif = pg(npi)%coefdif * Dsqrt(appo1 + appo2 + &
-                                       appo3)
-               endif
-            enddo
-!$omp end parallel do
-            call start_and_stop(3,15)
-         endif
-! Diffusion coefficient: end
-! Update the particle positions
-         call start_and_stop(2,8)
-!$omp parallel do default(none) private(npi) shared(nag,pg,dt)
-! Loop over the active particles
-         do npi=1,nag
-            if (pg(npi)%cella==0) cycle
-! To save the old coordinates
-            pg(npi)%CoordOld(:) = pg(npi)%coord(:)
-            if (pg(npi)%vel_type/="std") then
-! If the motion type is not "std", velocities are assigned
-               pg(npi)%coord(:) = pg(npi)%coord(:) + dt * pg(npi)%vstart(:)
-               else
-! Otherwise, the partial smoothed velocity field is integrated in time
-                  pg(npi)%coord(:) = pg(npi)%coord(:) + dt * pg(npi)%var(:)  
-            endif
-         enddo
-!$omp end parallel do
-! Wall element trajectories
-         if (Domain%tipo=="bsph") then
-!$omp parallel do default(none) private(npi) shared(DBSPH,pg_w,dt)
-            do npi=1,DBSPH%n_w
-               if (pg_w(npi)%cella==0) cycle
-               pg_w(npi)%coord(:) = pg_w(npi)%coord(:) + dt * pg_w(npi)%vel(:)
-            enddo
-!$omp end parallel do
-         endif
-         call start_and_stop(3,8)
-! Check on the particles gone out of the domain throughout the opened faces
-         call start_and_stop(2,9)
-         if (NumOpenFaces>0) call CancelOutgoneParticles_3D
-! Adding new particles from the inlet sections
-         if (SourceFace/=0) call GenerateSourceParticles_3D
-! Particle reordering 
-         call OrdGrid1 (nout)
-         call start_and_stop(3,9)
-! Set the parameters for the fixed particles 
-         if (Domain%NormFix) call NormFix
-! SPH parameters
          call start_and_stop(2,10)
-         call CalcVarLength
+         if ((Domain%tipo=="semi").and.(Domain%time_stage<2)) call CalcVarLength
          call start_and_stop(3,10)
-! Assessing the close boundaries and the integrals
+! To evaluate the close boundaries and integrals
 ! for the current particle in every loop and storing them in the general 
 ! storage array.
 ! Computation and storage of the boundary integrals
@@ -510,280 +215,578 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
             call start_and_stop(2,11)
             call ComputeBoundaryDataTab
             call start_and_stop(3,11)
-         endif
-   endif
-! Continuity equation 
-! Erosion criterion + continuity equation RHS 
-   call start_and_stop(2,12)
-   Ncbf_Max = 0
-   if (erosione.and..not. esplosione) then  
-      if (Domain%time_split==1) then 
-! Assessing particle status ("flu" or "sol") of the mixture particles
-! Calling the proper subroutine for the erosion criterion 
-         select case (Granular_flows_options%ID_erosion_criterion)
-            case(1)
-!$omp parallel do default(none) shared(pg,nag) private(npi,ncel)
-               do npi=1,nag
-                  pg(npi)%vel_old(:) = pg(npi)%vel(:)
-                  pg(npi)%normal_int_old(:) = pg(npi)%normal_int(:)        
-                  call initialization_fixed_granular_particle(npi)             
-               enddo
-!$omp end parallel do 
-!$omp parallel do default(none) shared(pg,nag) private(npi)
-               do npi=1,nag
-                  call Shields(npi) 
-               enddo
-!$omp end parallel do 
-!$omp parallel do default(none) shared(pg,nag,Granular_flows_options,Med)      &
-!$omp private(npi,ncel,aux,igridi,jgridi,kgridi)
-               do npi=1,nag
-                  ncel = ParticleCellNumber(pg(npi)%coord)
-                  aux = CellIndices(ncel,igridi,jgridi,kgridi)
-                  if (Granular_flows_options%ID_erosion_criterion==1) then
-                     if (pg(npi)%state=="sol") then
-                        pg(npi)%mu =                                           &
-                           Med(Granular_flows_options%ID_main_fluid)%visc *    &
-                           Med(Granular_flows_options%ID_main_fluid)%den0
-                        pg(npi)%visc =                                         &
-                           Med(Granular_flows_options%ID_main_fluid)%visc
-                     endif
+            endif
+      endif
+! Possible imposed velocities
+! Stop particles belonging to a rigid block and moving with a fixed 
+! velocity.
+! One may loop over particles instead of over zones
+      if (Domain%tipo=="semi") then
+         do ir = 1,NPartZone 
+            if (Partz(ir)%move/="fix") cycle
+! It assigns the movement with an imposed kinematics ("npointv" velocity data)
+            if (Partz(ir)%npointv>1) then
+               call vellaw(Partz(ir)%vlaw,Partz(ir)%vel,Partz(ir)%npointv)
+               write(nout,"(f12.4,a,i2,a,3e12.4)") tempo,"  zona",ir,"  vel."  &
+                  ,Partz(ir)%vel
+! As an alternative, one may loop over particles 
+               do npi=Partz(ir)%limit(1),Partz(ir)%limit(2) 
+                  if (pg(npi)%cella==0) cycle
+                  pg(npi)%var(:) = Partz(ir)%vel(:)
+                  if (tempo>=pg(npi)%tstop) then
+                     pg(npi)%vstart(:) = zero
+                     pg(npi)%vel(:) = zero
+                     else
+                        pg(npi)%vstart(:) = Partz(ir)%vel(:)
+                        pg(npi)%vel(:) = Partz(ir)%vel(:)
                   endif
                enddo
-!$omp end parallel do
-            case(2)
-!$omp parallel do default(none) shared(pg,nag) private(npi)
-               do npi=1,nag
-                  call Shields(npi) 
-               enddo
-!$omp end parallel do 
-            case(3)
-! To compute the second invariant of the rate-strain tensor and density 
-! derivatives
-               call inter_EqCont_2D 
-               call MohrC
-            case default
-         end select
-! Update auxiliary vector for counting particles, whose status is not "sol"
-         indarrayFlu = 0
-         do npi = 1,nag
-            if (pg(npi)%cella==0.or.pg(npi)%vel_type/="std") cycle
-            if (pg(npi)%state=="flu") then
-               indarrayFlu = indarrayFlu + 1
-! Check the boundary sizes and possible resizing
-               if (indarrayFlu>PARTICLEBUFFER) then
-                  call diagnostic (arg1=9,arg2=2,arg3=nomsub)
-               endif
-               Array_Flu(indarrayFlu) = npi
+! Fixed value of velocity (npointv = 1)
+               elseif (Partz(ir)%npointv==1) then
+! As an alternative, one may loop over particles 
+                  do npi=Partz(ir)%limit(1),Partz(ir)%limit(2) 
+                     if (pg(npi)%cella==0) cycle
+                     pg(npi)%var(:) = Partz(ir)%vel(:)
+                     if (tempo>=pg(npi)%tstop) then
+                        pg(npi)%vstart(:) = zero
+                        pg(npi)%vel(:)    = zero
+                        else
+                           pg(npi)%vel(:) = Partz(ir)%vel(:)
+                     endif
+                  enddo
             endif
          enddo
       endif
-! To compute the second invariant of the strain-rate tensor and density 
+      if ((Domain%time_split==0).and.(Domain%time_stage==1)) then 
+! Erosion criterium + continuity equation RHS   
+         call start_and_stop(2,12)
+         if ((erosione).and.(.not.esplosione)) then  
+! Detection of the mixture particle status ("flu" or "sol") 
+            if (Granular_flows_options%ID_erosion_criterion>1) then
+! Erosion criterion
+               if (index(modelloerosione,"shields")>0) then
+! Shields criterion
+!$omp parallel do default(none) shared(pg,nag) private(npi) 
+                  do npi=1,nag
+                     call Shields(npi) 
+                  enddo
+!$omp end parallel do
+                  elseif (index(modelloerosione,"mohr")>0) then
+! To compute the second invariant of the rate-strain tensor and density 
 ! derivatives
-      call inter_EqCont_3D
-      else 
+                     call inter_EqCont_2D 
+! Mohr-Coulomb criterion
+                     call MohrC
+               endif
+            endif
+! To update the auxiliary vector, which counts the particles with a status 
+! different from "sol" 
+            indarrayFlu = 0
+            do npi=1,nag
+               if (pg(npi)%cella==0.or.pg(npi)%vel_type/="std") cycle
+               if (pg(npi)%state=="flu") then
+                  indarrayFlu = indarrayFlu + 1
+! Checking not to overpass array sizes and possible resizing
+                  if (indarrayFlu>PARTICLEBUFFER) then
+                     call diagnostic (arg1=9,arg2=2,arg3=nomsub)
+                  endif
+                  Array_Flu(indarrayFlu) = npi
+               endif
+            enddo
+            else
 ! No erosion criterion  
-! To compute the second invariant of the strain-rate tensor and density 
-! derivatives
-         call inter_EqCont_3D
+               indarrayFlu = 0
+               do npi=1,nag
+                  if (pg(npi)%cella==0.or.pg(npi)%vel_type/="std") cycle
+                  indarrayFlu = indarrayFlu + 1
+! Checking not to overpass array sizes. Possible resizing.
+                  if (indarrayFlu>PARTICLEBUFFER) then
+                     call diagnostic (arg1=9,arg2=2,arg3=nomsub)
+                  endif
+                  Array_Flu(indarrayFlu) = npi
+               enddo
+         endif
+      endif 
+! Momentum equation 
+      Ncbf_Max = 0
+      call start_and_stop(2,6)
+!$omp parallel do default(none)                                                &
+!$omp private(npi,ii,tpres,tdiss,tvisc,ncbf,boundreaction)                     &
+!$omp shared(nag,pg,Domain,BoundaryDataPointer,Ncbf_Max,indarrayFlu,Array_Flu) &
+!$omp shared(it)
+! Loop over particles
+      do ii = 1,indarrayFlu
+         npi = Array_Flu(ii)
+         call inter_EqMoto (npi,tpres,tdiss,tvisc)  
+! Searching for the boundary faces, which are the nearest the npi-th current 
+! particle
+         if ((Domain%time_stage==1).or.(Domain%time_split==1)) then 
+            pg(npi)%kodvel = 0
+            pg(npi)%velass = zero
+         endif
+         if (Domain%tipo=="semi") Ncbf = BoundaryDataPointer(1,npi)
+         if ((Ncbf>0).and.(Domain%tipo=="semi")) then
+            Ncbf_Max = max(Ncbf_Max, Ncbf)
+            call AddBoundaryContributions_to_ME3D(npi,Ncbf,tpres,tdiss,tvisc)
+            if (pg(npi)%kodvel==0) then
+               BoundReaction = zero
+               call AddElasticBoundaryReaction_3D(npi,Ncbf,BoundReaction)
+               pg(npi)%acc(:) = tpres(:) + tdiss(:) + tvisc(:) + Domain%grav(:)&
+                                + BoundReaction(:)
+               else
+                  pg(npi)%acc(:) = zero
+            endif
+            else
+               if (Domain%tipo=="semi") then
+                  pg(npi)%acc(:) = tpres(:) + tdiss(:) + tvisc(:) +            &
+                                   Domain%grav(:)
+                  else 
+                     if (Domain%tipo=="bsph") then
+                        pg(npi)%acc(:) = (tpres(:) + tdiss(:) + tvisc(:)) /    &
+                                         pg(npi)%Gamma + Domain%grav(:)
+                     endif
+               endif
+         endif
+      enddo
+!$omp end parallel do
+      if (Ncbf_Max>Domain%MAXCLOSEBOUNDFACES) then
+         write (nout,"(a,i5,a,i5)")                                            &
+            "Increase parameter MAXCLOSEBOUNDFACES from",                      &
+            Domain%MAXCLOSEBOUNDFACES," to ",Ncbf_Max
+         call diagnostic (arg1=9,arg2=3,arg3=nomsub)
+      endif
+! Time integration for body dynamics
+      if (n_bodies>0) then
+         call start_and_stop(3,6)
+         call start_and_stop(2,19)
+         call RHS_body_dynamics
+         call start_and_stop(3,19)
+         call start_and_stop(2,6)
+      endif
+! Time integration scheme for momentum and energy equations 
+      if (Domain%time_split==0) then   
+! Explicit RK schemes
+         call start_and_stop(3,6)
+! Velocity smoothing, trajectory equation, BC, neighboring parameters (start)
+         elseif (Domain%time_split==1) then   
+! dt computation 
+            dtvel = half * (dt + DtPreviousStep) 
+!$omp parallel do default(none)                                                &
+!$omp private(npi,ii)                                                          &
+!$omp shared(nag,Pg,dtvel,indarrayFlu,Array_Flu)
+            do ii=1,indarrayFlu
+               npi = Array_Flu(ii)
+! kodvel = 0: the particle is internal to the domain. 
+               if (pg(npi)%kodvel==0) then 
+                  pg(npi)%vel(:) = pg(npi)%vel(:) + dtvel * pg(npi)%acc(:)
+! kodvel = 1: the particle has a critical flux condition. The vertical 
+! velocity component is assigned.
+                  elseif (pg(npi)%kodvel==1) then                                                    
+                     pg(npi)%vel(:) = pg(npi)%vel(:) + dtvel * pg(npi)%acc(:)                            
+                     pg(npi)%vel(3) = pg(npi)%velass(3)
+! kodvel = 2: the particle has an assigned normal velocity or source 
+! condition. All the velocity components are assigned.
+                    elseif (pg(npi)%kodvel==2) then                                                    
+                       pg(npi)%vel(:) = pg(npi)%velass(:)                                                
+               endif 
+            enddo
+!$omp end parallel do
+            call start_and_stop(3,6)
+! Energy equation: start
+            if (esplosione) then
+               do ii = 1,indarrayFlu
+                 npi = Array_Flu(ii)
+                 pg(npi)%IntEn = pg(npi)%IntEn + dtvel * pg(npi)%dEdT
+               enddo
+            endif
+! Energy equation: end
+! Time integration for body dynamics
+            if (n_bodies>0) then
+               call start_and_stop(2,19)
+               call time_integration_body_dynamics(dtvel)
+               call start_and_stop(3,19)
+            endif
+! Partial smoothing for velocity: start 
+            call start_and_stop(2,7)
+            call inter_SmoothVelo_3D
+!$omp parallel do default(none) private(npi,ii,TetaV1)                         &
+!$omp shared(nag,Pg,Med,Domain,dt,indarrayFlu,Array_Flu,esplosione)
+! Loop over all the active particles
+            do ii=1,indarrayFlu
+               npi = Array_Flu(ii)
+               if (esplosione) then
+                  TetaV1 = Domain%TetaV * pg(npi)%Csound * dt / Domain%h
+                  else
+! TetaV depending on the time step
+                     TetaV1 = Domain%TetaV * Med(pg(npi)%imed)%Celerita * dt / &
+                              Domain%h
+               endif
+               if (esplosione) pg(npi)%IntEn = pg(npi)%IntEn + TetaV1 *        &
+                                               pg(npi)%Envar
+               if (pg(npi)%kodvel==0) then                                            
+! The particle is inside the domain and far from boundaries
+                  pg(npi)%var(:) = pg(npi)%vel(:) + TetaV1 * pg(npi)%var(:)      
+                  pg(npi)%vel(:) = pg(npi)%var(:)                                        
+                  else
+! The particle is close to a "source", "level" or "normal velocity boundary
+! (kodvel = 1 or = 2): the final velocity is kept unmodified
+                     pg(npi)%var(:) = pg(npi)%vel(:)                                         
+               endif                                                                 
+            enddo
+!$omp end parallel do
+            call start_and_stop(3,7)
+! Partial smoothing for velocity: end
+! Diffusion coefficient: start (input option not recommended)
+            if (diffusione) then
+               call start_and_stop(2,15)
+!$omp parallel do default(none) private(npi,ii,appo1,appo2,appo3)              &
+!$omp shared(nag,pg,Med,indarrayFlu,Array_Flu)
+               do ii = 1,indarrayFlu
+                  npi = Array_Flu(ii)
+                  if ((pg(npi)%VolFra==VFmx).and.                              &
+                     (pg(npi)%visc==Med(pg(npi)%imed)%mumx/pg(npi)%dens)) then
+                     pg(npi)%coefdif = zero
+                     else
+                        call inter_CoefDif (npi)
+                        if (pg(npi)%uni>zero) pg(npi)%veldif = pg(npi)%veldif  &
+                                                               / pg(npi)%uni 
+                        appo1 = (pg(npi)%veldif(1) - pg(npi)%var(1)) *         &
+                                (pg(npi)%veldif(1) - pg(npi)%var(1))
+                        appo2 = (pg(npi)%veldif(2) - pg(npi)%var(2)) *         &
+                                (pg(npi)%veldif(2) - pg(npi)%var(2))
+                        appo3 = (pg(npi)%veldif(3) - pg(npi)%var(3)) *         &
+                                (pg(npi)%veldif(3) - pg(npi)%var(3))
+                        pg(npi)%coefdif = pg(npi)%coefdif * Dsqrt(appo1 + appo2&
+                                          + appo3)
+                  endif
+               enddo
+!$omp end parallel do
+               call start_and_stop(3,15)
+            endif
+! Diffusion coefficient: end
+! Update the particle positions
+            call start_and_stop(2,8)
+!$omp parallel do default(none) private(npi) shared(nag,pg,dt)
+! Loop over the active particles
+            do npi=1,nag
+               if (pg(npi)%cella==0) cycle
+! To save the old coordinates
+               pg(npi)%CoordOld(:) = pg(npi)%coord(:)
+               if (pg(npi)%vel_type/="std") then
+! If the motion type is not "std", velocities are assigned
+                  pg(npi)%coord(:) = pg(npi)%coord(:) + dt * pg(npi)%vstart(:)
+                  else
+! Otherwise, the partial smoothed velocity field is integrated in time
+                     pg(npi)%coord(:) = pg(npi)%coord(:) + dt * pg(npi)%var(:)  
+               endif
+            enddo
+!$omp end parallel do
+! Wall element trajectories
+            if (Domain%tipo=="bsph") then
+!$omp parallel do default(none) private(npi) shared(DBSPH,pg_w,dt)
+               do npi=1,DBSPH%n_w
+                  if (pg_w(npi)%cella==0) cycle
+                  pg_w(npi)%coord(:) = pg_w(npi)%coord(:) + dt *               &
+                                       pg_w(npi)%vel(:)
+               enddo
+!$omp end parallel do
+            endif
+            call start_and_stop(3,8)
+! Check on the particles gone out of the domain throughout the opened faces
+            call start_and_stop(2,9)
+            if (NumOpenFaces>0) call CancelOutgoneParticles_3D
+! Adding new particles from the inlet sections
+            if (SourceFace/=0) call GenerateSourceParticles_3D
+! Particle reordering 
+            call OrdGrid1 (nout)
+            call start_and_stop(3,9)
+! Set the parameters for the fixed particles 
+            if (Domain%NormFix) call NormFix
+! SPH parameters
+            call start_and_stop(2,10)
+            call CalcVarLength
+            call start_and_stop(3,10)
+! Assessing the close boundaries and the integrals
+! for the current particle in every loop and storing them in the general 
+! storage array.
+! Computation and storage of the boundary integrals
+            if (Domain%tipo=="semi") then
+               call start_and_stop(2,11)
+               call ComputeBoundaryDataTab
+               call start_and_stop(3,11)
+            endif
+      endif
+! Continuity equation 
+! Erosion criterion + continuity equation RHS 
+      call start_and_stop(2,12)
+      Ncbf_Max = 0
+      if (erosione.and..not. esplosione) then  
          if (Domain%time_split==1) then 
+! Assessing particle status ("flu" or "sol") of the mixture particles
+! Calling the proper subroutine for the erosion criterion 
+            select case (Granular_flows_options%ID_erosion_criterion)
+               case(1)
+!$omp parallel do default(none) shared(pg,nag) private(npi,ncel)
+                  do npi=1,nag
+                     pg(npi)%vel_old(:) = pg(npi)%vel(:)
+                     pg(npi)%normal_int_old(:) = pg(npi)%normal_int(:)        
+                     call initialization_fixed_granular_particle(npi)             
+                  enddo
+!$omp end parallel do 
+!$omp parallel do default(none) shared(pg,nag) private(npi)
+                  do npi=1,nag
+                     call Shields(npi) 
+                  enddo
+!$omp end parallel do 
+!$omp parallel do default(none) shared(pg,nag,Granular_flows_options,Med)      &
+!$omp private(npi,ncel,aux,igridi,jgridi,kgridi)
+                  do npi=1,nag
+                     ncel = ParticleCellNumber(pg(npi)%coord)
+                     aux = CellIndices(ncel,igridi,jgridi,kgridi)
+                     if (Granular_flows_options%ID_erosion_criterion==1) then
+                        if (pg(npi)%state=="sol") then
+                           pg(npi)%mu =                                        &
+                              Med(Granular_flows_options%ID_main_fluid)%visc * &
+                              Med(Granular_flows_options%ID_main_fluid)%den0
+                           pg(npi)%visc =                                      &
+                              Med(Granular_flows_options%ID_main_fluid)%visc
+                        endif
+                     endif
+                  enddo
+!$omp end parallel do
+               case(2)
+!$omp parallel do default(none) shared(pg,nag) private(npi)
+                  do npi=1,nag
+                     call Shields(npi) 
+                  enddo
+!$omp end parallel do 
+               case(3)
+! To compute the second invariant of the rate-strain tensor and density 
+! derivatives
+                  call inter_EqCont_2D 
+                  call MohrC
+               case default
+            end select
+! Update auxiliary vector for counting particles, whose status is not "sol"
             indarrayFlu = 0
             do npi = 1,nag
                if (pg(npi)%cella==0.or.pg(npi)%vel_type/="std") cycle
-               indarrayFlu = indarrayFlu + 1
-! Check array sizes and possible resizing 
-               if (indarrayFlu>PARTICLEBUFFER) then
-                  call diagnostic (arg1=9,arg2=2,arg3=nomsub)
+               if (pg(npi)%state=="flu") then
+                  indarrayFlu = indarrayFlu + 1
+! Check the boundary sizes and possible resizing
+                  if (indarrayFlu>PARTICLEBUFFER) then
+                     call diagnostic (arg1=9,arg2=2,arg3=nomsub)
+                  endif
+                  Array_Flu(indarrayFlu) = npi
                endif
-               Array_Flu(indarrayFlu) = npi
             enddo
          endif
-   endif 
-   if ((Domain%time_stage==1).or.(Domain%time_split==1)) then 
+! To compute the second invariant of the strain-rate tensor and density 
+! derivatives
+         call inter_EqCont_3D
+         else 
+! No erosion criterion  
+! To compute the second invariant of the strain-rate tensor and density 
+! derivatives
+            call inter_EqCont_3D
+            if (Domain%time_split==1) then 
+               indarrayFlu = 0
+               do npi = 1,nag
+                  if (pg(npi)%cella==0.or.pg(npi)%vel_type/="std") cycle
+                  indarrayFlu = indarrayFlu + 1
+! Check array sizes and possible resizing 
+                  if (indarrayFlu>PARTICLEBUFFER) then
+                     call diagnostic (arg1=9,arg2=2,arg3=nomsub)
+                  endif
+                  Array_Flu(indarrayFlu) = npi
+               enddo
+            endif
+      endif 
+      if ((Domain%time_stage==1).or.(Domain%time_split==1)) then 
 !$omp parallel do default(none) private(npi) shared(nag,pg)
-      do npi=1,nag
-         pg(npi)%koddens = 0
-         pg(npi)%densass = pg(npi)%dens
-      enddo
+         do npi=1,nag
+            pg(npi)%koddens = 0
+            pg(npi)%densass = pg(npi)%dens
+         enddo
 !$omp end parallel do
-   endif
-   if (Domain%tipo=="semi") then
+      endif
+      if (Domain%tipo=="semi") then
 !$omp parallel do default(none) private(npi,ii,BCtorodivV,Ncbf)                &
 !$omp shared(nag,pg,BoundaryDataPointer,Ncbf_Max,indarrayFlu,Array_Flu,it)
 ! Loop over all the active particles
 ! Density update 
 ! Boundary contributions to the continuity equation (SA-SPH)
-      do ii=1,indarrayFlu
-         npi = Array_Flu(ii)
-! Seaching for the neighbouring faces of the particle "npi"
-         BCtorodivV = zero
-         Ncbf = BoundaryDataPointer(1,npi)
-! Detecting the faces with actual contributions
-         if (Ncbf>0) then        
-            Ncbf_Max = max(Ncbf_Max, Ncbf)
-            Call AddBoundaryContribution_to_CE3D (npi, Ncbf, BCtorodivV)
-         endif
-         if (pg(npi)%koddens==0) then
-            pg(npi)%dden = pg(npi)%dden - BCtorodivV
-            elseif (pg(npi)%koddens==1) then
-               pg(npi)%dden = zero  
-! Boundary type is velocity or source
-               elseif (pg(npi)%koddens==2) then
-                  pg(npi)%dden = zero
-         endif
-      enddo
-!$omp end parallel do
-   endif  
-   if (Ncbf_Max>Domain%MAXCLOSEBOUNDFACES) then
-      write (nout,"(a,i5,a,i5)") "Increase parameter MAXCLOSEBOUNDFACES from " &
-         ,Domain%MAXCLOSEBOUNDFACES," to ",Ncbf_Max
-      call diagnostic (arg1=9,arg2=4,arg3=nomsub)
-   endif
-! Loop over all the active particles
-! Time integration of the continuity equation 
-   if (Domain%time_split==0) then   
-! Explicit RK schemes
-      call start_and_stop(3,12)
-      elseif (Domain%time_split==1) then 
-! Leapfrog scheme
-!$omp parallel do default(none) private(npi,ii)                                &
-!$omp shared(nag,pg,dt,indarrayFlu,Array_Flu,Domain,med)
          do ii=1,indarrayFlu
             npi = Array_Flu(ii)
-            if (pg(npi)%cella==0.or.pg(npi)%vel_type/="std") cycle
-            if (Domain%tipo=="bsph") pg(npi)%dden=pg(npi)%dden/pg(npi)%uni
-! Boundary type is "fixe" or "tapis" or "level"
+! Seaching for the neighbouring faces of the particle "npi"
+            BCtorodivV = zero
+            Ncbf = BoundaryDataPointer(1,npi)
+! Detecting the faces with actual contributions
+            if (Ncbf>0) then        
+               Ncbf_Max = max(Ncbf_Max, Ncbf)
+               Call AddBoundaryContribution_to_CE3D (npi, Ncbf, BCtorodivV)
+            endif
             if (pg(npi)%koddens==0) then
-               if (Domain%tipo=="semi") pg(npi)%dens = pg(npi)%dens + dt *     &
-                  pg(npi)%dden
-               if (Domain%density_thresholds==1) then        
-                  if (pg(npi)%dens<(0.9d0*med(pg(npi)%imed)%den0))             &
-                     pg(npi)%dens = 0.9d0*med(pg(npi)%imed)%den0
-                  if (pg(npi)%dens>(1.1d0*med(pg(npi)%imed)%den0))             &
-                     pg(npi)%dens = 1.1d0 * med(pg(npi)%imed)%den0
-               endif   
-               pg(npi)%densass = zero
-! Boundary type is "velocity" or "source"
-               elseif (pg(npi)%koddens==2) then
-                  pg(npi)%dens = pg(npi)%densass  
-! Density is kept constant'
+               pg(npi)%dden = pg(npi)%dden - BCtorodivV
+               elseif (pg(npi)%koddens==1) then
+                  pg(npi)%dden = zero  
+! Boundary type is velocity or source
+                  elseif (pg(npi)%koddens==2) then
+                     pg(npi)%dden = zero
             endif
          enddo
 !$omp end parallel do
+      endif  
+      if (Ncbf_Max>Domain%MAXCLOSEBOUNDFACES) then
+         write (nout,"(a,i5,a,i5)")                                            &
+            "Increase parameter MAXCLOSEBOUNDFACES from ",                     &
+            Domain%MAXCLOSEBOUNDFACES," to ",Ncbf_Max
+         call diagnostic (arg1=9,arg2=4,arg3=nomsub)
+      endif
+! Loop over all the active particles
+! Time integration of the continuity equation 
+      if (Domain%time_split==0) then   
+! Explicit RK schemes
          call start_and_stop(3,12)
+         elseif (Domain%time_split==1) then 
+! Leapfrog scheme
+!$omp parallel do default(none) private(npi,ii)                                &
+!$omp shared(nag,pg,dt,indarrayFlu,Array_Flu,Domain,med)
+            do ii=1,indarrayFlu
+               npi = Array_Flu(ii)
+               if (pg(npi)%cella==0.or.pg(npi)%vel_type/="std") cycle
+               if (Domain%tipo=="bsph") pg(npi)%dden=pg(npi)%dden/pg(npi)%uni
+! Boundary type is "fixe" or "tapis" or "level"
+               if (pg(npi)%koddens==0) then
+                  if (Domain%tipo=="semi") pg(npi)%dens = pg(npi)%dens + dt *  &
+                     pg(npi)%dden
+                  if (Domain%density_thresholds==1) then        
+                     if (pg(npi)%dens<(0.9d0*med(pg(npi)%imed)%den0))          &
+                        pg(npi)%dens = 0.9d0*med(pg(npi)%imed)%den0
+                     if (pg(npi)%dens>(1.1d0*med(pg(npi)%imed)%den0))          &
+                        pg(npi)%dens = 1.1d0 * med(pg(npi)%imed)%den0
+                  endif   
+                  pg(npi)%densass = zero
+! Boundary type is "velocity" or "source"
+                  elseif (pg(npi)%koddens==2) then
+                     pg(npi)%dens = pg(npi)%densass  
+! Density is kept constant'
+               endif
+            enddo
+!$omp end parallel do
+            call start_and_stop(3,12)
 ! Continuity equation: end
-         if (diffusione) then
-            call start_and_stop(2,16)
-            call aggdens
-            call start_and_stop(3,16)
-         endif
+            if (diffusione) then
+               call start_and_stop(2,16)
+               call aggdens
+               call start_and_stop(3,16)
+            endif
 ! Equation of state 
-         call start_and_stop(2,13)
-         call calcpre 
-         call start_and_stop(3,13)
-         if (n_bodies>0) then
-            call start_and_stop(2,19)
-            call body_pressure_mirror
-            call start_and_stop(3,19)
-         endif
-   endif
-   if (Domain%time_split==0) call time_integration
+            call start_and_stop(2,13)
+            call calcpre 
+            call start_and_stop(3,13)
+            if (n_bodies>0) then
+               call start_and_stop(2,19)
+               call body_pressure_mirror
+               call start_and_stop(3,19)
+            endif
+      endif
+      if (Domain%time_split==0) call time_integration
 ! Explicit RK schemes
 ! Partial smoothing for pressure and density update
-   if (Domain%TetaP>zero) then
-      call start_and_stop(2,14)
-      if (Domain%Psurf=='s') then
-         call inter_SmoothPres
-         elseif (Domain%Psurf=='a') then
-            call PressureSmoothing_3D
+      if (Domain%TetaP>zero) then
+         call start_and_stop(2,14)
+         if (Domain%Psurf=='s') then
+            call inter_SmoothPres
+            elseif (Domain%Psurf=='a') then
+               call PressureSmoothing_3D
+         endif
+         call start_and_stop(3,14)
       endif
-      call start_and_stop(3,14)
-   endif
-   if (n_bodies>0) then
-      call start_and_stop(2,19)
-      call body_pressure_postpro
-      call start_and_stop(3,19)
-   endif
-   if (diffusione) then
-      call start_and_stop(2,16)
+      if (n_bodies>0) then
+         call start_and_stop(2,19)
+         call body_pressure_postpro
+         call start_and_stop(3,19)
+      endif
+      if (diffusione) then
+         call start_and_stop(2,16)
 !$omp parallel do default(none) private(npi,ii)                                &
 !$omp shared(nag,Pg,Med,indarrayFlu,Array_Flu)
-      do ii = 1,indarrayFlu
-         npi = Array_Flu(ii)
-         if (pg(npi)%koddens/=0) cycle
-         if (pg(npi)%imed==1) then
-            pg(npi)%dens = pg(npi)%pres / (Med(1)%celerita * Med(1)%celerita)  & 
-                           + (Med(2)%den0 * VFmn + Med(1)%den0 * (one - VFmn))
-            elseif (pg(npi)%imed==2) then
-               pg(npi)%dens = pg(npi)%pres / (Med(2)%celerita *                &
-                              Med(2)%celerita) + (Med(2)%den0 * VFmx +         &
-                              Med(1)%den0 * (one - VFmx))
-         endif
-         Pg(npi)%rhoc = pg(npi)%pres / (med(2)%celerita * med(2)%celerita) +   &
-                        med(2)%den0
-         Pg(npi)%rhow = pg(npi)%pres / (med(1)%celerita * med(1)%celerita) +   &
-                        med(1)%den0
-      enddo
+         do ii = 1,indarrayFlu
+            npi = Array_Flu(ii)
+            if (pg(npi)%koddens/=0) cycle
+            if (pg(npi)%imed==1) then
+               pg(npi)%dens = pg(npi)%pres / (Med(1)%celerita *                &
+                              Med(1)%celerita) + (Med(2)%den0 * VFmn +         &
+                              Med(1)%den0 * (one - VFmn))
+               elseif (pg(npi)%imed==2) then
+                  pg(npi)%dens = pg(npi)%pres / (Med(2)%celerita *             &
+                                 Med(2)%celerita) + (Med(2)%den0 * VFmx +      &
+                                 Med(1)%den0 * (one - VFmx))
+            endif
+            Pg(npi)%rhoc = pg(npi)%pres / (med(2)%celerita * med(2)%celerita) +&
+                           med(2)%den0
+            Pg(npi)%rhow = pg(npi)%pres / (med(1)%celerita * med(1)%celerita) +&
+                           med(1)%den0
+         enddo
 !$omp end parallel do
-      call start_and_stop(3,16)
-   endif
-   call start_and_stop(2,20)
-   if (Granular_flows_options%ID_erosion_criterion==1) call mixture_viscosity 
-   call start_and_stop(3,20)
-! Apparent viscosity (input option not recommended)  
-   if (diffusione.or.esplosione) then
-      if ((Domain%time_split==1).or.(Domain%time_stage==Domain%RKscheme)) then
-         call start_and_stop(2,15)
-         call viscapp 
-         call start_and_stop(3,15)
+         call start_and_stop(3,16)
       endif
-   endif
-   if (Domain%tipo=="semi") then
+      call start_and_stop(2,20)
+      if (Granular_flows_options%ID_erosion_criterion==1) call mixture_viscosity 
+      call start_and_stop(3,20)
+! Apparent viscosity (input option not recommended)  
+      if (diffusione.or.esplosione) then
+         if ((Domain%time_split==1).or.(Domain%time_stage==Domain%RKscheme))   &
+            then
+            call start_and_stop(2,15)
+            call viscapp 
+            call start_and_stop(3,15)
+         endif
+      endif
+      if (Domain%tipo=="semi") then
 ! Boundary Conditions: start
 ! BC: checks for the particles gone out of the domain throughout the opened 
 ! faces
-      if ((Domain%time_split==0).and.(Domain%time_stage==Domain%RKscheme)) then
-         call start_and_stop(2,9)
-         if (NumOpenFaces>0) call CancelOutgoneParticles_3D
+         if ((Domain%time_split==0).and.(Domain%time_stage==Domain%RKscheme))  &
+            then
+            call start_and_stop(2,9)
+            if (NumOpenFaces>0) call CancelOutgoneParticles_3D
 ! Adding new particles at the inlet sections
-         if (SourceFace/=0) call GenerateSourceParticles_3D
+            if (SourceFace/=0) call GenerateSourceParticles_3D
 ! Particle reordering on the background positioning grid
-         call OrdGrid1 (nout)
-         call start_and_stop(3,9)
+            call OrdGrid1 (nout)
+            call start_and_stop(3,9)
 ! Set the parameters for the fixed particles 
-         if (Domain%NormFix) call NormFix
-         indarrayFlu = 0
-         do npi=1,nag
-            if ((pg(npi)%cella==0).or.(pg(npi)%vel_type/="std")) cycle
-               indarrayFlu = indarrayFlu + 1
+            if (Domain%NormFix) call NormFix
+            indarrayFlu = 0
+            do npi=1,nag
+               if ((pg(npi)%cella==0).or.(pg(npi)%vel_type/="std")) cycle
+                  indarrayFlu = indarrayFlu + 1
 ! Array sizes check and possibile resizing
-            if (indarrayFlu>PARTICLEBUFFER) then
-               call diagnostic (arg1=9,arg2=2,arg3=nomsub)
-            endif
-            Array_Flu(indarrayFlu) = npi
-         enddo 
-      endif
+               if (indarrayFlu>PARTICLEBUFFER) then
+                  call diagnostic (arg1=9,arg2=2,arg3=nomsub)
+               endif
+               Array_Flu(indarrayFlu) = npi
+            enddo 
+         endif
 ! Boundary Conditions: end
-   endif
+      endif
 ! Subroutine for wall BC treatment (DB-SPH)
 ! Density and pressure updates for wall elements: MUSCL + LPRS  
 ! + state equation 
-   call start_and_stop(2,18)
-   if ((Domain%tipo=="bsph").and.(nag>0).and.(DBSPH%n_w>0)) then
-      call Gradients_to_MUSCL   
-      call BC_wall_elements
-   endif
-   call start_and_stop(3,18)
-! Update of the time stage
-   if ((Domain%RKscheme>1).and.(Domain%time_split==0)) then
-      Domain%time_stage = MODULO(Domain%time_stage,Domain%RKscheme)
-      Domain%time_stage = Domain%time_stage + 1
-! End of the intermediate time stage loop
-      if (Domain%time_stage<2) then
-         continue
-         else
-            go to 1100
+      call start_and_stop(2,18)
+      if ((Domain%tipo=="bsph").and.(nag>0).and.(DBSPH%n_w>0)) then
+         call Gradients_to_MUSCL   
+         call BC_wall_elements
       endif
-   endif
+      call start_and_stop(3,18)
+! Update of the time stage
+      if ((Domain%RKscheme>1).and.(Domain%time_split==0)) then
+         Domain%time_stage = MODULO(Domain%time_stage,Domain%RKscheme)
+         Domain%time_stage = Domain%time_stage + 1
+      endif
+   enddo
 ! Post-processing
    if (allocated(Z_fluid_max)) then
       if ((int(tempo/Domain%depth_dt_out)>Domain%depth_it_out_last).or.        &

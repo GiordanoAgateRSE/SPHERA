@@ -162,14 +162,10 @@ if (((DBSPH%n_w+DBSPH%n_inlet+DBSPH%n_outlet)>0).and.(Domain%tipo=="bsph")) &
 !       enddo
    if (DBSPH%n_w>0) then
       call DBSPH_kinematics
-! Time integration for the first surface element velocity    
-! Loop over the surface element to copy and paste, all over the elements,
-! the imposed kinematics of the first surface element 
-      pg_w(1)%coord(:) = pg_w(1)%coord(:) + dt * pg_w(1)%vel(:)
+! Time integration for the surface element velocity    
 !$omp parallel do default(none) shared(DBSPH,pg_w,dt) private(npi)
-      do npi=2,DBSPH%n_w
-         pg_w(npi)%vel(:) = pg_w(1)%vel(:) 
-         pg_w(npi)%coord(:) = pg_w(npi)%coord(:) + dt * pg_w(1)%vel(:) 
+      do npi=1,DBSPH%n_w
+         pg_w(npi)%coord(:) = pg_w(npi)%coord(:) + dt * pg_w(npi)%vel(:) 
       enddo
 !$omp end parallel do
    endif

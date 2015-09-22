@@ -318,6 +318,17 @@ if (nres>0) close(nres)
 if (nplb>0) close(nplb)
 if (nfro>0) close(nfro)
 if (ncpt>0) close(ncpt)
+! To Concatenate the ".txt" output files and remove the original ones
+call system("cat *Body_dynamics* > Body-dynamics.txt")
+call system("rm -f *Body_dynamics*")
+call system("mv Body-dynamics.txt Body_dynamics.txt")
+call system("cat *Body_particles* > Body-particles.txt")
+call system("rm -f *Body_particles*")
+call system("mv Body-particles.txt Body_particles.txt")
+call system("cat *.cln > monitoring_lines.txt")
+call system("rm -f *.cln")
+call system("cat *.cpt > monitoring_points.txt")
+call system("rm -f *.cpt")
 stop
 !------------------------
 ! Contains

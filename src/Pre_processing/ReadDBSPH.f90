@@ -44,6 +44,7 @@ integer(4) :: ioerr,n_monitor_points,n_monitor_regions,i,alloc_stat
 integer(4) :: dealloc_stat,n_kinematics_records,j,n_inlet,n_outlet
 integer(4) :: ply_n_face_vert
 double precision :: dx_dxw,k_w
+double precision :: rotation_centre
 integer(4),allocatable,dimension(:) :: monitor_IDs
 double precision,dimension(:) :: monitor_region(6)           
 character(80) :: lcase
@@ -101,11 +102,12 @@ do while (TRIM(lcase(ainp))/="##### end dbsph #####")
             nout)) return
       endif
       call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
-      read(ainp,*,iostat=ioerr) n_kinematics_records,in_built_monitors
+      read(ainp,*,iostat=ioerr) n_kinematics_records,in_built_monitors,        &
+         rotation_centre(:)
       if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DBSPH_KINEMATICS",ninp,nout))  &
          return  
       if (.not.(allocated(DBSPH%kinematics))) then
-         allocate (DBSPH%kinematics(n_kinematics_records,4),STAT=alloc_stat)
+         allocate (DBSPH%kinematics(n_kinematics_records,7),STAT=alloc_stat)
          if (alloc_stat/=0) then
             write(nout,*)                                                      &
 'Error! Allocation of DBSPH%kinematics in ReadDBSPH failed; the program terminates here.'
@@ -198,10 +200,13 @@ do while (TRIM(lcase(ainp))/="##### end dbsph #####")
       write(nout,"(1x,a,1p,i12)")                                              &
 "n_kinematics_records............",n_kinematics_records 
       write(nout,"(1x,a,1p,l12)")                                              &
-"in-built_monitor_flag:..........",in_built_monitors      
+"in-built_monitor_flag:..........",in_built_monitors 
+      write(nout,"(1x,a,1p,3(g12.4))")                                         &
+"rotation_centre:................",rotation_centre(:) 
       do i=1,n_kinematics_records
-         write(nout,"(1x,a,1p,4(g12.4))")                                      &
-"time(s),u(m/s),v(m/s),w(m/s):...",DBSPH%kinematics(i,:)        
+         write(nout,"(1x,a,1p,7(g12.4))")                                      &
+"time(s),u(m/s),v(m/s),w(m/s),omega_x(rad/s),omega_y(rad/s),omega_z(rad/s):..."&
+            ,DBSPH%kinematics(i,:)        
       enddo 
       write(nout,"(1x,a,i12)")                                                 &
 "n_inlet:........................",n_inlet
@@ -241,6 +246,7 @@ do while (TRIM(lcase(ainp))/="##### end dbsph #####")
       endif
       DBSPH%n_kinematics_records = n_kinematics_records 
       DBSPH%in_built_monitors = in_built_monitors
+      DBSPH%rotation_centre(:) = rotation_centre(:) 
       DBSPH%n_inlet = n_inlet   
       DBSPH%n_outlet = n_outlet
       DBSPH%ply_n_face_vert = ply_n_face_vert
