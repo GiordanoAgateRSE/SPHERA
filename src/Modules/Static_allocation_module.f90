@@ -158,7 +158,7 @@ integer(4),dimension(0:3,2) :: icoordp ! Pointer for coordinate location 2D or
                                        ! in the main program for compatibility
                                        ! with xlf90
 character(len=8),parameter :: acode = "SPHERA  "
-character(len=8),parameter :: version = "7.2   "
+character(len=8),parameter :: version = "8.0   "
 character(255) :: nomecaso, nomecas2
 character(1),dimension(0:3) :: xyzlabel = (/ "T", "X", "Y", "Z" /)  
 character(4),dimension(3) :: ncordlabel = (/ "    ", "(2D)", "(3D)" /)  
