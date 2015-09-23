@@ -419,9 +419,13 @@ gravity_acceleration_x gravity_acceleration_z
 reference_pressure                  !  
 ##### end general physical properties #####
 
-!##### restart #####
-! (this section is not active)
-!##### end restart #####
+##### restart #####
+restart_mode restart_time_value     ! restart_mode("time" or "step"); 
+                                    ! restart_time_value(time value in seconds 
+                                    ! or step number, according to restart_mode) 
+restart_file                        ! restart_file(restart file name -with 
+                                    ! extension-)
+##### end restart #####
 
 ##### output regulation #####
 ! Post-processing parameters for .txt files. The first two words (and the 

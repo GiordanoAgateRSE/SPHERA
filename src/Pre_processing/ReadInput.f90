@@ -93,7 +93,7 @@ if (trim(ainp)/=trim(version)) then
 endif
 ! Loop over "input sections" 
 SECTION_LOOP: do while (ioerr==0)
-   call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
+   call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 ! If EOF is reached, then exit, otherwise to check the error code
    if (ioerr==-1) cycle SECTION_LOOP
    if (.NOT.ReadCheck (ioerr,ier,nrighe,ainp,"INPUT DATA",ninp,nout)) return

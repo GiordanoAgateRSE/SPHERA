@@ -39,7 +39,7 @@ use I_O_diagnostic_module
 !------------------------
 implicit none
 integer(4),parameter :: ner0 = 0
-integer(4) :: npi,NumCellmax,i,ier,k,kk,k1,k2,nlinee,nvalori
+integer(4) :: npi,NumCellmax,i,ier,k,kk,k1,k2,nlinee,nvalori,alloc_stat
 character(len=lencard) :: nomsub = "GEST_TRANS"
 character(len=lencard) :: filename,stringa,prefix,filevtk
 character(len=200)     :: cargo
@@ -574,9 +574,33 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
 ! Loop over the zones
          do i=1,NPartZone
          if (Partz(i)%IC_source_type==2) then
-            allocate(Z_fluid_max(Grid%ncd(1)*Grid%ncd(2)))
+            if (.not.allocated(Z_fluid_max)) then
+               allocate(Z_fluid_max(Grid%ncd(1)*Grid%ncd(2)),STAT=alloc_stat) 
+               if (alloc_stat/=0) then
+                  write(nout,*)                                                &
+                  'Allocation of Z_fluid_max in Gest_Trans failed;',           &
+                  ' the program terminates here.'
+                  stop ! Stop the main program
+                  else
+                     write (nout,*)                 
+                        'Allocation of Z_fluid_max in Gest_Trans successfully '&
+                        ' completed.'
+               endif   
+            endif
             Z_fluid_max = -999.d0
-            allocate(q_max(Grid%ncd(1)*Grid%ncd(2)))
+            if (.not.allocated(q_max)) then
+               allocate(q_max(Grid%ncd(1)*Grid%ncd(2)),STAT=alloc_stat) 
+               if (alloc_stat/=0) then
+                  write(nout,*)                                                &
+                  'Allocation of q_max in Gest_Trans failed;',                 &
+                  ' the program terminates here.'
+                  stop ! Stop the main program
+                  else
+                     write (nout,*)                 
+                        'Allocation of q_max in Gest_Trans successfully '      &
+                        'completed.'
+               endif   
+            endif
             q_max = 0.d0
             exit
          endif

@@ -40,7 +40,7 @@ implicit none
 integer(4), parameter :: ner0 = 0
 ! Flag transformation quadrilateral face in two triangular faces 
 logical :: OnlyTriangle 
-integer(4) :: npi,ier,i,n,isi,nfc,nt,nrecords,IC_loop,InputErr
+integer(4) :: npi,ier,i,n,isi,nfc,nt,nrecords,IC_loop,InputErr,alloc_stat
 integer(4) :: machine_Julian_day,machine_hour,machine_minute,machine_second
 integer(4),dimension(20) :: NumberEntities 
 character(len=lencard) :: nomsub = "GEST_INPUT"
@@ -72,7 +72,7 @@ OnlyTriangle = .FALSE.
 diffusione = .FALSE.
 esplosione = .FALSE.
 erosione = .FALSE.
-Restart = .FALSE.
+restart = .FALSE.
 tempo = zero
 dt = zero
 it_start = 0
@@ -160,7 +160,7 @@ endif
 ! A restart procedure has been invoked: restart positioning 
 ! (step number / step time)
 if ((Domain%istart>0).or.(Domain%start>zero)) then
-   Restart = .True.
+   restart = .True.
 ! To open the restart file from which restart data will be restored
    open(unit=nsav,file=trim(Domain%file),form="unformatted",status="old",      &
       iostat=ier)
@@ -170,11 +170,10 @@ if ((Domain%istart>0).or.(Domain%start>zero)) then
       else
          write(nout,'(1x,a)')                                                  &
 ">Data are read from the restart file"//trim(Domain%file)//" in the routine ReadRestartFile"
-         write(nscr,'(1x,a)')                                                  &
-">Data are read from the restart file in the routine ReadRestartFile"
    endif
 ! To restore data from the restart file
-   call ReadRestartFile (trim("heading"), ier, nrecords)
+! During the first reading of the restart file, only few parameters are read
+   call ReadRestartFile(trim("heading"),ier,nrecords)
    msg_err = trim("heading")
    if (ier/=0) then
       ier = ier + 200
@@ -362,15 +361,15 @@ if (.not.Restart) then
       else
          call diagnostic(arg1=10,arg2=5,arg3=nomsub)
    endif
-! A restart option is active
    else
+! A restart option is active
       if (nag<100) then
 ! Initial domain is empty (inlet section)
          PARTICLEBUFFER = INIPARTICLEBUFFER * Domain%COEFNMAXPARTI
          else
             PARTICLEBUFFER = nag * Domain%COEFNMAXPARTI
       endif
-      if (Domain%tipo=="semi") then   
+      if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then   
          allocate(pg(PARTICLEBUFFER),stat=ier)  
          else
             call diagnostic(arg1=10,arg2=5,arg3=nomsub)
@@ -382,6 +381,110 @@ if (.not.Restart) then
             write(nout,'(1x,a)') "    Array PG successfully allocated "
             Pg(:) = PgZero
       endif
+      if (Domain%tipo=="bsph") then
+! DB-SPH pre-processing
+         call Import_ply_surface_meshes
+         call DBSPH_IC_surface_elements
+         if (.not.allocated(NPartOrd_w)) then
+            allocate(NPartOrd_w(DBSPH%n_w+DBSPH%n_inlet+DBSPH%n_outlet),       &
+               Icont_w(grid%nmax+1),stat=ier) 
+            if (ier/=0) then
+               write(nout,*)                                                   &
+                  'Error! Allocation of NPartOrd_w or Icont_w Gest_Input failed'           
+               call diagnostic(arg1=5,arg2=340)
+               else
+                  write(nout,'(1x,a)')                                         &
+                     "Arrays NPARTORD_w and ICONT_w successfully allocated."
+                  NPartOrd_w(:) = 0
+                  Icont_w(:) = 0
+            endif
+         endif
+! Allocation of the array of the DB-SPH wall elements and semi-particles
+         if (.not.allocated(pg_w)) then
+            allocate(pg_w(DBSPH%n_w+DBSPH%n_inlet+DBSPH%n_outlet),STAT=        &
+               alloc_stat) 
+            if (alloc_stat/=0) then
+               write(nout,*)                                                   &
+                  'Allocation of pg_w in Gest_Input failed;',                  &
+                  ' the program terminates here.'
+               stop ! Stop the main program
+               else
+                  write (nout,*)                                               &
+                     "Allocation of pg_w in Gest_Input successfully completed."
+            endif   
+         endif
+      endif
+! Allocation of the array of the bodies
+      if (n_bodies>0) then
+         if (.not.allocated(body_arr)) then
+            allocate(body_arr(n_bodies),STAT=alloc_stat) 
+            if (alloc_stat/=0) then
+               write(nout,*)                                                   &
+                  'Allocation of body_arr in Gest_Input failed;',              &
+                  ' the program terminates here.'
+               stop ! Stop the main program
+               else
+                  write (nout,*)                                               &
+                     "Allocation of body_arr in Gest_Input well completed. "
+            endif   
+         endif
+! Management of body dynamics input
+         call Input_Body_Dynamics      
+! Allocation of the array of the body particles
+         if (.not.allocated(bp_arr)) then
+            allocate(bp_arr(n_body_part),STAT=alloc_stat) 
+            if (alloc_stat/=0) then
+               write(nout,*)                                                   &
+                  'Allocation of bp_arr in Gest_Input failed;',                &
+                  ' the program terminates here.'
+               stop ! Stop the main program
+               else
+                  write (nout,*)                 
+                     "Allocation of bp_arr in Gest_Input successfully completed"                                   &
+            endif   
+         endif         
+! Allocation of the array of the surface body particles
+         if (.not.allocated(surf_body_part)) then
+            allocate(surf_body_part(n_surf_body_part),STAT=alloc_stat) 
+            if (alloc_stat/=0) then
+               write(nout,*)                                                   &
+                  'Allocation of surf_body_part in Gest_Input failed;',        &
+                  ' the program terminates here.'
+               stop ! Stop the main program
+               else
+                  write (nout,*)                 
+                     'Allocation of surf_body_part in Gest_Input '             &
+                     ' successfully completed.'
+            endif   
+         endif
+      endif
+! Allocation of the array of the maximum water depth   
+      if (.not.allocated(Z_fluid_max)) then
+         allocate(Z_fluid_max(Grid%ncd(1)*Grid%ncd(2)),STAT=alloc_stat) 
+         if (alloc_stat/=0) then
+            write(nout,*)                                                      &
+            'Allocation of Z_fluid_max in Gest_Input failed;',                 &
+            ' the program terminates here.'
+            stop ! Stop the main program
+            else
+               write (nout,*)                 
+                  'Allocation of Z_fluid_max in Gest_Input successfully '      &
+                  ' completed.'
+         endif   
+      endif
+! Allocation of the array of the maximum specific flow rate   
+      if (.not.allocated(q_max)) then
+         allocate(q_max(Grid%ncd(1)*Grid%ncd(2)),STAT=alloc_stat) 
+         if (alloc_stat/=0) then
+            write(nout,*)                                                      &
+            'Allocation of q_max in Gest_Input failed;',                       &
+            ' the program terminates here.'
+            stop ! Stop the main program
+            else
+               write (nout,*)                 
+                  'Allocation of q_max in Gest_Input successfully completed.'
+         endif   
+      endif      
       if (Domain%RKscheme>1) then
          if (Domain%tipo=="semi") then   
            allocate(ts0_pg(PARTICLEBUFFER),stat=ier)  
@@ -405,7 +508,7 @@ if (.not.Restart) then
          else
             write(nout,'(1x,a)') "    Array BFACELIST successfully allocated "
       endif
-      call ReadRestartFile (trim("reading"), ier, nrecords)
+      call ReadRestartFile(trim("reading"),ier,nrecords)
       msg_err = trim("reading")
       if (ier/=0) then
          ier = ier + 200
@@ -442,9 +545,7 @@ if (Domain%ioutopt<0) then
    enddo
 endif
 ! Management of body dynamics input
-if (n_bodies>0) then
-   call Input_Body_Dynamics
-endif
+if ((n_bodies>0).and.(.not.Restart)) call Input_Body_Dynamics
 ! Memory allocation for the particle ordering arrays
 if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
    allocate(NPartOrd(PARTICLEBUFFER),Icont(grid%nmax+1),stat=ier) 
@@ -473,7 +574,7 @@ if (n_bodies>0) then
          Icont_bp(:) = 0
    endif
 endif
-if (Domain%tipo=="bsph") then
+if ((Domain%tipo=="bsph").and.(.not.Restart)) then
    call Import_ply_surface_meshes
    call DBSPH_IC_surface_elements
    if (.not.allocated(NPartOrd_w)) then
@@ -492,7 +593,7 @@ if (Domain%tipo=="bsph") then
    endif
 endif
 call OrdGrid1 (nout)
-if (Domain%tipo=="bsph") then
+if ((Domain%tipo=="bsph").and.(.not.Restart)) then
    call DBSPH_find_close_faces 
    call semi_particle_volumes
 endif

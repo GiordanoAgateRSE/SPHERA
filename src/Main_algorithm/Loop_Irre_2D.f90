@@ -883,11 +883,12 @@ ITERATION_LOOP: do while (it<Domain%itmax)
    if (kill_flag) exit ITERATION_LOOP
    if (tempo>=Domain%tmax) exit ITERATION_LOOP
 enddo  ITERATION_LOOP 
-! Post-processing (also for restart) 
+! Post-processing: log file 
 if ((it_eff/=it_print).AND.(nout>0)) then
    it_print = it_eff
    call print_results(it_eff,it_print,'fine__')
 endif
+! Post-processing: restart file
 if ((it_eff/=it_memo).AND.(nres>0)) then
    call memo_results(it_eff,it_memo,it_rest,dtvel,'fine__')
 endif

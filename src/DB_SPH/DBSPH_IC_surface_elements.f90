@@ -60,30 +60,30 @@ if (.not.allocated(pg_w)) then
       call diagnostic (arg1=5,arg2=340)
       stop ! Stop the main program
       else
-         pg_w(:)%cella = 0
-         pg_w(:)%adjacent_faces(1) = 0
-         pg_w(:)%adjacent_faces(2) = 0
-         pg_w(:)%adjacent_faces(3) = 0         
-         pg_w(:)%coord(1) = 0.d0
-         pg_w(:)%coord(2) = 0.d0
-         pg_w(:)%coord(3) = 0.d0
-         pg_w(:)%vel(1) = 0.d0
-         pg_w(:)%vel(2) = 0.d0         
-         pg_w(:)%vel(3) = 0.d0
-         pg_w(:)%dens = 0.d0
-         pg_w(:)%pres = 0.d0
-         pg_w(:)%normal(1) = 0.d0
-         pg_w(:)%normal(2) = 0.d0
-         pg_w(:)%normal(3) = 0.d0
-         pg_w(:)%weight = 0.d0 
-         pg_w(:)%wet = 0 
-         pg_w(:)%mass = 0.d0 
-         pg_w(:)%k_d = 0.d0
-         pg_w(:)%volume = 0.d0
          write (nout,*) "Allocation of pg_w in DBSPH_IC_surface_elements ",    &
                         "successfully completed."
    endif   
-endif 
+endif
+pg_w(:)%cella = 0
+pg_w(:)%adjacent_faces(1) = 0
+pg_w(:)%adjacent_faces(2) = 0
+pg_w(:)%adjacent_faces(3) = 0         
+pg_w(:)%coord(1) = 0.d0
+pg_w(:)%coord(2) = 0.d0
+pg_w(:)%coord(3) = 0.d0
+pg_w(:)%vel(1) = 0.d0
+pg_w(:)%vel(2) = 0.d0         
+pg_w(:)%vel(3) = 0.d0
+pg_w(:)%dens = 0.d0
+pg_w(:)%pres = 0.d0
+pg_w(:)%normal(1) = 0.d0
+pg_w(:)%normal(2) = 0.d0
+pg_w(:)%normal(3) = 0.d0
+pg_w(:)%weight = 0.d0 
+pg_w(:)%wet = 0 
+pg_w(:)%mass = 0.d0 
+pg_w(:)%k_d = 0.d0
+pg_w(:)%volume = 0.d0 
 !$omp parallel do default(none) shared(DBSPH,pg_w,Med,pg,ncord) private(i)
 do i=1,DBSPH%n_w 
    if (ncord==3) then

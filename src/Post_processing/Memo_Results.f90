@@ -66,10 +66,10 @@ if (index(str,'inizio')/=0) then
    if (NPartZone>0) nrecords = nrecords + 1
    if (NumBVertices>0) nrecords = nrecords + 1
    if (NumBSides>0) nrecords = nrecords + 1
-   write(nres) nrecords
-   write(nres) Ncord,Nag,NMedium,NPartZone,NumVertici, NumFacce, NumTratti,    &
+   write(nres) version,nrecords
+   write(nres) Ncord,Nag,NMedium,NPartZone,NumVertici,NumFacce,NumTratti,      &
       NumBVertices,NumBSides,NPointst,NPoints,NPointsl,NPointse,NLines,        &
-      NSections, GCBFVecDim,doubleh
+      NSections,GCBFVecDim,doubleh
    write(nres) domain
    write(nres) grid
    write(nres) Med(1:NMedium)
@@ -86,12 +86,6 @@ if (index(str,'inizio')/=0) then
    write(nout,'(a,i10,a,f15.5)') " Results and restart heading saved   step: ",&
       it,"   time: ",tempo
    write(nout,'(a,i10,a,f15.5)')                                               &
-" ----------------------------------------------------------------------------"
-   write(nscr,'(a,i10,a,f15.5)')                                               &
-" ----------------------------------------------------------------------------"
-   write(nscr,'(a,i10,a,f15.5)') " Results and restart heading saved   step: ",&
-      it,"   time: ",tempo
-   write(nscr,'(a,i10,a,f15.5)')                                               &
 " ----------------------------------------------------------------------------"
 endif
 if (Domain%irest_fr>0) then
@@ -114,10 +108,16 @@ if (Domain%imemo_fr>0) then
       endif
 endif
 if ((it_rest==it).or.(index(str,'inizio')/=0).or.(index(str,'fine')/=0)) then
-! If restartcode=1, then to save the whole array "pg"
+! If restartcode=1, then to save the whole arrays "pg","pg_w"
    restartcode = 1 
    write(nres) it,tempo,dt,nag,ncord,restartcode
    write(nres) pg(1:nag)
+   write(nres) pg_w(1:DBSPH%n_w+DBSPH%n_inlet+DBSPH%n_outlet)
+   write(nres) body_arr(1:n_bodies)
+   write(nres) bp_arr(1:n_body_part)
+   write(nres) surf_body_part(1:n_surf_body_part)
+   write(nres) Z_fluid_max(1:Grid%ncd(1)*Grid%ncd(2))
+   write(nres) q_max(1:Grid%ncd(1)*Grid%ncd(2))
    flush(nres)
    if (index(str,'inizio')==0) then
       write(nout,'(a,i10,a,f15.5)')                                            &
