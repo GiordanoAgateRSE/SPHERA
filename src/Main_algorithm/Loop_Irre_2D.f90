@@ -115,7 +115,8 @@ call start_and_stop(2,9)
 if ((it_corrente==it_start).and.(Domain%tipo=="bsph")) then
 !$omp parallel do default(none) shared(nag,pg,OpCount) private(npi) 
    do npi=1,nag
-      if (pg(npi)%imed/=pg(1)%imed) then
+      if (Partz(pg(npi)%izona)%DBSPH_fictitious_reservoir_flag.eqv.(.true.))   &
+         then
          OpCount(pg(npi)%imed) = OpCount(pg(npi)%imed) + 1    
          pg(npi)%cella = -1
       endif
@@ -508,15 +509,6 @@ ITERATION_LOOP: do while (it<Domain%itmax)
             call start_and_stop(2,10)
             call CalcVarLength
             call start_and_stop(3,10)
-! Subroutine for wall BC treatment (DB-SPH)
-! Density and pressure updates for wall elements: MUSCL + LPRS  
-! + equation of state 
-            call start_and_stop(2,18)
-            if ((Domain%tipo=="bsph").and.(nag>0).and.(DBSPH%n_w>0)) then
-               call Gradients_to_MUSCL   
-               call BC_wall_elements
-            endif
-            call start_and_stop(3,18)
 ! Assessing the close boundaries and the integrals
 ! for the current particle in every loop and storing them in the general 
 ! storage array.

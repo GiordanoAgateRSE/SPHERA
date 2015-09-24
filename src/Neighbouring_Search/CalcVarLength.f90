@@ -97,6 +97,7 @@ loop_nag: do npi=1,nag
       dShep_old(npi) = pg(npi)%dShep
       pg(npi)%dShep = zero 
       pg(npi)%sigma = zero 
+      pg(npi)%sigma_fluid = zero
       pg(npi)%FS = 0
       pg(npi)%DBSPH_inlet_ID = 0
       pg(npi)%DBSPH_outlet_ID = 0
@@ -223,8 +224,12 @@ loop_nag: do npi=1,nag
             if (Domain%tipo=="bsph") then
                pg(npi)%sigma = pg(npi)%sigma + pg(npj)%mass *                  &
                                PartKernel(4,npartint) / pg(npj)%dens 
-               pg(npi)%rhoSPH_new = pg(npi)%rhoSPH_new + pg(npj)%mass *        &
-                                    PartKernel(4,npartint)
+               if (pg(npi)%imed==pg(npj)%imed) then 
+                  pg(npi)%rhoSPH_new = pg(npi)%rhoSPH_new + pg(npj)%mass *     &
+                                       PartKernel(4,npartint)
+                  pg(npi)%sigma_fluid = pg(npi)%sigma_fluid + pg(npj)%mass *   &
+                                        PartKernel(4,npartint) / pg(npj)%dens
+               endif
             endif
 ! Searching for the nearest fluid/mixture SPH particle 
             if (erosione) then
@@ -331,9 +336,11 @@ loop_nag: do npi=1,nag
                   endif 
                   kernel_fw(2,npartint) = gradmod * ke_coef * denom
                   pg(npi)%sigma = pg(npi)%sigma +  pg_w(npj)%mass *            &
-                                  kernel_fw(1,npartint) / pg_w(npj)%dens 
-                  pg(npi)%rhoSPH_new = pg(npi)%rhoSPH_new + pg_w(npj)%mass *   &
-                                       kernel_fw(1,npartint)
+                                  kernel_fw(1,npartint) / pg_w(npj)%dens
+                  if (NMedium==1) then                 
+                     pg(npi)%rhoSPH_new = pg(npi)%rhoSPH_new + pg_w(npj)%mass *&
+                                          kernel_fw(1,npartint)
+                  endif
 ! Gallati anti-cluster kernel, interesting test: start
 ! kernel_fw(3,npartint) =(5.d0/(16.d0*PIGRECO*Domain%h**2))*((2.d0-rij_su_h)**3) 
 ! kernel_fw(4,npartint) = (-12.0d0 - 3.0d0 * rij_su_h_quad + 12.0d0 * rij_su_h)&
@@ -522,10 +529,14 @@ if (Domain%tipo=="bsph") then
          endif
          if (pg(npi)%rhoSPH_old==zero) then
             pg(npi)%DensShep = pg(npi)%rhoSPH_new * pg(npi)%Gamma
-            if (pg(npi)%FS ==1) then
-               pg(npi)%dens = pg(npi)%rhoSPH_new / pg(npi)%sigma
-               else
-                  pg(npi)%dens = pg(npi)%rhoSPH_new / pg(npi)%Gamma
+            if (NMedium==1) then
+               if (pg(npi)%FS ==1) then
+                  pg(npi)%dens = pg(npi)%rhoSPH_new / pg(npi)%sigma
+                  else
+                     pg(npi)%dens = pg(npi)%rhoSPH_new / pg(npi)%Gamma
+               endif
+               elseif(NMedium>1) then
+                  pg(npi)%dens = pg(npi)%rhoSPH_new / pg(npi)%sigma_fluid
             endif
          endif
       endif

@@ -113,9 +113,18 @@ call start_and_stop(2,9)
 if ((it_corrente==it_start).and.(Domain%tipo=="bsph")) then
 !$omp parallel do default(none) shared(nag,pg,OpCount) private(npi) 
    do npi=1,nag
-      if (pg(npi)%imed/=pg(1)%imed) then
+! Fictitious air reservoirs
+      if (Partz(pg(npi)%izona)%DBSPH_fictitious_reservoir_flag.eqv.(.true.))  &
+         then
          OpCount(pg(npi)%imed) = OpCount(pg(npi)%imed) + 1    
          pg(npi)%cella = -1
+      endif
+! Fictitious water reservoir top
+      if (Partz(1)%IC_source_type==2) then
+         if (pg(npi)%coord(3)>Partz(Nz)%H_res) then
+            OpCount(pg(npi)%imed) = OpCount(pg(npi)%imed) + 1    
+            pg(npi)%cella = -1
+         endif
       endif
    enddo
 !$omp end parallel do

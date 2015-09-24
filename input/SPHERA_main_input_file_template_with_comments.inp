@@ -126,11 +126,15 @@ IC_pressure_type IC_pressure_value
                             ! IC_pressure_value=(uniform pressure value for pa),
                             ! (free surface height for qp), (equivalent free 
                             ! surface level of the on-going fluid for pl)
-IC_reservoir_type Car_top_zone
+IC_reservoir_type Car_top_zone DB-SPH_fictitious_reservoir_flag
                             ! IC_reservoir_type=1(vertices and faces),2(from 
                             ! Cartesian topography); Car_top_zone = boundary ID 
                             ! of underlying topography(influence only if 
-                            ! IC_reservoir_type==2)
+                            ! IC_reservoir_type==2); 
+                            ! DB-SPH_fictitious_reservoir_flag = .true.(DB-SPH 
+                            ! fictitious fluid particles to complete the kernel 
+                            ! support at the free-surface, in pre-processing),
+                            ! .false.(no fictitious fluid particles)
 ! If (IC_reservoir_type==2): start
 dx_CartTopog H_res          ! dx_CartTopog(spatial resolution of the Cartesian 
                             ! topography); H_res(height of the reservoir free 

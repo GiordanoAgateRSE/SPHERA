@@ -232,12 +232,17 @@ if (((DBSPH%n_w+DBSPH%n_inlet+DBSPH%n_outlet)>0).and.(Domain%tipo=="bsph")) &
       if (Domain%tipo=="bsph") pg(npi)%dden = pg(npi)%dden / pg(npi)%Gamma
 ! Boundary type is fixe or tapis or level(?)
       if (pg(npi)%koddens==0) then
-         if (pg(npi)%FS==1) then
-            pg(npi)%dens = pg(npi)%rhoSPH_new / pg(npi)%sigma
-            if (pg(npi)%dens<(0.98d0*med(1)%den0)) pg(npi)%dens = 0.98d0 *  &
-               med(1)%den0 
-            else
-               pg(npi)%dens = pg(npi)%rhoSPH_new / pg(npi)%Gamma
+! SPH approxmation of density (alternative to the continuity equation)
+         if (NMedium==1) then
+            if (pg(npi)%FS==1) then
+               pg(npi)%dens = pg(npi)%rhoSPH_new / pg(npi)%sigma
+               if (pg(npi)%dens<(0.98d0*med(1)%den0)) pg(npi)%dens = 0.98d0 *  &
+                  med(1)%den0 
+               else
+                  pg(npi)%dens = pg(npi)%rhoSPH_new / pg(npi)%Gamma
+            endif
+            elseif (NMedium>1) then
+               pg(npi)%dens = pg(npi)%rhoSPH_new / pg(npi)%sigma_fluid
          endif
 ! Interesting test, according to Ferrand et al. (2013)
 ! beta = exp(-30000.*(min((pg(npi)%sigma/pg(npi)%Gamma),1.)-1.)**2)

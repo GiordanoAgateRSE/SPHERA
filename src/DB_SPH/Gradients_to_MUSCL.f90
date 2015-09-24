@@ -65,7 +65,7 @@ do npi=1,nag
       pg(npi)%dvel = zero
 ! Loop over the fluid neighbouring particles
       do contj=1,nPartIntorno(npi)   
-         npartint = (npi - 1)* NMAXPARTJ + contj
+         npartint = (npi - 1) * NMAXPARTJ + contj
          npj = PartIntorno(npartint)
          if (pg(npi)%imed==pg(npj)%imed) then
             vol_Shep = pg(npj)%mass / pg(npj)%dens 
@@ -85,8 +85,9 @@ do npi=1,nag
                                 Partkernel(1,npartint) * vol_Shep
          endif
       end do 
-      if (DBSPH%MUSCL_boundary_flag.eqv..true.) call                           &
-         Gradients_to_MUSCL_boundary(npi)
+      if ((DBSPH%MUSCL_boundary_flag.eqv..true.).and.(NMedium==1)) then
+         call Gradients_to_MUSCL_boundary(npi)
+      endif
    endif
 end do 
 !$omp end parallel do

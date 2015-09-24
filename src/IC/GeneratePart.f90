@@ -45,7 +45,7 @@ integer(4),intent(IN) :: IC_loop
 integer(4) :: Nt,Nz,Mate,IsopraS,NumParticles,i,j,k,dimensioni,NumPartPrima    
 integer(4) :: aux_factor,i_vertex,j_vertex,test_xy,test_z,n_levels,nag_aux
 integer(4) :: i_face,j_node,npi,ier,test_face,test_dam,test_xy_2
-double precision :: distance_hor,z_min,aux_scal,rnd
+double precision :: distance_hor,z_min,aux_scal,rnd,h_reservoir
 double precision :: aux_vec(3)
 integer(4),dimension(SPACEDIM) :: Npps
 double precision,dimension(SPACEDIM) :: MinOfMin,XminReset
@@ -75,6 +75,13 @@ allocate (xmin(spacedim,dimensioni),xmax(spacedim,dimensioni))
 ! Initializations
 !------------------------
 MinOfMin = max_positive_number
+if (Domain%tipo=="bsph") then
+! In case of DB-SPH boundary treatment, there is a fictitious water reservoir 
+! top, which completes the kernel suppport (only for pre-processing)
+   h_reservoir = Partz(Nz)%H_res + 3.d0 * Domain%h
+   else
+      h_reservoir = Partz(Nz)%H_res
+endif
 !------------------------
 ! Statements
 !------------------------
@@ -156,8 +163,7 @@ second_cycle: do Nz=1,NPartZone
                end do
 ! Generating daughter points of the Cartesian topography, according to dx
 ! (maybe the function "ceiling" would be better than "int" here)
-               n_levels = int((Partz(Nz)%H_res - z_aux(i_vertex)) /            &
-                          Domain%dd) 
+               n_levels = int((h_reservoir - z_aux(i_vertex)) / Domain%dd) 
                do i=1,aux_factor
                   do j=1,aux_factor
                      do k=1,n_levels
@@ -176,7 +182,7 @@ second_cycle: do Nz=1,NPartZone
                                                         * Domain%dd + (j -     &
                                                         1 + 0.5d0) *           &
                                                         Domain%dd
-                        pg_aux(NumParticles)%coord(3) = (Partz(Nz)%H_res -     &
+                        pg_aux(NumParticles)%coord(3) = (h_reservoir -         &
                                                         Domain%dd / 2.d0) -    &
                                                         (k - 1) * Domain%dd
 ! Test if the particle is below the reservoir
