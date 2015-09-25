@@ -82,7 +82,7 @@ if (Domain%tipo=="bsph") then
    pg(npi)%rhoSPH_new = zero
    pg(npi)%uni = zero
    pg(npi)%sigma = zero
-   pg(npi)%sigma_fluid = zero
+   pg(npi)%sigma_same_fluid = zero
    pg(npi)%dShep = zero 
    pg(npi)%FS = 0 
    pg(npi)%Gamma_last_active = zero

@@ -102,7 +102,7 @@ loop_nag: do npi=1,nag
       dShep_old(npi) = pg(npi)%dShep
       pg(npi)%dShep = zero 
       pg(npi)%sigma = zero 
-      pg(npi)%sigma_fluid = zero
+      pg(npi)%sigma_same_fluid = zero
       pg(npi)%FS = 0
       pg(npi)%DBSPH_inlet_ID = 0
       pg(npi)%DBSPH_outlet_ID = 0
@@ -232,8 +232,9 @@ loop_nag: do npi=1,nag
                if (pg(npi)%imed==pg(npj)%imed) then 
                   pg(npi)%rhoSPH_new = pg(npi)%rhoSPH_new + pg(npj)%mass *     &
                                        PartKernel(4,npartint)
-                  pg(npi)%sigma_fluid = pg(npi)%sigma_fluid + pg(npj)%mass *   &
-                                        PartKernel(4,npartint) / pg(npj)%dens
+                  pg(npi)%sigma_same_fluid = pg(npi)%sigma_fluid + pg(npj)%mass&
+                                             * PartKernel(4,npartint) /        &
+                                             pg(npj)%dens
                endif
             endif
 ! Searching for the nearest fluid/mixture SPH particle 
@@ -542,7 +543,7 @@ if (Domain%tipo=="bsph") then
                      pg(npi)%dens = pg(npi)%rhoSPH_new / pg(npi)%Gamma
                endif
                elseif(NMedium>1) then
-                  pg(npi)%dens = pg(npi)%rhoSPH_new / pg(npi)%sigma_fluid
+                  pg(npi)%dens = pg(npi)%rhoSPH_new / pg(npi)%sigma_same_fluid
             endif
          endif
       endif

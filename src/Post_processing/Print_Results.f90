@@ -151,7 +151,7 @@ if (nag>0) then
       if (pg(npi)%laminar_flag==1) then
          laminar_flag_count = laminar_flag_count + 1
       endif
-      if ((Med(pg(npi)%imed)%tipo=="granular").and.(pg(npi)%state=="flu")) then
+      if (Med(pg(npi)%imed)%tipo=="granular") then
          mixture_count = mixture_count + 1 
       endif
    enddo

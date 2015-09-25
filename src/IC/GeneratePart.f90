@@ -76,7 +76,7 @@ allocate (xmin(spacedim,dimensioni),xmax(spacedim,dimensioni))
 !------------------------
 MinOfMin = max_positive_number
 if (Domain%tipo=="bsph") then
-! In case of DB-SPH boundary treatment, there is a fictitious water reservoir 
+! In case of DB-SPH boundary treatment, there is a fictitious fluid reservoir 
 ! top, which completes the kernel suppport (only for pre-processing)
    h_reservoir = Partz(Nz)%H_res + 3.d0 * Domain%h
    else

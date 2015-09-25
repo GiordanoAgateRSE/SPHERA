@@ -246,7 +246,7 @@ if ((Domain%tipo=="bsph").and.(DBSPH%n_w > 0)) then
                     kernel_fw(2,npartint)  
       tpres(:) = tpres(:) + appopres(:)
       call viscomon_wall_elements(npi,npj,npartint,dervel,rvwalfa,rvwbeta)
-      DBSPH_BC_shear_viscosity_term(npi,npj,npartint,DBSPH_BC_she_vis_term)
+      call DBSPH_BC_shear_viscosity_term(npi,npj,npartint,DBSPH_BC_she_vis_term)
    end do
 ! Computation of the boundary shear viscosity term in DB-SPH-NS   
    DBSPH_BC_she_vis_term(:) = DBSPH_BC_she_vis_term(:) / pg(i_0)%dens /        &

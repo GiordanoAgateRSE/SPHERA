@@ -229,7 +229,7 @@ if (((DBSPH%n_w+DBSPH%n_inlet+DBSPH%n_outlet)>0).and.(Domain%tipo=="bsph")) &
       npi = Array_Flu(ii)
 ! Gamma=1 for particles in the inner domain
       if (nPartIntorno_fw(npi)==0) pg(npi)%Gamma = one         
-      if (Domain%tipo=="bsph") pg(npi)%dden = pg(npi)%dden / pg(npi)%Gamma
+      pg(npi)%dden = pg(npi)%dden / pg(npi)%Gamma
 ! Boundary type is fixe or tapis or level(?)
       if (pg(npi)%koddens==0) then
 ! SPH approxmation of density (alternative to the continuity equation)
@@ -242,7 +242,7 @@ if (((DBSPH%n_w+DBSPH%n_inlet+DBSPH%n_outlet)>0).and.(Domain%tipo=="bsph")) &
                   pg(npi)%dens = pg(npi)%rhoSPH_new / pg(npi)%Gamma
             endif
             elseif (NMedium>1) then
-               pg(npi)%dens = pg(npi)%rhoSPH_new / pg(npi)%sigma_fluid
+               pg(npi)%dens = pg(npi)%rhoSPH_new / pg(npi)%sigma_same_fluid
          endif
 ! Interesting test, according to Ferrand et al. (2013)
 ! beta = exp(-30000.*(min((pg(npi)%sigma/pg(npi)%Gamma),1.)-1.)**2)

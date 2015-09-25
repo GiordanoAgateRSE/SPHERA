@@ -176,8 +176,8 @@ type TyParticle
    double precision :: dShep ! Lagrangian derivative of Shepard 
                              ! coefficient 
    double precision :: sigma ! Discrete Shepard coefficient
-   double precision :: sigma_fluid ! Discrete Shepard coefficient involving 
-                                   ! neighbours of the same fluid
+   double precision :: sigma_same_fluid ! Discrete Shepard coefficient involving 
+                                        ! neighbours of the same fluid
    double precision :: Gamma ! Integral Shepard coefficient
    double precision :: Gamma_last_active ! Last value of Gamma before FS=3
    double precision :: dens_init_err ! Initial difference between SPH 
@@ -338,9 +338,10 @@ end type body_particle
 ! Zone
 type TyZone
    logical          :: DBSPH_fictitious_reservoir_flag ! .true.(DB-SPH 
-                                                       ! fictitious air 
+                                                       ! fictitious fluid 
                                                        ! particles to complete 
-                                                       ! the kernel support in 
+                                                       ! the kernel support at 
+                                                       ! free surface in 
                                                        ! pre-processing)
    integer(4)       :: ipool 
    integer(4)       :: npoints

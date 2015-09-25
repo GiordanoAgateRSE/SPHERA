@@ -25,10 +25,11 @@
 ! Description: Computation of the velocity gradients in the Viscous Sub-Layer of   
 !              the Surface Neutral Boundary Layer. The gradients are used in the  
 !              DB-SPH BC shear viscosity term (DB-SPH-NS). For wall elements, 
-!              the numerator and the denominator (Shepard coefficient of the 
-!              associated semi-particle) are updated independently (their ratio  
-!              is computed in "DBSPH_BC_shear_viscosity_term"): here are summed 
-!              their contributions.          
+!              the numerator and the denominator (wall element Shepard 
+!              coefficient without contributions from semi-particles) are   
+!              updated independently. Their ratio is computed in 
+!              "DBSPH_BC_shear_viscosity_term"): here are summed their 
+!              contributions.          
 !-------------------------------------------------------------------------------
 subroutine DBSPH_velocity_gradients_VSL_SNBL(i_0,i_a,npartint)
 !------------------------

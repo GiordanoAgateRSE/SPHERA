@@ -76,7 +76,7 @@ if (DBSPH%n_w>0) then
          endif
 !$omp parallel do default(none)                                                &
 !$omp shared(DBSPH,pg_w)                                                       &
-!$omp private(npi,rel_pos,vel_aux)
+!$omp private(npi,rel_pos,vel_aux,omega_aux)
          do npi=1,DBSPH%n_w
             rel_pos = pg_w(npi)%pos(:) - DBSPH%rotation_centre(:)          
             call Vector_Product(omega_aux,rel_pos,pg_w(npi)%vel(:),3)

@@ -85,7 +85,7 @@ do npi=1,nag
                                 Partkernel(1,npartint) * vol_Shep
          endif
       end do 
-      if ((DBSPH%MUSCL_boundary_flag.eqv..true.).and.(NMedium==1)) then
+      if ((DBSPH%MUSCL_boundary_flag.eqv.(.true.)).and.(NMedium==1)) then
          call Gradients_to_MUSCL_boundary(npi)
       endif
    endif
