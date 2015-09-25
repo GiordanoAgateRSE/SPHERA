@@ -26,7 +26,7 @@
 !              are added at a later stage) and the energy equation RHS (this last equation is not validated).   
 !----------------------------------------------------------------------------------------------------------------------------------
 
-subroutine inter_EqMoto (npi,tpres,tdiss,tvisc)
+subroutine inter_EqMoto(npi,tpres,tdiss,tvisc)
 !------------------------
 ! Modules
 !------------------------ 

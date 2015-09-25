@@ -195,7 +195,7 @@ xmin,xmax,ymin,xmax,zmin,zmax       ! (monitoring region vertices)
 imposed_kinematics_records flag_in-built_monitors rotation_centre_x rotation_centre_y rotation_centre_z
                                     ! imposed_kinematics_records(number of 
                                     ! records, which describe a possible imposed
-                                    ! kinematics; 
+                                    ! kinematics); 
                                     ! flag_in-built_monitors(logical): flag for 
                                     ! in-built motion of control lines and 
                                     ! DB-SPH frontiers;
@@ -208,8 +208,11 @@ time_last velocity_x_last velocity_x_last velocity_x_last omega_x_last omega_y_l
                                     ! (records for the imposed translational 
                                     ! kinematics to frontiers)
 ! if (imposed_kinematics_records==1): end
-n_inlet n_outlet                    ! n_inlet(number of inlet sections)
+n_inlet n_outlet ply_n_face_vert    ! n_inlet(number of inlet sections)
                                     ! n_outlet(number of outlet sections)
+                                    ! ply_n_face_vert(number of vertices of the 
+                                    ! DB-SPH faces as represented in the ".ply"
+                                    ! input files(3 in 3D,4 in 2D).
 ! if (n_inlet>1): start
 x_inlet_1 y_inlet_1 z_inlet_1 n_x_inlet_1 n_y_inlet_1 n_z_inlet_1 velocity_x_inlet_1 velocity_y_inlet_1 velocity_z_inlet_1 L_inlet_1
 ...                                 ! (other possible records)

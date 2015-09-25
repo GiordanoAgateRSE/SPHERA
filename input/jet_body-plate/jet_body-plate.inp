@@ -60,7 +60,7 @@ pa 0.
 ##### DBSPH #####
 1. .false. 0.5
 0 0
-0 .false.
+0 .false. 0. 0. 0.
 0 0
 ##### END DBSPH #####
 

@@ -1,4 +1,4 @@
-7.2
+8.0
 
 !-------------------------------------------------------------------------------
 ! File name and copyright: 2D_erosional_dam_break_SPHERA_demo.inp
@@ -66,7 +66,7 @@ perimeter
 uniform 009EA8
 std 0. 0. 0. 0.
 qp 0.067
-1 0
+1 0 .false.
 ! First dam
 Water reservoir
 3
@@ -75,14 +75,14 @@ perimeter
 uniform 009EA8
 std 0. 0. 0. 0.
 qp 0.5
-1 0
+1 0 .false.
 ##### END BOUNDARIES #####
 
 ##### DBSPH #####
 1. .false. 0.5
 0 0
-0 .false.
-0 0
+0 .false. 0. 0. 0.
+0 0 3
 ##### END DBSPH #####
 
 ##### BED LOAD TRANSPORT #####

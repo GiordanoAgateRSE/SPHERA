@@ -60,8 +60,17 @@ call random_seed()
 test_z = 0
 if (IC_loop==2) then
    do Nz=1,NPartZone
-      if (Partz(Nz)%IC_source_type==2) test_z = 1
-   end do 
+      if (Partz(Nz)%IC_source_type==2) then
+         test_z = 1
+         if (Domain%tipo=="bsph") then
+! In case of DB-SPH boundary treatment, there is a fictitious fluid reservoir 
+! top, which completes the kernel suppport (only for pre-processing)
+            h_reservoir = Partz(Nz)%H_res + 3.d0 * Domain%h
+            else
+               h_reservoir = Partz(Nz)%H_res
+         endif
+      endif
+   enddo 
 endif
 if (test_z==0) nag = 0 
 NumParticles = 0
@@ -75,13 +84,6 @@ allocate (xmin(spacedim,dimensioni),xmax(spacedim,dimensioni))
 ! Initializations
 !------------------------
 MinOfMin = max_positive_number
-if (Domain%tipo=="bsph") then
-! In case of DB-SPH boundary treatment, there is a fictitious fluid reservoir 
-! top, which completes the kernel suppport (only for pre-processing)
-   h_reservoir = Partz(Nz)%H_res + 3.d0 * Domain%h
-   else
-      h_reservoir = Partz(Nz)%H_res
-endif
 !------------------------
 ! Statements
 !------------------------
