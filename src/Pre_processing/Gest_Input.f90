@@ -439,8 +439,8 @@ if (.not.Restart) then
                   ' the program terminates here.'
                stop ! Stop the main program
                else
-                  write (nout,*)                 
-                     "Allocation of bp_arr in Gest_Input successfully completed"                                   &
+                  write (nout,*)                                               &               
+                     "Allocation of bp_arr in Gest_Input successfully completed"
             endif   
          endif         
 ! Allocation of the array of the surface body particles
@@ -452,8 +452,8 @@ if (.not.Restart) then
                   ' the program terminates here.'
                stop ! Stop the main program
                else
-                  write (nout,*)                 
-                     'Allocation of surf_body_part in Gest_Input '             &
+                  write (nout,*)                                               &
+                     'Allocation of surf_body_part in Gest_Input',             &
                      ' successfully completed.'
             endif   
          endif
@@ -467,8 +467,8 @@ if (.not.Restart) then
             ' the program terminates here.'
             stop ! Stop the main program
             else
-               write (nout,*)                 
-                  'Allocation of Z_fluid_max in Gest_Input successfully '      &
+               write (nout,*)                                                  &
+                  'Allocation of Z_fluid_max in Gest_Input successfully',      &
                   ' completed.'
          endif   
       endif
@@ -481,7 +481,7 @@ if (.not.Restart) then
             ' the program terminates here.'
             stop ! Stop the main program
             else
-               write (nout,*)                 
+               write (nout,*)                                                  &
                   'Allocation of q_max in Gest_Input successfully completed.'
          endif   
       endif      

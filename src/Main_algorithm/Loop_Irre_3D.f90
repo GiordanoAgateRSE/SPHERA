@@ -38,6 +38,7 @@ use I_O_diagnostic_module
 ! Declarations
 !------------------------
 implicit none
+logical :: done_flag
 integer(4) :: Ncbf,i,npi,it,it_print,it_memo,it_rest,ir,ii,num_out,Ncbf_Max
 integer(4) :: OpCountot,SpCountot,EpCountot,EpOrdGridtot,ncel,aux,igridi
 integer(4) :: jgridi,kgridi,machine_Julian_day,machine_hour,machine_minute
@@ -58,6 +59,7 @@ integer(4),external :: ParticleCellNumber,CellIndices,CellNumber
 !------------------------
 ! Initializations
 !------------------------
+done_flag = .false.
 if (esplosione) then
    do npi=1,nag
       if (index(Med(pg(npi)%imed)%tipo,"gas")>0) then
@@ -111,7 +113,7 @@ call start_and_stop(3,10)
 ! Removing fictitious reservoirs used for DB-SPH initialization
 call start_and_stop(2,9) 
 if ((it_corrente==it_start).and.(Domain%tipo=="bsph")) then
-!$omp parallel do default(none) shared(nag,pg,OpCount) private(npi) 
+!$omp parallel do default(none) shared(nag,pg,OpCount,Partz) private(npi) 
    do npi=1,nag
 ! Fictitious air reservoirs
       if (Partz(pg(npi)%izona)%DBSPH_fictitious_reservoir_flag.eqv.(.true.))  &
@@ -121,7 +123,7 @@ if ((it_corrente==it_start).and.(Domain%tipo=="bsph")) then
       endif
 ! Fictitious fluid reservoir top
       if (Partz(1)%IC_source_type==2) then
-         if (pg(npi)%coord(3)>Partz(Nz)%H_res) then
+         if (pg(npi)%coord(3)>Partz(pg(npi)%izona)%H_res) then
             OpCount(pg(npi)%imed) = OpCount(pg(npi)%imed) + 1    
             pg(npi)%cella = -1
          endif
@@ -208,7 +210,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
    tempo = tempo + dt
    if (nscr>0) write (nscr,"(a,i8,a,g13.6,a,g12.4,a,i8,a,i5)") " it= ",it,     &
       "   time= ",tempo,"  dt= ",dt,"    npart= ",nag,"   out= ",num_out
-   do while ((stage_flag.eqv.(.false.)).or.((Domain%RKscheme>1).and.           &
+   do while ((done_flag.eqv.(.false.)).or.((Domain%RKscheme>1).and.            &
       (Domain%time_stage>1)))
       if (Domain%time_split==0) then
 ! Explicit RK schemes 
@@ -794,6 +796,8 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
       if ((Domain%RKscheme>1).and.(Domain%time_split==0)) then
          Domain%time_stage = MODULO(Domain%time_stage,Domain%RKscheme)
          Domain%time_stage = Domain%time_stage + 1
+         else
+            done_flag = .true.
       endif
    enddo
 ! Post-processing

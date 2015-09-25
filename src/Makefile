@@ -4,11 +4,11 @@ VERSION = 8_0_AA
 EXECUTION = debug
 #    -O1 (run), -g -O0 -fbacktrace -C (gfortran debug),
 #    -g -O0 -traceback -C -check bounds -debug all (ifort debug)
-COMPILATION_FLAGS = -g -O0 -traceback -C -check bounds -debug all
+COMPILATION_FLAGS = -g -O0 -fbacktrace -C
 #    gfortran, ifort
-COMPILER = ifort
+COMPILER = gfortran
 #    -fopenmp, -openmp, (blank for debug)  
-OMP_FLAG =    
+OMP_FLAG = -fopenmp
 SOURCES = \
 ./Modules/Static_allocation_module.f90 \
 ./Modules/Hybrid_allocation_module.f90 \

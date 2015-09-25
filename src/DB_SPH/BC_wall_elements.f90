@@ -117,7 +117,7 @@ do npi=1,nag
          pstar = -99000.d0
       endif 
 ! Linearized Partial Riemann Solver: end
-! "den" and "den2" are auxiliary vectors to add contributions to the density and 
+! "den" is an auxiliary vector to add contributions to the density and 
 ! pressure denominators
       Ww_Shep = pg(npi)%mass / pg(npi)%dens * kernel_fw(1,npartint) 
       den(npj) = den(npj) + Ww_Shep
@@ -126,7 +126,7 @@ do npi=1,nag
    enddo
 enddo
 ! Updating wall element pressure and density
-!$omp parallel do default(none) private(npi) shared(neigh_w,pg_w,den,den2,DBSPH)
+!$omp parallel do default(none) private(npi) shared(neigh_w,pg_w,den,DBSPH)
 do npi=1,DBSPH%n_w
    if (neigh_w(npi)==1) then
       pg_w(npi)%dens = pg_w(npi)%dens / den(npi)

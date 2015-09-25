@@ -249,8 +249,8 @@ if ((Domain%tipo=="bsph").and.(DBSPH%n_w > 0)) then
       call DBSPH_BC_shear_viscosity_term(npi,npj,npartint,DBSPH_BC_she_vis_term)
    end do
 ! Computation of the boundary shear viscosity term in DB-SPH-NS   
-   DBSPH_BC_she_vis_term(:) = DBSPH_BC_she_vis_term(:) / pg(i_0)%dens /        &
-                              pg(i_0)%Gamma
+   DBSPH_BC_she_vis_term(:) = DBSPH_BC_she_vis_term(:) / pg(npi)%dens /        &
+                              pg(npi)%Gamma
 ! Update the overall (inner+BC) shear viscosity term in DB-SPH-NS
    tvisc(:) = tvisc(:) + DBSPH_BC_she_vis_term(:)
 endif

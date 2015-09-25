@@ -96,7 +96,6 @@ do while (TRIM(lcase(ainp)) /= "##### end body dynamics #####")
          write(nout,*)                                                         &
             'Allocation of body_arr in ReadBodyDynamics failed;',              &
             ' the program terminates here.'
-         call diagnostic (arg1=5,arg2=330)
          stop ! Stop the main program
          else
             write (nout,*)                                                     &

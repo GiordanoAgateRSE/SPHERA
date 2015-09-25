@@ -594,8 +594,8 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
                   ' the program terminates here.'
                   stop ! Stop the main program
                   else
-                     write (nout,*)                 
-                        'Allocation of Z_fluid_max in Gest_Trans successfully '&
+                     write (nout,*)                                            &
+                        'Allocation of Z_fluid_max in Gest_Trans successfully',&
                         ' completed.'
                endif   
             endif
@@ -608,8 +608,8 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
                   ' the program terminates here.'
                   stop ! Stop the main program
                   else
-                     write (nout,*)                 
-                        'Allocation of q_max in Gest_Trans successfully '      &
+                     write (nout,*)                                            &
+                        'Allocation of q_max in Gest_Trans successfully ',     &
                         'completed.'
                endif   
             endif

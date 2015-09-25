@@ -56,7 +56,7 @@ double precision :: vol_Shep,Ww_Shep
 !$omp parallel do default(none)                                                &
 !$omp private(npi,contj,npj,npartint,vol_Shep)                                 &
 !$omp shared(nag,pg,NMAXPARTJ,rag,nPartIntorno,Partintorno,PartKernel)         &
-!$omp shared(nPartIntorno_fw,DBSPH)
+!$omp shared(nPartIntorno_fw,DBSPH,NMedium)
 ! Loop over the fluid computational particles
 do npi=1,nag 
    if (nPartIntorno_fw(npi)>0) then   

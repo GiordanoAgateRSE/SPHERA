@@ -94,7 +94,7 @@ endif
 !$omp shared(Partintorno,PartKernel,ke_coef,kacl_coef,Doubleh,DoubleSquareh)   &
 !$omp shared(squareh,nomsub,ncord,eta,eta2,nout,nscr,erosione,ind_interfaces)  &
 !$omp shared(DBSPH,pg_w,Icont_w,Npartord_w,rag_fw,nPartIntorno_fw)             &
-!$omp shared(Partintorno_fw,kernel_fw,dShep_old,Granular_flows_options)
+!$omp shared(Partintorno_fw,kernel_fw,dShep_old,Granular_flows_options,NMedium)
 loop_nag: do npi=1,nag
    if (Domain%tipo=="bsph") then
       pg(npi)%rhoSPH_old = pg(npi)%rhoSPH_new
@@ -232,8 +232,9 @@ loop_nag: do npi=1,nag
                if (pg(npi)%imed==pg(npj)%imed) then 
                   pg(npi)%rhoSPH_new = pg(npi)%rhoSPH_new + pg(npj)%mass *     &
                                        PartKernel(4,npartint)
-                  pg(npi)%sigma_same_fluid = pg(npi)%sigma_fluid + pg(npj)%mass&
-                                             * PartKernel(4,npartint) /        &
+                  pg(npi)%sigma_same_fluid = pg(npi)%sigma_same_fluid +        &
+                                             pg(npj)%mass *                    &
+                                             PartKernel(4,npartint) /          &
                                              pg(npj)%dens
                endif
             endif

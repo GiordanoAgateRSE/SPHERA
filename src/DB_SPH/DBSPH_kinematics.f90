@@ -38,7 +38,7 @@ use I_O_diagnostic_module
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: j
+integer(4) :: j,i_a
 double precision :: vel_aux(3),omega_aux(3),rel_pos(3)
 !------------------------
 ! Explicit interfaces
@@ -76,11 +76,11 @@ if (DBSPH%n_w>0) then
          endif
 !$omp parallel do default(none)                                                &
 !$omp shared(DBSPH,pg_w)                                                       &
-!$omp private(npi,rel_pos,vel_aux,omega_aux)
-         do npi=1,DBSPH%n_w
-            rel_pos = pg_w(npi)%pos(:) - DBSPH%rotation_centre(:)          
-            call Vector_Product(omega_aux,rel_pos,pg_w(npi)%vel(:),3)
-            pg_w(npi)%vel(:) = pg_w(npi)%vel(:) + vel_aux(:)
+!$omp private(i_a,rel_pos,vel_aux,omega_aux)
+         do i_a=1,DBSPH%n_w
+            rel_pos = pg_w(i_a)%coord(:) - DBSPH%rotation_centre(:)          
+            call Vector_Product(omega_aux,rel_pos,pg_w(i_a)%vel(:),3)
+            pg_w(i_a)%vel(:) = pg_w(i_a)%vel(:) + vel_aux(:)
          enddo
 !$omp end parallel do
          exit

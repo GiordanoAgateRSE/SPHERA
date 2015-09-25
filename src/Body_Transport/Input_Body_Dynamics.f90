@@ -103,8 +103,8 @@ if (.not.allocated(bp_arr)) then
          ' the program terminates here.'
       stop ! Stop the main program
       else
-         write (nout,*)                 
-            'Allocation of bp_arr in Input_Body_Dynamics successfully completed"
+         write (nout,*)                                                        &                
+            "Allocation of bp_arr in Input_Body_Dynamics successfully completed"
    endif   
 endif
 npi = 1  
@@ -290,8 +290,8 @@ if (.not.allocated(surf_body_part)) then
          ' the program terminates here.'
       stop ! Stop the main program
       else
-         write (nout,*)                 
-            'Allocation of surf_body_part in Input_Body_Dynamics '             &
+         write (nout,*)                                                        &        
+            'Allocation of surf_body_part in Input_Body_Dynamics ',            &
             ' successfully completed.'
    endif   
 endif

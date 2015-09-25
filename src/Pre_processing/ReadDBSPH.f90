@@ -44,7 +44,7 @@ integer(4) :: ioerr,n_monitor_points,n_monitor_regions,i,alloc_stat
 integer(4) :: dealloc_stat,n_kinematics_records,j,n_inlet,n_outlet
 integer(4) :: ply_n_face_vert
 double precision :: dx_dxw,k_w
-double precision :: rotation_centre
+double precision :: rotation_centre(3)
 integer(4),allocatable,dimension(:) :: monitor_IDs
 double precision,dimension(:) :: monitor_region(6)           
 character(80) :: lcase

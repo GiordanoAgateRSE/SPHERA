@@ -39,7 +39,7 @@ use Dynamic_allocation_module
 implicit none
 character(7),intent(IN) :: option
 integer(4),intent(INOUT) :: ier,nrecords 
-integer(4) :: restartcode,save_istart,ioerr
+integer(4) :: restartcode,save_istart,ioerr,i
 double precision :: save_start
 character(12) :: ainp = "Restart File"
 character(len=8) :: versionerest
@@ -169,7 +169,19 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
                         DBSPH%n_outlet)
                      if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"pg_w",nsav,   &
                         nout)) return
-                     read(nsav,iostat=ioerr) body_arr(1:n_bodies)
+                     do i=1,n_bodies
+                        read(nsav,iostat=ioerr) body_arr(i)%npart,             &
+                           body_arr(i)%Ic_imposed,body_arr(i)%n_elem,          &
+                           body_arr(i)%imposed_kinematics,                     &
+                           body_arr(i)%n_records,body_arr%mass,                &
+                           body_arr(i)%umax,body_arr(i)%pmax,                  &
+                           body_arr(i)%x_CM,body_arr(i)%alfa,                  &
+                           body_arr(i)%x_rotC,body_arr(i)%u_CM,                &
+                           body_arr(i)%omega,body_arr(i)%Force,                &
+                           body_arr(i)%Moment,body_arr(i)%Ic,                  &
+                           body_arr(i)%Ic_inv,body_arr(i)%body_kinematics,     &
+                           body_arr(i)%elem
+                     enddo
                      if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"body_arr",    &
                         nsav,nout)) return
                      read(nsav,iostat=ioerr) bp_arr(1:n_body_part)
@@ -238,7 +250,19 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
                            DBSPH%n_outlet)
                         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"pg_w",nsav,&
                            nout)) return  
-                        read(nsav,iostat=ioerr) body_arr(1:n_bodies)
+                        do i=1,n_bodies
+                           read(nsav,iostat=ioerr) body_arr(i)%npart,          &
+                              body_arr(i)%Ic_imposed,body_arr(i)%n_elem,       &
+                              body_arr(i)%imposed_kinematics,                  &
+                              body_arr(i)%n_records,body_arr%mass,             &
+                              body_arr(i)%umax,body_arr(i)%pmax,               &
+                              body_arr(i)%x_CM,body_arr(i)%alfa,               &
+                              body_arr(i)%x_rotC,body_arr(i)%u_CM,             &
+                              body_arr(i)%omega,body_arr(i)%Force,             &
+                              body_arr(i)%Moment,body_arr(i)%Ic,               &
+                              body_arr(i)%Ic_inv,body_arr(i)%body_kinematics,  &
+                              body_arr(i)%elem
+                        enddo
                         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"body_arr", &
                            nsav,nout)) return
                         read(nsav,iostat=ioerr) bp_arr(1:n_body_part)

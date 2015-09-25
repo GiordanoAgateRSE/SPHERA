@@ -39,6 +39,7 @@ use I_O_diagnostic_module
 ! Declarations
 !------------------------
 implicit none
+logical :: done_flag
 integer(4) :: Ncbs,IntNcbs,i,ii,num_out,npi,it,it_print,it_memo,it_rest,ir
 integer(4) :: OpCountot,SpCountot,EpCountot,EpOrdGridtot,ncel,aux,igridi
 integer(4) :: jgridi,kgridi,machine_Julian_day,machine_hour,machine_minute
@@ -59,6 +60,7 @@ integer(4),external :: ParticleCellNumber,CellIndices,CellNumber
 !------------------------
 ! Initializations
 !------------------------
+done_flag = .false.
 if (esplosione) then
    do npi=1,nag
       if (index(Med(pg(npi)%imed)%tipo,"gas")>0) then
@@ -113,7 +115,7 @@ call start_and_stop(3,10)
 ! Removing fictitious reservoirs used for DB-SPH initialization
 call start_and_stop(2,9)
 if ((it_corrente==it_start).and.(Domain%tipo=="bsph")) then
-!$omp parallel do default(none) shared(nag,pg,OpCount) private(npi) 
+!$omp parallel do default(none) shared(nag,pg,OpCount,Partz) private(npi) 
    do npi=1,nag
       if (Partz(pg(npi)%izona)%DBSPH_fictitious_reservoir_flag.eqv.(.true.))   &
          then
@@ -205,7 +207,7 @@ ITERATION_LOOP: do while (it<Domain%itmax)
    tempo = tempo + dt
    if (nscr>0) write (nscr,"(a,i8,a,g13.6,a,g12.4,a,i8,a,i5)") " it= ",it,     &
       "   time= ",tempo,"  dt= ",dt,"    npart= ",nag,"   out= ",num_out
-   do while ((stage_flag.eqv.(.false.)).or.((Domain%RKscheme>1).and.           &
+   do while ((done_flag.eqv.(.false.)).or.((Domain%RKscheme>1).and.            &
       (Domain%time_stage>1)))
       if (Domain%time_split==0) then
 ! Explicit RK schemes 
@@ -781,6 +783,8 @@ ITERATION_LOOP: do while (it<Domain%itmax)
       if ((Domain%RKscheme>1).and.(Domain%time_split==0)) then
          Domain%time_stage = MODULO(Domain%time_stage,Domain%RKscheme)
          Domain%time_stage = Domain%time_stage + 1
+         else
+            done_flag = .true.
       endif
    enddo
 ! Post-processing

@@ -42,7 +42,7 @@ double precision,intent(IN) :: dtvel
 character(6),intent(IN) :: str
 integer(4),intent(INOUT) :: it_memo
 integer(4),intent(INOUT) :: it_rest
-integer(4) :: nrecords, restartcode
+integer(4) :: nrecords, restartcode,i
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -113,7 +113,17 @@ if ((it_rest==it).or.(index(str,'inizio')/=0).or.(index(str,'fine')/=0)) then
    write(nres) it,tempo,dt,nag,ncord,restartcode
    write(nres) pg(1:nag)
    write(nres) pg_w(1:DBSPH%n_w+DBSPH%n_inlet+DBSPH%n_outlet)
-   write(nres) body_arr(1:n_bodies)
+   do i=1,n_bodies
+   write(nres) body_arr(i)%npart,body_arr(i)%Ic_imposed,                       &
+      body_arr(i)%n_elem,body_arr(i)%imposed_kinematics,                       &
+      body_arr(i)%n_records,body_arr%mass,body_arr(i)%umax,                    &
+      body_arr(i)%pmax,body_arr(i)%x_CM,                                       &
+      body_arr(i)%alfa,body_arr(i)%x_rotC,                                     &
+      body_arr(i)%u_CM,body_arr(i)%omega,                                      &
+      body_arr(i)%Force,body_arr(i)%Moment,                                    &
+      body_arr(i)%Ic,body_arr(i)%Ic_inv,                                       &
+      body_arr(i)%body_kinematics,body_arr(i)%elem
+   enddo
    write(nres) bp_arr(1:n_body_part)
    write(nres) surf_body_part(1:n_surf_body_part)
    write(nres) Z_fluid_max(1:Grid%ncd(1)*Grid%ncd(2))

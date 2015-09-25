@@ -61,11 +61,11 @@ grad_vel_VSL_fw(:,npartint) = pg(i_0)%vel(:) / dsqrt(dot_product(              &
 ! elements
 pg_w(i_a)%grad_vel_VSL_times_mu(:) = pg_w(i_a)%grad_vel_VSL_times_mu(:) +      &
                                      pg(i_0)%mu * grad_vel_VSL_fw(:,npartint)  & 
-                                     * PartKernel_fw(2,npartint) *             &
-                                     pg(i_0)%mass / pg(i_0)%dens 
+                                     * kernel_fw(2,npartint) * pg(i_0)%mass /  &
+                                     pg(i_0)%dens 
 ! Contributions to the discrete Shepard coefficient of wall elements depending 
 ! on fluid particles (not on semi-particles)
-pg_w(i_a)%sigma = pg_w(i_a)%sigma + PartKernel_fw(2,npartint) * pg(i_0)%mass / &
+pg_w(i_a)%sigma = pg_w(i_a)%sigma + kernel_fw(2,npartint) * pg(i_0)%mass /     &
                   pg(i_0)%dens
 !------------------------
 ! Deallocations
