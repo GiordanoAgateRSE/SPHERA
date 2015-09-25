@@ -67,9 +67,14 @@ nPartIntorno = 0
 ind_interfaces = 0
 if ((Domain%tipo=="bsph").and.(nag>0)) then
    nPartIntorno_fw = 0
+   grad_vel_VSL_fw = 0.d0
    allocate (bounded(nag))
    bounded = 0
    allocate (dShep_old(nag))
+   pg_w(:)%sigma = 0.d0
+   pg_w(:)%grad_vel_VSL_times_mu(1) = 0.d0
+   pg_w(:)%grad_vel_VSL_times_mu(2) = 0.d0
+   pg_w(:)%grad_vel_VSL_times_mu(3) = 0.d0
 endif
 if (n_bodies>0) then 
    nPartIntorno_bp_f = 0
@@ -355,6 +360,7 @@ loop_nag: do npi=1,nag
 !    (rij_su_h/2.d0))
 ! if (rij_su_h/=0.d0) kernel_fw(2,npartint) = kernel_fw(2,npartint) * denom
 ! WendlandC4 kernel, interesting test: end
+                  call DBSPH_velocity_gradients_VSL_SNBL(npi,npj,npartint)
                enddo loop_fw
             endif
          enddo loop_krang      
@@ -515,7 +521,7 @@ if (Domain%tipo=="bsph") then
             else
                pg(npi)%Gamma = pg(npi)%sigma
                pg(npi)%Gamma = min (pg(npi)%Gamma,one)    
-          endif
+         endif
       endif
       if (it_corrente>-2) then
          min_sigma_Gamma = min((pg(npi)%sigma+0.05),pg(npi)%Gamma)

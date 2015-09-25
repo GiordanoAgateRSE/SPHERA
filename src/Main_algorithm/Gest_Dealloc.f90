@@ -365,21 +365,32 @@ if (Domain%tipo=="bsph") then
       deallocate (PartIntorno_fw,stat=ier)
       if (ier/=0) then
          write (nout,'(1x,a,i2)')                                              &
-            "   Array: PartIntorno_fw not deallocated with error code: ",ier
+            "   Array PartIntorno_fw not deallocated with error code: ",ier
          check = .false.
          else
             write (nout,'(1x,a)')                                              &
-               "   Array: PartIntorno_fw successfully deallocated "
+               "   Array PartIntorno_fw successfully deallocated "
+      endif
+   endif
+   if (allocated(grad_vel_VSL_fw)) then
+      deallocate (grad_vel_VSL_fw,stat=ier)
+      if (ier/=0) then
+         write (nout,'(1x,a,i2)')                                              &
+            "   Array grad_vel_VSL_fw not deallocated with error code: ",ier
+         check = .false.
+         else
+            write (nout,'(1x,a)')                                              &
+               "   Array grad_vel_VSL_fw successfully deallocated "
       endif
    endif
    if (allocated(kernel_fw)) then
       deallocate (kernel_fw,stat=ier)
       if (ier/=0) then
          write (nout,'(1x,a,i2)')                                              &
-            "   Array: kernel_fw not deallocated with error code: ",ier
+            "   Array kernel_fw not deallocated with error code: ",ier
          check = .false.
          else
-            write (nout,'(1x,a)') "   Array: kernel_fw successfully deallocated"
+            write (nout,'(1x,a)') "   Array kernel_fw successfully deallocated"
         endif
    endif
    if (allocated(rag_fw)) then

@@ -46,8 +46,9 @@ double precision :: dvtdn,denorm,rij_su_h,ke_coef,kacl_coef,rij_su_h_quad
 double precision :: vol_Shep,Ww_Shep,rijtemp,rijtemp2
 double precision :: gradmod,gradmodwacl,wu,denom,absv_pres_grav_inner
 double precision :: absv_Morris_inner,Morris_inner_weigth
-double precision,dimension(3) :: dervel,dervelmorr,appopres,appodiss,rvw
-double precision,dimension(3) :: rvwalfa,rvwbeta,ragtemp,rvw_sum
+double precision :: dervel(3),dervelmorr(3),appopres(3),appodiss(3),rvw(3)
+double precision :: rvwalfa(3),rvwbeta(3),ragtemp(3),rvw_sum(3)
+double precision :: DBSPH_BC_she_vis_term(3)
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -67,6 +68,7 @@ deltan = 1.d+07
 ke_coef = Domain%coefke / Domain%h
 kacl_coef = Domain%coefkacl / Domain%h
 rvw_sum(:) = zero
+DBSPH_BC_she_vis_term(:) = 0.d0
 !------------------------
 ! Statements
 !------------------------
@@ -244,9 +246,13 @@ if ((Domain%tipo=="bsph").and.(DBSPH%n_w > 0)) then
                     kernel_fw(2,npartint)  
       tpres(:) = tpres(:) + appopres(:)
       call viscomon_wall_elements(npi,npj,npartint,dervel,rvwalfa,rvwbeta)
-      call viscomorris_wall_elements(npi,npj,npartint,dervel,rvw)
-      tvisc(:) = tvisc(:) + rvw(:)
+      DBSPH_BC_shear_viscosity_term(npi,npj,npartint,DBSPH_BC_she_vis_term)
    end do
+! Computation of the boundary shear viscosity term in DB-SPH-NS   
+   DBSPH_BC_she_vis_term(:) = DBSPH_BC_she_vis_term(:) / pg(i_0)%dens /        &
+                              pg(i_0)%Gamma
+! Update the overall (inner+BC) shear viscosity term in DB-SPH-NS
+   tvisc(:) = tvisc(:) + DBSPH_BC_she_vis_term(:)
 endif
 !------------------------
 ! Deallocations

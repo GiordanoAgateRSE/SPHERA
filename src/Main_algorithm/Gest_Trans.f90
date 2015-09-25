@@ -170,7 +170,15 @@ if (Domain%tipo=="bsph") then
          "   Arrays PARTINTORNO_fw not allocated. Error code: ",ier
       call diagnostic (arg1=4,arg3=nomsub)
       else
-         write (nout,'(1x,a)') "   Arrays PARTINTORNO_fw successfully allocated"
+         write (nout,'(1x,a)') "   Array PARTINTORNO_fw successfully allocated"
+   endif
+   allocate(grad_vel_VSL_fw(1:3,1:NMAXPARTJ*PARTICLEBUFFER),stat=ier)
+   if (ier/=0) then
+      write (nout,'(1x,a,i2)')                                                 &
+         "   Array grad_vel_VSL_fw not allocated. Error code: ",ier
+      call diagnostic (arg1=4,arg3=nomsub)
+      else
+         write (nout,'(1x,a)') "   Array grad_vel_VSL_fw successfully allocated "
    endif
    allocate(kernel_fw(2,1:NMAXPARTJ*PARTICLEBUFFER),stat=ier)
    if (ier/=0) then
@@ -178,15 +186,15 @@ if (Domain%tipo=="bsph") then
          "   Arrays kernel_fw not allocated. Error code: ",ier
       call diagnostic (arg1=4,arg3=nomsub)
       else
-         write (nout,'(1x,a)') "   Arrays kernel_fw successfully allocated "
+         write (nout,'(1x,a)') "   Array kernel_fw successfully allocated "
    endif
    allocate (rag_fw(1:3,1:NMAXPARTJ*PARTICLEBUFFER),stat=ier)
    if (ier/=0) then
-      write (nout,'(1x,a,i2)') "   Arrays RAG_fw not allocated. Error code: ", &
+      write (nout,'(1x,a,i2)') "   Array RAG_fw not allocated. Error code: ", &
          ier
       call diagnostic (arg1=4,arg3=nomsub)
       else
-         write (nout,'(1x,a)') "   Arrays RAG_fw successfully allocated "
+         write (nout,'(1x,a)') "   Array RAG_fw successfully allocated "
    endif
 endif
 if (n_bodies>0) then
@@ -302,6 +310,8 @@ if ((Domain%tipo=="bsph").and.(DBSPH%n_w>0)) then
       size(kernel_fw)
    write (nout,*) " Size # of elements in array rag_fw              : ",       &
       size(rag_fw)
+   write (nout,*) " Size # of elements in array grad_vel_VSL_fw     : ",       &
+      size(grad_vel_VSL_fw)   
 endif
 if (n_bodies>0) then
    write (nout,*) " Size # of elements in array nPartIntorno_bp_f   : ",       &
@@ -349,6 +359,8 @@ if ((Domain%tipo=="bsph").and.(DBSPH%n_w>0)) then
       sizeof(kernel_fw)
    write (nout,*) " Size in bytes of array rag_fw                   : ",       &
       sizeof(rag_fw)
+   write (nout,*) " Size in bytes of array grad_vel_VSL_fw          : ",       &
+      sizeof(grad_vel_VSL_fw)   
 endif
 if (n_bodies>0) then
    write (nout,*) " Size in bytes of array nPartIntorno_bp_f        : ",       &

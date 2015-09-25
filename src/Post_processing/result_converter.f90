@@ -644,6 +644,20 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
             pg_w(finger(k))%normal(2),pg_w(finger(k))%normal(3),k=k1,k2)
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
+! Velocity gradient in VSL (projected along the wall element normal) times the 
+! shear viscosity
+      write(unitvtk,'(a)')                                                     &
+'      <DataArray type="Float32" Name="Normal vectors"  NumberOfComponents="3"  format="ascii" >'
+      do i=1,numpoints,6
+         k1 = i
+         k2 = k1 + 5
+         if (k2>numpoints) k2 = numpoints
+         write(unitvtk,'(8x,6(3(1x,e12.5)))') (                                &
+            pg_w(finger(k))%grad_vel_VSL_times_mu(1),                          &
+            pg_w(finger(k))%grad_vel_VSL_times_mu(2),                          &
+            pg_w(finger(k))%grad_vel_VSL_times_mu(3),k=k1,k2)
+      enddo
+      write(unitvtk,'(a)') '      </DataArray>'
 ! Pressure
       write(unitvtk,'(a)')                                                     &
          '      <DataArray type="Float32" Name="Pressure (Pa)" format="ascii" >'
@@ -697,7 +711,7 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
          if (k2>numpoints) k2 = numpoints
          write(unitvtk,'(8x,16(1x,e12.5))') (pg_w(finger(k))%volume,k=k1,k2)
       enddo
-      write(unitvtk,'(a)') '      </DataArray>'    
+      write(unitvtk,'(a)') '      </DataArray>'   
 ! Wall element ID 
       write(unitvtk,'(a)')                                                     &
       '      <DataArray type="Float32" Name="Finger" format="ascii" >'

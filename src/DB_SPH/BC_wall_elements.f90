@@ -104,7 +104,7 @@ do npi=1,nag
 ! Solution (density) in the central zone (here the wall element): subscript star
       uR = pg_w(npj)%vel(1) * pg_w(npj)%normal(1) + pg_w(npj)%vel(2) *         &
            pg_w(npj)%normal(2) + pg_w(npj)%vel(3) * pg_w(npj)%normal(3)
-      cL = Dsqrt(Med(pg(npi)%imed)%eps/rhoL)
+      cL = dsqrt(Med(pg(npi)%imed)%eps/rhoL)
       rhostar = rhoL + (uL - uR) * rhoL / cL
       if (rhostar<10.d0) then
          rhostar = 10.d0

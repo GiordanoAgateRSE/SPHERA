@@ -261,9 +261,16 @@ type TyParticle_w
    double precision :: mass ! Mass of the semi-particle
    double precision :: k_d ! Depth coefficient
    double precision :: volume ! Semi-particle volume (area in 2D)
+   double precision :: sigma ! Discrete Shepard coefficient of the wall elements
+                             ! depending on fluid particles (not on 
+                             ! semi-particles)
    double precision :: normal(3) ! Normal
    double precision :: coord(3) ! Position
    double precision :: vel(3) ! Velocity
+   double precision :: grad_vel_VSL_times_mu(3) ! Velocity gradient in VSL 
+                                                ! (projected along the wall 
+                                                ! element normal) times the 
+                                                ! shear viscosity
 end type TyParticle_w
 
 ! Body elements
