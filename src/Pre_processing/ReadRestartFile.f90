@@ -190,11 +190,12 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
                      read(nsav,iostat=ioerr) surf_body_part(1:n_surf_body_part)
                      if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,               &
                         "surf_body_part",nsav,nout)) return
-                     read(nsav,iostat=ioerr) Z_fluid_max(1:Grid%ncd(1)*        &
-                        Grid%ncd(2))
+                     if (allocated(Z_fluid_max)) read(nsav,iostat=ioerr)       &
+                        Z_fluid_max(1:Grid%ncd(1)*Grid%ncd(2))
                      if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,               &
                         "Z_fluid_max",nsav,nout)) return
-                     read(nsav,iostat=ioerr) q_max(1:Grid%ncd(1)*Grid%ncd(2))
+                     if (allocated(q_max)) read(nsav,iostat=ioerr)             &
+                        q_max(1:Grid%ncd(1)*Grid%ncd(2))
                      if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"q_max",nsav,  &
                         nout)) return
                      write(nout,'(a)') " "

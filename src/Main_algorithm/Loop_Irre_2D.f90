@@ -195,6 +195,7 @@ if (exetype=="linux") then
 endif
 it = it_start
 ITERATION_LOOP: do while (it<Domain%itmax)
+done_flag = .false.
 ! Set the iteration counter
    it = it + 1
    it_corrente = it
@@ -321,7 +322,7 @@ ITERATION_LOOP: do while (it<Domain%itmax)
 !$omp shared(nag,Pg,Domain,BoundaryDataPointer,indarrayFlu,Array_Flu,it)
       do ii=1,indarrayFlu
          npi = Array_Flu(ii)
-         call inter_EqMoto (npi,tpres,tdiss,tvisc)
+         call inter_EqMoto(npi,tpres,tdiss,tvisc)
 ! Searching for the boundary sides, which are the nearest the npi-th current 
 ! particle
          if ((Domain%time_stage==1).or.(Domain%time_split==1)) then 

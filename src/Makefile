@@ -1,14 +1,15 @@
 # Variables to be updated 
 VERSION = 8_0_AA
-#    run, debug
+#    bin, debug
 EXECUTION = debug
 #    -O1 (run), -g -O0 -fbacktrace -C (gfortran debug),
 #    -g -O0 -traceback -C -check bounds -debug all (ifort debug)
-COMPILATION_FLAGS = -g
+COMPILATION_FLAGS = -g -O0 -fbacktrace -C
 #    gfortran, ifort
 COMPILER = gfortran
 #    -fopenmp, -openmp, (blank for debug)  
 OMP_FLAG = 
+EXE_DIR = ../$(EXECUTION)/
 SOURCES = \
 ./Modules/Static_allocation_module.f90 \
 ./Modules/Hybrid_allocation_module.f90 \
@@ -42,7 +43,6 @@ $(wildcard ./Strings/*.f90) \
 $(wildcard ./Time_Integration/*.f90)
 # Other variables
 MAIN_FILE_ROOT = ./Main_algorithm/sphera
-EXE_DIR = ../bin/
 CODE = $(EXE_DIR)SPHERA_v_$(VERSION)_$(COMPILER)_$(EXECUTION)
 OBJECTS = $(patsubst %.f90,%.o,$(SOURCES))
 # Targets

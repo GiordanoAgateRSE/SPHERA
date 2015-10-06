@@ -126,8 +126,9 @@ if ((it_rest==it).or.(index(str,'inizio')/=0).or.(index(str,'fine')/=0)) then
    enddo
    write(nres) bp_arr(1:n_body_part)
    write(nres) surf_body_part(1:n_surf_body_part)
-   write(nres) Z_fluid_max(1:Grid%ncd(1)*Grid%ncd(2))
-   write(nres) q_max(1:Grid%ncd(1)*Grid%ncd(2))
+   if (allocated(Z_fluid_max)) write(nres)                                     &
+      Z_fluid_max(1:Grid%ncd(1)*Grid%ncd(2))
+   if (allocated(q_max)) write(nres) q_max(1:Grid%ncd(1)*Grid%ncd(2))
    flush(nres)
    if (index(str,'inizio')==0) then
       write(nout,'(a,i10,a,f15.5)')                                            &
