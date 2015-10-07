@@ -37,8 +37,8 @@ use I_O_diagnostic_module
 !------------------------
 implicit none
 integer(4),intent(inout) :: nrighe,ier,ninp,nout
-character(80),intent(inout) :: ainp 
 character(1),intent(inout) :: comment
+character(100),intent(inout) :: ainp 
 logical :: MUSCL_boundary_flag,in_built_monitors
 integer(4) :: ioerr,n_monitor_points,n_monitor_regions,i,alloc_stat            
 integer(4) :: dealloc_stat,n_kinematics_records,j,n_inlet,n_outlet

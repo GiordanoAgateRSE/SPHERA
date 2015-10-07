@@ -70,10 +70,6 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
 ' Warning! nblocchi>maxnumblock in subroutine result_converter.'
       write (nscr,'(a)')                                                       &
          '    Increase maxnumblock or decrease output frequency for vtu files.'
-      write (nout,'(a)')                                                       &
-' Warning: nblocchi>maxnumblock in subroutine result_converter.'
-      write (nout,'(a)')                                                       &
-         '     Increase maxnumblock or decrease output frequency for vtu files.'
       nblocchi = maxnumblock
    endif
    blocchi(nblocchi) = block
@@ -83,8 +79,6 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
    cargo = adjustl(cargo)
    filevtk =                                                                   &
 "VTKConverter_"//prefix(1:len_trim(prefix))//"_block_"//cargo(1:len_trim(cargo))//".vtu"
-   write(nscr,'(a)')                                                           &
-      "VTK formatted converted file  : "//filevtk(1:len_trim(filevtk))
    write(nout,'(a)')                                                           &
       "VTK formatted converted file  : "//filevtk(1:len_trim(filevtk))
    open(unit=unitvtk,file=filevtk,form='formatted',access='sequential',        &
@@ -543,8 +537,6 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
       cargo = adjustl(cargo)
       filevtk =                                                                &
 "VTKConverter_"//prefix(1:len_trim(prefix))//"_block_wall_"//cargo(1:len_trim(cargo))//".vtu"
-      write(nscr,'(a)')                                                        &
-         "VTK formatted converted file  : "//filevtk(1:len_trim(filevtk))
       write(nout,'(a)')                                                        &
          "VTK formatted converted file  : "//filevtk(1:len_trim(filevtk))
       open(unit=unitvtk,file=filevtk,form='formatted',access='sequential',     &
@@ -744,8 +736,6 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
       cargo = adjustl(cargo)
       filevtk =                                                                &
 "VTKConverter_"//prefix(1:len_trim(prefix))//"_block_body-part_"//cargo(1:len_trim(cargo))//".vtu"
-      write (nscr,'(a)')                                                       &
-         "VTK formatted converted file  : "//filevtk(1:len_trim(filevtk))
       write (nout,'(a)')                                                       &
           "VTK formatted converted file  : "//filevtk(1:len_trim(filevtk))
       open(unit=unitvtk,file=filevtk,form='formatted',access='sequential',     &
@@ -916,8 +906,6 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
       cargo = adjustl(cargo)
       filevtk =                                                                &
 "VTKConverter_"//prefix(1:len_trim(prefix))//"_block_body_"//cargo(1:len_trim(cargo))//".vtu"
-      write(nscr,'(a)')                                                        &
-         "VTK formatted converted file  : "//filevtk(1:len_trim(filevtk))
       write(nout,'(a)')                                                        &
          "VTK formatted converted file  : "//filevtk(1:len_trim(filevtk))
       open(unit=unitvtk,file=filevtk,form='formatted',access='sequential',     &

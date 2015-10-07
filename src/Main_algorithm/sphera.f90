@@ -240,7 +240,6 @@ do n=1,narg
 enddo
 ! I/O assignments
 call check_files
-write(nscr,1000) 
 write(nout,1000) 
 1000 format (                                                                  &
 1x,'------------------------------------------------------------------------'/ &
@@ -325,10 +324,15 @@ call system("mv Body-dynamics.txt Body_dynamics.txt")
 call system("cat *Body_particles* > Body-particles.txt")
 call system("rm -f *Body_particles*")
 call system("mv Body-particles.txt Body_particles.txt")
+call system("touch temp.cln")
 call system("cat *.cln > monitoring_lines.txt")
 call system("rm -f *.cln")
+call system("touch temp.cpt")
 call system("cat *.cpt > monitoring_points.txt")
 call system("rm -f *.cpt")
+call system("cat *blt_interfaces* > blt-interfaces.txt")
+call system("rm -f *blt_interfaces*")
+call system("mv blt-interfaces.txt blt_interfaces.txt")
 stop
 !------------------------
 ! Contains

@@ -173,7 +173,7 @@ endif
 if (nres>0) then
    it_memo = it_eff
    it_rest = it_eff
-   call memo_results ( it_eff, it_memo, it_rest, dtvel, 'inizio' )
+   call Memo_Results(it_eff,it_memo,it_rest,dtvel,'inizio')
 endif
 if (vtkconv) then
    call result_converter ('inizio')
@@ -794,7 +794,7 @@ done_flag = .false.
       call print_results(it_eff,it_print,'loop__')
    endif
    if (nres>0) then
-      call memo_results(it_eff,it_memo,it_rest,dtvel,'loop__')
+      call Memo_Results(it_eff,it_memo,it_rest,dtvel,'loop__')
    endif
 ! Computing variables at the monitoring points
    call CalcVarp
@@ -887,7 +887,7 @@ if ((it_eff/=it_print).AND.(nout>0)) then
 endif
 ! Post-processing: restart file
 if ((it_eff/=it_memo).AND.(nres>0)) then
-   call memo_results(it_eff,it_memo,it_rest,dtvel,'fine__')
+   call Memo_Results(it_eff,it_memo,it_rest,dtvel,'fine__')
 endif
 if (vtkconv) then
    call result_converter ('fine__')

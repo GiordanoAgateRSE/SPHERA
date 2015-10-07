@@ -404,7 +404,6 @@ write (nout,*)
 write (nout,*) 
 call s_ctime(nout)
 write (nout,*) 
-write (nscr,*) "Transient loop begins..."
 write (nout,*) "Transient loop begins..."
 write (nout,*)
 ! To initialize the post-processing file 

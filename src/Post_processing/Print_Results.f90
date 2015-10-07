@@ -155,7 +155,7 @@ if (nag>0) then
          mixture_count = mixture_count + 1 
       endif
    enddo
-   laminar_flag_perc = 100.d0 * (laminar_flag_count / mixture_count)
+   laminar_flag_perc = (100.d0 * laminar_flag_count) / mixture_count
    minvelo = Dsqrt(minvelo)
    maxvelo = Dsqrt(maxvelo)
    minvelx = minval(pg(1:nag)%vel(1),mask=pg(1:nag)%cella/=0)
@@ -490,8 +490,8 @@ if (nag>0) then
       endif   
    endif
    write(nout,*) "The total number of mixture particles is ",mixture_count,". "
-   write(nout,*) "The ",laminar_flag_perc,"% of mixture particles needs the ", &
-   "molecular viscous term in the momentum equation. "
+   write(nout,'(a,g12.3,a)') "The ",laminar_flag_perc,                         &
+"% of mixture particles needs the shear viscous term in the momentum equation. "
    else
       write(nout,'(128("."))') 
       write(nout,'(a)') "No particles inside the domain at the moment"

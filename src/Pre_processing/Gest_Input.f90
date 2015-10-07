@@ -57,7 +57,6 @@ character(80), external :: lcase
 ! Initializations
 !------------------------
 write(nout,'(1x,a)') ">> Input data management starts... "
-write(nscr,'(1x,a)') ">> Input data management starts... "
 ! Array deallocation
 call Gest_Dealloc(nomsub)
 ! Spatial dimensionality
@@ -133,8 +132,6 @@ if (InputErr/=0) then
 endif
 write(nout,'(1x,a)')                                                           &
    ">Data are read from an ASCII input file in the routine ReadInput"
-write(nscr,'(1x,a)')                                                           &
-">Data are read from an ASCII input file in the routine ReadInput"
 ! Deallocations of temporary arrays
 write(nout,'(1x,a)') ">> Deallocation of temporary arrays "
 deallocate(Vertice,BoundaryFace,Tratto,BoundaryVertex,stat=ier)
