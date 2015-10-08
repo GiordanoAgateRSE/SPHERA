@@ -60,14 +60,11 @@ character(80),external :: lcase
 ier = 0
 ! Restart heading 
 if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
-   rewind (nsav)
+   rewind(nsav)
    write(nout,'(a)')    "-------------------"
    write(nout,"(1x,a)") ">> Restart heading."
    write(nout,'(a)')    "-------------------"
-   write(nscr,'(a)')    "-------------------"
-   write(nscr,"(1x,a)") ">> Restart heading."
-   write(nscr,'(a)')    "-------------------"
-   read (nsav,iostat=ioerr) versionerest,nrecords
+   read(nsav,iostat=ioerr) versionerest,nrecords
    if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"versionerest,nrecords",nsav,    &
       nout)) return
 ! Check the program version
@@ -88,15 +85,15 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
    if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"ncord, nag, ...",nsav,nout))    &
       return
    elseif (TRIM(lcase(option))=="reading") then
-      write(nscr,'(a)')                                                        &
+      write(nout,'(a)')                                                        &
          "---------------------------------------------------------------------"
-      write(nscr,"(1x,a)")                                                     &
+      write(nout,"(1x,a)")                                                     &
          ">> Restart reading:  step         time      interval    num.particles"
       save_istart = Domain%istart
       save_start = Domain%start
       read(nsav,iostat=ioerr) domain
       if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"domain",nsav,nout)) return
-      read (nsav,iostat=ioerr) grid
+      read(nsav,iostat=ioerr) grid
       if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"grid",nsav,nout)) return
 ! Allocating the 2D matrix to detect free surface (erosion criterion)
       allocate (ind_interfaces(Grid%ncd(1),Grid%ncd(2),4),stat=ioerr)
@@ -108,14 +105,14 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
             write (nout,'(1x,a)')                                              &
                "    Array ind_interfaces successfully allocated "
       endif
-      read (nsav,iostat=ioerr) Med(1:NMedium)
+      read(nsav,iostat=ioerr) Med(1:NMedium)
       if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"Med",nsav,nout)) return
       if (NumVertici>0) then
          read(nsav,iostat=ioerr) Vertice(1:SPACEDIM,1:NumVertici)
          if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"Vertice",nsav,nout)) return
       endif
       if (NumFacce>0) then 
-         read (nsav,iostat=ioerr) BoundaryFace(1:NumFacce)
+         read(nsav,iostat=ioerr) BoundaryFace(1:NumFacce)
          if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"BoundaryFace",nsav,nout)) &
             return
       endif
@@ -129,7 +126,7 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
          if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"Tratto",nsav,nout)) return
       endif
       if (NPartZone>0) then
-         read (nsav,iostat=ioerr) Partz(1:NPartZone)
+         read(nsav,iostat=ioerr) Partz(1:NPartZone)
          if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"Partz",nsav,nout)) return
       endif
       if (NumBVertices>0) then
@@ -153,10 +150,8 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
                "it_start,tempo,dt,nag,ncord,restartcode",nsav,nout)) return
             write(nout,"(16x,i10,2(2x,g12.5),7x,i10)") it_start,tempo,dt,nag
             flush(nout)
-            write(nscr,"(16x,i10,2(2x,g12.5),7x,i10)") it_start,tempo,dt,nag
-            flush(nscr)
             if (it_start<save_istart) then
-               read (nsav,iostat=ioerr) 
+               read(nsav,iostat=ioerr) 
                if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"...",nsav,nout))    &
                   return
                else
@@ -203,8 +198,8 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
                         it_start,"   Time :",tempo; flush(nout)
 ! Reading for post-processing
                      elseif (restartcode==0) then
-                        read (nsav,iostat=ioerr) pg(1:nag)%coord(1),           &
-                           pg(1:nag)%coord(2),pg(1:nag)%coord(3), &
+                        read(nsav,iostat=ioerr) pg(1:nag)%coord(1),            &
+                           pg(1:nag)%coord(2),pg(1:nag)%coord(3),              &
                            pg(1:nag)%vel(1),pg(1:nag)%vel(2),pg(1:nag)%vel(3), &
                            pg(1:nag)%pres,pg(1:nag)%dens,pg(1:nag)%mass,       &
                            pg(1:nag)%visc,pg(1:nag)%IntEn,pg(1:nag)%VolFra,    &
@@ -238,7 +233,7 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
                write(nout,"(16x,i10,2(2x,g12.5),7x,i10)") it_start,tempo,dt,nag
                flush(nout)
                if (tempo<Domain%start) then
-                  read (nsav,iostat=ioerr) 
+                  read(nsav,iostat=ioerr) 
                   if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"...",nsav,nout)) &
                      return
                   else
@@ -287,7 +282,7 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
                         flush(nout)
 ! Reading for post-processing
                         elseif (restartcode==0) then
-                           read (nsav,iostat=ioerr) pg(1:nag)%coord(1),        &
+                           read(nsav,iostat=ioerr) pg(1:nag)%coord(1),         &
                               pg(1:nag)%coord(2),pg(1:nag)%coord(3),           &
                               pg(1:nag)%vel(1),pg(1:nag)%vel(2),               &
                               pg(1:nag)%vel(3),pg(1:nag)%pres,pg(1:nag)%dens,  &
@@ -310,21 +305,15 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
                   return
                endif
             enddo
-            write(nout,'(a,i10,a)') "   Restart Time Step:",Domain%start,      &
-               " has not been found"
             write(nscr,'(a,i10,a)') "   Restart Time Step:",Domain%start,      &
                " has not been found"
             ier = 3
             else
-               write (nout,'(a)') "  > Restart cannot be read at step:",       &
-                  it_start,"  time:",tempo
                write (nscr,'(a)') "  > Restart cannot be read at step:",       &
                   it_start,"  time:",tempo
                ier = 4
       endif
       write (nout,'(a)') "  > Restart read successfully at step:",it_start,    &
-         "  time:",tempo
-      write (nscr,'(a)') "  > Restart read successfully at step:",it_start,    &
          "  time:",tempo
       else
          ier = 5

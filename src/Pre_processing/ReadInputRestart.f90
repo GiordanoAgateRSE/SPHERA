@@ -63,7 +63,7 @@ do while (TRIM(lcase(ainp))/="##### end restart #####")
          token = lcase(GetToken(ainp,2,ioerr))
          if (.NOT.ReadCheck (ioerr,ier,nrighe,ainp,"RESTART DATA STEP value",  &
             ninp,nout)) return
-         read (token,*,iostat=ioerr) Domain%istart
+         read(token,*,iostat=ioerr) Domain%istart
          if (.NOT.ReadCheck (ioerr,ier,nrighe,ainp,"RESTART DATA STEP value",  &
             ninp,nout)) return
          if ((ncord>0).AND.(nout>0)) then
@@ -80,16 +80,16 @@ do while (TRIM(lcase(ainp))/="##### end restart #####")
          token = lcase(GetToken(ainp,2,ioerr))
          if (.NOT.ReadCheck (ioerr,ier,nrighe,ainp,"RESTART DATA TIME value",  &
             ninp,nout)) return
-         read (token,*,iostat=ioerr) Domain%start
+         read(token,*,iostat=ioerr) Domain%start
          if (.NOT.ReadCheck (ioerr,ier,nrighe,ainp,"RESTART DATA TIME value",  &
             ninp,nout)) return
          if ((ncord>0).and.(nout>0)) then
-            write (nout,"(1x,a,f20.12)") "Restart from time: ",Domain%start
+            write(nout,"(1x,a,f20.12)") "Restart from time: ",Domain%start
             if (Domain%start<zero) write (nout,"(1x,a)")                       &
                "Negative restart time!"
 ! Only the last read option keeps active
             if (Domain%istart>0) then
-               write (nout,"(1x,a,i12,a)") "Restart from step: ",Domain%istart,&
+               write(nout,"(1x,a,i12,a)") "Restart from step: ",Domain%istart, &
                   " option ignored!"
                Domain%istart = 0 
             endif
@@ -99,15 +99,15 @@ do while (TRIM(lcase(ainp))/="##### end restart #####")
          if ((ncord>0).and.(nout>0)) then
             inquire(file=Domain%file,exist=restartOK)
             if (restartOK) then
-               write (nout,"(1x,3a)") "Restart file: ",trim(Domain%file)
+               write(nout,"(1x,3a)") "Restart file: ",trim(Domain%file)
                else
-                  write (nout,"(1x,3a)") "Restart file: ",trim(Domain%file),   &
+                  write(nout,"(1x,3a)") "Restart file: ",trim(Domain%file),    &
                      " not found!"
             endif
          endif
    end select
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-   if (.NOT.ReadCheck (ioerr,ier,nrighe,ainp,"RESTART DATA",ninp,nout)) return
+   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"RESTART DATA",ninp,nout)) return
 enddo
 !------------------------
 ! Deallocations

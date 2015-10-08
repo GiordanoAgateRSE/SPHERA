@@ -360,6 +360,12 @@ if (.not.Restart) then
    endif
    else
 ! A restart option is active
+      call ReadInput(NumberEntities,OnlyTriangle,InputErr,ainp)
+      msg_err = trim("restart reading?")
+      if (InputErr/=0) then
+         InputErr = InputErr + 300
+         call diagnostic(arg1=5,arg2=InputErr,arg3=msg_err)
+      endif
       if (nag<100) then
 ! Initial domain is empty (inlet section)
          PARTICLEBUFFER = INIPARTICLEBUFFER * Domain%COEFNMAXPARTI
@@ -456,7 +462,7 @@ if (.not.Restart) then
          endif
       endif
 ! Allocation of the array of the maximum water depth   
-      if (.not.allocated(Z_fluid_max)) then
+      if ((Partz(1)%IC_source_type==2).and.(.not.allocated(Z_fluid_max))) then
          allocate(Z_fluid_max(Grid%ncd(1)*Grid%ncd(2)),STAT=alloc_stat) 
          if (alloc_stat/=0) then
             write(nout,*)                                                      &
@@ -470,7 +476,7 @@ if (.not.Restart) then
          endif   
       endif
 ! Allocation of the array of the maximum specific flow rate   
-      if (.not.allocated(q_max)) then
+      if ((Partz(1)%IC_source_type==2).and.(.not.allocated(q_max))) then
          allocate(q_max(Grid%ncd(1)*Grid%ncd(2)),STAT=alloc_stat) 
          if (alloc_stat/=0) then
             write(nout,*)                                                      &
@@ -512,12 +518,6 @@ if (.not.Restart) then
          call diagnostic(arg1=5,arg2=ier,arg3=msg_err)
       endif
       close(nsav)
-      call ReadInput(NumberEntities,OnlyTriangle,InputErr,ainp)
-      msg_err = trim("restart reading?")
-      if (InputErr/=0) then
-         InputErr = InputErr + 300
-         call diagnostic(arg1=5,arg2=InputErr,arg3=msg_err)
-      endif
       do i=1,NMedium
          if (Med(i)%codif/=zero) diffusione = .TRUE.
          if ((index(Med(i)%tipo,"granular")>0)) then

@@ -59,14 +59,14 @@ logical,external :: ReadCheck
 !------------------------
 ! In case of restart, input data sections are not read
 if (restart) then
-   do while (TRIM(lcase(ainp))/="##### end Section_flow_rate #####")
-      call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
+   do while (TRIM(lcase(ainp))/="##### end section flow rate #####")
+      call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
       if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"Section_flow_rate DATA",ninp,  &
          nout)) return
    enddo
    return
 endif
-call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
+call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"Section_flow_rate DATA",ninp,nout))  &
    return
 do while (TRIM(lcase(ainp))/="##### end section flow rate #####")

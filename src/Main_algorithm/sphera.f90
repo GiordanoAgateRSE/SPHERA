@@ -2,7 +2,7 @@
 ! SPHERA (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
 ! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-) 
 !      
-!     à).
+!     
 !   
 !      
 !  
@@ -247,21 +247,9 @@ write(nout,1000)
 1x,'research software; mesh-less Computational Fluid Dynamics code).        '/ &
 1x,'Copyright 2005-2015 (RSE SpA-formerly ERSE SpA, formerly CESI RICERCA,  '/ &
 1x,'formerly CESI-):                '/ &
-1x,'Andrea Amicarelli, Antonio Di Monaco, Sauro Manenti, Elia Bon,          '/ &
-1x,'Daria Gatti, Giordano Agate, Stefano Falappi, Barbara Flamini,          '/ &
-1x,'Roberto Guandalini, David Zuccalà).                                     '/ &
-1x,'                                   '/ &
-1x,'Amicarelli et al. (2015,CAF), Amicarelli et al. (2013,IJNME),           '/ &
-1x,'Manenti et al. (2012,JHE), Di Monaco et al. (2011,EACFM).               '/ & 
-1x,'                              '/ &
-1x,'SPHERA is released under the terms of GNU General Public License as     '/ &
-1x,'published by the Free Software Foundation,                              '/ &
-1x,'either version 3 of the License, or   '/ &
 1x,'SPHERA is distributed in the hope that it will be                       '/ &
 1x,'useful, but WITHOUT ANY WARRANTY; without even the implied warranty of  '/ &
 1x,'MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                    '/ &
-1x,'See the   You should have    '/ &
-1x,'received a copy of the GNU General Public License                       '/ &
 1x,' ',//)
 call start_and_stop(0,0)
 write(nout,*)

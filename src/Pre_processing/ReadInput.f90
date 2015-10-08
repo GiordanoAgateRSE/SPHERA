@@ -85,7 +85,7 @@ current_version = .TRUE.
 ! Statements
 !------------------------
 call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
-if (.NOT.ReadCheck (ioerr,ier,nrighe,ainp,"INPUT VERSION",ninp,nout)) return
+if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"INPUT VERSION",ninp,nout)) return
 if (trim(ainp)/=trim(version)) then
    ier = 2
    current_version = .FALSE.
