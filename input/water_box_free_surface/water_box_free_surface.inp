@@ -1,0 +1,160 @@
+7.2
+
+!-------------------------------------------------------------------------------
+! File name and copyright: water_box_free_surface.inp
+!    Copyright 2015 (RSE SpA, authored by Andrea Amicarelli)
+! File description: input file for SPHERA (RSE SpA, Amicarelli et al.).
+!    Simple and demonstrative 2D test case on hydrostatic conditions 
+!    (rough resolution).
+!
+! This file is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! This file is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with this file. If not, see <http://www.gnu.org/licenses/>.
+!-------------------------------------------------------------------------------
+
+##### TITLE #####
+water_box_free_surface
+##### END TITLE #####
+
+##### DOMAIN #####
+2 BSPH
+0.0005 1.3
+##### END DOMAIN #####
+
+##### VERTICES #####
+! box
+1   -0.009875   0.000
+2    0.009875   0.000
+3    0.009875   0.020
+4   -0.009875   0.020  
+! still water
+5   -0.009875   0.000
+6    0.009875   0.000
+7    0.009875   0.015
+8   -0.009875   0.015	 
+! Additional points for Auxiliary DB-SPH reservoir 2D (top, air)
+9   -0.009875   0.0163   
+10   0.009875   0.0163
+##### END VERTICES #####
+ 
+##### LINES #####
+1   1   2   3   4   1
+2   5   6   7   8   5
+3   8   7  10   9   8
+##### END LINES #####
+
+##### BOUNDARIES #####
+box
+1
+fixed
+0.
+111111
+!
+still_water
+2
+perimeter
+1
+uniform 009EA8
+std 0. 0. 0. 0.
+qp 0.01475
+1 0
+!
+air_reserv1_top
+3
+perimeter
+2
+uniform 009EA8
+std 0. 0. 0. 0.
+pa 0.
+1 0
+##### END BOUNDARIES #####
+
+##### DBSPH #####
+2. .false. 0.5
+0 0
+2 .false.  
+0. 0. 0. 0.
+6. 0. 0. 0.
+0 0        
+##### END DBSPH #####
+
+##### BED LOAD TRANSPORT #####
+0 1 2
+##### end BED LOAD TRANSPORT #####
+
+##### medium #####
+liquid
+1
+1000. 6.0e+4
+10. 0.
+0. 0.
+0. 0. 0.
+0.
+0.
+liquid
+2
+1.2 1.20e+5
+10. 0.
+0. 0. 
+0. 0. 0.
+0.
+0.
+##### end medium #####
+
+##### BODY DYNAMICS #####
+0 2 0
+##### end BODY DYNAMICS #####
+
+##### RUN PARAMETERS #####
+0.35 10000000
+0.025 0 1 0. .false.
+0.2 0.2 A           
+1.1 2. 0            
+9 10                
+800                 
+0                   
+##### end RUN PARAMETERS #####
+
+##### general physical properties #####
+0. -9.81
+0.
+##### end general physical properties #####
+
+##### output regulation #####
+results time 1.
+restart time 1.
+print partial 500
+control time 0.035
+level time 1. medium 1
+depth dt_out 900.
+##### end output regulation #####
+
+##### draw options #####
+vtkconverter any 0.01
+##### end draw options #####
+
+##### control points #####
+!
+##### end control points #####
+
+##### control lines #####
+H1
+0.000  0.000
+0.000  0.020
+20
+H2
+-0.010  0.000
+-0.010  0.020
+20
+##### end control lines #####
+
+##### section flow rate #####
+0 999. 1
+##### end Section flow rate #####
