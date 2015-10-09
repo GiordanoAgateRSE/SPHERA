@@ -2,7 +2,7 @@
 ! SPHERA (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
 ! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-) 
 !      
-!     à).
+!     
 !   
 !      
 !  
@@ -264,6 +264,8 @@ type TyParticle_w
    double precision :: sigma ! Discrete Shepard coefficient of the wall elements
                              ! depending on fluid particles (not on 
                              ! semi-particles)
+   double precision :: kin_visc_semi_part ! Kinematic viscosity of the 
+                                          ! semi-particle
    double precision :: normal(3) ! Normal
    double precision :: coord(3) ! Position
    double precision :: vel(3) ! Velocity

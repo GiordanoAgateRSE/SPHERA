@@ -198,7 +198,7 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
    write(unitvtk,'(a)') '      </DataArray>'
 ! Viscosity
    write(unitvtk,'(a)')                                                        &
-      '      <DataArray type="Float32" Name="Viscosity (mq/s)" format="ascii" >'
+      '      <DataArray type="Float32" Name="Viscosity (m^2/s)" format="ascii" >'
    do i=1,numpoints,16
       k1 = i
       k2 = k1 + 15
@@ -695,6 +695,7 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
          write(unitvtk,'(8x,16(1x,e12.5))') (pg_w(finger(k))%k_d,k=k1,k2)
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
+! Semi-particle volume      
       write(unitvtk,'(a)')                                                     &
 '      <DataArray type="Float32" Name="semi-particle volume (m^3)" format="ascii" >'
       do i=1,numpoints,16
@@ -703,7 +704,18 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
          if (k2>numpoints) k2 = numpoints
          write(unitvtk,'(8x,16(1x,e12.5))') (pg_w(finger(k))%volume,k=k1,k2)
       enddo
-      write(unitvtk,'(a)') '      </DataArray>'   
+      write(unitvtk,'(a)') '      </DataArray>'
+! Semi-particle kinematic viscosity      
+      write(unitvtk,'(a)')                                                     &
+'      <DataArray type="Float32" Name="semi-particle kinematic viscosity (m^2/s)" format="ascii" >'
+      do i=1,numpoints,16
+         k1 = i
+         k2 = k1 + 15
+         if (k2>numpoints) k2 = numpoints
+         write(unitvtk,'(8x,16(1x,e12.5))')                                    &
+            (pg_w(finger(k))%kin_visc_semi_part,k=k1,k2)
+      enddo
+      write(unitvtk,'(a)') '      </DataArray>'    
 ! Wall element ID 
       write(unitvtk,'(a)')                                                     &
       '      <DataArray type="Float32" Name="Finger" format="ascii" >'

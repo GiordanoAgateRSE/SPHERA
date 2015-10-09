@@ -55,7 +55,7 @@ pg_w(i_a)%grad_vel_VSL_times_mu(:) = pg_w(i_a)%grad_vel_VSL_times_mu(:) /      &
                                      pg_w(i_a)%sigma
 ! Contribution to the numerator of the boundary shear viscosity term 
 DBSPH_BC_she_vis_term(:) = DBSPH_BC_she_vis_term(:) -                          &
-                           kernel_fw(2,npartint) * pg_w(i_a)%weight *          &
+                           kernel_fw(1,npartint) * pg_w(i_a)%weight *          &
                            (pg_w(i_a)%grad_vel_VSL_times_mu(:) +               &
                            grad_vel_VSL_fw(:,npartint) * pg(i_0)%mu)
 !------------------------

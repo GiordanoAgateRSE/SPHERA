@@ -2,7 +2,7 @@
 ! SPHERA (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
 ! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-) 
 !      
-!     à).
+!     
 !   
 !      
 !  
@@ -408,6 +408,7 @@ done_flag = .false.
 ! Energy equation: end
 ! Time integration for body dynamics
             if (n_bodies>0) then
+
                call start_and_stop(2,19)
                call time_integration_body_dynamics(dtvel)
                call start_and_stop(3,19)

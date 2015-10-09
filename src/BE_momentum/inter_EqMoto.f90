@@ -211,7 +211,7 @@ do contj=1,nPartIntorno(npi)
    appodiss(:) = rvwalfa(:) + rvwbeta(:)
 ! Monaghan term (artificial viscosity)
    tdiss(:) = tdiss(:) + appodiss(:)   
-   call viscomorris (npi,npj,npartint,dervel,rvw)
+   call viscomorris(npi,npj,npartint,dervel,rvw)
    tvisc(:) = tvisc(:) + rvw(:)
    rvw_sum(:) = rvw_sum(:) + rvw(:)
 ! Momentum equation: end

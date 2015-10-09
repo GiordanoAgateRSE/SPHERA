@@ -72,6 +72,7 @@ if ((Domain%tipo=="bsph").and.(nag>0)) then
    bounded = 0
    allocate (dShep_old(nag))
    pg_w(:)%sigma = 0.d0
+   pg_w(:)%kin_visc_semi_part = 0.d0
    pg_w(:)%grad_vel_VSL_times_mu(1) = 0.d0
    pg_w(:)%grad_vel_VSL_times_mu(2) = 0.d0
    pg_w(:)%grad_vel_VSL_times_mu(3) = 0.d0

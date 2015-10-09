@@ -160,39 +160,48 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
                      read(nsav,iostat=ioerr) pg(1:nag)
                      if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"pg",nsav,     &
                         nout)) return
-                     read(nsav,iostat=ioerr) pg_w(1:DBSPH%n_w+DBSPH%n_inlet+   &
-                        DBSPH%n_outlet)
-                     if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"pg_w",nsav,   &
-                        nout)) return
-                     do i=1,n_bodies
-                        read(nsav,iostat=ioerr) body_arr(i)%npart,             &
-                           body_arr(i)%Ic_imposed,body_arr(i)%n_elem,          &
-                           body_arr(i)%imposed_kinematics,                     &
-                           body_arr(i)%n_records,body_arr%mass,                &
-                           body_arr(i)%umax,body_arr(i)%pmax,                  &
-                           body_arr(i)%x_CM,body_arr(i)%alfa,                  &
-                           body_arr(i)%x_rotC,body_arr(i)%u_CM,                &
-                           body_arr(i)%omega,body_arr(i)%Force,                &
-                           body_arr(i)%Moment,body_arr(i)%Ic,                  &
-                           body_arr(i)%Ic_inv,body_arr(i)%body_kinematics,     &
-                           body_arr(i)%elem
-                     enddo
-                     if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"body_arr",    &
-                        nsav,nout)) return
-                     read(nsav,iostat=ioerr) bp_arr(1:n_body_part)
-                     if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"bp_arr",      &
-                        nsav,nout)) return  
-                     read(nsav,iostat=ioerr) surf_body_part(1:n_surf_body_part)
-                     if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,               &
-                        "surf_body_part",nsav,nout)) return
-                     if (allocated(Z_fluid_max)) read(nsav,iostat=ioerr)       &
-                        Z_fluid_max(1:Grid%ncd(1)*Grid%ncd(2))
-                     if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,               &
-                        "Z_fluid_max",nsav,nout)) return
-                     if (allocated(q_max)) read(nsav,iostat=ioerr)             &
-                        q_max(1:Grid%ncd(1)*Grid%ncd(2))
-                     if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"q_max",nsav,  &
-                        nout)) return
+                     if (allocated(pg_w)) then
+                        read(nsav,iostat=ioerr) pg_w(1:DBSPH%n_w+DBSPH%n_inlet+&
+                           DBSPH%n_outlet)
+                        if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"pg_w",nsav,&
+                           nout)) return
+                     endif
+                     if (n_bodies>0) then
+                        do i=1,n_bodies
+                           read(nsav,iostat=ioerr) body_arr(i)%npart,          &
+                              body_arr(i)%Ic_imposed,body_arr(i)%n_elem,       &
+                              body_arr(i)%imposed_kinematics,                  &
+                              body_arr(i)%n_records,body_arr%mass,             &
+                              body_arr(i)%umax,body_arr(i)%pmax,               &
+                              body_arr(i)%x_CM,body_arr(i)%alfa,               &
+                              body_arr(i)%x_rotC,body_arr(i)%u_CM,             &
+                              body_arr(i)%omega,body_arr(i)%Force,             &
+                              body_arr(i)%Moment,body_arr(i)%Ic,               &
+                              body_arr(i)%Ic_inv,body_arr(i)%body_kinematics,  &
+                              body_arr(i)%elem
+                        enddo
+                        if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"body_arr", &
+                           nsav,nout)) return
+                        read(nsav,iostat=ioerr) bp_arr(1:n_body_part)
+                        if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"bp_arr",   &
+                           nsav,nout)) return  
+                        read(nsav,iostat=ioerr) surf_body_part(1:              &
+                           n_surf_body_part)
+                        if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,            &
+                           "surf_body_part",nsav,nout)) return
+                     endif   
+                     if (allocated(Z_fluid_max)) then
+                        read(nsav,iostat=ioerr)                                &
+                           Z_fluid_max(1:Grid%ncd(1)*Grid%ncd(2))
+                        if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,            &
+                           "Z_fluid_max",nsav,nout)) return
+                     endif
+                     if (allocated(q_max)) then
+                        read(nsav,iostat=ioerr)                                &
+                           q_max(1:Grid%ncd(1)*Grid%ncd(2))
+                        if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"q_max",nsav&
+                           ,nout)) return
+                     endif
                      write(nout,'(a)') " "
                      write(nout,'(a,i10,a,g12.5)') "   Located Restart Step :",&
                         it_start,"   Time :",tempo; flush(nout)
@@ -242,39 +251,48 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
                         read(nsav,iostat=ioerr) pg(1:nag)
                         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"pg",nsav,  &
                            nout)) return
-                        read(nsav,iostat=ioerr) pg_w(1:DBSPH%n_w+DBSPH%n_inlet+&
-                           DBSPH%n_outlet)
-                        if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"pg_w",nsav,&
-                           nout)) return  
-                        do i=1,n_bodies
-                           read(nsav,iostat=ioerr) body_arr(i)%npart,          &
-                              body_arr(i)%Ic_imposed,body_arr(i)%n_elem,       &
-                              body_arr(i)%imposed_kinematics,                  &
-                              body_arr(i)%n_records,body_arr%mass,             &
-                              body_arr(i)%umax,body_arr(i)%pmax,               &
-                              body_arr(i)%x_CM,body_arr(i)%alfa,               &
-                              body_arr(i)%x_rotC,body_arr(i)%u_CM,             &
-                              body_arr(i)%omega,body_arr(i)%Force,             &
-                              body_arr(i)%Moment,body_arr(i)%Ic,               &
-                              body_arr(i)%Ic_inv,body_arr(i)%body_kinematics,  &
-                              body_arr(i)%elem
-                        enddo
-                        if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"body_arr", &
-                           nsav,nout)) return
-                        read(nsav,iostat=ioerr) bp_arr(1:n_body_part)
-                        if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"bp_arr",   &
-                           nsav,nout)) return  
-                        read(nsav,iostat=ioerr) surf_body_part(1:              &
-                           n_surf_body_part)
-                        if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,            &
-                           "surf_body_part",nsav,nout)) return  
-                        read(nsav,iostat=ioerr) Z_fluid_max(1:Grid%ncd(1)*     &
-                           Grid%ncd(2))
-                        if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,            &
-                           "Z_fluid_max",nsav,nout)) return
-                        read(nsav,iostat=ioerr) q_max(1:Grid%ncd(1)*Grid%ncd(2))
-                        if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"q_max",    &
-                           nsav,nout)) return
+                        if (allocated(pg_w)) then
+                           read(nsav,iostat=ioerr) pg_w(1:                     &
+                              DBSPH%n_w+DBSPH%n_inlet+DBSPH%n_outlet)
+                           if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"pg_w",  &
+                              nsav,nout)) return  
+                        endif
+                        if (n_bodies>0) then
+                           do i=1,n_bodies
+                              read(nsav,iostat=ioerr) body_arr(i)%npart,       &
+                                 body_arr(i)%Ic_imposed,body_arr(i)%n_elem,    &
+                                 body_arr(i)%imposed_kinematics,               &
+                                 body_arr(i)%n_records,body_arr%mass,          &
+                                 body_arr(i)%umax,body_arr(i)%pmax,            &
+                                 body_arr(i)%x_CM,body_arr(i)%alfa,            &
+                                 body_arr(i)%x_rotC,body_arr(i)%u_CM,          &
+                                 body_arr(i)%omega,body_arr(i)%Force,          &
+                                 body_arr(i)%Moment,body_arr(i)%Ic,            &
+                                 body_arr(i)%Ic_inv,body_arr(i)%body_kinematics&
+                                 ,body_arr(i)%elem
+                           enddo
+                           if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,         &
+                              "body_arr",nsav,nout)) return
+                           read(nsav,iostat=ioerr) bp_arr(1:n_body_part)
+                           if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"bp_arr",&
+                              nsav,nout)) return  
+                           read(nsav,iostat=ioerr) surf_body_part(1:           &
+                              n_surf_body_part)
+                           if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,         &
+                              "surf_body_part",nsav,nout)) return
+                        endif  
+                        if (allocated(Z_fluid_max)) then
+                           read(nsav,iostat=ioerr) Z_fluid_max(1:Grid%ncd(1)*  &
+                              Grid%ncd(2))
+                           if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,         &
+                              "Z_fluid_max",nsav,nout)) return
+                        endif
+                        if (allocated(q_max)) then
+                           read(nsav,iostat=ioerr) q_max(1:                    &
+                              Grid%ncd(1)*Grid%ncd(2))
+                           if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"q_max", &
+                              nsav,nout)) return
+                        endif
                         write(nout,'(a)') 
                         write(nout,'(a,i10,a,g12.5)')                          &
                            "   Located Restart Step :",it_start,"   Time :",   &

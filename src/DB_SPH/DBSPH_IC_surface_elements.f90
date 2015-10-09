@@ -87,7 +87,8 @@ pg_w(:)%sigma = 0.d0
 pg_w(:)%wet = 0 
 pg_w(:)%mass = 0.d0 
 pg_w(:)%k_d = 0.d0
-pg_w(:)%volume = 0.d0 
+pg_w(:)%volume = 0.d0
+pg_w(:)%kin_visc_semi_part = 0.d0
 !$omp parallel do default(none) shared(DBSPH,pg_w,Med,pg,ncord) private(i)
 do i=1,DBSPH%n_w 
    if (ncord==3) then

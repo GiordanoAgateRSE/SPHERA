@@ -22,23 +22,30 @@
 
 !----------------------------------------------------------------------------------------------------------------------------------
 ! Program unit: viscomorris
-! Description: 
+! Description: To compute the volume inter-particle contributions to the shear 
+! viscosity term in the momentum equation (Morris, 1997, JCP). Both interactions
+! "fluid particle - fluid particle" and "fluid particle - semi-particle" (DBSPH)
+! are considered.   
 !----------------------------------------------------------------------------------------------------------------------------------
 
-subroutine viscomorris(npi,npj,npartint,dervel,rvw)
+subroutine viscomorris(npi,npj,npartint,mass_comput_part,dens_comput_part,     &
+kin_visc_comput_part,mass_neighbour,dens_neighbour,kin_visc_neighbour,         &
+kernel_der,vel_type,rel_dis,dervel,rvw)
 !------------------------
 ! Modules
 !------------------------ 
 use Static_allocation_module
-use Hybrid_allocation_module
-use Dynamic_allocation_module
 !------------------------
 ! Declarations
 !------------------------
 implicit none
-integer(4), intent(IN) :: npi,npj,npartint
-double precision,intent(IN) :: dervel(3)
-double precision,intent(OUT) :: rvw(3)
+integer(4),intent(in) :: npi,npj,npartint
+double precision,intent(in) :: mass_comput_part,dens_comput_part
+double precision,intent(in) :: kin_visc_comput_part,mass_neighbour
+double precision,intent(in) :: dens_neighbour,kin_visc_neighbour,kernel_der
+double precision,intent(in) :: dervel(3)
+character(3),intent(in) :: vel_type
+double precision,intent(out) :: rel_dis(3),rvw(3)
 double precision :: amassj,rhotilde,anuitilde,factivis
 !------------------------
 ! Explicit interfaces
@@ -52,6 +59,7 @@ double precision :: amassj,rhotilde,anuitilde,factivis
 !------------------------
 ! Statements
 !------------------------
+AA!!!
 if (pg(npj)%vel_type/="std") then 
    amassj = pg(npi)%mass
    rhotilde = pg(npi)%dens
