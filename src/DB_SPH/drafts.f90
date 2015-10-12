@@ -22,7 +22,8 @@
 
 !----------------------------------------------------------------------------------------------------------------------------------
 ! Program unit: viscomon_wall_elements
-! Description: Wall element contributions for Monaghan artificial viscosity term.               
+! Description: Wall element contributions for Monaghan artificial viscosity term.
+!              This term is not activated.               
 !----------------------------------------------------------------------------------------------------------------------------------
 
 subroutine viscomon_wall_elements(npi,npj,npartint,dervel,rvwalfa,rvwbeta)
