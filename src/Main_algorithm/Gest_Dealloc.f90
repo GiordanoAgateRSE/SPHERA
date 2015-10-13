@@ -55,7 +55,7 @@ character(LEN=lencard), intent(IN) :: nomsub
 write (nout,'(1x,a)') ">> Storage deallocation in routine "//trim(nomsub)
 check = .true.
 if (allocated(Vertice)) then
-   deallocate (Vertice,stat=ier)
+   deallocate(Vertice,stat=ier)
       if (ier/=0) then
       write (nout,'(1x,a,i2)')                                                 &
          "   Array: VERTICE not deallocated with error code: ",ier
@@ -65,7 +65,7 @@ if (allocated(Vertice)) then
    endif
 endif
 if (allocated(Tratto)) then
-   deallocate (Tratto,stat=ier)
+   deallocate(Tratto,stat=ier)
    if (ier/=0) then
       write (nout,'(1x,a,i2)')                                                 &
          "   Array: TRATTO not deallocated with error code: ",ier
@@ -75,7 +75,7 @@ if (allocated(Tratto)) then
    endif
 endif
 if (allocated(BoundaryFace)) then
-   deallocate (BoundaryFace,stat=ier)
+   deallocate(BoundaryFace,stat=ier)
    if (ier/=0) then
       write (nout,'(1x,a,i2)')                                                 &
          "   Array: BoundaryFace not deallocated with error code: ",ier
@@ -85,7 +85,7 @@ if (allocated(BoundaryFace)) then
    endif
 endif
 if (allocated(BFaceList)) then 
-   deallocate (BFaceList,stat=ier)
+   deallocate(BFaceList,stat=ier)
    if (ier/=0) then
       write (nout,'(1x,a,i2)')                                                 &
          "   Array: BFACELIST not deallocated with error code: ",ier
@@ -95,7 +95,7 @@ if (allocated(BFaceList)) then
    endif
 endif 
 if (allocated(BoundaryVertex)) then
-   deallocate (BoundaryVertex,stat=ier)
+   deallocate(BoundaryVertex,stat=ier)
    if (ier/=0) then
       write (nout,'(1x,a,i2)')                                                 &
          "   Array: BOUNDARYVERTEX not deallocated with error code: ",ier
@@ -105,7 +105,7 @@ if (allocated(BoundaryVertex)) then
    endif
 endif
 if (allocated(BoundarySide)) then
-   deallocate (BoundarySide,stat=ier)
+   deallocate(BoundarySide,stat=ier)
    if (ier/=0) then
       write (nout,'(1x,a,i2)')                                                 &
          "   Array: BOUNDARYSIDE not deallocated with error code: ",ier
@@ -115,7 +115,7 @@ if (allocated(BoundarySide)) then
    endif
 endif
 if (allocated(Partz)) then
-   deallocate (Partz,stat=ier)
+   deallocate(Partz,stat=ier)
    if (ier/=0) then
       write (nout,'(1x,a,i2)')                                                 &
          "   Array: PARTZ not deallocated with error code: ",ier
@@ -125,7 +125,7 @@ if (allocated(Partz)) then
    endif
 endif
 if (allocated(Med)) then
-   deallocate (Med,stat=ier)
+   deallocate(Med,stat=ier)
    if (ier/=0) then
       write (nout,'(1x,a,i2)')                                                 &
       "   Array: MED not deallocated with error code: ",ier
@@ -135,7 +135,7 @@ if (allocated(Med)) then
    endif
 endif
 if (allocated(OpCount)) then
-   deallocate (OpCount,stat=ier)
+   deallocate(OpCount,stat=ier)
    if (ier/=0) then
       write (nout,'(1x,a,i2)')                                                 &
          "   Array: OpCount not deallocated with error code: ",ier
@@ -145,7 +145,7 @@ if (allocated(OpCount)) then
    endif
 endif
 if (allocated(SpCount)) then
-   deallocate (SpCount,stat=ier)
+   deallocate(SpCount,stat=ier)
    if (ier/=0) then
       write (nout,'(1x,a,i2)')                                                 &
          "   Array: SpCount not deallocated with error code: ",ier
@@ -155,7 +155,7 @@ if (allocated(SpCount)) then
    endif
 endif
 if (allocated(EpCount)) then
-   deallocate (EpCount,stat=ier)
+   deallocate(EpCount,stat=ier)
    if (ier/=0) then
       write (nout,'(1x,a,i2)')                                                 &
          "   Array: EpCount not deallocated with error code: ",ier
@@ -165,7 +165,7 @@ if (allocated(EpCount)) then
    endif
 endif
 if (allocated(EpOrdGrid)) then
-   deallocate (EpOrdGrid,stat=ier)
+   deallocate(EpOrdGrid,stat=ier)
    if (ier/=0) then
       write (nout,'(1x,a,i2)')                                                 &
          "   Array: EpOrdGrid not deallocated with error code: ",ier
@@ -175,7 +175,7 @@ if (allocated(EpOrdGrid)) then
    endif
 endif
 if (allocated(Control_Sections)) then
-   deallocate (Control_Sections,stat=ier)
+   deallocate(Control_Sections,stat=ier)
    if (ier/=0) then
       write (nout,'(1x,a,i2)')                                                 &
          "   Array: CONTROL_SECTION not deallocated with error code: ",ier
@@ -186,7 +186,7 @@ if (allocated(Control_Sections)) then
    endif
 endif
 if (allocated(Control_Points)) then
-   deallocate (Control_Points,stat=ier)
+   deallocate(Control_Points,stat=ier)
    if (ier/=0) then
       write (nout,'(1x,a,i2)')                                                 &
          "   Array: CONTROL_POINTS not deallocated with error code: ",ier
@@ -197,7 +197,7 @@ if (allocated(Control_Points)) then
    endif
 endif
 if (allocated(Control_Lines)) then
-   deallocate (Control_Lines,stat=ier)
+   deallocate(Control_Lines,stat=ier)
    if (ier/=0) then
       write (nout,'(1x,a,i2)')                                                 &
          "   Array: CONTROL_LINES not deallocated with error code: ",ier
@@ -208,7 +208,7 @@ if (allocated(Control_Lines)) then
    endif
 endif
 if (allocated(Pg)) then
-   deallocate (Pg,stat=ier)
+   deallocate(Pg,stat=ier)
    if (ier/=0) then
       write (nout,'(1x,a,i2)')                                                 &
          "   Array: PG not deallocated with error code: ",ier
@@ -218,7 +218,7 @@ if (allocated(Pg)) then
    endif
 endif
 if (allocated(ts0_pg)) then
-   deallocate (ts0_pg,stat=ier)
+   deallocate(ts0_pg,stat=ier)
    if (ier/=0) then
       write (nout,'(1x,a,i2)')                                                 &
       "   Array: ts0_pg not deallocated with error code: ",ier
@@ -288,7 +288,7 @@ if (allocated(PartKernel)) then
    endif
 endif
 if (allocated(rag)) then
-   deallocate (rag,stat=ier)
+   deallocate(rag,stat=ier)
    if (ier/=0) then
       write (nout,'(1x,a,i2)')                                                 &
          "   Array: rag not deallocated with error code: ",ier
@@ -308,7 +308,7 @@ if (allocated(BoundaryDataTab)) then
    endif
 endif
 if (allocated(BoundaryDataPointer)) then
-   deallocate (BoundaryDataPointer,stat=ier)
+   deallocate(BoundaryDataPointer,stat=ier)
    if (ier/=0) then
       write (nout,'(1x,a,i2)')                                                 &
          "   Array: BoundaryDataPointer not deallocated with error code: ",ier
@@ -351,7 +351,7 @@ if (Domain%tipo=="bsph") then
       endif
    endif
    if (allocated(nPartIntorno_fw)) then
-      deallocate (nPartIntorno_fw,stat=ier)
+      deallocate(nPartIntorno_fw,stat=ier)
       if (ier/=0) then
          write (nout,'(1x,a,i2)')                                              &
          "   Array: nPartIntorno_fw not deallocated with error code: ",ier
@@ -362,7 +362,7 @@ if (Domain%tipo=="bsph") then
       endif
    endif
    if (allocated(PartIntorno_fw)) then
-      deallocate (PartIntorno_fw,stat=ier)
+      deallocate(PartIntorno_fw,stat=ier)
       if (ier/=0) then
          write (nout,'(1x,a,i2)')                                              &
             "   Array PartIntorno_fw not deallocated with error code: ",ier
@@ -373,7 +373,7 @@ if (Domain%tipo=="bsph") then
       endif
    endif
    if (allocated(grad_vel_VSL_fw)) then
-      deallocate (grad_vel_VSL_fw,stat=ier)
+      deallocate(grad_vel_VSL_fw,stat=ier)
       if (ier/=0) then
          write (nout,'(1x,a,i2)')                                              &
             "   Array grad_vel_VSL_fw not deallocated with error code: ",ier
@@ -384,7 +384,7 @@ if (Domain%tipo=="bsph") then
       endif
    endif
    if (allocated(kernel_fw)) then
-      deallocate (kernel_fw,stat=ier)
+      deallocate(kernel_fw,stat=ier)
       if (ier/=0) then
          write (nout,'(1x,a,i2)')                                              &
             "   Array kernel_fw not deallocated with error code: ",ier
@@ -394,7 +394,7 @@ if (Domain%tipo=="bsph") then
         endif
    endif
    if (allocated(rag_fw)) then
-      deallocate (rag_fw,stat=ier)
+      deallocate(rag_fw,stat=ier)
       if (ier/=0) then
          write (nout,'(1x,a,i2)')                                              &
             "   Array: rag_fw not deallocated with error code: ",ier
@@ -406,7 +406,7 @@ if (Domain%tipo=="bsph") then
 endif
 do i=1,n_bodies
    if (allocated(body_arr(i)%body_kinematics)) then
-      deallocate (body_arr(i)%body_kinematics,stat =ier)
+      deallocate(body_arr(i)%body_kinematics,stat =ier)
       if (ier/=0) then
          write (nout,'(1x,2a,i2)') "   Array: body_arr(i)%body_kinematics not",&
              " deallocated with error code: ",ier
@@ -418,7 +418,7 @@ do i=1,n_bodies
    endif
 enddo
 if (allocated(body_arr)) then
-   deallocate (body_arr,stat =ier)
+   deallocate(body_arr,stat =ier)
    if (ier/=0) then
       write (nout,'(1x,a,i2)')                                                 &
          "   Array: body_arr not deallocated with error code: ",ier
@@ -428,7 +428,7 @@ if (allocated(body_arr)) then
    endif
 endif
 if (allocated(bp_arr)) then
-   deallocate (bp_arr,stat =ier)
+   deallocate(bp_arr,stat =ier)
    if (ier/=0) then
       write (nout,'(1x,a,i2)')                                                 &
          "   Array: bp_arr not deallocated with error code: ",ier
@@ -438,7 +438,7 @@ if (allocated(bp_arr)) then
    endif
 endif
 if (allocated(Icont_bp)) then
-   deallocate (Icont_bp,stat=ier)
+   deallocate(Icont_bp,stat=ier)
    if (ier/=0) then
       write (nout,'(1x,a,i2)')                                                 &
          "   Array: Icont_bp not deallocated with error code: ",ier
@@ -448,7 +448,7 @@ if (allocated(Icont_bp)) then
    endif
 endif
 if (allocated(NPartOrd_bp)) then
-   deallocate (NPartOrd_bp,stat =ier)
+   deallocate(NPartOrd_bp,stat =ier)
    if (ier/=0) then
       write (nout,'(1x,a,i2)')                                                 &
          "   Array: NPartOrd_bp not deallocated with error code: ",ier
@@ -458,7 +458,7 @@ if (allocated(NPartOrd_bp)) then
    endif
 endif
 if (allocated(nPartIntorno_bp_f)) then
-   deallocate (nPartIntorno_bp_f,stat=ier)
+   deallocate(nPartIntorno_bp_f,stat=ier)
    if (ier/=0) then
       write (nout,'(1x,a,i2)')                                                 &
       "   Array: nPartIntorno_bp_f not deallocated with error code: ",ier
@@ -469,7 +469,7 @@ if (allocated(nPartIntorno_bp_f)) then
    endif
 endif
 if (allocated(PartIntorno_bp_f)) then
-   deallocate (PartIntorno_bp_f,stat=ier)
+   deallocate(PartIntorno_bp_f,stat=ier)
    if (ier/=0) then
       write (nout,'(1x,a,i2)')                                                 &
          "   Array: PartIntorno_bp_f not deallocated with error code: ",ier
@@ -480,7 +480,7 @@ if (allocated(PartIntorno_bp_f)) then
    endif
 endif
 if (allocated(KerDer_bp_f_cub_spl)) then
-   deallocate (KerDer_bp_f_cub_spl,stat =ier)
+   deallocate(KerDer_bp_f_cub_spl,stat =ier)
    if (ier/=0) then
       write (nout,'(1x,a,i2)')                                                 &
          "   Array: KerDer_bp_f_cub_spl not deallocated with error code: ",ier
@@ -491,7 +491,7 @@ if (allocated(KerDer_bp_f_cub_spl)) then
    endif
 endif
 if (allocated(KerDer_bp_f_Gal)) then
-   deallocate (KerDer_bp_f_Gal,stat =ier)
+   deallocate(KerDer_bp_f_Gal,stat =ier)
    if (ier/=0) then
       write (nout,'(1x,a,i2)')                                                 &
          "   Array: KerDer_bp_f_Gal not deallocated with error code: ",ier
@@ -502,7 +502,7 @@ if (allocated(KerDer_bp_f_Gal)) then
    endif
 endif 
 if (allocated(rag_bp_f)) then
-   deallocate (rag_bp_f,stat =ier)
+   deallocate(rag_bp_f,stat =ier)
    if (ier/=0) then
       write (nout,'(1x,a,i2)')                                                 &
          "   Array: rag_bp_f not deallocated with error code: ",ier
@@ -512,7 +512,7 @@ if (allocated(rag_bp_f)) then
    endif
 endif
 if (allocated(surf_body_part)) then
-   deallocate (surf_body_part,stat =ier)
+   deallocate(surf_body_part,stat =ier)
    if (ier/=0) then
       write (nout,'(1x,a,i2)')                                                 &
          "   Array: surf_body_part not deallocated with error code: ",ier
@@ -523,7 +523,7 @@ if (allocated(surf_body_part)) then
    endif
 endif 
 if (allocated(nPartIntorno_bp_bp)) then
-   deallocate (nPartIntorno_bp_bp,stat=ier)
+   deallocate(nPartIntorno_bp_bp,stat=ier)
    if (ier/=0) then
       write (nout,'(1x,a,i2)')                                                 &
          "   Array: nPartIntorno_bp_bp not deallocated with error code: ",ier
@@ -534,7 +534,7 @@ if (allocated(nPartIntorno_bp_bp)) then
    endif
 endif
 if (allocated(PartIntorno_bp_bp)) then
-   deallocate (PartIntorno_bp_bp,stat=ier)
+   deallocate(PartIntorno_bp_bp,stat=ier)
    if (ier/=0) then
       write (nout,'(1x,a,i2)')                                                 &
          "   Array: PartIntorno_bp_bp not deallocated with error code: ",ier
@@ -545,7 +545,7 @@ if (allocated(PartIntorno_bp_bp)) then
    endif
 endif
 if (allocated(rag_bp_bp)) then
-   deallocate (rag_bp_bp,stat=ier)
+   deallocate(rag_bp_bp,stat=ier)
    if (ier/=0) then
       write (nout,'(1x,a,i2)')                                                 &
          "   Array: rag_bp_bp not deallocated with error code: ",ier
@@ -555,7 +555,7 @@ if (allocated(rag_bp_bp)) then
    endif
 endif
 if (allocated(impact_vel)) then
-   deallocate (impact_vel,stat=ier)
+   deallocate(impact_vel,stat=ier)
    if (ier/=0) then
       write (nout,'(1x,a,i2)')                                                 &
          "   Array: impact_vel not deallocated with error code: ",ier
@@ -565,7 +565,7 @@ if (allocated(impact_vel)) then
    endif
 endif
 if (allocated(BoundaryConvexEdge)) then
-   deallocate (BoundaryConvexEdge,stat=ier)
+   deallocate(BoundaryConvexEdge,stat=ier)
    if (ier/=0) then
       write (nout,'(1x,a,i2)')                                                 &
          "   Array: BoundaryConvexEdge not deallocated with error code: ",ier
@@ -576,7 +576,7 @@ if (allocated(BoundaryConvexEdge)) then
    endif
 endif
 if (allocated(GCBFVector)) then
-   deallocate (GCBFVector,stat=ier)
+   deallocate(GCBFVector,stat=ier)
    if (ier/=0) then
       write (nout,'(1x,a,i2)')                                                 &
          "   Array: GCBFVector not deallocated with error code: ",ier

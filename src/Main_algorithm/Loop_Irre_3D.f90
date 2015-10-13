@@ -335,28 +335,30 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
             pg(npi)%kodvel = 0
             pg(npi)%velass = zero
          endif
-         if (Domain%tipo=="semi") Ncbf = BoundaryDataPointer(1,npi)
-         if ((Ncbf>0).and.(Domain%tipo=="semi")) then
-            Ncbf_Max = max(Ncbf_Max, Ncbf)
-            call AddBoundaryContributions_to_ME3D(npi,Ncbf,tpres,tdiss,tvisc)
-            if (pg(npi)%kodvel==0) then
-               BoundReaction = zero
-               call AddElasticBoundaryReaction_3D(npi,Ncbf,BoundReaction)
-               pg(npi)%acc(:) = tpres(:) + tdiss(:) + tvisc(:) + Domain%grav(:)&
-                                + BoundReaction(:)
-               else
-                  pg(npi)%acc(:) = zero
-            endif
-            else
-               if (Domain%tipo=="semi") then
+         if (Domain%tipo=="semi") then
+            Ncbf = BoundaryDataPointer(1,npi)
+            if (Ncbf>0) then
+               Ncbf_Max = max(Ncbf_Max, Ncbf)
+               call AddBoundaryContributions_to_ME3D(npi,Ncbf,tpres,tdiss,tvisc)
+               if (pg(npi)%kodvel==0) then
+                  BoundReaction = zero
+                  call AddElasticBoundaryReaction_3D(npi,Ncbf,BoundReaction)
                   pg(npi)%acc(:) = tpres(:) + tdiss(:) + tvisc(:) +            &
-                                   Domain%grav(:)
-                  else 
-                     if (Domain%tipo=="bsph") then
-                        pg(npi)%acc(:) = (tpres(:) + tdiss(:) + tvisc(:)) /    &
-                                         pg(npi)%Gamma + Domain%grav(:)
-                     endif
+                                   Domain%grav(:) + BoundReaction(:)
+                  else
+                     pg(npi)%acc(:) = zero
                endif
+               else
+                  if (Domain%tipo=="semi") then
+                     pg(npi)%acc(:) = tpres(:) + tdiss(:) + tvisc(:) +         &
+                                      Domain%grav(:)
+                     else 
+                        if (Domain%tipo=="bsph") then
+                           pg(npi)%acc(:) = (tpres(:) + tdiss(:) + tvisc(:)) / &
+                                            pg(npi)%Gamma + Domain%grav(:)
+                        endif
+                  endif
+            endif
          endif
       enddo
 !$omp end parallel do

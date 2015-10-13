@@ -68,9 +68,9 @@ ind_interfaces = 0
 if ((Domain%tipo=="bsph").and.(nag>0)) then
    nPartIntorno_fw = 0
    grad_vel_VSL_fw = 0.d0
-   allocate (bounded(nag))
+   allocate(bounded(nag))
    bounded = 0
-   allocate (dShep_old(nag))
+   allocate(dShep_old(nag))
    pg_w(:)%sigma = 0.d0
    pg_w(:)%kin_visc_semi_part = 0.d0
    pg_w(:)%grad_vel_VSL_times_mu(1) = 0.d0
@@ -550,8 +550,8 @@ if (Domain%tipo=="bsph") then
          endif
       endif
    enddo
-   if (allocated(bounded)) deallocate (bounded)
-   if (allocated(dShep_old)) deallocate (dShep_old)
+   if (allocated(bounded)) deallocate(bounded)
+   if (allocated(dShep_old)) deallocate(dShep_old)
 endif 
 ! SPH parameters for body transport in fluid flows
 if (n_bodies>0) then

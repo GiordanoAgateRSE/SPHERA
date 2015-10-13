@@ -96,7 +96,7 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
       read(nsav,iostat=ioerr) grid
       if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"grid",nsav,nout)) return
 ! Allocating the 2D matrix to detect free surface (erosion criterion)
-      allocate (ind_interfaces(Grid%ncd(1),Grid%ncd(2),4),stat=ioerr)
+      allocate(ind_interfaces(Grid%ncd(1),Grid%ncd(2),4),stat=ioerr)
       if (ioerr/=0) then
          write (nout,'(1x,a,i2)')                                              &
             "    Array ind_interfaces not allocated. Error code: ",ioerr
@@ -134,10 +134,14 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"BoundaryVertex",nsav,nout))&
            return
       endif
-      if (NumBSides>0) then
+      if (NumBSides>1) then
          read(nsav,iostat=ioerr) BoundarySide(1:NumBSides)
          if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"BoundarySide",nsav,nout)) &
             return
+         else
+            read(nsav,iostat=ioerr) BoundarySide(1)
+            if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"BoundarySide",nsav,    &
+               nout)) return
       endif
 ! Restart positions are based on the step number
       it_start = 0 

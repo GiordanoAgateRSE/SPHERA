@@ -54,8 +54,8 @@ integer(4),external :: CellIndices, CellNumber
 !------------------------
 ! Allocations
 !------------------------
-allocate (pres_wpp(DBSPH%n_w))
-allocate (den_wpp(DBSPH%n_w))
+allocate(pres_wpp(DBSPH%n_w))
+allocate(den_wpp(DBSPH%n_w))
 !------------------------
 ! Initializations
 !------------------------
@@ -199,8 +199,8 @@ endif
 !------------------------
 ! Deallocations
 !------------------------
-deallocate (pres_wpp)
-deallocate (den_wpp)
+deallocate(pres_wpp)
+deallocate(den_wpp)
 return
 end subroutine wall_elements_pp
 

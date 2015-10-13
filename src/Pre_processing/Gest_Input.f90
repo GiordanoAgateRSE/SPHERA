@@ -24,7 +24,6 @@
 ! Program unit: Gest_Input                   
 ! Description: Input check and management.                 
 !----------------------------------------------------------------------------------------------------------------------------------
-
 subroutine Gest_Input
 !------------------------
 ! Modules
@@ -273,7 +272,7 @@ if (.not.Restart) then
          call DefineBoundarySideGeometry2D
          elseif (ncord==3) then
 ! To replace 4-sided geometries with 3-sided geometries
-            if (OnlyTriangle) call ModifyFaces (NumberEntities)
+            if (OnlyTriangle) call ModifyFaces(NumberEntities)
             allocate(BFaceList(NumFacce),stat=ier) 
             if (ier/=0) then
                write(nout,'(1x,a,i2)')                                         &

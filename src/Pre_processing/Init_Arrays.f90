@@ -219,8 +219,7 @@ do i=1,size(BoundarySide)
    BoundarySide(i)%tipo = "    "
    BoundarySide(i)%stretch = 0
    BoundarySide(i)%previous_side = 0
-   BoundarySide(i)%vertex(1) = 0
-   BoundarySide(i)%vertex(2) = 0
+   BoundarySide(i)%vertex(1:SPACEDIM-1) = 0
    BoundarySide(i)%CloseParticles = 0
    BoundarySide(i)%length = zero
    BoundarySide(i)%CloseParticles_maxQuota = const_m_9999
@@ -231,7 +230,7 @@ do i=1,size(BoundarySide)
    enddo
    BoundarySide(i)%angle = zero
    do j=1,SPACEDIM
-      BoundarySide(i)%velocity(J) = zero
+      BoundarySide(i)%velocity(j) = zero
    enddo
 enddo
 ! In case of restart, it does not zero "domain" and "grid"

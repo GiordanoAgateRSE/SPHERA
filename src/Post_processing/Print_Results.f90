@@ -43,7 +43,7 @@ integer(4),intent(INOUT) :: it_print
 integer(4) :: npi,i,codice,dummy,OpCountot,SpCountot,minlocvelo,maxlocvelo,nbi
 integer(4) :: minlocvelx,maxlocvelx,minlocvely,maxlocvely,minlocvelz,maxlocvelz
 integer(4) :: minlocpres,maxlocpres,minlocdens,maxlocdens,minlocvisc,maxlocvisc
-integer(4) :: minloccodi,maxloccodi,minlocInEn,maxlocInEn
+integer(4) :: minloccodi,maxloccodi,minlocInEn,maxlocInEn,blt_laminar_flag_count
 integer(4) :: minlocvelo_w,maxlocvelo_w,minlocpres_w,maxlocpres_w
 integer(4) :: minlocvelo_bp,maxlocvelo_bp,minlocpres_bp,maxlocpres_bp
 integer(4) :: minlocvelo_body,maxlocvelo_body,minlocomega_body,maxlocomega_body
@@ -57,7 +57,7 @@ double precision :: maxpres_w,minvelo_bp,maxvelo_bp,minpres_bp,maxpres_bp
 double precision  :: minvelo_body,maxvelo_body,minomega_body,maxomega_body
 double precision  :: modomega,mintau_tauc,maxtau_tauc,mink_BetaGamma
 double precision  :: maxk_BetaGamma,minu_star,maxu_star,time_elapsed_tot_est
-double precision  :: minvelo,maxvelo,laminar_flag_perc
+double precision  :: minvelo,maxvelo,laminar_flag_perc,blt_laminar_flag_perc
 integer(4),dimension(1) :: pos
 character(len=42) :: fmt100="(a,i10,a,e18.9,a,e18.9,a,i  ,a,i  ,a,i  )"
 character(len=47) :: fmt101="(a,2(1x,f10.4,1x,a,1x,i6,1x,a,3(1x,f8.2,1x,a)))"
@@ -84,6 +84,7 @@ if ((index(str,'inizio')/=0).or.(index(str,'fine')/=0)) then
        if ((codice==0).or.(mod(it,codice)/=0)) return
 endif
 laminar_flag_count = 0
+blt_laminar_flag_count = 0
 mixture_count = 0
 !------------------------
 ! Statements
@@ -150,12 +151,15 @@ if (nag>0) then
       endif
       if (pg(npi)%laminar_flag==1) then
          laminar_flag_count = laminar_flag_count + 1
+         if (Med(pg(npi)%imed)%tipo=="granular") blt_laminar_flag_count =      &
+            blt_laminar_flag_count + 1
       endif
       if (Med(pg(npi)%imed)%tipo=="granular") then
          mixture_count = mixture_count + 1 
       endif
    enddo
-   laminar_flag_perc = (100.d0 * laminar_flag_count) / mixture_count
+   laminar_flag_perc = (100.d0 * laminar_flag_count) / nag
+   blt_laminar_flag_perc = (100.d0 * blt_laminar_flag_count) / mixture_count
    minvelo = Dsqrt(minvelo)
    maxvelo = Dsqrt(maxvelo)
    minvelx = minval(pg(1:nag)%vel(1),mask=pg(1:nag)%cella/=0)
@@ -489,9 +493,13 @@ if (nag>0) then
             "|",pg(maxlock_BetaGamma)%coord(3),"|"
       endif   
    endif
-   write(nout,*) "The total number of mixture particles is ",mixture_count,". "
    write(nout,'(a,g12.3,a)') "The ",laminar_flag_perc,                         &
+"% of fluid particles needs the shear viscous term in the momentum equation. "
+   if (mixture_count>0) then
+      write(nout,*) "The total number of mixture particles is ",mixture_count,". "
+      write(nout,'(a,g12.3,a)') "The ",blt_laminar_flag_perc,                  &
 "% of mixture particles needs the shear viscous term in the momentum equation. "
+   endif
    else
       write(nout,'(128("."))') 
       write(nout,'(a)') "No particles inside the domain at the moment"

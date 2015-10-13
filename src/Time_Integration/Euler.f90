@@ -200,7 +200,7 @@ if (((DBSPH%n_w+DBSPH%n_inlet+DBSPH%n_outlet)>0).and.(Domain%tipo=="bsph")) &
       call start_and_stop(3,9)
 ! To set the parameters for the fixed particles 
       if (Domain%NormFix)  call NormFix
-      allocate (uni_old(nag))
+      allocate(uni_old(nag))
 ! To update the auxiliary vector to count mobile "flu" particles (in "nag") 
       indarrayFlu = 0
       do npi=1,nag

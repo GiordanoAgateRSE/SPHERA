@@ -30,7 +30,9 @@
 !              updated independently. Their ratio is computed in 
 !              "DBSPH_BC_shear_viscosity_term"): here are summed their 
 !              contributions. To compute the kinematic viscosity of the 
-!              semi-particles.         
+!              semi-particles. Contributions to the discrete Shepard coefficient
+!              of wall elements depending on fluid particles (not on 
+!              semi-particles).        
 !-------------------------------------------------------------------------------
 subroutine DBSPH_velocity_gradients_VSL_SNBL(i_0,i_a,npartint)
 !------------------------
@@ -69,7 +71,7 @@ pg_w(i_a)%grad_vel_VSL_times_mu(:) = pg_w(i_a)%grad_vel_VSL_times_mu(:) +      &
 pg_w(i_a)%sigma = pg_w(i_a)%sigma + kernel_fw(1,npartint) * pg(i_0)%mass /     &
                   pg(i_0)%dens
 ! Contributions to the kinematic viscosity of the semi-particles
-pg_w(i_a)%kin_visc_semi_part = pg_w(i_a)%kin_visc_semi_part + pg(i_0)%visc     &
+pg_w(i_a)%kin_visc_semi_part = pg_w(i_a)%kin_visc_semi_part + pg(i_0)%visc *   &
                                kernel_fw(1,npartint) * pg(i_0)%mass /          &
                                pg(i_0)%dens
 !------------------------

@@ -25,7 +25,8 @@
 ! Description: Computation of the contributions to the numerator of the boundary
 !              shear viscosity term in DB-SPH-NS.          
 !-------------------------------------------------------------------------------
-subroutine DBSPH_BC_shear_viscosity_term(i_0,i_a,npartint,DBSPH_BC_she_vis_term)
+subroutine DBSPH_BC_shear_viscosity_term(i_0,i_a,npartint,                     &
+   DBSPH_wall_she_vis_term)
 !------------------------
 ! Modules
 !------------------------ 
@@ -36,7 +37,7 @@ use Dynamic_allocation_module
 !------------------------
 implicit none
 integer(4),intent(in) :: i_0,i_a,npartint
-double precision,intent(inout) :: DBSPH_BC_she_vis_term(3)
+double precision,intent(inout) :: DBSPH_wall_she_vis_term(3)
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -54,10 +55,10 @@ double precision,intent(inout) :: DBSPH_BC_she_vis_term(3)
 pg_w(i_a)%grad_vel_VSL_times_mu(:) = pg_w(i_a)%grad_vel_VSL_times_mu(:) /      &
                                      pg_w(i_a)%sigma
 ! Contribution to the numerator of the boundary shear viscosity term 
-DBSPH_BC_she_vis_term(:) = DBSPH_BC_she_vis_term(:) -                          &
-                           kernel_fw(1,npartint) * pg_w(i_a)%weight *          &
-                           (pg_w(i_a)%grad_vel_VSL_times_mu(:) +               &
-                           grad_vel_VSL_fw(:,npartint) * pg(i_0)%mu)
+DBSPH_wall_she_vis_term(:) = DBSPH_wall_she_vis_term(:) -                      &
+                             kernel_fw(1,npartint) * pg_w(i_a)%weight *        &
+                             (pg_w(i_a)%grad_vel_VSL_times_mu(:) +             &
+                             grad_vel_VSL_fw(:,npartint) * pg(i_0)%mu)
 !------------------------
 ! Deallocations
 !------------------------

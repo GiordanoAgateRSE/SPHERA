@@ -97,7 +97,7 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
 "case "//prefix(1:len_trim(prefix))//" * time "//cargo(1:len_trim(cargo))//" (s)"
 ! Coordinates 
    numpoints = count(pg(1:nag)%cella>0)
-   allocate (finger(numpoints))
+   allocate(finger(numpoints))
    k = 0
    do npi=1,nag
       if (pg(npi)%cella==0) cycle
@@ -366,17 +366,17 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
    endif 
-   if (Granular_flows_options%ID_erosion_criterion>=1) then
 ! laminar_flag
-      write(unitvtk,'(a)')                                                     &
-         '      <DataArray type="Int32" Name="laminar_flag" format="ascii" >'
-      do i=1,numpoints,16
-         k1 = i
-         k2 = k1 + 15
-         if (k2>numpoints) k2 = numpoints
-         write(unitvtk,'(8x,16(1x,i8))') (pg(finger(k))%laminar_flag,k = k1,k2)
-      enddo
-      write(unitvtk,'(a)') '      </DataArray>'   
+   write(unitvtk,'(a)')                                                        &
+      '      <DataArray type="Int32" Name="laminar_flag" format="ascii" >'
+   do i=1,numpoints,16
+      k1 = i
+      k2 = k1 + 15
+      if (k2>numpoints) k2 = numpoints
+      write(unitvtk,'(8x,16(1x,i8))') (pg(finger(k))%laminar_flag,k = k1,k2)
+   enddo
+   write(unitvtk,'(a)') '      </DataArray>'   
+   if (Granular_flows_options%ID_erosion_criterion>=1) then
 ! sigma_prime
       write(unitvtk,'(a)') '      <DataArray type="Float32" Name="sigma_prime" format="ascii" >'
       do i=1,numpoints,16
@@ -529,7 +529,7 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
 ! Flush unit content
    flush(unitvtk)
    close (unitvtk)
-   deallocate (finger)
+   deallocate(finger)
    if ((DBSPH%n_w>0).and.(Domain%tipo=="bsph")) then
 ! Open a vtu file for DB-SPH wall and semi-particle parameters  
 ! VTKConverter_<casename>_wall_<block>.vtk 
@@ -555,7 +555,7 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
 "case "//prefix(1:len_trim(prefix))//" * time "//cargo(1:len_trim(cargo))//" (s)"
 ! Point coordinates 
       numpoints = count(pg_w(1:DBSPH%n_w)%cella>0)
-      allocate (finger(numpoints))
+      allocate(finger(numpoints))
       k = 0
       do npi=1,DBSPH%n_w
          if (pg_w(npi)%cella==0) cycle
@@ -639,7 +639,7 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
 ! Velocity gradient in VSL (projected along the wall element normal) times the 
 ! shear viscosity
       write(unitvtk,'(a)')                                                     &
-'      <DataArray type="Float32" Name="Normal vectors"  NumberOfComponents="3"  format="ascii" >'
+'      <DataArray type="Float32" Name="Velocity gradient in VSL"  NumberOfComponents="3"  format="ascii" >'
       do i=1,numpoints,6
          k1 = i
          k2 = k1 + 5
@@ -737,7 +737,7 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
 ! Flushing the unit explicitly
       flush(unitvtk)
       close (unitvtk)
-      deallocate (finger)
+      deallocate(finger)
    endif
    if (n_bodies>0) then
 ! Body Transport post-processing for .vtu files: start
@@ -766,7 +766,7 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
 "case "//prefix(1:len_trim(prefix))//" * time "//cargo(1:len_trim(cargo))//" (s)"
 ! Point coordinates 
       numpoints = count(bp_arr(1:n_body_part)%cell>0)
-      allocate (finger(numpoints))
+      allocate(finger(numpoints))
       k = 0
       do npi=1,n_body_part
          if (bp_arr(npi)%cell==0) cycle
@@ -910,7 +910,7 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
 ! Flushing the unit explicitly 
       flush(unitvtk)
       close (unitvtk)
-      deallocate (finger)
+      deallocate(finger)
 ! Bodies: start
 ! Open the .vtu unstructured grid formatted file 
 ! VTKConverter_<casename>_body_<block>.vtk for the results storing
@@ -936,7 +936,7 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
 "case "//prefix(1:len_trim(prefix))//" * time "//cargo(1:len_trim(cargo))//" (s)"
 ! Point coordinates 
       numpoints = n_bodies
-      allocate (finger(numpoints))
+      allocate(finger(numpoints))
       k = 0
       do npi=1,n_bodies
          k = k + 1
@@ -1092,7 +1092,7 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
 ! Flushing the unit explicitly 
       flush(unitvtk)
       close (unitvtk)
-      deallocate (finger)
+      deallocate(finger)
    endif  
 endif 
 ! Updating the last output time for .vtu files 

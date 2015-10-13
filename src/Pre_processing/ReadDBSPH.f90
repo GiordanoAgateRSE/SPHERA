@@ -82,7 +82,7 @@ do while (TRIM(lcase(ainp))/="##### end dbsph #####")
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DBSPH_monitor_numbers",ninp,nout))&
       return
    if (n_monitor_points>0) then
-      if (.not.allocated(monitor_IDs)) allocate (monitor_IDs(n_monitor_points),&
+      if (.not.allocated(monitor_IDs)) allocate(monitor_IDs(n_monitor_points),&
          STAT=alloc_stat)
       if (alloc_stat/=0) then
          write(nout,*)                                                         &
@@ -107,7 +107,7 @@ do while (TRIM(lcase(ainp))/="##### end dbsph #####")
       if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DBSPH_KINEMATICS",ninp,nout))  &
          return  
       if (.not.(allocated(DBSPH%kinematics))) then
-         allocate (DBSPH%kinematics(n_kinematics_records,7),STAT=alloc_stat)
+         allocate(DBSPH%kinematics(n_kinematics_records,7),STAT=alloc_stat)
          if (alloc_stat/=0) then
             write(nout,*)                                                      &
 'Error! Allocation of DBSPH%kinematics in ReadDBSPH failed; the program terminates here.'
@@ -131,7 +131,7 @@ do while (TRIM(lcase(ainp))/="##### end dbsph #####")
          "DBSPH_INLET_OUTLET_PLY_N_FACE_VERT",ninp,nout)) return 
       if (n_inlet>0) then
          if (.not.allocated(DBSPH%inlet_sections)) then
-            allocate (DBSPH%inlet_sections(n_inlet,10),STAT=alloc_stat)
+            allocate(DBSPH%inlet_sections(n_inlet,10),STAT=alloc_stat)
             if (alloc_stat/=0) then
                write(nout,*)                                                   &
 'Allocation of DBSPH%inlet_sections in ReadDBSPH failed; the program terminates here'
@@ -150,7 +150,7 @@ do while (TRIM(lcase(ainp))/="##### end dbsph #####")
    if (n_outlet>0) then
 ! Reading position and normal of an outlet surface element       
       if (.not.allocated(DBSPH%outlet_sections)) then
-         allocate (DBSPH%outlet_sections(n_outlet,8),STAT=alloc_stat)
+         allocate(DBSPH%outlet_sections(n_outlet,8),STAT=alloc_stat)
          if (alloc_stat/=0) then
             write(nout,*)                                                      &
 'Allocation of DBSPH_outlet_sections in ReadDBSPH failed; the program terminates here'
@@ -234,7 +234,7 @@ do while (TRIM(lcase(ainp))/="##### end dbsph #####")
       DBSPH%monitor_region(:) = monitor_region(:)  
       if (n_monitor_points>0) then
          if (.not.(allocated(DBSPH%monitor_IDs))) then
-            allocate (DBSPH%monitor_IDs(n_monitor_points),STAT=alloc_stat)
+            allocate(DBSPH%monitor_IDs(n_monitor_points),STAT=alloc_stat)
             if (alloc_stat/=0) then
                write(nout,*)                                                   &
 'Allocation of DBSPH%n_monitor_points in ReadDBSPH failed; the program terminates here.'
@@ -252,7 +252,7 @@ do while (TRIM(lcase(ainp))/="##### end dbsph #####")
       DBSPH%ply_n_face_vert = ply_n_face_vert
    endif
    if (allocated(monitor_IDs)) then
-      deallocate (monitor_IDs,STAT=dealloc_stat)
+      deallocate(monitor_IDs,STAT=dealloc_stat)
       if (dealloc_stat/=0) then
          write(nout,*)                                                         &
 'Deallocation of monitor_IDs in ReadDBSPH failed; the program terminates here.'

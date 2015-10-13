@@ -36,6 +36,7 @@ use Hybrid_allocation_module
 ! Declarations
 !------------------------
 implicit none
+logical :: DBSPH_fictitious_reservoir_flag
 integer(4) :: nrighe,ier,ninp,nout
 integer(4),dimension(20) :: NumberEntities
 integer(4),dimension(NumBVertices) :: BoundaryVertex
@@ -121,6 +122,7 @@ do while (TRIM(lcase(ainp))/="##### end boundaries #####")
    valp = zero
    IC_source_type = 0
    Car_top_zone = 0
+   DBSPH_fictitious_reservoir_flag = .false.
    dx_CartTopog = 0.d0
    H_res = 0.d0
    ID_first_vertex = 0
@@ -267,9 +269,11 @@ do while (TRIM(lcase(ainp))/="##### end boundaries #####")
             ninp,nout)
          if (ier/=0) return  
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         if (ioerr==0) read(ainp,*,iostat=ioerr) IC_source_type,Car_top_zone
+         if (ioerr==0) read(ainp,*,iostat=ioerr) IC_source_type,Car_top_zone,  &
+            DBSPH_fictitious_reservoir_flag
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                             &
-            "IC_source_type, Car_top_zone",ninp,nout)) return
+            "IC_source_type, Car_top_zone, DBSPH_fictitious_reservoir_flag",   &
+            ninp,nout)) return
          if (IC_source_type==2) then
             call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
             if (ioerr==0) read(ainp,*,iostat=ioerr) dx_CartTopog,H_res
@@ -368,6 +372,8 @@ do while (TRIM(lcase(ainp))/="##### end boundaries #####")
       Partz(Izona)%Medium   = Medium
       Partz(Izona)%IC_source_type = IC_source_type
       Partz(Izona)%Car_top_zone = Car_top_zone
+      Partz(Izona)%DBSPH_fictitious_reservoir_flag =                           &
+         DBSPH_fictitious_reservoir_flag
       if (IC_source_type==2) then
          Partz(Izona)%dx_CartTopog = dx_CartTopog
          Partz(Izona)%H_res = H_res
@@ -533,6 +539,8 @@ BoundaryVertex(Tratto(index)%inivertex+Tratto(index)%numvertices-1)
                   Partz(Izona)%IC_source_type
                write(nout,"(1x,a,i12)") "Car_top_zone    : ",                  &
                   Partz(Izona)%Car_top_zone
+               write(nout,"(1x,a,l12)") "DBSPH_fictitious_reservoir_flag : ",  &
+                  Partz(Izona)%DBSPH_fictitious_reservoir_flag
                if (IC_source_type==2) then
                   write(nout,"(1x,a,1pe12.4)")    "dx_CartTopog    : ",        &
                      Partz(Izona)%dx_CartTopog

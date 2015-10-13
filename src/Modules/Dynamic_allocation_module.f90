@@ -90,10 +90,10 @@ integer(4),               dimension(:),    allocatable :: nPartIntorno_fw
 integer(4),               dimension(:),    allocatable :: PartIntorno_fw   
 ! Kernel parameter neighbouring array: kernel_fw(2,NMAXPARTJ*PARTICLEBUFFER),
 ! (wall neighbours; DBSPH)
-!    kernel_fw(1,i): -|gradW_0s|/|r_0s|, gradW: kernel gradient (cubic spline);
+!    kernel_fw(1,i): W_0a: absolute value of the kernel cubic spline (DBSPH)
+!    kernel_fw(2,i): -|gradW_0s|/|r_0s|, gradW: kernel gradient (cubic spline);
 !    Thus gradW = |gradW_0s| * (gradW_0s/|gradW_0s|) = - kernel_fw*rag, 
 !    rag=-(x_s-x_0) is aligned with gradW; "s" is a semi-particle.
-!    kernel_fw(2,i): W_0a: absolute value of the kernel cubic spline (DBSPH)
 double precision,         dimension(:,:),  allocatable :: kernel_fw
 ! Relative distances from wall particles: -r_0a, 
 ! rag_fw(components,NMAXPARTJ*PARTICLEBUFFER)

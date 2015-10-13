@@ -48,7 +48,7 @@ double precision :: gradmod,gradmodwacl,wu,denom,absv_pres_grav_inner
 double precision :: absv_Morris_inner,Morris_inner_weigth,kernel_der
 double precision :: dervel(3),dervelmorr(3),appopres(3),appodiss(3),rvw(3)
 double precision :: rvwalfa(3),rvwbeta(3),ragtemp(3),rvw_sum(3),rvw_semi_part(3)
-double precision :: DBSPH_BC_she_vis_term(3),t_visc_semi_part(3) 
+double precision :: DBSPH_wall_she_vis_term(3),t_visc_semi_part(3) 
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -82,7 +82,7 @@ deltan = 1.d+07
 ke_coef = Domain%coefke / Domain%h
 kacl_coef = Domain%coefkacl / Domain%h
 rvw_sum(:) = zero
-DBSPH_BC_she_vis_term(:) = 0.d0
+DBSPH_wall_she_vis_term(:) = 0.d0
 t_visc_semi_part(:) = 0.d0
 !------------------------
 ! Statements
@@ -229,7 +229,7 @@ do contj=1,nPartIntorno(npi)
    tdiss(:) = tdiss(:) + appodiss(:)
 ! To compute Morris term (interaction with neighbouring fluid particle)    
    call viscomorris(npi,npj,npartint,pg(npi)%mass,pg(npi)%dens,pg(npi)%visc,   &
-      pg(npj)%mass,pg(npj)%dens,pg(npj)%visc,kernel_der,PartKernel(2,npartint),&
+      pg(npj)%mass,pg(npj)%dens,pg(npj)%visc,PartKernel(2,npartint),           &
       pg(npj)%vel_type,rag(1:3,npartint),dervel,rvw)
 ! To add  Morris term (interaction with neighbouring fluid particle)
    tvisc(:) = tvisc(:) + rvw(:)
@@ -266,19 +266,21 @@ if ((DBSPH%n_w>0).and.(pg(npi)%laminar_flag==1)) then
                     (pg_w(npj)%dens * pg_w(npj)%dens)) * rag_fw(:,npartint) *  &
                     kernel_fw(2,npartint)  
       tpres(:) = tpres(:) + appopres(:)
-      call DBSPH_BC_shear_viscosity_term(npi,npj,npartint,DBSPH_BC_she_vis_term)
+      call DBSPH_BC_shear_viscosity_term(npi,npj,npartint,                     &
+         DBSPH_wall_she_vis_term)
 ! To compute Morris term (interaction with neighbouring semi-particle)    
-      kernel_der = kernel_fw(1,npartint)/(dot_product(rag_fw,rag_fw) + eta2)
+      kernel_der = kernel_fw(2,npartint)/(dot_product(rag_fw(:,npartint),      &
+                   rag_fw(:,npartint)) + eta2)
       call viscomorris(npi,npj,npartint,pg(npi)%mass,pg(npi)%dens,pg(npi)%visc,&
          pg_w(npj)%mass,pg_w(npj)%dens,pg_w(npj)%kin_visc_semi_part,kernel_der,&
-         PartKernel(2,npartint),"std",rag_fw(1:3,npartint),dervel,rvw_semi_part)
+         "std",rag_fw(1:3,npartint),dervel,rvw_semi_part)
       t_visc_semi_part(:) = t_visc_semi_part(:) + rvw_semi_part(:)   
    enddo
 ! Computation of the boundary shear viscosity term in DB-SPH-NS   
-   DBSPH_BC_she_vis_term(:) = DBSPH_BC_she_vis_term(:) / pg(npi)%dens /        &
-                              pg(npi)%Gamma
+   DBSPH_wall_she_vis_term(:) = DBSPH_wall_she_vis_term(:) / pg(npi)%dens /    &
+                                pg(npi)%Gamma
 ! Update the overall (inner+BC) shear viscosity term in DB-SPH-NS
-   tvisc(:) = tvisc(:) + DBSPH_BC_she_vis_term(:) + t_visc_semi_part(:)
+   tvisc(:) = tvisc(:) + DBSPH_wall_she_vis_term(:) + t_visc_semi_part(:)
 endif
 !------------------------
 ! Deallocations

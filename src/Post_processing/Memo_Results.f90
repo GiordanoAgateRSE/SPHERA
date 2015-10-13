@@ -79,7 +79,11 @@ if (index(str,'inizio')/=0) then
    if (NumTratti>0) write(nres) Tratto(1:NumTratti)
    if (NPartZone>0) write(nres) Partz(1:NPartZone)
    if (NumBVertices>0) write(nres) BoundaryVertex(1:NumBVertices)
-   if (NumBSides>0) write(nres) BoundarySide(1:NumBSides)
+   if (NumBSides>1) then
+      write(nres) BoundarySide(1:NumBSides)
+      else
+         write(nres) BoundarySide(1)
+   endif
    flush(nres)
    write(nout,'(a,i10,a,f15.5)')                                               &
 " ----------------------------------------------------------------------------"

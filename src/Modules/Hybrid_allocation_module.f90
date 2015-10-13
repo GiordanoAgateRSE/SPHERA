@@ -479,12 +479,12 @@ type TyBoundarySide
                                                ! neighbouring particles
    double precision :: angle
    double precision :: velocity(1:SPACEDIM) ! Velocity
-   double precision :: T(1:SPACEDIM, 1:SPACEDIM) ! Direction cosines of the 
+   double precision :: T(1:SPACEDIM,1:SPACEDIM)  ! Direction cosines of the 
                                                  ! local reference system of 
                                                  ! the boundary (the last one
                                                  ! is the normal)
-   double precision :: R(1:SPACEDIM, 1:SPACEDIM)      
-   double precision :: RN(1:SPACEDIM, 1:SPACEDIM)
+   double precision :: R(1:SPACEDIM,1:SPACEDIM)      
+   double precision :: RN(1:SPACEDIM,1:SPACEDIM)
    character(4)     :: tipo ! type: "FIXEd", "PERImeter", "SOURce"(,"TAPIs",  
                             ! "LEVEl", "FLOW", "VELOcity", "CRITic", "OPEN")
 end type TyBoundarySide

@@ -79,7 +79,7 @@ if (ncord == 2) then
    else
       dimensioni = NumFacce
 end if
-allocate (xmin(spacedim,dimensioni),xmax(spacedim,dimensioni))
+allocate(xmin(spacedim,dimensioni),xmax(spacedim,dimensioni))
 !------------------------
 ! Initializations
 !------------------------
@@ -394,7 +394,7 @@ nagpg = nag
 !------------------------
 ! Deallocations
 !------------------------
-deallocate (xmin,xmax)
+deallocate(xmin,xmax)
 return
 end subroutine GeneratePart
 
