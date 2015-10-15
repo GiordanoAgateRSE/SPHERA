@@ -46,7 +46,7 @@ use I_O_diagnostic_module
 implicit none
 integer(4) :: file_stat,n_vertices,old_size_vert,old_size_face,new_size_vert 
 integer(4) :: new_size_face,dealloc_stat,alloc_stat,n_faces,face_vert_num,i,j,k
-integer(4) :: aux_face_vert(4)
+integer(4) :: aux_face_vert(6)
 character(80) :: file_name,aux_char_1,aux_char_2
 type(vertex_der_type),dimension(:),allocatable :: aux_der_type_vert
 type(face_der_type),dimension(:),allocatable :: aux_der_type_faces
@@ -227,8 +227,9 @@ do
       old_size_face = 0
       else
          old_size_face = size(DBSPH%surf_mesh%faces)
-         if ((ncord==3).and.(DBSPH%ply_n_face_vert==4)) then
-            new_size_face = old_size_face + 2 *n_faces
+         if (ncord==3) then
+            new_size_face = old_size_face + (DBSPH%ply_n_face_vert - 2) *      &
+                            n_faces
             else
                new_size_face = old_size_face + n_faces
          endif
@@ -291,7 +292,7 @@ DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(k-1)%vert_list(2))%pos,         &
 DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(k-1)%vert_list(3))%pos,         &
                   DBSPH%surf_mesh%faces(k-1)%area,                             &
                   DBSPH%surf_mesh%faces(k-1)%normal)                         
-            case(4):
+            case(4)
 ! To import vertices of the quadrilateral face, split in 2 triangular faces
 ! Face 1: vertices 1,2,3 
             DBSPH%surf_mesh%faces(k)%vert_list(1:3) = old_size_vert +          &
@@ -317,7 +318,7 @@ DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(k-1)%vert_list(2))%pos,         &
 DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(k-1)%vert_list(3))%pos,         &
                DBSPH%surf_mesh%faces(k-1)%area,                                &
                DBSPH%surf_mesh%faces(k-1)%normal)            
-            case(5):
+            case(5)
 ! To import vertices of the pentagonal face, split in 3 triangular faces
 ! Face 1: vertices 1,2,5
             DBSPH%surf_mesh%faces(k)%vert_list(1:2) = old_size_vert +          &
@@ -355,7 +356,7 @@ DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(k-1)%vert_list(2))%pos,         &
 DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(k-1)%vert_list(3))%pos,         &
                DBSPH%surf_mesh%faces(k-1)%area,                                &
                DBSPH%surf_mesh%faces(k-1)%normal)            
-            case(6):
+            case(6)
 ! To import vertices of the hexagonal face, split in 4 triangular faces
 ! Face 1: vertices 1,2,6
             DBSPH%surf_mesh%faces(k)%vert_list(1:2) = old_size_vert +          &
@@ -433,14 +434,14 @@ DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(k-1)%vert_list(1))%pos          &
       stop
    endif
 ! Read the face vertices: end   
-!AA!!!
 ! Resize DBSPH%surf_mesh%faces on the actual number of faces 
-   if ((ncord==3).and.(DBSPH%ply_n_face_vert==4)) then
-      new_size_face = size(DBSPH%surf_mesh%faces) - (k - old_size_face - 1 - 2 &
-                      * n_faces)   
+! new_size_face = estimated_new_size_face - overestimation
+   if (ncord==3) then
+      new_size_face = size(DBSPH%surf_mesh%faces) - (k - old_size_face - 1 -   &
+                      (DBSPH%ply_n_face_vert - 2) * n_faces) 
       else
          new_size_face = size(DBSPH%surf_mesh%faces) - (k - old_size_face - 1  &
-                         - n_faces)   
+                         - n_faces)     
    endif
    old_size_face = size(DBSPH%surf_mesh%faces)
    if (new_size_face>old_size_face) then
