@@ -598,12 +598,34 @@ endif
 if (allocated(DBSPH%kinematics)) then
    deallocate(DBSPH%kinematics,STAT=ier)
    if (ier/=0) then
-      write(nout,*) 'Deallocation of aux_array in GestDealloc failed; ',       &
-         'the program terminates here.'
+      write(nout,*) 'Deallocation of DBSPH%kinematics in ',                    &
+         'GestDealloc failed; the program terminates here. '
       call diagnostic (arg1=5,arg2=340)       
       else
-         write (nout,'(1x,a)')                                                 &
-            "Deallocation of aux_array in GestDealloc successfully completed."
+         write (nout,'(1x,a)') "Deallocation of DBSPH%kinematics ",            &
+            "in GestDealloc successfully completed."
+   endif
+endif
+if (allocated(DBSPH%n_kinematics_records)) then
+   deallocate(DBSPH%n_kinematics_records,STAT=ier)
+   if (ier/=0) then
+      write(nout,*) 'Deallocation of DBSPH%n_kinematics_records in ',          &
+         'GestDealloc failed; the program terminates here. '
+      call diagnostic (arg1=5,arg2=340)       
+      else
+         write (nout,'(1x,a)') "Deallocation of DBSPH%n_kinematics_records ",  &
+            "in GestDealloc successfully completed."
+   endif
+endif
+if (allocated(DBSPH%rotation_centre)) then
+   deallocate(DBSPH%rotation_centre,STAT=ier)
+   if (ier/=0) then
+      write(nout,*) 'Deallocation of DBSPH%rotation_centre in ',               &
+         'GestDealloc failed; the program terminates here. '
+      call diagnostic (arg1=5,arg2=340)       
+      else
+         write (nout,'(1x,a)') "Deallocation of DBSPH%rotation_centre ",       &
+            "in GestDealloc successfully completed."
    endif
 endif
 if (allocated(DBSPH%inlet_sections)) then

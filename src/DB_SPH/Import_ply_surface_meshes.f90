@@ -44,8 +44,9 @@ use I_O_diagnostic_module
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: file_stat,n_vertices,old_size_vert,old_size_face,new_size_vert 
+integer(4) :: file_stat,n_vertices,old_size_vert,old_size_face,new_size_vert
 integer(4) :: new_size_face,dealloc_stat,alloc_stat,n_faces,face_vert_num,i,j,k
+integer(4) :: surface_mesh_file_ID
 integer(4) :: aux_face_vert(6)
 character(80) :: file_name,aux_char_1,aux_char_2
 type(vertex_der_type),dimension(:),allocatable :: aux_der_type_vert
@@ -68,6 +69,7 @@ end interface
 ! Initializations
 !------------------------
 new_size_face = 0
+surface_mesh_file_ID = 0
 !------------------------
 ! Statements
 !------------------------
@@ -84,7 +86,9 @@ if (file_stat/=0) then
               'Import_pl_surface_meshes; the program terminates here'
    stop
 endif
-do
+do 
+! To increment the file_number
+   surface_mesh_file_ID = surface_mesh_file_ID + 1
 ! Read the file name    
    read (unit_file_list,'(a)',IOSTAT=file_stat) file_name
 ! Exit the cicle at the end of file
@@ -284,6 +288,7 @@ do
                DBSPH%surf_mesh%faces(k)%vert_list(1:3) = old_size_vert +       &
                                                          aux_face_vert(1:3) + 1
                DBSPH%surf_mesh%faces(k)%vert_list(4) = 0
+               DBSPH%surf_mesh%surface_mesh_file_ID(k) = surface_mesh_file_ID
                k = k+1
 ! Computation of area and normal of the face
                call area_triangle(                                             &
@@ -298,12 +303,14 @@ DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(k-1)%vert_list(3))%pos,         &
             DBSPH%surf_mesh%faces(k)%vert_list(1:3) = old_size_vert +          &
                                                       aux_face_vert(1:3) + 1
             DBSPH%surf_mesh%faces(k)%vert_list(4) = 0
+            DBSPH%surf_mesh%surface_mesh_file_ID(k) = surface_mesh_file_ID
 ! Face 2: vertices 1,3,4            
             DBSPH%surf_mesh%faces(k+1)%vert_list(1) = old_size_vert +          &
                                                       aux_face_vert(1) + 1
             DBSPH%surf_mesh%faces(k+1)%vert_list(2:3) = old_size_vert +        &
                                                        aux_face_vert(3:4) + 1
             DBSPH%surf_mesh%faces(k+1)%vert_list(4) = 0
+            DBSPH%surf_mesh%surface_mesh_file_ID(k+1) = surface_mesh_file_ID
             k = k+2
 ! Computation of area and normal of the 2 faces
             call area_triangle(                                                &
@@ -326,16 +333,19 @@ DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(k-1)%vert_list(3))%pos,         &
             DBSPH%surf_mesh%faces(k)%vert_list(3) = old_size_vert +            &
                                                     aux_face_vert(5) + 1
             DBSPH%surf_mesh%faces(k)%vert_list(4) = 0
+            DBSPH%surf_mesh%surface_mesh_file_ID(k) = surface_mesh_file_ID
 ! Face 2: vertices 2,3,5
             DBSPH%surf_mesh%faces(k+1)%vert_list(1:2) = old_size_vert +        &
                                                         aux_face_vert(2:3) + 1
             DBSPH%surf_mesh%faces(k+1)%vert_list(3)= old_size_vert +           &
                                                      aux_face_vert(5) + 1
             DBSPH%surf_mesh%faces(k+1)%vert_list(4) = 0
+            DBSPH%surf_mesh%surface_mesh_file_ID(k+1) = surface_mesh_file_ID
 ! Face 3: vertices 3,4,5
             DBSPH%surf_mesh%faces(k+2)%vert_list(1:3) = old_size_vert +        &
                                                         aux_face_vert(3:5) + 1
             DBSPH%surf_mesh%faces(k+2)%vert_list(4) = 0
+            DBSPH%surf_mesh%surface_mesh_file_ID(k+2) = surface_mesh_file_ID
             k = k+3
 ! Computation of area and normal of the 3 faces
             call area_triangle(                                                &
@@ -364,22 +374,26 @@ DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(k-1)%vert_list(3))%pos,         &
             DBSPH%surf_mesh%faces(k)%vert_list(3) = old_size_vert +            &
                                                     aux_face_vert(6) + 1
             DBSPH%surf_mesh%faces(k)%vert_list(4) = 0
+            DBSPH%surf_mesh%surface_mesh_file_ID(k) = surface_mesh_file_ID
 ! Face 2: vertices 2,5,6
             DBSPH%surf_mesh%faces(k+1)%vert_list(1) = old_size_vert +          &
                                                       aux_face_vert(2) + 1
             DBSPH%surf_mesh%faces(k+1)%vert_list(2:3)= old_size_vert +         &
                                                        aux_face_vert(5:6) + 1
             DBSPH%surf_mesh%faces(k+1)%vert_list(4) = 0
+            DBSPH%surf_mesh%surface_mesh_file_ID(k+1) = surface_mesh_file_ID
 ! Face 3: vertices 2,3,5
             DBSPH%surf_mesh%faces(k+2)%vert_list(1:2) = old_size_vert +        &
                                                         aux_face_vert(2:3) + 1
             DBSPH%surf_mesh%faces(k+2)%vert_list(3)= old_size_vert +           &
                                                      aux_face_vert(5) + 1
             DBSPH%surf_mesh%faces(k+2)%vert_list(4) = 0
+            DBSPH%surf_mesh%surface_mesh_file_ID(k+2) = surface_mesh_file_ID
 ! Face 4: vertices 3,4,5 
             DBSPH%surf_mesh%faces(k+3)%vert_list(1:3) = old_size_vert +        &
                                                         aux_face_vert(3:5) + 1
             DBSPH%surf_mesh%faces(k+3)%vert_list(4) = 0
+            DBSPH%surf_mesh%surface_mesh_file_ID(k+3) = surface_mesh_file_ID
             k = k+4
 ! Computation of area and normal of the 4 faces
             call area_triangle(                                                &

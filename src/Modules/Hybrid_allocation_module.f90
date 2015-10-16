@@ -255,6 +255,7 @@ type TyParticle_w
                                          ! at maximum)
    integer(4)       :: wet ! =1 for wet wall particle (distance from fluid 
                            ! particle smaller than 1.3dx)
+   integer(4)       :: surface_mesh_file_ID ! ID of the surface mesh file
    double precision :: dens ! Density
    double precision :: pres ! Pressure
    double precision :: weight ! Area(3D)/length(2D) of the wall element 
@@ -656,6 +657,8 @@ end type
 
 ! Surface mesh for DB-SPH boundaries
 type DBSPH_surf_mesh_der_type 
+! ID of the surface mesh file
+   integer(4),allocatable,dimension(:)            :: surface_mesh_file_ID
 ! List of vertices of the surface mesh
    type(vertex_der_type),allocatable,dimension(:) :: vertices  
 ! List of faces (both 3D and 2D)
@@ -674,26 +677,29 @@ type DBSPH_der_type
    integer(4)        :: n_monitor_regions ! Number of monitoring regions 
                                           ! (0 or 1) to estimate the Force
                                           ! along x-direction 
-   integer(4)        :: n_kinematics_records ! Number of records for imposed
-                                             ! kinematics
    integer(4)        :: n_inlet ! Number of inlet sections (to impose DBSPH 
                                 ! inlet BC)
    integer(4)        :: n_outlet ! Number of outlet sections (to impose 
                                  ! DBSPH outlet BC)
    integer(4)        :: ply_n_face_vert ! Number of vertices for each surface 
                                         ! mesh face in the .ply input files 
+   integer(4)        :: surface_mesh_files ! number of files of the DBSPH 
+                                           ! surface meshes
    double precision  :: dx_dxw ! Ratio between the fluid and the 
                                ! semi-particle sizes
    double precision  :: k_w ! Coefficient to compute semi-particle volumes
                             ! (DB-SPH equations)
-   double precision  :: rotation_centre(3) ! centre of rotation for 
-                                           ! DB-SPH frontiers
    double precision  :: monitor_region(6) ! (xmin,xmax,ymin,xmax,zmin,zmax)
                                           ! to detect the monitoring region
 ! IDs of the monitoring points
-   integer(4),allocatable,dimension(:) :: monitor_IDs     
-! Array for the imposed kinematics of the DBSPH surface elements (n_records,4)
-   double precision,dimension(:,:),allocatable :: kinematics 
+   integer(4),allocatable,dimension(:) :: monitor_IDs
+! Number of records for imposed kinematics (surface_mesh_files,n_records)     
+   integer(4),allocatable,dimension(:) :: n_kinematics_records 
+! rotation_centre(surface_mesh_files,3): centre of rotation for DB-SPH frontiers
+   double precision,dimension(:,:),allocatable :: rotation_centre 
+! Array for the imposed kinematics of the DBSPH surface elements 
+! (surface_mesh_files,n_records,4)
+   double precision,dimension(:,:,:),allocatable :: kinematics 
 ! Array for the inlet sections useful to DB-SPH inlet BC (n_records,10): 
 ! positions, normal, velocity, length
    double precision,dimension(:,:),allocatable :: inlet_sections 

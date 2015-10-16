@@ -192,27 +192,34 @@ ID_wall_element_monitor_1 ... ID_wall_element_monitor_n
 ! if (n_monitor_regions>0): start
 xmin,xmax,ymin,xmax,zmin,zmax       ! (monitoring region vertices) 
 ! if (n_monitor_regions>0): end
-imposed_kinematics_records flag_in-built_monitors rotation_centre_x rotation_centre_y rotation_centre_z
-                                    ! imposed_kinematics_records(number of 
+surface_mesh_files flag_in-built_monitors ! surface_mesh_files: number of files 
+                                          ! of the DBSPH surface meshes;
+                                          ! flag_in-built_monitors(logical):   
+                                          ! flag for in-built motion of control   
+                                          ! lines and DB-SPH frontiers;
+! do i=1,surface_mesh_file
+imposed_kinematics_i_records rotation_centre_i_x rotation_centre_i_y rotation_centre_i_z
+                                    ! imposed_kinematics_i_records(number of 
                                     ! records, which describe a possible imposed
-                                    ! kinematics); 
-                                    ! flag_in-built_monitors(logical): flag for 
-                                    ! in-built motion of control lines and 
-                                    ! DB-SPH frontiers;
-                                    ! rotation_centre: centre of rotation for 
-                                    ! DB-SPH frontiers
-! if (imposed_kinematics_records==1): start
-time_1 velocity_x_1 velocity_x_1 velocity_x_1 omega_x_1 omega_y_1 omega_z_1 
+                                    ! kinematics for the i-th DBSPH surface 
+                                    ! mesh file); 
+                                    ! rotation_centre_1: centre of rotation for 
+                                    ! DB-SPH frontiers for the i-th DBSPH  
+                                    ! surface mesh file)
+! if (imposed_kinematics_i_records>0): start
+i_time_1 i_velocity_x_1 i_velocity_y_1 i_velocity_z_1 i_omega_x_1 i_omega_y_1 i_omega_z_1 
 ! ...                               ! other possible  records
-time_last velocity_x_last velocity_x_last velocity_x_last omega_x_last omega_y_last omega_z_last
+i_time_last i_velocity_x_last i_velocity_y_last i_velocity_z_last i_omega_x_last i_omega_y_last i_omega_z_last
                                     ! (records for the imposed translational 
-                                    ! kinematics to frontiers)
-! if (imposed_kinematics_records==1): end
+                                    ! kinematics to frontiers for the i-th  
+                                    ! DBSPH surface mesh file)
+! if (imposed_kinematics_i_records>0): end
+! enddo
 n_inlet n_outlet ply_n_face_vert    ! n_inlet(number of inlet sections)
                                     ! n_outlet(number of outlet sections)
-                                    ! ply_n_face_vert(number of vertices of the 
-                                    ! DB-SPH faces as represented in the ".ply"
-                                    ! input files(3 in 3D,4 in 2D).
+                                    ! ply_n_face_vert(maximum number of vertices  
+                                    ! of the DB-SPH faces as represented in the 
+                                    ! ".ply" input files(3/4/5/6 in 3D, 4 in 2D)
 ! if (n_inlet>1): start
 x_inlet_1 y_inlet_1 z_inlet_1 n_x_inlet_1 n_y_inlet_1 n_z_inlet_1 velocity_x_inlet_1 velocity_y_inlet_1 velocity_z_inlet_1 L_inlet_1
 ...                                 ! (other possible records)
