@@ -45,7 +45,7 @@ integer(4),dimension(20) :: NumberEntities
 character(len=lencard) :: nomsub = "GEST_INPUT"
 character(len=lencard) :: ainp,msg_err
 character(10), external :: ltrim
-character(80), external :: lcase
+character(100), external :: lcase
 !------------------------
 ! Explicit interfaces
 !------------------------

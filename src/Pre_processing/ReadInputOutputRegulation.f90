@@ -38,14 +38,14 @@ implicit none
 type (TyMedium), dimension(NMedium) :: Med
 integer(4) :: nrighe,ier, ninp,nout
 character(1) :: comment
-character(80) :: ainp
+character(100) :: ainp
 integer(4) :: iplot_fr,imemo_fr,irest_fr,icpoi_fr,ipllb_fr,ipllb_md,n,ioutopt
 integer(4) :: ioutpo2,ioerr
 double precision :: plot_fr,memo_fr,rest_fr,cpoi_fr,pllb_fr,depth_dt_out
-character(80) :: token
+character(100) :: token
 character(7),dimension(3) :: outopt = (/ "full   ","partial","null   " /)
 logical,external :: ReadCheck
-character(80),external :: GetToken,lcase
+character(100),external :: GetToken,lcase
 !------------------------
 ! Explicit interfaces
 !------------------------

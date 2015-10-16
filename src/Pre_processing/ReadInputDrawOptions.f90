@@ -37,11 +37,11 @@ use Hybrid_allocation_module
 implicit none
 integer(4) :: nrighe,ier, ninp,nout
 character(1) :: comment
-character(80) :: ainp
+character(100) :: ainp
 character(4) :: steptime
 integer(4) :: ioerr
-character(80) :: token
-character(80),external :: lcase, GetToken
+character(100) :: token
+character(100),external :: lcase, GetToken
 logical,external :: ReadCheck
 !------------------------
 ! Explicit interfaces

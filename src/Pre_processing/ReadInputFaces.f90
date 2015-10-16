@@ -40,12 +40,12 @@ integer(4) :: nrighe,ier, ninp,nout
 logical(4) :: prtopt
 integer(4),dimension(20) :: NumberEntities
 character(1) :: comment
-character(80) :: ainp
+character(100) :: ainp
 integer(4) :: n,i,ioerr,stretch
 integer(4),dimension(4) :: ivalues
 character(8) :: label
 logical,external :: ReadCheck
-character(80),external :: lcase, GetToken
+character(100),external :: lcase, GetToken
 !------------------------
 ! Explicit interfaces
 !------------------------

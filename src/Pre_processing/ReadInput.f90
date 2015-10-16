@@ -39,14 +39,14 @@ use Dynamic_allocation_module
 implicit none
 logical :: OnlyTriangle
 integer(4) :: ier
-character(80) :: ainp
+character(100) :: ainp
 integer(4),dimension(20)    :: NumberEntities
 logical :: restartOK
 integer(4) :: ioerr,nrighe,ioutpo2,iplot_fr,imemo_fr,irest_fr,icpoi_fr,ipllb_fr
 integer(4) :: ipllb_md,ioutopt
 double precision :: plot_fr,memo_fr,rest_fr,cpoi_fr,pllb_fr
 character(1) :: comment = "!"
-character(80),external :: lcase, GetToken
+character(100),external :: lcase, GetToken
 logical,external :: ReadCheck
 !------------------------
 ! Explicit interfaces
@@ -148,9 +148,9 @@ SECTION_LOOP: do while (ioerr==0)
          call ReadInputControlSections(NumberEntities,Control_Sections,ainp,   &
             comment,nrighe,ier,ninp,nout)
       case("##### section flow rate #####")
-         call ReadSectionFlowRate (ainp,comment,nrighe,ier,ninp,nout)
+         call ReadSectionFlowRate(ainp,comment,nrighe,ier,ninp,nout)
       case("##### draw options #####")
-         call ReadInputDrawOptions (ainp,comment,nrighe,ier,ninp,nout)
+         call ReadInputDrawOptions(ainp,comment,nrighe,ier,ninp,nout)
       case default 
         ier = 1
    end select

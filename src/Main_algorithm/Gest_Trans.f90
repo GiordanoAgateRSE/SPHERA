@@ -46,7 +46,7 @@ character(len=200)     :: cargo
 double precision,dimension(:),allocatable :: verticecolore
 logical,external :: check_files2
 integer(4),external :: stepdata
-character(80), external :: lcase
+character(100), external :: lcase
 !------------------------
 ! Explicit interfaces
 !------------------------

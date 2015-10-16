@@ -36,9 +36,9 @@ use Static_allocation_module
 implicit none
 integer(4) :: nrighe,ier,ninp,nout
 character(1) :: comment
-character(80) :: ainp
+character(100) :: ainp
 integer(4) :: n,ioerr
-character(80),external :: lcase
+character(100),external :: lcase
 logical,external :: ReadCheck
 !------------------------
 ! Explicit interfaces

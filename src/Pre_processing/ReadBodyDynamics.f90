@@ -44,7 +44,7 @@ double precision :: L_geom(3),x_CM(3),alfa(3),u_CM(3),omega(3),x_rotC(3)
 double precision :: mass_deact(6)
 double precision :: Ic(3,3)
 character(1) :: comment
-character(80) :: ainp,lcase !,token,GetToken
+character(100) :: ainp,lcase !,token,GetToken
 logical,external :: ReadCheck
 !------------------------
 ! Explicit interfaces

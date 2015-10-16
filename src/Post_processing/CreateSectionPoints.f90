@@ -43,7 +43,7 @@ character(1) :: opt
 integer(4) :: i,j,k,n,npse
 integer(4),dimension(3) :: Nmesh
 double precision,dimension(3) :: Cc,CcStart
-character(80), external :: lcase
+character(100), external :: lcase
 !------------------------
 ! Explicit interfaces
 !------------------------

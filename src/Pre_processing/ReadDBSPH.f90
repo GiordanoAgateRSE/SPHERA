@@ -44,7 +44,7 @@ integer(4) :: ioerr,n_monitor_points,n_monitor_regions,i,alloc_stat
 integer(4) :: dealloc_stat,j,n_inlet,n_outlet
 integer(4) :: ply_n_face_vert,surface_mesh_files
 double precision :: dx_dxw,k_w
-character(80) :: lcase
+character(100) :: lcase
 integer(4) :: n_kinematics_records(100)
 integer(4),allocatable,dimension(:) :: monitor_IDs
 double precision :: monitor_region(6)           

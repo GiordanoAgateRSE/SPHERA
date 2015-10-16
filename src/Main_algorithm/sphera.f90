@@ -41,7 +41,7 @@ integer(4) :: ier,i,n,narg
 double precision :: starttime,endtime
 character(len=255) :: nomearg
 character(len=lencard) :: nomsub = "Sphera"
-character(80),external :: lcase
+character(100),external :: lcase
 double precision,external :: omp_get_wtime
 !------------------------
 ! Explicit interfaces

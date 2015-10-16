@@ -37,15 +37,15 @@ use Hybrid_allocation_module
 implicit none
 integer(4) :: nrighe,ier,ninp,nout,nscr
 character(1) :: comment
-character(80) :: ainp
+character(100) :: ainp
 integer(4) :: itmax
 double precision :: tmax,CFL,TetaP,TetaV,COEFNMAXPARTJ,COEFNMAXPARTI
 integer(4) :: ioerr,time_split,RKscheme,body_part_reorder,MAXCLOSEBOUNDFACES
 integer(4) :: MAXNUMCONVEXEDGES,GCBFVecDim_loc,density_thresholds
 character(1) :: Psurf
-character(80) :: token
+character(100) :: token
 logical,external :: ReadCheck
-character(80),external :: lcase, GetToken
+character(100),external :: lcase, GetToken
 !------------------------
 ! Explicit interfaces
 !------------------------

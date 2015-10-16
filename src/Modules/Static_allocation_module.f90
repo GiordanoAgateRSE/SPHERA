@@ -169,6 +169,6 @@ character(255) :: nomefileerr ! File name for error file in erosion model
 character(8) :: modelloerosione ! type of erosion criterion (shields, mohr)
 ! "original" or "euristic"
 character(len=8) :: dt_opt = "original" 
-character(80),dimension(MAXTIT) :: title  
+character(100),dimension(MAXTIT) :: title  
 end module
 

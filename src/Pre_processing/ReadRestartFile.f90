@@ -44,7 +44,7 @@ double precision :: save_start
 character(12) :: ainp = "Restart File"
 character(len=8) :: versionerest
 logical,external :: ReadCheck
-character(80),external :: lcase
+character(100),external :: lcase
 !------------------------
 ! Explicit interfaces
 !------------------------

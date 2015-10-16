@@ -40,16 +40,16 @@ integer(4) :: nrighe,ier,ninp,nout,npts
 integer(4),dimension(20) :: NumberEntities
 type (TySection),dimension(0:Nsections+1) :: Control_Sections
 character(1) :: comment
-character(80) :: ainp
+character(100) :: ainp
 integer(4) :: icord,icor2,icor3,icolor,ndiv,ioerr
 double precision,dimension(3) :: vp
 character(8) :: label
-character(80) :: token
+character(100) :: token
 character(1),dimension(3) :: CoordLabel = (/ "x", "y", "z" /)
 double precision,dimension(3,2) :: values
 logical,external :: ReadCheck
 integer(4),external :: NumberSectionPoints
-character(80),external :: lcase, GetToken
+character(100),external :: lcase, GetToken
 !------------------------
 ! Explicit interfaces
 !------------------------
