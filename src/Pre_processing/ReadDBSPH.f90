@@ -24,8 +24,7 @@
 ! Program unit: ReadDBSPH                    
 ! Description: Reading input data for the DB-SPH boundary treatment scheme (Amicarelli et al., 2013, IJNME).                   
 !----------------------------------------------------------------------------------------------------------------------------------
-
-subroutine ReadDBSPH (ainp,comment,nrighe,ier,ninp,nout)
+subroutine ReadDBSPH(ainp,comment,nrighe,ier,ninp,nout)
 !------------------------
 ! Modules
 !------------------------ 

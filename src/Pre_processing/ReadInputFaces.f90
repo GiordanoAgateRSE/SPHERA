@@ -72,7 +72,7 @@ do while (TRIM(lcase(ainp))/="##### end faces #####")
    select case (TRIM(Domain%tipo))
       case ("semi","bsph") 
          ivalues = 0
-! ivalues(4) is the 4-th vertex (null in case of trinagles)
+! ivalues(4) is the 4-th vertex (null in case of triangles)
          read(ainp,*,iostat=ioerr) i,ivalues,stretch  
          write(label,"(i8)") i
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"FACE n."//label,ninp,nout)) &

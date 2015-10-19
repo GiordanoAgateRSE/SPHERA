@@ -24,8 +24,7 @@
 ! Program unit: ModifyFaces                   
 ! Description: To generate triangles from quadrilaterals (partitioning along the shortest diagonal)                 
 !----------------------------------------------------------------------------------------------------------------------------------
-
-subroutine ModifyFaces (NumberEntities)
+subroutine ModifyFaces(NumberEntities)
 !------------------------
 ! Modules
 !------------------------ 

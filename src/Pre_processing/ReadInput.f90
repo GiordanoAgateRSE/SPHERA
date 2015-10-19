@@ -24,7 +24,6 @@
 ! Program unit: ReadInput                    
 ! Description: Reading input data.                    
 !----------------------------------------------------------------------------------------------------------------------------------
-
 subroutine ReadInput(NumberEntities,OnlyTriangle,ier,ainp)
 !------------------------
 ! Modules
@@ -46,7 +45,7 @@ integer(4) :: ioerr,nrighe,ioutpo2,iplot_fr,imemo_fr,irest_fr,icpoi_fr,ipllb_fr
 integer(4) :: ipllb_md,ioutopt
 double precision :: plot_fr,memo_fr,rest_fr,cpoi_fr,pllb_fr
 character(1) :: comment = "!"
-character(100),external :: lcase, GetToken
+character(100),external :: lcase,GetToken
 logical,external :: ReadCheck
 !------------------------
 ! Explicit interfaces
@@ -96,9 +95,10 @@ SECTION_LOOP: do while (ioerr==0)
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 ! If EOF is reached, then exit, otherwise to check the error code
    if (ioerr==-1) cycle SECTION_LOOP
-   if (.NOT.ReadCheck (ioerr,ier,nrighe,ainp,"INPUT DATA",ninp,nout)) return
+   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"INPUT FILE SECTIONS",ninp,nout))  &
+      return
    if (ncord>0) write(nout,"(//,1x,a,/)") lcase(ainp) 
-   select case(TRIM(lcase(trim(ainp))))
+   select case(trim(lcase(trim(ainp))))
       case("##### title #####")
          call ReadInputTitle(ainp,comment,nrighe,ier,ninp,nout)
       case("##### restart #####")
@@ -130,7 +130,7 @@ SECTION_LOOP: do while (ioerr==0)
          call ReadDBSPH(ainp,comment,nrighe,ier,ninp,nout)
       case("##### boundaries #####")
          call ReadInputBoundaries(NumberEntities,Partz,Tratto,BoundaryVertex,  &
-            ainp,comment,nrighe,ier, ninp,nout)
+            ainp,comment,nrighe,ier,ninp,nout)
       case("##### run parameters #####")
          call ReadInputRunParameters (ainp,comment,nrighe,ier,ninp,nout,nscr)
       case("##### general physical properties #####")
