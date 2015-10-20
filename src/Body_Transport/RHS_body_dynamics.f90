@@ -57,6 +57,20 @@ double precision, external :: Gamma_boun
 !------------------------
 ! Explicit interfaces
 !------------------------
+interface
+   subroutine point_inout_polygon(point,n_sides,point_pol_1,point_pol_2,       &
+                                  point_pol_3,point_pol_4,point_pol_5,         &
+                                  point_pol_6,test)
+      implicit none
+      integer(4),intent(in) :: n_sides
+      double precision,intent(in) :: point(2),point_pol_1(2),point_pol_2(2)
+      double precision,intent(in) :: point_pol_3(2),point_pol_4(2)
+      double precision,intent(in) :: point_pol_5(2),point_pol_6(2)
+      integer(4),intent(inout) :: test
+      double precision :: dis1,dis2
+      double precision :: normal(2)
+   end subroutine point_inout_polygon
+end interface
 !------------------------
 ! Allocations
 !------------------------
@@ -237,10 +251,12 @@ do npi=1,n_body_part
                   endif
                   call reference_system_change(bp_arr(npi)%pos,                &
                      BoundaryFace(j)%Node(4)%GX,aux_mat,loc_pos)
-                  call point_inout_polygone(loc_pos(1:2),                      &
+                  call point_inout_polygon(loc_pos(1:2),                       &
                      BoundaryFace(j)%nodes,BoundaryFace(j)%Node(1)%LX(1:2),    &
                      BoundaryFace(j)%Node(2)%LX(1:2),                          &
                      BoundaryFace(j)%Node(3)%LX(1:2),                          &
+                     BoundaryFace(j)%Node(4)%LX(1:2),                          &
+                     BoundaryFace(j)%Node(4)%LX(1:2),                          &
                      BoundaryFace(j)%Node(4)%LX(1:2),test)
                   if ((r_per>0.d0).and.(r_per<=(2.d0*Domain%h)).and.           &
                      (test==1) ) then     

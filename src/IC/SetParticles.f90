@@ -24,7 +24,6 @@
 ! Program unit: SetParticles     
 ! Description: Particle coordinates (initial conditions).                
 !----------------------------------------------------------------------------------------------------------------------------------
-
 subroutine SetParticles(Nt,Nz,mate,Xmin,npps,NumParticles,IsopraS)
 !------------------------
 ! Modules
@@ -38,10 +37,10 @@ use I_O_diagnostic_module
 ! Declarations
 !------------------------
 implicit none
-integer(4),intent(IN):: Nt, Nz, mate
-integer(4),intent(IN), dimension(SPACEDIM) :: npps
-double precision,intent(IN), dimension(SPACEDIM) :: Xmin
-integer(4),intent(INOUT) :: NumParticles, IsopraS
+integer(4),intent(in):: Nt,Nz,mate
+integer(4),intent(in) :: npps(SPACEDIM)
+double precision,intent(in) :: Xmin(SPACEDIM)
+integer(4),intent(inout) :: NumParticles,IsopraS
 logical :: particellainterna
 integer(4) :: i,j,k,iaux,test,Nz_aux,nag_aux
 double precision :: aux1,aux2,aux3,rnd,tstop
@@ -62,10 +61,10 @@ logical,external :: IsParticleInternal3D,IsParticleInternal2D
 !------------------------
 if (nagpg>0) then
 ! To compute "time stop" for particles of type "law"
-   call stoptime (partz(Nz),tstop)
+   call stoptime(partz(Nz),tstop)
 ! To compute velocity for particles of type "law"
-   call vellaw (partz(Nz)%vlaw,Partz(Nz)%vel,Partz(Nz)%npointv)
-end if
+   call vellaw(partz(Nz)%vlaw,Partz(Nz)%vel,Partz(Nz)%npointv)
+endif
 if (Domain%tipo=="bsph") then
    if (ncord==3) then
       aux1 = + 0.25d0 * Domain%dd
@@ -82,7 +81,7 @@ if (Domain%tipo=="bsph") then
       aux3 = - Domain%dd * half
 endif
 PX(1) = Xmin(1) + aux1
-! In case the zone is declared but is not used.
+! In case the zone is declared, but not used.
 if (npps(1)<0) return
 ! Loop over the X direction.
 do i=1,(npps(1)-iaux)
@@ -101,8 +100,8 @@ do i=1,(npps(1)-iaux)
             particellainterna = IsParticleInternal2D(Nt,PX)
             else 
                 particellainterna = IsParticleInternal3D(Nt,PX,IsopraS)
-         end if
-! In case the particle is inside the domain
+         endif
+! In case the particle is inside the zone
          if (particellainterna) then
 ! the zone counter is increased
             NumParticles = NumParticles + 1
@@ -111,7 +110,7 @@ do i=1,(npps(1)-iaux)
             test = 0
             do Nz_aux=1,NPartZone
                if (Partz(Nz_aux)%IC_source_type==2) test = 1
-            end do 
+            enddo 
             if (test==0) then
                nag = nag + 1 
 ! To check the storage for the reached number of particles
@@ -134,7 +133,7 @@ do i=1,(npps(1)-iaux)
                                       Domain%dd
                else
                   pg(nag_aux)%coord = PX
-            end if
+            endif
             pg(nag_aux)%CoordOld = pg(nag_aux)%coord
 ! Setting Particle Parameters
             if (test==0) then
@@ -146,8 +145,8 @@ do i=1,(npps(1)-iaux)
             if ((Domain%tipo=="bsph").and.                                     &
                (Partz(pg(nag_aux)%izona)%tipo=="sour"))                        &
                call wavy_inlet(Partz(pg(nag_aux)%izona))
-         end if 
-      end do
+         endif 
+      enddo
    enddo
 enddo
 !------------------------

@@ -22,11 +22,13 @@
 
 !----------------------------------------------------------------------------------------------------------------------------------
 ! Program unit: IsPointInternal  
-! Description: Checking wheather a point with local normal coordinates csi() is internal to a given face, whose code  
-!              is fk (=1 triangle, =2 parallelogram).
+! Description: Checking wheather a point with local normal coordinates csi(1:3) is internal to a given face, whose type code  
+!              is fk (=1 triangle, =2 quadrilateral), or not.
+!              This procedure is based on the subroutine "LocalNormalCoordinatesGiven". They will be replaced by the subroutine 
+!              "point_inout_polygon" (already available in SPHERA), which is more effective and can be applied
+!              to any polygon (it already works for triangles and quadrilaterals).
 !----------------------------------------------------------------------------------------------------------------------------------
-
-Logical Function IsPointInternal(fk,csi)
+logical function IsPointInternal(fk,csi)
 !------------------------
 ! Modules
 !------------------------ 
@@ -35,8 +37,9 @@ use Static_allocation_module
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: i,fk
-double precision, dimension(1:SPACEDIM) :: csi
+integer(4),intent(in) :: fk
+double precision,intent(in) :: csi(SPACEDIM)
+integer(4) :: i
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -46,7 +49,7 @@ double precision, dimension(1:SPACEDIM) :: csi
 !------------------------
 ! Initializations
 !------------------------
-IsPointInternal = .FALSE.
+IsPointInternal = .false.
 !------------------------
 ! Statements
 !------------------------
@@ -55,19 +58,19 @@ if (fk==1) then
    do i=1,3
      if (csi(i)<zero) return
      if (csi(i)>one) return
-   end do
-   IsPointInternal = .TRUE.
-   else if (fk==2) then
+   enddo
+   IsPointInternal = .true.
+   elseif (fk==2) then
 ! Quadrilateral 
       do i=1,2
          if (csi(i)<zero) return
          if (csi(i)>one) return
-      end do
-      IsPointInternal = .TRUE.
-end if
+      enddo
+      IsPointInternal = .true.
+endif
 !------------------------
 ! Deallocations
 !------------------------
 return
-end Function IsPointInternal
+end function IsPointInternal
 

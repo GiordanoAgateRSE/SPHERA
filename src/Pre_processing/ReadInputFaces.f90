@@ -24,7 +24,6 @@
 ! Program unit: ReadInputFaces                         
 ! Description:                        
 !----------------------------------------------------------------------------------------------------------------------------------
-
 subroutine ReadInputFaces(NumberEntities,ainp,comment,nrighe,ier,prtopt,ninp,nout)
 !------------------------
 ! Modules
@@ -42,7 +41,7 @@ integer(4),dimension(20) :: NumberEntities
 character(1) :: comment
 character(100) :: ainp
 integer(4) :: n,i,ioerr,stretch
-integer(4),dimension(4) :: ivalues
+integer(4) :: ivalues(MAXFACENODES)
 character(8) :: label
 logical,external :: ReadCheck
 character(100),external :: lcase, GetToken
@@ -109,9 +108,10 @@ if ((ncord>0).AND.(nout>0).AND.(prtopt)) then
    write(nout,*)
    write(nout,"(1x,a)") "List of faces:"
    do n=1,NumberEntities(11)
-      write(nout,"(i10,' - ',4i10,' - ',i8)") n,BoundaryFace(n)%Node(1)%name,  &
+      write(nout,"(i10,' - ',6i10,' - ',i8)") n,BoundaryFace(n)%Node(1)%name,  &
          BoundaryFace(n)%Node(2)%name,BoundaryFace(n)%Node(3)%name,            &
-         BoundaryFace(n)%Node(4)%name,BoundaryFace(n)%stretch
+         BoundaryFace(n)%Node(4)%name,BoundaryFace(n)%Node(5)%name,            &
+         BoundaryFace(n)%Node(6)%name,BoundaryFace(n)%stretch
    enddo
 endif
 !------------------------

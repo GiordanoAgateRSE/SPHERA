@@ -68,16 +68,19 @@ line_last_ID line_last_vertex_1 ... line_last_vertex_last line_last_Boundary_ID
 ! 3D input parameters for the boundary faces of the fluid domain
 ! 3D boundary faces for wall frontiers, inlet/outlet sections, fluid reservoirs.
 ! In case of DB-SPH boundary treatment scheme, the code requires the faces of 
-! the parallelepiped domain as a "perimeter" and the "air reservoirs".
+! the parallelepiped domain as a "perimeter" and the "fictitious reservoirs".
 ! In case of SA-SPH boundary treatment scheme, the code requires the 
-! the boundary faces
+! the actual boundary faces.
 ! Vertex list clockwise (normal vector exiting the frontier/domain; 
-! view from the semi-space of the normal vector): not the best convention
-! The last vertex ID is 0 in case of triangular faces
+! view from the semi-space of the normal vector): not the best convention.
+! The last 1/2/3 vertex IDs are 0 in case of pentagonal/quadrilateral/triangular
+! faces.
 ! SA-SPH boundary normal vectors and reservoir face normal vectors point inward
 ! (clockwise list of points if looking from outside the fluid domain). For 
 ! "perimeter" boundaries: the vertices have to be adjacent, but there is no rule
 ! about the vertex order (better anticlockwise).
+! Faces can only be triangles or rectangles. Only "perimeter" faces can also be 
+! quadrilateral, pentagons and hexagons.
 1 face_1_vertex_1 ... face_1_vertex last face_1_Boundary_ID
                                            ! first face data
 ...                                        ! other records 

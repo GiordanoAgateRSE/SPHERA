@@ -24,7 +24,6 @@
 ! Program unit: IsParticleInternal2D
 ! Description: To check whether a particle is internal to the 2D domain. 
 !----------------------------------------------------------------------------------------------------------------------------------
-
 logical function IsParticleInternal2D (Nt,PX)
 !------------------------
 ! Modules

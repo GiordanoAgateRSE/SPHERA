@@ -34,7 +34,7 @@ integer(4),public,parameter :: MAXOPENSIDES = 10
 integer(4),public,parameter :: MAXOPENFACES = 50
 integer(4),public,parameter :: MAXPARTLINE = 2000
 integer(4),public,parameter :: LIMCLOSEBOUNDSIDES = 2
-integer(4),public,parameter :: MAXFACENODES = 4
+integer(4),public,parameter :: MAXFACENODES = 6
 integer(4),public,parameter :: NUMCOLS_BIT = 5
 integer(4),public,parameter :: NUMROWS_BIT = 22
 integer(4),public,parameter :: INT_KERNELTABLE = 40
@@ -148,6 +148,7 @@ double precision :: doublesquareh ! doubleh * doubleh
 double precision :: cubich ! Domain%h*Domain%h*Domain%h
 double precision :: unosuh ! 1./Domain%h
 double precision :: unosusquareh ! 1./(Domain%h*Domain%h)
+
 double precision :: dx_dxbodies ! Ratio between fluid particle and body
                                 ! particle size 
 ! Indices of cells that must be considered around the current one 

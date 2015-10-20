@@ -22,11 +22,12 @@
 
 !----------------------------------------------------------------------------------------------------------------------------------
 ! Program unit: LocalNormalCoordinates  
-! Description: Given the local coordinates PX(1 to 2) of a point P laying on the plane of the boundary face nf, the procedure
-!              assigns to csi(1 to 3) the normal coordinates of the point Q corresponding to P in the inverse linear tranformation.  
+! Description: Given the local Cartesian coordinates PX(1:2) of a point P laying on the plane of the boundary face nf, this
+!              procedure assigns to csi(1:3) the non-Cartesian coordinates in a different local reference systems, whose axis are 
+!              aligned with the face sides. Scaling provides coordinate values to go from 0 to 1 for internal points. This 
+!              procedure applies for triangular faces and simplier works for rectangular faces (not for quadrilateral faces).   
 !----------------------------------------------------------------------------------------------------------------------------------
-
-subroutine LocalNormalCoordinates ( PX, csi, nf )
+subroutine LocalNormalCoordinates(PX,csi,nf)
 !------------------------
 ! Modules
 !------------------------ 
@@ -37,13 +38,13 @@ use Dynamic_allocation_module
 ! Declarations
 !------------------------
 implicit none
-integer(4),intent(IN) :: nf
-double precision,intent(IN), dimension(1:SPACEDIM) :: PX
-double precision,intent(INOUT),dimension(1:SPACEDIM) :: csi
+integer(4),intent(in) :: nf
+double precision,intent(in) :: PX(SPACEDIM)
+double precision,intent(inout) :: csi(SPACEDIM)
 integer(4) :: i,j,k,nodes,fkod
 double precision :: AA,BB,CC,DueArea,UsuDueArea,xj,yj,xk,yk
-integer(4), dimension(3)   :: iseg = (/ 2,3,1 /)
-integer(4), dimension(2,3) :: mainod 
+integer(4),dimension(3) :: iseg = (/ 2,3,1 /)
+integer(4) :: mainod(2,3)
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -53,14 +54,12 @@ integer(4), dimension(2,3) :: mainod
 !------------------------
 ! Initializations
 !------------------------
-! Modification for compatibility xlf90 (IBM compiler): start
 mainod(1,1) = 1
 mainod(1,2) = 2
 mainod(1,3) = 3
 mainod(2,1) = 1
 mainod(2,2) = 3
 mainod(2,3) = 4
-! Modification for compatibility xlf90 (IBM compiler): end
 nodes = 4
 if (BoundaryFace(nf)%Node(4)%name<=0) nodes = 3
 fkod = nodes - 2                    ! = 1 (triangle), =2 (quadrilateral)
@@ -80,7 +79,7 @@ do i=1,2
    BB = yj - yk
    CC = xk - xj
    csi(i) = (AA + BB * PX(1) + CC * PX(2)) * UsuDueArea
-end do
+enddo
 csi(3) = one - (csi(1) + csi(2))
 !------------------------
 ! Deallocations

@@ -21,12 +21,16 @@
 !----------------------------------------------------------------------------------------------------------------------------------
 
 !----------------------------------------------------------------------------------------------------------------------------------
-! Program unit: point_inout_polygone   
-! Description: Test to evaluate if a point lies inside or strictly outside a polygone (a triangle or a quadrilateral).      
+! Program unit: point_inout_polygon
+! Description: Test to evaluate if a point lies inside or strictly outside a polygon. A point is internal to the polygon if its 
+!              distances from the lines passing for the polygon sides (no matter about the number of sides, but they must be taken
+!              in either a clockwise or an anti-clockwise order), have all the same sign of a generic polygon vertex not belonging 
+!              to the selected side -a null distance is always a positive test for internal points-). The maximum number of polygon
+!              sides is now equal to 6 (triangles, quadrilaterals, pentagons and hexagons can be treated).   
 !----------------------------------------------------------------------------------------------------------------------------------
-
-subroutine point_inout_polygone(point,n_sides,point_pol_1,point_pol_2,         &
-                                point_pol_3,point_pol_4,test)
+subroutine point_inout_polygon(point,n_sides,point_pol_1,point_pol_2,          &
+                               point_pol_3,point_pol_4,point_pol_5,point_pol_6,&
+                               test)
 !------------------------
 ! Modules
 !------------------------ 
@@ -36,7 +40,8 @@ subroutine point_inout_polygone(point,n_sides,point_pol_1,point_pol_2,         &
 implicit none
 integer(4),intent(in) :: n_sides
 double precision,intent(in) :: point(2),point_pol_1(2),point_pol_2(2)
-double precision,intent(in) :: point_pol_3(2),point_pol_4(2)
+double precision,intent(in) :: point_pol_3(2),point_pol_4(2),point_pol_5(2)
+double precision,intent(in) :: point_pol_6(2)
 integer(4),intent(inout) :: test
 double precision :: dis1,dis2
 double precision :: normal(2)
@@ -63,46 +68,84 @@ if (dsign(dis1,dis2)/=(dis1)) then
                                                   point_pol_3,dis2,normal)
       if (dsign(dis1,dis2)/=(dis1)) then
          test = 0
-         else
-            if (n_sides==3) then
-               call distance_point_line_2D(point,point_pol_3,point_pol_1,      &
+         elseif (n_sides==3) then
+            call distance_point_line_2D(point,point_pol_3,point_pol_1,         &
+                                        dis1,normal)
+            if (dis1/=0.d0) call distance_point_line_2D(point_pol_2,           &
+                                                        point_pol_3,           &
+                                                        point_pol_1,dis2,      &
+                                                        normal) 
+            if (dsign(dis1,dis2)/=(dis1)) then
+               test = 0
+               else
+                  test = 1
+            endif
+            else
+               call distance_point_line_2D(point,point_pol_3,point_pol_4,      &
                                            dis1,normal)
-               if (dis1/=0.d0) call distance_point_line_2D(point_pol_2,        &
+               if (dis1/=0.d0) call distance_point_line_2D(point_pol_1,        &
                                                            point_pol_3,        &
-                                                           point_pol_1,dis2,   &
-                                                           normal) 
+                                                           point_pol_4,        &
+                                                           dis2,normal) 
                if (dsign(dis1,dis2)/=(dis1)) then
                   test = 0
-                  else
-                     test = 1
-               endif
-               else
-                  call distance_point_line_2D(point,point_pol_3,point_pol_4,   &
-                                              dis1,normal)
-                  if (dis1/=0.d0) call distance_point_line_2D(point_pol_1,     &
-                                                              point_pol_3,     &
-                                                              point_pol_4,     &
-                                                              dis2,normal) 
-                  if (dsign(dis1,dis2)/=(dis1)) then
-                     test = 0
+                  elseif (n_sides==4) then
+                     call distance_point_line_2D(point,point_pol_4,            &
+                                                 point_pol_1,dis1,normal)
+                     if (dis1/=0.d0) call distance_point_line_2D(              &
+                                        point_pol_2,point_pol_4,               &
+                                        point_pol_1,dis2,normal) 
+                     if (dsign(dis1,dis2)/=(dis1)) then
+                        test = 0
+                        else
+                           test = 1
+                     endif
                      else
                         call distance_point_line_2D(point,point_pol_4,         &
-                                                    point_pol_1,dis1,normal)
-                        if (dis1/=0.d0) call distance_point_line_2D(           &
-                                           point_pol_2,point_pol_4,            &
-                                           point_pol_1,dis2,normal) 
+                                                    point_pol_5,dis1,normal)
+                        if (dis1/=0.d0) call distance_point_line_2D            &
+                           (point_pol_1,point_pol_4,point_pol_5,dis2,normal) 
                         if (dsign(dis1,dis2)/=(dis1)) then
                            test = 0
-                           else
-                              test = 1
+                           elseif (n_sides==5) then
+                              call distance_point_line_2D(point,point_pol_5,   &
+                                                 point_pol_1,dis1,normal)
+                              if (dis1/=0.d0) call distance_point_line_2D      &
+                                 (point_pol_2,point_pol_5,point_pol_1,dis2,    &
+                                 normal) 
+                              if (dsign(dis1,dis2)/=(dis1)) then
+                                 test = 0
+                                 else
+                                    test = 1
+                              endif
+                              else
+                                 call distance_point_line_2D(point,point_pol_5,&
+                                                    point_pol_6,dis1,normal)
+                                 if (dis1/=0.d0) call distance_point_line_2D   &
+                                    (point_pol_1,point_pol_5,point_pol_6,dis2, &
+                                    normal) 
+                                 if (dsign(dis1,dis2)/=(dis1)) then
+                                    test = 0
+                                    else
+                                       call distance_point_line_2D             &
+                                          (point,point_pol_6,point_pol_1,dis1, &
+                                          normal)
+                                       if (dis1/=0.d0) call                    &
+                                          distance_point_line_2D(point_pol_2,  &
+                                          point_pol_6,point_pol_1,dis2,normal) 
+                                       if (dsign(dis1,dis2)/=(dis1)) then
+                                          test = 0
+                                          else
+                                             test = 1
+                                       endif 
+                                 endif
                         endif
-                  endif
-            endif
+               endif
       endif
 endif
 !------------------------
 ! Deallocations
 !------------------------
 return
-end subroutine point_inout_polygone
+end subroutine point_inout_polygon
 

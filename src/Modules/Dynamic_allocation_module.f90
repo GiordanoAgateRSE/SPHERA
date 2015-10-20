@@ -24,7 +24,6 @@
 ! Program unit: Dynamic_allocation_module           
 ! Description: Module to define dynamically allocated variables.                    
 !----------------------------------------------------------------------------------------------------------------------------------
-
 module Dynamic_allocation_module
 use Hybrid_allocation_module
 ! Vertice(3,n_vertices): array of the geometrical vertices
