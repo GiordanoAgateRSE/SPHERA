@@ -55,9 +55,13 @@ logical,external :: IsPointInternal
 ! Explicit interfaces
 !------------------------
 interface
-   subroutine point_inout_polygon(point,n_sides,point_pol_1,point_pol_2,       &
-                                  point_pol_3,point_pol_4,point_pol_5,         &
-                                  point_pol_6,test)
+   subroutine point_inout_convex_non_degenerate_polygon(point,n_sides,         &
+                                                        point_pol_1,           &
+                                                        point_pol_2,           &
+                                                        point_pol_3,           &
+                                                        point_pol_4,           &
+                                                        point_pol_5,           &
+                                                        point_pol_6,test)
       implicit none
       integer(4),intent(in) :: n_sides
       double precision,intent(in) :: point(2),point_pol_1(2),point_pol_2(2)
@@ -66,7 +70,31 @@ interface
       integer(4),intent(inout) :: test
       double precision :: dis1,dis2
       double precision :: normal(2)
-   end subroutine point_inout_polygon
+   end subroutine point_inout_convex_non_degenerate_polygon
+   subroutine point_inout_quadrilateral(point,point_pol_1,point_pol_2,         &
+                                        point_pol_3,point_pol_4,test)
+      implicit none
+      double precision,intent(in) :: point(2),point_pol_1(2),point_pol_2(2)
+      double precision,intent(in) :: point_pol_3(2),point_pol_4(2)
+      integer(4),intent(inout) :: test
+   end subroutine point_inout_quadrilateral
+   subroutine point_inout_pentagon(point,point_pol_1,point_pol_2,              &
+                                   point_pol_3,point_pol_4,point_pol_5,test)
+      implicit none
+      double precision,intent(in) :: point(2),point_pol_1(2),point_pol_2(2)
+      double precision,intent(in) :: point_pol_3(2),point_pol_4(2)
+      double precision,intent(in) :: point_pol_5(2)
+      integer(4),intent(inout) :: test
+   end subroutine point_inout_pentagon
+   subroutine point_inout_hexagon(point,point_pol_1,point_pol_2,               &
+                                  point_pol_3,point_pol_4,point_pol_5,         &
+                                  point_pol_6,test)
+      implicit none
+      double precision,intent(in) :: point(2),point_pol_1(2),point_pol_2(2)
+      double precision,intent(in) :: point_pol_3(2),point_pol_4(2)
+      double precision,intent(in) :: point_pol_5(2),point_pol_6(2)
+      integer(4),intent(inout) :: test
+   end subroutine point_inout_hexagon
 end interface
 !------------------------
 ! Allocations
@@ -126,10 +154,42 @@ do kf=Tratto(mib)%iniface,(Tratto(mib)%iniface+Tratto(mib)%numvertices-1)
       enddo
 ! If the face intercepts the vertical line passing for Px, it saves the 
 ! z-coordinate of the intersection point.
-      call point_inout_polygon(LPint,nnodes,BoundaryFace(nf)%Node(1)%LX(1:2),  &
-         BoundaryFace(nf)%Node(2)%LX(1:2),BoundaryFace(nf)%Node(3)%LX(1:2),    &
-         BoundaryFace(nf)%Node(4)%LX(1:2),BoundaryFace(nf)%Node(5)%LX(1:2),    &
-         BoundaryFace(nf)%Node(6)%LX(1:2),test)
+      test = 0
+      select case (nnodes)
+         case(3)
+            call point_inout_convex_non_degenerate_polygon(LPint,nnodes,       &
+               BoundaryFace(nf)%Node(1)%LX(1:2),                               &
+               BoundaryFace(nf)%Node(2)%LX(1:2),                               &
+               BoundaryFace(nf)%Node(3)%LX(1:2),                               &
+               BoundaryFace(nf)%Node(3)%LX(1:2),                               &
+               BoundaryFace(nf)%Node(3)%LX(1:2),                               &
+               BoundaryFace(nf)%Node(3)%LX(1:2),test)         
+         case(4)
+            call point_inout_quadrilateral(LPint,                              &
+                                           BoundaryFace(nf)%Node(1)%LX(1:2),   &
+                                           BoundaryFace(nf)%Node(2)%LX(1:2),   &
+                                           BoundaryFace(nf)%Node(3)%LX(1:2),   &
+                                           BoundaryFace(nf)%Node(4)%LX(1:2),   &
+                                           test)
+         case(5)
+            call point_inout_pentagon(LPint,BoundaryFace(nf)%Node(1)%LX(1:2),  &
+                                      BoundaryFace(nf)%Node(2)%LX(1:2),        &
+                                      BoundaryFace(nf)%Node(3)%LX(1:2),        &
+                                      BoundaryFace(nf)%Node(4)%LX(1:2),        &
+                                      BoundaryFace(nf)%Node(5)%LX(1:2),test)            
+         case(6)
+            call point_inout_hexagon(LPint,BoundaryFace(nf)%Node(1)%LX(1:2),   &
+                                     BoundaryFace(nf)%Node(2)%LX(1:2),         &
+                                     BoundaryFace(nf)%Node(3)%LX(1:2),         &
+                                     BoundaryFace(nf)%Node(4)%LX(1:2),         &
+                                     BoundaryFace(nf)%Node(5)%LX(1:2),         &
+                                     BoundaryFace(nf)%Node(6)%LX(1:2),test)
+         case default
+            write(*,*) "Run-time error at IsParticleInternal3D. The number ",  &
+               "of face vertices (nnodes) must be 3, 4, 5 or 6. "
+            write(*,*) "SPHERA stops here. "   
+            stop                                      
+      endselect
       if (test==1) then    
          Nints = Nints + 1
          XYInts(Nints) = Pint(3)

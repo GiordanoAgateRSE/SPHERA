@@ -53,9 +53,13 @@ type(TyParticle),dimension(:),allocatable    :: pg_aux
 ! Explicit interfaces
 !------------------------
 interface
-   subroutine point_inout_polygon(point,n_sides,point_pol_1,point_pol_2,       &
-                                  point_pol_3,point_pol_4,point_pol_5,         &
-                                  point_pol_6,test)
+   subroutine point_inout_convex_non_degenerate_polygon(point,n_sides,         &
+                                                        point_pol_1,           &
+                                                        point_pol_2,           &
+                                                        point_pol_3,           &
+                                                        point_pol_4,           &
+                                                        point_pol_5,           &
+                                                        point_pol_6,test)
       implicit none
       integer(4),intent(in) :: n_sides
       double precision,intent(in) :: point(2),point_pol_1(2),point_pol_2(2)
@@ -64,7 +68,7 @@ interface
       integer(4),intent(inout) :: test
       double precision :: dis1,dis2
       double precision :: normal(2)
-   end subroutine point_inout_polygon
+   end subroutine point_inout_convex_non_degenerate_polygon
 end interface
 !------------------------
 ! Allocations
@@ -158,8 +162,8 @@ second_cycle: do Nz=1,NPartZone
 ! Loops over Cartesian topography points
          do i_vertex=Partz(Nz)%ID_first_vertex,Partz(Nz)%ID_last_vertex
 ! Check if the vertex is inside the plan_reservoir     
-            call point_inout_polygon(Vertice(1:2,i_vertex),                    &
-               Partz(Nz)%plan_reservoir_points,                                &
+            call point_inout_convex_non_degenerate_polygon(                    &
+               Vertice(1:2,i_vertex),Partz(Nz)%plan_reservoir_points,          &
                Partz(Nz)%plan_reservoir_pos(1,1:2),                            &
                Partz(Nz)%plan_reservoir_pos(2,1:2),                            &
                Partz(Nz)%plan_reservoir_pos(3,1:2),                            &
@@ -215,7 +219,7 @@ second_cycle: do Nz=1,NPartZone
                            if (Tratto(BoundaryFace(i_face)%stretch)%zone==     &
                               Partz(Nz)%Car_top_zone) then  
 ! Test if the point lies inside the plan projection of the face     
-                              call point_inout_polygon(                        &
+                              call point_inout_convex_non_degenerate_polygon(  &
                                  pg_aux(NumParticles)%coord(1:2),              &
                                  BoundaryFace(i_face)%nodes,                   &
                                  BoundaryFace(i_face)%Node(1)%GX(1:2),         &
@@ -249,7 +253,7 @@ second_cycle: do Nz=1,NPartZone
                         test_dam = 0
                         if (Partz(Nz)%dam_zone_ID>0) then
 ! Test if the point lies inside the plan projection of the dam zone
-                           call point_inout_polygon(                           &
+                           call point_inout_convex_non_degenerate_polygon(     &
                               pg_aux(NumParticles)%coord(1:2),                 &
                               Partz(Nz)%dam_zone_n_vertices,                   &
                               Partz(Nz)%dam_zone_vertices(1,1:2),              &
@@ -271,9 +275,9 @@ second_cycle: do Nz=1,NPartZone
 ! top                                  
 if ((Tratto(BoundaryFace(i_face)%stretch)%zone==Partz(Nz)%dam_zone_ID).and.    &
                                        (BoundaryFace(i_face)%T(3,3)<0.)) then 
-! Test if the particle horizontal coordinates ly inside the horizontal 
+! Test if the particle horizontal coordinates lie inside the horizontal 
 ! projection of the face
-                                    call point_inout_polygon(                  &
+ call point_inout_convex_non_degenerate_polygon(                               &
                                        pg_aux(NumParticles)%coord(1:2),        &
                                        BoundaryFace(i_face)%nodes,             &
                                        BoundaryFace(i_face)%Node(1)%GX(1:2),   &

@@ -21,16 +21,18 @@
 !----------------------------------------------------------------------------------------------------------------------------------
 
 !----------------------------------------------------------------------------------------------------------------------------------
-! Program unit: point_inout_polygon
+! Program unit: point_inout_convex_non_degenerate_polygon
 ! Description: Test to evaluate if a point lies inside or strictly outside a polygon. A point is internal to the polygon if its 
 !              distances from the lines passing for the polygon sides (no matter about the number of sides, but they must be taken
 !              in either a clockwise or an anti-clockwise order), have all the same sign of a generic polygon vertex not belonging 
 !              to the selected side -a null distance is always a positive test for internal points-). The maximum number of polygon
-!              sides is now equal to 6 (triangles, quadrilaterals, pentagons and hexagons can be treated).   
+!              sides is now equal to 6 (triangles, quadrilaterals, pentagons and hexagons can be treated).
+!              Polygons must be convex and non-degenerate (a n-side polygon should have n vertices, not more).   
 !----------------------------------------------------------------------------------------------------------------------------------
-subroutine point_inout_polygon(point,n_sides,point_pol_1,point_pol_2,          &
-                               point_pol_3,point_pol_4,point_pol_5,point_pol_6,&
-                               test)
+subroutine point_inout_convex_non_degenerate_polygon(point,n_sides,point_pol_1,&
+                                                     point_pol_2,point_pol_3,  &
+                                                     point_pol_4,point_pol_5,  &
+                                                     point_pol_6,test)
 !------------------------
 ! Modules
 !------------------------ 
@@ -147,5 +149,5 @@ endif
 ! Deallocations
 !------------------------
 return
-end subroutine point_inout_polygon
+end subroutine point_inout_convex_non_degenerate_polygon
 

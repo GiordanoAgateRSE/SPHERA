@@ -25,8 +25,8 @@
 ! Description: Checking wheather a point with local normal coordinates csi(1:3) is internal to a given face, whose type code  
 !              is fk (=1 triangle, =2 quadrilateral), or not.
 !              This procedure is based on the subroutine "LocalNormalCoordinatesGiven". They will be replaced by the subroutine 
-!              "point_inout_polygon" (already available in SPHERA), which is more effective and can be applied
-!              to any polygon (it already works for triangles and quadrilaterals).
+!              "point_inout_convex_non_degenerate_polygon" (already available in SPHERA), which is more effective and can be 
+!              applied to any polygon (it already works for triangles and quadrilaterals).
 !----------------------------------------------------------------------------------------------------------------------------------
 logical function IsPointInternal(fk,csi)
 !------------------------

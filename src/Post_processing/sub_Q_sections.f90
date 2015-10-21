@@ -47,9 +47,13 @@ integer(4), allocatable, dimension(:) :: n_particles
 ! Explicit interfaces
 !------------------------
 interface
-   subroutine point_inout_polygon(point,n_sides,point_pol_1,point_pol_2,       &
-                                  point_pol_3,point_pol_4,point_pol_5,         &
-                                  point_pol_6,test)
+   subroutine point_inout_convex_non_degenerate_polygon(point,n_sides,         &
+                                                        point_pol_1,           &
+                                                        point_pol_2,           &
+                                                        point_pol_3,           &
+                                                        point_pol_4,           &
+                                                        point_pol_5,           &
+                                                        point_pol_6,test)
       implicit none
       integer(4),intent(in) :: n_sides
       double precision,intent(in) :: point(2),point_pol_1(2),point_pol_2(2)
@@ -58,7 +62,7 @@ interface
       integer(4),intent(inout) :: test
       double precision :: dis1,dis2
       double precision :: normal(2)
-   end subroutine point_inout_polygon
+   end subroutine point_inout_convex_non_degenerate_polygon
 end interface
 !------------------------
 ! Allocations
@@ -161,8 +165,8 @@ if (it_corrente==1) then
                      Q_sections%section(i_sect)%vertex(1,:),                   &
                      Q_sections%section(i_sect)%loc_axis,P_intersection_loc) 
 ! Check if the intersection point lies within the section
-                  call point_inout_polygon(P_intersection_loc,                 &
-                     Q_sections%section(i_sect)%n_vertices,                    &
+                  call point_inout_convex_non_degenerate_polygon(              &
+                     P_intersection_loc,Q_sections%section(i_sect)%n_vertices, &
                      Q_sections%section(i_sect)%vertex_loc(1,:),               &
                      Q_sections%section(i_sect)%vertex_loc(2,:),               &
                      Q_sections%section(i_sect)%vertex_loc(3,:),               &
