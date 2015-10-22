@@ -59,9 +59,9 @@ nindex(2, 1) = 1
 nindex(2, 2) = 3
 nindex(2, 3) = 4
 nnodes = 6
-if (BoundaryFace(nf)%Node(6)%name<=0) nnodes = 5
-if (BoundaryFace(nf)%Node(5)%name<=0) nnodes = 4
-if (BoundaryFace(Nf)%Node(4)%name<=0) nnodes = 3
+if (BoundaryFace(nf)%Node(6)%name<0) nnodes = 5
+if (BoundaryFace(nf)%Node(5)%name<0) nnodes = 4
+if (BoundaryFace(Nf)%Node(4)%name<0) nnodes = 3
 BoundaryFace(Nf)%nodes = nnodes
 !------------------------
 ! Statements

@@ -61,7 +61,7 @@ mainod(2,1) = 1
 mainod(2,2) = 3
 mainod(2,3) = 4
 nodes = 4
-if (BoundaryFace(nf)%Node(4)%name<=0) nodes = 3
+if (BoundaryFace(nf)%Node(4)%name<0) nodes = 3
 fkod = nodes - 2                    ! = 1 (triangle), =2 (quadrilateral)
 DueArea = (3 - fkod) * BoundaryFace(nf)%Area
 UsuDueArea = one / DueArea
