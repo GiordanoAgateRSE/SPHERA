@@ -2,8 +2,8 @@
 VERSION = 8_0_AA
 #    bin, debug
 EXECUTION = debug
-#    -O1 (run), -g -O0 -fbacktrace -C (gfortran debug),
-#    -g -O0 -traceback -C -check bounds -debug all (ifort debug)
+#    -O1 (bin), -g -O0 -fbacktrace -C (gfortran debug),
+#    -g -O0 -traceback -C -check bounds -check noarg_temp_created -debug all (ifort debug)
 COMPILATION_FLAGS = -g -O0 -fbacktrace -C
 #    gfortran, ifort
 COMPILER = gfortran

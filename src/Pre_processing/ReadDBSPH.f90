@@ -108,7 +108,8 @@ do while (TRIM(lcase(ainp))/="##### end dbsph #####")
          return  
       do i=1,surface_mesh_files
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         read(ainp,*,iostat=ioerr) n_kinematics_records(i),rotation_centre(i,:)
+         read(ainp,*,iostat=ioerr) n_kinematics_records(i),                    &
+            rotation_centre(i,1:3)
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DBSPH_KINEMATICS",ninp,nout &
             )) return  
          if (.not.(allocated(DBSPH%kinematics))) then
@@ -127,7 +128,7 @@ do while (TRIM(lcase(ainp))/="##### end dbsph #####")
          endif  
          do j=1,n_kinematics_records(i)
             call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-            read(ainp,*,iostat=ioerr) DBSPH%kinematics(i,j,:)  
+            read(ainp,*,iostat=ioerr) DBSPH%kinematics(i,j,1:7)  
             if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DBSPH_KINEMATICS_RECORDS"&
                ,ninp,nout)) return            
          enddo
@@ -212,11 +213,11 @@ do while (TRIM(lcase(ainp))/="##### end dbsph #####")
          write(nout,"(1x,a,1p,i12)")                                           &
 "n_kinematics_records............",n_kinematics_records(j) 
          write(nout,"(1x,a,1p,3(g12.4))")                                      &
-"rotation_centre:................",rotation_centre(j,:) 
+"rotation_centre:................",rotation_centre(j,1:3) 
          do i=1,n_kinematics_records(j)
             write(nout,"(1x,a,1p,7(g12.4))")                                   &
 "time(s),u(m/s),v(m/s),w(m/s),omega_x(rad/s),omega_y(rad/s),omega_z(rad/s):..."&
-               ,DBSPH%kinematics(j,i,:)        
+               ,DBSPH%kinematics(j,i,1:7)        
          enddo
       enddo 
       write(nout,"(1x,a,i12)")                                                 &
