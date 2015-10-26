@@ -187,10 +187,10 @@ do while (TRIM(lcase(ainp))/="##### end boundaries #####")
             write(nout,*)                                                      &
 'TRAMPA in SOURCE boundary is not available. TRAMPA is setted to zero; check the VELOCITY boundary.'
             write(nout,*) ' '
-            write(*,*) ' '
-            write(*,*)                                                         &
+            write(nout,*) ' '
+            write(nout,*)                                                         &
 'TRAMPA in SOURCE boundary is not available. TRAMPA is setted to zero;  check the VELOCITY boundary.'
-            write(*,*) ' '
+            write(nout,*) ' '
             trampa = zero
          endif
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)

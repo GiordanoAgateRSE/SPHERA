@@ -1,14 +1,14 @@
 # Variables to be updated 
 VERSION = 8_0_AA
 #    bin, debug
-EXECUTION = debug
+EXECUTION = bin
 #    -O1 (bin), -g -O0 -fbacktrace -C (gfortran debug),
 #    -g -O0 -traceback -C -check bounds -check noarg_temp_created -debug all (ifort debug)
-COMPILATION_FLAGS = -g -O0 -fbacktrace -C
+COMPILATION_FLAGS = -O1
 #    gfortran, ifort
-COMPILER = gfortran
+COMPILER = ifort
 #    -fopenmp, -openmp, (blank for debug)  
-OMP_FLAG = 
+OMP_FLAG = -openmp
 EXE_DIR = ../$(EXECUTION)/
 SOURCES = \
 ./Modules/Static_allocation_module.f90 \

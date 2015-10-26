@@ -35,6 +35,7 @@ logical function IsParticleInternal3D(mib,PX,IsopraS)
 use Static_allocation_module
 use Hybrid_allocation_module
 use Dynamic_allocation_module
+use I_O_file_module
 !------------------------
 ! Declarations
 !------------------------
@@ -185,9 +186,8 @@ do kf=Tratto(mib)%iniface,(Tratto(mib)%iniface+Tratto(mib)%numvertices-1)
                                      BoundaryFace(nf)%Node(5)%LX(1:2),         &
                                      BoundaryFace(nf)%Node(6)%LX(1:2),test)
          case default
-            write(*,*) "Run-time error at IsParticleInternal3D. The number ",  &
-               "of face vertices (nnodes) must be 3, 4, 5 or 6. "
-            write(*,*) "SPHERA stops here. "   
+            write(nscr,*) "Run-time error at IsParticleInternal3D. The number",&
+               " of face vertices (nnodes) must be 3, 4, 5 or 6. SPHERA stops. "   
             stop                                      
       endselect
       if (test==1) then    
