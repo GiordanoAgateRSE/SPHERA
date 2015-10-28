@@ -1,11 +1,10 @@
 !----------------------------------------------------------------------------------------------------------------------------------
 ! SPHERA (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
-! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-; SPHERA has been authored for RSE SpA by 
-!    Andrea Amicarelli, Antonio Di Monaco, Sauro Manenti, Elia Bon, Daria Gatti, Giordano Agate, Stefano Falappi, 
-!    Barbara Flamini, Roberto Guandalini, David Zuccalà).
-! Main numerical developments of SPHERA: 
-!    Amicarelli et al. (2015,CAF), Amicarelli et al. (2013,IJNME), Manenti et al. (2012,JHE), Di Monaco et al. (2011,EACFM). 
-! Email contact: andrea.amicarelli@rse-web.it
+! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-)
+
+
+
+! SPHERA authors and email contact are provided on SPHERA documentation.
 
 ! This file is part of SPHERA.
 ! SPHERA is free software: you can redistribute it and/or modify
