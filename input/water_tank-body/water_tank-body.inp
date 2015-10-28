@@ -3,7 +3,7 @@
 !-------------------------------------------------------------------------------
 ! File name and copyright: water_tank-body.inp
 !    Copyright 2015 (RSE SpA, authored by Andrea Amicarelli)
-! File description: input file for SPHERA (RSE SpA).
+! File description: input file for SPHERA v.8.0 (RSE SpA).
 !    Simple and demonstrative 2D test case on hydrostatic conditions and
 !    "fluid - solid body" interactions (rough resolution).
 !
