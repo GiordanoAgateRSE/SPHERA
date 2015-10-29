@@ -1,23 +1,22 @@
 !----------------------------------------------------------------------------------------------------------------------------------
-! SPHERA (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
-! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-) 
-!      
-!     
-!   
-!      
-!  
+! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
+! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-)
 
-! This file is part of SPHERA.
-!  
-!  
-!  
-!  
+
+
+! SPHERA authors and email contact are provided on SPHERA documentation.
+
+! This file is part of SPHERA v.8.0.
+! SPHERA v.8.0 is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
 ! SPHERA is distributed in the hope that it will be useful,
 ! but WITHOUT ANY WARRANTY; without even the implied warranty of
-! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
-!  
-!  
-!  
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
 
 !----------------------------------------------------------------------------------------------------------------------------------
@@ -56,7 +55,7 @@ double precision :: vol_Shep,Ww_Shep
 !$omp parallel do default(none)                                                &
 !$omp private(npi,contj,npj,npartint,vol_Shep)                                 &
 !$omp shared(nag,pg,NMAXPARTJ,rag,nPartIntorno,Partintorno,PartKernel)         &
-!$omp shared(nPartIntorno_fw,DBSPH,NMedium)
+!$omp shared(nPartIntorno_fw,DBSPH)
 ! Loop over the fluid computational particles
 do npi=1,nag 
    if (nPartIntorno_fw(npi)>0) then   
@@ -65,7 +64,7 @@ do npi=1,nag
       pg(npi)%dvel = zero
 ! Loop over the fluid neighbouring particles
       do contj=1,nPartIntorno(npi)   
-         npartint = (npi - 1) * NMAXPARTJ + contj
+         npartint = (npi - 1)* NMAXPARTJ + contj
          npj = PartIntorno(npartint)
          if (pg(npi)%imed==pg(npj)%imed) then
             vol_Shep = pg(npj)%mass / pg(npj)%dens 
@@ -85,9 +84,8 @@ do npi=1,nag
                                 Partkernel(1,npartint) * vol_Shep
          endif
       end do 
-      if ((DBSPH%MUSCL_boundary_flag.eqv.(.true.)).and.(NMedium==1)) then
-         call Gradients_to_MUSCL_boundary(npi)
-      endif
+      if (DBSPH%MUSCL_boundary_flag.eqv..true.) call                           &
+         Gradients_to_MUSCL_boundary(npi)
    endif
 end do 
 !$omp end parallel do

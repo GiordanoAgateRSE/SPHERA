@@ -1,23 +1,22 @@
 !----------------------------------------------------------------------------------------------------------------------------------
-! SPHERA (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
-! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-) 
-!      
-!     
-!   
-!      
-!  
+! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
+! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-)
 
-! This file is part of SPHERA.
-!  
-!  
-!  
-!  
+
+
+! SPHERA authors and email contact are provided on SPHERA documentation.
+
+! This file is part of SPHERA v.8.0.
+! SPHERA v.8.0 is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
 ! SPHERA is distributed in the hope that it will be useful,
 ! but WITHOUT ANY WARRANTY; without even the implied warranty of
-! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
-!  
-!  
-!  
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
 
 !----------------------------------------------------------------------------------------------------------------------------------
@@ -25,6 +24,7 @@
 ! Description: Module to define derived types of both dynamically and statically allocated variables. (Di Monaco et al., 2011,
 !              EACFM; Manenti et al., 2012; JHE; Amicarelli et al., 2013, IJNME; Amicarelli et al., 2015, CAF)                    
 !----------------------------------------------------------------------------------------------------------------------------------
+
 module Hybrid_allocation_module
 use Static_allocation_module
 type TyGlobal
@@ -84,7 +84,7 @@ type TyGlobal
    double precision :: coord(3,2) ! Coordinates of 2 vertices of a diagonal 
                                   ! of the parallelepiped domain                       
    character(4)     :: tipo
-   character(100)    :: file
+   character(80)    :: file
    character(1)     :: Psurf 
    character(1)     :: RandomPos ! IC particle distribution noise. "r": slight 
                                  ! white noise is added, otherwise nothing.  
@@ -131,8 +131,7 @@ type TyParticle
    integer(4)       :: icol ! Colour 
    integer(4)       :: imed ! Fluid ID                          
    integer(4)       :: FS ! Free Surface (0,3: no free surface; 1,2: free 
-                          ! surface) (2,3: deactivated for Shep evolution) 
-   integer(4)       :: laminar_flag ! Laminar flag (for bed-load transport)                           
+                          ! surface) (2,3: deactivated for Shep evolution)                            
    double precision :: densass                        
    double precision :: mass ! Mass                          
    double precision :: dens ! Density                          
@@ -175,8 +174,6 @@ type TyParticle
    double precision :: dShep ! Lagrangian derivative of Shepard 
                              ! coefficient 
    double precision :: sigma ! Discrete Shepard coefficient
-   double precision :: sigma_same_fluid ! Discrete Shepard coefficient involving 
-                                        ! neighbours of the same fluid
    double precision :: Gamma ! Integral Shepard coefficient
    double precision :: Gamma_last_active ! Last value of Gamma before FS=3
    double precision :: dens_init_err ! Initial difference between SPH 
@@ -254,25 +251,15 @@ type TyParticle_w
                                          ! at maximum)
    integer(4)       :: wet ! =1 for wet wall particle (distance from fluid 
                            ! particle smaller than 1.3dx)
-   integer(4)       :: surface_mesh_file_ID ! ID of the surface mesh file
    double precision :: dens ! Density
    double precision :: pres ! Pressure
    double precision :: weight ! Area(3D)/length(2D) of the wall element 
    double precision :: mass ! Mass of the semi-particle
    double precision :: k_d ! Depth coefficient
    double precision :: volume ! Semi-particle volume (area in 2D)
-   double precision :: sigma ! Discrete Shepard coefficient of the wall elements
-                             ! depending on fluid particles (not on 
-                             ! semi-particles)
-   double precision :: kin_visc_semi_part ! Kinematic viscosity of the 
-                                          ! semi-particle
    double precision :: normal(3) ! Normal
    double precision :: coord(3) ! Position
    double precision :: vel(3) ! Velocity
-   double precision :: grad_vel_VSL_times_mu(3) ! Velocity gradient in VSL 
-                                                ! (projected along the wall 
-                                                ! element normal) times the 
-                                                ! shear viscosity
 end type TyParticle_w
 
 ! Body elements
@@ -339,12 +326,6 @@ end type body_particle
 
 ! Zone
 type TyZone
-   logical          :: DBSPH_fictitious_reservoir_flag ! .true.(DB-SPH 
-                                                       ! fictitious fluid 
-                                                       ! particles to complete 
-                                                       ! the kernel support at 
-                                                       ! free surface in 
-                                                       ! pre-processing)
    integer(4)       :: ipool 
    integer(4)       :: npoints
    integer(4)       :: icol ! Particle colour or number of vertical strips
@@ -479,12 +460,12 @@ type TyBoundarySide
                                                ! neighbouring particles
    double precision :: angle
    double precision :: velocity(1:SPACEDIM) ! Velocity
-   double precision :: T(1:SPACEDIM,1:SPACEDIM)  ! Direction cosines of the 
+   double precision :: T(1:SPACEDIM, 1:SPACEDIM) ! Direction cosines of the 
                                                  ! local reference system of 
                                                  ! the boundary (the last one
                                                  ! is the normal)
-   double precision :: R(1:SPACEDIM,1:SPACEDIM)      
-   double precision :: RN(1:SPACEDIM,1:SPACEDIM)
+   double precision :: R(1:SPACEDIM, 1:SPACEDIM)      
+   double precision :: RN(1:SPACEDIM, 1:SPACEDIM)
    character(4)     :: tipo ! type: "FIXEd", "PERImeter", "SOURce"(,"TAPIs",  
                             ! "LEVEl", "FLOW", "VELOcity", "CRITic", "OPEN")
 end type TyBoundarySide
@@ -656,8 +637,6 @@ end type
 
 ! Surface mesh for DB-SPH boundaries
 type DBSPH_surf_mesh_der_type 
-! ID of the surface mesh file
-   integer(4),allocatable,dimension(:)            :: surface_mesh_file_ID
 ! List of vertices of the surface mesh
    type(vertex_der_type),allocatable,dimension(:) :: vertices  
 ! List of faces (both 3D and 2D)
@@ -676,14 +655,12 @@ type DBSPH_der_type
    integer(4)        :: n_monitor_regions ! Number of monitoring regions 
                                           ! (0 or 1) to estimate the Force
                                           ! along x-direction 
+   integer(4)        :: n_kinematics_records ! Number of records for imposed
+                                             ! kinematics
    integer(4)        :: n_inlet ! Number of inlet sections (to impose DBSPH 
                                 ! inlet BC)
    integer(4)        :: n_outlet ! Number of outlet sections (to impose 
                                  ! DBSPH outlet BC)
-   integer(4)        :: ply_n_face_vert ! Number of vertices for each surface 
-                                        ! mesh face in the .ply input files 
-   integer(4)        :: surface_mesh_files ! number of files of the DBSPH 
-                                           ! surface meshes
    double precision  :: dx_dxw ! Ratio between the fluid and the 
                                ! semi-particle sizes
    double precision  :: k_w ! Coefficient to compute semi-particle volumes
@@ -691,14 +668,9 @@ type DBSPH_der_type
    double precision  :: monitor_region(6) ! (xmin,xmax,ymin,xmax,zmin,zmax)
                                           ! to detect the monitoring region
 ! IDs of the monitoring points
-   integer(4),allocatable,dimension(:) :: monitor_IDs
-! Number of records for imposed kinematics (surface_mesh_files,n_records)     
-   integer(4),allocatable,dimension(:) :: n_kinematics_records 
-! rotation_centre(surface_mesh_files,3): centre of rotation for DB-SPH frontiers
-   double precision,dimension(:,:),allocatable :: rotation_centre 
-! Array for the imposed kinematics of the DBSPH surface elements 
-! (surface_mesh_files,n_records,4)
-   double precision,dimension(:,:,:),allocatable :: kinematics 
+   integer(4),allocatable,dimension(:) :: monitor_IDs     
+! Array for the imposed kinematics of the DBSPH surface elements (n_records,4)
+   double precision,dimension(:,:),allocatable :: kinematics 
 ! Array for the inlet sections useful to DB-SPH inlet BC (n_records,10): 
 ! positions, normal, velocity, length
    double precision,dimension(:,:),allocatable :: inlet_sections 
@@ -716,6 +688,6 @@ type (TyParticle)   :: PgZero
 type (Tytime_stage) :: ts_pgZero
 type (TyQ_section)  :: Q_sections
 type (TyGranular_flows_options) Granular_flows_options
-type (DBSPH_der_type) :: DBSPH
+type(DBSPH_der_type) :: DBSPH
 
 end module Hybrid_allocation_module

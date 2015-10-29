@@ -1,23 +1,22 @@
 !----------------------------------------------------------------------------------------------------------------------------------
-! SPHERA (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
-! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-) 
-!      
-!     
-!   
-!      
-!  
+! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
+! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-)
 
-! This file is part of SPHERA.
-!  
-!  
-!  
-!  
+
+
+! SPHERA authors and email contact are provided on SPHERA documentation.
+
+! This file is part of SPHERA v.8.0.
+! SPHERA v.8.0 is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
 ! SPHERA is distributed in the hope that it will be useful,
 ! but WITHOUT ANY WARRANTY; without even the implied warranty of
-! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
-!  
-!  
-!  
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
 
 !----------------------------------------------------------------------------------------------------------------------------------
@@ -37,7 +36,7 @@ use I_O_file_module
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: i,nbi,npi,j,k,nei,erased_part,alloc_stat
+integer(4) :: i,nbi,npi,j,k,nei,erased_part,ier
 double precision :: xmin,xmax,ymin,ymax,zmin,zmax,mod_normal,aux_umax
 integer(4) :: vec_temp(3)
 double precision :: vec2_temp(3)
@@ -95,18 +94,7 @@ do i=1,n_bodies
    n_body_part = n_body_part + body_arr(i)%npart      
 end do
 ! Managing body particles  
-if (.not.allocated(bp_arr)) then
-   allocate(bp_arr(n_body_part),STAT=alloc_stat) 
-   if (alloc_stat/=0) then
-      write(nout,*)                                                            &
-         'Allocation of bp_arr in Input_Body_Dynamics failed;',                &
-         ' the program terminates here.'
-      stop ! Stop the main program
-      else
-         write (nout,*)                                                        &                
-            "Allocation of bp_arr in Input_Body_Dynamics successfully completed"
-   endif   
-endif
+allocate (bp_arr(n_body_part))
 npi = 1  
 ! Loop over the transported bodies (not to be parallelized)
 do nbi=1,n_bodies
@@ -281,20 +269,13 @@ enddo
 do i=1,n_body_part
    if (bp_arr(i)%area>0.d0) n_surf_body_part = n_surf_body_part + 1  
 enddo
-! Allocating the array of the surface body particles
-if (.not.allocated(surf_body_part)) then
-   allocate(surf_body_part(n_surf_body_part),STAT=alloc_stat) 
-   if (alloc_stat/=0) then
-      write(nout,*)                                                            &
-         'Allocation of surf_body_part in Input_Body_Dynamics failed;',        &
-         ' the program terminates here.'
-      stop ! Stop the main program
-      else
-         write (nout,*)                                                        &        
-            'Allocation of surf_body_part in Input_Body_Dynamics ',            &
-            ' successfully completed.'
-   endif   
-endif
+! Allocating the list of the surface body particles
+allocate (surf_body_part(n_surf_body_part),stat=ier)
+if (ier/=0) then
+   write (nout,'(1x,a,i2)') "   surf_body_part not allocated. Error code: ",ier
+   else
+      write (nout,'(1x,a)') "   Arrays surf_body_part successfully allocated "
+end if
 surf_body_part = 0
 ! Listing surface body particles
 j = 1

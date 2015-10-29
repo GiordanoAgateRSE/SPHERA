@@ -1,23 +1,22 @@
 !----------------------------------------------------------------------------------------------------------------------------------
-! SPHERA (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
-! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-) 
-!      
-!     
-!   
-!      
-!  
+! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
+! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-)
 
-! This file is part of SPHERA.
-!  
-!  
-!  
-!  
+
+
+! SPHERA authors and email contact are provided on SPHERA documentation.
+
+! This file is part of SPHERA v.8.0.
+! SPHERA v.8.0 is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
 ! SPHERA is distributed in the hope that it will be useful,
 ! but WITHOUT ANY WARRANTY; without even the implied warranty of
-! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
-!  
-!  
-!  
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
 
 !----------------------------------------------------------------------------------------------------------------------------------
@@ -79,7 +78,7 @@ write (nout,'(1x,a,3i8)') " Number of grid in x, y, z directions : ",          &
 write (nout,'(1x,a,i10)') " Number of total grid : ",Grid%nmax
 write (nout,'(1x,a)') " "
 ! Allocation of a 2D matrix to detect free surface (erosion criterion)
-allocate(ind_interfaces(Grid%ncd(1),Grid%ncd(2),4), stat = ier)
+allocate (ind_interfaces(Grid%ncd(1),Grid%ncd(2),4), stat = ier)
 if (ier/=0) then
    write (nout,'(1x,a,i2)')                                                    &
       "    Array ind_interfaces not allocated. Error code: ",ier

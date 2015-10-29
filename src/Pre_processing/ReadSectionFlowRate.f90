@@ -1,23 +1,22 @@
 !----------------------------------------------------------------------------------------------------------------------------------
-! SPHERA (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
-! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-) 
-!      
-!     
-!   
-!      
-!  
+! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
+! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-)
 
-! This file is part of SPHERA.
-!  
-!  
-!  
-!  
+
+
+! SPHERA authors and email contact are provided on SPHERA documentation.
+
+! This file is part of SPHERA v.8.0.
+! SPHERA v.8.0 is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
 ! SPHERA is distributed in the hope that it will be useful,
 ! but WITHOUT ANY WARRANTY; without even the implied warranty of
-! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
-!  
-!  
-!  
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
 
 !----------------------------------------------------------------------------------------------------------------------------------
@@ -38,7 +37,7 @@ use Dynamic_allocation_module
 implicit none
 integer(4) :: nrighe,ier,ninp,nout
 character(1) :: comment
-character(100) :: ainp,lcase 
+character(80) :: ainp,lcase 
 integer(4) :: n_fluid_types,ioerr,i,n_sect,n_vertices,section_ID
 double precision :: dt_out,aux_dis,area
 double precision :: plane_normal(3),vec_aux_1(3),vec_aux_2(3),vec_aux_3(3)
@@ -59,14 +58,14 @@ logical,external :: ReadCheck
 !------------------------
 ! In case of restart, input data sections are not read
 if (restart) then
-   do while (TRIM(lcase(ainp))/="##### end section flow rate #####")
-      call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+   do while (TRIM(lcase(ainp))/="##### end Section_flow_rate #####")
+      call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
       if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"Section_flow_rate DATA",ninp,  &
          nout)) return
    enddo
    return
 endif
-call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
 if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"Section_flow_rate DATA",ninp,nout))  &
    return
 do while (TRIM(lcase(ainp))/="##### end section flow rate #####")

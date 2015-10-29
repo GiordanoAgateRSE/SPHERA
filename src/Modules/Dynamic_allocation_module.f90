@@ -1,29 +1,29 @@
 !----------------------------------------------------------------------------------------------------------------------------------
-! SPHERA (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
-! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-) 
-!      
-!     
-!   
-!      
-!  
+! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
+! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-)
 
-! This file is part of SPHERA.
-!  
-!  
-!  
-!  
+
+
+! SPHERA authors and email contact are provided on SPHERA documentation.
+
+! This file is part of SPHERA v.8.0.
+! SPHERA v.8.0 is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
 ! SPHERA is distributed in the hope that it will be useful,
 ! but WITHOUT ANY WARRANTY; without even the implied warranty of
-! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
-!  
-!  
-!  
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
 
 !----------------------------------------------------------------------------------------------------------------------------------
 ! Program unit: Dynamic_allocation_module           
 ! Description: Module to define dynamically allocated variables.                    
 !----------------------------------------------------------------------------------------------------------------------------------
+
 module Dynamic_allocation_module
 use Hybrid_allocation_module
 ! Vertice(3,n_vertices): array of the geometrical vertices
@@ -70,12 +70,11 @@ integer(4),               dimension(:),    allocatable :: PartIntorno
 ! PartKernel(1,b): -|gradW_0b|/|r_0b|, gradW: kernel gradient (cubic spline);
 !    Thus gradW = |gradW_0b| * (gradW_0b/|gradW_0b|) = - PartKernel*rag, 
 !    rag=-(x_b-x_0) is aligned with gradW
-! PartKernel(2,b): PartKernel(1,b)/(|r_0b|^2+eps^2) = 
-!                  -|gradW_0b|/|r_0b|/(|r_0b|^2+eps^2)
+! PartKernel(2,b): -|gradW_0b|/[|r_0b|(|r_0b|^2+eps^2)], cubic spline kernel
 ! PartKernel(3,b): -|gradW_0b|/|r_0b|, Gallati anti-cluster kernel, 
 !                  used for pressure terms (SA-SPH) 
-! PartKernel(4,b): W_0b: absolute value of the kernel cubic spline (SASPH, but 
-!                        not used)
+! PartKernel(4,b): W_0b: absolute value of the kernel cubic spline,
+!                        used for interpolations and DB-SPH
 ! gradW vector is equal to -PartKernel(1 or 3,b)*rag_0b
 double precision,         dimension(:,:),  allocatable :: PartKernel
 ! rag(3,NMAXPARTJ*PARTICLEBUFFER): 3D vector list of -r_0b=x_0-x_b,
@@ -87,19 +86,12 @@ integer(4),               dimension(:),    allocatable :: nPartIntorno_fw
 ! PartIntorno_fw(NMAXPARTJ*PARTICLEBUFFER): array of the indeces of the 
 ! neighbouring wall particles 
 integer(4),               dimension(:),    allocatable :: PartIntorno_fw   
-! Kernel parameter neighbouring array: kernel_fw(2,NMAXPARTJ*PARTICLEBUFFER),
-! (wall neighbours; DBSPH)
-!    kernel_fw(1,i): W_0a: absolute value of the kernel cubic spline (DBSPH)
-!    kernel_fw(2,i): -|gradW_0s|/|r_0s|, gradW: kernel gradient (cubic spline);
-!    Thus gradW = |gradW_0s| * (gradW_0s/|gradW_0s|) = - kernel_fw*rag, 
-!    rag=-(x_s-x_0) is aligned with gradW; "s" is a semi-particle.
+! Kernel function neighbouring array (wall neighbours), 
+! kernel_fw(NMAXPARTJ*PARTICLEBUFFER)
 double precision,         dimension(:,:),  allocatable :: kernel_fw
 ! Relative distances from wall particles: -r_0a, 
 ! rag_fw(components,NMAXPARTJ*PARTICLEBUFFER)
-double precision,         dimension(:,:),  allocatable :: rag_fw
-! Velocity gradient in VSL, projected along the wall element normal (DB-SPH)
-double precision,         dimension(:,:),  allocatable :: grad_vel_VSL_fw
-! grad_vel_VSL_fw(components,NMAXPARTJ*PARTICLEBUFFER) 
+double precision,         dimension(:,:),  allocatable :: rag_fw  
 ! neighbouring arrays for body dynamics
 ! neighbouring arrays of the body particles 
 ! (body particle - fluid particle interactions; 

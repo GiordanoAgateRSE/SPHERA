@@ -1,29 +1,29 @@
 !----------------------------------------------------------------------------------------------------------------------------------
-! SPHERA (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
-! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-) 
-!      
-!     
-!   
-!      
-!  
+! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
+! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-)
 
-! This file is part of SPHERA.
-!  
-!  
-!  
-!  
+
+
+! SPHERA authors and email contact are provided on SPHERA documentation.
+
+! This file is part of SPHERA v.8.0.
+! SPHERA v.8.0 is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
 ! SPHERA is distributed in the hope that it will be useful,
 ! but WITHOUT ANY WARRANTY; without even the implied warranty of
-! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
-!  
-!  
-!  
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
 
 !----------------------------------------------------------------------------------------------------------------------------------
 ! Program unit: ReadInputFaces                         
 ! Description:                        
 !----------------------------------------------------------------------------------------------------------------------------------
+
 subroutine ReadInputFaces(NumberEntities,ainp,comment,nrighe,ier,prtopt,ninp,nout)
 !------------------------
 ! Modules
@@ -39,12 +39,12 @@ integer(4) :: nrighe,ier, ninp,nout
 logical(4) :: prtopt
 integer(4),dimension(20) :: NumberEntities
 character(1) :: comment
-character(100) :: ainp
+character(80) :: ainp
 integer(4) :: n,i,ioerr,stretch
-integer(4) :: ivalues(MAXFACENODES)
+integer(4),dimension(4) :: ivalues
 character(8) :: label
 logical,external :: ReadCheck
-character(100),external :: lcase, GetToken
+character(80),external :: lcase, GetToken
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -71,7 +71,7 @@ do while (TRIM(lcase(ainp))/="##### end faces #####")
    select case (TRIM(Domain%tipo))
       case ("semi","bsph") 
          ivalues = 0
-! ivalues(4) is the 4-th vertex (null in case of triangles)
+! ivalues(4) is the 4-th vertex (null in case of trinagles)
          read(ainp,*,iostat=ioerr) i,ivalues,stretch  
          write(label,"(i8)") i
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"FACE n."//label,ninp,nout)) &
@@ -108,10 +108,9 @@ if ((ncord>0).AND.(nout>0).AND.(prtopt)) then
    write(nout,*)
    write(nout,"(1x,a)") "List of faces:"
    do n=1,NumberEntities(11)
-      write(nout,"(i10,' - ',6i10,' - ',i8)") n,BoundaryFace(n)%Node(1)%name,  &
+      write(nout,"(i10,' - ',4i10,' - ',i8)") n,BoundaryFace(n)%Node(1)%name,  &
          BoundaryFace(n)%Node(2)%name,BoundaryFace(n)%Node(3)%name,            &
-         BoundaryFace(n)%Node(4)%name,BoundaryFace(n)%Node(5)%name,            &
-         BoundaryFace(n)%Node(6)%name,BoundaryFace(n)%stretch
+         BoundaryFace(n)%Node(4)%name,BoundaryFace(n)%stretch
    enddo
 endif
 !------------------------

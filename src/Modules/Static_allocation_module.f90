@@ -1,23 +1,22 @@
 !----------------------------------------------------------------------------------------------------------------------------------
-! SPHERA (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
-! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-) 
-!      
-!     
-!   
-!      
-!  
+! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
+! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-)
 
-! This file is part of SPHERA.
-!  
-!  
-!  
-!  
+
+
+! SPHERA authors and email contact are provided on SPHERA documentation.
+
+! This file is part of SPHERA v.8.0.
+! SPHERA v.8.0 is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
 ! SPHERA is distributed in the hope that it will be useful,
 ! but WITHOUT ANY WARRANTY; without even the implied warranty of
-! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
-!  
-!  
-!  
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
 
 !----------------------------------------------------------------------------------------------------------------------------------
@@ -34,7 +33,7 @@ integer(4),public,parameter :: MAXOPENSIDES = 10
 integer(4),public,parameter :: MAXOPENFACES = 50
 integer(4),public,parameter :: MAXPARTLINE = 2000
 integer(4),public,parameter :: LIMCLOSEBOUNDSIDES = 2
-integer(4),public,parameter :: MAXFACENODES = 6
+integer(4),public,parameter :: MAXFACENODES = 4
 integer(4),public,parameter :: NUMCOLS_BIT = 5
 integer(4),public,parameter :: NUMROWS_BIT = 22
 integer(4),public,parameter :: INT_KERNELTABLE = 40
@@ -148,7 +147,6 @@ double precision :: doublesquareh ! doubleh * doubleh
 double precision :: cubich ! Domain%h*Domain%h*Domain%h
 double precision :: unosuh ! 1./Domain%h
 double precision :: unosusquareh ! 1./(Domain%h*Domain%h)
-
 double precision :: dx_dxbodies ! Ratio between fluid particle and body
                                 ! particle size 
 ! Indices of cells that must be considered around the current one 
@@ -159,7 +157,7 @@ integer(4),dimension(0:3,2) :: icoordp ! Pointer for coordinate location 2D or
                                        ! in the main program for compatibility
                                        ! with xlf90
 character(len=8),parameter :: acode = "SPHERA  "
-character(len=8),parameter :: version = "8.0   "
+character(len=8),parameter :: version = "7.2   "
 character(255) :: nomecaso, nomecas2
 character(1),dimension(0:3) :: xyzlabel = (/ "T", "X", "Y", "Z" /)  
 character(4),dimension(3) :: ncordlabel = (/ "    ", "(2D)", "(3D)" /)  
@@ -170,6 +168,6 @@ character(255) :: nomefileerr ! File name for error file in erosion model
 character(8) :: modelloerosione ! type of erosion criterion (shields, mohr)
 ! "original" or "euristic"
 character(len=8) :: dt_opt = "original" 
-character(100),dimension(MAXTIT) :: title  
+character(80),dimension(MAXTIT) :: title  
 end module
 

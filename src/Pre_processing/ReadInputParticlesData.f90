@@ -1,23 +1,22 @@
 !----------------------------------------------------------------------------------------------------------------------------------
-! SPHERA (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
-! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-) 
-!      
-!     
-!   
-!      
-!  
+! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
+! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-)
 
-! This file is part of SPHERA.
-!  
-!  
-!  
-!  
+
+
+! SPHERA authors and email contact are provided on SPHERA documentation.
+
+! This file is part of SPHERA v.8.0.
+! SPHERA v.8.0 is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
 ! SPHERA is distributed in the hope that it will be useful,
 ! but WITHOUT ANY WARRANTY; without even the implied warranty of
-! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
-!  
-!  
-!  
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
 
 !----------------------------------------------------------------------------------------------------------------------------------
@@ -41,17 +40,17 @@ integer(4):: nrighe,ier,ninp,nout,Medium,npointv,icolor
 integer(4),dimension(20) :: NumberEntities
 double precision :: valp
 character(1) :: comment
-character(100) :: ainp
+character(80) :: ainp
 character(1) :: bends,slip
 character(3) :: move
 character(2) :: pressu
 double precision,dimension(3) :: values3
 double precision,dimension(0:3,maxpointsvlaw) :: valuev
 integer(4) :: ioerr,i,n,icord
-character(100) :: token
+character(80) :: token
 character(6) :: token_color
 logical,external :: ReadCheck
-character(100),external :: lcase, GetToken
+character(80),external :: lcase, GetToken
 !------------------------
 ! Explicit interfaces
 !------------------------

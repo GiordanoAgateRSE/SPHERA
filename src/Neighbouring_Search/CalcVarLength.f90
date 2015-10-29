@@ -1,23 +1,22 @@
 !----------------------------------------------------------------------------------------------------------------------------------
-! SPHERA (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
-! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-) 
-!      
-!     
-!   
-!      
-!  
+! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
+! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-)
 
-! This file is part of SPHERA.
-!  
-!  
-!  
-!  
+
+
+! SPHERA authors and email contact are provided on SPHERA documentation.
+
+! This file is part of SPHERA v.8.0.
+! SPHERA v.8.0 is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
 ! SPHERA is distributed in the hope that it will be useful,
 ! but WITHOUT ANY WARRANTY; without even the implied warranty of
-! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
-!  
-!  
-!  
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
 
 !----------------------------------------------------------------------------------------------------------------------------------
@@ -67,15 +66,9 @@ nPartIntorno = 0
 ind_interfaces = 0
 if ((Domain%tipo=="bsph").and.(nag>0)) then
    nPartIntorno_fw = 0
-   grad_vel_VSL_fw = 0.d0
-   allocate(bounded(nag))
+   allocate (bounded(nag))
    bounded = 0
-   allocate(dShep_old(nag))
-   pg_w(:)%sigma = 0.d0
-   pg_w(:)%kin_visc_semi_part = 0.d0
-   pg_w(:)%grad_vel_VSL_times_mu(1) = 0.d0
-   pg_w(:)%grad_vel_VSL_times_mu(2) = 0.d0
-   pg_w(:)%grad_vel_VSL_times_mu(3) = 0.d0
+   allocate (dShep_old(nag))
 endif
 if (n_bodies>0) then 
    nPartIntorno_bp_f = 0
@@ -95,7 +88,7 @@ endif
 !$omp shared(Partintorno,PartKernel,ke_coef,kacl_coef,Doubleh,DoubleSquareh)   &
 !$omp shared(squareh,nomsub,ncord,eta,eta2,nout,nscr,erosione,ind_interfaces)  &
 !$omp shared(DBSPH,pg_w,Icont_w,Npartord_w,rag_fw,nPartIntorno_fw)             &
-!$omp shared(Partintorno_fw,kernel_fw,dShep_old,Granular_flows_options,NMedium)
+!$omp shared(Partintorno_fw,kernel_fw,dShep_old,Granular_flows_options)
 loop_nag: do npi=1,nag
    if (Domain%tipo=="bsph") then
       pg(npi)%rhoSPH_old = pg(npi)%rhoSPH_new
@@ -103,7 +96,6 @@ loop_nag: do npi=1,nag
       dShep_old(npi) = pg(npi)%dShep
       pg(npi)%dShep = zero 
       pg(npi)%sigma = zero 
-      pg(npi)%sigma_same_fluid = zero
       pg(npi)%FS = 0
       pg(npi)%DBSPH_inlet_ID = 0
       pg(npi)%DBSPH_outlet_ID = 0
@@ -230,14 +222,8 @@ loop_nag: do npi=1,nag
             if (Domain%tipo=="bsph") then
                pg(npi)%sigma = pg(npi)%sigma + pg(npj)%mass *                  &
                                PartKernel(4,npartint) / pg(npj)%dens 
-               if (pg(npi)%imed==pg(npj)%imed) then 
-                  pg(npi)%rhoSPH_new = pg(npi)%rhoSPH_new + pg(npj)%mass *     &
-                                       PartKernel(4,npartint)
-                  pg(npi)%sigma_same_fluid = pg(npi)%sigma_same_fluid +        &
-                                             pg(npj)%mass *                    &
-                                             PartKernel(4,npartint) /          &
-                                             pg(npj)%dens
-               endif
+               pg(npi)%rhoSPH_new = pg(npi)%rhoSPH_new + pg(npj)%mass *        &
+                                    PartKernel(4,npartint)
             endif
 ! Searching for the nearest fluid/mixture SPH particle 
             if (erosione) then
@@ -344,11 +330,9 @@ loop_nag: do npi=1,nag
                   endif 
                   kernel_fw(2,npartint) = gradmod * ke_coef * denom
                   pg(npi)%sigma = pg(npi)%sigma +  pg_w(npj)%mass *            &
-                                  kernel_fw(1,npartint) / pg_w(npj)%dens
-                  if (NMedium==1) then                 
-                     pg(npi)%rhoSPH_new = pg(npi)%rhoSPH_new + pg_w(npj)%mass *&
-                                          kernel_fw(1,npartint)
-                  endif
+                                  kernel_fw(1,npartint) / pg_w(npj)%dens 
+                  pg(npi)%rhoSPH_new = pg(npi)%rhoSPH_new + pg_w(npj)%mass *   &
+                                       kernel_fw(1,npartint)
 ! Gallati anti-cluster kernel, interesting test: start
 ! kernel_fw(3,npartint) =(5.d0/(16.d0*PIGRECO*Domain%h**2))*((2.d0-rij_su_h)**3) 
 ! kernel_fw(4,npartint) = (-12.0d0 - 3.0d0 * rij_su_h_quad + 12.0d0 * rij_su_h)&
@@ -363,7 +347,6 @@ loop_nag: do npi=1,nag
 !    (rij_su_h/2.d0))
 ! if (rij_su_h/=0.d0) kernel_fw(2,npartint) = kernel_fw(2,npartint) * denom
 ! WendlandC4 kernel, interesting test: end
-                  call DBSPH_velocity_gradients_VSL_SNBL(npi,npj,npartint)
                enddo loop_fw
             endif
          enddo loop_krang      
@@ -524,7 +507,7 @@ if (Domain%tipo=="bsph") then
             else
                pg(npi)%Gamma = pg(npi)%sigma
                pg(npi)%Gamma = min (pg(npi)%Gamma,one)    
-         endif
+          endif
       endif
       if (it_corrente>-2) then
          min_sigma_Gamma = min((pg(npi)%sigma+0.05),pg(npi)%Gamma)
@@ -538,20 +521,16 @@ if (Domain%tipo=="bsph") then
          endif
          if (pg(npi)%rhoSPH_old==zero) then
             pg(npi)%DensShep = pg(npi)%rhoSPH_new * pg(npi)%Gamma
-            if (NMedium==1) then
-               if (pg(npi)%FS ==1) then
-                  pg(npi)%dens = pg(npi)%rhoSPH_new / pg(npi)%sigma
-                  else
-                     pg(npi)%dens = pg(npi)%rhoSPH_new / pg(npi)%Gamma
-               endif
-               elseif(NMedium>1) then
-                  pg(npi)%dens = pg(npi)%rhoSPH_new / pg(npi)%sigma_same_fluid
+            if (pg(npi)%FS ==1) then
+               pg(npi)%dens = pg(npi)%rhoSPH_new / pg(npi)%sigma
+               else
+                  pg(npi)%dens = pg(npi)%rhoSPH_new / pg(npi)%Gamma
             endif
          endif
       endif
    enddo
-   if (allocated(bounded)) deallocate(bounded)
-   if (allocated(dShep_old)) deallocate(dShep_old)
+   if (allocated(bounded)) deallocate (bounded)
+   if (allocated(dShep_old)) deallocate (dShep_old)
 endif 
 ! SPH parameters for body transport in fluid flows
 if (n_bodies>0) then

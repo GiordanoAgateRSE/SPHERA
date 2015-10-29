@@ -1,23 +1,22 @@
 !----------------------------------------------------------------------------------------------------------------------------------
-! SPHERA (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
-! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-) 
-!      
-!     
-!   
-!      
-!  
+! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
+! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-)
 
-! This file is part of SPHERA.
-!  
-!  
-!  
-!  
+
+
+! SPHERA authors and email contact are provided on SPHERA documentation.
+
+! This file is part of SPHERA v.8.0.
+! SPHERA v.8.0 is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
 ! SPHERA is distributed in the hope that it will be useful,
 ! but WITHOUT ANY WARRANTY; without even the implied warranty of
-! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
-!  
-!  
-!  
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
 
 !----------------------------------------------------------------------------------------------------------------------------------
@@ -70,6 +69,10 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
 ' Warning! nblocchi>maxnumblock in subroutine result_converter.'
       write (nscr,'(a)')                                                       &
          '    Increase maxnumblock or decrease output frequency for vtu files.'
+      write (nout,'(a)')                                                       &
+' Warning: nblocchi>maxnumblock in subroutine result_converter.'
+      write (nout,'(a)')                                                       &
+         '     Increase maxnumblock or decrease output frequency for vtu files.'
       nblocchi = maxnumblock
    endif
    blocchi(nblocchi) = block
@@ -79,6 +82,8 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
    cargo = adjustl(cargo)
    filevtk =                                                                   &
 "VTKConverter_"//prefix(1:len_trim(prefix))//"_block_"//cargo(1:len_trim(cargo))//".vtu"
+   write(nscr,'(a)')                                                           &
+      "VTK formatted converted file  : "//filevtk(1:len_trim(filevtk))
    write(nout,'(a)')                                                           &
       "VTK formatted converted file  : "//filevtk(1:len_trim(filevtk))
    open(unit=unitvtk,file=filevtk,form='formatted',access='sequential',        &
@@ -97,7 +102,7 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
 "case "//prefix(1:len_trim(prefix))//" * time "//cargo(1:len_trim(cargo))//" (s)"
 ! Coordinates 
    numpoints = count(pg(1:nag)%cella>0)
-   allocate(finger(numpoints))
+   allocate (finger(numpoints))
    k = 0
    do npi=1,nag
       if (pg(npi)%cella==0) cycle
@@ -198,7 +203,7 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
    write(unitvtk,'(a)') '      </DataArray>'
 ! Viscosity
    write(unitvtk,'(a)')                                                        &
-      '      <DataArray type="Float32" Name="Viscosity (m^2/s)" format="ascii" >'
+      '      <DataArray type="Float32" Name="Viscosity (mq/s)" format="ascii" >'
    do i=1,numpoints,16
       k1 = i
       k2 = k1 + 15
@@ -366,16 +371,6 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
    endif 
-! laminar_flag
-   write(unitvtk,'(a)')                                                        &
-      '      <DataArray type="Int32" Name="laminar_flag" format="ascii" >'
-   do i=1,numpoints,16
-      k1 = i
-      k2 = k1 + 15
-      if (k2>numpoints) k2 = numpoints
-      write(unitvtk,'(8x,16(1x,i8))') (pg(finger(k))%laminar_flag,k = k1,k2)
-   enddo
-   write(unitvtk,'(a)') '      </DataArray>'   
    if (Granular_flows_options%ID_erosion_criterion>=1) then
 ! sigma_prime
       write(unitvtk,'(a)') '      <DataArray type="Float32" Name="sigma_prime" format="ascii" >'
@@ -529,7 +524,7 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
 ! Flush unit content
    flush(unitvtk)
    close (unitvtk)
-   deallocate(finger)
+   deallocate (finger)
    if ((DBSPH%n_w>0).and.(Domain%tipo=="bsph")) then
 ! Open a vtu file for DB-SPH wall and semi-particle parameters  
 ! VTKConverter_<casename>_wall_<block>.vtk 
@@ -537,6 +532,8 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
       cargo = adjustl(cargo)
       filevtk =                                                                &
 "VTKConverter_"//prefix(1:len_trim(prefix))//"_block_wall_"//cargo(1:len_trim(cargo))//".vtu"
+      write(nscr,'(a)')                                                        &
+         "VTK formatted converted file  : "//filevtk(1:len_trim(filevtk))
       write(nout,'(a)')                                                        &
          "VTK formatted converted file  : "//filevtk(1:len_trim(filevtk))
       open(unit=unitvtk,file=filevtk,form='formatted',access='sequential',     &
@@ -555,7 +552,7 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
 "case "//prefix(1:len_trim(prefix))//" * time "//cargo(1:len_trim(cargo))//" (s)"
 ! Point coordinates 
       numpoints = count(pg_w(1:DBSPH%n_w)%cella>0)
-      allocate(finger(numpoints))
+      allocate (finger(numpoints))
       k = 0
       do npi=1,DBSPH%n_w
          if (pg_w(npi)%cella==0) cycle
@@ -636,20 +633,6 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
             pg_w(finger(k))%normal(2),pg_w(finger(k))%normal(3),k=k1,k2)
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
-! Velocity gradient in VSL (projected along the wall element normal) times the 
-! shear viscosity
-      write(unitvtk,'(a)')                                                     &
-'      <DataArray type="Float32" Name="Velocity gradient in VSL"  NumberOfComponents="3"  format="ascii" >'
-      do i=1,numpoints,6
-         k1 = i
-         k2 = k1 + 5
-         if (k2>numpoints) k2 = numpoints
-         write(unitvtk,'(8x,6(3(1x,e12.5)))') (                                &
-            pg_w(finger(k))%grad_vel_VSL_times_mu(1),                          &
-            pg_w(finger(k))%grad_vel_VSL_times_mu(2),                          &
-            pg_w(finger(k))%grad_vel_VSL_times_mu(3),k=k1,k2)
-      enddo
-      write(unitvtk,'(a)') '      </DataArray>'
 ! Pressure
       write(unitvtk,'(a)')                                                     &
          '      <DataArray type="Float32" Name="Pressure (Pa)" format="ascii" >'
@@ -695,7 +678,6 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
          write(unitvtk,'(8x,16(1x,e12.5))') (pg_w(finger(k))%k_d,k=k1,k2)
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
-! Semi-particle volume      
       write(unitvtk,'(a)')                                                     &
 '      <DataArray type="Float32" Name="semi-particle volume (m^3)" format="ascii" >'
       do i=1,numpoints,16
@@ -703,17 +685,6 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
          k2 = k1 + 15
          if (k2>numpoints) k2 = numpoints
          write(unitvtk,'(8x,16(1x,e12.5))') (pg_w(finger(k))%volume,k=k1,k2)
-      enddo
-      write(unitvtk,'(a)') '      </DataArray>'
-! Semi-particle kinematic viscosity      
-      write(unitvtk,'(a)')                                                     &
-'      <DataArray type="Float32" Name="semi-particle kinematic viscosity (m^2/s)" format="ascii" >'
-      do i=1,numpoints,16
-         k1 = i
-         k2 = k1 + 15
-         if (k2>numpoints) k2 = numpoints
-         write(unitvtk,'(8x,16(1x,e12.5))')                                    &
-            (pg_w(finger(k))%kin_visc_semi_part,k=k1,k2)
       enddo
       write(unitvtk,'(a)') '      </DataArray>'    
 ! Wall element ID 
@@ -737,7 +708,7 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
 ! Flushing the unit explicitly
       flush(unitvtk)
       close (unitvtk)
-      deallocate(finger)
+      deallocate (finger)
    endif
    if (n_bodies>0) then
 ! Body Transport post-processing for .vtu files: start
@@ -748,6 +719,8 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
       cargo = adjustl(cargo)
       filevtk =                                                                &
 "VTKConverter_"//prefix(1:len_trim(prefix))//"_block_body-part_"//cargo(1:len_trim(cargo))//".vtu"
+      write (nscr,'(a)')                                                       &
+         "VTK formatted converted file  : "//filevtk(1:len_trim(filevtk))
       write (nout,'(a)')                                                       &
           "VTK formatted converted file  : "//filevtk(1:len_trim(filevtk))
       open(unit=unitvtk,file=filevtk,form='formatted',access='sequential',     &
@@ -766,7 +739,7 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
 "case "//prefix(1:len_trim(prefix))//" * time "//cargo(1:len_trim(cargo))//" (s)"
 ! Point coordinates 
       numpoints = count(bp_arr(1:n_body_part)%cell>0)
-      allocate(finger(numpoints))
+      allocate (finger(numpoints))
       k = 0
       do npi=1,n_body_part
          if (bp_arr(npi)%cell==0) cycle
@@ -910,7 +883,7 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
 ! Flushing the unit explicitly 
       flush(unitvtk)
       close (unitvtk)
-      deallocate(finger)
+      deallocate (finger)
 ! Bodies: start
 ! Open the .vtu unstructured grid formatted file 
 ! VTKConverter_<casename>_body_<block>.vtk for the results storing
@@ -918,6 +891,8 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
       cargo = adjustl(cargo)
       filevtk =                                                                &
 "VTKConverter_"//prefix(1:len_trim(prefix))//"_block_body_"//cargo(1:len_trim(cargo))//".vtu"
+      write(nscr,'(a)')                                                        &
+         "VTK formatted converted file  : "//filevtk(1:len_trim(filevtk))
       write(nout,'(a)')                                                        &
          "VTK formatted converted file  : "//filevtk(1:len_trim(filevtk))
       open(unit=unitvtk,file=filevtk,form='formatted',access='sequential',     &
@@ -936,7 +911,7 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
 "case "//prefix(1:len_trim(prefix))//" * time "//cargo(1:len_trim(cargo))//" (s)"
 ! Point coordinates 
       numpoints = n_bodies
-      allocate(finger(numpoints))
+      allocate (finger(numpoints))
       k = 0
       do npi=1,n_bodies
          k = k + 1
@@ -1092,7 +1067,7 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
 ! Flushing the unit explicitly 
       flush(unitvtk)
       close (unitvtk)
-      deallocate(finger)
+      deallocate (finger)
    endif  
 endif 
 ! Updating the last output time for .vtu files 

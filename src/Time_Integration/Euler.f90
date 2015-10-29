@@ -1,23 +1,22 @@
 !----------------------------------------------------------------------------------------------------------------------------------
-! SPHERA (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
-! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-) 
-!      
-!     
-!   
-!      
-!  
+! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
+! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-)
 
-! This file is part of SPHERA.
-!  
-!  
-!  
-!  
+
+
+! SPHERA authors and email contact are provided on SPHERA documentation.
+
+! This file is part of SPHERA v.8.0.
+! SPHERA v.8.0 is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
 ! SPHERA is distributed in the hope that it will be useful,
 ! but WITHOUT ANY WARRANTY; without even the implied warranty of
-! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
-!  
-!  
-!  
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
 
 !----------------------------------------------------------------------------------------------------------------------------------
@@ -162,10 +161,14 @@ if (((DBSPH%n_w+DBSPH%n_inlet+DBSPH%n_outlet)>0).and.(Domain%tipo=="bsph")) &
 !       enddo
    if (DBSPH%n_w>0) then
       call DBSPH_kinematics
-! Time integration for the surface element velocity    
+! Time integration for the first surface element velocity    
+! Loop over the surface element to copy and paste, all over the elements,
+! the imposed kinematics of the first surface element 
+      pg_w(1)%coord(:) = pg_w(1)%coord(:) + dt * pg_w(1)%vel(:)
 !$omp parallel do default(none) shared(DBSPH,pg_w,dt) private(npi)
-      do npi=1,DBSPH%n_w
-         pg_w(npi)%coord(:) = pg_w(npi)%coord(:) + dt * pg_w(npi)%vel(:) 
+      do npi=2,DBSPH%n_w
+         pg_w(npi)%vel(:) = pg_w(1)%vel(:) 
+         pg_w(npi)%coord(:) = pg_w(npi)%coord(:) + dt * pg_w(1)%vel(:) 
       enddo
 !$omp end parallel do
    endif
@@ -200,7 +203,7 @@ if (((DBSPH%n_w+DBSPH%n_inlet+DBSPH%n_outlet)>0).and.(Domain%tipo=="bsph")) &
       call start_and_stop(3,9)
 ! To set the parameters for the fixed particles 
       if (Domain%NormFix)  call NormFix
-      allocate(uni_old(nag))
+      allocate (uni_old(nag))
 ! To update the auxiliary vector to count mobile "flu" particles (in "nag") 
       indarrayFlu = 0
       do npi=1,nag
@@ -223,26 +226,21 @@ if (((DBSPH%n_w+DBSPH%n_inlet+DBSPH%n_outlet)>0).and.(Domain%tipo=="bsph")) &
 !$omp parallel do default(none)                                                &
 !$omp private(npi,ii)                                                          &
 !$omp shared(nag,pg,med,dt,indarrayFlu,Array_Flu,Domain,uni_old)               &
-!$omp shared(beta,nPartIntorno_fw,it_corrente,NMedium)
+!$omp shared(beta,nPartIntorno_fw,it_corrente)
 ! Time integration of the continuity equation
    do ii=1,indarrayFlu
       npi = Array_Flu(ii)
 ! Gamma=1 for particles in the inner domain
       if (nPartIntorno_fw(npi)==0) pg(npi)%Gamma = one         
-      pg(npi)%dden = pg(npi)%dden / pg(npi)%Gamma
+      if (Domain%tipo=="bsph") pg(npi)%dden = pg(npi)%dden / pg(npi)%Gamma
 ! Boundary type is fixe or tapis or level(?)
       if (pg(npi)%koddens==0) then
-! SPH approxmation of density (alternative to the continuity equation)
-         if (NMedium==1) then
-            if (pg(npi)%FS==1) then
-               pg(npi)%dens = pg(npi)%rhoSPH_new / pg(npi)%sigma
-               if (pg(npi)%dens<(0.98d0*med(1)%den0)) pg(npi)%dens = 0.98d0 *  &
-                  med(1)%den0 
-               else
-                  pg(npi)%dens = pg(npi)%rhoSPH_new / pg(npi)%Gamma
-            endif
-            elseif (NMedium>1) then
-               pg(npi)%dens = pg(npi)%rhoSPH_new / pg(npi)%sigma_same_fluid
+         if (pg(npi)%FS==1) then
+            pg(npi)%dens = pg(npi)%rhoSPH_new / pg(npi)%sigma
+            if (pg(npi)%dens<(0.98d0*med(1)%den0)) pg(npi)%dens = 0.98d0 *  &
+               med(1)%den0 
+            else
+               pg(npi)%dens = pg(npi)%rhoSPH_new / pg(npi)%Gamma
          endif
 ! Interesting test, according to Ferrand et al. (2013)
 ! beta = exp(-30000.*(min((pg(npi)%sigma/pg(npi)%Gamma),1.)-1.)**2)

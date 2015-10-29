@@ -1,23 +1,22 @@
 !----------------------------------------------------------------------------------------------------------------------------------
-! SPHERA (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
-! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-) 
-!      
-!     
-!   
-!      
-!  
+! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
+! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-)
 
-! This file is part of SPHERA.
-!  
-!  
-!  
-!  
+
+
+! SPHERA authors and email contact are provided on SPHERA documentation.
+
+! This file is part of SPHERA v.8.0.
+! SPHERA v.8.0 is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
 ! SPHERA is distributed in the hope that it will be useful,
 ! but WITHOUT ANY WARRANTY; without even the implied warranty of
-! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
-!  
-!  
-!  
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
 
 !----------------------------------------------------------------------------------------------------------------------------------
@@ -38,14 +37,14 @@ implicit none
 type (TyMedium), dimension(NMedium) :: Med
 integer(4) :: nrighe,ier, ninp,nout
 character(1) :: comment
-character(100) :: ainp
+character(80) :: ainp
 integer(4) :: iplot_fr,imemo_fr,irest_fr,icpoi_fr,ipllb_fr,ipllb_md,n,ioutopt
 integer(4) :: ioutpo2,ioerr
 double precision :: plot_fr,memo_fr,rest_fr,cpoi_fr,pllb_fr,depth_dt_out
-character(100) :: token
+character(80) :: token
 character(7),dimension(3) :: outopt = (/ "full   ","partial","null   " /)
 logical,external :: ReadCheck
-character(100),external :: GetToken,lcase
+character(80),external :: GetToken,lcase
 !------------------------
 ! Explicit interfaces
 !------------------------

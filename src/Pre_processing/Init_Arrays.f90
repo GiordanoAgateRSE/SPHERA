@@ -1,23 +1,22 @@
 !----------------------------------------------------------------------------------------------------------------------------------
-! SPHERA (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
-! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-) 
-!      
-!     
-!   
-!      
-!  
+! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
+! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-)
 
-! This file is part of SPHERA.
-!  
-!  
-!  
-!  
+
+
+! SPHERA authors and email contact are provided on SPHERA documentation.
+
+! This file is part of SPHERA v.8.0.
+! SPHERA v.8.0 is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
 ! SPHERA is distributed in the hope that it will be useful,
 ! but WITHOUT ANY WARRANTY; without even the implied warranty of
-! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
-!  
-!  
-!  
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
 
 !----------------------------------------------------------------------------------------------------------------------------------
@@ -219,7 +218,8 @@ do i=1,size(BoundarySide)
    BoundarySide(i)%tipo = "    "
    BoundarySide(i)%stretch = 0
    BoundarySide(i)%previous_side = 0
-   BoundarySide(i)%vertex(1:SPACEDIM-1) = 0
+   BoundarySide(i)%vertex(1) = 0
+   BoundarySide(i)%vertex(2) = 0
    BoundarySide(i)%CloseParticles = 0
    BoundarySide(i)%length = zero
    BoundarySide(i)%CloseParticles_maxQuota = const_m_9999
@@ -230,7 +230,7 @@ do i=1,size(BoundarySide)
    enddo
    BoundarySide(i)%angle = zero
    do j=1,SPACEDIM
-      BoundarySide(i)%velocity(j) = zero
+      BoundarySide(i)%velocity(J) = zero
    enddo
 enddo
 ! In case of restart, it does not zero "domain" and "grid"

@@ -1,23 +1,22 @@
 !----------------------------------------------------------------------------------------------------------------------------------
-! SPHERA (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
-! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-) 
-!      
-!     
-!   
-!      
-!  
+! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
+! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-)
 
-! This file is part of SPHERA.
-!  
-!  
-!  
-!  
+
+
+! SPHERA authors and email contact are provided on SPHERA documentation.
+
+! This file is part of SPHERA v.8.0.
+! SPHERA v.8.0 is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
 ! SPHERA is distributed in the hope that it will be useful,
 ! but WITHOUT ANY WARRANTY; without even the implied warranty of
-! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
-!  
-!  
-!  
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
 
 !----------------------------------------------------------------------------------------------------------------------------------
@@ -104,7 +103,7 @@ do npi=1,nag
 ! Solution (density) in the central zone (here the wall element): subscript star
       uR = pg_w(npj)%vel(1) * pg_w(npj)%normal(1) + pg_w(npj)%vel(2) *         &
            pg_w(npj)%normal(2) + pg_w(npj)%vel(3) * pg_w(npj)%normal(3)
-      cL = dsqrt(Med(pg(npi)%imed)%eps/rhoL)
+      cL = Dsqrt(Med(pg(npi)%imed)%eps/rhoL)
       rhostar = rhoL + (uL - uR) * rhoL / cL
       if (rhostar<10.d0) then
          rhostar = 10.d0
@@ -117,14 +116,14 @@ do npi=1,nag
          pstar = -99000.d0
       endif 
 ! Linearized Partial Riemann Solver: end
-! "den" is an auxiliary vector to add contributions to the density and 
+! den(pnj) is an auxiliary vector to add contributions to the density and 
 ! pressure denominators
       Ww_Shep = pg(npi)%mass / pg(npi)%dens * kernel_fw(1,npartint) 
-      den(npj) = den(npj) + Ww_Shep
       pg_w(npj)%dens = pg_w(npj)%dens + rhostar * Ww_Shep
+      den(npj) = den(npj) + Ww_Shep
       pg_w(npj)%pres = pg_w(npj)%pres + pstar * Ww_Shep
-   enddo
-enddo
+   end do
+end do
 ! Updating wall element pressure and density
 !$omp parallel do default(none) private(npi) shared(neigh_w,pg_w,den,DBSPH)
 do npi=1,DBSPH%n_w
