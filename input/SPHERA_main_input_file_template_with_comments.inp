@@ -457,7 +457,7 @@ restart_file                        ! restart_file(restart file name -with
 ! Post-processing parameters for .txt files. The first two words (and the 
 ! possible fourth) of each line are keywords.
 results time dt_out                 ! dt_out(writing time step)
-restart time dt_restart             ! dt_restart(=99999., restart time step)
+restart time dt_restart             ! dt_restart(restart time frequency)
 print partial log_file_frequency    ! log_file_frequency (log file writing time 
                                     ! step in terms of time step number) 
 control time dt_out_mon             ! dt_out_mon(writing time step for 
