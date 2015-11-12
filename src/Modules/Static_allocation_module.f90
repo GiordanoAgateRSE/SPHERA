@@ -33,7 +33,7 @@ integer(4),public,parameter :: MAXOPENSIDES = 10
 integer(4),public,parameter :: MAXOPENFACES = 50
 integer(4),public,parameter :: MAXPARTLINE = 2000
 integer(4),public,parameter :: LIMCLOSEBOUNDSIDES = 2
-integer(4),public,parameter :: MAXFACENODES = 4
+integer(4),public,parameter :: MAXFACENODES = 6
 integer(4),public,parameter :: NUMCOLS_BIT = 5
 integer(4),public,parameter :: NUMROWS_BIT = 22
 integer(4),public,parameter :: INT_KERNELTABLE = 40
@@ -157,7 +157,7 @@ integer(4),dimension(0:3,2) :: icoordp ! Pointer for coordinate location 2D or
                                        ! in the main program for compatibility
                                        ! with xlf90
 character(len=8),parameter :: acode = "SPHERA  "
-character(len=8),parameter :: version = "7.2   "
+character(len=8),parameter :: version = "8.0   "
 character(255) :: nomecaso, nomecas2
 character(1),dimension(0:3) :: xyzlabel = (/ "T", "X", "Y", "Z" /)  
 character(4),dimension(3) :: ncordlabel = (/ "    ", "(2D)", "(3D)" /)  
@@ -168,6 +168,6 @@ character(255) :: nomefileerr ! File name for error file in erosion model
 character(8) :: modelloerosione ! type of erosion criterion (shields, mohr)
 ! "original" or "euristic"
 character(len=8) :: dt_opt = "original" 
-character(80),dimension(MAXTIT) :: title  
+character(100),dimension(MAXTIT) :: title  
 end module
 

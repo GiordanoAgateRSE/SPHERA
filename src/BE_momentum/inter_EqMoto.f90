@@ -24,8 +24,7 @@
 ! Description: Computation of the momentum equation RHS (with DB-SPH boundary treatment scheme, Shepard's coefficient and gravity 
 !              are added at a later stage) and the energy equation RHS (this last equation is not validated).   
 !----------------------------------------------------------------------------------------------------------------------------------
-
-subroutine inter_EqMoto (npi,tpres,tdiss,tvisc)
+subroutine inter_EqMoto(npi,tpres,tdiss,tvisc)
 !------------------------
 ! Modules
 !------------------------ 
@@ -43,12 +42,28 @@ double precision :: rhoi,rhoj,amassj,pi,pj,alpha,veln,velti,veltj,deltan,pre
 double precision :: coeff,secinv,nupa,nu,modderveln,moddervelt,moddervel
 double precision :: dvtdn,denorm,rij_su_h,ke_coef,kacl_coef,rij_su_h_quad
 double precision :: vol_Shep,Ww_Shep,rijtemp,rijtemp2
-double precision :: gradmod,gradmodwacl,wu,denom
-double precision,dimension(3) :: dervel,dervelmorr,appopres,appodiss,rvw
-double precision,dimension(3) :: rvwalfa,rvwbeta,ragtemp
+double precision :: gradmod,gradmodwacl,wu,denom,absv_pres_grav_inner
+double precision :: absv_Morris_inner,Morris_inner_weigth,kernel_der
+double precision :: dervel(3),dervelmorr(3),appopres(3),appodiss(3),rvw(3)
+double precision :: rvwalfa(3),rvwbeta(3),ragtemp(3),rvw_sum(3),rvw_semi_part(3)
+double precision :: DBSPH_wall_she_vis_term(3),t_visc_semi_part(3)
 !------------------------
 ! Explicit interfaces
 !------------------------
+interface
+   subroutine viscomorris(npi,npj,npartint,mass_comput_part,dens_comput_part,  &
+   kin_visc_comput_part,mass_neighbour,dens_neighbour,kin_visc_neighbour,      &
+   kernel_der,vel_type,rel_dis,dervel,rvw)
+   implicit none
+   integer(4),intent(in) :: npi,npj,npartint
+   double precision,intent(in) :: mass_comput_part,dens_comput_part
+   double precision,intent(in) :: kin_visc_comput_part,mass_neighbour
+   double precision,intent(in) :: dens_neighbour,kin_visc_neighbour,kernel_der
+   double precision,intent(in) :: rel_dis(3),dervel(3)
+   character(3),intent(in) :: vel_type
+   double precision,intent(out) :: rvw(3)
+   end subroutine viscomorris
+end interface
 !------------------------
 ! Allocations
 !------------------------
@@ -64,6 +79,9 @@ dervelmorr(:) = zero
 deltan = 1.d+07
 ke_coef = Domain%coefke / Domain%h
 kacl_coef = Domain%coefkacl / Domain%h
+rvw_sum(:) = zero
+DBSPH_wall_she_vis_term(:) = 0.d0
+t_visc_semi_part(:) = 0.d0
 !------------------------
 ! Statements
 !------------------------
@@ -202,22 +220,39 @@ do contj=1,nPartIntorno(npi)
          endif
    endif
    tpres(:) = tpres(:) + appopres(:)
+! To compute Monaghan term (artificial viscosity)   
    call viscomon (npi,npj,npartint,dervel,rvwalfa,rvwbeta)
    appodiss(:) = rvwalfa(:) + rvwbeta(:)
-! Monaghan term (artificial viscosity)
-   tdiss(:) = tdiss(:) + appodiss(:)   
-   call viscomorris (npi,npj,npartint,dervel,rvw)
+! To add Monaghan term (artificial viscosity)
+   tdiss(:) = tdiss(:) + appodiss(:)
+! To compute Morris term (interaction with neighbouring fluid particle)
+   call viscomorris(npi,npj,npartint,pg(npi)%mass,pg(npi)%dens,pg(npi)%visc,   &
+      pg(npj)%mass,pg(npj)%dens,pg(npj)%visc,PartKernel(2,npartint),           &
+      pg(npj)%vel_type,rag(1:3,npartint),dervel,rvw)
+! To add  Morris term (interaction with neighbouring fluid particle)   
    tvisc(:) = tvisc(:) + rvw(:)
+   rvw_sum(:) = rvw_sum(:) + rvw(:)
 ! Momentum equation: end
    if (esplosione) &
       pg(npi)%dEdT = pg(npi)%dEdT + half * (dervel(1) * (appopres(1) +         &
                      appodiss(1)) + dervel(2) * (appopres(2) + appodiss(2)) +  &
                      dervel(3) * (appopres(3) + appodiss(3)))
-end do
-! Boundary contributions (DB-SPH)
-if ((Domain%tipo=="bsph").and.(DBSPH%n_w > 0)) then
+enddo                     
+if (pg(npi)%visc>0.d0) then
+   absv_pres_grav_inner = dsqrt(dot_product(tpres,tpres)) + GI
+   absv_Morris_inner = dsqrt(dot_product(rvw_sum,rvw_sum))
+   Morris_inner_weigth = absv_Morris_inner / absv_pres_grav_inner * 100.d0
+   if (Morris_inner_weigth>5.d0) then
+      pg(npi)%laminar_flag = 1
+      else
+         pg(npi)%laminar_flag = 0
+   endif
+endif
+! Boundary contributions (DB-SPH), only in case of a simulated local laminar
+! regime
+if ((DBSPH%n_w>0).and.(pg(npi)%laminar_flag==1)) then
    do contj=1,nPartIntorno_fw(npi)
-      npartint = (npi - 1)* NMAXPARTJ + contj
+      npartint = (npi - 1) * NMAXPARTJ + contj
       npj = PartIntorno_fw(npartint)
       dervel(:) = pg_w(npj)%vel(:) - pg(npi)%vel(:)
       appopres(:) = - pg_w(npj)%dens * pg_w(npj)%weight * kernel_fw(1,npartint)&
@@ -229,10 +264,21 @@ if ((Domain%tipo=="bsph").and.(DBSPH%n_w > 0)) then
                     (pg_w(npj)%dens * pg_w(npj)%dens)) * rag_fw(:,npartint) *  &
                     kernel_fw(2,npartint)  
       tpres(:) = tpres(:) + appopres(:)
-      call viscomon_wall_elements(npi,npj,npartint,dervel,rvwalfa,rvwbeta)
-      call viscomorris_wall_elements(npi,npj,npartint,dervel,rvw)
-      tvisc(:) = tvisc(:) + rvw(:)
-   end do
+      call DBSPH_BC_shear_viscosity_term(npi,npj,npartint,                     &
+         DBSPH_wall_she_vis_term)
+! To compute Morris term (interaction with neighbouring semi-particle)
+      kernel_der = kernel_fw(2,npartint)/(dot_product(rag_fw(:,npartint),      &
+                   rag_fw(:,npartint)) + eta2)
+      call viscomorris(npi,npj,npartint,pg(npi)%mass,pg(npi)%dens,pg(npi)%visc,&
+         pg_w(npj)%mass,pg_w(npj)%dens,pg_w(npj)%kin_visc_semi_part,kernel_der,&
+         "std",rag_fw(1:3,npartint),dervel,rvw_semi_part)
+      t_visc_semi_part(:) = t_visc_semi_part(:) + rvw_semi_part(:)
+   enddo
+! Computation of the boundary shear viscosity term in DB-SPH-NS
+   DBSPH_wall_she_vis_term(:) = DBSPH_wall_she_vis_term(:) / pg(npi)%dens /    &
+                                pg(npi)%Gamma
+! Update the overall (inner+BC) shear viscosity term in DB-SPH-NS
+   tvisc(:) = tvisc(:) + DBSPH_wall_she_vis_term(:) + t_visc_semi_part(:)   
 endif
 !------------------------
 ! Deallocations

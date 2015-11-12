@@ -305,7 +305,9 @@ do icbs=1,IntNcbs
             TT(i) = TN * nnlocal(i)
          enddo
 ! Shear viscosity force (with changed sign)
-         SVforce = SVcoeff * (cinvisci + cinvisci) * IntWd1s0
+         if (pg(npi)%laminar_flag==1) then
+            SVforce = SVcoeff * (cinvisci + cinvisci) * IntWd1s0
+         endif
          do i=1,PLANEDIM
             ViscoMon(i) = ViscoMon(i) + TT(i)
 ! explosion

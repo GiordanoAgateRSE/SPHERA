@@ -35,11 +35,12 @@ use Hybrid_allocation_module
 ! Declarations
 !------------------------
 implicit none
+logical :: DBSPH_fictitious_reservoir_flag
 integer(4) :: nrighe,ier,ninp,nout
 integer(4),dimension(20) :: NumberEntities
 integer(4),dimension(NumBVertices) :: BoundaryVertex
 character(1) :: comment
-character(80) :: ainp
+character(100) :: ainp
 type (TyZone),dimension(NPartZone) :: Partz
 type (TyBoundaryStretch),dimension(NumTratti) :: Tratto
 integer(4) :: n,index,numv,indexi,indexf,Izona,ipointer,Medium,icolor,icord    
@@ -50,16 +51,16 @@ double precision :: pool_value,shear,velocity,trampa,valp,flowrate,H_res
 double precision,dimension(3) :: values1,values3
 double precision,dimension(0:3,maxpointsvlaw) :: valuev
 double precision :: plan_reservoir_pos(4,2),dam_zone_vertices(4,2)
-character(len=1) :: pool_plane,bends,slip
-character(len=2) :: pressu
-character(len=3) :: move
-character(len=4) :: tipo
-character(len=6) :: token_color
-character(len=8) :: label
-character(len=80):: token
+character(1) :: pool_plane,bends,slip
+character(2) :: pressu
+character(3) :: move
+character(4) :: tipo
+character(6) :: token_color
+character(8) :: label
+character(100):: token
 logical,external :: ReadCheck
 integer(4),external :: ptcolorrgb
-character(80), external :: lcase, GetToken
+character(100), external :: lcase, GetToken
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -120,6 +121,7 @@ do while (TRIM(lcase(ainp))/="##### end boundaries #####")
    valp = zero
    IC_source_type = 0
    Car_top_zone = 0
+   DBSPH_fictitious_reservoir_flag = .false.
    dx_CartTopog = 0.d0
    H_res = 0.d0
    ID_first_vertex = 0
@@ -184,10 +186,10 @@ do while (TRIM(lcase(ainp))/="##### end boundaries #####")
             write(nout,*)                                                      &
 'TRAMPA in SOURCE boundary is not available. TRAMPA is setted to zero; check the VELOCITY boundary.'
             write(nout,*) ' '
-            write(*,*) ' '
-            write(*,*)                                                         &
+            write(nout,*) ' '
+            write(nout,*)                                                      &
 'TRAMPA in SOURCE boundary is not available. TRAMPA is setted to zero;  check the VELOCITY boundary.'
-            write(*,*) ' '
+            write(nout,*) ' '
             trampa = zero
          endif
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
@@ -266,9 +268,11 @@ do while (TRIM(lcase(ainp))/="##### end boundaries #####")
             ninp,nout)
          if (ier/=0) return  
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         if (ioerr==0) read(ainp,*,iostat=ioerr) IC_source_type,Car_top_zone
+         if (ioerr==0) read(ainp,*,iostat=ioerr) IC_source_type,Car_top_zone,  &
+            DBSPH_fictitious_reservoir_flag
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                             &
-            "IC_source_type, Car_top_zone",ninp,nout)) return
+            "IC_source_type, Car_top_zone, DBSPH_fictitious_reservoir_flag",   &
+            ninp,nout)) return
          if (IC_source_type==2) then
             call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
             if (ioerr==0) read(ainp,*,iostat=ioerr) dx_CartTopog,H_res
@@ -367,6 +371,8 @@ do while (TRIM(lcase(ainp))/="##### end boundaries #####")
       Partz(Izona)%Medium   = Medium
       Partz(Izona)%IC_source_type = IC_source_type
       Partz(Izona)%Car_top_zone = Car_top_zone
+      Partz(Izona)%DBSPH_fictitious_reservoir_flag =                           &
+         DBSPH_fictitious_reservoir_flag
       if (IC_source_type==2) then
          Partz(Izona)%dx_CartTopog = dx_CartTopog
          Partz(Izona)%H_res = H_res
@@ -532,6 +538,8 @@ BoundaryVertex(Tratto(index)%inivertex+Tratto(index)%numvertices-1)
                   Partz(Izona)%IC_source_type
                write(nout,"(1x,a,i12)") "Car_top_zone    : ",                  &
                   Partz(Izona)%Car_top_zone
+               write(nout,"(1x,a,l12)") "DBSPH_fictitious_reservoir_flag : ",  &
+                  Partz(Izona)%DBSPH_fictitious_reservoir_flag
                if (IC_source_type==2) then
                   write(nout,"(1x,a,1pe12.4)")    "dx_CartTopog    : ",        &
                      Partz(Izona)%dx_CartTopog

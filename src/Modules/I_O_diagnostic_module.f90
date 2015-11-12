@@ -26,7 +26,7 @@
 
 module I_O_diagnostic_module
 interface 
-   subroutine diagnostic (arg1,arg2,arg3)
+   subroutine diagnostic(arg1,arg2,arg3)
       use Static_allocation_module
       integer(4),intent(in) :: arg1
       integer(4),intent(in),optional :: arg2

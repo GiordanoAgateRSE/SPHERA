@@ -35,7 +35,7 @@ use Dynamic_allocation_module
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: nrighe,ier,ninp,nout,ioerr,i,Id_body,n_elem,j,Id_elem
+integer(4) :: nrighe,ier,ninp,nout,ioerr,i,Id_body,n_elem,j,Id_elem,alloc_stat
 integer(4) :: imposed_kinematics,n_records,Ic_imposed 
 double precision :: mass
 integer(4) :: normal_act(6)
@@ -43,7 +43,7 @@ double precision :: L_geom(3),x_CM(3),alfa(3),u_CM(3),omega(3),x_rotC(3)
 double precision :: mass_deact(6)
 double precision :: Ic(3,3)
 character(1) :: comment
-character(80) :: ainp,lcase !,token,GetToken
+character(100) :: ainp,lcase !,token,GetToken
 logical,external :: ReadCheck
 !------------------------
 ! Explicit interfaces
@@ -57,7 +57,9 @@ logical,external :: ReadCheck
 !------------------------
 ! Statements
 !------------------------
-! In case of restart, input data are not read
+! In case of restart, input file sections are read just once (not twice as for
+! regular runs). restart=.false. during the first reading of the main input
+! file, even for restarted simulations.
 if (restart) then
    do while (TRIM(lcase(ainp)) /= "##### end body dynamics #####")
       call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
@@ -76,6 +78,8 @@ do while (TRIM(lcase(ainp)) /= "##### end body dynamics #####")
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"BODY DYNAMICS GENERAL INPUT",ninp,&
       nout)) return
 ! Writing the number of bodies and "dx_dxbodies" on the log file
+! In case of restart, ncord>0 since the first (and only) reading of the main
+! input file
    if ((ncord>0).and.(nout>0)) then
       write(nout,"(1x,a,1p,i12)") "n_bodies:.....................",n_bodies
       write(nout,"(1x,a,1p,e12.4)") "dx_dxbodies:..................",          &
@@ -85,9 +89,18 @@ do while (TRIM(lcase(ainp)) /= "##### end body dynamics #####")
       write(nout,"(1x,a)")  " "
    endif
 ! Allocation of the array of the bodies
-   if (allocated(body_arr)) then
-      else
-         allocate(body_arr(n_bodies))  
+   if (.not.allocated(body_arr)) then
+      allocate(body_arr(n_bodies),STAT=alloc_stat)
+      if (alloc_stat/=0) then
+         write(nout,*)                                                         &
+            'Allocation of body_arr in ReadBodyDynamics failed;',              &
+            ' the program terminates here.'
+         stop ! Stop the main program
+         else
+            write (nout,*)                                                     &
+               "Allocation of body_arr in ReadBodyDynamics ",                  &
+               "successfully completed."
+      endif
    endif
 ! Loop over the transported bodies
    do i=1,n_bodies

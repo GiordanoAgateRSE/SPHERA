@@ -40,14 +40,14 @@ integer(4),dimension(20) :: NumberEntities
 type (TyCtlPoint),dimension(NPointst) :: Control_Points
 type (TyCtlLine),dimension(NLines) :: Control_Lines
 character(1) :: comment
-character(80) :: ainp
+character(100) :: ainp
 integer(4) :: n,i,ndiv,icord,ioerr,npts
 double precision :: vp
 double precision,dimension(3) :: values1,values2,values3
 character(5) :: txt
 character(8) :: label
 logical,external :: ReadCheck 
-character(80), external :: lcase
+character(100), external :: lcase
 !------------------------
 ! Explicit interfaces
 !------------------------

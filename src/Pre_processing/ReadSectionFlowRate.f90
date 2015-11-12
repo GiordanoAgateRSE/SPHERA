@@ -37,7 +37,7 @@ use Dynamic_allocation_module
 implicit none
 integer(4) :: nrighe,ier,ninp,nout
 character(1) :: comment
-character(80) :: ainp,lcase 
+character(100) :: ainp,lcase
 integer(4) :: n_fluid_types,ioerr,i,n_sect,n_vertices,section_ID
 double precision :: dt_out,aux_dis,area
 double precision :: plane_normal(3),vec_aux_1(3),vec_aux_2(3),vec_aux_3(3)
@@ -58,14 +58,14 @@ logical,external :: ReadCheck
 !------------------------
 ! In case of restart, input data sections are not read
 if (restart) then
-   do while (TRIM(lcase(ainp))/="##### end Section_flow_rate #####")
-      call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
+   do while (TRIM(lcase(ainp))/="##### end section flow rate #####")
+      call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
       if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"Section_flow_rate DATA",ninp,  &
          nout)) return
    enddo
    return
 endif
-call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
+call Readriga(ainp,comment,nrighe,ioerr,ninp)
 if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"Section_flow_rate DATA",ninp,nout))  &
    return
 do while (TRIM(lcase(ainp))/="##### end section flow rate #####")
@@ -97,23 +97,23 @@ do while (TRIM(lcase(ainp))/="##### end section flow rate #####")
 ! Loop over the monitoring sections for flow rate
    do i=1,n_sect
 ! Reading the section parameters
-      call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
+      call Readriga(ainp,comment,nrighe,ioerr,ninp)
       read (ainp,*,iostat=ioerr) section_ID
       if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"section_ID",ninp,nout)) return
-      call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
+      call Readriga(ainp,comment,nrighe,ioerr,ninp)
       read (ainp,*,iostat=ioerr) n_vertices
       if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"n_vertices",ninp,nout)) return
-      call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
+      call Readriga(ainp,comment,nrighe,ioerr,ninp)
       read (ainp,*,iostat=ioerr) vertex(1,1),vertex(1,2),vertex(1,3)
       if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"vertex_1",ninp,nout)) return
-      call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
+      call Readriga(ainp,comment,nrighe,ioerr,ninp)
       read (ainp,*,iostat=ioerr) vertex(2,1),vertex(2,2),vertex(2,3)
       if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"vertex_2",ninp,nout)) return
-      call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
+      call Readriga(ainp,comment,nrighe,ioerr,ninp)
       read (ainp,*,iostat=ioerr) vertex(3,1),vertex(3,2),vertex(3,3)
       if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"vertex_3",ninp,nout)) return
       if (n_vertices==4) then
-         call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
+         call Readriga(ainp,comment,nrighe,ioerr,ninp)
          read (ainp,*,iostat=ioerr) vertex(4,1),vertex(4,2),vertex(4,3)
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"vertex_4",ninp,nout)) return           
       endif
@@ -154,7 +154,7 @@ do while (TRIM(lcase(ainp))/="##### end section flow rate #####")
          endif
       endif
    enddo         
-   call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
+   call Readriga(ainp,comment,nrighe,ioerr,ninp)
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"Section_flow_rate DATA",ninp,     &
       nout)) return
 enddo

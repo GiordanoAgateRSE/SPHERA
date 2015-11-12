@@ -39,14 +39,14 @@ integer(4) :: nrighe,ier, ninp,nout,nscr
 integer(4),dimension(20) :: NumberEntities
 type (TyMedium),dimension(NMedium) :: Med
 character(1) :: comment
-character(80) :: ainp
+character(100) :: ainp
 integer(4) :: index,nitersol,ioerr
 double precision :: den0,eps,alfaMon,betaMon,visc,viscmx,taucri,cuin,phi,Cs
 double precision :: cons,codif,Settling,coes,Rough,D50,Gamma,InitialIntEn,d_90
 double precision :: porosity
 character(8) :: tipo,erosionmodel
-character(80) :: token
-character(80),external :: GetToken,lcase
+character(100) :: token
+character(100),external :: GetToken,lcase
 logical,external :: ReadCheck
 !------------------------
 ! Explicit interfaces

@@ -144,9 +144,11 @@ face_loop: do icbf = 1,Ncbf
 ! Explosion
          endif
          if (cinvisci>zero) then
-            cinviscmult = two * cinvisci * IntdWrm1dV *                        &
-               Tratto(stretch)%ShearCoeff
-            ViscoShear(:) = ViscoShear(:) + cinviscmult * dvij(:)
+            if (pg(npi)%laminar_flag==1) then
+               cinviscmult = two * cinvisci * IntdWrm1dV *                     &
+                             Tratto(stretch)%ShearCoeff
+               ViscoShear(:) = ViscoShear(:) + cinviscmult * dvij(:)
+            endif
          endif
       endif
       elseif (stretchtype=="velo") then 

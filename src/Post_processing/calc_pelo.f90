@@ -48,7 +48,7 @@ double precision,dimension(3,nlines) :: pelolib
 !------------------------
 ! Allocations
 !------------------------
-allocate (PartCelnum(NMAXPARTJ),PartCel(NMAXPARTJ))
+allocate(PartCelnum(NMAXPARTJ),PartCel(NMAXPARTJ))
 !------------------------
 ! Initializations
 !------------------------
@@ -88,7 +88,7 @@ write (nplb,'(30g14.7)') tempo,pelolib
 !------------------------
 ! Deallocations
 !------------------------
-deallocate (PartCelnum,PartCel)
+deallocate(PartCelnum,PartCel)
 return
 end subroutine calc_pelo
 

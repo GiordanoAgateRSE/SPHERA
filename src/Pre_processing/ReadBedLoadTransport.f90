@@ -43,7 +43,7 @@ double precision :: dt_out,x_fixed,y_fixed,conv_crit_erosion,velocity_fixed_bed
 double precision :: Chezy_friction_coeff,x_min_dt,x_max_dt,y_min_dt,y_max_dt
 double precision :: z_min_dt,z_max_dt
 character(1) :: comment
-character(80) :: ainp,lcase 
+character(100) :: ainp,lcase
 logical,external :: ReadCheck
 !------------------------
 ! Explicit interfaces

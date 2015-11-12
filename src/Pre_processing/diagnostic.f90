@@ -23,8 +23,7 @@
 ! Program unit: diagnostic                   
 ! Description: Diagnostic (error) messages.                
 !----------------------------------------------------------------------------------------------------------------------------------
-
-subroutine diagnostic (ierr,ivalue,avalue)
+subroutine diagnostic(ierr,ivalue,avalue)
 !------------------------
 ! Modules
 !------------------------ 

@@ -39,11 +39,11 @@ implicit none
 integer(4) :: nrighe,ier,ninp,nout,ninp2
 integer(4),dimension(20) :: NumberEntities
 character(1) :: comment
-character(80) :: ainp
+character(100) :: ainp
 logical :: OnlyTriangle
 integer(4) :: ioerr
 logical,external :: ReadCheck
-character(80),external :: lcase, GetToken
+character(100),external :: lcase, GetToken
 !------------------------
 ! Explicit interfaces
 !------------------------

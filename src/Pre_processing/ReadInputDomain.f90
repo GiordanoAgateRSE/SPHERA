@@ -38,12 +38,12 @@ implicit none
 integer(4) :: nrighe,ier, ninp,nout,nscr
 integer(4),dimension(20) :: NumberEntities
 character(1) :: comment
-character(80) :: ainp
+character(100) :: ainp
 integer(4) :: ioerr
 double precision :: dd, trunc
-character(80) :: token
+character(100) :: token
 logical,external :: ReadCheck
-character(80),external :: lcase, GetToken
+character(100),external :: lcase, GetToken
 !------------------------
 ! Explicit interfaces
 !------------------------

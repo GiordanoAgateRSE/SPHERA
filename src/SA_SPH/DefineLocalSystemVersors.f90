@@ -24,7 +24,6 @@
 ! Description:  To define the directional cosines of the local reference system.  
 !              (Di Monaco et al., 2011, EACFM)                        
 !----------------------------------------------------------------------------------------------------------------------------------
-
 subroutine DefineLocalSystemVersors(Nf)
 !------------------------
 ! Modules
@@ -39,7 +38,7 @@ implicit none
 integer(4) :: Nf
 integer(4) :: i,j,n,nnodes,sidek,refnode,nod
 double precision :: U1len,W12len,LocX
-double precision,dimension(SPACEDIM) ::  RR,ss,nnlocal,U1,U2,W12
+double precision,dimension(SPACEDIM) :: RR,ss,nnlocal,U1,U2,W12
 integer(4),dimension(2,3) :: nindex 
 !------------------------
 ! Explicit interfaces
@@ -57,13 +56,16 @@ nindex(1, 3) = 3
 nindex(2, 1) = 1
 nindex(2, 2) = 3
 nindex(2, 3) = 4
-nnodes = 4
+nnodes = 6
+if (BoundaryFace(nf)%Node(6)%name<0) nnodes = 5
+if (BoundaryFace(nf)%Node(5)%name<0) nnodes = 4
+if (BoundaryFace(Nf)%Node(4)%name<0) nnodes = 3
+BoundaryFace(Nf)%nodes = nnodes
 !------------------------
 ! Statements
 !------------------------
-if (BoundaryFace(Nf)%Node(4)%name<=0) nnodes = 3
-BoundaryFace(Nf)%nodes = nnodes
-! sidek=1 (triangle),  sidek=2 (parallelogram)
+! sidek=1 (for triangles), sidek=2 (for quadrilaterals), sidek=3 (for pentagons)
+! sidek=4 (for hexagons)
 sidek = nnodes - 2                   
 do n=1,nnodes                     
     nod = BoundaryFace(nf)%Node(n)%name
@@ -75,7 +77,7 @@ enddo
 U1(1:SPACEDIM) = BoundaryFace(Nf)%Node(nindex(sidek,1))%GX(1:SPACEDIM) -       &
    BoundaryFace(Nf)%Node(nindex(sidek,3))%GX(1:SPACEDIM)
 U2(1:SPACEDIM) = BoundaryFace(Nf)%Node(nindex(sidek,2))%GX(1:SPACEDIM) -       &
-   BoundaryFace(Nf)%Node(nindex(sidek, 3))%GX(1:SPACEDIM)
+   BoundaryFace(Nf)%Node(nindex(sidek,3))%GX(1:SPACEDIM)
 ! Length of side U1
 U1len = Dsqrt(U1(1) * U1(1) + U1(2) * U1(2) + U1(3) * U1(3)) 
 ! To compute directional cosines of side W12
@@ -85,7 +87,9 @@ call Vector_Product(U1,U2,W12,SPACEDIM)
 ! Length of vector W12
 W12len = Dsqrt(W12(1) * W12(1) + W12(2) * W12(2) + W12(3) * W12(3))
 ! Area of the face "nf" (denominator=2 for triangles, =1 for parallelograms) 
-BoundaryFace(Nf)%Area = W12len / float(3 - sidek)   
+! The estimation of pentagon and hexagon face areas is not mandatory as they are
+! only considered for "perimeter" zones, not for SASPH frontiers.
+if (nnodes<=4) BoundaryFace(Nf)%Area = W12len / float(3 - sidek)
 ! Directional cosines of the normal to the face "nf"     
 nnlocal(1:SPACEDIM) = W12(1:SPACEDIM) / W12len
 ! Vector product ss=rrxnn; ss is the unity vector of the third local axis      

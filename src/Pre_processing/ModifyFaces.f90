@@ -23,8 +23,7 @@
 ! Program unit: ModifyFaces                   
 ! Description: To generate triangles from quadrilaterals (partitioning along the shortest diagonal)                 
 !----------------------------------------------------------------------------------------------------------------------------------
-
-subroutine ModifyFaces (NumberEntities)
+subroutine ModifyFaces(NumberEntities)
 !------------------------
 ! Modules
 !------------------------ 
@@ -52,7 +51,7 @@ new = NumberEntities(11)
 ! Statements
 !------------------------
 do n=1,NumberEntities(11)
-   if (BoundaryFace(n)%Node(4)%name==0) cycle
+   if (BoundaryFace(n)%Node(4)%name==-1) cycle
    new = new + 1
    d13 = zero
    d24 = zero

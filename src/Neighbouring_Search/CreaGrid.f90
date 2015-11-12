@@ -78,7 +78,7 @@ write (nout,'(1x,a,3i8)') " Number of grid in x, y, z directions : ",          &
 write (nout,'(1x,a,i10)') " Number of total grid : ",Grid%nmax
 write (nout,'(1x,a)') " "
 ! Allocation of a 2D matrix to detect free surface (erosion criterion)
-allocate (ind_interfaces(Grid%ncd(1),Grid%ncd(2),4), stat = ier)
+allocate(ind_interfaces(Grid%ncd(1),Grid%ncd(2),4), stat = ier)
 if (ier/=0) then
    write (nout,'(1x,a,i2)')                                                    &
       "    Array ind_interfaces not allocated. Error code: ",ier

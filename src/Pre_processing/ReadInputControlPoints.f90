@@ -39,11 +39,11 @@ integer(4) :: nrighe,ier,ninp,nout
 integer(4),dimension(20) :: NumberEntities
 type (TyCtlPoint),dimension(NPointst) :: Control_Points
 character(1) :: comment
-character(80) :: ainp
+character(100) :: ainp
 integer(4) :: n,i,icord,ioerr
 double precision,dimension(3) :: values1
 logical,external :: ReadCheck
-character(80),external :: lcase
+character(100),external :: lcase
 !------------------------
 ! Explicit interfaces
 !------------------------

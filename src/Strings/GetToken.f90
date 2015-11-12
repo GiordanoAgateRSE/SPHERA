@@ -24,7 +24,7 @@
 ! Description: 
 !----------------------------------------------------------------------------------------------------------------------------------
 
-character(80) function GetToken(ainp,itok,ioerr)
+character(100) function GetToken(ainp,itok,ioerr)
 !------------------------
 ! Modules
 !------------------------ 
