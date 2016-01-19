@@ -36,7 +36,7 @@ use I_O_file_module
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: i,nbi,npi,j,k,nei,erased_part,ier
+integer(4) :: i,nbi,npi,j,k,nei,erased_part,alloc_stat
 double precision :: xmin,xmax,ymin,ymax,zmin,zmax,mod_normal,aux_umax
 integer(4) :: vec_temp(3)
 double precision :: vec2_temp(3)
@@ -94,7 +94,18 @@ do i=1,n_bodies
    n_body_part = n_body_part + body_arr(i)%npart      
 end do
 ! Managing body particles  
-allocate (bp_arr(n_body_part))
+if (.not.allocated(bp_arr)) then
+   allocate(bp_arr(n_body_part),STAT=alloc_stat)
+   if (alloc_stat/=0) then
+      write(nout,*)                                                            &
+         'Allocation of bp_arr in Input_Body_Dynamics failed;',                &
+         ' the program terminates here.'
+      stop ! Stop the main program
+      else
+         write (nout,*)                                                        &
+            "Allocation of bp_arr in Input_Body_Dynamics successfully completed"
+   endif
+endif
 npi = 1  
 ! Loop over the transported bodies (not to be parallelized)
 do nbi=1,n_bodies
@@ -269,13 +280,20 @@ enddo
 do i=1,n_body_part
    if (bp_arr(i)%area>0.d0) n_surf_body_part = n_surf_body_part + 1  
 enddo
-! Allocating the list of the surface body particles
-allocate (surf_body_part(n_surf_body_part),stat=ier)
-if (ier/=0) then
-   write (nout,'(1x,a,i2)') "   surf_body_part not allocated. Error code: ",ier
-   else
-      write (nout,'(1x,a)') "   Arrays surf_body_part successfully allocated "
-end if
+! Allocating the array of the surface body particles
+if (.not.allocated(surf_body_part)) then
+   allocate(surf_body_part(n_surf_body_part),STAT=alloc_stat)
+   if (alloc_stat/=0) then
+      write(nout,*)                                                            &
+         'Allocation of surf_body_part in Input_Body_Dynamics failed;',        &
+         ' the program terminates here.'
+      stop ! Stop the main program
+      else
+         write (nout,*)                                                        &
+            'Allocation of surf_body_part in Input_Body_Dynamics ',            &
+            ' successfully completed.'
+   endif
+endif
 surf_body_part = 0
 ! Listing surface body particles
 j = 1

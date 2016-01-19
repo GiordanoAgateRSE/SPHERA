@@ -59,30 +59,36 @@ if (.not.allocated(pg_w)) then
       call diagnostic (arg1=5,arg2=340)
       stop ! Stop the main program
       else
-         pg_w(:)%cella = 0
-         pg_w(:)%adjacent_faces(1) = 0
-         pg_w(:)%adjacent_faces(2) = 0
-         pg_w(:)%adjacent_faces(3) = 0         
-         pg_w(:)%coord(1) = 0.d0
-         pg_w(:)%coord(2) = 0.d0
-         pg_w(:)%coord(3) = 0.d0
-         pg_w(:)%vel(1) = 0.d0
-         pg_w(:)%vel(2) = 0.d0         
-         pg_w(:)%vel(3) = 0.d0
-         pg_w(:)%dens = 0.d0
-         pg_w(:)%pres = 0.d0
-         pg_w(:)%normal(1) = 0.d0
-         pg_w(:)%normal(2) = 0.d0
-         pg_w(:)%normal(3) = 0.d0
-         pg_w(:)%weight = 0.d0 
-         pg_w(:)%wet = 0 
-         pg_w(:)%mass = 0.d0 
-         pg_w(:)%k_d = 0.d0
-         pg_w(:)%volume = 0.d0
          write (nout,*) "Allocation of pg_w in DBSPH_IC_surface_elements ",    &
                         "successfully completed."
    endif   
-endif 
+endif
+pg_w(:)%cella = 0
+pg_w(:)%surface_mesh_file_ID = DBSPH%surf_mesh%surface_mesh_file_ID(:)
+pg_w(:)%adjacent_faces(1) = 0
+pg_w(:)%adjacent_faces(2) = 0
+pg_w(:)%adjacent_faces(3) = 0
+pg_w(:)%coord(1) = 0.d0
+pg_w(:)%coord(2) = 0.d0
+pg_w(:)%coord(3) = 0.d0
+pg_w(:)%vel(1) = 0.d0
+pg_w(:)%vel(2) = 0.d0
+pg_w(:)%vel(3) = 0.d0
+pg_w(:)%dens = 0.d0
+pg_w(:)%pres = 0.d0
+pg_w(:)%normal(1) = 0.d0
+pg_w(:)%normal(2) = 0.d0
+pg_w(:)%normal(3) = 0.d0
+pg_w(:)%weight = 0.d0
+pg_w(:)%grad_vel_VSL_times_mu(1) = 0.d0
+pg_w(:)%grad_vel_VSL_times_mu(2) = 0.d0
+pg_w(:)%grad_vel_VSL_times_mu(3) = 0.d0
+pg_w(:)%sigma = 0.d0
+pg_w(:)%wet = 0
+pg_w(:)%mass = 0.d0
+pg_w(:)%k_d = 0.d0
+pg_w(:)%volume = 0.d0
+pg_w(:)%kin_visc_semi_part = 0.d0 
 !$omp parallel do default(none) shared(DBSPH,pg_w,Med,pg,ncord) private(i)
 do i=1,DBSPH%n_w 
    if (ncord==3) then
@@ -99,13 +105,9 @@ DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(i)%vert_list(3))%pos(:) +       &
 DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(i)%vert_list(4))%pos(:) ) / 4.d0    
    endif
    pg_w(i)%cella = ParticleCellNumber(pg_w(i)%coord)
-   pg_w(i)%vel(:) = 0.d0
    pg_w(i)%dens = Med(1)%den0                         
-   pg_w(i)%pres = 0.d0                          
    pg_w(i)%normal(:) = DBSPH%surf_mesh%faces(i)%normal(:)                      
    pg_w(i)%weight = DBSPH%surf_mesh%faces(i)%area
-   pg_w(i)%wet = 0       
-   pg_w(i)%adjacent_faces(:) = 0
 end do
 !$omp end parallel do
 ! Initializing fictitious surface elements representing DB-SPH inlet sections
@@ -116,11 +118,7 @@ do i=(DBSPH%n_w+1),(DBSPH%n_w+DBSPH%n_inlet)
    pg_w(i)%cella = ParticleCellNumber(pg_w(i)%coord)
    pg_w(i)%vel(:) = DBSPH%inlet_sections(j,7:9)
    pg_w(i)%dens = Med(1)%den0                         
-   pg_w(i)%pres = 0.d0                          
    pg_w(i)%normal(:) = DBSPH%inlet_sections(j,4:6)                      
-   pg_w(i)%weight = 0.d0
-   pg_w(i)%wet = 0       
-   pg_w(i)%adjacent_faces(:) = 0
 end do
 !$omp end parallel do
 ! Initializing fictitious surface elements representing DB-SPH outlet sections
@@ -129,13 +127,8 @@ do i=(DBSPH%n_w+DBSPH%n_inlet+1),(DBSPH%n_w+DBSPH%n_inlet+DBSPH%n_outlet)
    j= i - (DBSPH%n_w + DBSPH%n_inlet)  
    pg_w(i)%coord(:) = DBSPH%outlet_sections(j,1:3)
    pg_w(i)%cella = ParticleCellNumber(pg_w(i)%coord)
-   pg_w(i)%vel(:) = 0.d0
    pg_w(i)%dens = Med(1)%den0                         
-   pg_w(i)%pres = 0.d0                          
    pg_w(i)%normal(:) = DBSPH%outlet_sections(j,4:6)                      
-   pg_w(i)%weight = 0.d0
-   pg_w(i)%wet = 0       
-   pg_w(i)%adjacent_faces(:) = 0
 end do
 !$omp end parallel do
 !------------------------

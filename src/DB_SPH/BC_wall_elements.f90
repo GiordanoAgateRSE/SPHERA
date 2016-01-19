@@ -103,7 +103,7 @@ do npi=1,nag
 ! Solution (density) in the central zone (here the wall element): subscript star
       uR = pg_w(npj)%vel(1) * pg_w(npj)%normal(1) + pg_w(npj)%vel(2) *         &
            pg_w(npj)%normal(2) + pg_w(npj)%vel(3) * pg_w(npj)%normal(3)
-      cL = Dsqrt(Med(pg(npi)%imed)%eps/rhoL)
+      cL = dsqrt(Med(pg(npi)%imed)%eps/rhoL)
       rhostar = rhoL + (uL - uR) * rhoL / cL
       if (rhostar<10.d0) then
          rhostar = 10.d0
@@ -116,14 +116,14 @@ do npi=1,nag
          pstar = -99000.d0
       endif 
 ! Linearized Partial Riemann Solver: end
-! den(pnj) is an auxiliary vector to add contributions to the density and 
+! "den" is an auxiliary vector to add contributions to the density and 
 ! pressure denominators
       Ww_Shep = pg(npi)%mass / pg(npi)%dens * kernel_fw(1,npartint) 
-      pg_w(npj)%dens = pg_w(npj)%dens + rhostar * Ww_Shep
       den(npj) = den(npj) + Ww_Shep
+      pg_w(npj)%dens = pg_w(npj)%dens + rhostar * Ww_Shep
       pg_w(npj)%pres = pg_w(npj)%pres + pstar * Ww_Shep
-   end do
-end do
+   enddo
+enddo
 ! Updating wall element pressure and density
 !$omp parallel do default(none) private(npi) shared(neigh_w,pg_w,den,DBSPH)
 do npi=1,DBSPH%n_w

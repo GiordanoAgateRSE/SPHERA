@@ -38,7 +38,7 @@ implicit none
 double precision,parameter :: alfa = 1.0d0
 integer(4) :: npi
 double precision :: mu, mumax, secinv,cuin, smalen, smalenq, visc1, visc2 
-character(80),external :: lcase
+character(100),external :: lcase
 !------------------------
 ! Explicit interfaces
 !------------------------

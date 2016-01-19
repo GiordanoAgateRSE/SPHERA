@@ -55,7 +55,7 @@ double precision :: vol_Shep,Ww_Shep
 !$omp parallel do default(none)                                                &
 !$omp private(npi,contj,npj,npartint,vol_Shep)                                 &
 !$omp shared(nag,pg,NMAXPARTJ,rag,nPartIntorno,Partintorno,PartKernel)         &
-!$omp shared(nPartIntorno_fw,DBSPH)
+!$omp shared(nPartIntorno_fw,DBSPH,NMedium)
 ! Loop over the fluid computational particles
 do npi=1,nag 
    if (nPartIntorno_fw(npi)>0) then   
@@ -64,7 +64,7 @@ do npi=1,nag
       pg(npi)%dvel = zero
 ! Loop over the fluid neighbouring particles
       do contj=1,nPartIntorno(npi)   
-         npartint = (npi - 1)* NMAXPARTJ + contj
+         npartint = (npi - 1) * NMAXPARTJ + contj
          npj = PartIntorno(npartint)
          if (pg(npi)%imed==pg(npj)%imed) then
             vol_Shep = pg(npj)%mass / pg(npj)%dens 
@@ -83,9 +83,10 @@ do npi=1,nag
                                 (pg(npj)%var(3) - pg(npi)%var(3)) *            &
                                 Partkernel(1,npartint) * vol_Shep
          endif
-      end do 
-      if (DBSPH%MUSCL_boundary_flag.eqv..true.) call                           &
-         Gradients_to_MUSCL_boundary(npi)
+      end do
+      if ((DBSPH%MUSCL_boundary_flag.eqv.(.true.)).and.(NMedium==1)) then
+         call Gradients_to_MUSCL_boundary(npi)
+      endif
    endif
 end do 
 !$omp end parallel do

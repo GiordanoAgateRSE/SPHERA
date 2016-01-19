@@ -111,7 +111,7 @@ DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(pg_w(i)%adjacent_faces(j))%vert_l
                        "; the run terminates here."
          stop
       endif 
-! Compute the spread angle between the normal vectors
+! Compute the angle between the normal vectors
       aux_scalar = dot_product(pg_w(i)%normal,                                 &
                                pg_w(pg_w(i)%adjacent_faces(j))%normal)
       aux_vec(:) = aux_face2(ID_P_b_iso,:) - aux_face1(ID_P_0_iso,:) 

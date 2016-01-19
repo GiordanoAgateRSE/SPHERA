@@ -23,7 +23,6 @@
 ! Program unit: Vector_Product    
 ! Description: To return in ww the cross product of vectors uu and vv.           
 !----------------------------------------------------------------------------------------------------------------------------------
-
 subroutine Vector_Product(uu,VV,ww,SPACEDIM)
 !------------------------
 ! Modules

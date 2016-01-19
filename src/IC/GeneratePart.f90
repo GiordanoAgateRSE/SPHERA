@@ -32,19 +32,15 @@ use Static_allocation_module
 use Hybrid_allocation_module
 use Dynamic_allocation_module
 use I_O_diagnostic_module
-
 !------------------------
 ! Declarations
-!------------------------
-!------------------------
-! Explicit interfaces
 !------------------------
 implicit none
 integer(4),intent(IN) :: IC_loop
 integer(4) :: Nt,Nz,Mate,IsopraS,NumParticles,i,j,k,dimensioni,NumPartPrima    
 integer(4) :: aux_factor,i_vertex,j_vertex,test_xy,test_z,n_levels,nag_aux
 integer(4) :: i_face,j_node,npi,ier,test_face,test_dam,test_xy_2
-double precision :: distance_hor,z_min,aux_scal,rnd
+double precision :: distance_hor,z_min,aux_scal,rnd,h_reservoir
 double precision :: aux_vec(3)
 integer(4),dimension(SPACEDIM) :: Npps
 double precision,dimension(SPACEDIM) :: MinOfMin,XminReset
@@ -53,14 +49,44 @@ double precision,dimension(:,:),allocatable :: Xmin,Xmax
 character(len=lencard)  :: nomsub = "GeneratePart"
 type(TyParticle),dimension(:),allocatable    :: pg_aux
 !------------------------
+! Explicit interfaces
+!------------------------
+interface
+   subroutine point_inout_convex_non_degenerate_polygon(point,n_sides,         &
+                                                        point_pol_1,           &
+                                                        point_pol_2,           &
+                                                        point_pol_3,           &
+                                                        point_pol_4,           &
+                                                        point_pol_5,           &
+                                                        point_pol_6,test)
+      implicit none
+      integer(4),intent(in) :: n_sides
+      double precision,intent(in) :: point(2),point_pol_1(2),point_pol_2(2)
+      double precision,intent(in) :: point_pol_3(2),point_pol_4(2)
+      double precision,intent(in) :: point_pol_5(2),point_pol_6(2)
+      integer(4),intent(inout) :: test
+      double precision :: dis1,dis2
+      double precision :: normal(2)
+   end subroutine point_inout_convex_non_degenerate_polygon
+end interface
+!------------------------
 ! Allocations
 !------------------------
 call random_seed()
 test_z = 0
 if (IC_loop==2) then
    do Nz=1,NPartZone
-      if (Partz(Nz)%IC_source_type==2) test_z = 1
-   end do 
+      if (Partz(Nz)%IC_source_type==2) then
+         test_z = 1
+         if (Domain%tipo=="bsph") then
+! In case of DB-SPH boundary treatment, there is a fictitious fluid reservoir
+! top, which completes the kernel suppport (only for pre-processing)
+            h_reservoir = Partz(Nz)%H_res + 3.d0 * Domain%h
+            else
+               h_reservoir = Partz(Nz)%H_res
+         endif
+      endif
+   enddo   
 endif
 if (test_z==0) nag = 0 
 NumParticles = 0
@@ -69,7 +95,7 @@ if (ncord == 2) then
    else
       dimensioni = NumFacce
 end if
-allocate (xmin(spacedim,dimensioni),xmax(spacedim,dimensioni))
+allocate(xmin(spacedim,dimensioni),xmax(spacedim,dimensioni))
 !------------------------
 ! Initializations
 !------------------------
@@ -95,19 +121,19 @@ first_cycle: do Nz=1,NPartZone
 ! in 3D
          else
          call FindFrame(Xmin,Xmax,Nt)
-      end if
+      endif
 ! To evaluate the minimum and maximum coordinates of the zone checking for 
 ! all the subzones
       do i=1,Spacedim
          if (Xmin(i,nt)<Partz(Nz)%coordMM(i,1)) Partz(Nz)%coordMM(i,1) =       &
-                                                   Xmin(i,nt)
-         if ( Xmax(i,nt) > Partz(Nz)%coordMM(i,2) ) Partz(Nz)%coordMM(i,2) =   &
-                                                       Xmax(i,nt)
+            Xmin(i,nt)
+         if (Xmax(i,nt)>Partz(Nz)%coordMM(i,2)) Partz(Nz)%coordMM(i,2) =       &
+            Xmax(i,nt)
 ! To evaluate the minimum of subzones minimum coordinates
          MinOfMin(i) = min(MinOfMin(i),Xmin(i,nt))
-      end do
-   end do
-end do first_cycle
+      enddo
+   enddo
+enddo first_cycle
 ! Loop over the zone in order to set the particle locations
 second_cycle: do Nz=1,NPartZone
 ! To skip the boundaries not having types equal to "perimeter" or "pool"
@@ -135,11 +161,13 @@ second_cycle: do Nz=1,NPartZone
 ! Loops over Cartesian topography points
          do i_vertex=Partz(Nz)%ID_first_vertex,Partz(Nz)%ID_last_vertex
 ! Check if the vertex is inside the plan_reservoir     
-            call point_inout_polygone(Vertice(1:2,i_vertex),                   &
-               Partz(Nz)%plan_reservoir_points,                                &
+            call point_inout_convex_non_degenerate_polygon(                    &
+               Vertice(1:2,i_vertex),Partz(Nz)%plan_reservoir_points,          &
                Partz(Nz)%plan_reservoir_pos(1,1:2),                            &
                Partz(Nz)%plan_reservoir_pos(2,1:2),                            &
                Partz(Nz)%plan_reservoir_pos(3,1:2),                            &
+               Partz(Nz)%plan_reservoir_pos(4,1:2),                            &
+               Partz(Nz)%plan_reservoir_pos(4,1:2),                            &
                Partz(Nz)%plan_reservoir_pos(4,1:2),test_xy)
             if (test_xy==1) then
 ! Set the minimum topography height among the closest 9 points
@@ -155,8 +183,7 @@ second_cycle: do Nz=1,NPartZone
                end do
 ! Generating daughter points of the Cartesian topography, according to dx
 ! (maybe the function "ceiling" would be better than "int" here)
-               n_levels = int((Partz(Nz)%H_res - z_aux(i_vertex)) /            &
-                          Domain%dd) 
+               n_levels = int((h_reservoir - z_aux(i_vertex)) / Domain%dd)
                do i=1,aux_factor
                   do j=1,aux_factor
                      do k=1,n_levels
@@ -175,7 +202,7 @@ second_cycle: do Nz=1,NPartZone
                                                         * Domain%dd + (j -     &
                                                         1 + 0.5d0) *           &
                                                         Domain%dd
-                        pg_aux(NumParticles)%coord(3) = (Partz(Nz)%H_res -     &
+                        pg_aux(NumParticles)%coord(3) = (h_reservoir -
                                                         Domain%dd / 2.d0) -    &
                                                         (k - 1) * Domain%dd
 ! Test if the particle is below the reservoir
@@ -191,13 +218,15 @@ second_cycle: do Nz=1,NPartZone
                            if (Tratto(BoundaryFace(i_face)%stretch)%zone==     &
                               Partz(Nz)%Car_top_zone) then  
 ! Test if the point lies inside the plan projection of the face     
-                              call point_inout_polygone(                       &
+                              call point_inout_convex_non_degenerate_polygon(  &
                                  pg_aux(NumParticles)%coord(1:2),              &
                                  BoundaryFace(i_face)%nodes,                   &
                                  BoundaryFace(i_face)%Node(1)%GX(1:2),         &
                                  BoundaryFace(i_face)%Node(2)%GX(1:2),         &
                                  BoundaryFace(i_face)%Node(3)%GX(1:2),         &
                                  BoundaryFace(i_face)%Node(4)%GX(1:2),         &
+                                 BoundaryFace(i_face)%Node(4)%GX(1:2),         &
+                                 BoundaryFace(i_face)%Node(4)%GX(1:2),         &                                 
                                  test_xy)
                               if (test_xy==1) then
 ! No need for a critical section to update test_face: only one face/process 
@@ -223,12 +252,14 @@ second_cycle: do Nz=1,NPartZone
                         test_dam = 0
                         if (Partz(Nz)%dam_zone_ID>0) then
 ! Test if the point lies inside the plan projection of the dam zone
-                           call point_inout_polygone(                          &
+                           call point_inout_convex_non_degenerate_polygon(     &
                               pg_aux(NumParticles)%coord(1:2),                 &
                               Partz(Nz)%dam_zone_n_vertices,                   &
                               Partz(Nz)%dam_zone_vertices(1,1:2),              &
                               Partz(Nz)%dam_zone_vertices(2,1:2),              &
                               Partz(Nz)%dam_zone_vertices(3,1:2),              &
+                              Partz(Nz)%dam_zone_vertices(4,1:2),              &
+                              Partz(Nz)%dam_zone_vertices(4,1:2),              &
                               Partz(Nz)%dam_zone_vertices(4,1:2),test_xy)
                            if (test_xy==1) then
                               test_face = 0
@@ -243,14 +274,16 @@ second_cycle: do Nz=1,NPartZone
 ! top                                  
 if ((Tratto(BoundaryFace(i_face)%stretch)%zone==Partz(Nz)%dam_zone_ID).and.    &
                                        (BoundaryFace(i_face)%T(3,3)<0.)) then 
-! Test if the particle horizontal coordinates ly inside the horizontal 
+! Test if the particle horizontal coordinates lie inside the horizontal 
 ! projection of the face
-                                    call point_inout_polygone(                 &
+ call point_inout_convex_non_degenerate_polygon(                               &
                                        pg_aux(NumParticles)%coord(1:2),        &
                                        BoundaryFace(i_face)%nodes,             &
                                        BoundaryFace(i_face)%Node(1)%GX(1:2),   &
                                        BoundaryFace(i_face)%Node(2)%GX(1:2),   &
                                        BoundaryFace(i_face)%Node(3)%GX(1:2),   &
+                                       BoundaryFace(i_face)%Node(4)%GX(1:2),   &
+                                       BoundaryFace(i_face)%Node(4)%GX(1:2),   &
                                        BoundaryFace(i_face)%Node(4)%GX(1:2),   &
                                        test_xy_2)
                                     if (test_xy_2==1) then
@@ -341,7 +374,7 @@ if ((Tratto(BoundaryFace(i_face)%stretch)%zone==Partz(Nz)%dam_zone_ID).and.    &
       endif
       else
 ! Loop over the different regions belonging to a same zone
-         do Nt = Partz(Nz)%Indix(1), Partz(Nz)%Indix(2)
+         do Nt = Partz(Nz)%Indix(1),Partz(Nz)%Indix(2)
 ! To evaluate the number of particles for the subdomain Npps along all the 
 ! directions
             if ((Xmin(1,nt)== max_positive_number).or.                         &
@@ -349,12 +382,12 @@ if ((Tratto(BoundaryFace(i_face)%stretch)%zone==Partz(Nz)%dam_zone_ID).and.    &
 ! The zone is declared but is not used
                Npps = -1
                else 
-               do i=1,spacedim
-                  NumPartPrima = Nint((Xmin(i,nt) - MinOfMin(i)) / Domain%dd)
+               do i=1,SPACEDIM
+                  NumPartPrima = nint((Xmin(i,nt) - MinOfMin(i)) / Domain%dd)
                   Xminreset(i) = MinOfMIn(i) + NumPartPrima * Domain%dd
-                  Npps(i) = NInt((Xmax(i,nt) - XminReset(i)) / Domain%dd)  
-               end do
-            end if
+                  Npps(i) = nint((Xmax(i,nt) - XminReset(i)) / Domain%dd)
+               enddo
+            endif
 ! To force almost one particle if the domain width in a direction is smaller  
 ! than dx
             if (ncord==2) where (Npps==0) Npps = 1
@@ -367,25 +400,24 @@ if ((Tratto(BoundaryFace(i_face)%stretch)%zone==Partz(Nz)%dam_zone_ID).and.    &
                   IsopraS = 0
             end if     
 ! To set the particles in the zone
-            Call SetParticles (Nt,Nz,Mate,XminReset,Npps,NumParticles,         &
-                               IsopraS)
-         end do
+            call SetParticles(Nt,Nz,Mate,XminReset,Npps,NumParticles,IsopraS)
+         enddo
 ! To set the upper pointer for the particles in the nz-th zone
          Partz(Nz)%limit(2) = NumParticles
    endif
-end do second_cycle
+enddo second_cycle
 test_z = 0
 if (IC_loop==2) then
    do Nz=1,NPartZone
       if (Partz(Nz)%IC_source_type==2) test_z = 1
-   end do 
+   enddo 
 endif
 if (test_z==0) nag = NumParticles
 nagpg = nag
 !------------------------
 ! Deallocations
 !------------------------
-deallocate (xmin,xmax)
+deallocate(xmin,xmax)
 return
 end subroutine GeneratePart
 
