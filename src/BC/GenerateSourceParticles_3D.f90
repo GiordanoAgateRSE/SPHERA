@@ -91,6 +91,7 @@ if (inttimeratio>pinttimeratio) then
                pg(nag)%Gamma = 1.
                pg(nag)%uni = zero
                pg(nag)%sigma = zero
+               pg(nag)%sigma_same_fluid = zero
                pg(nag)%dShep = zero 
                pg(nag)%FS = 0 
             endif

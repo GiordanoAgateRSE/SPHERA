@@ -304,24 +304,24 @@ if (nres>0) close(nres)
 if (nplb>0) close(nplb)
 if (nfro>0) close(nfro)
 if (ncpt>0) close(ncpt)
-! To Concatenate the ".txt" output files and remove the original ones^M
-call system("touch Body_dynamics.tmp")^M
-call system("cat *Body_dynamics* > Body-dynamics.txt")^M
-call system("rm -f *Body_dynamics*")^M
-call system("mv Body-dynamics.txt Body_dynamics.txt")^M
-call system("touch Body_particles.tmp")^M
-call system("cat *Body_particles* > Body-particles.txt")^M
-call system("rm -f *Body_particles*")^M
-call system("mv Body-particles.txt Body_particles.txt")^M
-call system("touch temp.cln")^M
-call system("cat *.cln > monitoring_lines.txt")^M
-call system("rm -f *.cln")^M
-call system("touch temp.cpt")^M
-call system("cat *.cpt > monitoring_points.txt")^M
-call system("rm -f *.cpt")^M
-call system("touch blt_interfaces.tmp")^M
-call system("cat *blt_interfaces* > blt-interfaces.txt")^M
-call system("rm -f *blt_interfaces*")^M
+! To Concatenate the ".txt" output files and remove the original ones
+call system("touch Body_dynamics.tmp")
+call system("cat *Body_dynamics* > Body-dynamics.txt")
+call system("rm -f *Body_dynamics*")
+call system("mv Body-dynamics.txt Body_dynamics.txt")
+call system("touch Body_particles.tmp")
+call system("cat *Body_particles* > Body-particles.txt")
+call system("rm -f *Body_particles*")
+call system("mv Body-particles.txt Body_particles.txt")
+call system("touch temp.cln")
+call system("cat *.cln > monitoring_lines.txt")
+call system("rm -f *.cln")
+call system("touch temp.cpt")
+call system("cat *.cpt > monitoring_points.txt")
+call system("rm -f *.cpt")
+call system("touch blt_interfaces.tmp")
+call system("cat *blt_interfaces* > blt-interfaces.txt")
+call system("rm -f *blt_interfaces*")
 call system("mv blt-interfaces.txt blt_interfaces.txt")
 stop
 !------------------------

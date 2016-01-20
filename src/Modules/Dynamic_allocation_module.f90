@@ -87,7 +87,7 @@ integer(4),               dimension(:),    allocatable :: nPartIntorno_fw
 ! PartIntorno_fw(NMAXPARTJ*PARTICLEBUFFER): array of the indeces of the 
 ! neighbouring wall particles 
 integer(4),               dimension(:),    allocatable :: PartIntorno_fw   
-! Kernel parameter neighbouring array: kernel_fw(2,NMAXPARTJ*PARTICLEBUFFER)
+! Kernel parameter neighbouring array: kernel_fw(2,NMAXPARTJ*PARTICLEBUFFER),
 ! (wall neighbours; DBSPH)
 !    kernel_fw(1,i): W_0a: absolute value of the kernel cubic spline (DBSPH)
 !    kernel_fw(2,i): -|gradW_0s|/|r_0s|, gradW: kernel gradient (cubic spline);

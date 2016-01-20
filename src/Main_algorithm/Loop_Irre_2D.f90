@@ -775,8 +775,7 @@ done_flag = .false.
 ! Boundary Conditions: end
       endif
 ! Subroutine for wall BC treatment (DB-SPH)
-! Density and pressure updates for wall elements: MUSCL + LPRS  
-! + state equation 
+! Density and pressure updates for wall elements: MUSCL + LPRS + state equation
       call start_and_stop(2,18)
       if ((Domain%tipo=="bsph").and.(nag>0).and.(DBSPH%n_w>0)) then
          call Gradients_to_MUSCL   

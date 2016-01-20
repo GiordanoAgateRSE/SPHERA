@@ -202,7 +202,7 @@ second_cycle: do Nz=1,NPartZone
                                                         * Domain%dd + (j -     &
                                                         1 + 0.5d0) *           &
                                                         Domain%dd
-                        pg_aux(NumParticles)%coord(3) = (h_reservoir -
+                        pg_aux(NumParticles)%coord(3) = (h_reservoir -         &
                                                         Domain%dd / 2.d0) -    &
                                                         (k - 1) * Domain%dd
 ! Test if the particle is below the reservoir

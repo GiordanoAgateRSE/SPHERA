@@ -84,10 +84,10 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
    if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"ncord, nag, ...",nsav,nout))    &
       return
    elseif (TRIM(lcase(option))=="reading") then
-      write(nout,'(a)')
+      write(nout,'(a)')                                                        &
          "---------------------------------------------------------------------"
       write(nout,"(1x,a)")                                                     &
-         ">> Restart reading:  step         time      interval    num.particles"                                                              &
+         ">> Restart reading:  step         time      interval    num.particles"
       save_istart = Domain%istart
       save_start = Domain%start
       read(nsav,iostat=ioerr) domain

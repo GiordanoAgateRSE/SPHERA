@@ -65,7 +65,7 @@ if (restart) then
    enddo
    return
 endif
-call Readriga(ainp,comment,nrighe,ioerr,ninp)
+call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"Section_flow_rate DATA",ninp,nout))  &
    return
 do while (TRIM(lcase(ainp))/="##### end section flow rate #####")
@@ -97,23 +97,23 @@ do while (TRIM(lcase(ainp))/="##### end section flow rate #####")
 ! Loop over the monitoring sections for flow rate
    do i=1,n_sect
 ! Reading the section parameters
-      call Readriga(ainp,comment,nrighe,ioerr,ninp)
+      call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
       read (ainp,*,iostat=ioerr) section_ID
       if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"section_ID",ninp,nout)) return
-      call Readriga(ainp,comment,nrighe,ioerr,ninp)
+      call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
       read (ainp,*,iostat=ioerr) n_vertices
       if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"n_vertices",ninp,nout)) return
-      call Readriga(ainp,comment,nrighe,ioerr,ninp)
+      call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
       read (ainp,*,iostat=ioerr) vertex(1,1),vertex(1,2),vertex(1,3)
       if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"vertex_1",ninp,nout)) return
-      call Readriga(ainp,comment,nrighe,ioerr,ninp)
+      call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
       read (ainp,*,iostat=ioerr) vertex(2,1),vertex(2,2),vertex(2,3)
       if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"vertex_2",ninp,nout)) return
-      call Readriga(ainp,comment,nrighe,ioerr,ninp)
+      call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
       read (ainp,*,iostat=ioerr) vertex(3,1),vertex(3,2),vertex(3,3)
       if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"vertex_3",ninp,nout)) return
       if (n_vertices==4) then
-         call Readriga(ainp,comment,nrighe,ioerr,ninp)
+         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read (ainp,*,iostat=ioerr) vertex(4,1),vertex(4,2),vertex(4,3)
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"vertex_4",ninp,nout)) return           
       endif
@@ -154,7 +154,7 @@ do while (TRIM(lcase(ainp))/="##### end section flow rate #####")
          endif
       endif
    enddo         
-   call Readriga(ainp,comment,nrighe,ioerr,ninp)
+   call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"Section_flow_rate DATA",ninp,     &
       nout)) return
 enddo

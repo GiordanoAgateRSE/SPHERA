@@ -334,7 +334,6 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
             pg(npi)%kodvel = 0
             pg(npi)%velass = zero
          endif
-         endif
          if (Domain%tipo=="semi") then
             Ncbf = BoundaryDataPointer(1,npi)
             if (Ncbf>0) then
@@ -499,7 +498,8 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
 !$omp parallel do default(none) private(npi) shared(DBSPH,pg_w,dt)
                do npi=1,DBSPH%n_w
                   if (pg_w(npi)%cella==0) cycle
-                  pg_w(npi)%coord(:) = pg_w(npi)%coord(:) + dt * pg_w(npi)%vel(:)
+                  pg_w(npi)%coord(:) = pg_w(npi)%coord(:) + dt *               &
+                                       pg_w(npi)%vel(:)
                enddo
 !$omp end parallel do
             endif

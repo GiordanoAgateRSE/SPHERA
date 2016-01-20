@@ -115,7 +115,7 @@ do while (TRIM(lcase(ainp))/="##### end dbsph #####")
             allocate(DBSPH%kinematics(surface_mesh_files,                      &
                n_kinematics_records(i),7),STAT=alloc_stat)
             if (alloc_stat/=0) then
-               write(nout,*)
+               write(nout,*)                                                   &
 'Error! Allocation of DBSPH%kinematics in ReadDBSPH failed; the program terminates here.'
             call diagnostic(arg1=5,arg2=340)
 ! Stop the main program

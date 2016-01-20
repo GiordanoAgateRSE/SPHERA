@@ -79,11 +79,11 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph"))  then
    allocate(BoundaryDataPointer(1:3,1:PARTICLEBUFFER),stat=ier)
    if (ier/=0) then
       write(nout,'(1x,a,i2)')                                                  &
-         "   Arrays BoundaryDataPointer not allocated. Error code: ",ier
+         "   Array BoundaryDataPointer not allocated. Error code: ",ier
       call diagnostic (arg1=4,arg3=nomsub)
       else
          write(nout,'(1x,a)')                                                  &
-            "   Arrays BoundaryDataPointer successfully allocated "
+            "   Array BoundaryDataPointer successfully allocated "
    endif
    if (Ncord==2) then
       write(nout,'(a,i15)') "     Max num of close boundary sides: MaxNcbs = ",&
@@ -91,11 +91,11 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph"))  then
       allocate(BoundaryDataTab(1:MaxNcbs),stat=ier)
       if (ier/=0) then
          write(nout,'(1x,a,i2)')                                               &
-            "   Arrays BoundaryDataTab not allocated. Error code: ",ier
+            "   Array BoundaryDataTab not allocated. Error code: ",ier
           call diagnostic (arg1=4,arg3=nomsub)
          else
             write(nout,'(1x,a)')                                               &
-               "   Arrays BoundaryDataTab successfully allocated "
+               "   Array BoundaryDataTab successfully allocated "
       endif
       else
          write(nout,'(a,i15)')                                                 &
@@ -103,11 +103,11 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph"))  then
          allocate(BoundaryDataTab(1:MaxNcbf),stat=ier)
          if (ier/=0) then
             write(nout,'(1x,a,i2)')                                            &
-               "   Arrays BoundaryDataTab not allocated. Error code: ",ier
+               "   Array BoundaryDataTab not allocated. Error code: ",ier
             call diagnostic (arg1=4,arg3=nomsub)
             else
                write(nout,'(1x,a)')                                            &
-                  "   Arrays BoundaryDataTab successfully allocated"
+                  "   Array BoundaryDataTab successfully allocated"
          endif
    endif
 endif
@@ -116,57 +116,57 @@ write(nout,'(2a,i15)') "     Max num particles surrounding the current ",      &
    "particle: NMAXPARTJ = ",NMAXPARTJ
 allocate(Array_Flu(1:PARTICLEBUFFER),stat=ier)
 if (ier/=0) then
-   write(nout,'(1x,a,i2)') "   Arrays Array_Flu not allocated. Error code: ",  &
+   write(nout,'(1x,a,i2)') "   Array Array_Flu not allocated. Error code: ",   &
       ier
    call diagnostic (arg1=4,arg3=nomsub)
    else
-      write(nout,'(1x,a)') "   Arrays Array_Flu successfully allocated "
+      write(nout,'(1x,a)') "   Array Array_Flu successfully allocated "
 endif
 allocate(nPartIntorno(1:PARTICLEBUFFER),stat=ier)
 if (ier/=0) then
-   write(nout,'(1x,a,i2)')"   Arrays NPARTINTORNO not allocated. Error code: " &
+   write(nout,'(1x,a,i2)')"   Array NPARTINTORNO not allocated. Error code: "  &
    ,ier
    call diagnostic (arg1=4,arg3=nomsub)
    else
-      write(nout,'(1x,a)') "   Arrays NPARTINTORNO successfully allocated "
+      write(nout,'(1x,a)') "   Array NPARTINTORNO successfully allocated "
 endif
 allocate(PartIntorno(1:NMAXPARTJ*PARTICLEBUFFER),stat=ier)
 if (ier/=0) then
-   write(nout,'(1x,a,i2)') "   Arrays PARTINTORNO not allocated. Error code: " &
+   write(nout,'(1x,a,i2)') "   Array PARTINTORNO not allocated. Error code: "  &
       ,ier
    call diagnostic (arg1=4,arg3=nomsub)
    else
-      write(nout,'(1x,a)') "   Arrays PARTINTORNO successfully allocated "
+      write(nout,'(1x,a)') "   Array PARTINTORNO successfully allocated "
 endif
 allocate(PartKernel(1:4,1:NMAXPARTJ*PARTICLEBUFFER),stat=ier)
 if (ier/=0) then
-   write(nout,'(1x,a,i2)') "   Arrays PARTKERNEL not allocated. Error code: ", &
+   write(nout,'(1x,a,i2)') "   Array PARTKERNEL not allocated. Error code: ",  &
       ier
    call diagnostic (arg1=4,arg3=nomsub)
    else
-      write(nout,'(1x,a)') "   Arrays PARTKERNEL successfully allocated "
+      write(nout,'(1x,a)') "   Array PARTKERNEL successfully allocated "
 endif
 allocate(rag(1:3,1:NMAXPARTJ*PARTICLEBUFFER),stat=ier)
 if (ier/=0) then
-   write(nout,'(1x,a,i2)') "   Arrays RAG not allocated. Error code: ",ier
+   write(nout,'(1x,a,i2)') "   Array RAG not allocated. Error code: ",ier
    call diagnostic (arg1=4,arg3=nomsub)
    else
-      write(nout,'(1x,a)') "   Arrays RAG successfully allocated "
+      write(nout,'(1x,a)') "   Array RAG successfully allocated "
 endif
 if (Domain%tipo=="bsph") then
    allocate(nPartIntorno_fw(1:PARTICLEBUFFER),stat=ier)
    if (ier/=0) then
       write(nout,'(1x,a,i2)')                                                  &
-         "   Arrays NPARTINTORNO_fw not allocated. Error code: ",ier
+         "   Array NPARTINTORNO_fw not allocated. Error code: ",ier
       call diagnostic (arg1=4,arg3=nomsub)
       else
          write(nout,'(1x,a)')                                                  &
-            "   Arrays NPARTINTORNO_fw successfully allocated "
+            "   Array NPARTINTORNO_fw successfully allocated "
    endif
    allocate(PartIntorno_fw(1:NMAXPARTJ*PARTICLEBUFFER),stat=ier)
    if (ier/=0) then
       write(nout,'(1x,a,i2)')                                                  &
-         "   Arrays PARTINTORNO_fw not allocated. Error code: ",ier
+         "   Array PARTINTORNO_fw not allocated. Error code: ",ier
       call diagnostic (arg1=4,arg3=nomsub)
       else
          write(nout,'(1x,a)') "   Array PARTINTORNO_fw successfully allocated"
@@ -182,90 +182,90 @@ if (Domain%tipo=="bsph") then
    allocate(kernel_fw(2,1:NMAXPARTJ*PARTICLEBUFFER),stat=ier)
    if (ier/=0) then
       write(nout,'(1x,a,i2)')                                                  &
-         "   Arrays kernel_fw not allocated. Error code: ",ier
+         "   Array kernel_fw not allocated. Error code: ",ier
       call diagnostic (arg1=4,arg3=nomsub)
       else
-         write(nout,'(1x,a)') "   Arrays kernel_fw successfully allocated "
+         write(nout,'(1x,a)') "   Array kernel_fw successfully allocated "
    endif
    allocate(rag_fw(1:3,1:NMAXPARTJ*PARTICLEBUFFER),stat=ier)
    if (ier/=0) then
-      write(nout,'(1x,a,i2)') "   Arrays RAG_fw not allocated. Error code: ",  &
+      write(nout,'(1x,a,i2)') "   Array RAG_fw not allocated. Error code: ",   &
          ier
       call diagnostic (arg1=4,arg3=nomsub)
       else
-         write(nout,'(1x,a)') "   Arrays RAG_fw successfully allocated "
+         write(nout,'(1x,a)') "   Array RAG_fw successfully allocated "
    endif
 endif
 if (n_bodies>0) then
    allocate(nPartIntorno_bp_f(n_body_part),stat=ier)
    if (ier/=0) then
       write(nout,'(1x,a,i2)')                                                  &
-         "   Arrays nPartIntorno_bp_f not allocated. Error code: ",ier
+         "   Array nPartIntorno_bp_f not allocated. Error code: ",ier
       call diagnostic (arg1=4,arg3=nomsub)
       else
          write(nout,'(1x,a)')                                                  &
-            "   Arrays nPartIntorno_bp_f successfully allocated "
+            "   Array nPartIntorno_bp_f successfully allocated "
    endif
    allocate(PartIntorno_bp_f(NMAXPARTJ*n_body_part),stat=ier)
    if (ier/=0) then
       write(nout,'(1x,a,i2)')                                                  &
-         "   Arrays PartIntorno_bp_f not allocated. Error code: ",ier
+         "   Array PartIntorno_bp_f not allocated. Error code: ",ier
       call diagnostic (arg1=4,arg3=nomsub)
       else
          write(nout,'(1x,a)')                                                  &
-            "   Arrays PartIntorno_bp_f successfully allocated "
+            "   Array PartIntorno_bp_f successfully allocated "
    endif
    allocate(KerDer_bp_f_cub_spl(NMAXPARTJ*n_body_part),stat=ier)
    if (ier/=0) then
       write(nout,'(1x,a,i2)')                                                  &
-         "   Arrays KerDer_bp_f_cub_spl not allocated. Error code: ",ier
+         "   Array KerDer_bp_f_cub_spl not allocated. Error code: ",ier
       call diagnostic (arg1=4,arg3=nomsub)
       else
          write(nout,'(1x,a)')                                                  &
-            "   Arrays KerDer_bp_f_cub_spl successfully allocated "
+            "   Array KerDer_bp_f_cub_spl successfully allocated "
    endif
    allocate(KerDer_bp_f_Gal(NMAXPARTJ*n_body_part),stat=ier)
    if (ier/=0) then
       write(nout,'(1x,a,i2)')                                                  &
-         "   Arrays KerDer_bp_f_Gal not allocated. Error code: ",ier
+         "   Array KerDer_bp_f_Gal not allocated. Error code: ",ier
       call diagnostic (arg1=4,arg3=nomsub)
       else
          write(nout,'(1x,a)')                                                  &
-            "   Arrays KerDer_bp_f_Gal successfully allocated "
+            "   Array KerDer_bp_f_Gal successfully allocated "
    endif 
    allocate(rag_bp_f(3,NMAXPARTJ*n_body_part),stat=ier)
    if (ier/=0) then
-      write(nout,'(1x,a,i2)') "   Arrays rag_bp_f not allocated. Error code: " &
+      write(nout,'(1x,a,i2)') "   Array rag_bp_f not allocated. Error code: "  &
          ,ier
       call diagnostic (arg1=4,arg3=nomsub)
       else
-         write(nout,'(1x,a)') "   Arrays rag_bp_f successfully allocated "
+         write(nout,'(1x,a)') "   Array rag_bp_f successfully allocated "
    endif
    allocate(nPartIntorno_bp_bp(n_surf_body_part),stat=ier)
    if (ier/=0) then
       write(nout,'(1x,a,i2)')                                                  &
-         "   Arrays nPartIntorno_bp_bp not allocated. Error code: ",ier
+         "   Array nPartIntorno_bp_bp not allocated. Error code: ",ier
       call diagnostic (arg1=4,arg3=nomsub)
       else
       write(nout,'(1x,a)')                                                     &
-         "   Arrays nPartIntorno_bp_bp successfully allocated "
+         "   Array nPartIntorno_bp_bp successfully allocated "
    endif
    allocate(PartIntorno_bp_bp(n_surf_body_part*NMAXPARTJ),stat=ier)
    if (ier/=0) then
       write(nout,'(1x,a,i2)')                                                  &
-         "   Arrays PartIntorno_bp_bp not allocated. Error code: ",ier
+         "   Array PartIntorno_bp_bp not allocated. Error code: ",ier
       call diagnostic (arg1=4,arg3=nomsub)
       else
          write(nout,'(1x,a)')                                                  &
-            "   Arrays PartIntorno_bp_bp successfully allocated "
+            "   Array PartIntorno_bp_bp successfully allocated "
    endif
    allocate(rag_bp_bp(3,n_surf_body_part*NMAXPARTJ),stat=ier)
    if (ier/=0) then
       write(nout,'(1x,a,i2)')                                                  &
-         "   Arrays rag_bp_bp not allocated. Error code: ",ier
+         "   Array rag_bp_bp not allocated. Error code: ",ier
       call diagnostic (arg1=4,arg3=nomsub)
       else
-         write(nout,'(1x,a)') "   Arrays rag_bp_bp successfully allocated "
+         write(nout,'(1x,a)') "   Array rag_bp_bp successfully allocated "
    endif
    if (ncord==2)                                                               &
       allocate(impact_vel(n_surf_body_part,(n_bodies+NumBSides)),stat=ier)
@@ -309,6 +309,8 @@ if ((Domain%tipo=="bsph").and.(DBSPH%n_w>0)) then
       size(kernel_fw)
    write(nout,*) " Size # of elements in array rag_fw              : ",        &
       size(rag_fw)
+   write(nout,*) " Size # of elements in array grad_vel_VSL_fw     : ",        &
+      size(grad_vel_VSL_fw)
 endif
 if (n_bodies>0) then
    write(nout,*) " Size # of elements in array nPartIntorno_bp_f   : ",        &
@@ -356,6 +358,8 @@ if ((Domain%tipo=="bsph").and.(DBSPH%n_w>0)) then
       sizeof(kernel_fw)
    write(nout,*) " Size in bytes of array rag_fw                   : ",        &
       sizeof(rag_fw)
+   write(nout,*) " Size in bytes of array grad_vel_VSL_fw          : ",        &
+      sizeof(grad_vel_VSL_fw)      
 endif
 if (n_bodies>0) then
    write(nout,*) " Size in bytes of array nPartIntorno_bp_f        : ",        &
@@ -399,7 +403,6 @@ write(nout,*)
 write(nout,*) 
 call s_ctime(nout)
 write(nout,*) 
-write(nscr,*) "Transient loop begins..."
 write(nout,*) "Transient loop begins..."
 write(nout,*)
 ! To initialize the post-processing file 

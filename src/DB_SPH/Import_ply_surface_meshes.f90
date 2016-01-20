@@ -191,7 +191,7 @@ do
    if (.not.allocated(DBSPH%surf_mesh%faces)) then
       if (ncord==3) then
          allocate(DBSPH%surf_mesh%faces((DBSPH%ply_n_face_vert-2)*n_faces),    &
-            STAT=alloc_stat
+            STAT=alloc_stat)
          else
             allocate(DBSPH%surf_mesh%faces(n_faces),STAT=alloc_stat)
       endif
@@ -512,7 +512,7 @@ DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(k-1)%vert_list(1))%pos          &
       deallocate(DBSPH%surf_mesh%faces,STAT=dealloc_stat)
       if (dealloc_stat/=0) then
          write(nscr,*) 'Deallocation of DBSPH%surf_mesh%faces in ',            &
-            'Import_ply_surface_mesh failed; the program stops here.
+            'Import_ply_surface_mesh failed; the program stops here.'
          stop 
       endif          
       allocate(DBSPH%surf_mesh%faces(new_size_face),STAT=alloc_stat)

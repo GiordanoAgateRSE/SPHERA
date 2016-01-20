@@ -21,7 +21,7 @@
 
 !----------------------------------------------------------------------------------------------------------------------------------
 ! Program unit: ReadInputRestart                           
-! Description:                        
+! Description: Description: To read the restart parameters from the main input file.                        
 !----------------------------------------------------------------------------------------------------------------------------------
 
 subroutine ReadInputRestart(ainp,comment,nrighe,ier,ninp,nout)

@@ -156,7 +156,7 @@ endif
 ! A restart procedure has been invoked: restart positioning 
 ! (step number / step time)
 if ((Domain%istart>0).or.(Domain%start>zero)) then
-   Restart = .True.
+   restart = .True.
 ! To open the restart file from which restart data will be restored
    open(unit=nsav,file=trim(Domain%file),form="unformatted",status="old",      &
       iostat=ier)
@@ -166,8 +166,6 @@ if ((Domain%istart>0).or.(Domain%start>zero)) then
       else
          write(nout,'(1x,a)')                                                  &
 ">Data are read from the restart file"//trim(Domain%file)//" in the routine ReadRestartFile"
-         write(nscr,'(1x,a)')                                                  &
-">Data are read from the restart file in the routine ReadRestartFile"
    endif
 ! To restore data from the restart file
 ! During the first reading of the restart file, only few parameters are read

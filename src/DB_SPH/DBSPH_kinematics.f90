@@ -39,7 +39,7 @@ implicit none
 integer(4) :: i,j,i_a
 double precision :: rel_pos(3)
 double precision :: vel_aux(DBSPH%surface_mesh_files,3)
-double precision :: omega_aux(DBSPH%surface_mesh_files,3
+double precision :: omega_aux(DBSPH%surface_mesh_files,3)
 !------------------------
 ! Explicit interfaces
 !------------------------
