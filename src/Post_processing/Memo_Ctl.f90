@@ -85,7 +85,7 @@ if (Nlines>0) then
      write (ncpt,*) "line #", i,"    Label ",Control_Lines(i)%label
      do j=Control_Lines(i)%icont(1),Control_Lines(i)%icont(2)
         if (control_points(j)%cella==0) then
-           write (ncpt,'(a,i10,a,g14.7)') "control point ",j,                  &
+           write (ncpt,'(a,i10,a,3(g14.7))') "control point ",j,               &
               " is outside. Coord=",Control_Points(j)%coord(:)
            else
               write (ncpt,'(g14.7,i14,8(1x,g14.7))') tempo,it_corrente         &
@@ -111,7 +111,7 @@ if (Nsections>0) then
         "    Type ",Control_sections(i)%Tipo
      do j=Control_sections(i)%icont(1),Control_sections(i)%icont(2)
         if (control_points(j)%cella==0) then
-           write (ncpt,'(a,i10,a,g14.7)') "control point ",j,                  &
+           write (ncpt,'(a,i10,a,3(g14.7))') "control point ",j,               &
               " is outside. Coord=",Control_Points(j)%coord(:)
            else
               write (ncpt,'(g14.7,i14,8(1x,g14.7))') tempo,it_corrente         &

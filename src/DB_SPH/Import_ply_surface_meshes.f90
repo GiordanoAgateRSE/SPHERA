@@ -222,20 +222,6 @@ do
                 STAT=alloc_stat)
          endif
          if (alloc_stat/=0) then
-            write(nscr,*) 'Allocation of DBSPH%surf_mesh%surface_mesh_file_ID '&
-               'in Import_ply_surface_mesh failed; the program stops here.'
-            stop
-         endif
-      endif
-      if (.not.allocated(DBSPH%surf_mesh%surface_mesh_file_ID)) then
-         if (ncord==3) then
-             allocate(DBSPH%surf_mesh%surface_mesh_file_ID(                    &
-                (DBSPH%ply_n_face_vert-2)*n_faces),STAT=alloc_stat)
-            else
-             allocate(DBSPH%surf_mesh%surface_mesh_file_ID(n_faces),           &
-                STAT=alloc_stat)
-         endif
-         if (alloc_stat/=0) then
             write(nscr,*) 'Allocation of DBSPH%surf_mesh%surface_mesh_file_ID',&
                ' in Import_ply_surface_mesh failed; the program stops here.'
             stop
@@ -498,16 +484,16 @@ DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(k-1)%vert_list(1))%pos          &
    endif
 ! Read the face vertices: end   
 ! Resize DBSPH%surf_mesh%faces on the actual number of faces
-! new_size_face = estimated_new_size_face - overestimation
+! new_size_face = estimated_new_size_face - local overestimation
    if (ncord==3) then
-      new_size_face = size(DBSPH%surf_mesh%faces) - (k - old_size_face - 1 -   &
-                      (DBSPH%ply_n_face_vert - 2) * n_faces)
+      new_size_face = size(DBSPH%surf_mesh%faces) - ((DBSPH%ply_n_face_vert - &
+                      2) * n_faces - (k - 1 - old_size_face))
       else
-         new_size_face = size(DBSPH%surf_mesh%faces) - (k - old_size_face - 1  &
-                         - n_faces)   
+         new_size_face = size(DBSPH%surf_mesh%faces) - (n_faces - (k - 1 -     &
+                         old_size_face))
    endif
    old_size_face = size(DBSPH%surf_mesh%faces)
-   if (new_size_face>old_size_face) then
+   if (new_size_face<old_size_face) then
       aux_der_type_faces(:) = DBSPH%surf_mesh%faces(:)
       deallocate(DBSPH%surf_mesh%faces,STAT=dealloc_stat)
       if (dealloc_stat/=0) then
@@ -521,7 +507,7 @@ DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(k-1)%vert_list(1))%pos          &
             'Import_ply_surface_mesh failed; the program stops here.'
          stop 
       endif         
-      DBSPH%surf_mesh%faces(:) = aux_der_type_faces(1:old_size_face)
+      DBSPH%surf_mesh%faces(:) = aux_der_type_faces(1:new_size_face)
       if (allocated(aux_der_type_faces)) then
          deallocate(aux_der_type_faces,STAT=dealloc_stat)
          if (dealloc_stat/=0) then
@@ -552,7 +538,7 @@ DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(k-1)%vert_list(1))%pos          &
          stop
       endif
       DBSPH%surf_mesh%surface_mesh_file_ID(:) =                                &
-         aux_surface_mesh_file_ID(1:old_size_face)
+         aux_surface_mesh_file_ID(1:new_size_face)
       if (allocated(aux_surface_mesh_file_ID)) then
          deallocate(aux_surface_mesh_file_ID,STAT=dealloc_stat)
          if (dealloc_stat/=0) then
