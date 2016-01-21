@@ -89,13 +89,6 @@ pg_w(:)%mass = 0.d0
 pg_w(:)%k_d = 0.d0
 pg_w(:)%volume = 0.d0
 pg_w(:)%kin_visc_semi_part = 0.d0 
-!!!AA_8_0 test start
-do i=1,DBSPH%n_w
-   do j=1,3 
-      if (DBSPH%surf_mesh%faces(i)%vert_list(j)==0) write(nscr,*) "error",i,j
-   enddo
-enddo
-!!!AA_8_0 end
 !$omp parallel do default(none) shared(DBSPH,pg_w,Med,pg,ncord) private(i)
 do i=1,DBSPH%n_w 
    if (ncord==3) then
