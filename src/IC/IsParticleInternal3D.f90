@@ -1,6 +1,6 @@
 !----------------------------------------------------------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
-! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-)
+! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-Ricerca di Sistema)
 
 
 
@@ -16,7 +16,7 @@
 ! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ! GNU General Public License for more details.
 ! You should have received a copy of the GNU General Public License
-! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.  
+! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
 
 !----------------------------------------------------------------------------------------------------------------------------------
