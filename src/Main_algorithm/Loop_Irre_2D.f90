@@ -59,7 +59,6 @@ integer(4),external :: ParticleCellNumber,CellIndices,CellNumber
 !------------------------
 ! Initializations
 !------------------------
-done_flag = .false.
 if (esplosione) then
    do npi=1,nag
       if (index(Med(pg(npi)%imed)%tipo,"gas")>0) then
@@ -764,6 +763,7 @@ done_flag = .false.
             indarrayFlu = 0
             do npi=1,nag
                if ((pg(npi)%cella==0).or.(pg(npi)%vel_type/="std")) cycle
+
                   indarrayFlu = indarrayFlu + 1
 ! Array sizes check and possibile resizing
                if (indarrayFlu>PARTICLEBUFFER) then

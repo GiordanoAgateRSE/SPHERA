@@ -58,7 +58,6 @@ integer(4),external :: ParticleCellNumber,CellIndices,CellNumber
 !------------------------
 ! Initializations
 !------------------------
-done_flag = .false.
 if (esplosione) then
    do npi=1,nag
       if (index(Med(pg(npi)%imed)%tipo,"gas")>0) then
@@ -198,6 +197,7 @@ if (exetype=="linux") then
    endif
 endif   
 ITERATION_LOOP: do while (it<=Domain%itmax)
+   done_flag = .false.
    it = it + 1
    it_corrente = it
    it_eff = it

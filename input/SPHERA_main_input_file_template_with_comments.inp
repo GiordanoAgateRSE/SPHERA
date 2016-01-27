@@ -179,6 +179,7 @@ circum_dam_last_x circum_dam_last_y
 RGBColor
 ! If (Boundary_type=="open"): end
 ! If (Boundary_type=="source"): start
+fluid_ID
 flowrate 0.                 ! flowrate(inlet velocity * inlet area); 0.
 pa IC_pressure              !
 RGBColor 

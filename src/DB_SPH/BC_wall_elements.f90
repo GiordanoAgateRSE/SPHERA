@@ -21,7 +21,9 @@
 
 !----------------------------------------------------------------------------------------------------------------------------------
 ! Program unit: BC_wall_elements
-! Description: Wall element density and pressure (Amicarelli et al., 2013, IJNME).         
+! Description: Wall element density and pressure (Amicarelli et al., 2013, 
+!              IJNME). Shepard correction for the kinematic viscosity of the 
+!              semi-particles.         
 !----------------------------------------------------------------------------------------------------------------------------------
 
 subroutine BC_wall_elements
@@ -63,6 +65,8 @@ neigh_w = 0
 do npi=1,DBSPH%n_w
    pg_w(npi)%pres = zero
    pg_w(npi)%dens = med(1)%den0
+! Kinematic viscosity of the semi-particles
+   pg_w(npi)%kin_visc_semi_part = pg_w(npi)%kin_visc_semi_part / pg_w(npi)%sigma
 end do
 ! Loop over computational fluid particles for density and pressure 
 ! contributions to wall elements

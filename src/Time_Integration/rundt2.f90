@@ -61,7 +61,8 @@ dt_Mon = max_positive_number
 ! 3) interface diffusion condition dt_diff=(h**2/2*teta)
 do ii=1,indarrayFlu
    npi = Array_Flu(ii)
-   if (Granular_flows_options%ID_erosion_criterion==1) then
+   if ((Granular_flows_options%ID_erosion_criterion==1).and.                   &
+      (Med(pg(npi)%imed)%tipo=="granular")) then
       if (pg(npi)%state=="sol") cycle
       if ((pg(npi)%coord(1)<Granular_flows_options%x_min_dt).or.               &
          (pg(npi)%coord(1)>Granular_flows_options%x_max_dt).or.                &
@@ -70,7 +71,7 @@ do ii=1,indarrayFlu
          (pg(npi)%coord(3)<Granular_flows_options%z_min_dt).or.                &
          (pg(npi)%coord(3)>Granular_flows_options%z_max_dt)) then
          cycle
-      endif    
+      endif
    endif    
    mate = pg(npi)%imed
    U = sqrt(pg(npi)%vel(1) ** 2 + pg(npi)%vel(2) ** 2 + pg(npi)%vel(3) ** 2)

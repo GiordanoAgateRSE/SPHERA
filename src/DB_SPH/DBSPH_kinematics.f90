@@ -57,6 +57,8 @@ end interface
 !------------------------
 ! Initializations
 !------------------------
+vel_aux = 0.d0
+omega_aux = 0.d0
 !------------------------
 ! Statements
 !------------------------
@@ -91,15 +93,17 @@ if (DBSPH%n_w>0) then
       enddo
    enddo
 !$omp parallel do default(none)                                                &
-!$omp shared(DBSPH,pg_w,i)                                                     &
-!$omp private(i_a,rel_pos,vel_aux,omega_aux)
+!$omp shared(DBSPH,pg_w,i,vel_aux,omega_aux)                                   &
+!$omp private(i_a,rel_pos)
    do i_a=1,DBSPH%n_w
-      rel_pos(:) = pg_w(i_a)%coord(:) -                                        &
-                DBSPH%rotation_centre(pg_w(i_a)%surface_mesh_file_ID,:)
-      call Vector_Product(omega_aux(pg_w(i_a)%surface_mesh_file_ID,1:3),       &
-         rel_pos,pg_w(i_a)%vel,3)
-      pg_w(i_a)%vel(:) = pg_w(i_a)%vel(:) +                                    &
-                         vel_aux(pg_w(i_a)%surface_mesh_file_ID,:)
+      if (DBSPH%n_kinematics_records(pg_w(i_a)%surface_mesh_file_ID)>0) then
+         rel_pos(:) = pg_w(i_a)%coord(:) -                                     &
+                   DBSPH%rotation_centre(pg_w(i_a)%surface_mesh_file_ID,:)
+         call Vector_Product(omega_aux(pg_w(i_a)%surface_mesh_file_ID,1:3),    &
+            rel_pos,pg_w(i_a)%vel,3)
+         pg_w(i_a)%vel(:) = pg_w(i_a)%vel(:) +                                 &
+                            vel_aux(pg_w(i_a)%surface_mesh_file_ID,:)
+      endif
    enddo
 !$omp end parallel do
 endif
