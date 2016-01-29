@@ -334,32 +334,32 @@ done_flag = .false.
             Ncbs = BoundaryDataPointer(1,npi)
             IntNcbs = BoundaryDataPointer(2,npi)
          endif
-         if (Domain%tipo=="semi") then
-            if ((Ncbs>0).and.(IntNcbs>0)) then
+         if ((Ncbs>0).and.(IntNcbs>0).and.(Domain%tipo=="semi")) then
 ! SA-SPH boundary terms for the balance equations (using 
 ! the geometrical integrals already computed)  
-               call AddBoundaryContributions_to_ME2D(npi,IntNcbs,tpres,tdiss,  &
-                  tvisc)                  
-               if (pg(npi)%kodvel==0) then
-                  BoundReaction = zero
+            call AddBoundaryContributions_to_ME2D(npi,IntNcbs,tpres,tdiss,     &
+               tvisc)                  
+            if (pg(npi)%kodvel==0) then
+               BoundReaction = zero
 ! Additional repulsive force (it shouldn't be neither called, nor available)
-                  call AddElasticBoundaryReaction_2D(npi,IntNcbs,BoundReaction)
+               call AddElasticBoundaryReaction_2D(npi,IntNcbs,BoundReaction)
 ! Save acceleration and the assigned boundary velocities components 
 ! in the particle array
-                  pg(npi)%acc(:) = tpres(:) + tdiss(:) + tvisc(:) +            &
-                                   Domain%grav(:) + BoundReaction(:)
-                  else
-                     pg(npi)%acc(:) = zero
-               endif
+               pg(npi)%acc(:) = tpres(:) + tdiss(:) + tvisc(:) +               &
+                                Domain%grav(:) + BoundReaction(:)
                else
-                  if (Domain%tipo=="semi") then
-                     pg(npi)%acc(:) = tpres(:) + tdiss(:) + tvisc(:) +         &
-                                      Domain%grav(:)
-                     else
-                        pg(npi)%acc(:) = (tpres(:) + tdiss(:) + tvisc(:)) /    &
-                                         pg(npi)%Gamma + Domain%grav(:)
-                  endif
+                  pg(npi)%acc(:) = zero
             endif
+            else
+               if (Domain%tipo=="semi") then
+                  pg(npi)%acc(:) = tpres(:) + tdiss(:) + tvisc(:) +            &
+                                   Domain%grav(:)
+                  else
+                     if (Domain%tipo=="bsph") then
+                        pg(npi)%acc(:) = (tpres(:) + tdiss(:) + tvisc(:)) /    &
+                                          pg(npi)%Gamma + Domain%grav(:)
+                     endif
+               endif
          endif
       enddo
 !$omp end parallel do

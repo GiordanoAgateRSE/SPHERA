@@ -66,8 +66,8 @@ omega_aux = 0.d0
 ! imposed velocity to the first surface element.
 if (DBSPH%n_w>0) then
 !$omp parallel do default(none)                                                &
-!$omp shared(DBSPH,tempo)                                                      &
-!$omp private(i,j,vel_aux,omega_aux)
+!$omp shared(DBSPH,tempo,vel_aux,omega_aux)                                    &
+!$omp private(i,j)
    do i=1,DBSPH%surface_mesh_files
       do j=1,DBSPH%n_kinematics_records(i)
          if (DBSPH%kinematics(i,j,1)>=tempo) then
@@ -92,6 +92,7 @@ if (DBSPH%n_w>0) then
          endif
       enddo
    enddo
+!$omp end parallel do
 !$omp parallel do default(none)                                                &
 !$omp shared(DBSPH,pg_w,i,vel_aux,omega_aux)                                   &
 !$omp private(i_a,rel_pos)

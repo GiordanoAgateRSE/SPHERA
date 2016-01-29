@@ -27,7 +27,7 @@
 !              the numerator and the denominator (wall element Shepard 
 !              coefficient without contributions from semi-particles) are   
 !              updated independently. Their ratio is computed in 
-!              "DBSPH_BC_shear_viscosity_term"): here are summed their 
+!              "DBSPH_BC_shear_viscosity_term": here are summed their 
 !              contributions. To compute the kinematic viscosity of the 
 !              semi-particles (before Shepard correction). Contributions to the 
 !              discrete Shepard coefficient of wall elements depending on fluid  
@@ -57,8 +57,9 @@ integer(4),intent(in) :: i_0,i_a,npartint
 ! Statements
 !------------------------
 ! Velocity gradient in VSL for fluid particles
-grad_vel_VSL_fw(:,npartint) = pg(i_0)%vel(:) / dsqrt(dot_product(              &
-                              rag_fw(:,npartint),rag_fw(:,npartint)))  
+grad_vel_VSL_fw(:,npartint) = (pg(i_0)%vel(:)-pg_w(i_a)%vel(:)) /              &
+                              dsqrt(dot_product(rag_fw(:,npartint),            &
+                              rag_fw(:,npartint)))  
 ! Contributions to the numerator of the velocity gradient in VSL for surface 
 ! elements
 pg_w(i_a)%grad_vel_VSL_times_mu(:) = pg_w(i_a)%grad_vel_VSL_times_mu(:) +      &

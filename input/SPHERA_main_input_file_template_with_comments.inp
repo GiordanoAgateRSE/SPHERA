@@ -192,11 +192,17 @@ RGBColor
 
 ##### DBSPH #####
 ! Input parameters for the DB-SPH boundary treatment scheme
-dx_f/dx_w MUSCL_boundary_flag k_w   ! dx_f/dx_w(ratio between the fluid particle
-                                    ! size and the wall element size); 
-                                    ! MUSCL_boundary_flag(logical flag to 
-                                    ! activate boundary terms for MUSCL); k_w
-                                    ! (semi-particle depth coefficient)
+dx_f/dx_w MUSCL_boundary_flag k_w slip_ID ! dx_f/dx_w(ratio between the fluid 
+                                          ! particle size and the wall element  
+                                          ! size); MUSCL_boundary_flag(logical  
+                                          ! flag to activate boundary terms for 
+                                          ! MUSCL); k_w (semi-particle depth 
+                                          ! coefficient); slip_ID (ID for slip 
+                                          ! conditions) = 0(free-slip),1       
+                                          ! (no-slip),2(run-time choice 
+                                          ! depending on the inner shear 
+                                          ! viscosity terms in SPH-NS balance 
+                                          ! equations)
 n_monitor_points n_monitor_regions  ! n_monitor_points; n_monitor_regions=0,1(to
                                     ! estimate the Force along x-direction)
 ! if (n_monitor_points>0): start
@@ -216,7 +222,7 @@ imposed_kinematics_i_records rotation_centre_i_x rotation_centre_i_y rotation_ce
                                     ! records, which describe a possible imposed
                                     ! kinematics for the i-th DBSPH surface 
                                     ! mesh file); 
-                                    ! rotation_centre_1: centre of rotation for 
+                                    ! rotation_centre_1 (centre of rotation for 
                                     ! DB-SPH frontiers for the i-th DBSPH  
                                     ! surface mesh file)
 ! if (imposed_kinematics_i_records>0): start

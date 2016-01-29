@@ -334,9 +334,8 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
             pg(npi)%kodvel = 0
             pg(npi)%velass = zero
          endif
-         if (Domain%tipo=="semi") then
-            Ncbf = BoundaryDataPointer(1,npi)
-            if (Ncbf>0) then
+         if (Domain%tipo=="semi") Ncbf = BoundaryDataPointer(1,npi)
+         if ((Domain%tipo=="semi").and.(Ncbf>0)) then
                Ncbf_Max = max(Ncbf_Max, Ncbf)
                call AddBoundaryContributions_to_ME3D(npi,Ncbf,tpres,tdiss,tvisc)
                if (pg(npi)%kodvel==0) then
@@ -357,7 +356,6 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
                                             pg(npi)%Gamma + Domain%grav(:)
                         endif         
                   endif
-            endif
          endif
       enddo
 !$omp end parallel do

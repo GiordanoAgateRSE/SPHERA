@@ -82,6 +82,7 @@ kacl_coef = Domain%coefkacl / Domain%h
 rvw_sum(:) = zero
 DBSPH_wall_she_vis_term(:) = 0.d0
 t_visc_semi_part(:) = 0.d0
+Morris_inner_weigth = 0.d0
 !------------------------
 ! Statements
 !------------------------
@@ -241,7 +242,9 @@ enddo
 if (pg(npi)%visc>0.d0) then
    absv_pres_grav_inner = dsqrt(dot_product(tpres,tpres)) + GI
    absv_Morris_inner = dsqrt(dot_product(rvw_sum,rvw_sum))
-   Morris_inner_weigth = absv_Morris_inner / absv_pres_grav_inner * 100.d0
+   if (absv_pres_grav_inner/=0.) Morris_inner_weigth = absv_Morris_inner /     &
+                                                       absv_pres_grav_inner *  &
+                                                       100.d0
    if (Morris_inner_weigth>5.d0) then
       pg(npi)%laminar_flag = 1
       else
@@ -249,34 +252,39 @@ if (pg(npi)%visc>0.d0) then
    endif
 endif
 ! Boundary contributions (DB-SPH), only in case of a simulated local laminar
-! regime
-if ((DBSPH%n_w>0).and.(pg(npi)%laminar_flag==1)) then
+! regime or imposed no-slip conditions
+if (DBSPH%n_w>0) then
    do contj=1,nPartIntorno_fw(npi)
       npartint = (npi - 1) * NMAXPARTJ + contj
       npj = PartIntorno_fw(npartint)
       dervel(:) = pg_w(npj)%vel(:) - pg(npi)%vel(:)
-      appopres(:) = - pg_w(npj)%dens * pg_w(npj)%weight * kernel_fw(1,npartint)&
-                    * (pg(npi)%pres / (pg(npi)%dens * pg(npi)%dens) +          &
-                    pg_w(npj)%pres / (pg_w(npj)%dens * pg_w(npj)%dens))        &
-                    * pg_w(npj)%normal(:)
+      appopres(:) = - pg_w(npj)%dens * pg_w(npj)%weight *                      &
+                    kernel_fw(1,npartint) * (pg(npi)%pres / (pg(npi)%dens *    &
+                    pg(npi)%dens) + pg_w(npj)%pres / (pg_w(npj)%dens *         &
+                    pg_w(npj)%dens)) * pg_w(npj)%normal(:)
       appopres(:) = appopres(:) - pg_w(npj)%mass * (pg(npi)%pres /             &
                     (pg(npi)%dens * pg(npi)%dens) + pg_w(npj)%pres /           &
-                    (pg_w(npj)%dens * pg_w(npj)%dens)) * rag_fw(:,npartint) *  &
+                    (pg_w(npj)%dens * pg_w(npj)%dens)) * rag_fw(:,npartint)*   &
                     kernel_fw(2,npartint)  
       tpres(:) = tpres(:) + appopres(:)
-      call DBSPH_BC_shear_viscosity_term(npi,npj,npartint,                     &
-         DBSPH_wall_she_vis_term)
+      if ((pg(npi)%laminar_flag==1).or.(DBSPH%slip_ID==1)) then
+         call DBSPH_BC_shear_viscosity_term(npi,npj,npartint,                  &
+            DBSPH_wall_she_vis_term)
 ! To compute Morris term (interaction with neighbouring semi-particle)
-      kernel_der = kernel_fw(2,npartint)/(dot_product(rag_fw(:,npartint),      &
-                   rag_fw(:,npartint)) + eta2)
-      call viscomorris(npi,npj,npartint,pg(npi)%mass,pg(npi)%dens,pg(npi)%visc,&
-         pg_w(npj)%mass,pg_w(npj)%dens,pg_w(npj)%kin_visc_semi_part,kernel_der,&
-         "std",rag_fw(1:3,npartint),dervel,rvw_semi_part)
-      t_visc_semi_part(:) = t_visc_semi_part(:) + rvw_semi_part(:)
+         kernel_der = kernel_fw(2,npartint)/(dot_product(rag_fw(:,npartint),   &
+                      rag_fw(:,npartint)) + eta2)
+         call viscomorris(npi,npj,npartint,pg(npi)%mass,pg(npi)%dens,          &
+            pg(npi)%visc,pg_w(npj)%mass,pg_w(npj)%dens,                        &
+            pg_w(npj)%kin_visc_semi_part,kernel_der,"std",                     &
+            rag_fw(1:3,npartint),dervel,rvw_semi_part)
+         t_visc_semi_part(:) = t_visc_semi_part(:) + rvw_semi_part(:)
+      endif
    enddo
+   if ((pg(npi)%laminar_flag==1).or.(DBSPH%slip_ID==1)) then
 ! Computation of the boundary shear viscosity term in DB-SPH-NS
-   DBSPH_wall_she_vis_term(:) = DBSPH_wall_she_vis_term(:) / pg(npi)%dens /    &
-                                pg(npi)%Gamma
+      DBSPH_wall_she_vis_term(:) = DBSPH_wall_she_vis_term(:) / pg(npi)%dens   &
+                                   / pg(npi)%Gamma
+   endif
 ! Update the overall (inner+BC) shear viscosity term in DB-SPH-NS
    tvisc(:) = tvisc(:) + DBSPH_wall_she_vis_term(:) + t_visc_semi_part(:)   
 endif

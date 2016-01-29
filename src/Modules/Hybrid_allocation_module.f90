@@ -684,6 +684,10 @@ type DBSPH_der_type
                                         ! mesh face in the .ply input files 
    integer(4)        :: surface_mesh_files ! number of files of the DBSPH 
                                            ! surface meshes
+   integer(4)        :: slip_ID ! slip_ID (ID for slip conditions) = 0 
+                                ! (free-slip),1 (no-slip), 2 (run-time choice 
+                                ! depending on the inner shear viscosity terms 
+                                ! in SPH-NS balance equations)
    double precision  :: dx_dxw ! Ratio between the fluid and the 
                                ! semi-particle sizes
    double precision  :: k_w ! Coefficient to compute semi-particle volumes

@@ -637,18 +637,20 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
       write(unitvtk,'(a)') '      </DataArray>'
 ! Velocity gradient in VSL (projected along the wall element normal) times the
 ! shear viscosity
-      write(unitvtk,'(a)')                                                     &
+      if (DBSPH%slip_ID>0) then
+         write(unitvtk,'(a)')                                                  &
 '      <DataArray type="Float32" Name="Velocity gradient in VSL"  NumberOfComponents="3"  format="ascii" >'
-      do i=1,numpoints,6
-         k1 = i
-         k2 = k1 + 5
-         if (k2>numpoints) k2 = numpoints
-         write(unitvtk,'(8x,6(3(1x,e12.5)))') (                                &
-            pg_w(finger(k))%grad_vel_VSL_times_mu(1),                          &
-            pg_w(finger(k))%grad_vel_VSL_times_mu(2),                          &
-            pg_w(finger(k))%grad_vel_VSL_times_mu(3),k=k1,k2)
-      enddo
-      write(unitvtk,'(a)') '      </DataArray>'
+         do i=1,numpoints,6
+            k1 = i
+            k2 = k1 + 5
+            if (k2>numpoints) k2 = numpoints
+            write(unitvtk,'(8x,6(3(1x,e12.5)))') (                             &
+               pg_w(finger(k))%grad_vel_VSL_times_mu(1),                       &
+               pg_w(finger(k))%grad_vel_VSL_times_mu(2),                       &
+               pg_w(finger(k))%grad_vel_VSL_times_mu(3),k=k1,k2)
+         enddo
+         write(unitvtk,'(a)') '      </DataArray>'
+      endif
 ! Pressure
       write(unitvtk,'(a)')                                                     &
          '      <DataArray type="Float32" Name="Pressure (Pa)" format="ascii" >'
@@ -705,16 +707,18 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
 ! Semi-particle kinematic viscosity
-      write(unitvtk,'(a)')                                                     &
+      if (DBSPH%slip_ID>0) then
+         write(unitvtk,'(a)')                                                  &
 '      <DataArray type="Float32" Name="semi-particle kinematic viscosity (m^2/s)" format="ascii" >'
-      do i=1,numpoints,16
-         k1 = i
-         k2 = k1 + 15
-         if (k2>numpoints) k2 = numpoints
-         write(unitvtk,'(8x,16(1x,e12.5))')                                    &
-            (pg_w(finger(k))%kin_visc_semi_part,k=k1,k2)
-      enddo      
-      write(unitvtk,'(a)') '      </DataArray>'    
+         do i=1,numpoints,16
+            k1 = i
+            k2 = k1 + 15
+            if (k2>numpoints) k2 = numpoints
+            write(unitvtk,'(8x,16(1x,e12.5))')                                 &
+               (pg_w(finger(k))%kin_visc_semi_part,k=k1,k2)
+         enddo      
+         write(unitvtk,'(a)') '      </DataArray>'    
+      endif
 ! Wall element ID 
       write(unitvtk,'(a)')                                                     &
       '      <DataArray type="Float32" Name="Finger" format="ascii" >'

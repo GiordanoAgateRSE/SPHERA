@@ -362,7 +362,8 @@ loop_nag: do npi=1,nag
 !    (rij_su_h/2.d0))
 ! if (rij_su_h/=0.d0) kernel_fw(2,npartint) = kernel_fw(2,npartint) * denom
 ! WendlandC4 kernel, interesting test: end
-                  call DBSPH_velocity_gradients_VSL_SNBL(npi,npj,npartint)
+                  if (DBSPH%slip_ID>0)                                         &
+                     call DBSPH_velocity_gradients_VSL_SNBL(npi,npj,npartint)
                enddo loop_fw
             endif
          enddo loop_krang      

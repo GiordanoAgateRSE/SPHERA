@@ -55,46 +55,52 @@ dt_Mon = max_positive_number
 !------------------------
 ! Statements
 !------------------------
+if (indarrayFlu==0) then
+! In case there is no fluid (or movable) particle
+   dt = 0.d0   
+   else
 ! Time step depends on 3 conditions:
-! 1) the CFL condition: dt_CFL=min(2h/(c+U))
-! 2) viscous stability condition dt_vis=min(rho*h**2/(0.5*mu)) 
+! 1) the CFL condition: dt_CFL=(2h/(c+U))
+! 2) viscous stability condition dt_vis=(rho*h**2/(0.5*mu)) 
 ! 3) interface diffusion condition dt_diff=(h**2/2*teta)
-do ii=1,indarrayFlu
-   npi = Array_Flu(ii)
-   if ((Granular_flows_options%ID_erosion_criterion==1).and.                   &
-      (Med(pg(npi)%imed)%tipo=="granular")) then
-      if (pg(npi)%state=="sol") cycle
-      if ((pg(npi)%coord(1)<Granular_flows_options%x_min_dt).or.               &
-         (pg(npi)%coord(1)>Granular_flows_options%x_max_dt).or.                &
-         (pg(npi)%coord(2)<Granular_flows_options%y_min_dt).or.                &
-         (pg(npi)%coord(2)>Granular_flows_options%y_max_dt).or.                &
-         (pg(npi)%coord(3)<Granular_flows_options%z_min_dt).or.                &
-         (pg(npi)%coord(3)>Granular_flows_options%z_max_dt)) then
-         cycle
-      endif
-   endif    
-   mate = pg(npi)%imed
-   U = sqrt(pg(npi)%vel(1) ** 2 + pg(npi)%vel(2) ** 2 + pg(npi)%vel(3) ** 2)
-   dt_CFL = 2.d0 * Domain%h / (Med(mate)%celerita + U)
-   dt_vis = pg(npi)%dens * squareh / (half * pg(npi)%mu)
-   dtmin = min(dtmin,dt_CFL,dt_vis)
-   celiq = Med(mate)%eps / pg(npi)%dens
-   if (celiq>=zero) pg(npi)%Csound = Dsqrt(celiq)
-enddo
-do j=1,nmedium
-   diffmax = max(diffmax,Med(j)%codif)
-   if (dt_alfa_Mon.eqv..true.) then
-      visc_Mon_j = Med(j)%alfaMon * Med(j)%celerita * Domain%h /               &
-         Med(j)%den0
-      dt_Mon_j = squareh / (half * visc_Mon_j)
-      dt_Mon = min(dt_Mon,dt_Mon_j)
-   endif
-enddo
-dt_dif = half * squareh / (diffmax+0.000000001d0)
-dtmin = min(dtmin,dt_dif)
-if (dt_alfa_Mon.eqv..true.) dtmin = min(dtmin,dt_Mon)
+      do ii=1,indarrayFlu
+         npi = Array_Flu(ii)
+         if ((Granular_flows_options%ID_erosion_criterion==1).and.             &
+            (Med(pg(npi)%imed)%tipo=="granular")) then
+            if (pg(npi)%state=="sol") cycle
+            if ((pg(npi)%coord(1)<Granular_flows_options%x_min_dt).or.         &
+               (pg(npi)%coord(1)>Granular_flows_options%x_max_dt).or.          &
+               (pg(npi)%coord(2)<Granular_flows_options%y_min_dt).or.          &
+               (pg(npi)%coord(2)>Granular_flows_options%y_max_dt).or.          &
+               (pg(npi)%coord(3)<Granular_flows_options%z_min_dt).or.          &
+               (pg(npi)%coord(3)>Granular_flows_options%z_max_dt)) then
+               cycle
+            endif
+         endif    
+         mate = pg(npi)%imed
+         U = sqrt(pg(npi)%vel(1) ** 2 + pg(npi)%vel(2) ** 2 + pg(npi)%vel(3)   &
+             ** 2)
+         dt_CFL = 2.d0 * Domain%h / (Med(mate)%celerita + U)
+         dt_vis = pg(npi)%dens * squareh / (half * pg(npi)%mu)
+         dtmin = min(dtmin,dt_CFL,dt_vis)
+         celiq = Med(mate)%eps / pg(npi)%dens
+         if (celiq>=zero) pg(npi)%Csound = Dsqrt(celiq)
+      enddo
+      do j=1,nmedium
+         diffmax = max(diffmax,Med(j)%codif)
+         if (dt_alfa_Mon.eqv..true.) then
+            visc_Mon_j = Med(j)%alfaMon * Med(j)%celerita * Domain%h /         &
+               Med(j)%den0
+            dt_Mon_j = squareh / (half * visc_Mon_j)
+            dt_Mon = min(dt_Mon,dt_Mon_j)
+         endif
+      enddo
+      dt_dif = half * squareh / (diffmax+0.000000001d0)
+      dtmin = min(dtmin,dt_dif)
+      if (dt_alfa_Mon.eqv..true.) dtmin = min(dtmin,dt_Mon)
 ! CFL is used as a constant for each of the 3 stability conditions 
-dt = (one - pesodt) * Domain%CFL * dtmin + pesodt * dt_average
+      dt = (one - pesodt) * Domain%CFL * dtmin + pesodt * dt_average
+endif
 dt_average = (dt_average * (it_corrente - 1) + dt) / it_corrente
 !------------------------
 ! Deallocations

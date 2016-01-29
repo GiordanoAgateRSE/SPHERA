@@ -23,7 +23,6 @@
 ! Program unit: mixture_viscosity 
 ! Description: To compute the mixture viscosity of the bed-load transport layer.       
 !----------------------------------------------------------------------------------------------------------------------------------
-
 subroutine mixture_viscosity
 !------------------------
 ! Modules
@@ -67,7 +66,8 @@ do npi=1,nag
       if ((Granular_flows_options%viscosity_blt_formula==1).or.                &
          (Granular_flows_options%viscosity_blt_formula==4) ) then
          if (ind_interfaces(i_grid,j_grid,3).ne.0) then                  
-            z_int = pg(ind_interfaces(i_grid,j_grid,3))%coord(3)
+            z_int = pg(ind_interfaces(i_grid,j_grid,3))%coord(3) + Domain%dd / &
+                    2.d0
             pg(npi)%sigma_prime = ( - Domain%grav(3)) *                        &
                (Med(Granular_flows_options%ID_granular)%den0 -                 &
                Med(Granular_flows_options%ID_main_fluid)%den0) *               &
