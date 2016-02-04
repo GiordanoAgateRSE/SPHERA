@@ -37,7 +37,7 @@ implicit none
 integer(4),intent(inout) :: nrighe,ier,ninp,nout
 character(1),intent(inout) :: comment
 character(100),intent(inout) :: ainp
-logical :: MUSCL_boundary_flag,in_built_monitors
+logical :: MUSCL_boundary_flag,in_built_monitors,Gamma_limiter_flag
 integer(4) :: ioerr,n_monitor_points,n_monitor_regions,i,alloc_stat   
 integer(4) :: dealloc_stat,j,n_inlet,n_outlet,slip_ID
 integer(4) :: ply_n_face_vert,surface_mesh_files
@@ -74,7 +74,8 @@ call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DBSPH DATA",ninp,nout)) return
 do while (TRIM(lcase(ainp))/="##### end dbsph #####")
 ! Reading the ratio between the fluid and the semi-particle sizes (dx/dx_w)
-   read(ainp,*,iostat=ioerr) dx_dxw,MUSCL_boundary_flag,k_w,slip_ID
+   read(ainp,*,iostat=ioerr) dx_dxw,MUSCL_boundary_flag,k_w,slip_ID,           &
+      Gamma_limiter_flag
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DBSPH GENERAL INPUT",ninp,nout))  &
       return
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
@@ -182,6 +183,8 @@ do while (TRIM(lcase(ainp))/="##### end dbsph #####")
 "k_w(semi-particle coefficient)..",k_w
       write(nout,"(1x,a,1p,i12)")                                              &
 "DB-SPH slip_ID..................",slip_ID       
+      write(nout,"(1x,a,1p,l12)")                                              &
+"Gamma_limiter_flag:.............",Gamma_limiter_flag      
       write(nout,"(1x,a,1p,i12)")                                              &
 "n_monitor_points................",n_monitor_points       
       if (n_monitor_points>0) then
@@ -243,6 +246,7 @@ do while (TRIM(lcase(ainp))/="##### end dbsph #####")
       DBSPH%MUSCL_boundary_flag = MUSCL_boundary_flag
       DBSPH%k_w = k_w
       DBSPH%slip_ID = slip_ID
+      DBSPH%Gamma_limiter_flag = Gamma_limiter_flag
       DBSPH%n_monitor_points = n_monitor_points 
       DBSPH%n_monitor_regions = n_monitor_regions
       DBSPH%monitor_region(:) = monitor_region(:)  

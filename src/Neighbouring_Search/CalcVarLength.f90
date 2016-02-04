@@ -149,70 +149,77 @@ loop_nag: do npi=1,nag
 ! Cell out of domain
             if (ncelj==0) cycle    
 ! Loop over the particles in the cell 
-            loop_mm: do mm=Icont(ncelj),Icont(ncelj+1)-1  
-            if (nPartIntorno(npi)>=NMAXPARTJ) then
-               write (nout,'(1x,a,i12,a,i12,a)') ' The computational particle '&
-                  ,npi,' has reached ',NMAXPARTJ,' neighbouring particles.'
-               write (nout,'(1x,a,3f15.10)') '        Coordinate: ',           &
-                  pg(npi)%coord(:)
-               write (nscr,'(1x,a,i12,a,i12,a)') ' The computational particle '&
-                  ,npi,' has reached ',NMAXPARTJ,' neighbouring particles.'
-               write (nscr,'(1x,a,3f15.10)') '        Coordinate: ',           &
-                  pg(npi)%coord(:)
-               cycle
-            endif
-            if (Icont(ncelj+1)<=Icont(ncelj)) cycle
-            npj = NPartOrd(mm)
+            loop_mm: do mm=Icont(ncelj),Icont(ncelj+1)-1 
+! Warning. A computational particle has reached the maximum number of   
+! fluid particle neighbours allowed.                
+               if (nPartIntorno(npi)>=NMAXPARTJ) then
+                  write (nscr,'(1x,a,i12,a,i12,a)')                            &
+                     ' The computational particle ',npi,' has reached ',       &
+                     NMAXPARTJ,' fluid particle neighbours.'
+                  write (nscr,'(1x,a,3f15.10)') '        Coordinate: ',        &
+                     pg(npi)%coord(:)
+                  cycle
+               endif
+! Warning. A computational particle has reached the maximum number of   
+! wall element neighbours allowed.                
+               if (nPartIntorno_fw(npi)>=NMAXPARTJ) then
+                  write (nscr,'(1x,a,i12,a,i12,a)')                            &
+                     ' The computational particle ',npi,' has reached ',       &
+                     NMAXPARTJ,' wall element neighbours.'
+                  write (nscr,'(1x,a,3f15.10)') '        Coordinate: ',        &
+                     pg(npi)%coord(:)
+                  cycle
+               endif
+               if (Icont(ncelj+1)<=Icont(ncelj)) cycle
+               npj = NPartOrd(mm)
 ! Relative distance 
-            ragtemp(1:3) = pg(npi)%coord(1:3) - pg(npj)%coord(1:3)
+               ragtemp(1:3) = pg(npi)%coord(1:3) - pg(npj)%coord(1:3)
 ! Square of the relative distance (to improve accuracy later on)
-            rijtemp = ragtemp(1)*ragtemp(1) + ragtemp(2)*ragtemp(2) +          &
-                      ragtemp(3)*ragtemp(3)
+               rijtemp = ragtemp(1)*ragtemp(1) + ragtemp(2)*ragtemp(2) +       &
+                         ragtemp(3)*ragtemp(3)
 ! Check if the second particle is a neighbour of the first one 
-            if (rijtemp>doublesquareh) cycle
+               if (rijtemp>doublesquareh) cycle
 ! Increase of the number of neighburs  
-            nPartIntorno(npi) = nPartIntorno(npi) + 1
+               nPartIntorno(npi) = nPartIntorno(npi) + 1
 ! Increase an array pointer 
-            npartint = (npi - 1) * NMAXPARTJ + nPartIntorno(npi)
-! To check array sizes and possibly to kill the execution.
-            if (nPartIntorno(npi)>NMAXPARTJ) then
-               write (nout,'(1x,a,i12,a)')   ' ERROR! The particle ',npi,      &
-                  ' has too many surround particles.'
-               write (nout,'(1x,a,3f15.10)') '        Coordinate: ',           &
-                  pg(npi)%coord(:)
-               write (nscr,'(1x,a,i12,a)')   ' ERROR! The particle ',npi,      &
-                  ' has too many surround particles.'
-               write (nscr,'(1x,a,3f15.10)') '        Coordinate: ',           &
-                  pg(npi)%coord(:)
-               call diagnostic (arg1=10,arg2=1,arg3=nomsub)
-            endif
-            PartIntorno(npartint) = npj
-            rijtemp2 = rijtemp
-            rijtemp = Dsqrt(rijtemp)
-            rij_su_h = rijtemp / Domain%h
-            rij_su_h_quad = rijtemp2 / squareh
-            index_rij_su_h = int(rij_su_h)
-            denom = one / (rijtemp + eta)
-            rag(1:3,npartint) = ragtemp(1:3)
-            gradmod = zero
-            gradmodwacl = zero
-            wu = zero
-            PartKernel(1:4,npartint) = zero
-            if (index_rij_su_h>=2) cycle
-            gradmod = -two * rij_su_h + 1.5d0 * rij_su_h_quad
-            gradmodwacl = -12.0d0 - 3.0d0 * rij_su_h_quad + 12.0d0 * rij_su_h 
-            wu = 0.666666667d0 + rij_su_h_quad * (rij_su_h * half - one)
-            if (index_rij_su_h>0) then
-               gradmod = -gradmod + rij_su_h_quad - two
-               wu = (two - rij_su_h) * (two - rij_su_h) * (two - rij_su_h) *   & 
-                    0.166666666667d0
-            endif 
-            gradmod = gradmod * ke_coef
-            gradmodwacl = gradmodwacl * kacl_coef
-            PartKernel(1,npartint) = gradmod * denom 
-            PartKernel(2,npartint) = PartKernel(1,npartint) / (rijtemp2 + eta2)
-            PartKernel(3,npartint) = gradmodwacl * denom
-            PartKernel(4,npartint) = wu * Domain%coefke
+               npartint = (npi - 1) * NMAXPARTJ + nPartIntorno(npi)
+! Error. A computational particle has exceeded the maximum number of fluid  
+! particle neighbours allowed. Simulation is killed.               
+               if (nPartIntorno(npi)>NMAXPARTJ) then
+                  write (nscr,'(1x,a,i12,a)')   ' ERROR! The particle ',npi,   &
+                     ' has too many fluid particle neighbours.'
+                  write (nscr,'(1x,a,3f15.10)') '        Coordinate: ',        &
+                     pg(npi)%coord(:)
+                  call diagnostic(arg1=10,arg2=1,arg3=nomsub)
+               endif
+               PartIntorno(npartint) = npj
+               rijtemp2 = rijtemp
+               rijtemp = Dsqrt(rijtemp)
+               rij_su_h = rijtemp / Domain%h
+               rij_su_h_quad = rijtemp2 / squareh
+               index_rij_su_h = int(rij_su_h)
+               denom = one / (rijtemp + eta)
+               rag(1:3,npartint) = ragtemp(1:3)
+               gradmod = zero
+               gradmodwacl = zero
+               wu = zero
+               PartKernel(1:4,npartint) = zero
+               if (index_rij_su_h>=2) cycle
+               gradmod = -two * rij_su_h + 1.5d0 * rij_su_h_quad
+               gradmodwacl = -12.0d0 - 3.0d0 * rij_su_h_quad + 12.0d0 * rij_su_h 
+               wu = 0.666666667d0 + rij_su_h_quad * (rij_su_h * half - one)
+               if (index_rij_su_h>0) then
+                  gradmod = -gradmod + rij_su_h_quad - two
+                  wu = (two - rij_su_h) * (two - rij_su_h) * (two - rij_su_h) *& 
+                       0.166666666667d0
+               endif 
+               gradmod = gradmod * ke_coef
+               gradmodwacl = gradmodwacl * kacl_coef
+               PartKernel(1,npartint) = gradmod * denom 
+               PartKernel(2,npartint) = PartKernel(1,npartint) / (rijtemp2 +   &
+                                        eta2)
+               PartKernel(3,npartint) = gradmodwacl * denom
+               PartKernel(4,npartint) = wu * Domain%coefke
 ! WendlandC4 kernel, interesting test: start
 ! PartKernel(1,npartint) = (3.d0/(4.d0*PIGRECO*(2.d0*Domain%h**3))) *          &
 !    ((1-rij_su_h/2.d0)**5) * (-280.d0 * (rij_su_h/2.d0)**2 - 56.d0 *          &
@@ -226,42 +233,42 @@ loop_nag: do npi=1,nag
 !    kernel_fw(2,npartint) = (5.d0/(16.d0*PIGRECO*Domain%h**2)) *              &
 !    ((2.d0-rij_su_h)**3) 
 ! Gallati anti-cluster kernel, interesting test: end
-            if (Domain%tipo=="bsph") then
-               pg(npi)%sigma = pg(npi)%sigma + pg(npj)%mass *                  &
-                               PartKernel(4,npartint) / pg(npj)%dens 
-               if (pg(npi)%imed==pg(npj)%imed) then
-                  pg(npi)%rhoSPH_new = pg(npi)%rhoSPH_new + pg(npj)%mass *     &
-                                       PartKernel(4,npartint)
-                  pg(npi)%sigma_same_fluid = pg(npi)%sigma_same_fluid +        &
-                                             pg(npj)%mass *                    &
-                                             PartKernel(4,npartint) /          &
-                                             pg(npj)%dens
-               endif
-            endif
-! Searching for the nearest fluid/mixture SPH particle 
-            if (erosione) then
-               if (Med(pg(npi)%imed)%tipo/=Med(pg(npj)%imed)%tipo) then
-                  if ((rijtemp<pg(npi)%rijtempmin(1)).or.                      &
-                     ((rijtemp==pg(npi)%rijtempmin(1)).and.                    &
-                     (npj>pg(npi)%indneighliqsol))) then   
-                     if ((index(Med(pg(npi)%imed)%tipo,"liquid")>0).and.       &
-                        (pg(npi)%coord(3)>pg(npj)%coord(3))) then
-                        pg(npi)%indneighliqsol = npj
-                        pg(npi)%rijtempmin(1) = rijtemp
-                        elseif ((index(Med(pg(npi)%imed)%tipo,"granular")>0)   &
-                           .and.(pg(npi)%coord(3)<pg(npj)%coord(3))) then
-                           pg(npi)%indneighliqsol = npj
-                           pg(npi)%rijtempmin(1) = rijtemp
-                     endif
+               if (Domain%tipo=="bsph") then
+                  pg(npi)%sigma = pg(npi)%sigma + pg(npj)%mass *               &
+                                  PartKernel(4,npartint) / pg(npj)%dens 
+                  if (pg(npi)%imed==pg(npj)%imed) then
+                     pg(npi)%rhoSPH_new = pg(npi)%rhoSPH_new + pg(npj)%mass *  &
+                                          PartKernel(4,npartint)
+                     pg(npi)%sigma_same_fluid = pg(npi)%sigma_same_fluid +     &
+                                                pg(npj)%mass *                 &
+                                                PartKernel(4,npartint) /       &
+                                                pg(npj)%dens
                   endif
                endif
+! Searching for the nearest fluid/mixture SPH particle 
+               if (erosione) then
+                  if (Med(pg(npi)%imed)%tipo/=Med(pg(npj)%imed)%tipo) then
+                     if ((rijtemp<pg(npi)%rijtempmin(1)).or.                   &
+                        ((rijtemp==pg(npi)%rijtempmin(1)).and.                 &
+                        (npj>pg(npi)%indneighliqsol))) then   
+                        if ((index(Med(pg(npi)%imed)%tipo,"liquid")>0).and.    &
+                           (pg(npi)%coord(3)>pg(npj)%coord(3))) then
+                           pg(npi)%indneighliqsol = npj
+                           pg(npi)%rijtempmin(1) = rijtemp
+                           elseif ((index(Med(pg(npi)%imed)%tipo,"granular")>0)&
+                              .and.(pg(npi)%coord(3)<pg(npj)%coord(3))) then
+                              pg(npi)%indneighliqsol = npj
+                              pg(npi)%rijtempmin(1) = rijtemp
+                        endif
+                     endif
+                  endif
 ! Searching for the nearest mobile/fixed particle (if cycle apparently less 
 ! efficient than the previous one because we have to compute the interface 
 ! normal)              
-               if (pg(npi)%state/=pg(npj)%state) then
-                  if (pg(npi)%state=="flu") then
-                     if (pg(npi)%imed==Granular_flows_options%ID_granular)     &
-                        pg(npi)%normal_int(:) = pg(npi)%normal_int(:)          &
+                  if (pg(npi)%state/=pg(npj)%state) then
+                     if (pg(npi)%state=="flu") then
+                        if (pg(npi)%imed==Granular_flows_options%ID_granular)  &
+                           pg(npi)%normal_int(:) = pg(npi)%normal_int(:)       &
                                                 - (pg(npj)%coord(:) -          &
                                                 pg(npi)%coord(:)) *            &
                                                 PartKernel(4,npartint) 
@@ -310,6 +317,15 @@ loop_nag: do npi=1,nag
                   if (rijtemp>doublesquareh) cycle
 ! Counter increases 
                   nPartIntorno_fw(npi) = nPartIntorno_fw(npi) + 1
+! Error. A computational particle has exceeded the maximum number of wall  
+! element neighbours allowed. Simulation is killed.               
+                  if (nPartIntorno_fw(npi)>NMAXPARTJ) then
+                     write (nscr,'(1x,a,i12,a)')   ' ERROR! The particle ',npi,&
+                        ' has too many wall element neighbours.'
+                     write (nscr,'(1x,a,3f15.10)') '        Coordinate: ',     &
+                        pg(npi)%coord(:)
+                     call diagnostic(arg1=10,arg2=9,arg3=nomsub)
+                  endif                  
                   npartint = (npi - 1) * NMAXPARTJ + nPartIntorno_fw(npi)
 ! Savings
                   PartIntorno_fw(npartint) = npj
@@ -523,7 +539,8 @@ if (Domain%tipo=="bsph") then
             pg(npi)%Gamma = one
             else
                pg(npi)%Gamma = pg(npi)%sigma
-               pg(npi)%Gamma = min (pg(npi)%Gamma,one)    
+               if (DBSPH%Gamma_limiter_flag.eqv..true.) pg(npi)%Gamma =         &
+                  min(pg(npi)%Gamma,one)    
          endif
       endif
       if (it_corrente>-2) then
@@ -539,8 +556,8 @@ if (Domain%tipo=="bsph") then
          if (pg(npi)%rhoSPH_old==zero) then
             pg(npi)%DensShep = pg(npi)%rhoSPH_new * pg(npi)%Gamma
             if (NMedium==1) then
-               if (pg(npi)%FS ==1) then
-                  pg(npi)%dens = pg(npi)%rhoSPH_new / pg(npi)%sigma
+               if (pg(npi)%FS==1) then
+                  pg(npi)%dens = pg(npi)%rhoSPH_new / pg(npi)%sigma 
                   else
                      pg(npi)%dens = pg(npi)%rhoSPH_new / pg(npi)%Gamma
                endif

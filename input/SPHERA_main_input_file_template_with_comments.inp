@@ -192,17 +192,15 @@ RGBColor
 
 ##### DBSPH #####
 ! Input parameters for the DB-SPH boundary treatment scheme
-dx_f/dx_w MUSCL_boundary_flag k_w slip_ID ! dx_f/dx_w(ratio between the fluid 
-                                          ! particle size and the wall element  
-                                          ! size); MUSCL_boundary_flag(logical  
-                                          ! flag to activate boundary terms for 
-                                          ! MUSCL); k_w (semi-particle depth 
-                                          ! coefficient); slip_ID (ID for slip 
-                                          ! conditions) = 0(free-slip),1       
-                                          ! (no-slip),2(run-time choice 
-                                          ! depending on the inner shear 
-                                          ! viscosity terms in SPH-NS balance 
-                                          ! equations)
+dx_f/dx_w MUSCL_boundary_flag k_w slip_ID Gamma_limiter_flag
+! dx_f/dx_w(ratio between the fluid particle size and the wall element size)
+! MUSCL_boundary_flag(logical flag to activate boundary terms for MUSCL)
+! k_w (semi-particle depth coefficient)
+! slip_ID (ID for slip conditions) = 0 (free-slip), 1 (no-slip), 
+!    2 (run-time choice depending on the inner shear viscosity terms in SPH-NS 
+!    balance equations)
+! Gamma_limiter_flag: logical variable to activate or deactivate Gamma upper 
+! limiter (1.)
 n_monitor_points n_monitor_regions  ! n_monitor_points; n_monitor_regions=0,1(to
                                     ! estimate the Force along x-direction)
 ! if (n_monitor_points>0): start
@@ -229,9 +227,11 @@ imposed_kinematics_i_records rotation_centre_i_x rotation_centre_i_y rotation_ce
 i_time_1 i_velocity_x_1 i_velocity_y_1 i_velocity_z_1 i_omega_x_1 i_omega_y_1 i_omega_z_1 
 ! ...                               ! other possible  records
 i_time_last i_velocity_x_last i_velocity_y_last i_velocity_z_last i_omega_x_last i_omega_y_last i_omega_z_last
-                                    ! (records for the imposed translational 
+                                    ! (records for the imposed  
                                     ! kinematics to frontiers for the i-th  
-                                    ! DBSPH surface mesh file)
+                                    ! DBSPH surface mesh file); time of the last
+                                    ! record should be slightly higher than time
+                                    ! at the end of the simulation. 
 ! if (imposed_kinematics_i_records>0): end
 ! enddo
 n_inlet n_outlet ply_n_face_vert    ! n_inlet(number of inlet sections)

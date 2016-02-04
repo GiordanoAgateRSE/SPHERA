@@ -671,6 +671,8 @@ type DBSPH_der_type
                                             ! reconstruction
    logical           :: in_built_monitors ! Flag to activate (or not) 
                                           ! in-built motion of control lines 
+   logical           :: Gamma_limiter_flag ! flag to activate or deactivate 
+                                           ! Gamma upper limiter (1.)
    integer(4)        :: n_w ! Number of surface elements
    integer(4)        :: n_monitor_points ! Number of monitoring points
    integer(4)        :: n_monitor_regions ! Number of monitoring regions 

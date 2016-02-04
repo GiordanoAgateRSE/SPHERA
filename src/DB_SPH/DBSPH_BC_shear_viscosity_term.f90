@@ -49,10 +49,6 @@ double precision,intent(inout) :: DBSPH_wall_she_vis_term(3)
 !------------------------
 ! Statements
 !------------------------
-! Semi-particle velocity gradient (times shear viscosity) in the Viscous  
-! Sub-Layer of the Surface Neutral Boundary Layer
-pg_w(i_a)%grad_vel_VSL_times_mu(:) = pg_w(i_a)%grad_vel_VSL_times_mu(:) /      &
-                                     pg_w(i_a)%sigma
 ! Contribution to the numerator of the boundary shear viscosity term 
 DBSPH_wall_she_vis_term(:) = DBSPH_wall_she_vis_term(:) -                      &
                              kernel_fw(1,npartint) * pg_w(i_a)%weight *        &

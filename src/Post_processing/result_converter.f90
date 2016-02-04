@@ -364,17 +364,19 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
             pg(finger(k))%dvel(3,2),pg(finger(k))%dvel(3,3),k=k1,k2)
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
-   endif 
-! laminar_flag
-   write(unitvtk,'(a)')                                                        &
-      '      <DataArray type="Int32" Name="laminar_flag" format="ascii" >'
-   do i=1,numpoints,16
-      k1 = i
-      k2 = k1 + 15
-      if (k2>numpoints) k2 = numpoints
-      write(unitvtk,'(8x,16(1x,i8))') (pg(finger(k))%laminar_flag,k = k1,k2)
-   enddo
-   write(unitvtk,'(a)') '      </DataArray>'
+   endif
+! Laminar_flag
+   if (.not.((Domain%tipo=="bsph").and.(DBSPH%slip_ID<2))) then 
+      write(unitvtk,'(a)')                                                     &
+         '      <DataArray type="Int32" Name="laminar_flag" format="ascii" >'
+      do i=1,numpoints,16
+         k1 = i
+         k2 = k1 + 15
+         if (k2>numpoints) k2 = numpoints
+         write(unitvtk,'(8x,16(1x,i8))') (pg(finger(k))%laminar_flag,k = k1,k2)
+      enddo
+      write(unitvtk,'(a)') '      </DataArray>'
+   endif
    if (Granular_flows_options%ID_erosion_criterion>=1) then
 ! sigma_prime
       write(unitvtk,'(a)') '      <DataArray type="Float32" Name="sigma_prime" format="ascii" >'

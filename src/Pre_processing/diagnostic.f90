@@ -235,8 +235,8 @@ select case (ierr)
       write(nout,'(1x,a)') 'Specific code error is:'
       select case (dato)
          case (1); write(nout,'(1x,a,i10,2a)')                                 &
-' 1 - Number of surrounding particles of current particle is greater than max '&
-            ,NMAXPARTJ,' (a).  Routine ->',stringa(1:la)
+' 1 - Too many fluid particle neighbours. Maximum number allowed is: ',        &
+                      NMAXPARTJ,' (a).  Routine ->',stringa(1:la)
          case (2); write(nout,'(1x,2a)')                                       &
             ' 2 - Array BoundaryVertex bounds exceed.  Routine ->',            &
             stringa(1:la)
@@ -257,6 +257,9 @@ select case (ierr)
          case (8); write(nout,'(1x,2a)')                                       &
 ' 8 - Free level condition is not found. Routine -> ',                         &
             stringa(1:la)
+         case (9); write(nout,'(1x,a,i10,2a)')                                 &
+' 9 - Too many wall element neighbours. Maximum number allowed is: ',          &
+                      NMAXPARTJ,' (a).  Routine ->',stringa(1:la)
          case (88); write(nout,'(1x,2a)')                                      &
 '88 - Error deltat law calculation for "law" particles. Routine -> '           &
             ,stringa(1:la)

@@ -214,18 +214,21 @@ if (((DBSPH%n_w+DBSPH%n_inlet+DBSPH%n_outlet)>0).and.(Domain%tipo=="bsph")) &
 ! Boundary conditions: end
    do npi=1,nag 
       pg(npi)%Gamma = pg(npi)%Gamma + pg(npi)%dShep * dt
-      if (pg(npi)%Gamma>=one) pg(npi)%Gamma = one 
+      if ((DBSPH%Gamma_limiter_flag.eqv..true.).and.(pg(npi)%Gamma>=one))      &
+         pg(npi)%Gamma = one 
    enddo
    call CalcVarLength
 !$omp parallel do default(none)                                                &
 !$omp private(npi,ii)                                                          &
 !$omp shared(nag,pg,med,dt,indarrayFlu,Array_Flu,Domain,uni_old)               &
-!$omp shared(beta,nPartIntorno_fw,it_corrente,NMedium)
+!$omp shared(beta,nPartIntorno_fw,it_corrente,NMedium,DBSPH)
 ! Time integration of the continuity equation
    do ii=1,indarrayFlu
       npi = Array_Flu(ii)
+      if (DBSPH%Gamma_limiter_flag.eqv..true.) then
 ! Gamma=1 for particles in the inner domain
-      if (nPartIntorno_fw(npi)==0) pg(npi)%Gamma = one         
+         if (nPartIntorno_fw(npi)==0) pg(npi)%Gamma = one 
+      endif        
       pg(npi)%dden = pg(npi)%dden / pg(npi)%Gamma
 ! Boundary type is fixe or tapis or level(?)
       if (pg(npi)%koddens==0) then

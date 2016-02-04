@@ -23,9 +23,10 @@
 ! Program unit: BC_wall_elements
 ! Description: Wall element density and pressure (Amicarelli et al., 2013, 
 !              IJNME). Shepard correction for the kinematic viscosity of the 
-!              semi-particles.         
+!              semi-particles. Shepard correction for the velocity gradient 
+!              (times shear viscosity) of the semi-particles in the Viscous  
+!              Sub-Layer of the Surface Neutral Boundary Layer.         
 !----------------------------------------------------------------------------------------------------------------------------------
-
 subroutine BC_wall_elements
 !------------------------
 ! Modules
@@ -67,7 +68,11 @@ do npi=1,DBSPH%n_w
    pg_w(npi)%dens = med(1)%den0
 ! Kinematic viscosity of the semi-particles
    pg_w(npi)%kin_visc_semi_part = pg_w(npi)%kin_visc_semi_part / pg_w(npi)%sigma
-end do
+! Semi-particle velocity gradient (times shear viscosity) in the Viscous  
+! Sub-Layer of the Surface Neutral Boundary Layer: normalization
+   pg_w(npi)%grad_vel_VSL_times_mu(:) = pg_w(npi)%grad_vel_VSL_times_mu(:) /   &
+                                        pg_w(npi)%sigma
+enddo
 ! Loop over computational fluid particles for density and pressure 
 ! contributions to wall elements
 !$omp end parallel do
