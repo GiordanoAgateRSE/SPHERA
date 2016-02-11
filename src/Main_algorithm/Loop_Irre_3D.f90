@@ -284,7 +284,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
                   elseif (index(modelloerosione,"mohr")>0) then
 ! To compute the second invariant of the rate-strain tensor and density 
 ! derivatives
-                     call inter_EqCont_2D 
+                     call inter_EqCont_3D 
 ! Mohr-Coulomb criterion
                      call MohrC
                endif

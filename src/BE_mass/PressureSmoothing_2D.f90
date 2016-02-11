@@ -85,7 +85,7 @@ endif
 !$omp shared(sompW_vec,n_bodies,AppUnity_vec) 
 do ii=1,indarrayFlu
    npi = Array_Flu(ii)
-! Excluding particles cose to the face with conditions "flow", "velo" and "sour"
+! Excluding particles close to the face with conditions "flow", "velo" and "sour"
    if (pg(npi)%koddens==0) then 
       Nsp = nPartIntorno(npi)
       if (Nsp > 0) then
@@ -173,7 +173,7 @@ do ii=1,indarrayFlu
 ! Computing TetaP depending on the time step
                      TetaP1 = Domain%TetaP * Med(pg(npi)%imed)%Celerita * dt / &
                               Domain%h
-               end if
+               endif
                AppUnity = AppUnity + VIntWdV_FT + VIntWdV_SO + VIntWdV_OSP +   &
                           VIntWdV_OSB
                select case (SmoothVersion)
@@ -191,12 +191,12 @@ do ii=1,indarrayFlu
                   case default
 ! no smoothing
                      smoothpi = Pg(npi)%pres       
-               end select
+               endselect
                pg(npi)%vpres = smoothpi
          endif
-      end if
-   end if
-end do
+      endif
+   endif
+enddo
 !$omp end parallel do
 ! The new density and pressure values are temporarily saved in PartDens and 
 ! PartPress. In the next cycle, these values are copied in row k.
@@ -205,7 +205,7 @@ end do
 !$omp shared(nag,Pg,Domain,Med,indarrayFlu,Array_Flu,esplosione)
 do ii=1,indarrayFlu
    npi = Array_Flu(ii)
-! Excluding particles cose to the face with conditions "flow", "velo" and "sour"
+! Excluding particles close to the face with conditions "flow", "velo" and "sour"
    if (pg(npi)%koddens==0) then 
       pg(npi)%pres = pg(npi)%vpres
       if (esplosione) then
@@ -217,9 +217,9 @@ do ii=1,indarrayFlu
          else
              pg(npi)%dens = Med(pg(npi)%imed)%den0 * (one + (pg(npi)%vpres -   &
                             Domain%Prif) / Med(pg(npi)%imed)%eps)
-      end if
-   end if
-end do
+      endif
+   endif
+enddo
 !$omp end parallel do
 !------------------------
 ! Deallocations

@@ -120,7 +120,7 @@ do npi=1,nag
 ! equation of state 
       rhorif = Med(pg(npi)%imed)%den0
       c2 = Med(pg(npi)%imed)%eps / rhorif
-      pstar = c2 * (rhostar-rhorif)
+      pstar = c2 * (rhostar-rhorif) + Domain%prif
       if (pstar<-99000.d0) then
          pstar = -99000.d0
       endif 
@@ -142,7 +142,7 @@ do npi=1,DBSPH%n_w
 ! non-negative pressure values
       if (pg_w(npi)%pres<0.d0) pg_w(npi)%pres = zero 
    endif
-end do
+enddo
 !$omp end parallel do
 !------------------------
 ! Deallocations

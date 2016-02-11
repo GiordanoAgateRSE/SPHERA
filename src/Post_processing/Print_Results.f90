@@ -492,12 +492,15 @@ if (nag>0) then
             "|",pg(maxlock_BetaGamma)%coord(3),"|"
       endif   
    endif
-   write(nout,'(a,g12.3,a)') "The ",laminar_flag_perc,                         &
+   if (.not.((Domain%tipo=="bsph").and.(DBSPH%slip_ID<2))) then   
+      write(nout,'(a,g12.3,a)') "The ",laminar_flag_perc,                      &
 "% of fluid particles needs the shear viscous term in the momentum equation. "
-   if (mixture_count>0) then
-      write(nout,*) "The total number of mixture particles is ",mixture_count,". "
-      write(nout,'(a,g12.3,a)') "The ",blt_laminar_flag_perc,                  &
+      if (mixture_count>0) then
+         write(nout,*) "The total number of mixture particles is ",            &
+            mixture_count,". "
+         write(nout,'(a,g12.3,a)') "The ",blt_laminar_flag_perc,               &
 "% of mixture particles needs the shear viscous term in the momentum equation. "
+      endif
    endif
    else
       write(nout,'(128("."))')

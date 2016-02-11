@@ -307,6 +307,8 @@ do icbs=1,IntNcbs
 ! Shear viscosity force (with changed sign)
          if (pg(npi)%laminar_flag==1) then
             SVforce = SVcoeff * (cinvisci + cinvisci) * IntWd1s0
+            else
+               SVforce = 0.d0
          endif
          do i=1,PLANEDIM
             ViscoMon(i) = ViscoMon(i) + TT(i)

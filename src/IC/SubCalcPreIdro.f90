@@ -71,7 +71,7 @@ pl_id = 0
 ! To search for free level conditions, if present ("pl" type).
 do npi=1,nag
    Nz = pg(npi)%izona
-   if (partz(Nz)%pressure/="pl" ) cycle 
+   if (partz(Nz)%pressure/="pl") cycle 
    if (pl_id==0) then
       pl_id = int(partz(Nz)%valp)
       else if (pl_id/=int(partz(Nz)%valp)) then
@@ -82,8 +82,8 @@ end do
 particle_loop: do npi=1,nag
 ! Initial conditions for pressure (from input file)
    Nz = pg(npi)%izona
-   if (partz(Nz)%pressure=="pa" ) then  
-      pg(npi)%pres = partz(Nz)%valp
+   if (partz(Nz)%pressure=="pa") then  
+      pg(npi)%pres = partz(Nz)%valp + Domain%prif
       pg(npi)%dens = med(pg(npi)%imed)%den0
       cycle particle_loop
    end if   
@@ -155,27 +155,28 @@ particle_loop: do npi=1,nag
                        (1.d0 - pg(npi)%coord(1) / 0.5925d0)
          else
             pg(npi)%pres = (affond1 * Med(pg(nnsave)%imed)%den0 + affond2 *    &
-                            med(pg(npi)%imed)%den0) * gravmod
+                            med(pg(npi)%imed)%den0) * gravmod + Domain%prif
       endif
       else
          affond1 = (ZQuotaColonna - pg(npi)%coord(3)) * coshor +               &
                    pg(npi)%coord(1) * senhor 
-         pg(npi)%pres = affond1 * med(pg(npi)%imed)%den0 * gravmod
+         pg(npi)%pres = affond1 * med(pg(npi)%imed)%den0 * gravmod + Domain%prif
          if (Domain%tipo == "bsph") then
 ! To check this line
             pg(npi)%pres = 0.d0 * (affond1 * med(pg(npi)%imed)%den0 * gravmod) &
                            * (1.d0 - pg(npi)%coord(1) / 0.5925d0)
             else
-               pg(npi)%pres = (affond1 * med(pg(npi)%imed)%den0 * gravmod)
+               pg(npi)%pres = (affond1 * med(pg(npi)%imed)%den0 * gravmod) +   &
+                              Domain%prif
          end if
    endif
 ! Density
-   pg(npi)%dens = (one + pg(npi)%pres/med(pg(npi)%imed)%eps) *                 &
+   pg(npi)%dens = (one + (pg(npi)%pres - Domain%prif) / med(pg(npi)%imed)%eps)*&
                   med(pg(npi)%imed)%den0
    pg(npi)%dden = zero
 ! Diffusion model
    if (diffusione) then
-      if ( pg(npi)%VolFra == VFmx) then
+      if (pg(npi)%VolFra == VFmx) then
          pg(npi)%pres = ((ZQuotaColonna - ZQuotaMediumCorr) * (med(2)%den0 *   &
                         VFmn + med(1)%den0 * (one - VFmn)) + (ZQuotaMediumCorr &
                         - pg(npi)%coord(3)) * (med(2)%den0 * VFmx + med(1)%den0&
@@ -184,15 +185,15 @@ particle_loop: do npi=1,nag
                         med(pg(npi)%imed)%den0 
          pg(npi)%rhow = (one + pg(npi)%pres / med(1)%eps) * med(1)%den0
          pg(npi)%dens = VFmx * pg(npi)%rhoc + (one - VFmx) * pg(npi)%rhow
-         else if (pg(npi)%VolFra==VFmn) then
+         elseif (pg(npi)%VolFra==VFmn) then
             pg(npi)%pres = ((ZQuotaColonna - pg(npi)%coord(3)) * (med(2)%den0 *&
                            VFmn + med(1)%den0 * (one - VFmn))) * gravmod 
             pg(npi)%rhoc = (one + pg(npi)%pres / med(2)%eps) * med(2)%den0 
             pg(npi)%rhow = (one + pg(npi)%pres / med(pg(npi)%imed)%eps) *      &
                            med(pg(npi)%imed)%den0
             pg(npi)%dens = VFmn * pg(npi)%rhoc + (one - VFmn) * pg(npi)%rhow
-      end if
-   end if
+      endif
+   endif
 enddo particle_loop
 !------------------------
 ! Deallocations

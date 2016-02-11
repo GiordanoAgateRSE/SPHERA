@@ -62,11 +62,11 @@ if (diffusione) then
       if (pg(npi)%imed == 1)then
          pg(npi)%pres = wc2 * (pg(npi)%dens - (crhorif * VFmn + wrhorif * (1 - &
                         VFmn))) 
-         else if (pg(npi)%imed==2) then
+         elseif (pg(npi)%imed==2) then
          pg(npi)%pres = cc2 * (pg(npi)%dens - (crhorif * VFmx + wrhorif * (1 - &
                         VFmx))) 
-      end if
-   end do
+      endif
+   enddo
 !$omp end parallel do
    else
 ! Is this useless?
@@ -86,13 +86,13 @@ if (diffusione) then
 ! It evaluats the new pressure particle value 
                   rhorif = Med(pg(npi)%imed)%den0
                   c2 = Med(pg(npi)%imed)%eps / rhorif
-                  if ((pg(npi)%dens-rhorif)/=0.) pg(npi)%pres = c2 *           &
-                                                (pg(npi)%dens - rhorif)
-            end if
-         end do
+                  if ((pg(npi)%dens-rhorif)/=0.d0) pg(npi)%pres = c2 *         &
+                     (pg(npi)%dens - rhorif) + Domain%prif
+            endif
+         enddo
 !$omp end parallel do
-      end if
-end if
+      endif
+endif
 !------------------------
 ! Deallocations
 !------------------------

@@ -112,7 +112,8 @@ do while (TRIM(lcase(ainp))/="##### end dbsph #####")
             rotation_centre(i,1:3)
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DBSPH_KINEMATICS",ninp,nout &
             )) return
-         if (.not.(allocated(DBSPH%kinematics))) then
+         if ((.not.(allocated(DBSPH%kinematics))).and.                         &
+            (n_kinematics_records(i)/=0)) then
             allocate(DBSPH%kinematics(surface_mesh_files,                      &
                n_kinematics_records(i),7),STAT=alloc_stat)
             if (alloc_stat/=0) then

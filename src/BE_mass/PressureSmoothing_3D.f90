@@ -74,8 +74,8 @@ endif
 !$omp shared(sompW_vec,AppUnity_vec,n_bodies,dt)
 do ii=1,indarrayFlu
    npi = Array_Flu(ii)
-! Excluding particles cose to the face with conditions "flow", "velo" and "sour"
-   if (pg(npi)%koddens == 0) then 
+! Excluding particles close to the face with conditions "flow", "velo" and "sour"
+   if (pg(npi)%koddens==0) then 
       DiffP = zero
       Nsp = nPartIntorno(npi)
       if (Nsp>0) then
@@ -84,66 +84,65 @@ do ii=1,indarrayFlu
          sompW = zero
          Appunity = zero
          do j=1,Nsp
-            npartint = (npi - 1)* NMAXPARTJ + j
+            npartint = (npi - 1) * NMAXPARTJ + j
             npj = PartIntorno(npartint)
             pesoj = pg(npj)%mass * PartKernel(4,npartint) / pg(npj)%dens
             Appunity = Appunity + pesoj
             sompW = sompW + (pg(npj)%pres - pi) * pesoj
-         end do
+         enddo
          if (n_bodies>0) then
             sompW = sompW + sompW_vec(npi)
             AppUnity = AppUnity + AppUnity_vec(npi)
          endif
          if (Domain%tipo=="bsph") then
-            TetaP1 = Domain%TetaP * Med(pg(npi)%imed)%Celerita * dt / Domain%h
-            pg(npi)%vpres = pi + TetaP1 * sompW / AppUnity
+            pg(npi)%vpres = sompW / AppUnity
             else          
                Ncbf = BoundaryDataPointer(1,npi)
                ibdt = BoundaryDataPointer(3,npi)
                if (Ncbf>0) then
                   do icbf=1,Ncbf
                      ibdp = ibdt + icbf - 1
-                     if (BoundaryDataTab(ibdp)%LocXYZ(3) > zero) then
+                     if (BoundaryDataTab(ibdp)%LocXYZ(3)>zero) then
                         IntWdV = BoundaryDataTab(ibdp)%BoundaryIntegral(2)
                         AppUnity = AppUnity + IntWdV
-                     end if
-                  end do
-               end if
+                     endif
+                  enddo
+               endif
                if (SmoothingNormalisation=="complete  ") then
                   if (AppUnity<MinTotUnit) then
- ! in case of non-null reference pressure
+! in case of non-null reference pressure
                      DiffP = sompW + (p0i - pi) * (one - AppUnity)  
                      else
                      DiffP = sompW / AppUnity
-                  end if
-                  else if (SmoothingNormalisation=="incomplete") then
+                  endif
+                  elseif (SmoothingNormalisation=="incomplete") then
                      DiffP = sompW / AppUnity
-               end if
+               endif
          endif
-      end if
+      endif
       if (Domain%tipo=="semi") pg(npi)%vpres = DiffP
-   end if
-end do
+   endif
+enddo
 !$omp end parallel do
-!$omp parallel do default(none) &
-!$omp private(npi,ii,smoothpi,TetaP1) &
+!$omp parallel do default(none)                                                &
+!$omp private(npi,ii,smoothpi,TetaP1)                                          &
 !$omp shared(nag,pg,Med,Domain,dt,indarrayFlu,Array_Flu,esplosione)
 do ii=1,indarrayFlu
    npi = Array_Flu(ii)
-! Excluding particles cose to the face with conditions "flow", "velo" and "sour"
+! Excluding particles close to the face with conditions "flow", "velo" and "sour"
    if (pg(npi)%koddens==0) then 
 ! Computing TetaP depending on the time step
       if (esplosione) then
          TetaP1 = Domain%TetaP * pg(npi)%Csound * dt / Domain%h
          else
              TetaP1 = Domain%TetaP * Med(pg(npi)%imed)%Celerita * dt / Domain%h
-      end if
+      endif
       smoothpi = pg(npi)%pres + TetaP1 * pg(npi)%vpres
-      pg(npi)%Pres = smoothpi
+      pg(npi)%pres = smoothpi
       pg(npi)%dens = Med(pg(npi)%imed)%den0 * (one + (smoothpi - Domain%Prif)  &
                      / Med(pg(npi)%imed)%eps)
-   end if
-end do
+   endif
+enddo
 !$omp end parallel do
 !------------------------
 ! Deallocations

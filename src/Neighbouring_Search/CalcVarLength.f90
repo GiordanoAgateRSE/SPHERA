@@ -161,14 +161,16 @@ loop_nag: do npi=1,nag
                   cycle
                endif
 ! Warning. A computational particle has reached the maximum number of   
-! wall element neighbours allowed.                
-               if (nPartIntorno_fw(npi)>=NMAXPARTJ) then
-                  write (nscr,'(1x,a,i12,a,i12,a)')                            &
-                     ' The computational particle ',npi,' has reached ',       &
-                     NMAXPARTJ,' wall element neighbours.'
-                  write (nscr,'(1x,a,3f15.10)') '        Coordinate: ',        &
-                     pg(npi)%coord(:)
-                  cycle
+! wall element neighbours allowed.
+               if ((Domain%tipo=="bsph").and.(DBSPH%n_w>0)) then
+                  if (nPartIntorno_fw(npi)>=NMAXPARTJ) then
+                     write (nscr,'(1x,a,i12,a,i12,a)')                         &
+                        ' The computational particle ',npi,' has reached ',    &
+                        NMAXPARTJ,' wall element neighbours.'
+                     write (nscr,'(1x,a,3f15.10)') '        Coordinate: ',     &
+                        pg(npi)%coord(:)
+                     cycle
+                  endif
                endif
                if (Icont(ncelj+1)<=Icont(ncelj)) cycle
                npj = NPartOrd(mm)

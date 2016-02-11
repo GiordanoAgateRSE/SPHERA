@@ -232,7 +232,6 @@ if (((DBSPH%n_w+DBSPH%n_inlet+DBSPH%n_outlet)>0).and.(Domain%tipo=="bsph")) &
       pg(npi)%dden = pg(npi)%dden / pg(npi)%Gamma
 ! Boundary type is fixe or tapis or level(?)
       if (pg(npi)%koddens==0) then
-      
 ! SPH approxmation of density (alternative to the continuity equation)
          if (NMedium==1) then
             if (pg(npi)%FS==1) then

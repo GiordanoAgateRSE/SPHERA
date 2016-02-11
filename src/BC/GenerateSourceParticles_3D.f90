@@ -105,14 +105,14 @@ if (inttimeratio>pinttimeratio) then
                "smagorin")>0)) then
                pg(nag)%state = "flu"
                pg(nag)%VolFra = VFmn
-               else if ((index(Med(mat)%tipo,"granular")>0).or.                &
+               elseif ((index(Med(mat)%tipo,"granular")>0).or.                 &
                        (index(Med(mat)%tipo,"general")>0)) then
                   pg(nag)%state = "sol"
                   pg(nag)%VolFra = VFmx
-                  else if (index(Med(mat)%tipo,"gas")>0) then
+                  elseif (index(Med(mat)%tipo,"gas")>0) then
                      pg(nag)%state = "flu"
                      pg(nag)%VolFra = VFmn
-            end if
+            endif
 ! Movement/kinematics index
             pg(nag)%vel_type = partz(izone)%move        
             if (partz(izone)%move/="std") pg(nag)%visc = zero
@@ -124,18 +124,20 @@ if (inttimeratio>pinttimeratio) then
 ! To initialize "press" and "dens" (density computed from pressure
             if (partz(izone)%pressure=="pa") then       
 ! Pression value from input file
-               pg(nag)%pres = partz(izone)%valp
-               else if (partz(izone)%pressure=="qp") then   
+               pg(nag)%pres = partz(izone)%valp + Domain%prif
+               elseif (partz(izone)%pressure=="qp") then   
 ! Free surface level from input file 
                   pg(nag)%pres = Med(mat)%den0 * Domain%grav(3) *              &
-                                 (pg(nag)%coord(3) - partz(izone)%valp)
-            end if
-            pg(nag)%dens = Med(mat)%den0 * (one + pg(nag)%pres / Med(mat)%eps)
-         end do
-      end if 
-   end do
+                                 (pg(nag)%coord(3) - partz(izone)%valp) +      &
+                                 Domain%prif
+            endif
+            pg(nag)%dens = Med(mat)%den0 * (one + (pg(nag)%pres - Domain%prif) &
+                           / Med(mat)%eps)
+         enddo
+      endif 
+   enddo
    pinttimeratio = inttimeratio
-end if
+endif
 !------------------------
 ! Deallocations
 !------------------------

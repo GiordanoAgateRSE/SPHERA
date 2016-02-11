@@ -57,7 +57,7 @@ type TyGlobal
    double precision :: coefke  
    double precision :: coefkacl  
    double precision :: CFL ! CFL number                     
-   double precision :: prif ! Reference presure                          
+   double precision :: prif ! Reference pressure                          
    double precision :: plot_fr ! Output frequency for log file                       
    double precision :: memo_fr ! Frequency for result saving 
    double precision :: rest_fr ! Output frequency for restart files
@@ -68,7 +68,6 @@ type TyGlobal
                                          ! was printed (auxiliary variable)             
    double precision :: TetaP ! Partial smoothing parameter for pressure                         
    double precision :: TetaV ! Partial smoothing parameter for velocity                         
-   double precision :: pre ! Reference pressure                            
    double precision :: h ! Kernel support length scale                              
    double precision :: start ! Simulation start time                          
    double precision :: COEFNMAXPARTI ! Max number of fluid 
