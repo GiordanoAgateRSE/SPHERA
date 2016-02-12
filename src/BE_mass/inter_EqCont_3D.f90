@@ -124,7 +124,7 @@ do npi=1,nag
          dvdi(9) = dvdi(9) + pesogradj(3) * dvar(3)      !dw/dz
       endif 
 ! End continuity equation
-   end do
+   enddo
    if ((Granular_flows_options%ID_erosion_criterion==1).or.                    &
       (Granular_flows_options%ID_erosion_criterion==3)) then
 ! Wrong renormalization: start
@@ -173,7 +173,7 @@ do npi=1,nag
                 dvdi(8)) )
       pg(npi)%secinv = Dsqrt( half * moddia + quarter * modout)
    endif   
-end do
+enddo
 !$omp end parallel do
 call start_and_stop(3,12)
 call start_and_stop(2,19)

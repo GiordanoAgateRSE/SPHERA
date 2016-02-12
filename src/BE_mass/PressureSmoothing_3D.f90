@@ -70,7 +70,7 @@ endif
 !$omp private(npi,ii,Nsp,DiffP,p0i,pi,sompW,Appunity)                          &
 !$omp private(j,npartint,npj,pesoj,Ncbf,ibdt,icbf,ibdp,intWdV)                 &
 !$omp shared(nag,Pg,Med,Domain,nPartIntorno,PartIntorno,NMAXPARTJ,PartKernel)  &
-!$omp shared(BoundaryDataPointer,BoundaryDataTab,indarrayFlu,Array_Flu,TetaP1) &
+!$omp shared(BoundaryDataPointer,BoundaryDataTab,indarrayFlu,Array_Flu)        &
 !$omp shared(sompW_vec,AppUnity_vec,n_bodies,dt)
 do ii=1,indarrayFlu
    npi = Array_Flu(ii)

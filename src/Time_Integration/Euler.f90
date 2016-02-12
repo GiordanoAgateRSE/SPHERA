@@ -142,7 +142,7 @@ do npi=1,nag
    endif
 ! To save the old particle coordinates 
    pg(npi)%CoordOld(:) = pg(npi)%coord(:)
-   if (pg(npi)%vel_type /= "std") then
+   if (pg(npi)%vel_type/="std") then
 ! With imposed velocity (BC)
       pg(npi)%coord(:) = pg(npi)%coord(:) + dt * pg(npi)%vstart(:)
       else

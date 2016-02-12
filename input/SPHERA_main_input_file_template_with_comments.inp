@@ -317,7 +317,7 @@ diffusion_coefficient settling velocity coefficient
 0. 0. 0.                            
 ! If (fluid_type==liquid): start                                    
 dynamic_viscosity                   !
-roughness_coefficient               ! null recommended values (i.e. inactive 
+roughness_coefficient               ! null recommended value (i.e. inactive 
                                     ! parameter)
 ! If (fluid_type==liquid): end
 ! if ((fluid_type==granular).and.(erosion_criterion_ID==1)): start

@@ -83,8 +83,8 @@ do ii=1,indarrayFlu
    do contj=1,nPartIntorno(npi)
       npartint = (npi - 1)* NMAXPARTJ + contj
       npj = PartIntorno(npartint)
-      rhoi   = pg(npi)%dens
-      rhoj   = pg(npj)%dens
+      rhoi = pg(npi)%dens
+      rhoj = pg(npj)%dens
       amassj = pg(npj)%mass
       dervel(:) = pg(npj)%vel(:) - pg(npi)%vel(:)
       if (pg(npj)%vel_type/="std") then
@@ -93,11 +93,11 @@ do ii=1,indarrayFlu
          moddervel = - two * (pg(npi)%vel(1) * pg(npj)%zer(1) + pg(npi)%vel(2) &
                      * pg(npj)%zer(2) + pg(npi)%vel(3) * pg(npj)%zer(3))
          dervel(:) = moddervel * pg(npj)%zer(:)    
-      end if
+      endif
       if (Med(pg(npj)%imed)%den0/=Med(pg(npi)%imed)%den0) cycle
       pesoj = amassj * PartKernel(4,npartint) / rhoj
       pg(npi)%var(:) = pg(npi)%var(:) + dervel(:) * pesoj   
-   end do
+   enddo
    if (esplosione) pg(npi)%Envar = pg(npi)%Envar + (pg(npj)%IntEn -            &
                                    pg(npi)%IntEn) * pesoj
    if (n_bodies>0) then
@@ -121,14 +121,14 @@ do ii=1,indarrayFlu
                   (strtype=='flow')) then
                   pg(npi)%var(:) = zero   
                   exit  
-               end if
+               endif
                DVGlo(:) = two * (Tratto(facestr)%velocity(:) - pg(npi)%vel(:))
                do i=1,SPACEDIM
                   DVLoc(i) = zero
                   do j=1,SPACEDIM
                      DVLoc(i) = DVLoc(i) + BoundaryFace(iface)%T(j,i) * DVGlo(j)
-                  end do
-               end do
+                  enddo
+               enddo
                IntWdV = BoundaryDataTab(ibdp)%BoundaryIntegral(2)
                if ((strtype=='fixe').or.(strtype=='tapi')) then
                   BCLoc(1) = DVLoc(1) * IntWdV * Tratto(facestr)%ShearCoeff
@@ -139,14 +139,14 @@ do ii=1,indarrayFlu
                      do j=1,SPACEDIM
                         BCGlo(i) = BCGlo(i) + BoundaryFace(iface)%T(i,j) *     &
                                    BCLoc(j)
-                     end do
-                  end do
+                     enddo
+                  enddo
                   pg(npi)%var(:) = pg(npi)%var(:) + BCGlo(:)   
-               end if
-            end do
-         end if
+               endif
+            enddo
+         endif
    endif   
-end do
+enddo
 !$omp end parallel do
 !------------------------
 ! Deallocations
