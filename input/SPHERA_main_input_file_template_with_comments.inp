@@ -192,7 +192,7 @@ RGBColor
 
 ##### DBSPH #####
 ! Input parameters for the DB-SPH boundary treatment scheme
-dx_f/dx_w MUSCL_boundary_flag k_w slip_ID Gamma_limiter_flag
+dx_f/dx_w MUSCL_boundary_flag k_w slip_ID Gamma_limiter_flag 
 ! dx_f/dx_w(ratio between the fluid particle size and the wall element size)
 ! MUSCL_boundary_flag(logical flag to activate boundary terms for MUSCL)
 ! k_w (semi-particle depth coefficient)
@@ -201,6 +201,9 @@ dx_f/dx_w MUSCL_boundary_flag k_w slip_ID Gamma_limiter_flag
 !    balance equations)
 ! Gamma_limiter_flag: logical variable to activate or deactivate Gamma upper 
 ! limiter (1.)
+negative_wall_p_allowed FS_allowed  ! negative_wall_p_allowed: pressure of wall 
+                                    ! elements can be negative; FS_allowed: free
+                                    ! surface detection can be avoided. 
 n_monitor_points n_monitor_regions  ! n_monitor_points; n_monitor_regions=0,1(to
                                     ! estimate the Force along x-direction)
 ! if (n_monitor_points>0): start
@@ -213,7 +216,7 @@ surface_mesh_files flag_in-built_monitors ! surface_mesh_files: number of files
                                           ! of the DBSPH surface meshes;
                                           ! flag_in-built_monitors(logical):   
                                           ! flag for in-built motion of control   
-                                          ! lines and DB-SPH frontiers;
+                                          ! lines and DB-SPH frontiers
 ! do i=1,surface_mesh_file
 imposed_kinematics_i_records rotation_centre_i_x rotation_centre_i_y rotation_centre_i_z
                                     ! imposed_kinematics_i_records(number of 

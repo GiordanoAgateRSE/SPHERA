@@ -23,7 +23,6 @@
 ! Program unit: Loop_Irre_2D         
 ! Description: 2D main algorithm.                    
 !----------------------------------------------------------------------------------------------------------------------------------
-
 subroutine Loop_Irre_2D  
 !------------------------
 ! Modules
@@ -488,16 +487,6 @@ done_flag = .false.
                endif
             enddo
 !$omp end parallel do
-! Wall element trajectories
-            if (Domain%tipo=="bsph") then
-!$omp parallel do default(none) private(npi) shared(DBSPH,pg_w,dt)
-               do npi=1,DBSPH%n_w
-                  if (pg_w(npi)%cella==0) cycle
-                  pg_w(npi)%coord(:) = pg_w(npi)%coord(:) + dt *               &
-                                       pg_w(npi)%vel(:)
-               enddo
-!$omp end parallel do
-            endif
             call start_and_stop(3,8)
 ! Check on the particles gone out of the domain throughout the opened sides
             call start_and_stop(2,9)

@@ -24,7 +24,6 @@
 ! Description: To accumulate contributions for the 3D continuity equation. Computation of velocity gradients and the second 
 !              invariant of the strain-rate tensor.        
 !----------------------------------------------------------------------------------------------------------------------------------
- 
 subroutine inter_EqCont_3D
 !------------------------
 ! Modules

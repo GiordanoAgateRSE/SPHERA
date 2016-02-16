@@ -24,7 +24,6 @@
 ! Description: Module to define derived types of both dynamically and statically allocated variables. (Di Monaco et al., 2011,
 !              EACFM; Manenti et al., 2012; JHE; Amicarelli et al., 2013, IJNME; Amicarelli et al., 2015, CAF)                    
 !----------------------------------------------------------------------------------------------------------------------------------
-
 module Hybrid_allocation_module
 use Static_allocation_module
 type TyGlobal
@@ -672,6 +671,9 @@ type DBSPH_der_type
                                           ! in-built motion of control lines 
    logical           :: Gamma_limiter_flag ! flag to activate or deactivate 
                                            ! Gamma upper limiter (1.)
+   logical           :: negative_wall_p_allowed ! pressure of wall elements can 
+                                                ! be negative
+   logical           :: FS_allowed ! free surface detection can be avoided
    integer(4)        :: n_w ! Number of surface elements
    integer(4)        :: n_monitor_points ! Number of monitoring points
    integer(4)        :: n_monitor_regions ! Number of monitoring regions 

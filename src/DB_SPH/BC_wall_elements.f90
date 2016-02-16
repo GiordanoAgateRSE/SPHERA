@@ -140,7 +140,8 @@ do npi=1,DBSPH%n_w
       pg_w(npi)%dens = pg_w(npi)%dens / den(npi)
       pg_w(npi)%pres = pg_w(npi)%pres / den(npi)
 ! non-negative pressure values
-      if (pg_w(npi)%pres<0.d0) pg_w(npi)%pres = zero 
+      if ((DBSPH%negative_wall_p_allowed.eqv..false.).and.                     &
+         (pg_w(npi)%pres<0.d0)) pg_w(npi)%pres = zero 
    endif
 enddo
 !$omp end parallel do

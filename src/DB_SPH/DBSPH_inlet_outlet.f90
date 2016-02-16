@@ -23,7 +23,6 @@
 ! Program unit: DBSPH_inlet_outlet
 ! Description: Impose boundary conditions at the inlet and outlet sections (DB-SPH boundary treatment scheme).            
 !----------------------------------------------------------------------------------------------------------------------------------
-
 subroutine DBSPH_inlet_outlet(npi)
 !------------------------
 ! Modules

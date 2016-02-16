@@ -77,7 +77,7 @@ do while (TRIM(lcase(ainp))/="##### end run parameters #####")
    read (ainp,*,iostat=ioerr) CFL, time_split, RKscheme, pesodt, dt_alfa_Mon
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"CFL",ninp,nout)) return
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-   read (ainp,*,iostat=ioerr) TetaP, TetaV
+   read(ainp,*,iostat=ioerr) TetaP,TetaV
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"TETAP & TETAV",ninp,nout)) return
    token = GetToken(ainp,3,ioerr)
    if (ioerr==0) then

@@ -38,6 +38,7 @@ integer(4),intent(inout) :: nrighe,ier,ninp,nout
 character(1),intent(inout) :: comment
 character(100),intent(inout) :: ainp
 logical :: MUSCL_boundary_flag,in_built_monitors,Gamma_limiter_flag
+logical :: negative_wall_p_allowed,FS_allowed
 integer(4) :: ioerr,n_monitor_points,n_monitor_regions,i,alloc_stat   
 integer(4) :: dealloc_stat,j,n_inlet,n_outlet,slip_ID
 integer(4) :: ply_n_face_vert,surface_mesh_files
@@ -77,6 +78,10 @@ do while (TRIM(lcase(ainp))/="##### end dbsph #####")
    read(ainp,*,iostat=ioerr) dx_dxw,MUSCL_boundary_flag,k_w,slip_ID,           &
       Gamma_limiter_flag
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DBSPH GENERAL INPUT",ninp,nout))  &
+      return
+   call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+   read(ainp,*,iostat=ioerr) negative_wall_p_allowed,FS_allowed
+   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DBSPH GENERAL INPUT 2",ninp,nout))&
       return
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
    read(ainp,*,iostat=ioerr) n_monitor_points,n_monitor_regions
@@ -185,7 +190,11 @@ do while (TRIM(lcase(ainp))/="##### end dbsph #####")
       write(nout,"(1x,a,1p,i12)")                                              &
 "DB-SPH slip_ID..................",slip_ID       
       write(nout,"(1x,a,1p,l12)")                                              &
-"Gamma_limiter_flag:.............",Gamma_limiter_flag      
+"Gamma_limiter_flag:.............",Gamma_limiter_flag
+      write(nout,"(1x,a,1p,l12)")                                              &
+"negative_wall_p_allowed:........",negative_wall_p_allowed
+      write(nout,"(1x,a,1p,l12)")                                              &
+"FS_allowed:.....................",FS_allowed
       write(nout,"(1x,a,1p,i12)")                                              &
 "n_monitor_points................",n_monitor_points       
       if (n_monitor_points>0) then
@@ -248,6 +257,8 @@ do while (TRIM(lcase(ainp))/="##### end dbsph #####")
       DBSPH%k_w = k_w
       DBSPH%slip_ID = slip_ID
       DBSPH%Gamma_limiter_flag = Gamma_limiter_flag
+      DBSPH%negative_wall_p_allowed = negative_wall_p_allowed
+      DBSPH%FS_allowed = FS_allowed
       DBSPH%n_monitor_points = n_monitor_points 
       DBSPH%n_monitor_regions = n_monitor_regions
       DBSPH%monitor_region(:) = monitor_region(:)  

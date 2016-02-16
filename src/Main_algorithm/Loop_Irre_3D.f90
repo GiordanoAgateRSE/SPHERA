@@ -23,7 +23,6 @@
 ! Program unit: Loop_Irre_3D         
 ! Description: 3D main algorithm.                    
 !----------------------------------------------------------------------------------------------------------------------------------
-
 subroutine Loop_Irre_3D
 !------------------------
 ! Modules
@@ -457,7 +456,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
                      (pg(npi)%visc==Med(pg(npi)%imed)%mumx/pg(npi)%dens)) then
                      pg(npi)%coefdif = zero
                      else
-                        call inter_CoefDif (npi)
+                        call inter_CoefDif(npi)
                         if (pg(npi)%uni>zero) pg(npi)%veldif = pg(npi)%veldif  &
                                                                / pg(npi)%uni 
                         appo1 = (pg(npi)%veldif(1) - pg(npi)%var(1)) *         &
@@ -491,16 +490,6 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
                endif
             enddo
 !$omp end parallel do
-! Wall element trajectories
-            if (Domain%tipo=="bsph") then
-!$omp parallel do default(none) private(npi) shared(DBSPH,pg_w,dt)
-               do npi=1,DBSPH%n_w
-                  if (pg_w(npi)%cella==0) cycle
-                  pg_w(npi)%coord(:) = pg_w(npi)%coord(:) + dt *               &
-                                       pg_w(npi)%vel(:)
-               enddo
-!$omp end parallel do
-            endif
             call start_and_stop(3,8)
 ! Check on the particles gone out of the domain throughout the opened faces
             call start_and_stop(2,9)

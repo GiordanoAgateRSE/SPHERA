@@ -24,7 +24,6 @@
 ! Description: Neighbouring search (pre-conditioned dynamic vector), relative positions, kernel functions/derivatives, 
 !              Shepard's coefficient, position of the fluid-sediment interfaces along each background grid column.                                             
 !----------------------------------------------------------------------------------------------------------------------------------
-
 subroutine CalcVarLength
 !------------------------
 ! Modules
@@ -346,10 +345,10 @@ loop_nag: do npi=1,nag
                   kernel_fw(1,npartint) = wu * Domain%coefke
                   pg(npi)%dShep = pg(npi)%dShep + kernel_fw(1,npartint) *      &
                                   pg_w(npj)%weight * (pg_w(npj)%normal(1) *    &
-                                  (pg_w(npj)%vel(1)-pg(npi)%var(1)) +          &
+                                  (pg_w(npj)%vel(1) - pg(npi)%var(1)) +        &
                                   pg_w(npj)%normal(2) * (pg_w(npj)%vel(2) -    &
                                   pg(npi)%var(2)) + pg_w(npj)%normal(3) *      &
-                                  (pg_w(npj)%vel(3)-pg(npi)%var(3))) 
+                                  (pg_w(npj)%vel(3) - pg(npi)%var(3))) 
                   if ((rij_su_h*Domain%h)<=                                    &
                      (1.3d0*Domain%dd+pg_w(npj)%weight/2.d0)) then
                      pg_w(npj)%wet = 1
@@ -547,7 +546,8 @@ if (Domain%tipo=="bsph") then
       endif
       if (it_corrente>-2) then
          min_sigma_Gamma = min((pg(npi)%sigma+0.05),pg(npi)%Gamma)
-         if (min_sigma_Gamma/=pg(npi)%Gamma) then
+         if ((DBSPH%FS_allowed.eqv..true.).and.                                &
+            (min_sigma_Gamma/=pg(npi)%Gamma)) then
             pg(npi)%Gamma_last_active = zero
             pg(npi)%FS = 1
             pg(npi)%uni = pg(npi)%sigma

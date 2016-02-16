@@ -23,7 +23,6 @@
 ! Program unit: inter_SmoothVelo_3D 
 ! Description: To calculate a corrective term for velocity.    
 !----------------------------------------------------------------------------------------------------------------------------------
-
 subroutine inter_SmoothVelo_3D
 !------------------------
 ! Modules

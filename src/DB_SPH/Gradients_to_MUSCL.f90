@@ -21,10 +21,10 @@
 
 !----------------------------------------------------------------------------------------------------------------------------------
 ! Program unit: Gradients_to_MUSCL
-! Description: 0th-order consistency estimation of velocity and density gradients
-!              for the MUSCL reconstruction (to feed the Partial Linearized Riemann Solver; Amicarelli et al., 2013, IJNME).                
+! Description: 0th-order consistency estimation of velocity and density 
+!              gradients for the MUSCL reconstruction (to feed the Partial 
+!              Linearized Riemann Solver; Amicarelli et al., 2013, IJNME).                
 !----------------------------------------------------------------------------------------------------------------------------------
-
 subroutine Gradients_to_MUSCL
 !------------------------
 ! Modules
@@ -39,7 +39,7 @@ use I_O_diagnostic_module
 !------------------------
 implicit none
 integer(4) :: npi,npj,npartint,contj
-double precision :: vol_Shep,Ww_Shep
+double precision :: volume,Ww_Shep
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -53,7 +53,7 @@ double precision :: vol_Shep,Ww_Shep
 ! Statements
 !------------------------
 !$omp parallel do default(none)                                                &
-!$omp private(npi,contj,npj,npartint,vol_Shep)                                 &
+!$omp private(npi,contj,npj,npartint,volume)                                   &
 !$omp shared(nag,pg,NMAXPARTJ,rag,nPartIntorno,Partintorno,PartKernel)         &
 !$omp shared(nPartIntorno_fw,DBSPH,NMedium)
 ! Loop over the fluid computational particles
@@ -67,28 +67,28 @@ do npi=1,nag
          npartint = (npi - 1) * NMAXPARTJ + contj
          npj = PartIntorno(npartint)
          if (pg(npi)%imed==pg(npj)%imed) then
-            vol_Shep = pg(npj)%mass / pg(npj)%dens 
+            volume = pg(npj)%mass / pg(npj)%dens 
 ! Computation of the density gradient: fluid particle contributions
             pg(npi)%drho(:) = pg(npi)%drho(:) + rag(:,npartint) * (pg(npj)%dens&
                               - pg(npi)%dens) * Partkernel(1,npartint)  *      &
-                              vol_Shep
+                              volume
 ! Computation of the velocity gradient: fluid particle contributions
             pg(npi)%dvel(1,:) = pg(npi)%dvel(1,:) + rag(:,npartint) *          &
                                 (pg(npj)%var(1) - pg(npi)%var(1)) *            &
-                                Partkernel(1,npartint) * vol_Shep
+                                Partkernel(1,npartint) * volume
             pg(npi)%dvel(2,:) = pg(npi)%dvel(2,:) + rag(:,npartint) *          &
                                 (pg(npj)%var(2) - pg(npi)%var(2)) *            &
-                                Partkernel(1,npartint) * vol_Shep
+                                Partkernel(1,npartint) * volume
             pg(npi)%dvel(3,:) = pg(npi)%dvel(3,:) + rag(:,npartint) *          &
                                 (pg(npj)%var(3) - pg(npi)%var(3)) *            &
-                                Partkernel(1,npartint) * vol_Shep
+                                Partkernel(1,npartint) * volume
          endif
-      end do
+      enddo
       if ((DBSPH%MUSCL_boundary_flag.eqv.(.true.)).and.(NMedium==1)) then
          call Gradients_to_MUSCL_boundary(npi)
       endif
    endif
-end do 
+enddo 
 !$omp end parallel do
 !------------------------
 ! Deallocations

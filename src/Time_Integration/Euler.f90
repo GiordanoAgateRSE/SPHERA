@@ -23,7 +23,6 @@
 ! Program unit: Euler                                           
 ! Description: Explicit RK1 time integration scheme (Euler scheme).  
 !----------------------------------------------------------------------------------------------------------------------------------
-
 subroutine Euler  
 !------------------------
 ! Modules
@@ -154,11 +153,6 @@ enddo
 ! Wall element trajectories
 if (((DBSPH%n_w+DBSPH%n_inlet+DBSPH%n_outlet)>0).and.(Domain%tipo=="bsph")) &
    then
-! This commented part should be useful for further developments
-!       do npi = 1,n_w
-!          if (pg_w(npi)%cella==0) cycle
-!          pg_w(npi)%coord(:) = pg_w(npi)%coord(:) + dt * pg_w(npi)%vel(:)
-!       enddo
    call DBSPH_kinematics
 ! Time integration for the surface element velocity      
 !$omp parallel do default(none) shared(DBSPH,pg_w,dt) private(npi)

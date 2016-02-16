@@ -23,7 +23,6 @@
 ! Program unit: DBSPH_IC_surface_elements
 ! Description: Initialization of wall surface elements (Amicarelli et al., 2013, IJNME).           
 !----------------------------------------------------------------------------------------------------------------------------------
-
 subroutine DBSPH_IC_surface_elements
 !------------------------
 ! Modules
@@ -106,7 +105,7 @@ DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(i)%vert_list(4))%pos(:) ) / 4.d0
    endif
    pg_w(i)%cella = ParticleCellNumber(pg_w(i)%coord)
    pg_w(i)%dens = Med(1)%den0                         
-   pg_w(i)%normal(:) = DBSPH%surf_mesh%faces(i)%normal(:)                      
+   pg_w(i)%normal(:) = DBSPH%surf_mesh%faces(i)%normal(:)
    pg_w(i)%weight = DBSPH%surf_mesh%faces(i)%area
 end do
 !$omp end parallel do
