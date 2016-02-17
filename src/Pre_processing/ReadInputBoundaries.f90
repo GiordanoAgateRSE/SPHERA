@@ -23,7 +23,6 @@
 ! Program unit: ReadInputBoundaries                    
 ! Description: Reading input data for the boundary treatment scheme SA-SPH (semi-analytic approach; Di Monaco et al., 2011, EACFM).                      
 !----------------------------------------------------------------------------------------------------------------------------------
-
 subroutine ReadInputBoundaries(NumberEntities,Partz,Tratto,BoundaryVertex,ainp,&
    comment,nrighe,ier,ninp,nout)
 !------------------------
@@ -57,7 +56,7 @@ character(3) :: move
 character(4) :: tipo
 character(6) :: token_color
 character(8) :: label
-character(100):: token
+character(100) :: token
 logical,external :: ReadCheck
 integer(4),external :: ptcolorrgb
 character(100), external :: lcase, GetToken

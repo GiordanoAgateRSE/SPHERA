@@ -66,12 +66,18 @@ neigh_w = 0
 do npi=1,DBSPH%n_w
    pg_w(npi)%pres = zero
    pg_w(npi)%dens = med(1)%den0
+   if (pg_w(npi)%sigma>0.000001d0) then
 ! Kinematic viscosity of the semi-particles
-   pg_w(npi)%kin_visc_semi_part = pg_w(npi)%kin_visc_semi_part / pg_w(npi)%sigma
+      pg_w(npi)%kin_visc_semi_part = pg_w(npi)%kin_visc_semi_part /            &
+                                     pg_w(npi)%sigma
 ! Semi-particle velocity gradient (times shear viscosity) in the Viscous  
 ! Sub-Layer of the Surface Neutral Boundary Layer: normalization
-   pg_w(npi)%grad_vel_VSL_times_mu(:) = pg_w(npi)%grad_vel_VSL_times_mu(:) /   &
+      pg_w(npi)%grad_vel_VSL_times_mu(:) = pg_w(npi)%grad_vel_VSL_times_mu(:) /&
                                         pg_w(npi)%sigma
+      else
+         pg_w(npi)%kin_visc_semi_part = 0.d0
+         pg_w(npi)%grad_vel_VSL_times_mu(:) = 0.d0   
+   endif
 enddo
 ! Loop over computational fluid particles for density and pressure 
 ! contributions to wall elements

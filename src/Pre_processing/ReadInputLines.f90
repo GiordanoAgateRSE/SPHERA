@@ -23,7 +23,6 @@
 ! Program unit: ReadInputLines                          
 ! Description:                        
 !----------------------------------------------------------------------------------------------------------------------------------
-
 subroutine ReadInputLines(NumberEntities,BoundaryVertex,Tratto,ainp,comment,   &
                           nrighe,ier,ninp,nout)
 !------------------------
@@ -94,7 +93,7 @@ do while (TRIM(lcase(ainp))/="##### end lines #####")
                numv_line = 0
                cycle VERTEX_LOOP
             endif
-            numv  = numv + 1
+            numv = numv + 1
             if (numv>MAXLINENODES) then
                stop 'ERRORE in ReadInputLines numv>MAXLINENODES'
             endif

@@ -21,10 +21,11 @@
 
 !----------------------------------------------------------------------------------------------------------------------------------
 ! Program unit: adjacent_faces_isolated_points
-! Description: Provided 2 adjacent triangular/quadrilateral faces, it finds at least 2 vertices not in common, at least one per 
-!              face. They are ID_face1_iso and ID_face2_iso. In case the faces are not adjacent, then false_hyp=.true.         
+! Description: Provided 2 adjacent triangular/quadrilateral faces, it finds at 
+!              least 2 vertices not in common, at least one per face. They are 
+!              ID_face1_iso and ID_face2_iso. In case the faces are not 
+!              adjacent, then false_hyp=.true.         
 !----------------------------------------------------------------------------------------------------------------------------------
-
 subroutine adjacent_faces_isolated_points(face1,face2,ID_face1_iso,            &
                                           ID_face2_iso,false_hyp)
 !------------------------
@@ -83,7 +84,7 @@ do_vertices_face1: do i=1,n_vert
          cycle do_vertices_face1
       endif
    enddo
-end do do_vertices_face1
+enddo do_vertices_face1
 ! The only/first vertex (in 3D/2D) of the 1st face, not contributing to 
 ! test_face1, is finally found
 if (ncord==3) then

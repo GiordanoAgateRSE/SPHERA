@@ -25,7 +25,6 @@
 !              to the previous and the following ones, which are instead aligned each other. This numerical feature reduces the  
 !              SPH truncation errors at the DB-SPH inlet sections. A white noise is also added. (Amicarelli et al., 2013, IJNME).                
 !----------------------------------------------------------------------------------------------------------------------------------
-
 subroutine wavy_inlet(i_inlet)
 !------------------------
 ! Modules

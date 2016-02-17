@@ -24,7 +24,6 @@
 ! Description: Finding the adjacent surface elements of a given surface element, both using 3D -triangular elements- and 2D 
 !              -quadrilateral raw elements- configurations (DB-SPH).          
 !----------------------------------------------------------------------------------------------------------------------------------
-
 subroutine DBSPH_find_close_faces
 !------------------------
 ! Modules
