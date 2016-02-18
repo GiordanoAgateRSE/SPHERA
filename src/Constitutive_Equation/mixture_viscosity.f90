@@ -55,7 +55,7 @@ mu_main_fluid = Med(Granular_flows_options%ID_main_fluid)%visc *               &
 !------------------------
 !$omp parallel do default(none) shared(nag,Med,pg,lambda_star)                 &
 !$omp shared(Granular_flows_options,mu_main_fluid,Domain,ind_interfaces,nout)  &
-!$omp shared(BoundaryDataPointer)                                              &
+!$omp shared(BoundaryDataPointer,tempo)                                        &
 !$omp private(npi,i_cell,i_aux,i_grid,j_grid,k_grid,z_int,vel2,lambda,mu_e)    &
 !$omp private(tau_c,vel)
 do npi=1,nag
@@ -81,6 +81,12 @@ do npi=1,nag
          if (pg(npi)%sigma_prime<0.d0) pg(npi)%sigma_prime = 0.d0
          if (Granular_flows_options%viscosity_blt_formula==3)                  &
             pg(npi)%sigma_prime = 0.d0
+         if ((tempo>=Granular_flows_options%t_q0).and.                         &
+            (tempo<=Granular_flows_options%t_liq)) then
+            pg(npi)%sigma_prime = pg(npi)%sigma_prime * (1.d0 - (tempo -       &
+                                  Granular_flows_options%t_q0) /               &
+                                  Granular_flows_options%t_liq) 
+         endif
 ! secinv=sqrt(I2(e_ij) (secinv is the sqrt of the second inveriant of the 
 ! strain-rate tensor)
          tau_c = pg(npi)%sigma_prime *                                         &

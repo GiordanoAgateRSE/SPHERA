@@ -23,7 +23,6 @@
 ! Program unit: Static_allocation_module            
 ! Description: Module to define global (and statically allocated) variables.                                          
 !----------------------------------------------------------------------------------------------------------------------------------
-
 module Static_allocation_module
 ! Global constants for array sizes: start
 integer(4),public,parameter :: SPACEDIM = 3

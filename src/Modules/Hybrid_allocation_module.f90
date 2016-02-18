@@ -635,6 +635,8 @@ type TyGranular_flows_options
                                 ! estimation
    double precision :: z_max_dt ! z_max to involve SPH mixture particles in dt 
                                 ! estimation 
+   double precision :: t_q0 ! t_q0: quake start time 
+   double precision :: t_liq ! t_liq: liquefaction time
 ! x and/or y coordinates defining the monitoring line/point   
    double precision,dimension(:,:),allocatable :: lines                  
 end type 

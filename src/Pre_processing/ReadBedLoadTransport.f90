@@ -41,7 +41,7 @@ integer(4) :: n_max_iterations,erosion_flag,viscosity_blt_formula
 integer(4) :: deposition_at_frontiers,Gamma_slope_flag
 double precision :: dt_out,x_fixed,y_fixed,conv_crit_erosion,velocity_fixed_bed
 double precision :: Chezy_friction_coeff,x_min_dt,x_max_dt,y_min_dt,y_max_dt
-double precision :: z_min_dt,z_max_dt
+double precision :: z_min_dt,z_max_dt,t_q0,t_liq
 character(1) :: comment
 character(100) :: ainp,lcase
 logical,external :: ReadCheck
@@ -104,7 +104,10 @@ do while (TRIM(lcase(ainp)) /= "##### end bed load transport #####")
       call ReadRiga (ainp,comment,nrighe,ioerr,ninp)   
       read(ainp,*,iostat=ioerr) z_min_dt,z_max_dt
       if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"Z_MIN_DT,Z_MAX_DT",ninp,nout)) &
-         return       
+         return
+      call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
+      read(ainp,*,iostat=ioerr) t_q0,t_liq
+      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"t_q0,t_liq",ninp,nout)) return          
    endif
 ! Writing input parameters (first part)
    if ((ncord>0).and.(nout > 0)) then
@@ -159,7 +162,10 @@ do while (TRIM(lcase(ainp)) /= "##### end bed load transport #####")
             write(nout,"(1x,a,1p,g12.5)") "z_min_dt:.....................",    &
                z_min_dt
             write(nout,"(1x,a,1p,g12.5)") "z_max_dt:.....................",    &
-               z_max_dt         
+               z_max_dt
+            write(nout,"(1x,a,1p,g12.5)") "t_q0:.........................",t_q0
+            write(nout,"(1x,a,1p,g12.5)") "t_liq:.........................",   &
+               t_liq               
          endif
          write(nout,"(1x,a)")  " "
       endif
@@ -188,7 +194,9 @@ do while (TRIM(lcase(ainp)) /= "##### end bed load transport #####")
       Granular_flows_options%y_min_dt = y_min_dt
       Granular_flows_options%y_max_dt = y_max_dt
       Granular_flows_options%z_min_dt = z_min_dt
-      Granular_flows_options%z_max_dt = z_max_dt      
+      Granular_flows_options%z_max_dt = z_max_dt
+      Granular_flows_options%t_q0 = t_q0
+      Granular_flows_options%t_liq = t_liq   
 ! Allocation of the array of the monitoring lines
       if (allocated(Granular_flows_options%lines)) then
          else
