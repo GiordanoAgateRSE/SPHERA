@@ -86,7 +86,7 @@ if (indarrayFlu==0) then
          celiq = Med(mate)%eps / pg(npi)%dens
          if (celiq>=zero) pg(npi)%Csound = Dsqrt(celiq)
       enddo
-      do j=1,nmedium
+      do j=1,NMedium
          diffmax = max(diffmax,Med(j)%codif)
          if (dt_alfa_Mon.eqv..true.) then
             visc_Mon_j = Med(j)%alfaMon * Med(j)%celerita * Domain%h /         &

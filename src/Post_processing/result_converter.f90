@@ -23,7 +23,6 @@
 ! Program unit: result_converter               
 ! Description: Post-processing for .vtu (fluid dynamics parameters) and .vtk (geometry) files for Paraview.        
 !----------------------------------------------------------------------------------------------------------------------------------
-
 subroutine result_converter(str)
 !------------------------
 ! Modules
@@ -298,6 +297,19 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
          write(unitvtk,'(8x,16(1x,e12.5))') (pg(finger(k))%sigma,k=k1,k2)
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
+! Discrete Shepard coefficient in the same fluid
+      if (NMedium>1) then
+         write(unitvtk,'(a)')                                                  &
+'      <DataArray type="Float32" Name="discrete Shepard same phase" format="ascii" >'
+         do i=1,numpoints,16
+            k1 = i
+            k2 = k1 + 15
+            if (k2>numpoints) k2 = numpoints
+            write(unitvtk,'(8x,16(1x,e12.5))') (pg(finger(k))%sigma_same_fluid,&
+               k=k1,k2)
+         enddo
+         write(unitvtk,'(a)') '      </DataArray>'
+      endif      
 ! Integral Shepard coefficient
       write(unitvtk,'(a)')                                                     &
 '      <DataArray type="Float32" Name="integral Shepard" format="ascii" >'

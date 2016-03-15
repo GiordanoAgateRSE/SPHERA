@@ -21,13 +21,16 @@
 
 !----------------------------------------------------------------------------------------------------------------------------------
 ! Program unit: AddElasticBoundaryReaction_3D                                
-! Description: To add supplementariìy normal boundary reaction to support eventual insufficient pressure gradient boundary term. 
-!              in case of few neighbouring particles and presence of normal component of mass force (gravity).
-!              The normal reaction is computed with the formula R=(c0^2/d) ln(zi/d) [for zi<d], stemming from the compressible 
+! Description: To add supplementary normal boundary reaction to support 
+!              eventual insufficient pressure gradient boundary term. 
+!              In case of few neighbouring particles and presence of normal 
+!              component of mass force (gravity).
+!              The normal reaction is computed with the formula 
+!              R=(c0^2/d) ln(zi/d) [for zi<d], stemming from the compressible 
 !              reaction of the fluid, where:
-!                 c0^2 = E/ro0 is the square of the sound speed within the fluid;
-!                 zi is the distance of the particle Pi from the boundary face;
-!                 d is a reference distance from which the reaction is added.
+!                c0^2 = E/ro0 is the square of the sound speed within the fluid;
+!                zi is the distance of the particle Pi from the boundary face;
+!                d is a reference distance from which the reaction is added.
 !              Check that the elastic boundary reaction never works.
 !              (Di Monaco et al., 2011, EACFM).                        
 !----------------------------------------------------------------------------------------------------------------------------------

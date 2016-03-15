@@ -23,7 +23,6 @@
 ! Program unit: ReadInputMedium                          
 ! Description:                        
 !----------------------------------------------------------------------------------------------------------------------------------
-
 subroutine ReadInputMedium(NumberEntities,Med,ainp,comment,nrighe,ier,ninp,    &
                            nout,nscr)
 !------------------------

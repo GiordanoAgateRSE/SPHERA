@@ -21,9 +21,11 @@
 
 !----------------------------------------------------------------------------------------------------------------------------------
 ! Program unit: fixed_bed_slope_limited
-! Description: Forced sedimentation (or no erosion) for particles at least 2h below the fixed bed (as it is defined in the 
-!              associated column) during the same time step: i.e. the maximum slope of the fixed bed is 2h/2h. This avoids eventual
-!              too fast propagation of erosion along the vertical (erosion is an interface phenomenon).                    
+! Description: Forced deposition (or no erosion) for particles at least 2h below
+!              the fixed bed (as it is defined in the associated column) during
+!              the same time step: i.e. the maximum slope of the fixed bed is 
+!              2h/2h. This avoids eventual too fast propagation of erosion along
+!              the vertical (erosion is an interface phenomenon).                    
 !----------------------------------------------------------------------------------------------------------------------------------
 
 subroutine fixed_bed_slope_limited(npi,igridi,jgridi,test)

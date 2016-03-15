@@ -63,7 +63,9 @@ if (.not.allocated(pg_w)) then
    endif   
 endif
 pg_w(:)%cella = 0
-pg_w(:)%surface_mesh_file_ID = DBSPH%surf_mesh%surface_mesh_file_ID(:)
+pg_w(1:DBSPH%n_w)%surface_mesh_file_ID =                                       &
+   DBSPH%surf_mesh%surface_mesh_file_ID(1:DBSPH%n_w)
+pg_w(DBSPH%n_w+1:DBSPH%n_w+DBSPH%n_inlet+DBSPH%n_outlet)%surface_mesh_file_ID =0
 pg_w(:)%adjacent_faces(1) = 0
 pg_w(:)%adjacent_faces(2) = 0
 pg_w(:)%adjacent_faces(3) = 0

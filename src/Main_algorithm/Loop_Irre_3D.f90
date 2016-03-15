@@ -82,19 +82,6 @@ it_eff = it_start
 it_print = it_start
 it_memo = it_start
 it_rest = it_start
-! Variable to count the particles, which are not "sol"
-indarrayFlu = 0
-do npi=1,nag
-   if ((pg(npi)%cella==0).or.(pg(npi)%vel_type/="std")) cycle
-   if (pg(npi)%state=="flu") then
-      indarrayFlu = indarrayFlu + 1
-! To check the maximum dimension of the array and possible resizing
-      if (indarrayFlu>PARTICLEBUFFER) then
-         call diagnostic (arg1=9,arg2=1,arg3=nomsub)
-      endif
-      Array_Flu(indarrayFlu) = npi
-   endif
-enddo
 ! Introductory procedure for inlet conditions
 call PreSourceParticles_3D
 if (Domain%time_split==0) Domain%time_stage = 1
@@ -108,8 +95,8 @@ call CalcVarLength
 if ((it_corrente==-2).and.(Domain%tipo=="bsph")) it_corrente = it_start
 call start_and_stop(3,10)
 ! Removing fictitious reservoirs used for DB-SPH initialization
-call start_and_stop(2,9) 
 if ((it_corrente==it_start).and.(Domain%tipo=="bsph")) then
+   call start_and_stop(2,9) 
 !$omp parallel do default(none) shared(nag,pg,OpCount,Partz) private(npi)
    do npi=1,nag
 ! Fictitious air reservoirs
@@ -128,7 +115,19 @@ if ((it_corrente==it_start).and.(Domain%tipo=="bsph")) then
    enddo
 !$omp end parallel do
    call OrdGrid1 (nout)
-   indarrayFlu = nag
+! Variable to count the particles, which are not "sol"
+   indarrayFlu = 0
+   do npi=1,nag
+      if ((pg(npi)%cella==0).or.(pg(npi)%vel_type/="std")) cycle
+      if (pg(npi)%state=="flu") then
+         indarrayFlu = indarrayFlu + 1
+! To check the maximum dimension of the array and possible resizing
+         if (indarrayFlu>PARTICLEBUFFER) then
+            call diagnostic (arg1=9,arg2=1,arg3=nomsub)
+         endif
+         Array_Flu(indarrayFlu) = npi
+      endif
+   enddo   
    call start_and_stop(3,9)
    call start_and_stop(2,10)
 ! This fictitious value avoid CalcVarlength computing Gamma, sigma and density 
@@ -333,7 +332,11 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
             pg(npi)%kodvel = 0
             pg(npi)%velass = zero
          endif
-         if (Domain%tipo=="semi") Ncbf = BoundaryDataPointer(1,npi)
+         if (Domain%tipo=="semi") then
+            Ncbf = BoundaryDataPointer(1,npi)
+            else
+               Ncbf = 0
+         endif
          if ((Domain%tipo=="semi").and.(Ncbf>0)) then
                Ncbf_Max = max(Ncbf_Max, Ncbf)
                call AddBoundaryContributions_to_ME3D(npi,Ncbf,tpres,tdiss,tvisc)
@@ -912,7 +915,7 @@ if (nout>0) then
 "----------------------------------------------------------------------------------------"
    write (nout,*) " "
    SpCountot = 0
-   do i=1,Nmedium
+   do i=1,NMedium
       SpCountot = SpCountot + SpCount(i)
       write (nout,'(a,i15,a,a)')                                               &
          "Number of source particles        :  SpCount = ",SpCount(i),         &
@@ -922,7 +925,7 @@ if (nout>0) then
       SpCountot
    write (nout,*) " "
    OpCountot = 0
-   do i=1,Nmedium
+   do i=1,NMedium
       OpCountot = OpCountot + OpCount(i)
       write (nout,'(a,i15,a,a)')                                               &
          "Number of outgone particles       :  OpCount = ",OpCount(i),         &
@@ -932,7 +935,7 @@ if (nout>0) then
       "Number of total outgone particles :  OpCountot = ",OpCountot
    write (nout,*) " "
    EpCountot = 0
-   do i=1,Nmedium
+   do i=1,NMedium
       EpCountot = EpCountot + EpCount(i)
       write (nout,'(a,i15,a,a)')                                               &
          "Number of escaped particles       :  EpCount = ",EpCount(i),         &
@@ -942,7 +945,7 @@ if (nout>0) then
       "Number of total escaped particles :  EpCountot = ",EpCountot
    write (nout,*) " "
    EpOrdGridtot = 0
-   do i=1,Nmedium
+   do i=1,NMedium
       EpOrdGridtot = EpOrdGridtot + EpOrdGrid(i)
       write (nout,'(a,i15,a,a)')                                               &
          "Number of escaped particles (OrdGrid1)       :  EpOrdGrid = ",       & 

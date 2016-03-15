@@ -201,10 +201,10 @@ do
       endif
       if (.not.allocated(aux_der_type_faces)) then
          if (ncord==3) then
-             allocate(aux_der_type_faces((DBSPH%ply_n_face_vert-2)*n_faces),   &
-                STAT=alloc_stat)
+            allocate(aux_der_type_faces((DBSPH%ply_n_face_vert-2)*n_faces),    &
+               STAT=alloc_stat)
             else
-             allocate(aux_der_type_faces(n_faces),STAT=alloc_stat)
+               allocate(aux_der_type_faces(n_faces),STAT=alloc_stat)
          endif
          if (alloc_stat/=0) then
             write(nscr,*) 'Allocation of aux_der_type_faces in ',              &
@@ -214,11 +214,11 @@ do
       endif
       if (.not.allocated(DBSPH%surf_mesh%surface_mesh_file_ID)) then
          if (ncord==3) then
-             allocate(DBSPH%surf_mesh%surface_mesh_file_ID(                    &
-                (DBSPH%ply_n_face_vert-2)*n_faces),STAT=alloc_stat)
+            allocate(DBSPH%surf_mesh%surface_mesh_file_ID(                     &
+               (DBSPH%ply_n_face_vert-2)*n_faces),STAT=alloc_stat)
             else
-             allocate(DBSPH%surf_mesh%surface_mesh_file_ID(n_faces),           &
-                STAT=alloc_stat)
+               allocate(DBSPH%surf_mesh%surface_mesh_file_ID(n_faces),         &
+                  STAT=alloc_stat)
          endif
          if (alloc_stat/=0) then
             write(nscr,*) 'Allocation of DBSPH%surf_mesh%surface_mesh_file_ID',&
@@ -228,10 +228,10 @@ do
       endif
       if (.not.allocated(aux_surface_mesh_file_ID)) then
          if (ncord==3) then
-             allocate(aux_surface_mesh_file_ID(                                &
-                (DBSPH%ply_n_face_vert-2)*n_faces),STAT=alloc_stat)
+            allocate(aux_surface_mesh_file_ID(                                 &
+               (DBSPH%ply_n_face_vert-2)*n_faces),STAT=alloc_stat)
             else
-             allocate(aux_surface_mesh_file_ID(n_faces),STAT=alloc_stat)
+               allocate(aux_surface_mesh_file_ID(n_faces),STAT=alloc_stat)
          endif
          if (alloc_stat/=0) then
             write(nscr,*) 'Allocation of aux_surface_mesh_file_ID ',           &
@@ -458,6 +458,7 @@ DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(k-1)%vert_list(3))%pos,         &
          else
             DBSPH%surf_mesh%faces(k)%vert_list(1:4) = old_size_vert +          &
                                                       aux_face_vert(1:4) + 1
+            DBSPH%surf_mesh%surface_mesh_file_ID(k) = surface_mesh_file_ID
             k = k+1
 ! Computation of normal (area will be re-written)             
             call area_triangle(                                                &

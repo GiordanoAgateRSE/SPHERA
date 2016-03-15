@@ -235,16 +235,30 @@ loop_nag: do npi=1,nag
 !    ((2.d0-rij_su_h)**3) 
 ! Gallati anti-cluster kernel, interesting test: end
                if (Domain%tipo=="bsph") then
+!AA!!! test start
                   pg(npi)%sigma = pg(npi)%sigma + pg(npj)%mass *               &
                                   PartKernel(4,npartint) / pg(npj)%dens 
                   if (pg(npi)%imed==pg(npj)%imed) then
                      pg(npi)%rhoSPH_new = pg(npi)%rhoSPH_new + pg(npj)%mass *  &
                                           PartKernel(4,npartint)
-                     pg(npi)%sigma_same_fluid = pg(npi)%sigma_same_fluid +     &
-                                                pg(npj)%mass *                 &
-                                                PartKernel(4,npartint) /       &
-                                                pg(npj)%dens
+                     else
+                        pg(npi)%rhoSPH_new = pg(npi)%rhoSPH_new + pg(npj)%mass &
+                                             / pg(npj)%dens * pg(npi)%dens *   &
+                                             PartKernel(4,npartint)
                   endif
+!                  pg(npi)%sigma = pg(npi)%sigma + pg(npj)%mass *               &
+!                                  PartKernel(4,npartint) / pg(npj)%dens 
+!                  if (pg(npi)%imed==pg(npj)%imed) then
+!                     pg(npi)%rhoSPH_new = pg(npi)%rhoSPH_new + pg(npj)%mass *  &
+!                                          PartKernel(4,npartint)
+!                     if (NMedium>1) then
+!                        pg(npi)%sigma_same_fluid = pg(npi)%sigma_same_fluid +  &
+!                                                   pg(npj)%mass *              &
+!                                                   PartKernel(4,npartint) /    &
+!                                                   pg(npj)%dens
+!                     endif
+!                  endif
+!AA!!! test end
                endif
 ! Searching for the nearest fluid/mixture SPH particle 
                if (erosione) then
@@ -359,12 +373,29 @@ loop_nag: do npi=1,nag
                      gradmod = - gradmod + rij_su_h_quad - two
                   endif 
                   kernel_fw(2,npartint) = gradmod * ke_coef * denom
-                  pg(npi)%sigma = pg(npi)%sigma +  pg_w(npj)%mass *            &
-                                  kernel_fw(1,npartint) / pg_w(npj)%dens
+                  pg(npi)%sigma = pg(npi)%sigma +  pg_w(npj)%volume *          &
+                                  kernel_fw(1,npartint)
+!AA!!!test start  
                   if (NMedium==1) then
                      pg(npi)%rhoSPH_new = pg(npi)%rhoSPH_new + pg_w(npj)%mass *&
                                           kernel_fw(1,npartint)
-                  endif                                       
+                     else
+                        pg(npi)%rhoSPH_new = pg(npi)%rhoSPH_new + pg(npi)%dens &
+                                             * pg_w(npj)%volume *              &
+                                             kernel_fw(1,npartint)                        
+                  endif                                
+!                  if (NMedium==1) then
+!                     pg(npi)%rhoSPH_new = pg(npi)%rhoSPH_new + pg_w(npj)%mass *&
+!                                          kernel_fw(1,npartint)
+!                     else
+!                        pg(npi)%rhoSPH_new = pg(npi)%rhoSPH_new + pg(npi)%dens &
+!                                             * pg_w(npj)%volume *              &
+!                                             kernel_fw(1,npartint)                        
+!                        pg(npi)%sigma_same_fluid = pg(npi)%sigma_same_fluid +  &
+!                                                   pg_w(npj)%volume *          &
+!                                                   kernel_fw(1,npartint)
+!                  endif
+!AA!!!test end                  
 ! Gallati anti-cluster kernel, interesting test: start
 ! kernel_fw(3,npartint) =(5.d0/(16.d0*PIGRECO*Domain%h**2))*((2.d0-rij_su_h)**3) 
 ! kernel_fw(4,npartint) = (-12.0d0 - 3.0d0 * rij_su_h_quad + 12.0d0 * rij_su_h)&
@@ -539,33 +570,70 @@ if (Domain%tipo=="bsph") then
          if (nPartIntorno_fw(npi)==0) then 
             pg(npi)%Gamma = one
             else
+!AA!!! test start            
                pg(npi)%Gamma = pg(npi)%sigma
+!               if (NMedium==1) then
+!                  pg(npi)%Gamma = pg(npi)%sigma
+!                  else
+!                     pg(npi)%Gamma = pg(npi)%sigma_same_fluid
+!               endif               
+!AA!!! test end                  
                if (DBSPH%Gamma_limiter_flag.eqv..true.) pg(npi)%Gamma =         &
                   min(pg(npi)%Gamma,one)    
          endif
       endif
       if (it_corrente>-2) then
+!AA!!! test start      
          min_sigma_Gamma = min((pg(npi)%sigma+0.05),pg(npi)%Gamma)
+!         if (NMedium==1) then
+!            min_sigma_Gamma = min((pg(npi)%sigma+0.05),pg(npi)%Gamma)
+!            else
+!               min_sigma_Gamma = min((pg(npi)%sigma_same_fluid+0.05),          &
+!                                 pg(npi)%Gamma)
+!         endif
+!AA!!! test end
          if ((DBSPH%FS_allowed.eqv..true.).and.                                &
             (min_sigma_Gamma/=pg(npi)%Gamma)) then
             pg(npi)%Gamma_last_active = zero
             pg(npi)%FS = 1
-            pg(npi)%uni = pg(npi)%sigma
+!AA!!! test start
+            pg(npi)%uni = pg(npi)%sigma            
+!            if (NMedium==1) then
+!               pg(npi)%uni = pg(npi)%sigma
+!               else
+!                  pg(npi)%uni = pg(npi)%sigma_same_fluid
+!            endif
+!AA!!! test end            
             else
                pg(npi)%uni = pg(npi)%Gamma
                pg(npi)%Gamma_last_active = zero
          endif
          if (pg(npi)%rhoSPH_old==zero) then
             pg(npi)%DensShep = pg(npi)%rhoSPH_new * pg(npi)%Gamma
-            if (NMedium==1) then
-               if (pg(npi)%FS==1) then
-                  pg(npi)%dens = pg(npi)%rhoSPH_new / pg(npi)%sigma 
-                  else
-                     pg(npi)%dens = pg(npi)%rhoSPH_new / pg(npi)%Gamma
-               endif
-               elseif(NMedium>1) then
-                  pg(npi)%dens = pg(npi)%rhoSPH_new / pg(npi)%sigma_same_fluid                  
+!AA!!! test start
+!            if (NMedium==1) then
+!               if (pg(npi)%FS==1) then
+!                  pg(npi)%dens = pg(npi)%rhoSPH_new / pg(npi)%sigma 
+!                  else
+!                     pg(npi)%dens = pg(npi)%rhoSPH_new / pg(npi)%Gamma
+!               endif
+!               elseif(NMedium>1) then
+!                  pg(npi)%dens = pg(npi)%rhoSPH_new / pg(npi)%sigma_same_fluid                  
+!            endif
+            if (pg(npi)%FS==0) then
+               pg(npi)%dens = pg(npi)%rhoSPH_new / pg(npi)%Gamma
+               else
+!AA!!! test2 start
+                  pg(npi)%dens = pg(npi)%rhoSPH_new / pg(npi)%sigma  
+!                  if (NMedium==1) then
+!                     pg(npi)%dens = pg(npi)%rhoSPH_new / pg(npi)%sigma 
+!                     else
+!                        pg(npi)%dens = pg(npi)%rhoSPH_new /                    &
+!                                       pg(npi)%sigma_same_fluid
+!                  endif
+!AA!!! test2 end
             endif
+!AA!!! test end
          endif
       endif
    enddo

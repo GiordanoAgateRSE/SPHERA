@@ -83,19 +83,6 @@ it_eff = it_start
 it_print = it_start
 it_memo = it_start
 it_rest = it_start
-! Variable to count the particles, which are not "sol"
-indarrayFlu = 0
-do npi=1,nag
-   if ((pg(npi)%cella==0).or.(pg(npi)%vel_type/="std")) cycle
-   if (pg(npi)%state=="flu") then
-      indarrayFlu = indarrayFlu + 1
-! To check the maximum dimension of the array and possible resizing
-      if (indarrayFlu>PARTICLEBUFFER) then
-         call diagnostic(arg1=9,arg2=1,arg3=nomsub)
-      endif
-      Array_Flu(indarrayFlu) = npi
-   endif
-enddo
 ! Introductory procedure for inlet conditions
 call PreSourceParticles_2D
 ! Initializing the time stage for time integration
@@ -110,8 +97,8 @@ call CalcVarLength
 if ((it_corrente==-2).and.(Domain%tipo=="bsph")) it_corrente = it_start  
 call start_and_stop(3,10)
 ! Removing fictitious reservoirs used for DB-SPH initialization
-call start_and_stop(2,9)
 if ((it_corrente==it_start).and.(Domain%tipo=="bsph")) then
+   call start_and_stop(2,9)
 !$omp parallel do default(none) shared(nag,pg,OpCount,Partz) private(npi) 
    do npi=1,nag
       if (Partz(pg(npi)%izona)%DBSPH_fictitious_reservoir_flag.eqv.(.true.))   &
@@ -121,8 +108,20 @@ if ((it_corrente==it_start).and.(Domain%tipo=="bsph")) then
       endif
    enddo
 !$omp end parallel do
-   call OrdGrid1 (nout)
-   indarrayFlu = nag
+   call OrdGrid1(nout)
+! Variable to count the particles, which are not "sol"
+   indarrayFlu = 0
+   do npi=1,nag
+      if ((pg(npi)%cella==0).or.(pg(npi)%vel_type/="std")) cycle
+      if (pg(npi)%state=="flu") then
+         indarrayFlu = indarrayFlu + 1
+! To check the maximum dimension of the array and possible resizing
+         if (indarrayFlu>PARTICLEBUFFER) then
+            call diagnostic(arg1=9,arg2=1,arg3=nomsub)
+         endif
+         Array_Flu(indarrayFlu) = npi
+      endif
+   enddo
    call start_and_stop(3,9)
    call start_and_stop(2,10)
 ! This fictitious value avoid CalcVarlength computing Gamma, sigma and density 
@@ -265,32 +264,58 @@ done_flag = .false.
       if ((Domain%time_split==0).and.(Domain%time_stage==1)) then               
 ! Erosion criterium + continuity equation RHS  
          call start_and_stop(2,12)
-         if ((erosione).and.(.not.esplosione)) then  
-! Detection of the mixture particle status ("flu" or "sol") 
-            if (Granular_flows_options%ID_erosion_criterion>1) then
-               if (index(modelloerosione,"shields")>0) then
-! Shields criterion
+         if ((erosione).and.(.not.esplosione)) then
+            select case (Granular_flows_options%ID_erosion_criterion)
+               case(1)
+!$omp parallel do default(none) shared(pg,nag) private(npi,ncel)
+                  do npi=1,nag
+                     pg(npi)%vel_old(:) = pg(npi)%vel(:)
+                     pg(npi)%normal_int_old(:) = pg(npi)%normal_int(:)
+                     call initialization_fixed_granular_particle(npi)             
+                  enddo
+!$omp end parallel do 
 !$omp parallel do default(none) shared(pg,nag) private(npi) 
                   do npi=1,nag
-                     call Shields(npi)
+                     call Shields(npi) 
                   enddo
 !$omp end parallel do
-                  elseif (index(modelloerosione,"mohr")>0) then
+! Initializing viscosity for fixed particles
+!$omp parallel do default(none) shared(pg,nag,Granular_flows_options,Med)      &
+!$omp private(npi,ncel,aux,igridi,jgridi,kgridi)
+                  do npi=1,nag
+                     ncel = ParticleCellNumber(pg(npi)%coord)
+                     aux = CellIndices(ncel,igridi,jgridi,kgridi)
+                     if (Granular_flows_options%ID_erosion_criterion==1) then
+                        if (pg(npi)%state=="sol") then
+                           pg(npi)%mu =                                        &
+                              Med(Granular_flows_options%ID_main_fluid)%visc * &
+                              Med(Granular_flows_options%ID_main_fluid)%den0
+                           pg(npi)%visc =                                      &
+                              Med(Granular_flows_options%ID_main_fluid)%visc
+                        endif
+                     endif
+                  enddo
+!$omp end parallel do  
+               case(2)
+!$omp parallel do default(none) shared(pg,nag) private(npi)
+                  do npi=1,nag
+                     call Shields(npi) 
+                  enddo
+!$omp end parallel do 
+               case(3)
 ! To compute the second invariant of the rate-strain tensor and density 
 ! derivatives
-                     call inter_EqCont_2D
-! Mohr-Coulomb criterion
-                     call MohrC
-               endif
-            endif
-! To update the auxiliary vector, which counts the particles with a status 
-! different from "sol" 
+                  call inter_EqCont_2D 
+                  call MohrC
+               case default
+            end select
+! Update auxiliary vector for counting particles, whose status is not "sol"
             indarrayFlu = 0
             do npi=1,nag
                if ((pg(npi)%cella==0).or.(pg(npi)%vel_type/="std")) cycle
                if (pg(npi)%state=="flu") then
                   indarrayFlu = indarrayFlu + 1
-! Checking not to overpass array sizes 
+! Check the boundary sizes and possible resizing
                   if (indarrayFlu>PARTICLEBUFFER) then
                      call diagnostic (arg1=9,arg2=2,arg3=nomsub)
                   endif
@@ -332,6 +357,9 @@ done_flag = .false.
          if (Domain%tipo=="semi") then
             Ncbs = BoundaryDataPointer(1,npi)
             IntNcbs = BoundaryDataPointer(2,npi)
+            else
+               Ncbs = 0
+               IntNcbs = 0
          endif
          if ((Ncbs>0).and.(IntNcbs>0).and.(Domain%tipo=="semi")) then
 ! SA-SPH boundary terms for the balance equations (using 
@@ -472,10 +500,22 @@ done_flag = .false.
 ! Diffusion coefficient: end
 ! Update the particle positions
             call start_and_stop(2,8)
-!$omp parallel do default(none) private(npi) shared(nag,Pg,dt,med)
 ! Loop over the active particles
+!AA!! test start
+!$omp parallel do default(none) private(npi) shared(nag,pg,dt,med)
+!!$omp parallel do default(none) private(npi,ncel,igridi,jgridi,kgridi,aux)     &
+!!$omp shared(nag,pg,dt,med,Granular_flows_options,ind_interfaces)
+!AA!! test end
             do npi=1,nag
                if (pg(npi)%cella==0) cycle
+!AA!! test start
+!               if (Granular_flows_options%ID_erosion_criterion==1) then
+!                  ncel = ParticleCellNumber(pg(npi)%coord)
+!                  aux = CellIndices(ncel,igridi,jgridi,kgridi)
+!                  if((Granular_flows_options%t_liq>Granular_flows_options%t_q0)&
+!                     .and.(ind_interfaces(igridi,jgridi,1)==0)) cycle
+!               endif
+!AA!! test end                              
 ! To save the old coordinates
             pg(npi)%CoordOld(:) = pg(npi)%coord(:)
                if (pg(npi)%vel_type/="std") then
@@ -570,7 +610,7 @@ done_flag = .false.
                if (pg(npi)%state=="flu") then
                   indarrayFlu = indarrayFlu + 1
 ! Check the boundary sizes and possible resizing
-                  if (indarrayFlu > PARTICLEBUFFER) then
+                  if (indarrayFlu>PARTICLEBUFFER) then
                      call diagnostic (arg1=9,arg2=2,arg3=nomsub)
                   endif
                   Array_Flu(indarrayFlu) = npi
@@ -592,7 +632,7 @@ done_flag = .false.
                   indarrayFlu = indarrayFlu + 1
 ! Check array sizes and possible resizing 
                   if (indarrayFlu>PARTICLEBUFFER) then
-                     call diagnostic (arg1=9,arg2=2,arg3=nomsub)
+                     call diagnostic(arg1=9,arg2=2,arg3=nomsub)
                   endif
                   Array_Flu(indarrayFlu) = npi
                enddo
@@ -748,11 +788,10 @@ done_flag = .false.
             call OrdGrid1 (nout)
             call start_and_stop(3,9)
 ! Set the parameters for the fixed particles 
-            if (Domain%NormFix)  call NormFix
+            if (Domain%NormFix) call NormFix
             indarrayFlu = 0
             do npi=1,nag
                if ((pg(npi)%cella==0).or.(pg(npi)%vel_type/="std")) cycle
-
                   indarrayFlu = indarrayFlu + 1
 ! Array sizes check and possibile resizing
                if (indarrayFlu>PARTICLEBUFFER) then
@@ -889,7 +928,7 @@ if (nout>0) then
 "----------------------------------------------------------------------------------------"
    write (nout,*) " "
    SpCountot = 0
-   do i=1,Nmedium
+   do i=1,NMedium
       SpCountot = SpCountot + SpCount(i)
       write (nout,'(a,i15,a,a)')                                               &
          "Number of source particles        :  SpCount = ",SpCount(i),         &
@@ -899,7 +938,7 @@ if (nout>0) then
       SpCountot
    write (nout,*) " "
    OpCountot = 0
-   do i=1,Nmedium
+   do i=1,NMedium
       OpCountot = OpCountot + OpCount(i)
       write (nout,'(a,i15,a,a)')                                               &
          "Number of outgone particles       :  OpCount = ",OpCount(i),         &
@@ -909,7 +948,7 @@ if (nout>0) then
       OpCountot
    write (nout,*) " "
    EpCountot = 0
-   do i=1,Nmedium
+   do i=1,NMedium
       EpCountot = EpCountot + EpCount(i)
       write (nout,'(a,i15,a,a)')                                               &
          "Number of escaped particles       :  EpCount = ",EpCount(i),         &
@@ -919,7 +958,7 @@ if (nout>0) then
       EpCountot
    write (nout,*) " "
    EpOrdGridtot = 0
-   do i=1,Nmedium
+   do i=1,NMedium
       EpOrdGridtot = EpOrdGridtot + EpOrdGrid(i)
       write (nout,'(a,i15,a,a)')                                               &
          "Number of escaped particles (OrdGrid1)      :  EpOrdGrid = ",        &

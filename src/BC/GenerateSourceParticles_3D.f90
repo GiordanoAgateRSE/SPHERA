@@ -23,7 +23,6 @@
 ! Program unit: GenerateSourceParticles_3D
 ! Description: To generate new source particles at the inlet section (only in 3D and with one quadrilateral inlet section). 
 !----------------------------------------------------------------------------------------------------------------------------------
-
 subroutine GenerateSourceParticles_3D 
 !------------------------
 ! Modules
@@ -65,7 +64,7 @@ if (inttimeratio>pinttimeratio) then
       SourceFace = isi
       nt = BoundaryFace(SourceFace)%stretch
       if (tratto(nt)%tipo=="sour") then
-         i_source=i_source+1
+         i_source = i_source + 1
          DisplFrac = RowVelocity(i_source) * TimeFrac 
          do ip=1,NumPartFace(i_source)
 ! To generate a new particle row 
@@ -85,7 +84,7 @@ if (inttimeratio>pinttimeratio) then
                pg(nag)%vel(sd) = Tratto(nt)%NormVelocity * nn(sd)
                pg(nag)%var(sd) = pg(nag)%vel(sd)
             end do
-            if (Domain%tipo=="bsph") call wavy_inlet(isi)
+            if (Domain%tipo=="bsph") call wavy_inlet(i_source)
             if (Domain%tipo=="bsph") then
                pg(nag)%rhoSPH_new = zero
                pg(nag)%Gamma = 1.

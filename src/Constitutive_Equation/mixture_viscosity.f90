@@ -70,7 +70,12 @@ do npi=1,nag
             pg(npi)%sigma_prime = ( - Domain%grav(3)) *                        &
                (Med(Granular_flows_options%ID_granular)%den0 -                 &
                Med(Granular_flows_options%ID_main_fluid)%den0) *               &
-               (z_int-pg(npi)%coord(3))
+               (z_int - pg(npi)%coord(3))
+            if (ind_interfaces(i_grid,j_grid,1)==0) then
+               pg(npi)%sigma_prime = ( - Domain%grav(3)) *                     &
+                  Med(Granular_flows_options%ID_granular)%den0 * (z_int -      &
+                  pg(npi)%coord(3))
+            endif  
                else
 ! This case (probably) never occurs
                   pg(npi)%sigma_prime = pg(npi)%pres *                         &
@@ -82,7 +87,8 @@ do npi=1,nag
          if (Granular_flows_options%viscosity_blt_formula==3)                  &
             pg(npi)%sigma_prime = 0.d0
          if ((tempo>=Granular_flows_options%t_q0).and.                         &
-            (tempo<=Granular_flows_options%t_liq)) then
+            (tempo<=Granular_flows_options%t_liq).and.                         &
+            (ind_interfaces(i_grid,j_grid,1)/=0)) then
             pg(npi)%sigma_prime = pg(npi)%sigma_prime * (1.d0 - (tempo -       &
                                   Granular_flows_options%t_q0) /               &
                                   Granular_flows_options%t_liq) 

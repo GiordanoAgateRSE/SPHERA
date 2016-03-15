@@ -23,8 +23,7 @@
 ! Program unit: start_and_stop                 
 ! Description: Time recording.          
 !----------------------------------------------------------------------------------------------------------------------------------
-
-subroutine start_and_stop (iset,itot)
+subroutine start_and_stop(iset,itot)
 !------------------------
 ! Modules
 !------------------------ 

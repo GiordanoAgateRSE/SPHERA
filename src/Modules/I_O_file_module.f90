@@ -23,8 +23,6 @@
 ! Program unit: I_O_file_module            
 ! Description: Module for I/O.                     
 !----------------------------------------------------------------------------------------------------------------------------------
-
-! I/O units for files
 module I_O_file_module
 integer(4) :: nscr = 0 ! Screen 
 integer(4) :: ninp = 11 ! Input

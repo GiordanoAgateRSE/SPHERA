@@ -21,10 +21,13 @@
 
 !----------------------------------------------------------------------------------------------------------------------------------
 ! Program unit: FindCloseBoundarySides2D                                       
-! Description: To finds the "close" boundary sides, i.e. those sited at a distance from particle npi<=2h. It returns:
+! Description: To find the "close" boundary sides, i.e. those sited at a 
+!              distance from particle npi<=2h. It returns:
 !                 Ncbs: number of close boundary sides (= 0, 1, 2)
 !                 Cloboside(1:Ncbs): list of close boundary sides
-!                 LocXY(1:PLANEDIM,1:Ncbs): local coordinates of particle npi with respect each boundary side (vertex V1) 
+!                 LocXY(1:PLANEDIM,1:Ncbs): local coordinates of particle npi 
+!                                           with respect each boundary side 
+!                                           (vertex V1) 
 !              (Di Monaco et al., 2011, EACFM)                        
 !----------------------------------------------------------------------------------------------------------------------------------
 

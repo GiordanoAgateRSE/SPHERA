@@ -23,7 +23,6 @@
 ! Program unit: GenerateSourceParticles_2D
 ! Description: To generate new source particles to simulate inlet fluid flow (only in 2D and with one inlet section).
 !----------------------------------------------------------------------------------------------------------------------------------
-
 subroutine GenerateSourceParticles_2D
 !------------------------
 ! Modules
@@ -88,8 +87,8 @@ if (inttimeratio>pinttimeratio) then
                                             * tempo / tratto(nt)%trampa
                pg(nag)%var(sd) = pg(nag)%vel(sd) 
             end do
-            if (Domain%tipo == "bsph") call wavy_inlet(isi)
-            if (Domain%tipo == "bsph") then
+            if (Domain%tipo=="bsph") call wavy_inlet(i_source)
+            if (Domain%tipo=="bsph") then
                pg(nag)%rhoSPH_new = zero
                pg(nag)%Gamma = 1.
                pg(nag)%uni = zero

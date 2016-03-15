@@ -67,7 +67,7 @@ if (indarrayFlu==0) then
          dt_vis = pg(npi)%dens * squareh / (half * pg(npi)%mu)
          dtmin  = min(dtmin,dt_CFL,dt_vis)
       enddo
-      do j=1,nmedium
+      do j=1,NMedium
          diffmax = max(diffmax,Med(j)%codif)
       enddo
       dt_dif = half * squareh / (diffmax+0.000000001d0)

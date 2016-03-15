@@ -23,7 +23,6 @@
 ! Program unit: Print_Results               
 ! Description: Post-processing for the log file.       
 !----------------------------------------------------------------------------------------------------------------------------------
-
 subroutine Print_Results(it,it_print,str)
 !------------------------
 ! Modules

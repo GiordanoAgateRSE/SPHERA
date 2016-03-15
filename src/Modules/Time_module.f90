@@ -23,7 +23,6 @@
 ! Program unit: Time_module            
 ! Description: Module for time recording.                                           
 !----------------------------------------------------------------------------------------------------------------------------------
-
 module Time_module
 use Static_allocation_module
 integer(4),parameter :: redcard = 20 ! Reduced length of strings
@@ -74,6 +73,5 @@ data tot_routines(18) / "     Wall parameter update              " /
 data tot_routines(19) / "     Rigid body transport               " /
 data tot_routines(20) / "     Mixture viscosity                  " /
 data tot_routines(numb_subr) / "Totale                                  " /
-
 end module Time_module
  

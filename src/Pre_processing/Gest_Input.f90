@@ -23,7 +23,6 @@
 ! Program unit: Gest_Input                   
 ! Description: Input check and management.                 
 !----------------------------------------------------------------------------------------------------------------------------------
-
 subroutine Gest_Input
 !------------------------
 ! Modules
@@ -184,7 +183,7 @@ if ((Domain%istart>0).or.(Domain%start>zero)) then
    else
 ! No restart: standard initialization
       ncord = NumberEntities(1)
-      nmedium = NumberEntities(2)
+      NMedium = NumberEntities(2)
       NPartZone = NumberEntities(3)
       NPoints = NumberEntities(4)
       NPointsl = NumberEntities(6)
