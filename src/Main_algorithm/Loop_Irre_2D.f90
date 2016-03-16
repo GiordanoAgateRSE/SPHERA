@@ -390,6 +390,7 @@ done_flag = .false.
          endif
       enddo
 !$omp end parallel do
+
       if (n_bodies>0) then
          call start_and_stop(3,6)
          call start_and_stop(2,19)
@@ -501,21 +502,9 @@ done_flag = .false.
 ! Update the particle positions
             call start_and_stop(2,8)
 ! Loop over the active particles
-!AA!! test start
 !$omp parallel do default(none) private(npi) shared(nag,pg,dt,med)
-!!$omp parallel do default(none) private(npi,ncel,igridi,jgridi,kgridi,aux)     &
-!!$omp shared(nag,pg,dt,med,Granular_flows_options,ind_interfaces)
-!AA!! test end
             do npi=1,nag
                if (pg(npi)%cella==0) cycle
-!AA!! test start
-!               if (Granular_flows_options%ID_erosion_criterion==1) then
-!                  ncel = ParticleCellNumber(pg(npi)%coord)
-!                  aux = CellIndices(ncel,igridi,jgridi,kgridi)
-!                  if((Granular_flows_options%t_liq>Granular_flows_options%t_q0)&
-!                     .and.(ind_interfaces(igridi,jgridi,1)==0)) cycle
-!               endif
-!AA!! test end                              
 ! To save the old coordinates
             pg(npi)%CoordOld(:) = pg(npi)%coord(:)
                if (pg(npi)%vel_type/="std") then
