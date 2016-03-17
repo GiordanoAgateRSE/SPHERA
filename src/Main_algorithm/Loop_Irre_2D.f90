@@ -390,7 +390,6 @@ done_flag = .false.
          endif
       enddo
 !$omp end parallel do
-
       if (n_bodies>0) then
          call start_and_stop(3,6)
          call start_and_stop(2,19)

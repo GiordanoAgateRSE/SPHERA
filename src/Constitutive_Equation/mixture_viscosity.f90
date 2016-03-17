@@ -18,7 +18,6 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
 !----------------------------------------------------------------------------------------------------------------------------------
 ! Program unit: mixture_viscosity 
 ! Description: To compute the mixture viscosity of the bed-load transport layer.       
@@ -86,12 +85,14 @@ do npi=1,nag
          if (pg(npi)%sigma_prime<0.d0) pg(npi)%sigma_prime = 0.d0
          if (Granular_flows_options%viscosity_blt_formula==3)                  &
             pg(npi)%sigma_prime = 0.d0
-         if ((tempo>=Granular_flows_options%t_q0).and.                         &
-            (tempo<=Granular_flows_options%t_liq).and.                         &
-            (ind_interfaces(i_grid,j_grid,1)/=0)) then
-            pg(npi)%sigma_prime = pg(npi)%sigma_prime * (1.d0 - (tempo -       &
-                                  Granular_flows_options%t_q0) /               &
-                                  Granular_flows_options%t_liq) 
+         if (Granular_flows_options%t_liq>=0.000001) then
+            if ((tempo>=Granular_flows_options%t_q0).and.                      &
+               (tempo<=Granular_flows_options%t_liq).and.                      &
+               (ind_interfaces(i_grid,j_grid,1)/=0)) then
+               pg(npi)%sigma_prime = pg(npi)%sigma_prime * (1.d0 - (tempo -    &
+                                     Granular_flows_options%t_q0) /            &
+                                     Granular_flows_options%t_liq) 
+            endif
          endif
 ! secinv=sqrt(I2(e_ij) (secinv is the sqrt of the second inveriant of the 
 ! strain-rate tensor)
