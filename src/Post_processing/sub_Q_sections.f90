@@ -18,12 +18,11 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
 !----------------------------------------------------------------------------------------------------------------------------------
 ! Program unit: sub_Q_sections                 
-! Description: Writing flow rate at monitoring sections provided in input for the flow rate (only in 3D).           
+! Description: Writing flow rate at monitoring sections provided in input for 
+!              the flow rate (only in 3D).           
 !----------------------------------------------------------------------------------------------------------------------------------
-
 subroutine sub_Q_sections
 !------------------------
 ! Modules

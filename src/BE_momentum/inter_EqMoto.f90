@@ -245,7 +245,9 @@ if (pg(npi)%visc>0.d0) then
    if (absv_pres_grav_inner/=0.) Morris_inner_weigth = absv_Morris_inner /     &
                                                        absv_pres_grav_inner *  &
                                                        100.d0
-   if (Morris_inner_weigth>5.d0) then
+! Taking into account the condition (absv_pres_grav_inner==0.d0) is only due to 
+! graphical reasons. 
+   if ((Morris_inner_weigth>5.d0).or.(absv_pres_grav_inner==0.d0)) then
       pg(npi)%laminar_flag = 1
       else
          pg(npi)%laminar_flag = 0
