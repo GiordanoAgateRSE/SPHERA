@@ -18,7 +18,6 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
 !----------------------------------------------------------------------------------------------------------------------------------
 ! Program unit: Hybrid_allocation_module            
 ! Description: Module to define derived types of both dynamically and statically allocated variables. (Di Monaco et al., 2011,
@@ -583,7 +582,7 @@ type TyQ_section
    integer(4)       :: it_out_last ! Auxiliary variable to print flow rates 
    double precision :: dt_out ! Writing time step for section flow rates
 ! type section to monitor flow rates
-   type(tyQ_section_array), dimension(:), allocatable :: section           
+   type(tyQ_section_array),dimension(:),allocatable :: section           
 end type  
 
 ! Derived type for bed-load transport layer 

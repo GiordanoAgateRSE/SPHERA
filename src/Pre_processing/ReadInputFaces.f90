@@ -18,7 +18,6 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
 !----------------------------------------------------------------------------------------------------------------------------------
 ! Program unit: ReadInputFaces                         
 ! Description:                        

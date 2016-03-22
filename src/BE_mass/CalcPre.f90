@@ -58,7 +58,7 @@ if (diffusione) then
       wrhorif = Med(1)%den0
       wc2 = Med(1)%celerita * Med(1)%celerita
       cc2 = Med(2)%celerita * Med(2)%celerita
-      if (pg(npi)%imed == 1)then
+      if (pg(npi)%imed==1)then
          pg(npi)%pres = wc2 * (pg(npi)%dens - (crhorif * VFmn + wrhorif * (1 - &
                         VFmn))) 
          elseif (pg(npi)%imed==2) then

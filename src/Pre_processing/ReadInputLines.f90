@@ -18,7 +18,6 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
 !----------------------------------------------------------------------------------------------------------------------------------
 ! Program unit: ReadInputLines                          
 ! Description:                        
@@ -58,14 +57,6 @@ character(100),external :: lcase, GetToken
 !------------------------
 ! Statements
 !------------------------
-! In case of restart, input data are not read
-if (restart) then
-   do while (TRIM(lcase(ainp))/="##### end lines #####")
-      call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"LINES DATA",ninp,nout)) return
-   enddo
-   return
-endif
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"LINES DATA",ninp,nout)) return
 do while (TRIM(lcase(ainp))/="##### end lines #####")

@@ -18,7 +18,6 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
 !----------------------------------------------------------------------------------------------------------------------------------
 ! Program unit: ReadInputBoundaries                    
 ! Description: Reading input data for the boundary treatment scheme SA-SPH (semi-analytic approach; Di Monaco et al., 2011, EACFM).                      

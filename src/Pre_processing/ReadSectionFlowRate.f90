@@ -18,12 +18,10 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
 !----------------------------------------------------------------------------------------------------------------------------------
 ! Program unit: ReadSectionFlowRate                                
 ! Description: Input management for the flow rate monitoring sections.                         
 !----------------------------------------------------------------------------------------------------------------------------------
-
 subroutine ReadSectionFlowRate(ainp,comment,nrighe,ier,ninp,nout)
 !------------------------
 ! Modules
@@ -56,15 +54,6 @@ logical,external :: ReadCheck
 !------------------------
 ! Statements
 !------------------------
-! In case of restart, input data sections are not read
-if (restart) then
-   do while (TRIM(lcase(ainp))/="##### end section flow rate #####")
-      call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"Section_flow_rate DATA",ninp,  &
-         nout)) return
-   enddo
-   return
-endif
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"Section_flow_rate DATA",ninp,nout))  &
    return

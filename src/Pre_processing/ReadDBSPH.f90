@@ -18,7 +18,6 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
 !----------------------------------------------------------------------------------------------------------------------------------
 ! Program unit: ReadDBSPH                    
 ! Description: Reading input data for the DB-SPH boundary treatment scheme (Amicarelli et al., 2013, IJNME).                   
@@ -62,15 +61,6 @@ n_kinematics_records(:) = 0
 !------------------------
 ! Statements
 !------------------------
-! In case of restart, input data are not read
-if (restart) then
-! Lower case letters are required
-   do while (TRIM(lcase(ainp))/="##### end dbsph #####") 
-      call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DBSPH DATA",ninp,nout)) return
-   enddo
-  return
-endif
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DBSPH DATA",ninp,nout)) return
 do while (TRIM(lcase(ainp))/="##### end dbsph #####")

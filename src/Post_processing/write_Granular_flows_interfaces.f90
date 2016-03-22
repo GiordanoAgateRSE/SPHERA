@@ -18,12 +18,10 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
 !----------------------------------------------------------------------------------------------------------------------------------
 ! Program unit: write_Granular_flows_interfaces                  
 ! Description: Post-processing the interfaces for bed-load transport phenomena.             
 !----------------------------------------------------------------------------------------------------------------------------------
-
 subroutine write_Granular_flows_interfaces
 !------------------------
 ! Modules

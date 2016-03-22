@@ -18,7 +18,6 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
 !----------------------------------------------------------------------------------------------------------------------------------
 ! Program unit: Update_Zmax_at_grid_vert_columns                 
 ! Description: Updating the 2D array of the maximum values of the fluid particle height, for each grid columns (only in 3D).
@@ -26,7 +25,6 @@
 !              file (only in 3D). Printing the 2D fields of the specific flow rate components (current time step), at the same
 !              frequency of the water depth (only in 3D).            
 !----------------------------------------------------------------------------------------------------------------------------------
-
 subroutine Update_Zmax_at_grid_vert_columns(print_flag)
 !------------------------
 ! Modules

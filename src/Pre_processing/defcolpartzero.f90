@@ -18,13 +18,11 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
 !----------------------------------------------------------------------------------------------------------------------------------
 ! Program unit: defcolpartzero                   
 ! Description:  On the particle colours for visualization purposes.               
 !----------------------------------------------------------------------------------------------------------------------------------
-
-subroutine defcolpartzero (ir,partz,pg)
+subroutine defcolpartzero(ir,partz,pg)
 !------------------------
 ! Modules
 !------------------------ 

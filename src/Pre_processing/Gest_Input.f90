@@ -18,7 +18,6 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
 !----------------------------------------------------------------------------------------------------------------------------------
 ! Program unit: Gest_Input                   
 ! Description: Input check and management.                 
@@ -164,7 +163,7 @@ if ((Domain%istart>0).or.(Domain%start>zero)) then
       call diagnostic(arg1=5,arg2=201,arg3=trim(ainp))
       else
          write(nout,'(1x,a)')                                                  &
-">Data are read from the restart file"//trim(Domain%file)//" in the routine ReadRestartFile"
+">Data are read from the restart file "//trim(Domain%file)//" in the routine ReadRestartFile"
    endif
 ! To restore data from the restart file
 ! During the first reading of the restart file, only few parameters are read
@@ -587,7 +586,7 @@ if ((Domain%tipo=="bsph").and.(.not.Restart)) then
       endif
    endif
 endif
-call OrdGrid1 (nout)
+call OrdGrid1(nout)
 if ((Domain%tipo=="bsph").and.(.not.Restart)) then
    call DBSPH_find_close_faces 
    call semi_particle_volumes

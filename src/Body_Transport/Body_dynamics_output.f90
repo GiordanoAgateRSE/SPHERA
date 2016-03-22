@@ -18,12 +18,10 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-----------------------------------------------------------------------------------------------------------------------------------
-
 !----------------------------------------------------------------------------------------------------------------------------------
 ! Program unit: Body_dynamics_output
 ! Description: .txt output files for body transport in fluid flows. 
 !----------------------------------------------------------------------------------------------------------------------------------
-
 subroutine Body_dynamics_output
 !------------------------
 ! Modules

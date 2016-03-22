@@ -56,7 +56,9 @@ character(100),external :: lcase, GetToken
 !------------------------
 ! Statements
 !------------------------
-! In case of restart, input data are not read
+! In case of restart, this input file section is read just once (not twice as 
+! for regular runs). restart=.false. during the first reading of the main input
+! file, even for restarted simulations.
 if (restart) then
    do while (TRIM(lcase(ainp))/="##### end domain #####")
       call ReadRiga(ainp,comment,nrighe,ioerr,ninp)

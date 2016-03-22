@@ -18,12 +18,10 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
 !----------------------------------------------------------------------------------------------------------------------------------
 ! Program unit: ReadInputControlPoints                     
 ! Description: Reading monitoring points.                      
 !----------------------------------------------------------------------------------------------------------------------------------
-
 subroutine ReadInputControlPoints(NumberEntities,Control_Points,ainp,comment,  &
                                   nrighe,ier,ninp,nout)
 !------------------------

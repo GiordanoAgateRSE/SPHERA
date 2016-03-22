@@ -77,8 +77,8 @@ n_particles = 0
 write(nomefile_Q_sections,"(a,a,i8.8,a)") nomecaso(1:len_trim(nomecaso)),      &
    '_Q_sections_',it_corrente,".txt"
 open(ncpt,file=nomefile_Q_sections,status="unknown",form="formatted")
-if (it_corrente==1) then
-! First step
+if (.not.(allocated(Q_sections%section(1)%flow_rate))) then
+! First step in any case (standard or restart execution)
    write (ncpt,*) "Flow rate values(m^3/s) "
    write (ncpt,'((7x,a),(4x,a),(5x,a),(6x,a),(5x,a),(3x,a),(5x,a),6(5x,a))')   &
       " Time(s)"," ID_section","fluid_type"," Q(m^3/s)"," Area(m^2)",          &

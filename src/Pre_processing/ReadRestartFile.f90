@@ -18,12 +18,10 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
 !----------------------------------------------------------------------------------------------------------------------------------
 ! Program unit: ReadRestartFile
 ! Description: To read the restart file.                       
 !----------------------------------------------------------------------------------------------------------------------------------
-
 subroutine ReadRestartFile(option,ier,nrecords)
 !------------------------
 ! Modules
@@ -90,7 +88,9 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
          ">> Restart reading:  step         time      interval    num.particles"
       save_istart = Domain%istart
       save_start = Domain%start
-      read(nsav,iostat=ioerr) domain
+! Since here, Domain%istart and Domain%start are zeroed, until next reading of 
+! the main input file.
+      read(nsav,iostat=ioerr) Domain
       if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"domain",nsav,nout)) return
       read(nsav,iostat=ioerr) grid
       if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"grid",nsav,nout)) return
@@ -156,9 +156,39 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
             if (it_start<save_istart) then
                read(nsav,iostat=ioerr) 
                if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"...",nsav,nout))    &
-                  return
+                  return  
+               if (restartcode==1) then                 
+                  if (allocated(pg_w)) then
+                     read(nsav,iostat=ioerr) 
+                     if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"pg_w",        &
+                        nsav,nout)) return
+                  endif
+                  if (n_bodies>0) then
+                     do i=1,n_bodies
+                        read(nsav,iostat=ioerr) 
+                     enddo
+                     if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,               &
+                              "body_arr",nsav,nout)) return
+                     read(nsav,iostat=ioerr) 
+                     if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"bp_arr",      &
+                              nsav,nout)) return
+                     read(nsav,iostat=ioerr) 
+                     if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,               &
+                              "surf_body_part",nsav,nout)) return
+                  endif
+                  if (allocated(Z_fluid_max)) then
+                     read(nsav,iostat=ioerr)
+                     if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,               &
+                        "Z_fluid_max",nsav,nout)) return
+                  endif
+                  if (allocated(q_max)) then
+                     read(nsav,iostat=ioerr) 
+                     if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"q_max",       &
+                        nsav,nout)) return
+                  endif  
+               endif              
                else
-! Reading for restart
+! Actual array reading for restart
                   if (restartcode==1) then
                      read(nsav,iostat=ioerr) pg(1:nag)
                      if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"pg",nsav,     &
@@ -244,12 +274,42 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
                   "it_start,tempo,dt,nag,ncord,restartcode",nsav,nout)) return
                write(nout,"(16x,i10,2(2x,g12.5),7x,i10)") it_start,tempo,dt,nag
                flush(nout)
-               if (tempo<Domain%start) then
+               if (tempo<save_start) then
                   read(nsav,iostat=ioerr) 
                   if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"...",nsav,nout)) &
                      return
+                  if (restartcode==1) then
+                     if (allocated(pg_w)) then
+                        read(nsav,iostat=ioerr) 
+                        if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"pg_w",     &
+                           nsav,nout)) return
+                     endif
+                     if (n_bodies>0) then
+                        do i=1,n_bodies
+                           read(nsav,iostat=ioerr) 
+                        enddo
+                        if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,            &
+                                 "body_arr",nsav,nout)) return
+                        read(nsav,iostat=ioerr) 
+                        if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"bp_arr",   &
+                                 nsav,nout)) return
+                        read(nsav,iostat=ioerr) 
+                        if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,            &
+                                 "surf_body_part",nsav,nout)) return
+                     endif
+                     if (allocated(Z_fluid_max)) then
+                        read(nsav,iostat=ioerr)
+                        if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,            &
+                           "Z_fluid_max",nsav,nout)) return
+                     endif
+                     if (allocated(q_max)) then
+                        read(nsav,iostat=ioerr) 
+                        if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"q_max",    &
+                           nsav,nout)) return
+                     endif
+                  endif 
                   else
-! Reading for restart
+! Actual array reading for restart
                      if (restartcode==1) then
                         read(nsav,iostat=ioerr) pg(1:nag)
                         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"pg",nsav,  &
@@ -326,7 +386,7 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
                   return
                endif
             enddo
-            write(nscr,'(a,i10,a)') "   Restart Time Step:",Domain%start,      &
+            write(nscr,'(a,i10,a)') "   Restart Time Step:",save_start,        &
                " has not been found"
             ier = 3
             else

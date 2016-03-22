@@ -18,12 +18,10 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
 !----------------------------------------------------------------------------------------------------------------------------------
 ! Program unit: ReadInputRestart                           
 ! Description: Description: To read the restart parameters from the main input file.                        
 !----------------------------------------------------------------------------------------------------------------------------------
-
 subroutine ReadInputRestart(ainp,comment,nrighe,ier,ninp,nout)
 !------------------------
 ! Modules

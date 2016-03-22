@@ -18,7 +18,6 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
 !----------------------------------------------------------------------------------------------------------------------------------
 ! Program unit: Loop_Irre_2D         
 ! Description: 2D main algorithm.                    
@@ -390,6 +389,7 @@ done_flag = .false.
          endif
       enddo
 !$omp end parallel do
+
       if (n_bodies>0) then
          call start_and_stop(3,6)
          call start_and_stop(2,19)

@@ -18,12 +18,10 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
 !----------------------------------------------------------------------------------------------------------------------------------
 ! Program unit: ReadInputControlSections                      
 ! Description: Reading control sections (not valid for the flow rate)                       
 !----------------------------------------------------------------------------------------------------------------------------------
-
 subroutine ReadInputControlSections(NumberEntities,Control_Sections,ainp,      &
                                     comment,nrighe,ier,ninp,nout)
 !------------------------

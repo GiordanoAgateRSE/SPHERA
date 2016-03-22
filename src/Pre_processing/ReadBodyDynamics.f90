@@ -18,12 +18,10 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
 !----------------------------------------------------------------------------------------------------------------------------------
 ! Program unit: ReadBodyDynamics                    
 ! Description: Reading input data for body trasnport in fluid flows (Amicarelli et al., 2015, CAF).                  
 !----------------------------------------------------------------------------------------------------------------------------------
-
 subroutine ReadBodyDynamics (ainp,comment,nrighe,ier,ninp,nout)
 !------------------------
 ! Modules
@@ -57,17 +55,6 @@ logical,external :: ReadCheck
 !------------------------
 ! Statements
 !------------------------
-! In case of restart, input file sections are read just once (not twice as for
-! regular runs). restart=.false. during the first reading of the main input
-! file, even for restarted simulations.
-if (restart) then
-   do while (TRIM(lcase(ainp)) /= "##### end body dynamics #####")
-      call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
-      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"BODY DYNAMICS DATA",ninp,nout))&
-         return
-   enddo
-   return
-endif
 call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
 if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"BODY DYNAMICS DATA",ninp,nout))      &
    return

@@ -18,12 +18,10 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
 !----------------------------------------------------------------------------------------------------------------------------------
 ! Program unit: ReadInputGeneralPhysical                          
 ! Description:                        
 !----------------------------------------------------------------------------------------------------------------------------------
-
 subroutine ReadInputGeneralPhysical(NumberEntities,ainp,comment,nrighe,ier,ninp,nout)
 !------------------------
 ! Modules
@@ -55,15 +53,6 @@ logical,external :: ReadCheck
 !------------------------
 ! Statements
 !------------------------
-! In case of restart, input data are not read
-if (restart) then
-   do while (TRIM(lcase(ainp))/="##### end general physical properties #####")
-      call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                                &
-         "GENERAL PHYSICAL PROPERTIES DATA",ninp,nout)) return
-   enddo
-   return
-endif
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"GENERAL PHYSICAL PROPERTIES DATA",   &
    ninp,nout)) return

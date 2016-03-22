@@ -18,12 +18,10 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
 !----------------------------------------------------------------------------------------------------------------------------------
 ! Program unit: ReadInputParticlesData                          
 ! Description:                        
 !----------------------------------------------------------------------------------------------------------------------------------
-
 subroutine ReadInputParticlesData(NumberEntities,Medium,icolor,bends,move,slip,&
                                   npointv,valuev,values3,pressu,valp,ainp,     &
                                   comment,nrighe,ier,ninp,nout)
