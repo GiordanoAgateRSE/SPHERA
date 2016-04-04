@@ -187,7 +187,7 @@ type TyParticle
    double precision :: Gamma_slope ! Transversal slope angle of the fixed bed
                                    ! (along the direction transversal to the 
                                    ! mean flow; bed-load transport)
-   double precision :: sigma_prime ! Effective normal stress
+   double precision :: sigma_prime_m ! Mean of the effective normal stresses
    double precision :: u_star ! Friction velocity representative of the
                               ! Surface Neutral Boundary Layer 
    double precision :: C_L ! Lift coefficient for 3D erosion criterion
@@ -198,7 +198,6 @@ type TyParticle
    double precision :: k_BetaGamma ! Ratio between 3D critical shear stress
                                    ! (Shields-Seminara) and analogous 2D 
                                    ! criterion (tauc/tauc,00) 
-   double precision :: Bn ! Bingham number   
    double precision :: normal_int(3) ! Normal of the interface between the
                                      ! bed-oad transport layer and the pure 
                                      ! fluid (pointing outward the main 
@@ -601,12 +600,6 @@ type TyGranular_flows_options
    integer(4)       :: erosion_flag ! Erosion_flag: 0(activated far from 
                                     ! fronts); 1(not activated), 
                                     ! 2(activated everywhere)
-   integer(4)       :: viscosity_blt_formula ! Formula
-                                             ! for viscosity in the bed-load
-                                             ! transport region 
-                                             ! (1:Chauchat-Medale 2010 CMAME; 
-                                             ! 2:Chezy-like; 3:diluted 
-                                             ! viscosity)
    integer(4)       :: deposition_at_frontiers ! Forced deposition at frontiers
                                                ! (erosion criterion=2): yes(1)
                                                ! or no(2) 
@@ -619,9 +612,6 @@ type TyGranular_flows_options
                                           ! speed-up a simulation 
    double precision :: dt_out ! Writing time step for the interface monitoring
                               ! lines
-   double precision :: Chezy_friction_coeff ! Chezy's friction coefficient 
-                                            ! (in case of Chezy-like viscosity
-                                            ! formula)
    double precision :: x_min_dt ! x_min to involve SPH mixture particles in dt
                                 ! estimation
    double precision :: x_max_dt ! x_max to involve SPH mixture particles in dt 

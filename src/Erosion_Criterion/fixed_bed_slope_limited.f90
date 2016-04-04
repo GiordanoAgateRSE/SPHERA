@@ -68,7 +68,7 @@ if (ind_interfaces(igridi,jgridi,4)>0) then
          pg(npi)%state = "sol"   
          pg(npi)%vel = 0.d0
          pg(npi)%var = 0.d0
-         pg(npi)%sigma_prime = 0.0d0  
+         pg(npi)%sigma_prime_m = 0.0d0  
       endif
       if (pg(npi)%indneighliqsol.ne.0) then
          aux_ID = pg(npi)%indneighliqsol

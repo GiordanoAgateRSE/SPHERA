@@ -35,10 +35,10 @@ use Dynamic_allocation_module
 implicit none
 integer(4) :: nrighe,ier,ninp,nout,nscr,ioerr,ID_erosion_criterion
 integer(4) :: ID_main_fluid,ID_granular,monitoring_lines,i,line_ID
-integer(4) :: n_max_iterations,erosion_flag,viscosity_blt_formula
+integer(4) :: n_max_iterations,erosion_flag
 integer(4) :: deposition_at_frontiers,Gamma_slope_flag
 double precision :: dt_out,x_fixed,y_fixed,conv_crit_erosion,velocity_fixed_bed
-double precision :: Chezy_friction_coeff,x_min_dt,x_max_dt,y_min_dt,y_max_dt
+double precision :: x_min_dt,x_max_dt,y_min_dt,y_max_dt
 double precision :: z_min_dt,z_max_dt,t_q0,t_liq
 character(1) :: comment
 character(100) :: ainp,lcase
@@ -69,19 +69,14 @@ do while (TRIM(lcase(ainp)) /= "##### end bed load transport #####")
       if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                                &
          "VELOCITY FIXED BED, EROSION FLAG",ninp,nout)) return
       call ReadRiga (ainp,comment,nrighe,ioerr,ninp)   
-      read(ainp,*,iostat=ioerr) viscosity_blt_formula,deposition_at_frontiers, &
-         Gamma_slope_flag
-      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"VISCOSITY BLT FORMULA",ninp,   &
+      read(ainp,*,iostat=ioerr) deposition_at_frontiers,Gamma_slope_flag
+      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"OTHER EROSION PARAMETERS",ninp,&
          nout)) return
       call ReadRiga (ainp,comment,nrighe,ioerr,ninp)   
       read(ainp,*,iostat=ioerr) monitoring_lines,dt_out,conv_crit_erosion,     &
          n_max_iterations
       if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                                &
          "BED LOAD TRANSPORT MONITORING LINES",ninp,nout)) return
-      call ReadRiga (ainp,comment,nrighe,ioerr,ninp)   
-      read(ainp,*,iostat=ioerr) Chezy_friction_coeff
-      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"CHEZY FRICTION COEFFICIENT",   &
-         ninp,nout)) return 
       call ReadRiga (ainp,comment,nrighe,ioerr,ninp)   
       read(ainp,*,iostat=ioerr) x_min_dt,x_max_dt
       if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"X_MIN_DT,X_MAX_DT",ninp,nout)) &
@@ -123,8 +118,6 @@ do while (TRIM(lcase(ainp)) /= "##### end bed load transport #####")
             velocity_fixed_bed    
          write(nout,"(1x,a,1p,i12)") "erosion_flag:.................",         &
             erosion_flag
-         write(nout,"(1x,a,1p,i12)") "viscosity_blt_formula:........",         &
-            viscosity_blt_formula
          write(nout,"(1x,a,1p,i12)") "deposition_at_frontiers:......",         &
             deposition_at_frontiers
          write(nout,"(1x,a,1p,i12)") "deposition_at_frontiers:......",         &
@@ -137,25 +130,14 @@ do while (TRIM(lcase(ainp)) /= "##### end bed load transport #####")
             conv_crit_erosion
          write(nout,"(1x,a,1p,i12)") "n_max_iterations:.............",         &
             n_max_iterations   
-         if (viscosity_blt_formula==2) then
-            write(nout,"(1x,a,1p,g12.5)") "Chezy_friction_coeff:.........",    &
-               Chezy_friction_coeff
-            write(nout,"(1x,a,1p,g12.5)") "x_min_dt:.....................",    &
-               x_min_dt
-            write(nout,"(1x,a,1p,g12.5)") "x_max_dt:.....................",    &
-               x_max_dt
-            write(nout,"(1x,a,1p,g12.5)") "y_min_dt:.....................",    &
-               y_min_dt
-            write(nout,"(1x,a,1p,g12.5)") "y_max_dt:.....................",    &
-               y_max_dt
-            write(nout,"(1x,a,1p,g12.5)") "z_min_dt:.....................",    &
-               z_min_dt
-            write(nout,"(1x,a,1p,g12.5)") "z_max_dt:.....................",    &
-               z_max_dt
-            write(nout,"(1x,a,1p,g12.5)") "t_q0:.........................",t_q0
-            write(nout,"(1x,a,1p,g12.5)") "t_liq:.........................",   &
-               t_liq               
-         endif
+         write(nout,"(1x,a,1p,g12.5)") "x_min_dt:.....................",x_min_dt
+         write(nout,"(1x,a,1p,g12.5)") "x_max_dt:.....................",x_max_dt
+         write(nout,"(1x,a,1p,g12.5)") "y_min_dt:.....................",y_min_dt
+         write(nout,"(1x,a,1p,g12.5)") "y_max_dt:.....................",y_max_dt
+         write(nout,"(1x,a,1p,g12.5)") "z_min_dt:.....................",z_min_dt
+         write(nout,"(1x,a,1p,g12.5)") "z_max_dt:.....................",z_max_dt
+         write(nout,"(1x,a,1p,g12.5)") "t_q0:.........................",t_q0
+         write(nout,"(1x,a,1p,g12.5)") "t_liq:.........................",t_liq               
          write(nout,"(1x,a)")  " "
       endif
    endif
@@ -166,17 +148,11 @@ do while (TRIM(lcase(ainp)) /= "##### end bed load transport #####")
       Granular_flows_options%ID_granular = ID_granular
       Granular_flows_options%velocity_fixed_bed = velocity_fixed_bed
       Granular_flows_options%erosion_flag = erosion_flag
-      Granular_flows_options%viscosity_blt_formula = viscosity_blt_formula
       Granular_flows_options%deposition_at_frontiers = deposition_at_frontiers
       Granular_flows_options%Gamma_slope_flag = Gamma_slope_flag     
       Granular_flows_options%monitoring_lines = monitoring_lines 
       Granular_flows_options%dt_out = dt_out 
       Granular_flows_options%conv_crit_erosion = conv_crit_erosion
-      if (viscosity_blt_formula==2) then
-         Granular_flows_options%Chezy_friction_coeff = Chezy_friction_coeff  
-         else
-            Granular_flows_options%Chezy_friction_coeff = 0.d0
-      endif
       Granular_flows_options%n_max_iterations = n_max_iterations
       Granular_flows_options%x_min_dt = x_min_dt
       Granular_flows_options%x_max_dt = x_max_dt

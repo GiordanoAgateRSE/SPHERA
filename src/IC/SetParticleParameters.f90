@@ -99,7 +99,7 @@ if (Granular_flows_options%ID_erosion_criterion==1) then
       pg(npi)%visc = Med(Granular_flows_options%ID_main_fluid)%visc
    endif
    call initialization_fixed_granular_particle(npi)
-   pg(npi)%sigma_prime = 0.0d0
+   pg(npi)%sigma_prime_m = 0.0d0
 endif
 ! Particle status, depending on the velocity components (fluid or solid).
 if ((index(Med(Mate)%tipo,"liquid")>0).or.                                     &

@@ -192,7 +192,7 @@ do while (TRIM(lcase(ainp))/="##### end medium #####")
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"EXPLOSION COEFF",ninp,      &
             nout)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         read(ainp,*,iostat=ioerr) cons, viscmx
+         read(ainp,*,iostat=ioerr) cons,viscmx
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"CONSISTENCY & VISCO MAX",   &
             ninp,nout)) return            
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
@@ -226,23 +226,19 @@ do while (TRIM(lcase(ainp))/="##### end medium #####")
          read(ainp,*,iostat=ioerr) gamma,InitialIntEn
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"EXPLOSION COEFF",ninp,      &
             nout)) return
+         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+         read(ainp,*,iostat=ioerr) phi
+         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"PHI",ninp,nout)) return
+         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+         read(ainp,*,iostat=ioerr) coes,viscmx,visc
+         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                             &
+            "COHESION, VISCO MAX & VISCO",ninp,nout)) return            
          if (Granular_flows_options%ID_erosion_criterion==1) then
-            call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-            read(ainp,*,iostat=ioerr) phi
-            if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"PHI",ninp,nout)) return
             call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
             read(ainp,*,iostat=ioerr) porosity,D50,d_90
             if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                          &
                "POROSITY, D50 and D_90",ninp,nout)) return
             else
-               call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-               read(ainp,*,iostat=ioerr) coes, viscmx, visc
-               if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                       &
-                  "COHESION, VISCO MAX & VISCO",ninp,nout)) return            
-               call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-               read(ainp,*,iostat=ioerr) phi
-               if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"PHI",ninp,nout))      &
-                  return
                call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
                token = lcase(GetToken(ainp,1,ioerr))
                read(token,*,iostat=ioerr) Rough

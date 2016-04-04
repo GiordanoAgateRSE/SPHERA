@@ -18,14 +18,12 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
 !----------------------------------------------------------------------------------------------------------------------------------
 ! Program unit: rundt2                                          
 ! Description: Time step computation according to stability constraints (inertia terms, visosity term, interface diffusion -not 
 !              recommended-). Plus. a special treatment for Monaghan artificial viscosity term and management of low-velocity 
 !              SPH mixture particles for bed-laod transport phenomena.
 !----------------------------------------------------------------------------------------------------------------------------------
-
 subroutine rundt2
 !------------------------
 ! Modules

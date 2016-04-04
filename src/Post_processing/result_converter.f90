@@ -390,13 +390,14 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
       write(unitvtk,'(a)') '      </DataArray>'
    endif
    if (Granular_flows_options%ID_erosion_criterion>=1) then
-! sigma_prime
-      write(unitvtk,'(a)') '      <DataArray type="Float32" Name="sigma_prime" format="ascii" >'
+! sigma_prime_m
+      write(unitvtk,'(a)') '      <DataArray type="Float32" Name="sigma_prime_m" format="ascii" >'
       do i=1,numpoints,16
          k1 = i
          k2 = k1 + 15
          if (k2>numpoints) k2 = numpoints
-         write(unitvtk,'(8x,16(1x,e12.5))') (pg(finger(k))%sigma_prime,k=k1,k2)
+         write(unitvtk,'(8x,16(1x,e12.5))')                                    &
+            (pg(finger(k))%sigma_prime_m,k=k1,k2)
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
 ! sec_inv
@@ -429,18 +430,6 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
          write(unitvtk,'(8x,16(1x,e12.5))') (pg(finger(k))%coord(3),k=k1,k2)
       enddo
       write(unitvtk,'(a)') '      </DataArray>' 
-! Bingham number
-      if (Granular_flows_options%viscosity_blt_formula==4) then
-         write(unitvtk,'(a)')                                                  &
-            '      <DataArray type="Float32" Name="Bn" format="ascii" >'
-         do i=1,numpoints,16
-            k1 = i
-            k2 = k1 + 15
-            if (k2>numpoints) k2 = numpoints
-            write(unitvtk,'(8x,16(1x,e12.5))') (pg(finger(k))%Bn,k=k1,k2)
-         enddo  
-         write(unitvtk,'(a)') '      </DataArray>'
-      endif
       if (Granular_flows_options%erosion_flag.ne.1) then    
 ! Beta
          write(unitvtk,'(a)')                                                  &

@@ -274,11 +274,8 @@ velocity_fixed_bed erosion_flag     ! velocity_fixed_bed(velocity threshold
                                     ! detect the fixed bed); erosion_flag=0
                                     ! (activated far from fronts); 1(inactive),
                                     ! 2(active everywhere)
-viscosity_blt_formula deposition_at_frontiers Gamma_slope_flag
-                                    ! viscosity_blt_formula(in the bed-load 
-                                    ! transport layer)=1(Chauchat-Médale 2010 
-                                    ! CMAME),2(Chezy-like),3(diluted viscosity),
-                                    ! 4(lambda(Bn));deposition_at_frontiers=1
+deposition_at_frontiers Gamma_slope_flag
+                                    ! deposition_at_frontiers=1
                                     ! (imposed),0(not imposed); Gamma_slope_flag
                                     ! =1(Gamma slope angle computed),0(null)
 n_monitor_lines dt_out erosion_convergence_criterion n_max_iterations
@@ -289,7 +286,6 @@ n_monitor_lines dt_out erosion_convergence_criterion n_max_iterations
                                     ! criterion); n_max_iterations(maximum 
                                     ! number of iterations for the erosion 
                                     ! criterion)
-Chezy_friction_coefficient          ! Chezy_friction_coefficient(default=0.005)
 x_min_dt x_max_dt
 y_min_dt y_max_dt
 z_min_dt z_max_dt                   ! Vertices of the parallelepiped, within 
@@ -325,18 +321,20 @@ dynamic_viscosity                   !
 roughness_coefficient               ! null recommended value (i.e. inactive 
                                     ! parameter)
 ! If (fluid_type==liquid): end
+! If (fluid_type==granular): start
+phi                                 ! phi(internal friction angle in degrees, 
+                                    ! even if the code works in radians)
+
+cohesion viscosity_max tuned_viscosity
+                                    ! cohesion (draft parameter); viscosity_max 
+                                    ! (threshold for dynamic viscosity), tuned_
+                                    ! dynamic viscosity (only for Manenti et 
+                                    ! al., 2012) 
+! If (fluid_type==granular): end
 ! if ((fluid_type==granular).and.(erosion_criterion_ID==1)): start
-delta                               ! delta(internal friction angle in degrees, 
-                                    ! even if the code works in radians)       
 effective_porosity d_50 d_90        !
 ! if ((fluid_type==granular).and.(erosion_criterion_ID==1)): end
 ! if ((fluid_type==granular).and.(erosion_criterion_ID>1)): start
-! Alternative to the reference blt scheme
-cohesion viscosity_max tuned_viscosity
-                                    ! cohesion; viscosity_max,tuned_viscosity (
-                                    ! tuning parameters for viscosity) 
-delta                               ! delta(internal friction angle in degrees, 
-                                    ! even if the code works in radians)                                        
 roughness_coefficient d_50 erosion_model
                                     ! roughness_coefficient; d_50; erosion_model
                                     ! =shields,mohr
