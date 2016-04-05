@@ -18,7 +18,6 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
 !----------------------------------------------------------------------------------------------------------------------------------
 ! Program unit: Shields 
 ! Description: 3D erosion criterion based on the formulation of both Shields-van Rijn 2D criterion and Seminara et al.(2002) 
@@ -449,7 +448,7 @@ if (Granular_flows_options%ID_erosion_criterion==1) then
 ! 2D critical Shields parameter, according to Zhang (2006).
       Taubcr = Taubcror * Kbeta * Kgamma
 endif
-if (Taubcr.ne.0.d0) then
+if (Taubcr>1.d-9) then
     pg(npi)%tau_tauc = Taub / Taubcr
     if (pg(npi)%tau_tauc>99999.d0) pg(npi)%tau_tauc = 99999.d0
     else

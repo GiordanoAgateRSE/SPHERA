@@ -37,7 +37,7 @@ use I_O_file_module
 !------------------------
 implicit none
 integer(4) :: npi,i_cell,i_aux,i_grid,j_grid,k_grid
-double precision :: z_int,K_0 
+double precision :: z_int,K_0,mu_main_fluid,eps_liquid 
 integer(4),external :: ParticleCellNumber,CellIndices 
 !------------------------
 ! Explicit interfaces
@@ -48,13 +48,18 @@ integer(4),external :: ParticleCellNumber,CellIndices
 !------------------------
 ! Initializations
 !------------------------
+mu_main_fluid = Med(Granular_flows_options%ID_main_fluid)%visc *               &
+                Med(Granular_flows_options%ID_main_fluid)%den0
 !------------------------
 ! Statements
 !------------------------
 !$omp parallel do default(none) shared(nag,Med,pg)                             &
-!$omp shared(Granular_flows_options,Domain,ind_interfaces,tempo,K_0)           &                                                        &
-!$omp private(npi,i_cell,i_aux,i_grid,j_grid,k_grid,z_int)
+!$omp shared(Granular_flows_options,Domain,ind_interfaces,tempo)               &
+!$omp shared(K_0,mu_main_fluid)                                                &
+!$omp private(npi,i_cell,i_aux,i_grid,j_grid,k_grid,z_int,eps_liquid)
 do npi=1,nag
+! volume fraction of the liquid phase
+   eps_liquid = 1.d0 - Med(Granular_flows_options%ID_granular)%gran_vol_frac_max
    if ((Med(pg(npi)%imed)%tipo=="granular").and.(pg(npi)%state=="flu")) then
       i_cell = ParticleCellNumber(pg(npi)%coord) 
       i_aux = CellIndices(i_cell,i_grid,j_grid,k_grid)
@@ -69,6 +74,7 @@ do npi=1,nag
             pg(npi)%sigma_prime_m = ( - Domain%grav(3)) *                      &
                Med(Granular_flows_options%ID_granular)%den0 * (z_int -         &
                pg(npi)%coord(3))
+            eps_liquid = 0.d0   
          endif  
             else
 ! This case (probably) never occurs
@@ -97,8 +103,9 @@ do npi=1,nag
       if (pg(npi)%secinv>1.d-9) then 
          pg(npi)%mu = pg(npi)%sigma_prime_m * dsin(                            &
                       Med(Granular_flows_options%ID_granular)%phi) / (2.d0 *   &
-                      pg(npi)%secinv)
+                      pg(npi)%secinv) + mu_main_fluid * eps_liquid                 
          else
+! Fictitoius value representative of perfect uniform flow conditions
             pg(npi)%mu = 0.d0       
       endif
 ! To save computational time in the transition zone of elastic-platic regime
