@@ -18,11 +18,10 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: Loop_Irre_3D         
 ! Description: 3D main algorithm.                    
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 subroutine Loop_Irre_3D
 !------------------------
 ! Modules
@@ -321,10 +320,13 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
 !$omp parallel do default(none)                                                &
 !$omp private(npi,ii,tpres,tdiss,tvisc,ncbf,boundreaction)                     &
 !$omp shared(nag,pg,Domain,BoundaryDataPointer,Ncbf_Max,indarrayFlu,Array_Flu) &
-!$omp shared(it)
+!$omp shared(it,Med,Granular_flows_options)
 ! Loop over particles
       do ii = 1,indarrayFlu
          npi = Array_Flu(ii)
+! The mixture particles, which are temporarily affected by the frictional 
+! viscosity threshold are fixed.
+         if (pg(npi)%mu==Med(Granular_flows_options%ID_granular)%mumx) cycle
          call inter_EqMoto (npi,tpres,tdiss,tvisc)  
 ! Searching for the boundary faces, which are the nearest the npi-th current 
 ! particle

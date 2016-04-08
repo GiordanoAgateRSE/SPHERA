@@ -18,10 +18,10 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: Loop_Irre_2D         
 ! Description: 2D main algorithm.                    
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 subroutine Loop_Irre_2D  
 !------------------------
 ! Modules
@@ -340,9 +340,16 @@ done_flag = .false.
 ! Loop over particles
 !$omp parallel do default(none)                                                &
 !$omp private(npi,ii,tpres,tdiss,tvisc,Ncbs,IntNcbs,BoundReaction)             &
-!$omp shared(nag,Pg,Domain,BoundaryDataPointer,indarrayFlu,Array_Flu,it)
+!$omp shared(nag,Pg,Domain,BoundaryDataPointer,indarrayFlu,Array_Flu,it,Med)   &
+!$omp shared(Granular_flows_options)
       do ii=1,indarrayFlu
          npi = Array_Flu(ii)
+! The mixture particles, which are temporarily affected by the frictional 
+! viscosity threshold are fixed.
+         if (pg(npi)%mu==Med(Granular_flows_options%ID_granular)%mumx) then
+            pg(npi)%acc(:) = zero
+            cycle
+         endif          
          call inter_EqMoto(npi,tpres,tdiss,tvisc)
 ! Searching for the boundary sides, which are the nearest the npi-th current 
 ! particle
@@ -389,7 +396,6 @@ done_flag = .false.
          endif
       enddo
 !$omp end parallel do
-
       if (n_bodies>0) then
          call start_and_stop(3,6)
          call start_and_stop(2,19)

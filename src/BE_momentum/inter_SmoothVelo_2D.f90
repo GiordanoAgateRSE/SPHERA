@@ -18,12 +18,10 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: inter_SmoothVelo_2D 
 ! Description: To calculate a corrective term for velocity.    
-!----------------------------------------------------------------------------------------------------------------------------------
-
+!-------------------------------------------------------------------------------
 subroutine inter_SmoothVelo_2D 
 !------------------------
 ! Modules
@@ -81,9 +79,12 @@ endif
 !$omp shared(nag,Pg,Domain,Med,Tratto,acix,nPartIntorno,NMAXPARTJ,PartIntorno) &
 !$omp shared(PartKernel,BoundaryDataPointer,BoundaryDataTab,BoundarySide)      &
 !$omp shared(indarrayFlu,Array_Flu,esplosione,kernel_fw,unity,dervel_mat)      &
-!$omp shared(unity_vec,n_bodies)
+!$omp shared(unity_vec,n_bodies,Granular_flows_options)
 do ii=1,indarrayFlu
    npi = Array_Flu(ii)
+! The mixture particles, which are temporarily affected by the frictional 
+! viscosity threshold are fixed.
+   if (pg(npi)%mu==Med(Granular_flows_options%ID_granular)%mumx) cycle
    pg(npi)%var = zero
    pg(npi)%Envar = zero
    do contj=1,nPartIntorno(npi)

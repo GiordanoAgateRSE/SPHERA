@@ -109,8 +109,11 @@ do npi=1,nag
             pg(npi)%mu = 0.d0       
       endif
 ! To save computational time in the transition zone of elastic-platic regime
-      if (pg(npi)%mu>Med(Granular_flows_options%ID_granular)%mumx)             &
+      if (pg(npi)%mu>Med(Granular_flows_options%ID_granular)%mumx) then
          pg(npi)%mu = Med(Granular_flows_options%ID_granular)%mumx
+         pg(npi)%vel(:) = 0.d0
+         if (Granular_flows_options%erosion_flag/=1) pg(npi)%state = "sol"
+      endif
 ! Kinematic viscosity is updated
       pg(npi)%visc = pg(npi)%mu / pg(npi)%dens
    endif

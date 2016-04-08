@@ -18,12 +18,13 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: inter_EqMoto
-! Description: Computation of the momentum equation RHS (with DB-SPH boundary treatment scheme, Shepard's coefficient and gravity 
-!              are added at a later stage) and the energy equation RHS (this last equation is not validated).   
-!----------------------------------------------------------------------------------------------------------------------------------
+! Description: Computation of the momentum equation RHS (with DB-SPH boundary 
+!              treatment scheme, Shepard's coefficient and gravity are added at 
+!              a later stage) and the energy equation RHS (this last equation is
+!              not validated).   
+!-------------------------------------------------------------------------------
 subroutine inter_EqMoto(npi,tpres,tdiss,tvisc)
 !------------------------
 ! Modules
