@@ -491,7 +491,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
                   pg(npi)%coord(:) = pg(npi)%coord(:) + dt * pg(npi)%vstart(:)
                   else
 ! Otherwise, the partial smoothed velocity field is integrated in time
-                     pg(npi)%coord(:) = pg(npi)%coord(:) + dt * pg(npi)%var(:)  
+                     pg(npi)%coord(:) = pg(npi)%coord(:) + dt * pg(npi)%vel(:)  
                endif
             enddo
 !$omp end parallel do

@@ -77,10 +77,10 @@ endif
 !$omp shared(dervel_mat,Granular_flows_options)
 do ii=1,indarrayFlu
    npi = Array_Flu(ii)
+   pg(npi)%var = zero
 ! The mixture particles, which are temporarily affected by the frictional 
 ! viscosity threshold are fixed.
    if (pg(npi)%mu==Med(Granular_flows_options%ID_granular)%mumx) cycle
-   pg(npi)%var = zero
    do contj=1,nPartIntorno(npi)
       npartint = (npi - 1)* NMAXPARTJ + contj
       npj = PartIntorno(npartint)

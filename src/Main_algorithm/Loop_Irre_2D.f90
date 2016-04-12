@@ -511,13 +511,13 @@ done_flag = .false.
             do npi=1,nag
                if (pg(npi)%cella==0) cycle
 ! To save the old coordinates
-            pg(npi)%CoordOld(:) = pg(npi)%coord(:)
+               pg(npi)%CoordOld(:) = pg(npi)%coord(:)
                if (pg(npi)%vel_type/="std") then
 ! If the motion type is not "std", velocities are assigned     
                   pg(npi)%coord(:) = pg(npi)%coord(:) + dt * pg(npi)%vstart(:)
                   else
 ! Otherwise, the partial smoothed velocity field is integrated in time
-                     pg(npi)%coord(:) = pg(npi)%coord(:) + dt * pg(npi)%var(:) 
+                     pg(npi)%coord(:) = pg(npi)%coord(:) + dt * pg(npi)%vel(:) 
                endif
             enddo
 !$omp end parallel do
