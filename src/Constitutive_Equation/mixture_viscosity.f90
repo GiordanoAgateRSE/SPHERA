@@ -95,8 +95,9 @@ do npi=1,nag
       endif
 ! Coefficient of lateral earth pressure at rest
       K_0 = 1.d0 - dsin(Med(Granular_flows_options%ID_granular)%phi)
-! Mean of the effective stresses
-      pg(npi)%sigma_prime_m = pg(npi)%sigma_prime_m * (2.d0 * K_0 + 1.d0) / 3.d0
+! Mean of the effective stresses: 
+! respect of Mohr-Coulomb criterion assumption on plane strain
+      pg(npi)%sigma_prime_m = pg(npi)%sigma_prime_m * (K_0 + 1.d0) / 2.d0
 ! secinv=sqrt(I2(e_ij) (secinv is the sqrt of the second inveriant of the 
 ! strain-rate tensor)
 ! Frictional viscosity is the mixture viscosity in the bed-load transport layer

@@ -76,7 +76,7 @@ endif
 !$omp private(ii,npi,contj,npartint,npj,rhoi,rhoj,amassj,dervel,moddervel)     &
 !$omp private(pesoj,Ncbs,IntNcbs,ibdt,ibdp,icbs,IntLocXY,iside,sidestr,strtype)&
 !$omp private(i,sss,nnn,DVGlo,DVLoc,IntWdV,BCLoc,BCGlo)                        &
-!$omp shared(nag,Pg,Domain,Med,Tratto,acix,nPartIntorno,NMAXPARTJ,PartIntorno) &
+!$omp shared(nag,pg,Domain,Med,Tratto,acix,nPartIntorno,NMAXPARTJ,PartIntorno) &
 !$omp shared(PartKernel,BoundaryDataPointer,BoundaryDataTab,BoundarySide)      &
 !$omp shared(indarrayFlu,Array_Flu,esplosione,kernel_fw,unity,dervel_mat)      &
 !$omp shared(unity_vec,n_bodies,Granular_flows_options)
@@ -100,14 +100,14 @@ do ii=1,indarrayFlu
          moddervel = - two * (pg(npi)%vel(1) * pg(npj)%zer(1) + pg(npi)%vel(2) &
                      * pg(npj)%zer(2) + pg(npi)%vel(3) * pg(npj)%zer(3))
          dervel(:) = moddervel * pg(npj)%zer(:) 
-      end if
-      if ( Med(pg(npj)%imed)%den0/=Med(pg(npi)%imed)%den0) cycle
+      endif
+      if (Med(pg(npj)%imed)%den0/=Med(pg(npi)%imed)%den0) cycle
       pesoj = amassj * PartKernel(4,npartint) / rhoj
       unity = unity + pesoj
       pg(npi)%var(:) = pg(npi)%var(:) + dervel(:) * pesoj   
       if (esplosione) pg(npi)%Envar = pg(npi)%Envar + (pg(npj)%IntEn -         &
                                       pg(npi)%IntEn) * pesoj
-   end do
+   enddo
    if (n_bodies>0) then
       pg(npi)%var(:) = pg(npi)%var(:) + dervel_mat(npi,:)
       unity = unity + unity_vec(npi)
@@ -131,28 +131,28 @@ do ii=1,indarrayFlu
                   then
                   pg(npi)%var(:) = zero   
                   exit  
-               end if
+               endif
                do i=1,PLANEDIM
                   sss(i) = BoundarySide(iside)%T(acix(i),1)
                   nnn(i) = BoundarySide(iside)%T(acix(i),3)
                   DVGlo(i) = two * (Tratto(sidestr)%velocity(acix(i)) -        &
                              pg(npi)%vel(acix(i)))
-               end do
+               enddo
                DVLoc(1) = sss(1) * DVGlo(1) + sss(2) * DVGlo(2)
                DVLoc(2) = nnn(1) * DVGlo(1) + nnn(2) * DVGlo(2)
                IntWdV = BoundaryDataTab(ibdp)%BoundaryIntegral(3)
-               if (strtype == 'fixe' .or. strtype == 'tapi') then
+               if ((strtype=='fixe').or.(strtype=='tapi')) then
                   BCLoc(1) = DVLoc(1) * IntWdV * Tratto(sidestr)%ShearCoeff
                   BCLoc(2) = DVLoc(2) * IntWdV
                   BCGlo(1) = sss(1) * BCLoc(1) + nnn(1) * BCLoc(2)
                   BCGlo(2) = sss(2) * BCLoc(1) + nnn(2) * BCLoc(2)
                   pg(npi)%var(1) = pg(npi)%var(1) + BCGlo(1)   
                   pg(npi)%var(3) = pg(npi)%var(3) + BCGlo(2)   
-               end if
-            end do
-         end if
+               endif
+            enddo
+         endif
    endif
-end do
+enddo
 !$omp end parallel do
 !------------------------
 ! Deallocations
