@@ -18,12 +18,12 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: mixture_viscosity 
 ! Description: To compute the frictional viscosity for the bed-load transport 
 !              layer, according to the formulation of Schaeffer (1987) and the 
 !              KTGF in the packing limit.       
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 subroutine mixture_viscosity
 !------------------------
 ! Modules
@@ -37,7 +37,9 @@ use I_O_file_module
 !------------------------
 implicit none
 integer(4) :: npi,i_cell,i_aux,i_grid,j_grid,k_grid
-double precision :: z_int,K_0,mu_main_fluid,eps_liquid 
+double precision :: mu_main_fluid,eps_fluid_blt,p_fluid_blt_top,gamma_fluid
+double precision :: z_blt_top_fluid,Beta_slope_blt_top_mixture
+double precision :: Gamma_slope_blt_top_mixture
 integer(4),external :: ParticleCellNumber,CellIndices 
 !------------------------
 ! Explicit interfaces
@@ -50,40 +52,51 @@ integer(4),external :: ParticleCellNumber,CellIndices
 !------------------------
 mu_main_fluid = Med(Granular_flows_options%ID_main_fluid)%visc *               &
                 Med(Granular_flows_options%ID_main_fluid)%den0
+! Volume fraction of the fluid phase in the bed-load transport layer
+eps_fluid_blt = 1.d0 -                                                         &
+   Med(Granular_flows_options%ID_granular)%gran_vol_frac_max
+! Specific weight of the fluid phase
+gamma_fluid = Med(Granular_flows_options%ID_main_fluid)%den0 * GI
 !------------------------
 ! Statements
 !------------------------
 !$omp parallel do default(none) shared(nag,Med,pg)                             &
-!$omp shared(Granular_flows_options,Domain,ind_interfaces,tempo)               &
-!$omp shared(K_0,mu_main_fluid)                                                &
-!$omp private(npi,i_cell,i_aux,i_grid,j_grid,k_grid,z_int,eps_liquid)
+!$omp shared(Granular_flows_options,ind_interfaces,tempo,mu_main_fluid)        &
+!$omp shared(eps_fluid_blt,gamma_fluid)                                        &
+!$omp private(npi,i_cell,i_aux,i_grid,j_grid,k_grid,p_fluid_blt_top)           &
+!$omp private(z_blt_top_fluid,Beta_slope_blt_top_mixture)                      &
+!$omp private(Gamma_slope_blt_top_mixture) 
 do npi=1,nag
-! volume fraction of the liquid phase
-   eps_liquid = 1.d0 - Med(Granular_flows_options%ID_granular)%gran_vol_frac_max
    if ((Med(pg(npi)%imed)%tipo=="granular").and.(pg(npi)%state=="flu")) then
       i_cell = ParticleCellNumber(pg(npi)%coord) 
       i_aux = CellIndices(i_cell,i_grid,j_grid,k_grid)
-! Vertical effective stress  
-      if (ind_interfaces(i_grid,j_grid,3).ne.0) then                  
-         z_int = pg(ind_interfaces(i_grid,j_grid,3))%coord(3)
-         pg(npi)%sigma_prime_m = ( - Domain%grav(3)) *                         &
-            (Med(Granular_flows_options%ID_granular)%den0 -                    &
-            Med(Granular_flows_options%ID_main_fluid)%den0) *                  &
-            (z_int - pg(npi)%coord(3))
-         if (ind_interfaces(i_grid,j_grid,1)==0) then
-            pg(npi)%sigma_prime_m = ( - Domain%grav(3)) *                      &
-               Med(Granular_flows_options%ID_granular)%den0 * (z_int -         &
-               pg(npi)%coord(3))
-            eps_liquid = 0.d0   
-         endif  
-            else
-! This case (probably) never occurs
-               pg(npi)%sigma_prime_m = pg(npi)%pres *                          &
-                  (Med(Granular_flows_options%ID_granular)%den0 -              &
-                  Med(Granular_flows_options%ID_main_fluid)%den0)              &
-                  / Med(Granular_flows_options%ID_granular)%den0             
-      endif 
-      if (pg(npi)%sigma_prime_m<0.d0) pg(npi)%sigma_prime_m = 0.d0
+! fluid pressure (simplifying assumption: 1D filtration with piezometric lines  
+!    in the bed-load transport layer parallel to the local 3D slope of the 
+!    bed-load transport layer top)
+      if (ind_interfaces(i_grid,j_grid,1)==0) then
+         pg(npi)%pres_fluid = 0.d0
+         else
+            p_fluid_blt_top = pg(ind_interfaces(i_grid,j_grid,2))%pres
+            z_blt_top_fluid = pg(ind_interfaces(i_grid,j_grid,2))%coord(3)
+!AA!!! test start      
+            Beta_slope_blt_top_mixture = 0.d0
+            Gamma_slope_blt_top_mixture = 0.d0
+!      Beta_slope_blt_top_mixture = pg(ind_interfaces(i_grid,j_grid,3))%Beta_slope
+!      Gamma_slope_blt_top_mixture =                                           &
+!         pg(ind_interfaces(i_grid,j_grid,3))%Gamma_slope
+!AA!!! test end
+            pg(npi)%pres_fluid = p_fluid_blt_top + gamma_fluid *               &
+                                 (z_blt_top_fluid - pg(npi)%coord(3)) *        &
+                                 ((dcos(Beta_slope_blt_top_mixture)) ** 2) *   &
+                                 ((dcos(Gamma_slope_blt_top_mixture)) ** 2)
+      endif
+! Mean of the effective stresses as the difference between the total pressure 
+! and the fluid pressure
+! The mean effective stress cannot be negative
+! In the presence of a negative fluid pressure, this is zeroed
+      pg(npi)%sigma_prime_m = max(pg(npi)%pres - max(pg(npi)%pres_fluid,0.d0), &
+                              0.d0) 
+! Liquefaction model
       if (Granular_flows_options%t_liq>=0.000001) then
          if ((tempo>=Granular_flows_options%t_q0).and.                         &
             (tempo<=Granular_flows_options%t_liq).and.                         &
@@ -93,20 +106,15 @@ do npi=1,nag
                                   Granular_flows_options%t_liq) 
          endif
       endif
-! Coefficient of lateral earth pressure at rest
-      K_0 = 1.d0 - dsin(Med(Granular_flows_options%ID_granular)%phi)
-! Mean of the effective stresses: 
-! respect of Mohr-Coulomb criterion assumption on plane strain
-      pg(npi)%sigma_prime_m = pg(npi)%sigma_prime_m * (K_0 + 1.d0) / 2.d0
 ! secinv=sqrt(I2(e_ij) (secinv is the sqrt of the second inveriant of the 
 ! strain-rate tensor)
 ! Frictional viscosity is the mixture viscosity in the bed-load transport layer
       if (pg(npi)%secinv>1.d-9) then 
          pg(npi)%mu = pg(npi)%sigma_prime_m * dsin(                            &
                       Med(Granular_flows_options%ID_granular)%phi) / (2.d0 *   &
-                      pg(npi)%secinv) + mu_main_fluid * eps_liquid                 
+                      pg(npi)%secinv) + mu_main_fluid * eps_fluid_blt                 
          else
-! Fictitoius value representative of perfect uniform flow conditions
+! Fictitious value representative of perfect uniform flow conditions
             pg(npi)%mu = 0.d0       
       endif
 ! To save computational time in the transition zone of elastic-platic regime

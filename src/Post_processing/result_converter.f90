@@ -18,11 +18,11 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: result_converter               
-! Description: Post-processing for .vtu (fluid dynamics parameters) and .vtk (geometry) files for Paraview.        
-!----------------------------------------------------------------------------------------------------------------------------------
+! Description: Post-processing for .vtu (fluid dynamics parameters) and .vtk 
+!              (geometry) files for Paraview.        
+!-------------------------------------------------------------------------------
 subroutine result_converter(str)
 !------------------------
 ! Modules
@@ -398,6 +398,16 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
          if (k2>numpoints) k2 = numpoints
          write(unitvtk,'(8x,16(1x,e12.5))')                                    &
             (pg(finger(k))%sigma_prime_m,k=k1,k2)
+      enddo
+      write(unitvtk,'(a)') '      </DataArray>'
+! pres_fluid
+      write(unitvtk,'(a)') '      <DataArray type="Float32" Name="pres_fluid" format="ascii" >'
+      do i=1,numpoints,16
+         k1 = i
+         k2 = k1 + 15
+         if (k2>numpoints) k2 = numpoints
+         write(unitvtk,'(8x,16(1x,e12.5))')                                    &
+            (pg(finger(k))%pres_fluid,k=k1,k2)
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
 ! sec_inv

@@ -188,6 +188,8 @@ type TyParticle
                                    ! (along the direction transversal to the 
                                    ! mean flow; bed-load transport)
    double precision :: sigma_prime_m ! Mean of the effective normal stresses
+   double precision :: pres_fluid ! Pressure of the fluid phase (bed-load 
+                                  ! transport)
    double precision :: u_star ! Friction velocity representative of the
                               ! Surface Neutral Boundary Layer 
    double precision :: C_L ! Lift coefficient for 3D erosion criterion

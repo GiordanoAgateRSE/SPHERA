@@ -18,11 +18,12 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: CalcVarLength            
-! Description: Neighbouring search (pre-conditioned dynamic vector), relative positions, kernel functions/derivatives, 
-!              Shepard's coefficient, position of the fluid-sediment interfaces along each background grid column.                                             
+! Description: Neighbouring search (pre-conditioned dynamic vector), relative 
+!              positions, kernel functions/derivatives, Shepard's coefficient, 
+!              position of the fluid-sediment interfaces along each background 
+!              grid column.                                             
 !----------------------------------------------------------------------------------------------------------------------------------
 subroutine CalcVarLength
 !------------------------
@@ -261,7 +262,7 @@ loop_nag: do npi=1,nag
 !AA!!! test end
                endif
 ! Searching for the nearest fluid/mixture SPH particle 
-               if (erosione) then
+               if (Granular_flows_options%ID_erosion_criterion>0) then
                   if (Med(pg(npi)%imed)%tipo/=Med(pg(npj)%imed)%tipo) then
                      if ((rijtemp<pg(npi)%rijtempmin(1)).or.                   &
                         ((rijtemp==pg(npi)%rijtempmin(1)).and.                 &
@@ -417,7 +418,7 @@ loop_nag: do npi=1,nag
          enddo loop_krang      
       enddo loop_irang       
    enddo loop_jrang   
-   if (erosione) then
+   if (Granular_flows_options%ID_erosion_criterion>0) then
 ! Free surface detection along the grid column
       if (index(Med(pg(npi)%imed)%tipo,"liquid")>0) then
 !$omp critical (free_surface_detection)
@@ -467,10 +468,10 @@ loop_nag: do npi=1,nag
          pg(npi)%normal_int(:) = pg(npi)%normal_int(:)/normal_int_abs
       endif    
    endif
-   if (erosione) then
+   if (Granular_flows_options%ID_erosion_criterion>0) then
 !$omp critical (interface_definition)  
 ! Update the local position of the upper interface of the bed-load transport 
-! layer
+! layer (mixture side)
       if ((index(Med(pg(npi)%imed)%tipo,"liquid")>0).and.                      &
          (pg(npi)%indneighliqsol.ne.0)) then 
          if (ind_interfaces(igridi,jgridi,3)==0) then
@@ -485,9 +486,8 @@ loop_nag: do npi=1,nag
          endif
       endif        
 ! Update the local position of the upper interface of the bed-load transport 
-! layer (liquid side), only for Shields 2D and Mohr erosion criteria   
-      if ((Granular_flows_options%ID_erosion_criterion.ne.1).and.              &
-         (index(Med(pg(npi)%imed)%tipo,"granular")>0).and.                     &
+! layer (liquid side)   
+      if ((index(Med(pg(npi)%imed)%tipo,"granular")>0).and.                    &
          (pg(npi)%indneighliqsol.ne.0)) then   
          if (ind_interfaces(igridi,jgridi,2)==0) then
             ind_interfaces(igridi,jgridi,2) = pg(npi)%indneighliqsol   

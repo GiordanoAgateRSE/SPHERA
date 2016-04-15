@@ -18,13 +18,13 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: compute_k_BetaGamma
-! Description:  To compute k_BetaGamma=teta_c/teta_c,00. k_BetaGamma is the ratio between Shields critical non-dimensional 
-!               stress for a generic 3D slope (teta_c) and its analogous value defined by Shields diagram (teta_c,00) on flat bed.                
-!----------------------------------------------------------------------------------------------------------------------------------
-
+! Description:  To compute k_BetaGamma=teta_c/teta_c,00. k_BetaGamma is the 
+!               ratio between Shields critical non-dimensional stress for a 
+!               generic 3D slope (teta_c) and its analogous value defined by 
+!               Shields diagram (teta_c,00) on flat bed.                
+!-------------------------------------------------------------------------------
 subroutine compute_k_BetaGamma(npi,npj,DistZmin)
 !------------------------
 ! Modules
@@ -106,8 +106,8 @@ if ((pg(npi)%Beta_slope>=Med(pg(npi)%imed)%Phi).or.                            &
                   if (Re>=1.0e6) then
                      pg(npi)%C_D = 0.2d0
                      else
-                        pg(npi)%C_D = 24.0d0 / Re + (2.6d0*Re / 5.0d0) /       &
-                                      (1.0d0+(Re/5.0d0)**1.52d0) +             &
+                        pg(npi)%C_D = 24.0d0 / Re + (2.6d0 * Re / 5.0d0) /     &
+                                      (1.0d0 + (Re / 5.0d0) ** 1.52d0) +       &
                                       (0.411d0 * (Re / 2.63e5) ** ( - 7.94d0)) &
                                       / (1.0d0 + (Re / 2.63e5) ** ( - 8.0d0))  &
                                       + (Re ** 0.8d0) / 4.61e5

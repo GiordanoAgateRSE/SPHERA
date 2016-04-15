@@ -144,8 +144,17 @@ integer(4),               dimension(:),    allocatable :: OpCount,SpCount
 integer(4),               dimension(:),    allocatable :: EpCount,EpOrdGrid
 ! Array to count fluid particles (but those with status="sol")
 integer(4),               dimension(:),    allocatable :: Array_Flu
-! Arrays 2D to detect the free surface in case of erosion model
-! (store pl_imed, intliq_id, intsol_id) of every column.
+! Arrays 2D to detect the interfaces (bed-load transport):
+! (i_grid_min:i_grid_max,j_grid_min:j_grid_max,1:4),
+! ind_interfaces(i_grid,j_grid,1): free surface particle ID in the grid column 
+!    (i_grid,j_grid)
+! ind_interfaces(i_grid,j_grid,2): liquid particle ID of the "liquid - bedload 
+!    transport layer" interface in the grid column (i_grid,j_grid) (liquid side)
+! ind_interfaces(i_grid,j_grid,3): mixture particle ID of the "liquid - bedload 
+!    transport layer" interface in the grid column (i_grid,j_grid) (mixture 
+!    side)
+! ind_interfaces(i_grid,j_grid,4): mixture particle ID of the "bedload transport
+!    layer - fixed bed" interface in the grid column (i_grid,j_grid)
 integer(4),               dimension(:,:,:),allocatable :: ind_interfaces 
 ! Only in 3D: the 2D arrays of the maximum values of the fluid particle height
 ! (at the nodes of the grid columns) and the specific flow rate. 

@@ -18,16 +18,14 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: fixed_bed_slope_limited
 ! Description: Forced deposition (or no erosion) for particles at least 2h below
 !              the fixed bed (as it is defined in the associated column) during
 !              the same time step: i.e. the maximum slope of the fixed bed is 
 !              2h/2h. This avoids eventual too fast propagation of erosion along
 !              the vertical (erosion is an interface phenomenon).                    
-!----------------------------------------------------------------------------------------------------------------------------------
-
+!-------------------------------------------------------------------------------
 subroutine fixed_bed_slope_limited(npi,igridi,jgridi,test)
 !------------------------
 ! Modules
@@ -68,7 +66,8 @@ if (ind_interfaces(igridi,jgridi,4)>0) then
          pg(npi)%state = "sol"   
          pg(npi)%vel = 0.d0
          pg(npi)%var = 0.d0
-         pg(npi)%sigma_prime_m = 0.0d0  
+         pg(npi)%sigma_prime_m = 0.0d0
+         pg(npi)%pres_fluid = 0.d0  
       endif
       if (pg(npi)%indneighliqsol.ne.0) then
          aux_ID = pg(npi)%indneighliqsol

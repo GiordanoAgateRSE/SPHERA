@@ -18,13 +18,11 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: SetParticleParameters     
 ! Description: Setting initial particle parameters.               
-!----------------------------------------------------------------------------------------------------------------------------------
-
-subroutine SetParticleParameters (npi,Nz,Mate)
+!-------------------------------------------------------------------------------
+subroutine SetParticleParameters(npi,Nz,Mate)
 !------------------------
 ! Modules
 !------------------------ 
@@ -100,6 +98,7 @@ if (Granular_flows_options%ID_erosion_criterion==1) then
    endif
    call initialization_fixed_granular_particle(npi)
    pg(npi)%sigma_prime_m = 0.0d0
+   pg(npi)%pres_fluid = 0.0d0
 endif
 ! Particle status, depending on the velocity components (fluid or solid).
 if ((index(Med(Mate)%tipo,"liquid")>0).or.                                     &
