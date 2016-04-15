@@ -38,8 +38,7 @@ use I_O_file_module
 implicit none
 integer(4) :: npi,i_cell,i_aux,i_grid,j_grid,k_grid
 double precision :: mu_main_fluid,eps_fluid_blt,p_fluid_blt_top,gamma_fluid
-double precision :: z_blt_top_fluid,Beta_slope_blt_top_mixture
-double precision :: Gamma_slope_blt_top_mixture
+double precision :: z_blt_top_fluid,alfa_TBT
 integer(4),external :: ParticleCellNumber,CellIndices 
 !------------------------
 ! Explicit interfaces
@@ -64,13 +63,12 @@ gamma_fluid = Med(Granular_flows_options%ID_main_fluid)%den0 * GI
 !$omp shared(Granular_flows_options,ind_interfaces,tempo,mu_main_fluid)        &
 !$omp shared(eps_fluid_blt,gamma_fluid)                                        &
 !$omp private(npi,i_cell,i_aux,i_grid,j_grid,k_grid,p_fluid_blt_top)           &
-!$omp private(z_blt_top_fluid,Beta_slope_blt_top_mixture)                      &
-!$omp private(Gamma_slope_blt_top_mixture) 
+!$omp private(z_blt_top_fluid,alfa_TBT)
 do npi=1,nag
    if ((Med(pg(npi)%imed)%tipo=="granular").and.(pg(npi)%state=="flu")) then
       i_cell = ParticleCellNumber(pg(npi)%coord) 
       i_aux = CellIndices(i_cell,i_grid,j_grid,k_grid)
-! fluid pressure (simplifying assumption: 1D filtration with piezometric lines  
+! Fluid pressure (simplifying assumption: 1D filtration with piezometric lines  
 !    in the bed-load transport layer parallel to the local 3D slope of the 
 !    bed-load transport layer top)
       if (ind_interfaces(i_grid,j_grid,1)==0) then
@@ -78,17 +76,19 @@ do npi=1,nag
          else
             p_fluid_blt_top = pg(ind_interfaces(i_grid,j_grid,2))%pres
             z_blt_top_fluid = pg(ind_interfaces(i_grid,j_grid,2))%coord(3)
-!AA!!! test start      
-            Beta_slope_blt_top_mixture = 0.d0
-            Gamma_slope_blt_top_mixture = 0.d0
-!      Beta_slope_blt_top_mixture = pg(ind_interfaces(i_grid,j_grid,3))%Beta_slope
-!      Gamma_slope_blt_top_mixture =                                           &
-!         pg(ind_interfaces(i_grid,j_grid,3))%Gamma_slope
-!AA!!! test end
+! "alfa_TBT" means “Topographic angle at the Bed-load transport layer Top” 
+! between the local interface normal (computed on the mixture particle, 
+! which locally defines this interface) and the vertical. The formulation for 
+! the fluid pressure only depends on this angle, no matter abut the flow 
+! direction.
+            alfa_TBT = dacos(                                                  &
+               pg(ind_interfaces(i_grid,j_grid,3))%normal_int_mixture_top(3))
+! The limiter of PI/2 simply allows assigning null fluid pressure in case of 
+! "anti-gravity" slopes (very rare and very local in case of bed-load transport)
+            alfa_TBT = max(alfa_TBT,PIGRECO/2.d0) 
             pg(npi)%pres_fluid = p_fluid_blt_top + gamma_fluid *               &
                                  (z_blt_top_fluid - pg(npi)%coord(3)) *        &
-                                 ((dcos(Beta_slope_blt_top_mixture)) ** 2) *   &
-                                 ((dcos(Gamma_slope_blt_top_mixture)) ** 2)
+                                 ((dcos(alfa_TBT)) ** 2)
       endif
 ! Mean of the effective stresses as the difference between the total pressure 
 ! and the fluid pressure

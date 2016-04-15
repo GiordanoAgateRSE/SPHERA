@@ -18,10 +18,12 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: Hybrid_allocation_module            
-! Description: Module to define derived types of both dynamically and statically allocated variables. (Di Monaco et al., 2011,
-!              EACFM; Manenti et al., 2012; JHE; Amicarelli et al., 2013, IJNME; Amicarelli et al., 2015, CAF)                    
+! Description: Module to define derived types of both dynamically and statically
+!              allocated variables (Di Monaco et al., 2011, EACFM; Manenti et 
+!              al., 2012; JHE; Amicarelli et al., 2013, IJNME; Amicarelli et 
+!              al., 2015, CAF).                    
 !----------------------------------------------------------------------------------------------------------------------------------
 module Hybrid_allocation_module
 use Static_allocation_module
@@ -201,14 +203,20 @@ type TyParticle
                                    ! (Shields-Seminara) and analogous 2D 
                                    ! criterion (tauc/tauc,00) 
    double precision :: normal_int(3) ! Normal of the interface between the
-                                     ! bed-oad transport layer and the pure 
-                                     ! fluid (pointing outward the main 
-                                     ! flow domain)
+                                     ! mobile particles and the fixed particles 
+                                     ! (bed-load transport in the presence of an
+                                     ! erosion criterion); the normal vector 
+                                     ! points intward the mobile domain
+   double precision :: normal_int_mixture_top(3) ! Normal of the interface 
+                                                 ! between the mixture and the 
+                                                 ! pure fluid (top of the 
+                                                 ! bed-load transport layer, 
+                                                 ! mixture side)
    double precision :: vel_old(3) ! Velocity vector before the erosion 
                                   ! criterion (3D erosion criterion)
-   double precision :: normal_int_old(3) ! (fixed bed - mixture) interface
-                                         ! normal before the erosion 
-                                         ! criterion (3D erosion criterion)
+   double precision :: normal_int_old(3) ! normal_int variable before the 
+                                         ! erosion criterion (3D erosion 
+                                         ! criterion)
    double precision :: drho(3) ! Density gradient (SPH pseudo-consistent 
                                ! approximation over fluid particles)
    double precision :: veldif(3) ! Velocity in diffusion model 

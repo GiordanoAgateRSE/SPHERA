@@ -24,7 +24,7 @@
 !              positions, kernel functions/derivatives, Shepard's coefficient, 
 !              position of the fluid-sediment interfaces along each background 
 !              grid column.                                             
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 subroutine CalcVarLength
 !------------------------
 ! Modules
@@ -44,7 +44,7 @@ integer(4) :: irestocell,celleloop,fw,i_grid,j_grid,bp,bp_f,aux2,i
 double precision :: rij_su_h,ke_coef,kacl_coef,rij_su_h_quad,rijtemp,rijtemp2
 double precision :: gradmod,gradmodwacl,wu,denom,normal_int_abs,abs_vel
 double precision :: min_sigma_Gamma,dis_fp_dbsph_inoutlet
-double precision :: dbsph_inoutlet_threshold
+double precision :: dbsph_inoutlet_threshold,normal_int_mixture_top_abs
 double precision :: ragtemp(3)
 integer(4),dimension(:),allocatable :: bounded
 double precision,dimension(:),allocatable :: dShep_old
@@ -89,7 +89,7 @@ endif
 !$omp private(jrang,krang,mm,npj,npartint,ncelj,ragtemp,rijtemp,rijtemp2)      &
 !$omp private(rij_su_h,rij_su_h_quad,denom,index_rij_su_h,gradmod,gradmodwacl) &
 !$omp private(wu,contliq,fw,normal_int_abs,abs_vel,dis_fp_dbsph_inoutlet)      &
-!$omp private(dbsph_inoutlet_threshold)                                        &
+!$omp private(dbsph_inoutlet_threshold,normal_int_mixture_top_abs)             &
 !$omp shared(nag,pg,Domain,Med,Icont,Npartord,NMAXPARTJ,rag,nPartIntorno)      &
 !$omp shared(Partintorno,PartKernel,ke_coef,kacl_coef,Doubleh,DoubleSquareh)   &
 !$omp shared(squareh,nomsub,ncord,eta,eta2,nout,nscr,erosione,ind_interfaces)  &
@@ -127,7 +127,10 @@ loop_nag: do npi=1,nag
          endif      
       enddo
    endif
-   if (erosione) pg(npi)%normal_int(:) = 0.d0
+   if (Granular_flows_options%ID_erosion_criterion>0) then
+      pg(npi)%normal_int(:) = 0.d0
+      pg(npi)%normal_int_mixture_top(:) = 0.d0
+   endif   
    nceli = pg(npi)%cella
    if (nceli==0) cycle
    irestocell = CellIndices (nceli,igridi,jgridi,kgridi)
@@ -261,8 +264,10 @@ loop_nag: do npi=1,nag
 !                  endif
 !AA!!! test end
                endif
+! In case of bed-load transport with an erosion criterion
+               if ((Granular_flows_options%ID_erosion_criterion>0).and.        &
+                  (Granular_flows_options%erosion_flag/=1)) then
 ! Searching for the nearest fluid/mixture SPH particle 
-               if (Granular_flows_options%ID_erosion_criterion>0) then
                   if (Med(pg(npi)%imed)%tipo/=Med(pg(npj)%imed)%tipo) then
                      if ((rijtemp<pg(npi)%rijtempmin(1)).or.                   &
                         ((rijtemp==pg(npi)%rijtempmin(1)).and.                 &
@@ -319,6 +324,18 @@ loop_nag: do npi=1,nag
                         endif
                      endif
                   endif              
+               endif
+! In case of bed-load transport 
+               if (Granular_flows_options%ID_erosion_criterion>0) then
+! To estimate the normal to the mixture top
+                  if (pg(npi)%imed==Granular_flows_options%ID_granular) then
+                     if (pg(npi)%imed/=pg(npj)%imed) then
+                        pg(npi)%normal_int_mixture_top(:) =                    &
+                           pg(npi)%normal_int_mixture_top(:) +                 &
+                           (pg(npj)%coord(:) - pg(npi)%coord(:)) *             &
+                           PartKernel(4,npartint)  
+                     endif
+                  endif
                endif
             enddo loop_mm
 ! Loop over the neighbouring wall particles in the cell
@@ -460,15 +477,30 @@ loop_nag: do npi=1,nag
             endif
       endif                                     
    endif
+! In case of bed-load transport with an erosion criterion
+   if ((Granular_flows_options%ID_erosion_criterion>0).and.                    &
+      (Granular_flows_options%erosion_flag/=1)) then
 ! Normalization of the interface normal between the granular mixture and the 
 ! fixed bed (bed-load transport)
-   if ((erosione).and.(pg(npi)%imed==Granular_flows_options%ID_granular)) then 
-      normal_int_abs = dsqrt(dot_product(pg(npi)%normal_int,pg(npi)%normal_int)) 
-      if (normal_int_abs>zero) then
-         pg(npi)%normal_int(:) = pg(npi)%normal_int(:)/normal_int_abs
+      if (pg(npi)%imed==Granular_flows_options%ID_granular) then 
+         normal_int_abs = dsqrt(dot_product(pg(npi)%normal_int,                &
+                          pg(npi)%normal_int)) 
+         if (normal_int_abs>zero) then
+            pg(npi)%normal_int(:) = pg(npi)%normal_int(:)/normal_int_abs
+         endif
       endif    
    endif
    if (Granular_flows_options%ID_erosion_criterion>0) then
+! Normalization of the mixture top interface 
+      if (pg(npi)%imed==Granular_flows_options%ID_granular) then 
+         normal_int_mixture_top_abs = dsqrt(dot_product(                       &
+            pg(npi)%normal_int_mixture_top,                                    &
+            pg(npi)%normal_int_mixture_top)) 
+         if (normal_int_mixture_top_abs>zero) then
+            pg(npi)%normal_int_mixture_top(:) =                                &
+               pg(npi)%normal_int_mixture_top(:) / normal_int_mixture_top_abs
+         endif    
+      endif
 !$omp critical (interface_definition)  
 ! Update the local position of the upper interface of the bed-load transport 
 ! layer (mixture side)

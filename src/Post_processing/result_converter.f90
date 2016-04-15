@@ -440,6 +440,19 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
          write(unitvtk,'(8x,16(1x,e12.5))') (pg(finger(k))%coord(3),k=k1,k2)
       enddo
       write(unitvtk,'(a)') '      </DataArray>' 
+! normal_int_mixture_top
+      write(unitvtk,'(a)')                                                     &
+'      <DataArray type="Float32" Name="normal_int_mixture_top vector"  NumberOfComponents="3"  format="ascii" >'
+      do i=1,numpoints,6
+         k1 = i
+         k2 = k1 + 5
+         if (k2>numpoints) k2 = numpoints
+         write(unitvtk,'(8x,6(3(1x,e12.5)))') (                                &
+            pg(finger(k))%normal_int_mixture_top(1),                           &
+            pg(finger(k))%normal_int_mixture_top(2),                           &
+            pg(finger(k))%normal_int_mixture_top(3),k=k1,k2)
+      enddo
+      write(unitvtk,'(a)') '      </DataArray>' 
       if (Granular_flows_options%erosion_flag.ne.1) then    
 ! Beta
          write(unitvtk,'(a)')                                                  &
@@ -452,17 +465,6 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
                (pg(finger(k))%Beta_slope,k=k1,k2)
          enddo
          write(unitvtk,'(a)') '      </DataArray>' 
-! normal_int
-         write(unitvtk,'(a)')                                                  &
-'      <DataArray type="Float32" Name="normal_int vector"  NumberOfComponents="3"  format="ascii" >'
-         do i=1,numpoints,6
-            k1 = i
-            k2 = k1 + 5
-            if (k2>numpoints) k2 = numpoints
-            write(unitvtk,'(8x,6(3(1x,e12.5)))') (pg(finger(k))%normal_int(1), &
-               pg(finger(k))%normal_int(2),pg(finger(k))%normal_int(3),k=k1,k2)
-         enddo
-         write(unitvtk,'(a)') '      </DataArray>'
 ! tau_tauc
          write(unitvtk,'(a)')                                                  &
 '      <DataArray type="Float32" Name="tau_tauc" format="ascii" >'
@@ -482,7 +484,18 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
             if (k2>numpoints) k2 = numpoints
             write(unitvtk,'(8x,16(1x,e12.5))') (pg(finger(k))%u_star,k=k1,k2)
          enddo
-         write(unitvtk,'(a)') '      </DataArray>'  
+         write(unitvtk,'(a)') '      </DataArray>'
+! normal_int
+         write(unitvtk,'(a)')                                                  &
+'      <DataArray type="Float32" Name="normal_int vector"  NumberOfComponents="3"  format="ascii" >'
+         do i=1,numpoints,6
+            k1 = i
+            k2 = k1 + 5
+            if (k2>numpoints) k2 = numpoints
+            write(unitvtk,'(8x,6(3(1x,e12.5)))') (pg(finger(k))%normal_int(1), &
+               pg(finger(k))%normal_int(2),pg(finger(k))%normal_int(3),k=k1,k2)
+         enddo
+         write(unitvtk,'(a)') '      </DataArray>'    
          if (Granular_flows_options%ID_erosion_criterion==1) then  
             if (ncord==3) then    
 ! C_D
