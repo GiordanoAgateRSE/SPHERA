@@ -264,9 +264,8 @@ loop_nag: do npi=1,nag
 !                  endif
 !AA!!! test end
                endif
-! In case of bed-load transport with an erosion criterion
-               if ((Granular_flows_options%ID_erosion_criterion>0).and.        &
-                  (Granular_flows_options%erosion_flag/=1)) then
+! In case of bed-load transport with/without any erosion criterion
+               if (Granular_flows_options%ID_erosion_criterion>0) then
 ! Searching for the nearest fluid/mixture SPH particle 
                   if (Med(pg(npi)%imed)%tipo/=Med(pg(npj)%imed)%tipo) then
                      if ((rijtemp<pg(npi)%rijtempmin(1)).or.                   &
@@ -324,9 +323,6 @@ loop_nag: do npi=1,nag
                         endif
                      endif
                   endif              
-               endif
-! In case of bed-load transport 
-               if (Granular_flows_options%ID_erosion_criterion>0) then
 ! To estimate the normal to the mixture top
                   if (pg(npi)%imed==Granular_flows_options%ID_granular) then
                      if (pg(npi)%imed/=pg(npj)%imed) then
@@ -490,6 +486,7 @@ loop_nag: do npi=1,nag
          endif
       endif    
    endif
+! In case of bed-load transport
    if (Granular_flows_options%ID_erosion_criterion>0) then
 ! Normalization of the mixture top interface 
       if (pg(npi)%imed==Granular_flows_options%ID_granular) then 

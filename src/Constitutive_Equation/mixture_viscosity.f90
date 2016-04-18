@@ -85,7 +85,7 @@ do npi=1,nag
                pg(ind_interfaces(i_grid,j_grid,3))%normal_int_mixture_top(3))
 ! The limiter of PI/2 simply allows assigning null fluid pressure in case of 
 ! "anti-gravity" slopes (very rare and very local in case of bed-load transport)
-            alfa_TBT = max(alfa_TBT,PIGRECO/2.d0) 
+            alfa_TBT = min(alfa_TBT,PIGRECO/2.d0) 
             pg(npi)%pres_fluid = p_fluid_blt_top + gamma_fluid *               &
                                  (z_blt_top_fluid - pg(npi)%coord(3)) *        &
                                  ((dcos(alfa_TBT)) ** 2)
@@ -121,7 +121,9 @@ do npi=1,nag
       if (pg(npi)%mu>Med(Granular_flows_options%ID_granular)%mumx) then
          pg(npi)%mu = Med(Granular_flows_options%ID_granular)%mumx
          pg(npi)%vel(:) = 0.d0
-         if (Granular_flows_options%erosion_flag/=1) pg(npi)%state = "sol"
+! No matter about the presence/absence of an erosion criterion, the particles 
+! in the transition zone of elastic-platic regime are set fixed.
+         pg(npi)%state = "sol"
       endif
 ! Kinematic viscosity is updated
       pg(npi)%visc = pg(npi)%mu / pg(npi)%dens
