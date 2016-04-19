@@ -18,12 +18,11 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: RHS_body_dynamics  
-! Description:  To estimate the RHS of the body dynamics equations (Amicarelli et al.,2015,CAF).     
-!----------------------------------------------------------------------------------------------------------------------------------
-
+! Description:  To estimate the RHS of the body dynamics equations (Amicarelli 
+!               et al.,2015,CAF).     
+!-------------------------------------------------------------------------------
 subroutine RHS_body_dynamics
 !------------------------
 ! Modules
@@ -118,14 +117,15 @@ do npi=1,n_body_part
 end do
 ! Loop over the transported bodies (gravity forces and Ic initialization)
 !$omp parallel do default(none) private(i)                                     &
-!$omp shared(n_bodies,body_arr,Domain,it_start,it_corrente,ncord,aux_gravity)
+!$omp shared(n_bodies,body_arr,Domain,it_start,on_going_time_step,ncord)       &
+!$omp shared(aux_gravity)
 do i=1,n_bodies
    if (body_arr(i)%imposed_kinematics==0) then
       aux_gravity(i,:) = body_arr(i)%mass * Domain%grav(:)
       body_arr(i)%Force = 0.d0
       body_arr(i)%Moment = 0.d0
       if ((body_arr(i)%Ic_imposed==0).and.((ncord==3).or.                      &
-         ((it_start+1)==it_corrente)) ) then
+         ((it_start+1)==on_going_time_step)) ) then
          body_arr(i)%Ic = 0.d0
       endif
    endif 
@@ -194,7 +194,7 @@ do npi=1,n_body_part
                   if (r_per<((Domain%dd/dx_dxbodies)/10.d0)) then   
                      write(file_name_test,"(a,a,i8.8,a,i8.8,a,i8.8,a)")        &
                         nomecaso(1:len_trim(nomecaso)),'_close_impact_',       &
-                        it_corrente,'_',npi,'_',npj,".txt"
+                        on_going_time_step,'_',npi,'_',npj,".txt"
                      open (60,file=file_name_test,status="unknown",            &
                         form="formatted")
                      write (60,                                                &
@@ -202,11 +202,12 @@ do npi=1,n_body_part
                        " time"," npi"," npj"," nbi"," nbj"," imp_vel(m/s)",    &
                        " r_per"," k_masses"," Gamma_boun"," r_par",            &
                        " n_x"," n_y"," n_z"
-                     write (60,'((g14.7,1x),4(i14,1x),8(g14.7,1x))') tempo,npi &
-                        ,npj,bp_arr(npi)%body,bp_arr(npj)%body,                &
-                        impact_vel(aux2,bp_arr(npj)%body),r_per,k_masses,      &
-                        Gamma_boun(r_per,Domain%h),r_par,bp_arr(npj)%normal(1),&
-                        bp_arr(npj)%normal(2),bp_arr(npj)%normal(3)
+                     write (60,'((g14.7,1x),4(i14,1x),8(g14.7,1x))')           &
+                        simulation_time,npi,npj,bp_arr(npi)%body,              &
+                        bp_arr(npj)%body,impact_vel(aux2,bp_arr(npj)%body),    &
+                        r_per,k_masses,Gamma_boun(r_per,Domain%h),r_par,       &
+                        bp_arr(npj)%normal(1),bp_arr(npj)%normal(2),           &
+                        bp_arr(npj)%normal(3)
                      close(60)
                   endif
                   Force(bp_arr(npi)%body,bp_arr(npj)%body,:) =                 &
@@ -419,7 +420,7 @@ do npi=1,n_body_part
                body_arr(bp_arr(npi)%body)%Ic(2,3) - bp_arr(npi)%mass *         &
                (bp_arr(npi)%rel_pos(2) * bp_arr(npi)%rel_pos(3)) 
          endif 
-         if ((ncord==2).and.((it_start+1)==it_corrente)) then
+         if ((ncord==2).and.((it_start+1)==on_going_time_step)) then
             body_arr(bp_arr(npi)%body)%Ic(2,2) =                               &
                body_arr(bp_arr(npi)%body)%Ic(2,2) + bp_arr(npi)%mass *         &
                (bp_arr(npi)%rel_pos(1) ** 2 + bp_arr(npi)%rel_pos(3) ** 2)
@@ -431,8 +432,8 @@ enddo
 ! boundary-body impacts; computation of Ic and its inverse)
 ! AA!!!test sub for inter_front
 !$omp parallel do default(none) private(i,j,k_masses,alfa_boun,aux_int)        &
-!$omp shared(n_bodies,body_arr,ncord,it_start,it_corrente,aux,r_per_min,Domain)&
-!$omp shared(Force_mag_sum,Force,Moment,inter_front)
+!$omp shared(n_bodies,body_arr,ncord,it_start,on_going_time_step,aux,r_per_min)&
+!$omp shared(Domain,Force_mag_sum,Force,Moment,inter_front)
 do i=1,n_bodies
    if (body_arr(i)%imposed_kinematics==0) then
 ! Forces and torques/moments
@@ -463,7 +464,7 @@ do i=1,n_bodies
          body_arr(i)%Ic(3,2) = body_arr(i)%Ic(2,3)
          call Matrix_Inversion_3x3(body_arr(i)%Ic,body_arr(i)%Ic_inv,aux_int)
       endif
-      if ((ncord==2).and.((it_start+1)==it_corrente)) then
+      if ((ncord==2).and.((it_start+1)==on_going_time_step)) then
          body_arr(i)%Ic_inv = 0.d0 
          body_arr(i)%Ic_inv(2,2) = 1.d0/body_arr(i)%Ic(2,2)
       endif

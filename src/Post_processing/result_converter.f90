@@ -53,13 +53,13 @@ character(len=10)  :: cargo
 ! Initializations
 !------------------------
 ! .. check for time sampling is active
-curtime = tempo  
+curtime = simulation_time  
 !------------------------
 ! Statements
 !------------------------
 if ((curtime<val_time).and.(index(str,'fine')==0)) return
 ! Rounding current physical time for Paraview .vtu files
-   curtime = tempo - MOD(tempo,abs(freq_time))  
+   curtime = simulation_time - MOD(simulation_time,abs(freq_time))  
    if (nag>0) then
       block = block + 1
       nblocchi = nblocchi + 1

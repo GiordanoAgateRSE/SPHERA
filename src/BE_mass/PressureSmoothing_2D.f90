@@ -18,12 +18,11 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: PressureSmoothing_2D
-! Description: Partial smoothing for pressure (Di Monaco et al., 2011), also with DB-SPH boundary treatment scheme. 
-!----------------------------------------------------------------------------------------------------------------------------------
-
+! Description: Partial smoothing for pressure (Di Monaco et al., 2011), also 
+!              with DB-SPH boundary treatment scheme. 
+!-------------------------------------------------------------------------------
 subroutine PressureSmoothing_2D
 !------------------------
 ! Modules

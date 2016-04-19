@@ -63,7 +63,7 @@ integer(4),external :: ParticleCellNumber, CellIndices, CellNumber
 !$omp private(preidro,pretot,preeff,coeff1,coeff2,mu,mumax,Velocity2)          &
 !$omp shared(ind_interfaces,nomsub,nout,nscr,nag,pg,Med,Domain,Grid,Icont)     &
 !$omp shared(npartord,nPartIntorno,PartIntorno,NMAXPARTJ,diffusione,esplosione)&
-!$omp shared(it_corrente)
+!$omp shared(on_going_time_step)
 do npi = 1,nag
    if ((pg(npi)%cella==0).or.(pg(npi)%vel_type/="std")) cycle
 ! Check motion status and viscosity computation 
@@ -194,7 +194,7 @@ do npi = 1,nag
          end if
       enddo
 ! Search completed                          
-      if ((flag==0).and.(it_corrente>Med(imed)%NIterSol)) then
+      if ((flag==0).and.(on_going_time_step>Med(imed)%NIterSol)) then
          if (pg(npi)%CloseBcOut==0) then
             pg(npi)%state = "sol"
             pg(npi)%vel = zero

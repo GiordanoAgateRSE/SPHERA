@@ -128,7 +128,7 @@ call start_and_stop(3,7)
 call start_and_stop(2,17)
 !$omp parallel do default(none)                                                &
 !$omp private(npi)                                                             &
-!$omp shared(nag,Pg,Domain,dt,ts0_pg,it_corrente)
+!$omp shared(nag,Pg,Domain,dt,ts0_pg)
 ! Time integration for position and density (trajectories and continuity
 !  equation)
 do npi=1,nag
@@ -214,7 +214,7 @@ if (((DBSPH%n_w+DBSPH%n_inlet+DBSPH%n_outlet)>0).and.(Domain%tipo=="bsph")) &
 !$omp parallel do default(none)                                                &
 !$omp private(npi,ii)                                                          &
 !$omp shared(nag,pg,med,dt,indarrayFlu,Array_Flu,Domain,uni_old)               &
-!$omp shared(beta,nPartIntorno_fw,it_corrente,NMedium,DBSPH)
+!$omp shared(beta,nPartIntorno_fw,NMedium,DBSPH)
 ! Time integration of the continuity equation
    do ii=1,indarrayFlu
       npi = Array_Flu(ii)

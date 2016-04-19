@@ -18,12 +18,10 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: Memo_Ctl               
 ! Description: Post-processing for monitoring lines and points.       
-!----------------------------------------------------------------------------------------------------------------------------------
-
+!-------------------------------------------------------------------------------
 subroutine Memo_Ctl
 !------------------------
 ! Modules
@@ -52,7 +50,7 @@ character(255) :: nomefilectl
 !------------------------
 if (Npoints>0) then
    write(nomefilectl,"(a,a,i8.8,a)") nomecaso(1:len_trim(nomecaso)),'_',       &
-      it_corrente,".cpt"
+      on_going_time_step,".cpt"
    open(ncpt,file=nomefilectl,status="unknown",form="formatted")
    write (ncpt,*) "Control points "
    write (ncpt,'(1x,2(a,10x),3(a,8x),3(a,5x),a,7x,a)') " Time","Iter",         &
@@ -64,9 +62,10 @@ if (Npoints>0) then
         write (ncpt,'(a,i10,a,3g14.7)') "control point ",i,                    &
            " is outside. Coord=",Control_Points(i)%coord(:)
         else
-           write (ncpt,'(g14.7,i14,8(1x,g14.7))') tempo,it_corrente            &
-              ,Control_Points(i)%coord(:),Control_Points(i)%vel(:),            &
-              Control_Points(i)%pres,Control_Points(i)%dens
+           write (ncpt,'(g14.7,i14,8(1x,g14.7))') simulation_time,             &
+              on_going_time_step,Control_Points(i)%coord(:),                   &
+              Control_Points(i)%vel(:),Control_Points(i)%pres,                 &
+              Control_Points(i)%dens
      endif
   enddo
   close (ncpt)
@@ -74,7 +73,7 @@ endif
 ! Printing monitoring line data
 if (Nlines>0) then
    write(nomefilectl,"(a,a,i8.8,a)") nomecaso(1:len_trim(nomecaso)),'_',       &
-      it_corrente,".cln"
+      on_going_time_step,".cln"
    open(ncpt,file=nomefilectl,status="unknown",form="formatted")
    write (ncpt,*) "Control lines "
    write (ncpt,'(1x,2(a,10x),3(a,8x),3(a,5x),a,7x,a)') " Time","Iter",         &
@@ -88,9 +87,10 @@ if (Nlines>0) then
            write (ncpt,'(a,i10,a,3(g14.7))') "control point ",j,               &
               " is outside. Coord=",Control_Points(j)%coord(:)
            else
-              write (ncpt,'(g14.7,i14,8(1x,g14.7))') tempo,it_corrente         &
-                 ,Control_Points(j)%coord(:),Control_Points(j)%vel(:),         &
-                 Control_Points(j)%pres,Control_Points(j)%dens
+              write (ncpt,'(g14.7,i14,8(1x,g14.7))') simulation_time,          &
+                 on_going_time_step,Control_Points(j)%coord(:),                &
+                 Control_Points(j)%vel(:),Control_Points(j)%pres,              &
+                 Control_Points(j)%dens
         endif
      enddo
   enddo
@@ -99,7 +99,7 @@ endif
 ! Printing monitoring section data (not for the flow rate)
 if (Nsections>0) then
    write(nomefilectl,"(a,a,i8.8,a)") nomecaso(1:len_trim(nomecaso)),'_',       &
-      it_corrente,".csc"
+      on_going_time_step,".csc"
    open(ncpt,file=nomefilectl,status="unknown",form="formatted")
    write (ncpt,*) "Control sections "
    write (ncpt,'(1x,2(a,10x),3(a,8x),3(a,5x),a,7x,a)') " Time","Iter",         &
@@ -114,9 +114,10 @@ if (Nsections>0) then
            write (ncpt,'(a,i10,a,3(g14.7))') "control point ",j,               &
               " is outside. Coord=",Control_Points(j)%coord(:)
            else
-              write (ncpt,'(g14.7,i14,8(1x,g14.7))') tempo,it_corrente         &
-                 ,Control_Points(j)%coord(:),Control_Points(j)%vel(:)          &
-                 ,Control_Points(j)%pres,Control_Points(j)%dens
+              write (ncpt,'(g14.7,i14,8(1x,g14.7))') simulation_time,          &
+                 on_going_time_step,Control_Points(j)%coord(:),                &
+                 Control_Points(j)%vel(:),Control_Points(j)%pres,              &
+                 Control_Points(j)%dens
         endif
      enddo
   enddo

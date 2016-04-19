@@ -36,7 +36,7 @@ use I_O_file_module
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: npi,i_cell,i_aux,i_grid,j_grid,k_grid
+integer(4) :: npi,i_cell,i_aux,i_grid,j_grid,k_grid,alloc_stat
 double precision :: mu_main_fluid,eps_fluid_blt,p_fluid_blt_top,gamma_fluid
 double precision :: z_blt_top_fluid,alfa_TBT
 integer(4),external :: ParticleCellNumber,CellIndices 
@@ -60,8 +60,8 @@ gamma_fluid = Med(Granular_flows_options%ID_main_fluid)%den0 * GI
 ! Statements
 !------------------------
 !$omp parallel do default(none) shared(nag,Med,pg)                             &
-!$omp shared(Granular_flows_options,ind_interfaces,tempo,mu_main_fluid)        &
-!$omp shared(eps_fluid_blt,gamma_fluid)                                        &
+!$omp shared(Granular_flows_options,ind_interfaces,simulation_time)            &
+!$omp shared(eps_fluid_blt,gamma_fluid,mu_main_fluid)                          &
 !$omp private(npi,i_cell,i_aux,i_grid,j_grid,k_grid,p_fluid_blt_top)           &
 !$omp private(z_blt_top_fluid,alfa_TBT)
 do npi=1,nag
@@ -71,7 +71,8 @@ do npi=1,nag
 ! Fluid pressure (simplifying assumption: 1D filtration with piezometric lines  
 !    in the bed-load transport layer parallel to the local 3D slope of the 
 !    bed-load transport layer top)
-      if (ind_interfaces(i_grid,j_grid,1)==0) then
+      if (Granular_flows_options%saturation_flag(i_grid,j_grid).eqv..false.)   &
+         then
          pg(npi)%pres_fluid = 0.d0
          else
             p_fluid_blt_top = pg(ind_interfaces(i_grid,j_grid,2))%pres
@@ -98,12 +99,14 @@ do npi=1,nag
                               0.d0) 
 ! Liquefaction model
       if (Granular_flows_options%t_liq>=0.000001) then
-         if ((tempo>=Granular_flows_options%t_q0).and.                         &
-            (tempo<=Granular_flows_options%t_liq).and.                         &
-            (ind_interfaces(i_grid,j_grid,1)/=0)) then
-            pg(npi)%sigma_prime_m = pg(npi)%sigma_prime_m * (1.d0 - (tempo -   &
-                                  Granular_flows_options%t_q0) /               &
-                                  Granular_flows_options%t_liq) 
+         if ((simulation_time>=Granular_flows_options%t_q0).and.               &
+            (simulation_time<=Granular_flows_options%t_liq).and.               &
+            (Granular_flows_options%saturation_flag(i_grid,j_grid).eqv..true.))&
+            then
+            pg(npi)%sigma_prime_m = pg(npi)%sigma_prime_m * (1.d0 -            &
+                                    (simulation_time -                         &
+                                    Granular_flows_options%t_q0) /             &
+                                    Granular_flows_options%t_liq) 
          endif
       endif
 ! secinv=sqrt(I2(e_ij) (secinv is the sqrt of the second inveriant of the 

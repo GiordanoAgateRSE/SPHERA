@@ -18,12 +18,10 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: time_integration_body_dynamics                                           
 ! Description: Euler time integration for body transport in fluid flows.  
-!----------------------------------------------------------------------------------------------------------------------------------
-
+!-------------------------------------------------------------------------------
 subroutine time_integration_body_dynamics(dtvel) 
 !------------------------
 ! Modules
@@ -57,7 +55,7 @@ allocate(teta(n_bodies,3))
 ! Loop over bodies (body dynamics)
 !$omp parallel do default(none)                                                &
 !$omp private(i,vec_temp,vec2_temp,vec3_temp,domega_dt,aux_umax)               &
-!$omp shared(n_bodies,body_arr,dt,ncord,teta,dtvel,tempo)
+!$omp shared(n_bodies,body_arr,dt,ncord,teta,dtvel,simulation_time)
 do i=1,n_bodies
 ! Staggered parameters (velocity and angular velocity)
    if (body_arr(i)%imposed_kinematics==0) then
@@ -90,8 +88,8 @@ do i=1,n_bodies
       else
 ! Imposed kinematics
          do j=1,body_arr(i)%n_records
-            if (body_arr(i)%body_kinematics(j,1)>=tempo) then
-               if (body_arr(i)%body_kinematics(j,1)==tempo) then
+            if (body_arr(i)%body_kinematics(j,1)>=simulation_time) then
+               if (body_arr(i)%body_kinematics(j,1)==simulation_time) then
                   body_arr(i)%u_CM(:) = body_arr(i)%body_kinematics(j,2:4)
                   body_arr(i)%omega(:) = body_arr(i)%body_kinematics(j,5:7)
                   else
@@ -100,14 +98,14 @@ do i=1,n_bodies
                         body_arr(i)%body_kinematics(j-1,2:4)) /                &
                         (body_arr(i)%body_kinematics(j,1) -                    &
                         body_arr(i)%body_kinematics(j-1,1)) *                  &
-                        (tempo - body_arr(i)%body_kinematics(j-1,1))
+                        (simulation_time - body_arr(i)%body_kinematics(j-1,1))
                      body_arr(i)%omega(:) =                                    &
                         body_arr(i)%body_kinematics(j-1,5:7) +                 &
                         (body_arr(i)%body_kinematics(j,5:7) -                  &
                         body_arr(i)%body_kinematics(j-1,5:7)) /                &
                         (body_arr(i)%body_kinematics(j,1) -                    &
                         body_arr(i)%body_kinematics(j-1,1)) *                  &
-                        (tempo-body_arr(i)%body_kinematics(j-1,1))                                      
+                        (simulation_time-body_arr(i)%body_kinematics(j-1,1))                                      
                endif
                exit
             endif

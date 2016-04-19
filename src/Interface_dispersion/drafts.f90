@@ -153,12 +153,12 @@ double precision :: tirhoc,tirhow,vdens,a1,b1,c1
 !------------------------
 !$omp parallel do default(none)                                                &
 !$omp private(npi,vdens,tirhoc,tirhow,a1,b1,c1,ii)                             &  
-!$omp shared(nag,Pg,Med,Domain,dt,it_corrente,ncord,indarrayFlu,Array_Flu)
+!$omp shared(nag,Pg,Med,Domain,dt,on_going_time_step,ncord,indarrayFlu,Array_Flu)
 do ii=1,indarrayFlu
    npi = Array_Flu(ii)
    if (pg(npi)%koddens/=0) cycle
    vdens  = pg(npi)%dden / pg(npi)%dens
-   if(it_corrente<=1) then
+   if(on_going_time_step<=1) then
       pg(npi)%tiroc = pg(npi)%rhoc * pg(npi)%VolFra
       tirhoc = pg(npi)%tiroc + dt * (pg(npi)%tiroc * vdens + pg(npi)%rhoc *    &
                pg(npi)%diffu - Med(2)%settlingcoef)

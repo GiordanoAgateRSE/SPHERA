@@ -18,11 +18,10 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: CalcPre 
 ! Description:  Particle pressure estimation.      
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 subroutine CalcPre
 !------------------------
 ! Modules
@@ -69,7 +68,7 @@ if (diffusione) then
 !$omp end parallel do
    else
 ! Is this useless?
-      if (it_corrente>0) then  
+      if (on_going_time_step>0) then  
 !$omp parallel do default(none) private(npi,rhorif,c2)                         & 
 !$omp shared(nag,pg,Domain,Med,esplosione) 
 ! Loop over all the particles

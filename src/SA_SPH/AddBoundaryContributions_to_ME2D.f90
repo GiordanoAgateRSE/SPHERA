@@ -18,13 +18,12 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: AddBoundaryContributions_to_ME2D                                
-! Description: To compute boundary terms for the 2D momentum equation (gradPsuro, 
-!              ViscoF). Equations refer to particle npi. (Di Monaco et al., 2011, EACFM).                        
-!----------------------------------------------------------------------------------------------------------------------------------
-
+! Description: To compute boundary terms for the 2D momentum equation 
+!              (gradPsuro,ViscoF). Equations refer to particle npi. (Di Monaco 
+!              et al., 2011, EACFM).                        
+!-------------------------------------------------------------------------------
 subroutine AddBoundaryContributions_to_ME2D(npi,IntNcbs,tpres,tdiss,tvisc) 
 !------------------------
 ! Modules
@@ -162,12 +161,12 @@ do icbs=1,IntNcbs
          elseif (strtype=="velo") then     
             if ((Domain%time_stage==1).or.(Domain%time_split==1)) then 
                pg(npi)%kodvel = 2
-               if (tempo<Tratto(sidestr)%trampa) then
+               if (simulation_time<Tratto(sidestr)%trampa) then
                   pg(npi)%velass(1) = Tratto(sidestr)%NormVelocity*nnlocal(1) *&
-                     tempo / Tratto(sidestr)%trampa
+                     simulation_time / Tratto(sidestr)%trampa
                   pg(npi)%velass(2) = zero           
                   pg(npi)%velass(3) = Tratto(sidestr)%NormVelocity*nnlocal(2) *&
-                     tempo / Tratto(sidestr)%trampa
+                     simulation_time / Tratto(sidestr)%trampa
                   else
                      pg(npi)%velass(1) = Tratto(sidestr)%NormVelocity*nnlocal(1)
                      pg(npi)%velass(2) = zero            
@@ -196,12 +195,12 @@ do icbs=1,IntNcbs
                      else
                         Tratto(sidestr)%NormVelocity = zero
                   endif
-                  if (tempo<Tratto(sidestr)%trampa) then
+                  if (simulation_time<Tratto(sidestr)%trampa) then
                      pg(npi)%velass(1) = Tratto(sidestr)%NormVelocity *        &
-                        nnlocal(1) * tempo / Tratto(sidestr)%trampa
+                        nnlocal(1) * simulation_time / Tratto(sidestr)%trampa
                      pg(npi)%velass(2) = zero           
                      pg(npi)%velass(3) = Tratto(sidestr)%NormVelocity *        &
-                        nnlocal(2) * tempo / Tratto(sidestr)%trampa
+                        nnlocal(2) * simulation_time / Tratto(sidestr)%trampa
                      else
                         pg(npi)%velass(1) = Tratto(sidestr)%NormVelocity *     &
                            nnlocal(1)
@@ -215,13 +214,13 @@ do icbs=1,IntNcbs
                   if (xpi>=zero.AND.xpi<=RifBoundarySide%length) then
                      if ((Domain%time_stage==1).or.(Domain%time_split==1)) then 
                         pg(npi)%kodvel = 2
-                        if (tempo<Tratto(sidestr)%trampa) then
+                        if (simulation_time<Tratto(sidestr)%trampa) then
                            pg(npi)%velass(1) = Tratto(sidestr)%NormVelocity *  &
-                                               nnlocal(1) * tempo /            &
+                                               nnlocal(1) * simulation_time /  &
                                                Tratto(sidestr)%trampa
                            pg(npi)%velass(2) = zero           
                            pg(npi)%velass(3) = Tratto(sidestr)%NormVelocity *  &
-                                               nnlocal(2) * tempo /            &
+                                               nnlocal(2) * simulation_time /  &
                                                Tratto(sidestr)%trampa
                            else
                               pg(npi)%velass(1) = Tratto(sidestr)%NormVelocity &

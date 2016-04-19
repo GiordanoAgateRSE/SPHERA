@@ -18,11 +18,10 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: Print_Results               
 ! Description: Post-processing for the log file.       
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 subroutine Print_Results(it,it_print,str)
 !------------------------
 ! Modules
@@ -345,9 +344,9 @@ if (nag>0) then
    endif 
 ! Final prints
    write(nout,'(128("."))')
-   write(nout,fmt100) " Print at:     | step: ",it," | time: ",tempo," | Dt: " &
-      ,dt," | Particles: inside ",dummy," gone out ",OpCountot," gone in ",    &
-      SpCountot
+   write(nout,fmt100) " Print at:     | step: ",it," | time: ",simulation_time,&
+      " | Dt: ",dt," | Particles: inside ",dummy," gone out ",OpCountot,       &
+      " gone in ",SpCountot
    if (exetype=="linux") then
       time_elapsed_tot_est = ((Domain%t_pre_iter-Domain%t0) +                  &
                              (machine_Julian_day * 24 * 60 * 60 + machine_hour &
@@ -360,8 +359,8 @@ if (nag>0) then
       time_elapsed_tot_est = ((Domain%t_pre_iter-Domain%t0) +                  &
                              (machine_Julian_day * 24 * 60 * 60 + machine_hour &
                              * 60 * 60 + machine_minute * 60 + machine_second -&
-                             Domain%t_pre_iter) * (Domain%tmax / tempo)) /     &
-                             (3600.0d0)  
+                             Domain%t_pre_iter) * (Domain%tmax /               &
+                             simulation_time)) / (3600.0d0)  
       if (time_elapsed_tot_est<0.d0) time_elapsed_tot_est =                    &
          time_elapsed_tot_est + 366.d0 * 24.d0 * 60.d0 * 60.d0  
       write(nout,'(a,g12.5,a,g12.5,a)')                                        &

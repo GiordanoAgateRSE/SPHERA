@@ -547,8 +547,8 @@ loop_nag: do npi=1,nag
    endif
 enddo loop_nag
 !$omp end parallel do
-! To compute the interface flags (bed-load transport)
-if (erosione) then
+! To compute the interface flags and the saturation flag (bed-load transport) 
+if (Granular_flows_options%ID_erosion_criterion>0) then
    do npi=1,nag
       nceli = ParticleCellNumber(pg(npi)%coord)
       irestocell = CellIndices(nceli,igridi,jgridi,kgridi)
@@ -569,7 +569,12 @@ if (erosione) then
          endif
       endif
    enddo
-!$omp parallel do default(none) shared(Grid,pg,ind_interfaces,nout)            &
+! Initialization of the saturation flag
+   if (Granular_flows_options%saturation_freezing_time>=simulation_time) then
+      Granular_flows_options%saturation_flag = .false.
+   endif   
+!$omp parallel do default(none)                                                &
+!$omp shared(Grid,pg,ind_interfaces,nout,Granular_flows_options,simulation_time)&
 !$omp private(i_grid,j_grid)
    do i_grid=1,Grid%ncd(1)
       do j_grid=1,Grid%ncd(2)
@@ -588,6 +593,11 @@ if (erosione) then
             pg(ind_interfaces(i_grid,j_grid,3))%blt_flag = 2
          if (ind_interfaces(i_grid,j_grid,1).ne.0)                             &
             pg(ind_interfaces(i_grid,j_grid,1))%blt_flag = 1
+! Saturation flag 
+         if ((Granular_flows_options%saturation_freezing_time>=simulation_time)&
+            .and.(ind_interfaces(i_grid,j_grid,1)/=0)) then
+            Granular_flows_options%saturation_flag(i_grid,j_grid) = .true.
+         endif            
       enddo
    enddo
 !$omp end parallel do
@@ -595,7 +605,7 @@ endif
 if (Domain%tipo=="bsph") then
    do npi=1,nag
 ! Gamma (integral Shepard coefficient) intialization (but for inlet sections)
-      if (it_corrente==-2) then
+      if (on_going_time_step==-2) then
          if (nPartIntorno_fw(npi)==0) then 
             pg(npi)%Gamma = one
             else
@@ -611,7 +621,7 @@ if (Domain%tipo=="bsph") then
                   min(pg(npi)%Gamma,one)    
          endif
       endif
-      if (it_corrente>-2) then
+      if (on_going_time_step>-2) then
 !AA!!! test start      
          min_sigma_Gamma = min((pg(npi)%sigma+0.05),pg(npi)%Gamma)
 !         if (NMedium==1) then

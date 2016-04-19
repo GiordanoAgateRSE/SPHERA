@@ -18,11 +18,11 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: sub_Q_sections                 
 ! Description: Writing flow rate at monitoring sections provided in input for 
 !              the flow rate (only in 3D).           
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 subroutine sub_Q_sections
 !------------------------
 ! Modules
@@ -75,7 +75,7 @@ n_particles = 0
 !------------------------
 ! .txt file creation and headings (only at the beginning of the simulation)
 write(nomefile_Q_sections,"(a,a,i8.8,a)") nomecaso(1:len_trim(nomecaso)),      &
-   '_Q_sections_',it_corrente,".txt"
+   '_Q_sections_',on_going_time_step,".txt"
 open(ncpt,file=nomefile_Q_sections,status="unknown",form="formatted")
 if (.not.(allocated(Q_sections%section(1)%flow_rate))) then
 ! First step in any case (standard or restart execution)
@@ -196,7 +196,8 @@ if (.not.(allocated(Q_sections%section(1)%flow_rate))) then
                Q_sections%section(i_sect)%flow_rate(j) / Q_sections%dt_out
 ! Writing the flow rate on a ".txt" file    
             write(ncpt,'((f14.6,1x),2(i14,1x),2(f14.6,1x),(i14,1x),7(f14.6,1x))'&
-               )tempo,i_sect,j,Q_sections%section(i_sect)%flow_rate(j),        &
+               )simulation_time,i_sect,j,                                      &
+               Q_sections%section(i_sect)%flow_rate(j),                        &
                Q_sections%section(i_sect)%area,n_particles(i_sect),            &
                Q_sections%dt_out,Q_sections%section(i_sect)%normal(:),         &
                Q_sections%section(i_sect)%vertex(1,:)
@@ -210,7 +211,7 @@ if (.not.(allocated(Q_sections%section(1)%flow_rate))) then
 ! Writing the global flow rate on a ".txt" file  
          j = Q_sections%n_fluid_types + 1
          write(ncpt,'((f14.6,1x),2(i14,1x),2(f14.6,1x),(i14,1x),7(f14.6,1x))') &
-            tempo,i_sect,j,Q_sections%section(i_sect)%flow_rate(j),            &
+            simulation_time,i_sect,j,Q_sections%section(i_sect)%flow_rate(j),  &
             Q_sections%section(i_sect)%area,n_particles(i_sect),               &
             Q_sections%dt_out,Q_sections%section(i_sect)%normal(:),            &
             Q_sections%section(i_sect)%vertex(1,:) 

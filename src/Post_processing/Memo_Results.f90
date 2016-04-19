@@ -18,12 +18,10 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: Memo_Results               
 ! Description: To write detailed results for restart. Not recommended.       
-!----------------------------------------------------------------------------------------------------------------------------------
-
+!-------------------------------------------------------------------------------
 subroutine Memo_Results(it,it_memo,it_rest,dtvel,str)
 !------------------------
 ! Modules
@@ -87,7 +85,7 @@ if (index(str,'inizio')/=0) then
    write(nout,'(a,i10,a,f15.5)')                                               &
 " ----------------------------------------------------------------------------"
    write(nout,'(a,i10,a,f15.5)') " Results and restart heading saved   step: ",&
-      it,"   time: ",tempo
+      it,"   time: ",simulation_time
    write(nout,'(a,i10,a,f15.5)')                                               &
 " ----------------------------------------------------------------------------"
 endif
@@ -97,7 +95,7 @@ if (Domain%irest_fr>0) then
    endif
 ! Case with restart  
    elseif (Domain%rest_fr>zero) then
-      if ((it>1).and.(mod(tempo,Domain%rest_fr)<=dtvel)) then
+      if ((it>1).and.(mod(simulation_time,Domain%rest_fr)<=dtvel)) then
          it_rest = it
      endif
 endif
@@ -106,14 +104,14 @@ if (Domain%imemo_fr>0) then
         it_memo = it
    endif
    elseif (Domain%memo_fr>zero) then
-      if ((it>1).and.(mod(tempo,Domain%memo_fr)<=dtvel)) then
+      if ((it>1).and.(mod(simulation_time,Domain%memo_fr)<=dtvel)) then
          it_memo = it
       endif
 endif
 if ((it_rest==it).or.(index(str,'inizio')/=0).or.(index(str,'fine')/=0)) then
 ! If restartcode=1, then to save the whole arrays "pg","pg_w"
    restartcode = 1 
-   write(nres) it,tempo,dt,nag,ncord,restartcode
+   write(nres) it,simulation_time,dt,nag,ncord,restartcode
    write(nres) pg(1:nag)
    if (allocated(pg_w)) write(nres)                                            &
       pg_w(1:DBSPH%n_w+DBSPH%n_inlet+DBSPH%n_outlet)
@@ -138,14 +136,14 @@ if ((it_rest==it).or.(index(str,'inizio')/=0).or.(index(str,'fine')/=0)) then
       write(nout,'(a,i10,a,f15.5)')                                            &
       " --------------------------------------------------------------------"
       write(nout,'(a,i10,a,f15.5)') " Results and restart saved   step: ",it,  &
-         "   time: ",tempo
+         "   time: ",simulation_time
       write(nout,'(a,i10,a,f15.5)')                                            &
       " --------------------------------------------------------------------"
    endif
    elseif (it_memo==it) then
 ! If restartcode=0, then to save "pg" only for visualizations
       restartcode = 0  
-      write(nres) it,tempo,dt,nag,ncord,restartcode
+      write(nres) it,simulation_time,dt,nag,ncord,restartcode
       write(nres) pg(1:nag)%coord(1),pg(1:nag)%coord(2),pg(1:nag)%coord(3),    &
          pg(1:nag)%vel(1),pg(1:nag)%vel(2),pg(1:nag)%vel(3),pg(1:nag)%pres,    &
          pg(1:nag)%dens,pg(1:nag)%mass,pg(1:nag)%visc,pg(1:nag)%IntEn,         &
@@ -155,7 +153,7 @@ if ((it_rest==it).or.(index(str,'inizio')/=0).or.(index(str,'fine')/=0)) then
          write(nout,'(a,i10,a,f15.5)')                                         &
             " --------------------------------------------------------"
          write(nout,'(a,i10,a,f15.5)') " Results saved   step: ",it,"   time: "&
-            ,tempo
+            ,simulation_time
          write(nout,'(a,i10,a,f15.5)')                                         &
             " --------------------------------------------------------"
       endif

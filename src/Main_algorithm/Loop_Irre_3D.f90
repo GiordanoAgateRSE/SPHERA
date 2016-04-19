@@ -39,7 +39,7 @@ logical :: done_flag
 integer(4) :: Ncbf,i,npi,it,it_print,it_memo,it_rest,ir,ii,num_out,Ncbf_Max
 integer(4) :: OpCountot,SpCountot,EpCountot,EpOrdGridtot,ncel,aux,igridi
 integer(4) :: jgridi,kgridi,machine_Julian_day,machine_hour,machine_minute
-integer(4) :: machine_second
+integer(4) :: machine_second,alloc_stat
 real :: time_aux_2
 double precision :: pretot,BCtorodivV,DtPreviousStep,TetaV1,xmax,ymax,zmax
 double precision :: appo1,appo2,appo3,dtvel
@@ -89,12 +89,31 @@ if (Domain%time_split==0) Domain%time_stage = 1
 !------------------------
 ! SPH parameters 
 call start_and_stop(2,10)
-if ((it_corrente==it_start).and.(Domain%tipo=="bsph")) it_corrente = -2
+! Allocation of the 2D array of the saturation flag (bed-load transport)
+if ((Granular_flows_options%ID_erosion_criterion>0).and.                       &
+   (.not.allocated(Granular_flows_options%saturation_flag))) then
+   allocate(Granular_flows_options%saturation_flag(Grid%ncd(1),Grid%ncd(2)),   &
+      STAT=alloc_stat)
+   if (alloc_stat/=0) then
+      write(nout,*)                                                            &
+      'Allocation of Granular_flows_options%saturation_flag failed;',          &
+      ' the program stops here.'
+      call diagnostic(arg1=4,arg2=1,arg3=nomsub)
+      stop 
+      else
+         write (nout,*)                                                        &
+            'Allocation of Granular_flows_options%saturation_flag is ',        &
+            ' successfully completed.'
+   endif
+endif 
+if ((on_going_time_step==it_start).and.(Domain%tipo=="bsph"))                  &
+   on_going_time_step = -2
 call CalcVarLength
-if ((it_corrente==-2).and.(Domain%tipo=="bsph")) it_corrente = it_start
+if ((on_going_time_step==-2).and.(Domain%tipo=="bsph")) on_going_time_step =   &
+   it_start
 call start_and_stop(3,10)
 ! Removing fictitious reservoirs used for DB-SPH initialization
-if ((it_corrente==it_start).and.(Domain%tipo=="bsph")) then
+if ((on_going_time_step==it_start).and.(Domain%tipo=="bsph")) then
    call start_and_stop(2,9) 
 !$omp parallel do default(none) shared(nag,pg,OpCount,Partz) private(npi)
    do npi=1,nag
@@ -131,10 +150,10 @@ if ((it_corrente==it_start).and.(Domain%tipo=="bsph")) then
    call start_and_stop(2,10)
 ! This fictitious value avoid CalcVarlength computing Gamma, sigma and density 
 ! for this very call     
-   it_corrente = - 1
+   on_going_time_step = - 1
    call CalcVarLength
-! The correct value of "it_corrente" is restored
-   it_corrente = it_start
+! The correct value of "on_going_time_step" is restored
+   on_going_time_step = it_start
    call start_and_stop(3,10)
 endif
 ! Subroutine for wall BC treatment (DB-SPH)
@@ -196,16 +215,16 @@ endif
 ITERATION_LOOP: do while (it<=Domain%itmax)
    done_flag = .false.
    it = it + 1
-   it_corrente = it
+   on_going_time_step = it
    it_eff = it
 ! To store the old time step duration, to evaluate the new value of time step 
 ! duration and the total time value
    DtPreviousStep = dt
 ! Stability condition
    if (nag>0) call rundt2 
-   tempo = tempo + dt
+   simulation_time = simulation_time + dt
    if (nscr>0) write (nscr,"(a,i8,a,g13.6,a,g12.4,a,i8,a,i5)") " it= ",it,     &
-      "   time= ",tempo,"  dt= ",dt,"    npart= ",nag,"   out= ",num_out
+      "   time= ",simulation_time,"  dt= ",dt,"    npart= ",nag,"   out= ",num_out
    do while ((done_flag.eqv.(.false.)).or.((Domain%RKscheme>1).and.            &
       (Domain%time_stage>1)))
       if (Domain%time_split==0) then
@@ -234,13 +253,13 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
 ! It assigns the movement with an imposed kinematics ("npointv" velocity data)
             if (Partz(ir)%npointv>1) then
                call vellaw(Partz(ir)%vlaw,Partz(ir)%vel,Partz(ir)%npointv)
-               write(nout,"(f12.4,a,i2,a,3e12.4)") tempo,"  zona",ir,"  vel."  &
-                  ,Partz(ir)%vel
+               write(nout,"(f12.4,a,i2,a,3e12.4)") simulation_time,"  zona",ir,&
+                  "  vel.",Partz(ir)%vel
 ! As an alternative, one may loop over particles 
                do npi=Partz(ir)%limit(1),Partz(ir)%limit(2) 
                   if (pg(npi)%cella==0) cycle
                   pg(npi)%var(:) = Partz(ir)%vel(:)
-                  if (tempo>=pg(npi)%tstop) then
+                  if (simulation_time>=pg(npi)%tstop) then
                      pg(npi)%vstart(:) = zero
                      pg(npi)%vel(:) = zero
                      else
@@ -254,7 +273,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
                   do npi=Partz(ir)%limit(1),Partz(ir)%limit(2)
                      if (pg(npi)%cella==0) cycle
                      pg(npi)%var(:) = Partz(ir)%vel(:)
-                     if (tempo>=pg(npi)%tstop) then
+                     if (simulation_time>=pg(npi)%tstop) then
                         pg(npi)%vstart(:) = zero
                         pg(npi)%vel(:)    = zero
                         else
@@ -752,6 +771,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
 ! Boundary Conditions: start
 ! BC: checks for the particles gone out of the domain throughout the opened 
 ! faces
+
          if ((Domain%time_split==0).and.(Domain%time_stage==Domain%RKscheme))  &
             then
             call start_and_stop(2,9)
@@ -795,9 +815,9 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
    enddo
 ! Post-processing
    if (allocated(Z_fluid_max)) then
-      if ((int(tempo/Domain%depth_dt_out)>Domain%depth_it_out_last).or.        &
-         (it_corrente==1)) then
-         Domain%depth_it_out_last = int(tempo / Domain%depth_dt_out)
+      if ((int(simulation_time/Domain%depth_dt_out)>Domain%depth_it_out_last)  &
+         .or.(on_going_time_step==1)) then
+         Domain%depth_it_out_last = int(simulation_time / Domain%depth_dt_out)
          call Update_Zmax_at_grid_vert_columns(1) 
          else
             call Update_Zmax_at_grid_vert_columns(0)
@@ -821,14 +841,17 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
          if (mod(it,Domain%icpoi_fr)==0)  call Body_dynamics_output      
       endif
       elseif (Domain%cpoi_fr>zero) then
-         if ((mod(tempo,Domain%cpoi_fr)<=dtvel).and.npointst>0) then
+         if ((mod(simulation_time,Domain%cpoi_fr)<=dtvel).and.npointst>0) then
             call memo_ctl
          endif
          if (n_bodies>0) then
-            if (mod(tempo,Domain%cpoi_fr)<=dtvel)  call Body_dynamics_output         
+            if (mod(simulation_time,Domain%cpoi_fr)<=dtvel) then
+               call Body_dynamics_output
+            endif         
          endif
 ! DB-SPH post-processing and update of the variable "wet" in the array "pg"
-         if ((Domain%tipo=="bsph").and.(mod(tempo,Domain%cpoi_fr)<=dtvel)) then
+         if ((Domain%tipo=="bsph").and.(mod(simulation_time,Domain%cpoi_fr)<=  &
+            dtvel)) then
             if ((DBSPH%n_monitor_points>0).or.(DBSPH%n_monitor_regions==1))    &
                call wall_elements_pp
 !$omp parallel do default(none) shared(DBSPH,pg_w) private(npi)
@@ -843,22 +866,22 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
          call calc_pelo
       endif
       elseif (Domain%pllb_fr>zero) then
-         if ((mod(tempo,Domain%pllb_fr) <= dtvel).and.nlines>0) then
+         if ((mod(simulation_time,Domain%pllb_fr) <= dtvel).and.nlines>0) then
             call calc_pelo
          endif
    endif
    if (Granular_flows_options%monitoring_lines>0) then
-      if ((int(tempo/Granular_flows_options%dt_out)>                           &
-         Granular_flows_options%it_out_last).or.(it_corrente==1)) then
-         Granular_flows_options%it_out_last = int(tempo /                      &
+      if ((int(simulation_time/Granular_flows_options%dt_out)>                 &
+         Granular_flows_options%it_out_last).or.(on_going_time_step==1)) then
+         Granular_flows_options%it_out_last = int(simulation_time /            &
             Granular_flows_options%dt_out)
          call write_Granular_flows_interfaces
       endif
    endif
    if (Q_sections%n_sect>0) then
-      if ((int(tempo/Q_sections%dt_out)>Q_sections%it_out_last).or.            &
-         (it_corrente==1)) then
-         Q_sections%it_out_last = int(tempo / Q_sections%dt_out)
+      if ((int(simulation_time/Q_sections%dt_out)>Q_sections%it_out_last).or.  &
+         (on_going_time_step==1)) then
+         Q_sections%it_out_last = int(simulation_time / Q_sections%dt_out)
          call sub_Q_sections
       endif
    endif
@@ -874,10 +897,10 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
             ymax = max(ymax,pg(npi)%coord(2))
             zmax = max(zmax,pg(npi)%coord(3))
          enddo
-         write (nfro,'(4g14.7)') tempo,xmax,ymax,zmax
+         write (nfro,'(4g14.7)') simulation_time,xmax,ymax,zmax
       endif
       elseif (Domain%memo_fr>zero) then
-         if (it>1.and.mod(tempo,Domain%memo_fr) <= dtvel) then
+         if (it>1.and.mod(simulation_time,Domain%memo_fr) <= dtvel) then
             xmax = - 1.0d30
             ymax = - 1.0d30
             zmax = - 1.0d30
@@ -887,7 +910,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
                ymax = max(ymax,pg(npi)%coord(2))
                zmax = max(zmax,pg(npi)%coord(3))
             enddo
-            write (nfro,'(4g14.7)') tempo, xmax ,ymax, zmax
+            write (nfro,'(4g14.7)') simulation_time, xmax ,ymax, zmax
          endif
    endif
 ! Paraview output
@@ -897,7 +920,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
 ! If the "kill file" exists, then the run is stopped and last results are saved.
    inquire (file=nomefilekill,EXIST=kill_flag)
    if (kill_flag) exit ITERATION_LOOP
-   if (tempo>=Domain%tmax) exit ITERATION_LOOP
+   if (simulation_time>=Domain%tmax) exit ITERATION_LOOP
 enddo  ITERATION_LOOP 
 ! Post-processing: log file
 if (it_eff/=it_print.and.nout>0) then

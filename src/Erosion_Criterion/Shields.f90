@@ -358,7 +358,8 @@ iter_ustar: do while ((flagz0).and.                                            &
          ' per il calcolo di Ustar. ' 
       write (uniterr,*) '  Provare a ridurre il valore di Ks e rilanciare ',   &
          '(for Shields 2D or Mohr erosion criterion). ' 
-      write (uniterr,*) '  tempo = ',tempo,'  Velocity',Velocity
+      write (uniterr,*) '  simulation_time = ',simulation_time,'  Velocity',   &
+         Velocity
       write (uniterr,*) '  Ustar',Ustar,'  Ustarold',Ustarold
       write (uniterr,'(a,i6,a,3f10.7,a,e10.3)') '  npi = ',npi,                &
          '      pg(npi)%coord = ',pg(npi)%coord(1),pg(npi)%coord(2),           &
@@ -400,7 +401,8 @@ iter_ustar: do while ((flagz0).and.                                            &
                write (uniterr,*) '   ' 
                write (uniterr,*) ' WARNING! Z0>rijtempmin per il calcolo di ', &
                   ' Ustar. ' 
-               write (uniterr,*) '  tempo = ',tempo,'  Velocity',Velocity
+               write (uniterr,*) '  simulation_time = ',simulation_time,       &
+                  '  Velocity',Velocity
                write (uniterr,*) '  Ustar',Ustar,'  Ustarold',Ustarold
                write (uniterr,'(a,i6,a,3f10.7)') '  npi = ',npi,               &
                   '      pg(npi)%coord = ',pg(npi)%coord(1),pg(npi)%coord(2),  &
@@ -464,7 +466,7 @@ if (Taubcr>1.d-9) then
     else
        pg(npi)%tau_tauc = 99999.d0  
 endif
-if ((Taub>Taubcr).and.(it_corrente>Med(imed)%NIterSol)) then 
+if ((Taub>Taubcr).and.(on_going_time_step>Med(imed)%NIterSol)) then 
    if (pg(npi)%state.ne."flu") then
       pg(npi)%dens = med(imed)%den0 + (pretot / (Med(imed)%celerita *          &
                      Med(imed)%celerita))

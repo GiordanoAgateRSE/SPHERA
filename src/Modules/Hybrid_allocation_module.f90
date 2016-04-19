@@ -24,7 +24,7 @@
 !              allocated variables (Di Monaco et al., 2011, EACFM; Manenti et 
 !              al., 2012; JHE; Amicarelli et al., 2013, IJNME; Amicarelli et 
 !              al., 2015, CAF).                    
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 module Hybrid_allocation_module
 use Static_allocation_module
 type TyGlobal
@@ -616,6 +616,9 @@ type TyGranular_flows_options
    integer(4)       :: Gamma_slope_flag ! Flag to activate (or not) Gamma_slope       
                                         ! (effects only when ID_erosion 
                                         ! criterion=1) 
+   double precision :: saturation_freezing_time ! Time since which saturation 
+                                                ! state is freezed and not 
+                                                ! computed anymore.
    double precision :: conv_crit_erosion ! Convergence criterion for erosion  
    double precision :: velocity_fixed_bed ! (optional) velocity_fixed_bed:  
                                           ! velocity threshold (input) to 
@@ -636,6 +639,10 @@ type TyGranular_flows_options
                                 ! estimation 
    double precision :: t_q0 ! t_q0: quake start time 
    double precision :: t_liq ! t_liq: liquefaction time
+   logical,dimension(:,:),allocatable :: saturation_flag ! Free surface flag 
+                                                         ! (presence of the 
+                                                         ! free surface along 
+                                                         ! the vertical)
 ! x and/or y coordinates defining the monitoring line/point   
    double precision,dimension(:,:),allocatable :: lines                  
 end type 

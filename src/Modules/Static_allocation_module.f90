@@ -18,10 +18,10 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: Static_allocation_module            
 ! Description: Module to define global (and statically allocated) variables.                                          
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 module Static_allocation_module
 ! Global constants for array sizes: start
 integer(4),public,parameter :: SPACEDIM = 3
@@ -70,8 +70,8 @@ integer(4) :: Ncord,NMedium,NPartZone
 integer(4) :: NPointst,NPoints,NPointsl,NPointse,NLines,NSections,GCBFVecDim
 integer(4) :: NumVertici,NumFacce,NumTratti,NumBVertices,NumBSides
 integer(4) :: Nag,nagpg,PARTICLEBUFFER,nag_reservoir_CartTopog
-integer(4) :: it_start,it_corrente,it_eff,indarrayFlu,indarraySol
-double precision :: tempo,dt,pesodt,dt_average,DTminBER
+integer(4) :: it_start,on_going_time_step,it_eff,indarrayFlu,indarraySol
+double precision :: simulation_time,dt,pesodt,dt_average,DTminBER
 ! Global variables: end
 ! Global variables for inlet sections: start
 integer(4) :: NumOpenSides,SourceSide,mat,irz,izone

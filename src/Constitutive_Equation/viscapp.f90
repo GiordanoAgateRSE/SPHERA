@@ -18,12 +18,11 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: viscapp 
-! Description: Constitutive equation with tuninig parameters (validated in Manenti et al.,2012,JHE).        
-!----------------------------------------------------------------------------------------------------------------------------------
-
+! Description: Constitutive equation with tuninig parameters (validated in 
+!              Manenti et al.,2012,JHE).        
+!-------------------------------------------------------------------------------
 subroutine viscapp
 !------------------------
 ! Modules
@@ -54,7 +53,7 @@ character(100),external :: lcase
 if (.not. diffusione) then
 !$omp parallel do default(none)                                                &
 !$omp private(npi,visc1,smalen,smalenq,visc2,secinv,cuin,mu,mumax)             &
-!$omp shared(nag,pg,Med,Domain,it_corrente)
+!$omp shared(nag,pg,Med,Domain,on_going_time_step)
    do npi=1,nag
       if ((pg(npi)%cella==0).or.(pg(npi)%vel_type/="std")) cycle
       select case (Med(pg(npi)%imed)%tipo)
@@ -79,7 +78,7 @@ if (.not. diffusione) then
             if (pg(npi)%state=="sol") then
 ! During the first NIterSol steps, the mixture particles do not move
                if (((pg(npi)%visc/=mumax/pg(npi)%dens).and.                    &
-                  (it_corrente>Med(pg(npi)%imed)%NIterSol)).or.                &
+                  (on_going_time_step>Med(pg(npi)%imed)%NIterSol)).or.         &
                   (pg(npi)%kodvel==2)) then
                   pg(npi)%state = "flu"
                end if

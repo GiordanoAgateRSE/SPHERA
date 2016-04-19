@@ -18,15 +18,17 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: IsParticleInternal3D
-! Description: To check whether a particle is internal to a 3D volume (domain/zone) or not. It checks if point Px() is internal to  
-!              the perimeter mib. It returns .true. (positive check) or .false. . The perimeter can be both convex or concave. 
-!              The input point is internal to the zone if the number of both "faces intercepted by the vertical (passing for the 
-!              input point) above the input point" and "faces intercepted by the vertical (passing for the input point)  
-!              below the input point" are odd.
-!----------------------------------------------------------------------------------------------------------------------------------
+! Description: To check whether a particle is internal to a 3D volume 
+!              (domain/zone) or not. It checks if point Px() is internal to  
+!              the perimeter mib. It returns .true. (positive check) or .false. 
+!              . The perimeter can be both convex or concave. The input point is
+!              internal to the zone if the number of both "faces intercepted by 
+!              the vertical (passing for the input point) above the input point"
+!              and "faces intercepted by the vertical (passing for the input 
+!              point) below the input point" are odd.
+!-------------------------------------------------------------------------------
 logical function IsParticleInternal3D(mib,PX,IsopraS)
 !------------------------
 ! Modules

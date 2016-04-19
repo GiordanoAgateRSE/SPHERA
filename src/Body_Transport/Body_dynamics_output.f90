@@ -18,10 +18,10 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-----------------------------------------------------------------------------------------------------------------------------------
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: Body_dynamics_output
 ! Description: .txt output files for body transport in fluid flows. 
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 subroutine Body_dynamics_output
 !------------------------
 ! Modules
@@ -82,9 +82,9 @@ do npi=1,n_body_part
 enddo
 ! File creation and heading
 write(nomefilectl_Body_dynamics,"(a,a,i8.8,a)") nomecaso(1:len_trim(nomecaso)),&
-   '_Body_dynamics_',it_corrente,".txt"
+   '_Body_dynamics_',on_going_time_step,".txt"
 open (ncpt,file=nomefilectl_Body_dynamics,status="unknown",form="formatted")
-if (it_corrente==1) then
+if (on_going_time_step==1) then
    write (ncpt,*) "Body dynamics values "
    write (ncpt,'(5(7x,a),3(5x,a),3(9x,a),3(1x,a),3(8x,a),(9x,a),2(7x,a))')     &
       " Time(s)"," Body_ID"," x_CM(m)"," y_CM(m)"," z_CM(m)"," u_CM(m/s)",     &
@@ -95,7 +95,7 @@ endif
 flush(ncpt)
 ! Loop over the bodies
 do nbi=1,n_bodies
-   write (ncpt,'(g14.7,1x,i14,1x,18(g14.7,1x))') tempo,nbi,                    &
+   write (ncpt,'(g14.7,1x,i14,1x,18(g14.7,1x))') simulation_time,nbi,          &
       body_arr(nbi)%x_CM(:),body_arr(nbi)%u_CM(:),body_arr(nbi)%Force(:),      &
       body_arr(nbi)%omega(:),body_arr(nbi)%Moment(:),body_arr(nbi)%pmax,       &
       pmax_R(nbi),pmax_L(nbi)
@@ -103,9 +103,9 @@ enddo
 close (ncpt)
 ! Monitoring the surface body particles
 write(nomefilectl_Body_particles,"(a,a,i8.8,a)")                               &
-   nomecaso(1:len_trim(nomecaso)),'_Body_particles_',it_corrente,".txt"
+   nomecaso(1:len_trim(nomecaso)),'_Body_particles_',on_going_time_step,".txt"
 open (ncpt,file=nomefilectl_Body_particles,status="unknown",form="formatted")
-if (it_corrente==1) then
+if (on_going_time_step==1) then
    write (ncpt,*) " Body particle parameters"
    write (ncpt,'((7x,a),(3x,a),(7x,a),3(10x,a),3(8x,a),(6x,a),4(1x,a))')       &
       " Time(s)"," particle_ID"," body_ID"," x(m)"," y(m)"," z(m)"," u(m/s)",  &
@@ -115,7 +115,7 @@ endif
 flush(ncpt)
 do nsi=1,n_surf_body_part
    npi=surf_body_part(nsi)
-   write (ncpt,'(g14.7,1x,2(i14,1x),11(g14.7,1x))') tempo,npi,                 &
+   write (ncpt,'(g14.7,1x,2(i14,1x),11(g14.7,1x))') simulation_time,npi,       &
       bp_arr(npi)%body,bp_arr(npi)%pos(:),bp_arr(npi)%vel(:),                  &
       bp_arr(npi)%pres,impact_vel(nsi,1),impact_vel(nsi,2),impact_vel(nsi,3),  &
       impact_vel(nsi,4)

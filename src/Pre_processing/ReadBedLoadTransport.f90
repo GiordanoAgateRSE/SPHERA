@@ -18,10 +18,10 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: ReadBedLoadTransport                   
 ! Description: Reading input data for bed-load transport.                 
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 subroutine ReadBedLoadTransport(ainp,comment,nrighe,ier,ninp,nout,nscr)
 !------------------------
 ! Modules
@@ -33,12 +33,12 @@ use Dynamic_allocation_module
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: nrighe,ier,ninp,nout,nscr,ioerr,ID_erosion_criterion
+integer(4) :: nrighe,ier,ninp,nout,nscr,ioerr,ID_erosion_criterion,alloc_stat
 integer(4) :: ID_main_fluid,ID_granular,monitoring_lines,i,line_ID
 integer(4) :: n_max_iterations,erosion_flag
 integer(4) :: deposition_at_frontiers,Gamma_slope_flag
 double precision :: dt_out,x_fixed,y_fixed,conv_crit_erosion,velocity_fixed_bed
-double precision :: x_min_dt,x_max_dt,y_min_dt,y_max_dt
+double precision :: x_min_dt,x_max_dt,y_min_dt,y_max_dt,saturation_freezing_time
 double precision :: z_min_dt,z_max_dt,t_q0,t_liq
 character(1) :: comment
 character(100) :: ainp,lcase
@@ -55,41 +55,42 @@ logical,external :: ReadCheck
 !------------------------
 ! Statements
 !------------------------
-call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
+call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"BED LOAD TRANSPORT DATA",ninp,nout)) &
    return
 do while (TRIM(lcase(ainp)) /= "##### end bed load transport #####")
 ! Reading input parameters (first part)
-   read(ainp,*,iostat=ioerr) ID_erosion_criterion,ID_main_fluid,ID_granular
+   read(ainp,*,iostat=ioerr) ID_erosion_criterion,ID_main_fluid,ID_granular,   &
+      saturation_freezing_time
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"BED LOAD TRANSPORT GENERAL INPUT",&
       ninp,nout)) return
    if (ID_erosion_criterion>0) then
-      call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
+      call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
       read(ainp,*,iostat=ioerr) velocity_fixed_bed,erosion_flag
       if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                                &
          "VELOCITY FIXED BED, EROSION FLAG",ninp,nout)) return
-      call ReadRiga (ainp,comment,nrighe,ioerr,ninp)   
+      call ReadRiga(ainp,comment,nrighe,ioerr,ninp)   
       read(ainp,*,iostat=ioerr) deposition_at_frontiers,Gamma_slope_flag
       if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"OTHER EROSION PARAMETERS",ninp,&
          nout)) return
-      call ReadRiga (ainp,comment,nrighe,ioerr,ninp)   
+      call ReadRiga(ainp,comment,nrighe,ioerr,ninp)   
       read(ainp,*,iostat=ioerr) monitoring_lines,dt_out,conv_crit_erosion,     &
          n_max_iterations
       if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                                &
          "BED LOAD TRANSPORT MONITORING LINES",ninp,nout)) return
-      call ReadRiga (ainp,comment,nrighe,ioerr,ninp)   
+      call ReadRiga(ainp,comment,nrighe,ioerr,ninp)   
       read(ainp,*,iostat=ioerr) x_min_dt,x_max_dt
       if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"X_MIN_DT,X_MAX_DT",ninp,nout)) &
          return      
-      call ReadRiga (ainp,comment,nrighe,ioerr,ninp)   
+      call ReadRiga(ainp,comment,nrighe,ioerr,ninp)   
       read(ainp,*,iostat=ioerr) y_min_dt,y_max_dt
       if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"Y_MIN_DT,Y_MAX_DT",ninp,nout)) &
          return 
-      call ReadRiga (ainp,comment,nrighe,ioerr,ninp)   
+      call ReadRiga(ainp,comment,nrighe,ioerr,ninp)   
       read(ainp,*,iostat=ioerr) z_min_dt,z_max_dt
       if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"Z_MIN_DT,Z_MAX_DT",ninp,nout)) &
          return
-      call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
+      call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
       read(ainp,*,iostat=ioerr) t_q0,t_liq
       if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"t_q0,t_liq",ninp,nout)) return          
    endif
@@ -114,6 +115,8 @@ do while (TRIM(lcase(ainp)) /= "##### end bed load transport #####")
             ID_main_fluid
          write(nout,"(1x,a,1p,i12)") "ID_granular:..................",         &
             ID_granular
+         write(nout,"(1x,a,1p,g12.5)") "saturation_freezing_time:.....",       &
+            saturation_freezing_time
          write(nout,"(1x,a,1p,g12.5)") "velocity_fixed_bed:...........",       &
             velocity_fixed_bed    
          write(nout,"(1x,a,1p,i12)") "erosion_flag:.................",         &
@@ -146,6 +149,7 @@ do while (TRIM(lcase(ainp)) /= "##### end bed load transport #####")
    if (ID_erosion_criterion>0) then      
       Granular_flows_options%ID_main_fluid = ID_main_fluid
       Granular_flows_options%ID_granular = ID_granular
+      Granular_flows_options%saturation_freezing_time = saturation_freezing_time
       Granular_flows_options%velocity_fixed_bed = velocity_fixed_bed
       Granular_flows_options%erosion_flag = erosion_flag
       Granular_flows_options%deposition_at_frontiers = deposition_at_frontiers
@@ -165,17 +169,26 @@ do while (TRIM(lcase(ainp)) /= "##### end bed load transport #####")
 ! Allocation of the array of the monitoring lines
       if (allocated(Granular_flows_options%lines)) then
          else
-            allocate(Granular_flows_options%lines(monitoring_lines,2)) 
+            if (.not.allocated(Granular_flows_options%lines)) then
+               allocate(Granular_flows_options%lines(monitoring_lines,2),      &
+                  stat=alloc_stat)
+               if (alloc_stat/=0) then
+                  write(nscr,'(a)')                                            &
+                     "Allocation of Granular_flows_options%lines failed. "
+                  write(nscr,'(a)') "The execution stops here. "
+                  stop
+               endif
+            endif
 ! Initializing the auxiliary variable to print results
             Granular_flows_options%it_out_last = 0
       endif
 ! Loop over the monitoring lines
       do i=1,monitoring_lines
-         call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
+         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read(ainp,*,iostat=ioerr) line_ID
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                             &
             "BED LOAD TRANSPORT MONITORING LINES",ninp,nout)) return      
-         call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
+         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read(ainp,*,iostat=ioerr) x_fixed,y_fixed
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                             &
             "BED LOAD TRANSPORT MONITORING LINES",ninp,nout)) return
@@ -195,7 +208,7 @@ do while (TRIM(lcase(ainp)) /= "##### end bed load transport #####")
       enddo  
    endif   
 ! Reading the last line 
-   call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
+   call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"BED LOAD TRANSPORT DATA",ninp,nout&
       )) return
 enddo

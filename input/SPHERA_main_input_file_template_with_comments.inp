@@ -260,14 +260,17 @@ x_outlet_last y_outlet_last z_outlet_last n_x_outlet_last n_y_outlet_last n_z_ou
 
 ##### BED LOAD TRANSPORT #####
 ! Input parameters for bed-load transport (blt) scheme
-erosion_criterion_ID ID_main_fluid ID granular 
+erosion_criterion_ID ID_main_fluid ID granular saturation_freezing_time
                                     ! erosion_criterion_ID=0(no bed-load 
                                     ! transport),1(Shields-Seminara),2(Shields 
                                     ! without blt-fixed bed interactions),3
                                     ! (Mohr-Coulomb, not recommended); 
                                     ! ID_main_fluid(medium of 
                                     ! the main fluid); ID granular
-                                    ! (medium of the blt layer)
+                                    ! (medium of the blt layer); 
+                                    ! saturation_freezing_time: time since which
+                                    ! saturation state is freezed and not 
+                                    ! computed anymore.
 ! if (erosion_criterion_ID>0): start
 velocity_fixed_bed erosion_flag     ! velocity_fixed_bed(velocity threshold
                                     ! -e.g. equal to velocity scale/100- to 

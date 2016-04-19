@@ -18,12 +18,10 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: Gest_Trans         
 ! Description: Introductory procedure for the main algorithm.                    
-!----------------------------------------------------------------------------------------------------------------------------------
-
+!-------------------------------------------------------------------------------
 subroutine Gest_Trans 
 !------------------------
 ! Modules
@@ -80,7 +78,7 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph"))  then
    if (ier/=0) then
       write(nout,'(1x,a,i2)')                                                  &
          "   Array BoundaryDataPointer not allocated. Error code: ",ier
-      call diagnostic (arg1=4,arg3=nomsub)
+      call diagnostic(arg1=4,arg3=nomsub)
       else
          write(nout,'(1x,a)')                                                  &
             "   Array BoundaryDataPointer successfully allocated "
@@ -92,7 +90,7 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph"))  then
       if (ier/=0) then
          write(nout,'(1x,a,i2)')                                               &
             "   Array BoundaryDataTab not allocated. Error code: ",ier
-          call diagnostic (arg1=4,arg3=nomsub)
+          call diagnostic(arg1=4,arg3=nomsub)
          else
             write(nout,'(1x,a)')                                               &
                "   Array BoundaryDataTab successfully allocated "
@@ -104,7 +102,7 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph"))  then
          if (ier/=0) then
             write(nout,'(1x,a,i2)')                                            &
                "   Array BoundaryDataTab not allocated. Error code: ",ier
-            call diagnostic (arg1=4,arg3=nomsub)
+            call diagnostic(arg1=4,arg3=nomsub)
             else
                write(nout,'(1x,a)')                                            &
                   "   Array BoundaryDataTab successfully allocated"
@@ -118,7 +116,7 @@ allocate(Array_Flu(1:PARTICLEBUFFER),stat=ier)
 if (ier/=0) then
    write(nout,'(1x,a,i2)') "   Array Array_Flu not allocated. Error code: ",   &
       ier
-   call diagnostic (arg1=4,arg3=nomsub)
+   call diagnostic(arg1=4,arg3=nomsub)
    else
       write(nout,'(1x,a)') "   Array Array_Flu successfully allocated "
 endif
@@ -126,7 +124,7 @@ allocate(nPartIntorno(1:PARTICLEBUFFER),stat=ier)
 if (ier/=0) then
    write(nout,'(1x,a,i2)')"   Array NPARTINTORNO not allocated. Error code: "  &
    ,ier
-   call diagnostic (arg1=4,arg3=nomsub)
+   call diagnostic(arg1=4,arg3=nomsub)
    else
       write(nout,'(1x,a)') "   Array NPARTINTORNO successfully allocated "
 endif
@@ -134,7 +132,7 @@ allocate(PartIntorno(1:NMAXPARTJ*PARTICLEBUFFER),stat=ier)
 if (ier/=0) then
    write(nout,'(1x,a,i2)') "   Array PARTINTORNO not allocated. Error code: "  &
       ,ier
-   call diagnostic (arg1=4,arg3=nomsub)
+   call diagnostic(arg1=4,arg3=nomsub)
    else
       write(nout,'(1x,a)') "   Array PARTINTORNO successfully allocated "
 endif
@@ -142,14 +140,14 @@ allocate(PartKernel(1:4,1:NMAXPARTJ*PARTICLEBUFFER),stat=ier)
 if (ier/=0) then
    write(nout,'(1x,a,i2)') "   Array PARTKERNEL not allocated. Error code: ",  &
       ier
-   call diagnostic (arg1=4,arg3=nomsub)
+   call diagnostic(arg1=4,arg3=nomsub)
    else
       write(nout,'(1x,a)') "   Array PARTKERNEL successfully allocated "
 endif
 allocate(rag(1:3,1:NMAXPARTJ*PARTICLEBUFFER),stat=ier)
 if (ier/=0) then
    write(nout,'(1x,a,i2)') "   Array RAG not allocated. Error code: ",ier
-   call diagnostic (arg1=4,arg3=nomsub)
+   call diagnostic(arg1=4,arg3=nomsub)
    else
       write(nout,'(1x,a)') "   Array RAG successfully allocated "
 endif
@@ -158,7 +156,7 @@ if (Domain%tipo=="bsph") then
    if (ier/=0) then
       write(nout,'(1x,a,i2)')                                                  &
          "   Array NPARTINTORNO_fw not allocated. Error code: ",ier
-      call diagnostic (arg1=4,arg3=nomsub)
+      call diagnostic(arg1=4,arg3=nomsub)
       else
          write(nout,'(1x,a)')                                                  &
             "   Array NPARTINTORNO_fw successfully allocated "
@@ -167,7 +165,7 @@ if (Domain%tipo=="bsph") then
    if (ier/=0) then
       write(nout,'(1x,a,i2)')                                                  &
          "   Array PARTINTORNO_fw not allocated. Error code: ",ier
-      call diagnostic (arg1=4,arg3=nomsub)
+      call diagnostic(arg1=4,arg3=nomsub)
       else
          write(nout,'(1x,a)') "   Array PARTINTORNO_fw successfully allocated"
    endif
@@ -175,7 +173,7 @@ if (Domain%tipo=="bsph") then
    if (ier/=0) then
       write(nout,'(1x,a,i2)')                                                  &
          "   Array grad_vel_VSL_fw not allocated. Error code: ",ier
-      call diagnostic (arg1=4,arg3=nomsub)
+      call diagnostic(arg1=4,arg3=nomsub)
       else
          write(nout,'(1x,a)') "   Array grad_vel_VSL_fw successfully allocated "
    endif
@@ -183,7 +181,7 @@ if (Domain%tipo=="bsph") then
    if (ier/=0) then
       write(nout,'(1x,a,i2)')                                                  &
          "   Array kernel_fw not allocated. Error code: ",ier
-      call diagnostic (arg1=4,arg3=nomsub)
+      call diagnostic(arg1=4,arg3=nomsub)
       else
          write(nout,'(1x,a)') "   Array kernel_fw successfully allocated "
    endif
@@ -191,7 +189,7 @@ if (Domain%tipo=="bsph") then
    if (ier/=0) then
       write(nout,'(1x,a,i2)') "   Array RAG_fw not allocated. Error code: ",   &
          ier
-      call diagnostic (arg1=4,arg3=nomsub)
+      call diagnostic(arg1=4,arg3=nomsub)
       else
          write(nout,'(1x,a)') "   Array RAG_fw successfully allocated "
    endif
@@ -201,7 +199,7 @@ if (n_bodies>0) then
    if (ier/=0) then
       write(nout,'(1x,a,i2)')                                                  &
          "   Array nPartIntorno_bp_f not allocated. Error code: ",ier
-      call diagnostic (arg1=4,arg3=nomsub)
+      call diagnostic(arg1=4,arg3=nomsub)
       else
          write(nout,'(1x,a)')                                                  &
             "   Array nPartIntorno_bp_f successfully allocated "
@@ -210,7 +208,7 @@ if (n_bodies>0) then
    if (ier/=0) then
       write(nout,'(1x,a,i2)')                                                  &
          "   Array PartIntorno_bp_f not allocated. Error code: ",ier
-      call diagnostic (arg1=4,arg3=nomsub)
+      call diagnostic(arg1=4,arg3=nomsub)
       else
          write(nout,'(1x,a)')                                                  &
             "   Array PartIntorno_bp_f successfully allocated "
@@ -219,7 +217,7 @@ if (n_bodies>0) then
    if (ier/=0) then
       write(nout,'(1x,a,i2)')                                                  &
          "   Array KerDer_bp_f_cub_spl not allocated. Error code: ",ier
-      call diagnostic (arg1=4,arg3=nomsub)
+      call diagnostic(arg1=4,arg3=nomsub)
       else
          write(nout,'(1x,a)')                                                  &
             "   Array KerDer_bp_f_cub_spl successfully allocated "
@@ -228,7 +226,7 @@ if (n_bodies>0) then
    if (ier/=0) then
       write(nout,'(1x,a,i2)')                                                  &
          "   Array KerDer_bp_f_Gal not allocated. Error code: ",ier
-      call diagnostic (arg1=4,arg3=nomsub)
+      call diagnostic(arg1=4,arg3=nomsub)
       else
          write(nout,'(1x,a)')                                                  &
             "   Array KerDer_bp_f_Gal successfully allocated "
@@ -237,7 +235,7 @@ if (n_bodies>0) then
    if (ier/=0) then
       write(nout,'(1x,a,i2)') "   Array rag_bp_f not allocated. Error code: "  &
          ,ier
-      call diagnostic (arg1=4,arg3=nomsub)
+      call diagnostic(arg1=4,arg3=nomsub)
       else
          write(nout,'(1x,a)') "   Array rag_bp_f successfully allocated "
    endif
@@ -245,7 +243,7 @@ if (n_bodies>0) then
    if (ier/=0) then
       write(nout,'(1x,a,i2)')                                                  &
          "   Array nPartIntorno_bp_bp not allocated. Error code: ",ier
-      call diagnostic (arg1=4,arg3=nomsub)
+      call diagnostic(arg1=4,arg3=nomsub)
       else
       write(nout,'(1x,a)')                                                     &
          "   Array nPartIntorno_bp_bp successfully allocated "
@@ -254,7 +252,7 @@ if (n_bodies>0) then
    if (ier/=0) then
       write(nout,'(1x,a,i2)')                                                  &
          "   Array PartIntorno_bp_bp not allocated. Error code: ",ier
-      call diagnostic (arg1=4,arg3=nomsub)
+      call diagnostic(arg1=4,arg3=nomsub)
       else
          write(nout,'(1x,a)')                                                  &
             "   Array PartIntorno_bp_bp successfully allocated "
@@ -263,7 +261,7 @@ if (n_bodies>0) then
    if (ier/=0) then
       write(nout,'(1x,a,i2)')                                                  &
          "   Array rag_bp_bp not allocated. Error code: ",ier
-      call diagnostic (arg1=4,arg3=nomsub)
+      call diagnostic(arg1=4,arg3=nomsub)
       else
          write(nout,'(1x,a)') "   Array rag_bp_bp successfully allocated "
    endif
@@ -274,7 +272,7 @@ if (n_bodies>0) then
    if (ier/=0) then
       write(nout,'(1x,a,i2)')                                                  &
          "   Array impact_vel not allocated. Error code: ",ier
-      call diagnostic (arg1=4,arg3=nomsub)
+      call diagnostic(arg1=4,arg3=nomsub)
       else
          write(nout,'(1x,a)') "   Array impact_vel successfully allocated "
    endif
@@ -415,14 +413,14 @@ endif
 if ((Domain%ipllb_fr>0).OR.(Domain%pllb_fr>zero)) then
    open (nplb,file=nomefile(4),status="unknown",access="sequential",           &
       form="formatted")
-   write(nplb,"(a)") "tempo         free_surface_quota"
+   write(nplb,"(a)") "time          free_surface_quota"
    else
       nplb = - nplb
 endif
 if ((Domain%imemo_fr>0).OR.(Domain%memo_fr>zero)) then
    open (nfro,file=nomefile(5),status="unknown",access="sequential"            &
       ,form="formatted")
-   write(nfro,"(a)") "tempo         x fronte      (y fronte)    z fronte"
+   write(nfro,"(a)") "time          x fronte      (y fronte)    z fronte"
    else
       nfro = - nfro
 endif
@@ -566,7 +564,7 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
          if (ier/=0) then
             write(nout,'(1x,a,i2)')                                            &
                "   Array GCBFPointers not allocated. Error code: ",ier
-            call diagnostic (arg1=4,arg3=nomsub)
+            call diagnostic(arg1=4,arg3=nomsub)
             else
                write(nout,'(1x,a)')                                            &
                   "   Array GCBFPointers successfully allocated"
@@ -626,7 +624,7 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
       endif
    endif 
    else
-      call diagnostic (arg1=10,arg2=5,arg3=nomsub)
+      call diagnostic(arg1=10,arg2=5,arg3=nomsub)
 endif
 ! To create vtk file
 if (vtkconv) then

@@ -69,7 +69,7 @@ diffusione = .FALSE.
 esplosione = .FALSE.
 erosione = .FALSE.
 restart = .FALSE.
-tempo = zero
+simulation_time = zero
 dt = zero
 it_start = 0
 !------------------------
@@ -523,7 +523,7 @@ if (.not.Restart) then
          endif
       enddo
 ! To save current time for "result_converter"
-      val_time = tempo
+      val_time = simulation_time
       close(ninp)
 endif
 ! Writing on the log file 

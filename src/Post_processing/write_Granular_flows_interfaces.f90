@@ -18,10 +18,10 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: write_Granular_flows_interfaces                  
 ! Description: Post-processing the interfaces for bed-load transport phenomena.             
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 subroutine write_Granular_flows_interfaces
 !------------------------
 ! Modules
@@ -53,9 +53,9 @@ integer(4),external :: CellIndices,ParticleCellNumber
 !------------------------
 ! .txt file creation and heading
 write(nomefile_blt_interfaces,"(a,a,i8.8,a)") nomecaso(1:len_trim(nomecaso)),  &
-   '_blt_interfaces_',it_corrente,".txt"
+   '_blt_interfaces_',on_going_time_step,".txt"
 open(ncpt,file=nomefile_blt_interfaces,status="unknown",form="formatted")
-if (it_corrente==1) then
+if (on_going_time_step==1) then
 ! First step
    write (ncpt,*) "Bed load transport interfaces "
    write (ncpt,'((7x,a),(5x,a),(5x,a),(7x,a),(7x,a),(8x,a))')                  &
@@ -92,8 +92,8 @@ if (it_corrente==1) then
                   else
                      z_BedLoad_PureFluid = z_bed 
                endif   
-               write(ncpt,'(6(g14.6,1x))') tempo,pos_aux(1),pos_aux(2),        &
-                  z_free_surface,z_BedLoad_PureFluid,z_bed
+               write(ncpt,'(6(g14.6,1x))') simulation_time,pos_aux(1),         &
+                  pos_aux(2),z_free_surface,z_BedLoad_PureFluid,z_bed
             enddo 
          endif 
          if (Granular_flows_options%lines(i,2)==-999.d0) then
@@ -123,8 +123,8 @@ if (it_corrente==1) then
                   else
                      z_BedLoad_PureFluid = z_bed 
                endif   
-               write(ncpt,'(6(g14.6,1x))') tempo,pos_aux(1),pos_aux(2),        &
-                  z_free_surface,z_BedLoad_PureFluid,z_bed
+               write(ncpt,'(6(g14.6,1x))') simulation_time,pos_aux(1),         &
+                  pos_aux(2),z_free_surface,z_BedLoad_PureFluid,z_bed
             enddo
          endif
          if ((Granular_flows_options%lines(i,1).ne.-999.d0).and.               &
@@ -154,7 +154,7 @@ if (it_corrente==1) then
                else
                   z_BedLoad_PureFluid = z_bed 
             endif   
-            write(ncpt,'(6(g14.6,1x))') tempo,pos_aux(1),pos_aux(2),           &
+            write(ncpt,'(6(g14.6,1x))') simulation_time,pos_aux(1),pos_aux(2), &
                z_free_surface,z_BedLoad_PureFluid,z_bed
          endif          
       enddo

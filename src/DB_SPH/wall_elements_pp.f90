@@ -18,14 +18,15 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: wall_elements_pp
-! Description: Smoothing wall element values for post-processing. Post-processing the wall surface element values 
-!              (provided a selected region). Post-processing the hydrodynamic normal force on DBSPH surface elements 
-!              (provided a selected region). Post-processing the wall surface element values (provided selected element IDs).               
-!----------------------------------------------------------------------------------------------------------------------------------
-
+! Description: Smoothing wall element values for post-processing. 
+!              Post-processing the wall surface element values 
+!              (provided a selected region). Post-processing the hydrodynamic 
+!              normal force on DBSPH surface elements (provided a selected 
+!              region). Post-processing the wall surface element values 
+!              (provided selected element IDs).               
+!-------------------------------------------------------------------------------
 subroutine wall_elements_pp
 !------------------------
 ! Modules
@@ -127,7 +128,7 @@ end do
 ! Writing the pressure force (post-processing) (provided a region)
 if (DBSPH%n_monitor_regions==1) then
    write(nomefilectl_wall,"(a,a,i8.8,a)") nomecaso(1:len_trim(nomecaso)),      &
-                                          '_wall_Fx_',it_corrente,".txt"
+                                          '_wall_Fx_',on_going_time_step,".txt"
    open (unit_dbsph_Fx,file=nomefilectl_wall,status="unknown",form="formatted")
    write (unit_dbsph_Fx,*) "Force "
    write (unit_dbsph_Fx,'(1x,2(a,10x))') " Time(s)","Fx(kgm/s^2)"
@@ -144,14 +145,14 @@ if (DBSPH%n_monitor_regions==1) then
                                            pg_w(npi)%normal(1)*pg_w(npi)%weight
       endif
    end do
-   write (unit_dbsph_Fx,'(2(1x,g14.7))') tempo,Fx
+   write (unit_dbsph_Fx,'(2(1x,g14.7))') simulation_time,Fx
    close (unit_dbsph_Fx)
 endif
 ! Writing the wall element pressure values derived from post-processing 
 ! (provided a region)
 if (DBSPH%n_monitor_regions==1) then
    write(nomefilectl_wall,"(a,a,i8.8,a)") nomecaso(1:len_trim(nomecaso)),      &
-      '_wall_region_',it_corrente,".txt"
+      '_wall_region_',on_going_time_step,".txt"
    open (unit_dbsph_se_reg,file=nomefilectl_wall,status="unknown",             &
       form="formatted")
    write (unit_dbsph_se_reg,*) "Wall element values "
@@ -167,9 +168,9 @@ if (DBSPH%n_monitor_regions==1) then
           (pg_w(npi)%coord(2)<=DBSPH%monitor_region(4)).and.                   &
           (pg_w(npi)%coord(3)>=DBSPH%monitor_region(5)).and.                   &
           (pg_w(npi)%coord(3)<=DBSPH%monitor_region(6))) then
-         write (unit_dbsph_se_reg,'(g14.7,2(i14),8(1x,g14.7),i3)') tempo,      &
-            it_corrente,i,pg_w(npi)%coord(:),pg_w(npi)%vel(:),                 &
-            pg_w(npi)%pres,pres_wpp(npi),pg_w(npi)%wet 
+         write (unit_dbsph_se_reg,'(g14.7,2(i14),8(1x,g14.7),i3)')             &
+            simulation_time,on_going_time_step,i,pg_w(npi)%coord(:),           &
+            pg_w(npi)%vel(:),pg_w(npi)%pres,pres_wpp(npi),pg_w(npi)%wet 
       endif
    end do
    close (unit_dbsph_se_reg)
@@ -178,7 +179,7 @@ endif
 ! (provided the element IDs)
 if (DBSPH%n_monitor_points>0) then
    write(nomefilectl_wall,"(a,a,i8.8,a)") nomecaso(1:len_trim(nomecaso)),      &
-      '_wall_IDs_',it_corrente,".txt"
+      '_wall_IDs_',on_going_time_step,".txt"
    open (unit_dbsph_se_ID,file=nomefilectl_wall,status="unknown",              &
       form="formatted")
    write (unit_dbsph_se_ID,*) "Wall element values "
@@ -188,8 +189,8 @@ if (DBSPH%n_monitor_points>0) then
    call flush(unit_dbsph_se_ID)
    write (unit_dbsph_se_ID,*) "wall_elements"
    do i=1,DBSPH%n_monitor_points
-      write (unit_dbsph_se_ID,'(g14.7,2(i14),8(1x,g14.7),i3)') tempo,          &
-         it_corrente,i,pg_w(DBSPH%monitor_IDs(i))%coord(:),                    &
+      write (unit_dbsph_se_ID,'(g14.7,2(i14),8(1x,g14.7),i3)') simulation_time,&
+         on_going_time_step,i,pg_w(DBSPH%monitor_IDs(i))%coord(:),             &
          pg_w(DBSPH%monitor_IDs(i))%vel(:),pg_w(DBSPH%monitor_IDs(i))%pres,    &
          pres_wpp(DBSPH%monitor_IDs(i)),pg_w(DBSPH%monitor_IDs(i))%wet           
    end do   

@@ -18,11 +18,11 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: GenerateSourceParticles_2D
-! Description: To generate new source particles to simulate inlet fluid flow (only in 2D and with one inlet section).
-!----------------------------------------------------------------------------------------------------------------------------------
+! Description: To generate new source particles to simulate inlet fluid flow 
+!              (only in 2D and with one inlet section).
+!-------------------------------------------------------------------------------
 subroutine GenerateSourceParticles_2D
 !------------------------
 ! Modules
@@ -49,7 +49,7 @@ integer(4),external :: ParticleCellNumber
 !------------------------
 ! Initializations
 !------------------------
-Time = tempo
+Time = simulation_time
 !------------------------
 ! Statements
 !------------------------
@@ -83,8 +83,8 @@ if (inttimeratio>pinttimeratio) then
                pg(nag)%coord(sd) = PartLine(i_source,ip,sd) - (yfila +         &
                                    DisplFrac) * nn(sd)
                pg(nag)%vel(sd) = Tratto(nt)%NormVelocity * nn(sd) 
-               if (tempo<Tratto(nt)%trampa) pg(nag)%vel(sd) = pg(nag)%vel(sd)  &
-                                            * tempo / tratto(nt)%trampa
+               if (simulation_time<Tratto(nt)%trampa) pg(nag)%vel(sd) =        &
+                  pg(nag)%vel(sd) * simulation_time / tratto(nt)%trampa
                pg(nag)%var(sd) = pg(nag)%vel(sd) 
             end do
             if (Domain%tipo=="bsph") call wavy_inlet(i_source)

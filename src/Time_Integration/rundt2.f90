@@ -18,11 +18,13 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: rundt2                                          
-! Description: Time step computation according to stability constraints (inertia terms, visosity term, interface diffusion -not 
-!              recommended-). Plus. a special treatment for Monaghan artificial viscosity term and management of low-velocity 
-!              SPH mixture particles for bed-laod transport phenomena.
+! Description: Time step computation according to stability constraints (inertia
+!              terms, visosity term, interface diffusion -not recommended-). 
+!              Plus, a special treatment for Monaghan artificial viscosity term 
+!              and management of low-velocity SPH mixture particles for bed-load
+!              transport phenomena.
 !----------------------------------------------------------------------------------------------------------------------------------
 subroutine rundt2
 !------------------------
@@ -99,7 +101,7 @@ if (indarrayFlu==0) then
 ! CFL is used as a constant for each of the 3 stability conditions 
       dt = (one - pesodt) * Domain%CFL * dtmin + pesodt * dt_average
 endif
-dt_average = (dt_average * (it_corrente - 1) + dt) / it_corrente
+dt_average = (dt_average * (on_going_time_step - 1) + dt) / on_going_time_step
 !------------------------
 ! Deallocations
 !------------------------

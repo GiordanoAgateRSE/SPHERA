@@ -18,13 +18,17 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: Update_Zmax_at_grid_vert_columns                 
-! Description: Updating the 2D array of the maximum values of the fluid particle height, for each grid columns (only in 3D).
-!              Printing the 2D field of the water depth (current time step), according to the output frequency chosen in the input
-!              file (only in 3D). Printing the 2D fields of the specific flow rate components (current time step), at the same
-!              frequency of the water depth (only in 3D).            
-!----------------------------------------------------------------------------------------------------------------------------------
+! Description: Updating the 2D array of the maximum values of the fluid particle
+!              height, for each grid columns (only in 3D).
+!              Printing the 2D field of the water depth (current time step), 
+!              according to the output frequency chosen in the input file (only 
+!              in 3D). 
+!              Printing the 2D fields of the specific flow rate components 
+!              (current time step), at the same frequency of the water depth 
+!              (only in 3D).            
+!-------------------------------------------------------------------------------
 subroutine Update_Zmax_at_grid_vert_columns(print_flag)
 !------------------------
 ! Modules
@@ -77,7 +81,7 @@ n_part_step = 0
 !------------------------
 !$omp parallel do default(none)                                                &
 !$omp shared(nag,pg,Grid,Z_fluid_max,Domain,Z_fluid_step,n_part_step)          &
-!$omp shared(qx_step_grid,qy_step_grid,tempo)                                  &
+!$omp shared(qx_step_grid,qy_step_grid)                                        &
 !$omp private(npi,GridColumn,pos)
 do npi=1,nag
    pos(1) = pg(npi)%coord(1)
@@ -94,7 +98,7 @@ do npi=1,nag
 enddo
 !$omp end parallel do
 !$omp parallel do default(none)                                                &
-!$omp shared(Grid,n_part_step,qx_step_grid,qy_step_grid,tempo)                 &
+!$omp shared(Grid,n_part_step,qx_step_grid,qy_step_grid)                       &
 !$omp private(GridColumn,pos,i_grid,j_grid)
 do i_grid=1,Grid%ncd(1)
    do j_grid=1,Grid%ncd(2)
@@ -115,7 +119,7 @@ do i_grid=1,Grid%ncd(1)
 enddo
 !$omp end parallel do
 ! .txt file creation and heading (only at the beginning of the simulation)
-if (it_corrente==1) then
+if (on_going_time_step==1) then
    write(nomefile_h_step,"(a,a)") nomecaso(1:len_trim(nomecaso)),              &
       "_h_qx_qy_step.txt"
    open(ncpt,file=nomefile_h_step,status="unknown",form="formatted")
@@ -127,15 +131,14 @@ if (it_corrente==1) then
 ! Writing the 2D free surface field at the current time step
       if (print_flag==1) then
          write(nomefile_h_step,"(a,a,i8.8,a)") nomecaso(1:len_trim(nomecaso)), &
-            '_h_qx_qy_step',it_corrente,".txt"
+            '_h_qx_qy_step',on_going_time_step,".txt"
          open(ncpt,file=nomefile_h_step,status="unknown",form="formatted")
       endif   
       do i_zone=1,NPartZone
          if (Partz(i_zone)%IC_source_type==2) then
 !$omp parallel do default(none)                                                &
 !$omp shared(ncpt,Partz,Vertice,Grid,h_step,Z_fluid_step,i_zone,qx_step)       &
-!$omp shared(qy_step,qx_step_grid,qy_step_grid,n_part_step,q_max,tempo)        &
-!$omp shared(print_flag)                                                       &
+!$omp shared(qy_step,qx_step_grid,qy_step_grid,n_part_step,q_max,print_flag)   &                                                       &
 !$omp private(i_vertex,GridColumn,pos,i_aux)
             do i_vertex=Partz(i_zone)%ID_first_vertex,                         &
                Partz(i_zone)%ID_last_vertex

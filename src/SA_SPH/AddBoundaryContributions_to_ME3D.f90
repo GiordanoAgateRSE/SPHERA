@@ -18,14 +18,12 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: AddBoundaryContributions_to_ME3D                                
 ! Description: To compute boundary terms for 3D momentum equation (gradPsuro, 
-!              ViscoF). Equations refer to particle npi. It performs implicit computation of gradPsuro. 
-!              (Di Monaco et al., 2011, EACFM).                        
-!----------------------------------------------------------------------------------------------------------------------------------
-
+!              ViscoF). Equations refer to particle npi. It performs implicit 
+!              computation of gradPsuro (Di Monaco et al., 2011, EACFM).                        
+!-------------------------------------------------------------------------------
 subroutine AddBoundaryContributions_to_ME3D(npi,Ncbf,tpres,tdiss,tvisc)
 !------------------------
 ! Modules
@@ -154,9 +152,9 @@ face_loop: do icbf = 1,Ncbf
       elseif (stretchtype=="velo") then 
          if ((Domain%time_stage==1).or.(Domain%time_split==1)) then 
             pg(npi)%kodvel = 2
-            if (tempo<Tratto(stretch)%trampa) then
+            if (simulation_time<Tratto(stretch)%trampa) then
                pg(npi)%velass(:) = Tratto(stretch)%NormVelocity * nnlocal(:) * &
-                  tempo / Tratto(stretch)%trampa
+                  simulation_time / Tratto(stretch)%trampa
                else
                   pg(npi)%velass(:) = Tratto(stretch)%NormVelocity * nnlocal(:) 
             endif
@@ -188,9 +186,9 @@ face_loop: do icbf = 1,Ncbf
                   else
                      Tratto(stretch)%NormVelocity = zero
                endif
-               if (tempo<Tratto(stretch)%trampa) then
+               if (simulation_time<Tratto(stretch)%trampa) then
                   pg(npi)%velass(:) = Tratto(stretch)%NormVelocity *           &
-                     nnlocal(:) * tempo / Tratto(stretch)%trampa
+                     nnlocal(:) * simulation_time / Tratto(stretch)%trampa
                   else
                      pg(npi)%velass(:) = Tratto(stretch)%NormVelocity *        &
                         nnlocal(:) 
@@ -201,9 +199,9 @@ face_loop: do icbf = 1,Ncbf
             elseif (stretchtype=="sour") then         
                if ((Domain%time_stage==1).or.(Domain%time_split==1)) then 
                   pg(npi)%kodvel = 2
-                  if (tempo<Tratto(stretch)%trampa) then
+                  if (simulation_time<Tratto(stretch)%trampa) then
                      pg(npi)%velass(:) = Tratto(stretch)%NormVelocity *        &
-                        nnlocal(:) * tempo / Tratto(stretch)%trampa
+                        nnlocal(:) * simulation_time / Tratto(stretch)%trampa
                      else
                         pg(npi)%velass(:) = Tratto(stretch)%NormVelocity *     &
                            nnlocal(:) 

@@ -18,10 +18,10 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: ReadRestartFile
 ! Description: To read the restart file.                       
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 subroutine ReadRestartFile(option,ier,nrecords)
 !------------------------
 ! Modules
@@ -148,10 +148,13 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
 ! It reads all the saved steps and overwrite the restart values until the
 ! restart time is reached.      
          do while (save_istart>it_start)
-            read(nsav,iostat=ioerr) it_start,tempo,dt,nag,ncord,restartcode
+            read(nsav,iostat=ioerr) it_start,simulation_time,dt,nag,ncord,     &
+               restartcode
             if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,                        &
-               "it_start,tempo,dt,nag,ncord,restartcode",nsav,nout)) return
-            write(nout,"(16x,i10,2(2x,g12.5),7x,i10)") it_start,tempo,dt,nag
+               "it_start,simulation_time,dt,nag,ncord,restartcode",nsav,nout)) &
+               return
+            write(nout,"(16x,i10,2(2x,g12.5),7x,i10)") it_start,               &
+               simulation_time,dt,nag
             flush(nout)
             if (it_start<save_istart) then
                read(nsav,iostat=ioerr) 
@@ -237,7 +240,7 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
                      endif                        
                      write(nout,'(a)') " "
                      write(nout,'(a,i10,a,g12.5)') "   Located Restart Step :",&
-                        it_start,"   Time :",tempo; flush(nout)
+                        it_start,"   Time :",simulation_time; flush(nout)
 ! Reading for post-processing
                      elseif (restartcode==0) then
                         read(nsav,iostat=ioerr) pg(1:nag)%coord(1),            &
@@ -250,7 +253,8 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
                            nout)) return
                         write(nscr,'(a)') " "
                         write(nscr,'(a,i10,a,g12.5)')                          &
-                           "   Located Result Step :",it_start,"   Time :",tempo
+                           "   Located Result Step :",it_start,"   Time :",    &
+                           simulation_time
                         flush(nscr)
                         write(nscr,'(a)')                                      &
 "       But this step is not a restart step. Check the correct step for restart in the restart file."
@@ -267,14 +271,17 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
          ier = 3
 ! Restart positions are based on the step number
          elseif (save_start>zero) then
-            tempo = zero
-            do while (save_start>tempo)
-               read(nsav,iostat=ioerr) it_start,tempo,dt,nag,ncord,restartcode
+            simulation_time = zero
+            do while (save_start>simulation_time)
+               read(nsav,iostat=ioerr) it_start,simulation_time,dt,nag,ncord,  &
+                  restartcode
                if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,                     &
-                  "it_start,tempo,dt,nag,ncord,restartcode",nsav,nout)) return
-               write(nout,"(16x,i10,2(2x,g12.5),7x,i10)") it_start,tempo,dt,nag
+                  "it_start,simulation_time,dt,nag,ncord,restartcode",nsav,    &
+                  nout)) return
+               write(nout,"(16x,i10,2(2x,g12.5),7x,i10)") it_start,            &
+                  simulation_time,dt,nag
                flush(nout)
-               if (tempo<save_start) then
+               if (simulation_time<save_start) then
                   read(nsav,iostat=ioerr) 
                   if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"...",nsav,nout)) &
                      return
@@ -359,7 +366,7 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
                         write(nout,'(a)') 
                         write(nout,'(a,i10,a,g12.5)')                          &
                            "   Located Restart Step :",it_start,"   Time :",   &
-                           tempo
+                           simulation_time
                         flush(nout)
 ! Reading for post-processing
                         elseif (restartcode==0) then
@@ -374,7 +381,7 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
                            write(nout,'(a)') 
                            write(nout,'(a,i10,a,g12.5)')                       &
                               "   Located Result Time :",it_start,"   Time :", &
-                              tempo
+                              simulation_time
                            flush(nout)
                            write(nscr,'(a)')                                   &
 "       But this time is not a restart time. Check the correct time for restart in the restart file."
@@ -391,11 +398,11 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
             ier = 3
             else
                write (nscr,'(a)') "  > Restart cannot be read at step:",       &
-                  it_start,"  time:",tempo
+                  it_start,"  time:",simulation_time
                ier = 4
       endif
       write (nout,'(a)') "  > Restart read successfully at step:",it_start,    &
-         "  time:",tempo
+         "  time:",simulation_time
       else
          ier = 5
 endif

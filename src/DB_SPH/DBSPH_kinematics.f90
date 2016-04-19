@@ -18,11 +18,11 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: DBSPH_kinematics
-! Description: Imposing input kinematics for the DB-SPH elements (linear interpolation of input data).             
-!----------------------------------------------------------------------------------------------------------------------------------
+! Description: Imposing input kinematics for the DB-SPH elements (linear 
+!              interpolation of input data).             
+!-------------------------------------------------------------------------------
 subroutine DBSPH_kinematics
 !------------------------
 ! Modules
@@ -66,12 +66,12 @@ omega_aux = 0.d0
 ! imposed velocity to the first surface element.
 if (DBSPH%n_w>0) then
 !$omp parallel do default(none)                                                &
-!$omp shared(DBSPH,tempo,vel_aux,omega_aux)                                    &
+!$omp shared(DBSPH,simulation_time,vel_aux,omega_aux)                          &
 !$omp private(i,j)
    do i=1,DBSPH%surface_mesh_files
       do j=1,DBSPH%n_kinematics_records(i)
-         if (DBSPH%kinematics(i,j,1)>=tempo) then
-            if (DBSPH%kinematics(i,j,1)==tempo) then
+         if (DBSPH%kinematics(i,j,1)>=simulation_time) then
+            if (DBSPH%kinematics(i,j,1)==simulation_time) then
                vel_aux(i,:) = DBSPH%kinematics(i,j,2:4)
                omega_aux(i,:) = DBSPH%kinematics(i,j,5:7)
                else
@@ -79,14 +79,14 @@ if (DBSPH%n_w>0) then
                                (DBSPH%kinematics(i,j,2:4) -                    &
                                DBSPH%kinematics(i,j-1,2:4)) /                  &
                                (DBSPH%kinematics(i,j,1) -                      &
-                               DBSPH%kinematics(i,j-1,1)) * (tempo -           &
+                               DBSPH%kinematics(i,j-1,1)) * (simulation_time - &
                                DBSPH%kinematics(i,j-1,1))
                   omega_aux(i,:) = DBSPH%kinematics(i,j-1,5:7) +               &
                                  (DBSPH%kinematics(i,j,5:7) -                  &
                                  DBSPH%kinematics(i,j-1,5:7)) /                &
                                  (DBSPH%kinematics(i,j,1) -                    &
-                                 DBSPH%kinematics(i,j-1,1)) * (tempo -         &
-                                 DBSPH%kinematics(i,j-1,1))
+                                 DBSPH%kinematics(i,j-1,1)) * (simulation_time &
+                                 - DBSPH%kinematics(i,j-1,1))
             endif
             exit
          endif

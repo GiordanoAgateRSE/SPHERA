@@ -18,12 +18,11 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: OrdGrid1              
-! Description: Ordering the numerical elements on the background positioning grid.       
-!----------------------------------------------------------------------------------------------------------------------------------
-
+! Description: Ordering the numerical elements on the background positioning 
+!              grid.       
+!-------------------------------------------------------------------------------
 subroutine OrdGrid1(nout)
 !------------------------
 ! Modules
@@ -102,7 +101,7 @@ do npi=1,nag
 enddo
 ! Fluid particles: end
 ! Semi-particles/wall elements (DB-SPH): start
-if ((DBSPH%n_w>0).and.((it_corrente == it_start).or.                           &
+if ((DBSPH%n_w>0).and.((on_going_time_step == it_start).or.                    &
    (Domain%body_part_reorder==1))) then
    Icont_w = 0
    numpartincelgiaaposto = 0
