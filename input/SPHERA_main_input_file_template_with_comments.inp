@@ -327,12 +327,11 @@ roughness_coefficient               ! null recommended value (i.e. inactive
 ! If (fluid_type==granular): start
 phi                                 ! phi(internal friction angle in degrees, 
                                     ! even if the code works in radians)
-
 cohesion viscosity_max tuned_viscosity
                                     ! cohesion (draft parameter); viscosity_max 
-                                    ! (threshold for dynamic viscosity), tuned_
-                                    ! dynamic viscosity (only for Manenti et 
-                                    ! al., 2012) 
+                                    ! (threshold for frictional viscosity), 
+                                    ! tuned_viscosity (tuned dynamic viscosity -
+                                    ! only for Manenti et al., 2012) 
 ! If (fluid_type==granular): end
 ! if ((fluid_type==granular).and.(erosion_criterion_ID==1)): start
 effective_porosity d_50 d_90        !
