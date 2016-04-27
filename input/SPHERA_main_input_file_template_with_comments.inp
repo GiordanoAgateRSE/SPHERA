@@ -200,7 +200,7 @@ dx_f/dx_w MUSCL_boundary_flag k_w slip_ID Gamma_limiter_flag
 !    2 (run-time choice depending on the inner shear viscosity terms in SPH-NS 
 !    balance equations)
 ! Gamma_limiter_flag: logical variable to activate or deactivate Gamma upper 
-! limiter (1.)
+! limiter (.true.)
 negative_wall_p_allowed FS_allowed  ! negative_wall_p_allowed: pressure of wall 
                                     ! elements can be negative; FS_allowed: free
                                     ! surface detection can be avoided. 

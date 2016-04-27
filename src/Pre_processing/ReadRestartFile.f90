@@ -189,6 +189,11 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
                      if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"q_max",       &
                         nsav,nout)) return
                   endif  
+                  if (allocated(Granular_flows_options%saturation_flag)) then
+                     read(nsav,iostat=ioerr) 
+                     if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,               &
+                        "saturation_flag",nsav,nout)) return
+                  endif  
                endif              
                else
 ! Actual array reading for restart
@@ -237,7 +242,14 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
                            q_max(1:Grid%ncd(1)*Grid%ncd(2))
                         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"q_max",nsav&
                            ,nout)) return
-                     endif                        
+                     endif                     
+                     if (allocated(Granular_flows_options%saturation_flag)) then
+                        read(nsav,iostat=ioerr)                                &
+                           Granular_flows_options%saturation_flag(1:Grid%ncd(1)&
+                           ,1:Grid%ncd(2))
+                        if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,            &
+                           "saturation_flag",nsav,nout)) return
+                     endif                                            
                      write(nout,'(a)') " "
                      write(nout,'(a,i10,a,g12.5)') "   Located Restart Step :",&
                         it_start,"   Time :",simulation_time; flush(nout)
@@ -314,6 +326,11 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
                         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"q_max",    &
                            nsav,nout)) return
                      endif
+                     if (allocated(Granular_flows_options%saturation_flag)) then
+                        read(nsav,iostat=ioerr) 
+                        if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,            &
+                        "saturation_flag",nsav,nout)) return
+                     endif 
                   endif 
                   else
 ! Actual array reading for restart
@@ -362,7 +379,15 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
                               Grid%ncd(1)*Grid%ncd(2))
                            if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"q_max", &
                               nsav,nout)) return
-                        endif                          
+                        endif                           
+                        if (allocated(Granular_flows_options%saturation_flag)) &
+                           then
+                           read(nsav,iostat=ioerr)                             &
+                              Granular_flows_options%saturation_flag(          &
+                              1:Grid%ncd(1),1:Grid%ncd(2))
+                           if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,         &
+                              "saturation_flag",nsav,nout)) return
+                        endif                                             
                         write(nout,'(a)') 
                         write(nout,'(a,i10,a,g12.5)')                          &
                            "   Located Restart Step :",it_start,"   Time :",   &

@@ -610,6 +610,23 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
                endif
             endif
             q_max = 0.d0
+! Allocation of the 2D array of the saturation flag (bed-load transport)
+            if ((Granular_flows_options%ID_erosion_criterion>0).and.           &
+               (.not.allocated(Granular_flows_options%saturation_flag))) then
+               allocate(Granular_flows_options%saturation_flag(Grid%ncd(1),    &
+                  Grid%ncd(2)),STAT=alloc_stat)
+               if (alloc_stat/=0) then
+                  write(nout,*)                                                &
+                  'Allocation of Granular_flows_options%saturation_flag ',     &
+                  'failed; the program stops here.'
+                  call diagnostic(arg1=4,arg2=1,arg3=nomsub)
+                  stop 
+                  else
+                     write (nout,*)                                            &
+                        'Allocation of Granular_flows_options%saturation_flag',&
+                        ' is successfully completed.'
+               endif
+            endif 
             exit
          endif
       enddo     
