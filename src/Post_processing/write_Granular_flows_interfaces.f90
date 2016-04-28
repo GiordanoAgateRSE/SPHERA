@@ -36,6 +36,7 @@ use Dynamic_allocation_module
 implicit none
 integer(4) :: i_grid,j_grid,i_cell,i_aux,i,k_grid,i2_grid,j2_grid
 double precision :: x_grid,y_grid,z_free_surface,z_BedLoad_PureFluid,z_bed
+double precision :: z_soil_bottom
 double precision :: pos_aux(3)
 character(255) :: nomefile_blt_interfaces
 integer(4),external :: CellIndices,ParticleCellNumber
@@ -58,8 +59,9 @@ open(ncpt,file=nomefile_blt_interfaces,status="unknown",form="formatted")
 if (on_going_time_step==1) then
 ! First step
    write (ncpt,*) "Bed load transport interfaces "
-   write (ncpt,'((7x,a),(5x,a),(5x,a),(7x,a),(7x,a),(8x,a))')                  &
-      " Time(s)"," x_grid(m)"," y_grid(m)"," z_FS(m)"," z_fm(m)"," z_b(m)"
+   write (ncpt,'((7x,a),(5x,a),(5x,a),(7x,a),(7x,a),(6x,a),(6x,a))')           &
+      " Time(s)"," x_grid(m)"," y_grid(m)"," z_FS(m)"," z_fm(m)"," z_bed(m)",  &
+      " z_bot(m)"
    flush(ncpt)
    else
 ! Other steps 
@@ -91,9 +93,17 @@ if (on_going_time_step==1) then
                      / 2.d0
                   else
                      z_BedLoad_PureFluid = z_bed 
+               endif
+               if (ind_interfaces(i_grid,j_grid,5)>0) then
+                  z_soil_bottom =                                              &
+                     pg(ind_interfaces(i_grid,j_grid,5))%coord(3) + Domain%dd  &
+                     / 2.d0
+                  else
+                     z_soil_bottom = -999.d0 
                endif   
-               write(ncpt,'(6(g14.6,1x))') simulation_time,pos_aux(1),         &
-                  pos_aux(2),z_free_surface,z_BedLoad_PureFluid,z_bed
+               write(ncpt,'(7(g14.6,1x))') simulation_time,pos_aux(1),         &
+                  pos_aux(2),z_free_surface,z_BedLoad_PureFluid,z_bed,         &
+                  z_soil_bottom
             enddo 
          endif 
          if (Granular_flows_options%lines(i,2)==-999.d0) then
@@ -123,8 +133,16 @@ if (on_going_time_step==1) then
                   else
                      z_BedLoad_PureFluid = z_bed 
                endif   
-               write(ncpt,'(6(g14.6,1x))') simulation_time,pos_aux(1),         &
-                  pos_aux(2),z_free_surface,z_BedLoad_PureFluid,z_bed
+               if (ind_interfaces(i_grid,j_grid,5)>0) then
+                  z_soil_bottom =                                              &
+                     pg(ind_interfaces(i_grid,j_grid,5))%coord(3) + Domain%dd  &
+                     / 2.d0
+                  else
+                     z_soil_bottom = -999.d0 
+               endif 
+               write(ncpt,'(7(g14.6,1x))') simulation_time,pos_aux(1),         &
+                  pos_aux(2),z_free_surface,z_BedLoad_PureFluid,z_bed,         &
+                  z_soil_bottom
             enddo
          endif
          if ((Granular_flows_options%lines(i,1).ne.-999.d0).and.               &
@@ -154,8 +172,15 @@ if (on_going_time_step==1) then
                else
                   z_BedLoad_PureFluid = z_bed 
             endif   
-            write(ncpt,'(6(g14.6,1x))') simulation_time,pos_aux(1),pos_aux(2), &
-               z_free_surface,z_BedLoad_PureFluid,z_bed
+            if (ind_interfaces(i_grid,j_grid,5)>0) then
+               z_soil_bottom =                                                 &
+                  pg(ind_interfaces(i_grid,j_grid,5))%coord(3) + Domain%dd /   &
+                  2.d0
+               else
+                  z_soil_bottom = -999.d0 
+            endif             
+            write(ncpt,'(7(g14.6,1x))') simulation_time,pos_aux(1),pos_aux(2), &
+               z_free_surface,z_BedLoad_PureFluid,z_bed,z_soil_bottom
          endif          
       enddo
 endif 

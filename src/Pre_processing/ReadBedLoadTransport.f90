@@ -38,8 +38,8 @@ integer(4) :: ID_main_fluid,ID_granular,monitoring_lines,i,line_ID
 integer(4) :: n_max_iterations,erosion_flag
 integer(4) :: deposition_at_frontiers,Gamma_slope_flag
 double precision :: dt_out,x_fixed,y_fixed,conv_crit_erosion,velocity_fixed_bed
-double precision :: x_min_dt,x_max_dt,y_min_dt,y_max_dt,saturation_freezing_time
-double precision :: z_min_dt,z_max_dt,t_q0,t_liq
+double precision :: x_min_dt,x_max_dt,y_min_dt,y_max_dt,time_minimum_saturation
+double precision :: z_min_dt,z_max_dt,t_q0,t_liq,time_maximum_saturation
 character(1) :: comment
 character(100) :: ainp,lcase
 logical,external :: ReadCheck
@@ -61,7 +61,7 @@ if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"BED LOAD TRANSPORT DATA",ninp,nout)) &
 do while (TRIM(lcase(ainp)) /= "##### end bed load transport #####")
 ! Reading input parameters (first part)
    read(ainp,*,iostat=ioerr) ID_erosion_criterion,ID_main_fluid,ID_granular,   &
-      saturation_freezing_time
+      time_minimum_saturation,time_maximum_saturation
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"BED LOAD TRANSPORT GENERAL INPUT",&
       ninp,nout)) return
    if (ID_erosion_criterion>0) then
@@ -115,8 +115,10 @@ do while (TRIM(lcase(ainp)) /= "##### end bed load transport #####")
             ID_main_fluid
          write(nout,"(1x,a,1p,i12)") "ID_granular:..................",         &
             ID_granular
-         write(nout,"(1x,a,1p,g12.5)") "saturation_freezing_time:.....",       &
-            saturation_freezing_time
+         write(nout,"(1x,a,1p,g12.5)") "time_minimum_saturation:......",       &
+            time_minimum_saturation
+         write(nout,"(1x,a,1p,g12.5)") "time_maximum_saturation:......",       &
+            time_maximum_saturation
          write(nout,"(1x,a,1p,g12.5)") "velocity_fixed_bed:...........",       &
             velocity_fixed_bed    
          write(nout,"(1x,a,1p,i12)") "erosion_flag:.................",         &
@@ -149,7 +151,8 @@ do while (TRIM(lcase(ainp)) /= "##### end bed load transport #####")
    if (ID_erosion_criterion>0) then      
       Granular_flows_options%ID_main_fluid = ID_main_fluid
       Granular_flows_options%ID_granular = ID_granular
-      Granular_flows_options%saturation_freezing_time = saturation_freezing_time
+      Granular_flows_options%time_minimum_saturation = time_minimum_saturation
+      Granular_flows_options%time_maximum_saturation = time_maximum_saturation
       Granular_flows_options%velocity_fixed_bed = velocity_fixed_bed
       Granular_flows_options%erosion_flag = erosion_flag
       Granular_flows_options%deposition_at_frontiers = deposition_at_frontiers

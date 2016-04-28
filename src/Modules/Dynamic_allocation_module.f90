@@ -18,11 +18,10 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: Dynamic_allocation_module           
 ! Description: Module to define dynamically allocated variables.                    
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 module Dynamic_allocation_module
 use Hybrid_allocation_module
 ! Vertice(3,n_vertices): array of the geometrical vertices
@@ -155,6 +154,8 @@ integer(4),               dimension(:),    allocatable :: Array_Flu
 !    side)
 ! ind_interfaces(i_grid,j_grid,4): mixture particle ID of the "bedload transport
 !    layer - fixed bed" interface in the grid column (i_grid,j_grid)
+! ind_interfaces(i_grid,j_grid,5): mixture particle ID of the bottom of the 
+!    granular material in the grid column (i_grid,j_grid).
 integer(4),               dimension(:,:,:),allocatable :: ind_interfaces 
 ! Only in 3D: the 2D arrays of the maximum values of the fluid particle height
 ! (at the nodes of the grid columns) and the specific flow rate. 

@@ -554,6 +554,60 @@ endif
 if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
 ! To estimate "DTmin" for boundary elastic reaction 
    call EvaluateBER_TimeStep
+! In case of bed-load transport
+   if (Granular_flows_options%ID_erosion_criterion>0) then        
+! Allocation of the 2D array of the minimum saturation flag (bed-load transport)
+      if (.not.allocated(                                                      &
+         Granular_flows_options%minimum_saturation_flag))then
+         allocate(Granular_flows_options%minimum_saturation_flag(              &
+            Grid%ncd(1),Grid%ncd(2)),STAT=alloc_stat)
+         if (alloc_stat/=0) then
+            write(nout,*) 'Allocation of ',                                    &
+               'Granular_flows_options%minimum_saturation_flag ',              &
+               'failed; the program stops here. '
+            call diagnostic(arg1=4,arg2=1,arg3=nomsub)
+            stop 
+            else
+               write (nout,*) 'Allocation of ',                                &
+                  'Granular_flows_options%minimum_saturation_flag is',         &
+                  ' successfully completed.'
+         endif
+      endif 
+! Allocation of the 2D array of the maximum saturation flag (bed-load transport)
+      if (.not.allocated(                                                      &
+         Granular_flows_options%maximum_saturation_flag)) then
+         allocate(Granular_flows_options%maximum_saturation_flag(              &
+            Grid%ncd(1),Grid%ncd(2)),STAT=alloc_stat)
+         if (alloc_stat/=0) then
+            write(nout,*) 'Allocation of ',                                    &
+               'Granular_flows_options%maximum_saturation_flag ',              &
+               'failed; the program stops here. '
+            call diagnostic(arg1=4,arg2=1,arg3=nomsub)
+            stop 
+            else
+               write (nout,*) 'Allocation of ',                                &
+                  'Granular_flows_options%maximum_saturation_flag is',         &
+                  ' successfully completed.'
+         endif
+      endif
+! Allocation of the 2D array of the saturation conditions
+      if (.not.allocated(Granular_flows_options%saturation_conditions)&
+         ) then
+         allocate(Granular_flows_options%saturation_conditions(                &
+            Grid%ncd(1),Grid%ncd(2)),STAT=alloc_stat)
+         if (alloc_stat/=0) then
+            write(nout,*) 'Allocation of ',                                    &
+               'Granular_flows_options%saturation_conditions failed; '         &
+               ,'the program stops here. '
+            call diagnostic(arg1=4,arg2=1,arg3=nomsub)
+            stop 
+            else
+               write (nout,*) 'Allocation of ',                                &
+                  'Granular_flows_options%saturation_conditions is ',          &
+                  'successfully completed.'
+         endif
+      endif
+   endif
    if (ncord==2) then
       call start_and_stop(2,5)
       call loop_irre_2D 
@@ -610,23 +664,6 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
                endif
             endif
             q_max = 0.d0
-! Allocation of the 2D array of the saturation flag (bed-load transport)
-            if ((Granular_flows_options%ID_erosion_criterion>0).and.           &
-               (.not.allocated(Granular_flows_options%saturation_flag))) then
-               allocate(Granular_flows_options%saturation_flag(Grid%ncd(1),    &
-                  Grid%ncd(2)),STAT=alloc_stat)
-               if (alloc_stat/=0) then
-                  write(nout,*)                                                &
-                  'Allocation of Granular_flows_options%saturation_flag ',     &
-                  'failed; the program stops here.'
-                  call diagnostic(arg1=4,arg2=1,arg3=nomsub)
-                  stop 
-                  else
-                     write (nout,*)                                            &
-                        'Allocation of Granular_flows_options%saturation_flag',&
-                        ' is successfully completed.'
-               endif
-            endif 
             exit
          endif
       enddo     

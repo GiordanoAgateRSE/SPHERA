@@ -18,12 +18,10 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: CreaGrid             
 ! Description: To create the background positioning grid.    
-!----------------------------------------------------------------------------------------------------------------------------------
-
+!-------------------------------------------------------------------------------
 subroutine CreaGrid
 !------------------------
 ! Modules
@@ -37,7 +35,7 @@ use I_O_diagnostic_module
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: ier
+integer(4) :: alloc_stat
 double precision :: epsi
 character(len=lencard) :: nomsub = "CreaGrid"
 double precision, dimension(3) :: dextr
@@ -78,14 +76,14 @@ write (nout,'(1x,a,3i8)') " Number of grid in x, y, z directions : ",          &
 write (nout,'(1x,a,i10)') " Number of total grid : ",Grid%nmax
 write (nout,'(1x,a)') " "
 ! Allocation of a 2D matrix to detect free surface (erosion criterion)
-allocate(ind_interfaces(Grid%ncd(1),Grid%ncd(2),4), stat = ier)
-if (ier/=0) then
+allocate(ind_interfaces(Grid%ncd(1),Grid%ncd(2),5),stat=alloc_stat)
+if (alloc_stat/=0) then
    write (nout,'(1x,a,i2)')                                                    &
-      "    Array ind_interfaces not allocated. Error code: ",ier
+      "    Array ind_interfaces not allocated. Error code: ",alloc_stat
    call diagnostic (arg1=4,arg3=nomsub)
    else
       write (nout,'(1x,a)') "    Array ind_interfaces successfully allocated "
-end if
+endif
 !------------------------
 ! Deallocations
 !------------------------

@@ -616,9 +616,22 @@ type TyGranular_flows_options
    integer(4)       :: Gamma_slope_flag ! Flag to activate (or not) Gamma_slope       
                                         ! (effects only when ID_erosion 
                                         ! criterion=1) 
-   double precision :: saturation_freezing_time ! Time since which saturation 
-                                                ! state is freezed and not 
-                                                ! computed anymore.
+   double precision :: time_minimum_saturation ! Time related to the minimum 
+                                               ! saturation of the granular 
+                                               ! material.
+   double precision :: time_maximum_saturation ! Time related to the maximum 
+                                               ! saturation of the granular 
+                                               ! material. So far, 
+                                               ! time_minimum_saturation 
+                                               ! has to be smaller than (or 
+                                               ! equal to) 
+                                               ! time_maximum_saturation.
+                                               ! When t<=t_min_sat, there is 
+                                               ! always phreatic zone below the 
+                                               ! free surface and dry soil 
+                                               ! elsewhere. When t>=t_max_sat, 
+                                               ! the saturation zones are 
+                                               ! freezed at t_max_sat.
    double precision :: conv_crit_erosion ! Convergence criterion for erosion  
    double precision :: velocity_fixed_bed ! (optional) velocity_fixed_bed:  
                                           ! velocity threshold (input) to 
@@ -639,10 +652,30 @@ type TyGranular_flows_options
                                 ! estimation 
    double precision :: t_q0 ! t_q0: quake start time 
    double precision :: t_liq ! t_liq: liquefaction time
-   logical,dimension(:,:),allocatable :: saturation_flag ! Free surface flag 
-                                                         ! (presence of the 
-                                                         ! free surface along 
-                                                         ! the vertical)
+   logical,dimension(:,:),allocatable :: minimum_saturation_flag ! Free surface 
+                                                                 ! flag 
+                                                                 ! (presence of 
+                                                                 ! the free 
+                                                                 ! surface along
+                                                                 ! the vertical)
+                                                                 ! at the time 
+                                                                 ! of minimum 
+                                                                 ! saturation of
+                                                                 ! the granular 
+                                                                 ! material
+   logical,dimension(:,:),allocatable :: maximum_saturation_flag ! Free surface 
+                                                                 ! flag 
+                                                                 ! (presence of 
+                                                                 ! the free 
+                                                                 ! surface along
+                                                                 ! the vertical)
+                                                                 ! at the time 
+                                                                 ! of maximum 
+                                                                 ! saturation of
+                                                                 ! the granular 
+                                                                 ! material
+   integer(4),dimension(:,:),allocatable :: saturation_conditions 
+! Saturation conditions: 1 (phreatic zone), 2 (infiltration zone), 3 (dry soil)
 ! x and/or y coordinates defining the monitoring line/point   
    double precision,dimension(:,:),allocatable :: lines                  
 end type 

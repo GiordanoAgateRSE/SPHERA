@@ -38,7 +38,7 @@ use I_O_file_module
 implicit none
 integer(4) :: npi,i_cell,i_aux,i_grid,j_grid,k_grid,alloc_stat
 double precision :: mu_main_fluid,eps_fluid_blt,p_fluid_blt_top,gamma_fluid
-double precision :: z_blt_top_fluid,alfa_TBT
+double precision :: z_blt_top_fluid,alfa_TBT,z_soil_bottom,z_inf_sat
 integer(4),external :: ParticleCellNumber,CellIndices 
 !------------------------
 ! Explicit interfaces
@@ -63,33 +63,53 @@ gamma_fluid = Med(Granular_flows_options%ID_main_fluid)%den0 * GI
 !$omp shared(Granular_flows_options,ind_interfaces,simulation_time)            &
 !$omp shared(eps_fluid_blt,gamma_fluid,mu_main_fluid)                          &
 !$omp private(npi,i_cell,i_aux,i_grid,j_grid,k_grid,p_fluid_blt_top)           &
-!$omp private(z_blt_top_fluid,alfa_TBT)
+!$omp private(z_blt_top_fluid,alfa_TBT,z_soil_bottom,z_inf_sat)
 do npi=1,nag
    if ((Med(pg(npi)%imed)%tipo=="granular").and.(pg(npi)%state=="flu")) then
       i_cell = ParticleCellNumber(pg(npi)%coord) 
       i_aux = CellIndices(i_cell,i_grid,j_grid,k_grid)
-! Fluid pressure (simplifying assumption: 1D filtration with piezometric lines  
-!    in the bed-load transport layer parallel to the local 3D slope of the 
-!    bed-load transport layer top)
-      if (Granular_flows_options%saturation_flag(i_grid,j_grid).eqv..false.)   &
-         then
-         pg(npi)%pres_fluid = 0.d0
-         else
-            p_fluid_blt_top = pg(ind_interfaces(i_grid,j_grid,2))%pres
-            z_blt_top_fluid = pg(ind_interfaces(i_grid,j_grid,2))%coord(3)
+      if (Granular_flows_options%saturation_conditions(i_grid,j_grid)==1) then
+! Fluid pressure
+! Phreatic zone (simplifying assumption: 1D filtration with piezometric lines  
+! in the bed-load transport layer parallel to the local 3D slope of the 
+! bed-load transport layer top)
+         p_fluid_blt_top = pg(ind_interfaces(i_grid,j_grid,2))%pres
+         z_blt_top_fluid = pg(ind_interfaces(i_grid,j_grid,2))%coord(3)
 ! "alfa_TBT" means “Topographic angle at the Bed-load transport layer Top” 
 ! between the local interface normal (computed on the mixture particle, 
 ! which locally defines this interface) and the vertical. The formulation for 
 ! the fluid pressure only depends on this angle, no matter abut the flow 
 ! direction.
-            alfa_TBT = dacos(                                                  &
-               pg(ind_interfaces(i_grid,j_grid,3))%normal_int_mixture_top(3))
+         alfa_TBT = dacos(                                                     &
+            pg(ind_interfaces(i_grid,j_grid,3))%normal_int_mixture_top(3))
 ! The limiter of PI/2 simply allows assigning null fluid pressure in case of 
 ! "anti-gravity" slopes (very rare and very local in case of bed-load transport)
-            alfa_TBT = min(alfa_TBT,PIGRECO/2.d0) 
-            pg(npi)%pres_fluid = p_fluid_blt_top + gamma_fluid *               &
-                                 (z_blt_top_fluid - pg(npi)%coord(3)) *        &
-                                 ((dcos(alfa_TBT)) ** 2)
+         alfa_TBT = min(alfa_TBT,PIGRECO/2.d0) 
+         pg(npi)%pres_fluid = p_fluid_blt_top + gamma_fluid *                  &
+                              (z_blt_top_fluid - pg(npi)%coord(3)) *           &
+                              ((dcos(alfa_TBT)) ** 2)
+         elseif (Granular_flows_options%saturation_conditions(i_grid,j_grid)==2&
+            ) then
+! Infiltration zone
+            z_blt_top_fluid = pg(ind_interfaces(i_grid,j_grid,2))%coord(3)
+            z_soil_bottom = pg(ind_interfaces(i_grid,j_grid,5))%coord(3)
+            z_inf_sat = z_blt_top_fluid - (simulation_time -                   &
+                        Granular_flows_options%time_minimum_saturation) /      &
+                        (Granular_flows_options%time_maximum_saturation -      &
+                        Granular_flows_options%time_minimum_saturation) *      &
+                        (z_blt_top_fluid - z_soil_bottom)
+            if (pg(npi)%coord(3)>=z_inf_sat) then
+               p_fluid_blt_top = pg(ind_interfaces(i_grid,j_grid,2))%pres
+               pg(npi)%pres_fluid = p_fluid_blt_top * (1.d0 - (z_blt_top_fluid &
+                                    - pg(npi)%coord(3)) / (z_blt_top_fluid -   &
+                                    z_soil_bottom))
+               else
+                  pg(npi)%pres_fluid = 0.d0
+            endif
+            else
+! Dry soil
+               if (Granular_flows_options%saturation_conditions(i_grid,j_grid) &
+                  ==3) pg(npi)%pres_fluid = 0.d0   
       endif
 ! Mean of the effective stresses as the difference between the total pressure 
 ! and the fluid pressure
@@ -101,8 +121,7 @@ do npi=1,nag
       if (Granular_flows_options%t_liq>=0.000001) then
          if ((simulation_time>=Granular_flows_options%t_q0).and.               &
             (simulation_time<=Granular_flows_options%t_liq).and.               &
-            (Granular_flows_options%saturation_flag(i_grid,j_grid).eqv..true.))&
-            then
+            (pg(npi)%pres_fluid>0.d0)) then
             pg(npi)%sigma_prime_m = pg(npi)%sigma_prime_m * (1.d0 -            &
                                     (simulation_time -                         &
                                     Granular_flows_options%t_q0) /             &

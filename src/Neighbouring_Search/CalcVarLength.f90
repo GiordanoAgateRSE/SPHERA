@@ -471,6 +471,21 @@ loop_nag: do npi=1,nag
                endif
 !$omp end critical (fixed_bed_detection) 
             endif
+!$omp critical (soil_bottom_detection)
+            if (ind_interfaces(igridi,jgridi,5)==0) then
+               ind_interfaces(igridi,jgridi,5) = npi   
+               else
+                  if (pg(npi)%coord(3)<                                        &
+                     pg(ind_interfaces(igridi,jgridi,5))%coord(3)) then
+                        ind_interfaces(igridi,jgridi,5) = npi 
+                        elseif (pg(npi)%coord(3)==                             &
+                           pg(ind_interfaces(igridi,jgridi,5))%coord(3))       &
+                           then
+                           if (npi>ind_interfaces(igridi,jgridi,5))            &
+                              ind_interfaces(igridi,jgridi,5) = npi
+                  endif
+            endif
+!$omp end critical (soil_bottom_detection) 
       endif                                     
    endif
 ! In case of bed-load transport with an erosion criterion
@@ -514,7 +529,7 @@ loop_nag: do npi=1,nag
                      ind_interfaces(igridi,jgridi,3) = pg(npi)%indneighliqsol
          endif
       endif        
-! Update the local position of the upper interface of the bed-load transport 
+! To update the local position of the upper interface of the bed-load transport 
 ! layer (liquid side)   
       if ((index(Med(pg(npi)%imed)%tipo,"granular")>0).and.                    &
          (pg(npi)%indneighliqsol.ne.0)) then   
@@ -547,8 +562,9 @@ loop_nag: do npi=1,nag
    endif
 enddo loop_nag
 !$omp end parallel do
-! To compute the interface flags and the saturation flag (bed-load transport) 
+! In case of bed-load transport 
 if (Granular_flows_options%ID_erosion_criterion>0) then
+! To compute the interface flags
    do npi=1,nag
       nceli = ParticleCellNumber(pg(npi)%coord)
       irestocell = CellIndices(nceli,igridi,jgridi,kgridi)
@@ -569,10 +585,13 @@ if (Granular_flows_options%ID_erosion_criterion>0) then
          endif
       endif
    enddo
-! Initialization of the saturation flag
-   if (Granular_flows_options%saturation_freezing_time>=simulation_time) then
-      Granular_flows_options%saturation_flag = .false.
-   endif   
+! Initialization of the saturation flags
+   if (Granular_flows_options%time_minimum_saturation>=simulation_time) then
+      Granular_flows_options%minimum_saturation_flag = .false.
+   endif
+   if (Granular_flows_options%time_maximum_saturation>=simulation_time) then
+      Granular_flows_options%maximum_saturation_flag = .false.
+   endif
 !$omp parallel do default(none)                                                &
 !$omp shared(Grid,pg,ind_interfaces,nout,Granular_flows_options,simulation_time)&
 !$omp private(i_grid,j_grid)
@@ -593,11 +612,58 @@ if (Granular_flows_options%ID_erosion_criterion>0) then
             pg(ind_interfaces(i_grid,j_grid,3))%blt_flag = 2
          if (ind_interfaces(i_grid,j_grid,1).ne.0)                             &
             pg(ind_interfaces(i_grid,j_grid,1))%blt_flag = 1
-! Saturation flag 
-         if ((Granular_flows_options%saturation_freezing_time>=simulation_time)&
+         if (ind_interfaces(i_grid,j_grid,5).ne.0)                             &
+            pg(ind_interfaces(i_grid,j_grid,5))%blt_flag = 4
+! Saturation flags
+         if ((Granular_flows_options%time_minimum_saturation>=simulation_time) &
             .and.(ind_interfaces(i_grid,j_grid,1)/=0)) then
-            Granular_flows_options%saturation_flag(i_grid,j_grid) = .true.
-         endif            
+            Granular_flows_options%minimum_saturation_flag(i_grid,j_grid) =    &
+               .true.
+         endif
+         if ((Granular_flows_options%time_maximum_saturation>=simulation_time) &
+            .and.(ind_interfaces(i_grid,j_grid,1)/=0)) then
+            Granular_flows_options%maximum_saturation_flag(i_grid,j_grid) =    &
+               .true.
+         endif
+! Saturation conditions
+         if (simulation_time<=Granular_flows_options%time_minimum_saturation)  &
+            then
+! Time lower than / equal to time at minimum saturation
+            if (Granular_flows_options%minimum_saturation_flag(i_grid,j_grid)  &
+               .eqv..true.) then
+! Phreatic zone
+               Granular_flows_options%saturation_conditions = 1
+               else
+! Dry soil
+                  Granular_flows_options%saturation_conditions = 3
+            endif
+            elseif (simulation_time<                                           &
+               Granular_flows_options%time_maximum_saturation) then
+! Time lower than time at minimum saturation and higher than time at maximum 
+! saturation 
+               if (Granular_flows_options%minimum_saturation_flag(i_grid,      &
+                  j_grid).eqv..true.) then
+! Phreatic zone
+                  Granular_flows_options%saturation_conditions = 1
+                  elseif (Granular_flows_options%maximum_saturation_flag(i_grid&
+                     ,j_grid).eqv..true.) then
+! Unsaturated zone
+                     Granular_flows_options%saturation_conditions = 2
+                     else
+! Dry soil
+                        Granular_flows_options%saturation_conditions = 3
+               endif
+               else
+! Time higher than time at maximum saturation         
+                  if (Granular_flows_options%maximum_saturation_flag(i_grid,   &
+                     j_grid).eqv..true.) then
+! Phreatic zone
+                     Granular_flows_options%saturation_conditions = 1
+                     else
+! Dry soil
+                        Granular_flows_options%saturation_conditions = 3
+                  endif
+         endif
       enddo
    enddo
 !$omp end parallel do

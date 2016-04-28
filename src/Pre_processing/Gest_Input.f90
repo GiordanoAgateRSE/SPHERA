@@ -485,21 +485,40 @@ if (.not.Restart) then
                   'Allocation of q_max in Gest_Input successfully completed.'
          endif
       endif
-! Allocation of the 2D array of the saturation flag (bed-load transport)
+! Allocation of the 2D array of the minimum saturation flag (bed-load transport)
       if ((Granular_flows_options%ID_erosion_criterion>0).and.                 &
-         (.not.allocated(Granular_flows_options%saturation_flag))) then
-         allocate(Granular_flows_options%saturation_flag(Grid%ncd(1),          &
+         (.not.allocated(Granular_flows_options%minimum_saturation_flag))) then
+         allocate(Granular_flows_options%minimum_saturation_flag(Grid%ncd(1),  &
             Grid%ncd(2)),STAT=alloc_stat)
          if (alloc_stat/=0) then
             write(nout,*)                                                      &
-            'Allocation of Granular_flows_options%saturation_flag failed;',    &
-            ' the program stops here.'
+            'Allocation of Granular_flows_options%minimum_saturation_flag ',   &
+            ' failed; the program stops here.'
             call diagnostic(arg1=4,arg2=1,arg3=nomsub)
             stop 
             else
                write (nout,*)                                                  &
-                  'Allocation of Granular_flows_options%saturation_flag is ',  &
-                  ' successfully completed.'
+                  'Allocation of ',                                            &
+                  'Granular_flows_options%minimum_saturation_flag is ',        &
+                  'successfully completed.'
+         endif
+      endif
+! Allocation of the 2D array of the maximum saturation flag (bed-load transport)
+      if ((Granular_flows_options%ID_erosion_criterion>0).and.                 &
+         (.not.allocated(Granular_flows_options%maximum_saturation_flag))) then
+         allocate(Granular_flows_options%maximum_saturation_flag(Grid%ncd(1),  &
+            Grid%ncd(2)),STAT=alloc_stat)
+         if (alloc_stat/=0) then
+            write(nout,*)                                                      &
+            'Allocation of Granular_flows_options%maximum_saturation_flag ',   &
+            ' failed; the program stops here.'
+            call diagnostic(arg1=4,arg2=1,arg3=nomsub)
+            stop 
+            else
+               write (nout,*)                                                  &
+                  'Allocation of ',                                            &
+                  'Granular_flows_options%maximum_saturation_flag is ',        &
+                  'successfully completed.'
          endif
       endif      
       if (Domain%RKscheme>1) then

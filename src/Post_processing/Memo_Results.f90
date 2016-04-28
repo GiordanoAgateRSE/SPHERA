@@ -131,8 +131,12 @@ if ((it_rest==it).or.(index(str,'inizio')/=0).or.(index(str,'fine')/=0)) then
    if (allocated(Z_fluid_max)) write(nres)                                     &
       Z_fluid_max(1:Grid%ncd(1)*Grid%ncd(2))
    if (allocated(q_max)) write(nres) q_max(1:Grid%ncd(1)*Grid%ncd(2))
-   if (allocated(Granular_flows_options%saturation_flag)) write(nres)          &
-      Granular_flows_options%saturation_flag(1:Grid%ncd(1),1:Grid%ncd(2))
+   if (allocated(Granular_flows_options%minimum_saturation_flag)) write(nres)  &
+      Granular_flows_options%minimum_saturation_flag(1:Grid%ncd(1),            &
+      1:Grid%ncd(2))
+   if (allocated(Granular_flows_options%maximum_saturation_flag)) write(nres)  &
+      Granular_flows_options%maximum_saturation_flag(1:Grid%ncd(1),            &
+      1:Grid%ncd(2))
    flush(nres)
    if (index(str,'inizio')==0) then
       write(nout,'(a,i10,a,f15.5)')                                            &

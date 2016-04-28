@@ -609,17 +609,43 @@ if(allocated(Granular_flows_options%lines)) then
             "is successfully completed."
    endif
 endif
-if(allocated(Granular_flows_options%saturation_flag)) then
-   deallocate(Granular_flows_options%saturation_flag,STAT=alloc_stat)
+if(allocated(Granular_flows_options%minimum_saturation_flag)) then
+   deallocate(Granular_flows_options%minimum_saturation_flag,STAT=alloc_stat)
    if (alloc_stat/=0) then
       write(nout,*)                                                            &
-         'Deallocation of Granular_flows_options%saturation_flag failed; ',    &
-         'the program stops here. '
+         'Deallocation of Granular_flows_options%minimum_saturation_flag ',    &
+         'failed; the program stops here. '
       call diagnostic(arg1=4,arg2=1,arg3=nomsub)       
       else
          write (nout,'(1x,a)')                                                 &
-            "Deallocation of Granular_flows_options%saturation_flag is ",      &
-            "successfully completed. "
+            "Deallocation of Granular_flows_options%minimum_saturation_flag ", &
+            "is successfully completed. "
+   endif
+endif
+if(allocated(Granular_flows_options%maximum_saturation_flag)) then
+   deallocate(Granular_flows_options%maximum_saturation_flag,STAT=alloc_stat)
+   if (alloc_stat/=0) then
+      write(nout,*)                                                            &
+         'Deallocation of Granular_flows_options%maximum_saturation_flag ',    &
+         'failed; the program stops here. '
+      call diagnostic(arg1=4,arg2=1,arg3=nomsub)       
+      else
+         write (nout,'(1x,a)')                                                 &
+            "Deallocation of Granular_flows_options%maximum_saturation_flag ", &
+            "is successfully completed. "
+   endif
+endif
+if(allocated(Granular_flows_options%saturation_conditions)) then
+   deallocate(Granular_flows_options%saturation_conditions,STAT=alloc_stat)
+   if (alloc_stat/=0) then
+      write(nout,*)                                                            &
+         'Deallocation of Granular_flows_options%saturation_conditions ',      &
+         'failed; the program stops here. '
+      call diagnostic(arg1=4,arg2=1,arg3=nomsub)       
+      else
+         write (nout,'(1x,a)')                                                 &
+            "Deallocation of Granular_flows_options%saturation_conditions ",   &
+            "is successfully completed. "
    endif
 endif
 if (allocated(DBSPH%kinematics)) then

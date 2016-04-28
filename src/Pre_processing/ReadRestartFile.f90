@@ -95,7 +95,7 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
       read(nsav,iostat=ioerr) grid
       if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"grid",nsav,nout)) return
 ! Allocating the 2D matrix to detect free surface (erosion criterion)
-      allocate(ind_interfaces(Grid%ncd(1),Grid%ncd(2),4),stat=ioerr)
+      allocate(ind_interfaces(Grid%ncd(1),Grid%ncd(2),5),stat=ioerr)
       if (ioerr/=0) then
          write (nout,'(1x,a,i2)')                                              &
             "    Array ind_interfaces not allocated. Error code: ",ioerr
@@ -189,10 +189,17 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
                      if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"q_max",       &
                         nsav,nout)) return
                   endif  
-                  if (allocated(Granular_flows_options%saturation_flag)) then
+                  if (allocated(Granular_flows_options%minimum_saturation_flag)&
+                     ) then
                      read(nsav,iostat=ioerr) 
                      if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,               &
-                        "saturation_flag",nsav,nout)) return
+                        "minimum_saturation_flag",nsav,nout)) return
+                  endif
+                  if (allocated(Granular_flows_options%maximum_saturation_flag)&
+                     ) then
+                     read(nsav,iostat=ioerr) 
+                     if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,               &
+                        "maximum_saturation_flag",nsav,nout)) return
                   endif  
                endif              
                else
@@ -243,13 +250,22 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
                         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"q_max",nsav&
                            ,nout)) return
                      endif                     
-                     if (allocated(Granular_flows_options%saturation_flag)) then
+                     if (allocated                                             &
+                        (Granular_flows_options%minimum_saturation_flag)) then
                         read(nsav,iostat=ioerr)                                &
-                           Granular_flows_options%saturation_flag(1:Grid%ncd(1)&
-                           ,1:Grid%ncd(2))
+                           Granular_flows_options%minimum_saturation_flag(     &
+                           1:Grid%ncd(1),1:Grid%ncd(2))
                         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,            &
-                           "saturation_flag",nsav,nout)) return
-                     endif                                            
+                           "minimum_saturation_flag",nsav,nout)) return
+                     endif 
+                     if (allocated                                             &
+                        (Granular_flows_options%maximum_saturation_flag)) then
+                        read(nsav,iostat=ioerr)                                &
+                           Granular_flows_options%maximum_saturation_flag(     &
+                           1:Grid%ncd(1),1:Grid%ncd(2))
+                        if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,            &
+                           "maximum_saturation_flag",nsav,nout)) return
+                     endif                                           
                      write(nout,'(a)') " "
                      write(nout,'(a,i10,a,g12.5)') "   Located Restart Step :",&
                         it_start,"   Time :",simulation_time; flush(nout)
@@ -326,11 +342,18 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
                         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"q_max",    &
                            nsav,nout)) return
                      endif
-                     if (allocated(Granular_flows_options%saturation_flag)) then
+                     if (allocated                                             &
+                        (Granular_flows_options%minimum_saturation_flag)) then
                         read(nsav,iostat=ioerr) 
                         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,            &
-                        "saturation_flag",nsav,nout)) return
-                     endif 
+                        "minimum_saturation_flag",nsav,nout)) return
+                     endif
+                     if (allocated                                             &
+                        (Granular_flows_options%maximum_saturation_flag)) then
+                        read(nsav,iostat=ioerr) 
+                        if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,            &
+                        "maximum_saturation_flag",nsav,nout)) return
+                     endif
                   endif 
                   else
 ! Actual array reading for restart
@@ -380,14 +403,24 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
                            if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"q_max", &
                               nsav,nout)) return
                         endif                           
-                        if (allocated(Granular_flows_options%saturation_flag)) &
+                        if (allocated                                          &
+                           (Granular_flows_options%minimum_saturation_flag)) &
                            then
                            read(nsav,iostat=ioerr)                             &
-                              Granular_flows_options%saturation_flag(          &
+                              Granular_flows_options%minimum_saturation_flag(  &
                               1:Grid%ncd(1),1:Grid%ncd(2))
                            if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,         &
-                              "saturation_flag",nsav,nout)) return
-                        endif                                             
+                              "minimum_saturation_flag",nsav,nout)) return
+                        endif 
+                        if (allocated                                          &
+                           (Granular_flows_options%maximum_saturation_flag)) &
+                           then
+                           read(nsav,iostat=ioerr)                             &
+                              Granular_flows_options%maximum_saturation_flag(  &
+                              1:Grid%ncd(1),1:Grid%ncd(2))
+                           if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,         &
+                              "maximum_saturation_flag",nsav,nout)) return
+                        endif
                         write(nout,'(a)') 
                         write(nout,'(a,i10,a,g12.5)')                          &
                            "   Located Restart Step :",it_start,"   Time :",   &
