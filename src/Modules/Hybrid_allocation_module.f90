@@ -616,6 +616,11 @@ type TyGranular_flows_options
    integer(4)       :: Gamma_slope_flag ! Flag to activate (or not) Gamma_slope       
                                         ! (effects only when ID_erosion 
                                         ! criterion=1) 
+   integer(4)       :: saturation_scheme ! saturation_scheme=0(dry soil),1(fully 
+                                         ! saturated soil),2(saturation zones 
+                                         ! depepending on 
+                                         ! time_minimum_saturation and
+                                         ! time_maximum_saturation)
    double precision :: time_minimum_saturation ! Time related to the minimum 
                                                ! saturation of the granular 
                                                ! material.

@@ -36,7 +36,7 @@ implicit none
 integer(4) :: nrighe,ier,ninp,nout,nscr,ioerr,ID_erosion_criterion,alloc_stat
 integer(4) :: ID_main_fluid,ID_granular,monitoring_lines,i,line_ID
 integer(4) :: n_max_iterations,erosion_flag
-integer(4) :: deposition_at_frontiers,Gamma_slope_flag
+integer(4) :: deposition_at_frontiers,Gamma_slope_flag,saturation_scheme
 double precision :: dt_out,x_fixed,y_fixed,conv_crit_erosion,velocity_fixed_bed
 double precision :: x_min_dt,x_max_dt,y_min_dt,y_max_dt,time_minimum_saturation
 double precision :: z_min_dt,z_max_dt,t_q0,t_liq,time_maximum_saturation
@@ -60,9 +60,13 @@ if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"BED LOAD TRANSPORT DATA",ninp,nout)) &
    return
 do while (TRIM(lcase(ainp)) /= "##### end bed load transport #####")
 ! Reading input parameters (first part)
-   read(ainp,*,iostat=ioerr) ID_erosion_criterion,ID_main_fluid,ID_granular,   &
-      time_minimum_saturation,time_maximum_saturation
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"BED LOAD TRANSPORT GENERAL INPUT",&
+   read(ainp,*,iostat=ioerr) ID_erosion_criterion,ID_main_fluid,ID_granular
+   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"BED-LOAD TRANSPORT INPUT LINE 1", &
+      ninp,nout)) return
+   call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+   read(ainp,*,iostat=ioerr) saturation_scheme,time_minimum_saturation,        &
+      time_maximum_saturation
+   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"BED-LOAD TRANSPORT INPUT LINE 2", &
       ninp,nout)) return
    if (ID_erosion_criterion>0) then
       call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
@@ -115,6 +119,8 @@ do while (TRIM(lcase(ainp)) /= "##### end bed load transport #####")
             ID_main_fluid
          write(nout,"(1x,a,1p,i12)") "ID_granular:..................",         &
             ID_granular
+         write(nout,"(1x,a,1p,i12)") "saturation_scheme:............",         &
+            saturation_scheme
          write(nout,"(1x,a,1p,g12.5)") "time_minimum_saturation:......",       &
             time_minimum_saturation
          write(nout,"(1x,a,1p,g12.5)") "time_maximum_saturation:......",       &
@@ -151,6 +157,7 @@ do while (TRIM(lcase(ainp)) /= "##### end bed load transport #####")
    if (ID_erosion_criterion>0) then      
       Granular_flows_options%ID_main_fluid = ID_main_fluid
       Granular_flows_options%ID_granular = ID_granular
+      Granular_flows_options%saturation_scheme = saturation_scheme
       Granular_flows_options%time_minimum_saturation = time_minimum_saturation
       Granular_flows_options%time_maximum_saturation = time_maximum_saturation
       Granular_flows_options%velocity_fixed_bed = velocity_fixed_bed

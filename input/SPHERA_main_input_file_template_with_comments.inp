@@ -80,10 +80,13 @@ line_last_ID line_last_vertex_1 ... line_last_vertex_last line_last_Boundary_ID
 ! about the vertex order (better anticlockwise).
 ! Faces can only be triangles or rectangles. Only "perimeter" faces can also be 
 ! quadrilateral, pentagons and hexagons.
-1 face_1_vertex_1 ... face_1_vertex last face_1_Boundary_ID
-                                           ! first face data
+1 face_1_vertex_1 ... face_1_vertex_6 face_1_Boundary_ID
+                                           ! first face data ("-1" is mandatory 
+                                           ! for meaningless vertex IDs (e.g., 
+                                           ! 5th and 6th vertices of a 
+                                           ! quadrilateral) 
 ...                                        ! other records 
-face_last_ID face_last_vertex_1 ... face_last_vertex_last face_last_Boundary_ID
+face_last_ID face_last_vertex_1 ... face_last_vertex_6 face_last_Boundary_ID
 ##### END FACES #####
 ! If (D==3D): end
 
@@ -260,14 +263,19 @@ x_outlet_last y_outlet_last z_outlet_last n_x_outlet_last n_y_outlet_last n_z_ou
 
 ##### BED LOAD TRANSPORT #####
 ! Input parameters for bed-load transport (blt) scheme
-erosion_criterion_ID ID_main_fluid ID granular time_minimum_saturation time_maximum_saturation
+erosion_criterion_ID ID_main_fluid ID granular
                                     ! erosion_criterion_ID=0(no bed-load 
                                     ! transport),1(Shields-Seminara),2(Shields 
                                     ! without blt-fixed bed interactions),3
                                     ! (Mohr-Coulomb, not recommended); 
                                     ! ID_main_fluid(medium of 
                                     ! the main fluid); ID granular
-                                    ! (medium of the blt layer); 
+                                    ! (medium of the blt layer). 
+saturation_scheme time_minimum_saturation time_maximum_saturation
+                                    ! saturation_scheme=0(dry soil),1(fully 
+                                    ! saturated soil),2(saturation zones 
+                                    ! depepending on time_minimum_saturation and
+                                    ! time_maximum_saturation);
                                     ! time_minimum_saturation: time related to 
                                     ! a relative minimum saturation of the  
                                     ! granular material.

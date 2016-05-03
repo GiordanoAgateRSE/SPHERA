@@ -447,13 +447,19 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
          k1 = i
          k2 = k1 + 5
          if (k2>numpoints) k2 = numpoints
+! Zeroing the mixture top normal, for those particles, which do not represent 
+! this interface
+         do k=k1,k2
+            if (pg(finger(k))%blt_flag/=2)                                     &
+               pg(finger(k))%normal_int_mixture_top(:) = 0.d0
+         enddo
          write(unitvtk,'(8x,6(3(1x,e12.5)))') (                                &
             pg(finger(k))%normal_int_mixture_top(1),                           &
             pg(finger(k))%normal_int_mixture_top(2),                           &
             pg(finger(k))%normal_int_mixture_top(3),k=k1,k2)
       enddo
       write(unitvtk,'(a)') '      </DataArray>' 
-      if (Granular_flows_options%erosion_flag.ne.1) then    
+      if (Granular_flows_options%erosion_flag.ne.1) then
 ! Beta
          write(unitvtk,'(a)')                                                  &
          '      <DataArray type="Float32" Name="Beta(radians)" format="ascii" >'
