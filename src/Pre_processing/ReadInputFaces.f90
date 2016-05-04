@@ -18,11 +18,12 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: ReadInputFaces                         
 ! Description:                        
-!----------------------------------------------------------------------------------------------------------------------------------
-subroutine ReadInputFaces(NumberEntities,ainp,comment,nrighe,ier,prtopt,ninp,nout)
+!-------------------------------------------------------------------------------
+subroutine ReadInputFaces(NumberEntities,ainp,comment,nrighe,ier,prtopt,ninp,  &
+                          nout)
 !------------------------
 ! Modules
 !------------------------ 
@@ -33,7 +34,7 @@ use Dynamic_allocation_module
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: nrighe,ier, ninp,nout
+integer(4) :: nrighe,ier,ninp,nout
 logical(4) :: prtopt
 integer(4),dimension(20) :: NumberEntities
 character(1) :: comment

@@ -18,11 +18,11 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: ply2SPHERA_perimeter
-! Description: Format conversion from .ply to the format of VERTICES and FACES of SPHERA main input file.        
-!----------------------------------------------------------------------------------------------------------------------------------
+! Description: Format conversion from .ply to the format of VERTICES and FACES 
+!              of SPHERA main input file.        
+!-------------------------------------------------------------------------------
 program ply2SPHERA_perimeter
 !------------------------
 ! Modules
@@ -117,7 +117,7 @@ if (read_stat/=0) then
 endif
 read(11,'(/)',IOSTAT=read_stat)
 if (read_stat/=0) then
-   write(0,*) "Error in reading lines 10-11 of .ply input file. ",              &
+   write(0,*) "Error in reading lines 10-11 of .ply input file. ",             &
       "The program stops here. "
    stop
 endif
@@ -150,7 +150,7 @@ do i_face=1,n_faces
       stop
    endif   
    face_ID = i_face + perimeter_first_face_ID - 1
-   if (face_sides<6) vertex_IDs_of_ply_face((face_sides+1):6) = -1.d0 
+   if (face_sides<6) vertex_IDs_of_ply_face((face_sides+1):6) = -1. 
    write(13,'(8(i8,1x))',IOSTAT=write_stat) face_ID,                           &
       vertex_IDs_of_ply_face(:),perimeter_ID
    if (write_stat/=0) then

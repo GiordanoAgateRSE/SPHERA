@@ -18,19 +18,27 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: GridCellBoundaryFacesIntersections3D                                       
-! Description: To find the boundary faces intercepted by each frame cell of the grid nc[1,NumCells]. In the generic row nc of the 
-!              vector CFBFPointers(1 to NumCells,1 to 2), it sets:
+! Description: To find the boundary faces intercepted by each frame cell of the 
+!              grid nc[1,NumCells]. In the generic row nc of the vector 
+!              CFBFPointers(1 to NumCells,1 to 2), it sets:
 !                 in the first column: the number of the intercepted faces
-!                 in the second column: the pointer to CFBFVector, where the list of intercepted faces begins 
-!              Searching is based on a principle of exclusion and is carried out in two phases: 
-!                 First phase: for every cell, it excludes (as possibly intercepted) the faces, whose vertices all lie in one of the semispaces (defined by the planes containing the cell faces), which do not include the cell itself.  
-!                 Second phase: for every remaining face, it verifies if all the 8 cell vertices belong to one of the semispaces defined by the plane containing the face. In the positive case, the face is excluded.  
+!                 in the second column: the pointer to CFBFVector, where the 
+!                                       list of intercepted faces begins 
+!              Searching is based on a principle of exclusion and is carried out
+!              in two phases: 
+!                 First phase: for every cell, it excludes (as possibly 
+!                              intercepted) the faces, whose vertices all lie in
+!                              one of the semispaces (defined by the planes 
+!                              containing the cell faces), which do not include
+!                              the cell itself.  
+!                 Second phase: for every remaining face, it verifies if all the
+!                               8 cell vertices belong to one of the semispaces 
+!                               defined by the plane containing the face. In the
+!                               positive case, the face is excluded.  
 !              (Di Monaco et al., 2011, EACFM)                        
-!----------------------------------------------------------------------------------------------------------------------------------
-
+!-------------------------------------------------------------------------------
 subroutine GridCellBoundaryFacesIntersections3D(NumCellmax)
 !------------------------
 ! Modules
@@ -179,8 +187,8 @@ do nc=1,Grid%nmax
                if (flpointer_cell>Domain%MAXCLOSEBOUNDFACES) then
                   write(nout,'(1x,a)')                                         &
 " Too many faces crossing a given cell. Please increase the parameter MAXCLOSEBOUNDFACES. "
-                  call diagnostic (arg1=4,arg3=nomsub)
-               endif    
+                  call diagnostic(arg1=4,arg3=nomsub)
+               endif
             endif
          endif
       endif

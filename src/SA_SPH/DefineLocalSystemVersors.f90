@@ -18,13 +18,13 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: DefineLocalSystemVersors                                      
-! Description:  To define the directional cosines of the local reference system (Di Monaco et al., 2011, EACFM). Further
-!               modifications take into account pentagon and hexagon faces (only for complex "perimeter" zones / fluid reseroirs,
-!               not for SASPH frontiers).                       
-!----------------------------------------------------------------------------------------------------------------------------------
+! Description:  To define the directional cosines of the local reference system 
+!               (Di Monaco et al., 2011, EACFM). Further modifications take into
+!               account pentagon and hexagon faces (only for complex "perimeter"
+!               zones / fluid reseroirs, not for SASPH frontiers).                       
+!-------------------------------------------------------------------------------
 subroutine DefineLocalSystemVersors(Nf)
 !------------------------
 ! Modules
@@ -51,16 +51,16 @@ integer(4),dimension(2,3) :: nindex
 ! Initializations
 !------------------------
 ! Modification for compatibility with IBM Fortran compiler (xlf90)
-nindex(1, 1) = 1
-nindex(1, 2) = 2
-nindex(1, 3) = 3
-nindex(2, 1) = 1
-nindex(2, 2) = 3
-nindex(2, 3) = 4
+nindex(1,1) = 1
+nindex(1,2) = 2
+nindex(1,3) = 3
+nindex(2,1) = 1
+nindex(2,2) = 3
+nindex(2,3) = 4
 nnodes = 6
-if (BoundaryFace(nf)%Node(6)%name<0) nnodes = 5
-if (BoundaryFace(nf)%Node(5)%name<0) nnodes = 4
-if (BoundaryFace(Nf)%Node(4)%name<0) nnodes = 3
+if (BoundaryFace(nf)%Node(6)%name<=0) nnodes = 5
+if (BoundaryFace(nf)%Node(5)%name<=0) nnodes = 4
+if (BoundaryFace(Nf)%Node(4)%name<=0) nnodes = 3
 BoundaryFace(Nf)%nodes = nnodes
 !------------------------
 ! Statements

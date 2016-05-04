@@ -18,10 +18,11 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: ModifyFaces                   
-! Description: To generate triangles from quadrilaterals (partitioning along the shortest diagonal)                 
-!----------------------------------------------------------------------------------------------------------------------------------
+! Description: To generate triangles from quadrilaterals (partitioning along the
+!              shortest diagonal)                 
+!-------------------------------------------------------------------------------
 subroutine ModifyFaces(NumberEntities)
 !------------------------
 ! Modules
@@ -35,7 +36,7 @@ use Dynamic_allocation_module
 implicit none
 integer(4),intent(IN),dimension(20) :: NumberEntities
 integer(4) :: n,i,new
-double precision :: d13, d24
+double precision :: d13,d24
 !------------------------
 ! Explicit interfaces
 !------------------------
