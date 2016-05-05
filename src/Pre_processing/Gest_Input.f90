@@ -313,7 +313,7 @@ if (.not.Restart) then
 ! To assess the number of particles. Total number of particles is 
 ! allocated depending on the value "nag". 
          if (nag<100) then
-! Initial domain empty (inlet section) 
+! Initial domain empty (inlet section)
             PARTICLEBUFFER = INIPARTICLEBUFFER * Domain%COEFNMAXPARTI
             else
                PARTICLEBUFFER = nag * Domain%COEFNMAXPARTI

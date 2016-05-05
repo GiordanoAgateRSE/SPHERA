@@ -18,10 +18,11 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: ReadInputBoundaries                    
-! Description: Reading input data for the boundary treatment scheme SA-SPH (semi-analytic approach; Di Monaco et al., 2011, EACFM).                      
-!----------------------------------------------------------------------------------------------------------------------------------
+! Description: Reading input data for the boundary treatment scheme SA-SPH 
+!              (semi-analytic approach; Di Monaco et al., 2011, EACFM).                      
+!-------------------------------------------------------------------------------
 subroutine ReadInputBoundaries(NumberEntities,Partz,Tratto,BoundaryVertex,ainp,&
    comment,nrighe,ier,ninp,nout)
 !------------------------
@@ -42,10 +43,11 @@ character(100) :: ainp
 type (TyZone),dimension(NPartZone) :: Partz
 type (TyBoundaryStretch),dimension(NumTratti) :: Tratto
 integer(4) :: n,index,numv,indexi,indexf,Izona,ipointer,Medium,icolor,icord    
-integer(4) :: ioerr,npointv,IC_source_type,Car_top_zone,dx_CartTopog
+integer(4) :: ioerr,npointv,IC_source_type,Car_top_zone
 integer(4) :: plan_reservoir_points,nag_aux,i,i1,i2,i_point,ID_first_vertex
 integer(4) :: ID_last_vertex,dam_zone_ID,dam_zone_n_vertices
 double precision :: pool_value,shear,velocity,trampa,valp,flowrate,H_res
+double precision :: dx_CartTopog
 double precision,dimension(3) :: values1,values3
 double precision,dimension(0:3,maxpointsvlaw) :: valuev
 double precision :: plan_reservoir_pos(4,2),dam_zone_vertices(4,2)

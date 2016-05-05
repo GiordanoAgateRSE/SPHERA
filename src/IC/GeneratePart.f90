@@ -18,11 +18,10 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: GeneratePart     
 ! Description: Particle positions (initial conditions).             
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 subroutine GeneratePart(IC_loop)
 !------------------------
 ! Modules
@@ -40,9 +39,10 @@ integer(4),intent(IN) :: IC_loop
 integer(4) :: Nt,Nz,Mate,IsopraS,NumParticles,i,j,k,dimensioni,NumPartPrima    
 integer(4) :: aux_factor,i_vertex,j_vertex,test_xy,test_z,n_levels,nag_aux
 integer(4) :: i_face,j_node,npi,ier,test_face,test_dam,test_xy_2
-double precision :: distance_hor,z_min,aux_scal,rnd,h_reservoir
+double precision :: distance_hor,z_min,aux_scal,rnd
 double precision :: aux_vec(3)
 integer(4),dimension(SPACEDIM) :: Npps
+double precision,dimension(NPartZone) :: h_reservoir
 double precision,dimension(SPACEDIM) :: MinOfMin,XminReset
 double precision,dimension(:),allocatable    :: z_aux
 double precision,dimension(:,:),allocatable :: Xmin,Xmax
@@ -72,33 +72,35 @@ end interface
 !------------------------
 ! Allocations
 !------------------------
+if (ncord == 2) then
+   dimensioni = NumTratti
+   else
+      dimensioni = NumFacce
+endif
+allocate(xmin(spacedim,dimensioni),xmax(spacedim,dimensioni))
+!------------------------
+! Initializations
+!------------------------
 call random_seed()
+NumParticles = 0
 test_z = 0
 if (IC_loop==2) then
    do Nz=1,NPartZone
       if (Partz(Nz)%IC_source_type==2) then
          test_z = 1
-         if (Domain%tipo=="bsph") then
-! In case of DB-SPH boundary treatment, there is a fictitious fluid reservoir
-! top, which completes the kernel suppport (only for pre-processing)
-            h_reservoir = Partz(Nz)%H_res + 3.d0 * Domain%h
-            else
-               h_reservoir = Partz(Nz)%H_res
-         endif
       endif
    enddo   
 endif
-if (test_z==0) nag = 0 
-NumParticles = 0
-if (ncord == 2) then
-   dimensioni = NumTratti
-   else
-      dimensioni = NumFacce
-end if
-allocate(xmin(spacedim,dimensioni),xmax(spacedim,dimensioni))
-!------------------------
-! Initializations
-!------------------------
+if (test_z==0) nag = 0
+do Nz=1,NPartZone
+   if (Domain%tipo=="bsph") then
+! In case of DB-SPH boundary treatment, there is a fictitious fluid reservoir
+! top, which completes the kernel suppport (only for pre-processing)
+      h_reservoir(Nz) = Partz(Nz)%H_res + 3.d0 * Domain%h
+      else
+         h_reservoir(Nz) = Partz(Nz)%H_res
+   endif
+enddo
 MinOfMin = max_positive_number
 !------------------------
 ! Statements
@@ -180,10 +182,10 @@ second_cycle: do Nz=1,NPartZone
                   if (distance_hor<=(1.5*Partz(Nz)%dx_CartTopog))              &
                      z_aux(i_vertex) = min(z_aux(i_vertex),                    &
                                            (Vertice(3,j_vertex)))
-               end do
+               enddo
 ! Generating daughter points of the Cartesian topography, according to dx
 ! (maybe the function "ceiling" would be better than "int" here)
-               n_levels = int((h_reservoir - z_aux(i_vertex)) / Domain%dd)
+               n_levels = int((h_reservoir(Nz) - z_aux(i_vertex)) / Domain%dd)
                do i=1,aux_factor
                   do j=1,aux_factor
                      do k=1,n_levels
@@ -202,7 +204,7 @@ second_cycle: do Nz=1,NPartZone
                                                         * Domain%dd + (j -     &
                                                         1 + 0.5d0) *           &
                                                         Domain%dd
-                        pg_aux(NumParticles)%coord(3) = (h_reservoir -         &
+                        pg_aux(NumParticles)%coord(3) = (h_reservoir(Nz) -     &
                                                         Domain%dd / 2.d0) -    &
                                                         (k - 1) * Domain%dd
 ! Test if the particle is below the reservoir
