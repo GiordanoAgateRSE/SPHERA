@@ -18,12 +18,11 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
 !----------------------------------------------------------------------------------------------------------------------------------
 ! Program unit: PreSourceParticles_3D
-! Description: To generate new source particles at the inlet section (only in 3D and with one quadrilateral inlet section).  
+! Description: To generate new source particles at the inlet section (only in 3D
+!              and with one quadrilateral inlet section).  
 !----------------------------------------------------------------------------------------------------------------------------------
-
 subroutine PreSourceParticles_3D 
 !------------------------
 ! Modules

@@ -18,14 +18,13 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: FindBoundaryConvexEdges3D                                       
-! Description:  To look for possible edges with an associated convex geometry. Their geometrical data are saved in 
-!               BoundaryConvexEdge as TyBoundaryConvexEdge.
+! Description: To look for possible edges with an associated convex geometry. 
+!              Their geometrical data are saved in BoundaryConvexEdge as 
+!              TyBoundaryConvexEdge.
 !              (Di Monaco et al., 2011, EACFM)                        
-!----------------------------------------------------------------------------------------------------------------------------------
-
+!-------------------------------------------------------------------------------
 subroutine FindBoundaryConvexEdges3D
 !------------------------
 ! Modules

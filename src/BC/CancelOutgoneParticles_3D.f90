@@ -18,18 +18,21 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
 !----------------------------------------------------------------------------------------------------------------------------------
 ! Program unit: CancelOutgoneParticles_3D
-! Description: To count and delete the outgoing particles on boundaries of type "leve", "flow", "velo", "crit", "open".
-!              Deletion occurs in 2 different ways:
-!              a) If the particle belongs to a particle zone (maxzone) with the highest index (the only zone where both particle  
-!                 number reduction and increase are allowed), then the outgoing particle (npi) is replaced by the last
-!                 particle (nag) in the particle array pg, and the total number of particle becomes nag=nag-1; simultaneously,
-!                 the index of the last particle of the zone is changed (Partz(maxzone)%limit(2)).   
-!              b) Otherwise, simply pg(npi)%cella = 0 (particle out of the domain boundaries).
+! Description: To count and delete the outgoing particles on boundaries of type 
+!              "leve", "flow", "velo", "crit", "open". Deletion occurs in 2 
+!              different ways:
+!              a) If the particle belongs to a particle zone (maxzone) with the 
+!                 highest index (the only zone where both particle number 
+!                 reduction and increase are allowed), then the outgoing 
+!                 particle (npi) is replaced by the last particle (nag) in the 
+!                 particle array pg, and the total number of particle becomes 
+!                 nag=nag-1; simultaneously, the index of the last particle of 
+!                 the zone is changed (Partz(maxzone)%limit(2)).   
+!              b) Otherwise, simply pg(npi)%cella = 0 (particle out of the 
+!                 domain boundaries).
 !----------------------------------------------------------------------------------------------------------------------------------
-
 subroutine CancelOutgoneParticles_3D  
 !------------------------
 ! Modules

@@ -79,7 +79,7 @@ do while (TRIM(lcase(ainp))/="##### end faces #####")
 ! To count quadrilaterals to be splitted in triangles (if required)
          if (ivalues(4)>0) NumberEntities(18) = NumberEntities(18) + 1
          if (ncord>0) then
-            if (BoundaryFace(i)%Node(1)%name==0) then 
+            if (BoundaryFace(i)%Node(1)%name<=0) then 
                BoundaryFace(i)%Node(1:MAXFACENODES)%name =                     &
                   ivalues(1:MAXFACENODES)
                BoundaryFace(i)%stretch = stretch

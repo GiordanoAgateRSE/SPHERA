@@ -119,9 +119,9 @@ do kf=Tratto(mib)%iniface,(Tratto(mib)%iniface+Tratto(mib)%numvertices-1)
    nf = BFaceList(kf)
 ! Number of the vertices of the zone face   
    nnodes = 6
-   if (BoundaryFace(nf)%Node(6)%name<0) nnodes = 5
-   if (BoundaryFace(nf)%Node(5)%name<0) nnodes = 4
-   if (BoundaryFace(nf)%Node(4)%name<0) nnodes = 3
+   if (BoundaryFace(nf)%Node(6)%name<=0) nnodes = 5
+   if (BoundaryFace(nf)%Node(5)%name<=0) nnodes = 4
+   if (BoundaryFace(nf)%Node(4)%name<=0) nnodes = 3
 ! The last vertex is arbitrarily assumed as the origin of the local reference 
 ! system 
    norig = nnodes 

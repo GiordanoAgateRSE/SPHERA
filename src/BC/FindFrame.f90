@@ -18,12 +18,11 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: FindFrame
-! Description: It finds extremes of the rectangular frame which contains the boundary mib. 
-!----------------------------------------------------------------------------------------------------------------------------------
-
+! Description: It finds extremes of the rectangular frame which contains the 
+!              boundary mib. 
+!-------------------------------------------------------------------------------
 subroutine FindFrame(Xmin,Xmax,Nt)
 !------------------------
 ! Modules
@@ -52,7 +51,7 @@ integer(4) :: i,n,iv,nf,nod
 !------------------------
 do iv=Tratto(Nt)%iniface,(Tratto(Nt)%iniface+Tratto(Nt)%numvertices-1)
    nf = BFaceList(iv)
-   do n=1,4
+   do n=1,6
       nod = BoundaryFace(nf)%Node(n)%name
       if (nod<=0) cycle
       do i=1,Ncord

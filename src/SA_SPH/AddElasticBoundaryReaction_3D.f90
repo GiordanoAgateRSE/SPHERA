@@ -18,8 +18,7 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: AddElasticBoundaryReaction_3D                                
 ! Description: To add supplementary normal boundary reaction to support 
 !              eventual insufficient pressure gradient boundary term. 
@@ -33,8 +32,7 @@
 !                d is a reference distance from which the reaction is added.
 !              Check that the elastic boundary reaction never works.
 !              (Di Monaco et al., 2011, EACFM).                        
-!----------------------------------------------------------------------------------------------------------------------------------
-
+!-------------------------------------------------------------------------------
 subroutine AddElasticBoundaryReaction_3D(npi,Ncbf,BoundReaction)
 !------------------------
 ! Modules
@@ -84,7 +82,7 @@ do icbf=1,Ncbf
       if (zi<zimin) then
          call LocalNormalCoordinates (PXLoc, csi, iface)
          fkod = BoundaryFace(iface)%nodes - 2
-         if (IsPointInternal(fkod, csi)) then 
+         if (IsPointInternal(fkod,csi)) then 
 ! The projection of the particle position, which is normal to the plane of the 
 ! face "iface", is internal to "iface".
             vin = zero
