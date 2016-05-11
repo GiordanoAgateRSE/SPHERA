@@ -36,7 +36,7 @@ use Dynamic_allocation_module
 implicit none
 character(7),intent(IN) :: option
 integer(4),intent(INOUT) :: ier,nrecords 
-integer(4) :: restartcode,save_istart,ioerr,i
+integer(4) :: restartcode,save_istart,ioerr,i,alloc_stat
 double precision :: save_start
 character(12) :: ainp = "Restart File"
 character(len=8) :: versionerest
@@ -51,10 +51,10 @@ character(100),external :: lcase
 !------------------------
 ! Initializations
 !------------------------
+ier = 0
 !------------------------
 ! Statements
 !------------------------
-ier = 0
 ! Restart heading 
 if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
    rewind(nsav)
@@ -92,17 +92,83 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
 ! the main input file.
       read(nsav,iostat=ioerr) Domain
       if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"domain",nsav,nout)) return
-      read(nsav,iostat=ioerr) grid
-      if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"grid",nsav,nout)) return
-! Allocating the 2D matrix to detect free surface (erosion criterion)
-      allocate(ind_interfaces(Grid%ncd(1),Grid%ncd(2),5),stat=ioerr)
-      if (ioerr/=0) then
-         write (nout,'(1x,a,i2)')                                              &
-            "    Array ind_interfaces not allocated. Error code: ",ioerr
-         stop ' routine ReadRestartFile'
-         else
-            write (nout,'(1x,a)')                                              &
-               "    Array ind_interfaces successfully allocated "
+      read(nsav,iostat=ioerr) Grid
+      if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"Grid",nsav,nout)) return
+! Allocating the 2D matrix to detect free surface
+      if (.not.allocated(ind_interfaces)) then
+         allocate(ind_interfaces(Grid%ncd(1),Grid%ncd(2),5),STAT=alloc_stat)
+         if (alloc_stat/=0) then
+            write(nout,*)                                                      &
+            'Allocation of ind_interfaces in ReadRestartFile failed;',         &
+            ' the program terminates here.'
+            stop
+            else
+               write (nout,*)                                                  &
+                  'Allocation of ind_interfaces in ReadRestartFile ',          &
+                  'successfully completed.'
+         endif
+      endif
+! Allocation of the array of the maximum water depth
+      if ((Partz(1)%IC_source_type==2).and.(.not.allocated(Z_fluid_max))) then
+         allocate(Z_fluid_max(Grid%ncd(1)*Grid%ncd(2)),STAT=alloc_stat)
+         if (alloc_stat/=0) then
+            write(nout,*)                                                      &
+            'Allocation of Z_fluid_max in ReadRestartFile failed;',            &
+            ' the program terminates here.'
+            stop
+            else
+               write (nout,*)                                                  &
+                  'Allocation of Z_fluid_max in ReadRestartFile successfully', &
+                  ' completed.'
+         endif
+      endif
+! Allocation of the array of the maximum specific flow rate
+      if ((Partz(1)%IC_source_type==2).and.(.not.allocated(q_max))) then
+         allocate(q_max(Grid%ncd(1)*Grid%ncd(2)),STAT=alloc_stat)
+         if (alloc_stat/=0) then
+            write(nout,*)                                                      &
+            'Allocation of q_max in ReadRestartFile failed;',                  &
+            ' the program terminates here.'
+            stop
+            else
+               write (nout,*)                                                  &
+                  'Allocation of q_max in ReadRestartFile successfully ',      &
+                  'completed.'
+         endif
+      endif
+! Allocation of the 2D array of the minimum saturation flag (bed-load transport)
+      if ((Granular_flows_options%ID_erosion_criterion>0).and.                 &
+         (.not.allocated(Granular_flows_options%minimum_saturation_flag))) then
+         allocate(Granular_flows_options%minimum_saturation_flag(Grid%ncd(1),  &
+            Grid%ncd(2)),STAT=alloc_stat)
+         if (alloc_stat/=0) then
+            write(nout,*)                                                      &
+            'Allocation of Granular_flows_options%minimum_saturation_flag ',   &
+            ' in ReadRestartFile failed; the program stops here.'
+            stop 
+            else
+               write (nout,*)                                                  &
+                  'Allocation of ',                                            &
+                  'Granular_flows_options%minimum_saturation_flag in ',        &
+                  'ReadRestartFile is successfully completed.'
+         endif
+      endif
+! Allocation of the 2D array of the maximum saturation flag (bed-load transport)
+      if ((Granular_flows_options%ID_erosion_criterion>0).and.                 &
+         (.not.allocated(Granular_flows_options%maximum_saturation_flag))) then
+         allocate(Granular_flows_options%maximum_saturation_flag(Grid%ncd(1),  &
+            Grid%ncd(2)),STAT=alloc_stat)
+         if (alloc_stat/=0) then
+            write(nout,*)                                                      &
+            'Allocation of Granular_flows_options%maximum_saturation_flag ',   &
+            ' in ReadRestartFile failed; the program stops here.'
+            stop 
+            else
+               write (nout,*)                                                  &
+                  'Allocation of ',                                            &
+                  'Granular_flows_options%maximum_saturation_flag in ',        &
+                  'ReadRestartFile is successfully completed.'
+         endif
       endif
       read(nsav,iostat=ioerr) Med(1:NMedium)
       if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"Med",nsav,nout)) return
@@ -268,7 +334,8 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
                      endif                                           
                      write(nout,'(a)') " "
                      write(nout,'(a,i10,a,g12.5)') "   Located Restart Step :",&
-                        it_start,"   Time :",simulation_time; flush(nout)
+                        it_start,"   Time :",simulation_time
+                     flush(nout)
 ! Reading for post-processing
                      elseif (restartcode==0) then
                         read(nsav,iostat=ioerr) pg(1:nag)%coord(1),            &
@@ -310,7 +377,7 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
                   simulation_time,dt,nag
                flush(nout)
                if (simulation_time<save_start) then
-                  read(nsav,iostat=ioerr) 
+                  read(nsav,iostat=ioerr)
                   if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"...",nsav,nout)) &
                      return
                   if (restartcode==1) then

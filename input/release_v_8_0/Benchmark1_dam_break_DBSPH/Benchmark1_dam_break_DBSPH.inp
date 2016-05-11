@@ -1,0 +1,245 @@
+7.2
+
+!-------------------------------------------------------------------------------
+! File name and copyright: Benchmark1_dam_break_DBSPH.inp
+!    Copyright 2016 (RSE SpA, authored by Andrea Amicarelli)
+! File description: input file for SPHERA v.8.0 (RSE SpA).
+!    Reference: Amicarelli et al. 2013 (IJNME).
+!
+! This file is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! This file is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with this file. If not, see <http://www.gnu.org/licenses/>.
+!-------------------------------------------------------------------------------
+
+##### TITLE #####
+Benchmark1_dam_break_DBSPH
+##### END TITLE #####
+
+##### DOMAIN #####
+3 bsph
+0.0075 1.3
+##### END DOMAIN #####
+
+##### VERTICES #####
+! Parallelepiped domain
+ 1   0.0     0.0        0.0
+ 2   1.59750 0.0        0.0
+ 3   1.59750 0.60375    0.0
+ 4   0.0     0.60375    0.0
+ 5   0.0     0.0        0.75
+ 6   1.59750 0.0        0.75
+ 7   1.59750 0.60375    0.75
+ 8   0.0     0.60375    0.75
+! Additional points for Water reservoir (DB-SPH)
+ 9   0.3975  0.001875   0.001875
+10   0.3975  0.601875   0.001875
+11   0.3975  0.001875   0.301875
+12   0.3975  0.601875   0.301875
+13   0.00    0.001875   0.301875
+14   0.00    0.601875   0.301875
+! Additional points for Auxiliary DB-SPH reservoir 1 (front, air) 
+! reservoir distant dx_w/2 from the solid boundaries
+15   0.42    0.001875   0.001875 
+16   0.42    0.601875   0.001875
+17   0.42    0.001875   0.301875
+18   0.42    0.601875   0.301875
+! Additional points for Auxiliary DB-SPH reservoir 2 (top, air)
+! reservoir distant dx_w/2 from the solid boundaries
+19   0.00    0.001875   0.324375
+20   0.00    0.601875   0.324375
+21   0.3975  0.001875   0.324375
+22   0.3975  0.601875   0.324375
+! Additional points for Auxiliary DB-SPH reservoir 3 (top-front edge, air)
+! reservoir distant dx_w/2 from the solid boundaries
+23   0.42    0.001875   0.324375
+24   0.42    0.601875   0.324375
+! Additional points for Water reservoir (DB-SPH)
+!  reservoir distant dx_w/2 from the solid boundaries
+25   0.00    0.001875   0.001875
+26   0.00    0.601875   0.001875
+! Eventual additional points for Auxiliary DBSPH reservoir 1 (front, air) 
+! (fictititious points very close or coincident with  points 9-12, to improve 
+! the reservoir discretization in case of need)
+27   0.3975  0.001875   0.001875
+28   0.3975  0.601875   0.001875
+29   0.3975  0.001875   0.301875
+30   0.3975  0.601875   0.301875
+##### END VERTICES #####
+ 
+##### FACES #####
+! Domain
+ 1    1  5  6  2  1
+ 2    4  3  7  8  1		
+ 3    1  4  8  5  1		
+ 4    2  6  7  3  1
+ 5    1  2  3  4  1
+ 6    5  8  7  6  1     
+!Water Reservoir     
+ 7   25 13 11  9  2 ! right face 
+ 8   25 13 14 26  2 ! back face 
+ 9   26 14 12 10  2 ! left face
+ 10   9 10 12 11  2 ! front face  
+11   25 26 10  9  2 ! bottom face
+12   11 13 14 12  2 ! top face 
+! Auxiliary DBSPH reservoir 1 (front, air)
+13   17 15 16 18  3 ! front face  
+14   27 11 12 28  3 ! back face
+15   29 27 15 17  3 ! right face   
+16   18 16 28 30  3 ! left face  
+17   29 17 18 30  3 ! top face     
+18   28 16 15 27  3 ! bottom face 
+! Auxiliary DBSPH reservoir 2 (top, air)
+19   11 21 19 13  3 ! right face
+20   12 22 21 11  3 ! front face 
+21   20 22 12 14  3 ! left face  
+22   19 20 14 13  3 ! back face  
+23   11 12 14 13  3 ! bottom face  
+24   19 21 22 20  3 ! top face
+! Auxiliary DBSPH reservoir 3 (top-front edge, air)
+25   23 17 18 24  3 ! front face   
+26   11 21 22 12  3 ! back face  
+27   21 11 17 23  3 ! right face  
+28   24 18 12 22  3 ! left face  
+29   21 23 24 22  3 ! top face   
+30   12 18 17 11  3 ! bottom face   
+##### END FACES #####
+
+##### BOUNDARIES #####
+Frontier
+1
+fixed
+0.
+111111
+!
+Water
+2
+perimeter
+1
+uniform 009EA8
+std 0. 0. 0. 0.
+qp 0.30
+1 0
+!
+Aux_air_reserv1_front
+3
+perimeter
+2
+uniform 009EA8
+std 0. 0. 0. 0.
+pa 0.
+1 0
+!
+Aux_air_reserv1_top
+4
+perimeter
+2
+uniform 009EA8
+std 0. 0. 0. 0.
+pa 0.
+1 0
+!
+Aux_air_reserv1_edge
+5
+perimeter
+2
+uniform 009EA8
+std 0. 0. 0. 0.
+pa 0.
+1 0
+##### END BOUNDARIES #####
+
+##### DBSPH #####
+2. .false. 0.5
+0 1
+0.89625 1.02375 0.238125 0.365625 -999999. 999999.
+2 .false.
+0. 0. 0. 0.
+2. 0. 0. 0.
+0 0
+##### END DBSPH #####
+
+##### BED LOAD TRANSPORT #####
+0 1 2
+##### end BED LOAD TRANSPORT #####
+
+##### medium #####
+liquid
+1
+1000. 6.0e+4
+1. 0.
+0. 0.
+0. 0. 0.
+0.
+0.
+liquid
+2
+1.2 6.0e+4
+1. 0.
+0. 0. 
+0. 0. 0.
+0.
+0.
+##### end medium #####
+
+##### BODY DYNAMICS #####
+0 2 0
+##### end BODY DYNAMICS #####
+
+##### RUN PARAMETERS #####
+2. 1000000000
+0.025 0 1 0. .false.
+0.3 0.3 A
+1.1 2. 0
+9 100
+300000
+0
+##### end RUN PARAMETERS #####
+
+##### general physical properties #####
+0. 0. -9.81
+0.
+##### end general physical properties #####
+
+##### output regulation #####
+results time 1.
+restart time 1.
+print partial 10
+control time 0.05
+level time 0.05 medium 1
+depth dt_out 900.
+##### end output regulation #####
+
+##### draw options #####
+vtkconverter any 0.05
+##### end draw options #####
+
+##### control points #####
+0.754 0.31 0.026
+0.8   0.31 0.01
+##### end control points #####
+
+##### control lines #####
+H1
+0.899 0.31 0.01
+0.899 0.31 0.70
+70
+H2
+1.0201 0.31 0.01
+1.0201 0.31 0.70
+70
+##### end control lines #####
+
+##### control sections #####
+!
+##### end control sections #####
+
+##### section flow rate #####
+0 1. 1
+##### end section flow rate #####

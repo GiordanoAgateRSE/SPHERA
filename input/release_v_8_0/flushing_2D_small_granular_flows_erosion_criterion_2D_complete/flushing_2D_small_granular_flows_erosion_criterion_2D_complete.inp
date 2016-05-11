@@ -1,0 +1,218 @@
+7.2
+
+!-------------------------------------------------------------------------------
+! File name and copyright: 
+!    flushing_2D_small_granular_flows_erosion_criterion_2D_complete.inp
+!    Copyright 2016 (RSE SpA, authored by Andrea Amicarelli)
+! File description: input file for SPHERA v.8.0 (RSE SpA).
+!    Reference: Amicarelli & Agate 2014 (SPHERIC).
+!
+! This file is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! This file is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with this file. If not, see <http://www.gnu.org/licenses/>.
+!-------------------------------------------------------------------------------
+
+##### TITLE #####
+flushing_2D_small_granular_flows_erosion_criterion_2D_complete
+##### END TITLE #####
+
+##### DOMAIN #####
+2 semi
+0.051 1.25
+##### END DOMAIN #####
+
+##### VERTICES #####
+ 1 0.0 2.8  
+ 2 0.0 1.0  
+ 3 0.0 0.0  
+ 4 3.6 0.0  
+ 5 2.0 1.0  
+ 6 4.3 0.0  
+ 7 4.3 0.75 
+ 8 2.9 0.75 
+ 9 2.9 2.8  
+10 0.0 2.7  
+11 0.0 1.5  
+12 0.0 3.0  
+13 2.9 3.0  
+##### END VERTICES #####
+
+##### LINES #####
+1 12 10
+2 10 11
+! Frontier 1
+3 11 2 3 4 6
+! Outlet 
+4 6 7
+! Frontier 2
+5 7 8 13 
+! Reservoir
+6 1 10 11 2 5 4 6 7 8 9 1
+! Granular bed
+7 2 3 4 5 2
+##### END LINES #####
+
+##### BOUNDARIES #####
+Frontier_1
+1
+fixed
+1.
+111111
+!
+Frontier_s
+2
+fixed
+1.
+111111
+!
+Frontier_2
+3
+fixed
+1.
+111111
+!
+Outlet
+4
+open
+FF0000
+!
+Frontier_3
+5
+fixed
+1.
+111111
+!
+Water
+6
+perimeter
+1
+uniform 009EA8
+std 0. 0. 0. 0.
+pl 1
+1 0
+!
+Granular_bed
+7
+perimeter
+2
+uniform FF0000
+std 0. 0. 0. 0.
+pl 1
+1 0
+##### END BOUNDARIES #####
+
+##### DBSPH #####
+1. .false. 0.5
+0 0
+0 .false.
+0 0
+##### END DBSPH #####
+
+##### BED LOAD TRANSPORT #####
+1 1 2           
+0.0 2           
+1 0 1           
+1 2.5 0.03 30   
+0.005           
+-999999. 999999.
+-999999. 999999.
+-999999. 999999.
+1               
+-999. 0.0       
+##### end BED LOAD TRANSPORT #####
+
+##### medium #####
+liquid
+1
+1000. 1.0e+6
+0.1 0.
+0. 0.
+0. 0. 0.
+.001
+0.
+!
+granular
+2
+1750. 1.75e+6
+0.1 0.
+0. 0.
+0. 0. 0.
+30.       
+0.37 0.0001 0.0001
+##### end medium #####
+
+##### BODY DYNAMICS #####
+0 2 0
+##### end BODY DYNAMICS #####
+
+##### RUN PARAMETERS #####
+10. 1000000000
+0.25 1 1 0. .false.
+0.25 0. A
+10. 4. 0
+10 100
+100000
+0
+##### end RUN PARAMETERS #####
+
+##### general physical properties #####
+0. -9.81
+0.
+##### end general physical properties #####
+
+##### output regulation #####
+results time 99999.
+restart time 99999.
+print partial 1000
+control time 1.
+level time 1. medium 1
+depth dt_out 999999.
+##### end output regulation #####
+
+##### draw options #####
+vtkconverter any 0.1
+##### end draw options #####
+
+##### control points #####
+!
+##### end control points #####
+
+##### control lines #####
+H1
+1.900 0. 0.
+1.900 1. 1.
+20
+H2
+2.500 0. 0.
+2.500 1. 1.
+20
+H3
+3.000 0. 0.
+3.000 1. 1.
+20
+H4
+3.600 0. 0.
+3.600 1. 1.
+20
+##### end control lines #####
+
+##### control sections #####
+!
+##### end control sections #####
+
+##### section flow rate #####
+1 0.1 2    
+1          
+4          
+2.9 -0.5 0.
+2.9  0.5 0.
+2.9  0.5 2.
+2.9 -0.5 2.
+##### end section flow rate #####

@@ -244,14 +244,14 @@ if (.not.Restart) then
          erosione = .TRUE.
          modelloerosione = Med(i)%modelloerosione
       endif
-    enddo
-    close(ninp)
-    nag = 0
-    if (ncord==2)then
+   enddo
+   close(ninp)
+   nag = 0
+   if (ncord==2)then
 ! 10 / (7 * pigreco) *(3./2.) /(h**2)
-       Domain%coefke = 0.682093d0 / squareh  
+      Domain%coefke = 0.682093d0 / squareh  
 ! 5 / (16 * pigreco)/(h**2)
-       Domain%coefkacl = 0.099472d0 / squareh   
+      Domain%coefkacl = 0.099472d0 / squareh   
 ! Particle volume
       Domain%PVolume = Domain%dd * Domain%dd
       elseif (ncord==3)then
@@ -458,69 +458,6 @@ if (.not.Restart) then
             endif
          endif
       endif
-! Allocation of the array of the maximum water depth
-      if ((Partz(1)%IC_source_type==2).and.(.not.allocated(Z_fluid_max))) then
-         allocate(Z_fluid_max(Grid%ncd(1)*Grid%ncd(2)),STAT=alloc_stat)
-         if (alloc_stat/=0) then
-            write(nout,*)                                                      &
-            'Allocation of Z_fluid_max in Gest_Input failed;',                 &
-            ' the program terminates here.'
-            stop ! Stop the main program
-            else
-               write (nout,*)                                                  &
-                  'Allocation of Z_fluid_max in Gest_Input successfully',      &
-                  ' completed.'
-         endif
-      endif
-! Allocation of the array of the maximum specific flow rate
-      if ((Partz(1)%IC_source_type==2).and.(.not.allocated(q_max))) then
-         allocate(q_max(Grid%ncd(1)*Grid%ncd(2)),STAT=alloc_stat)
-         if (alloc_stat/=0) then
-            write(nout,*)                                                      &
-            'Allocation of q_max in Gest_Input failed;',                       &
-            ' the program terminates here.'
-            stop ! Stop the main program
-            else
-               write (nout,*)                                                  &
-                  'Allocation of q_max in Gest_Input successfully completed.'
-         endif
-      endif
-! Allocation of the 2D array of the minimum saturation flag (bed-load transport)
-      if ((Granular_flows_options%ID_erosion_criterion>0).and.                 &
-         (.not.allocated(Granular_flows_options%minimum_saturation_flag))) then
-         allocate(Granular_flows_options%minimum_saturation_flag(Grid%ncd(1),  &
-            Grid%ncd(2)),STAT=alloc_stat)
-         if (alloc_stat/=0) then
-            write(nout,*)                                                      &
-            'Allocation of Granular_flows_options%minimum_saturation_flag ',   &
-            ' failed; the program stops here.'
-            call diagnostic(arg1=4,arg2=1,arg3=nomsub)
-            stop 
-            else
-               write (nout,*)                                                  &
-                  'Allocation of ',                                            &
-                  'Granular_flows_options%minimum_saturation_flag is ',        &
-                  'successfully completed.'
-         endif
-      endif
-! Allocation of the 2D array of the maximum saturation flag (bed-load transport)
-      if ((Granular_flows_options%ID_erosion_criterion>0).and.                 &
-         (.not.allocated(Granular_flows_options%maximum_saturation_flag))) then
-         allocate(Granular_flows_options%maximum_saturation_flag(Grid%ncd(1),  &
-            Grid%ncd(2)),STAT=alloc_stat)
-         if (alloc_stat/=0) then
-            write(nout,*)                                                      &
-            'Allocation of Granular_flows_options%maximum_saturation_flag ',   &
-            ' failed; the program stops here.'
-            call diagnostic(arg1=4,arg2=1,arg3=nomsub)
-            stop 
-            else
-               write (nout,*)                                                  &
-                  'Allocation of ',                                            &
-                  'Granular_flows_options%maximum_saturation_flag is ',        &
-                  'successfully completed.'
-         endif
-      endif      
       if (Domain%RKscheme>1) then
          if (Domain%tipo=="semi") then   
            allocate(ts0_pg(PARTICLEBUFFER),stat=ier)  

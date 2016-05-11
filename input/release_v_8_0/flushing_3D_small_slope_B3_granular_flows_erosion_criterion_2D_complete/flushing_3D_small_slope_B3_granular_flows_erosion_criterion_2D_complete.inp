@@ -1,0 +1,266 @@
+7.2
+
+!-------------------------------------------------------------------------------
+! File name and copyright: 
+!    flushing_3D_small_slope_B3_granular_flows_erosion_criterion_2D_complete.inp
+!    Copyright 2016 (RSE SpA, authored by Andrea Amicarelli)
+! File description: input file for SPHERA v.8.0 (RSE SpA).
+!    Description: simplified 3D flushing (sediment removal from water reservoir)
+!
+! This file is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! This file is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with this file. If not, see <http://www.gnu.org/licenses/>.
+!-------------------------------------------------------------------------------
+
+##### TITLE #####
+flushing_3D_small_slope_B3_granular_flows_erosion_criterion_2D_complete
+##### END TITLE #####
+
+##### DOMAIN #####
+3 semi
+0.101 1.25
+##### END DOMAIN #####
+
+##### VERTICES #####
+ 1 0.0 0.0 2.8
+ 2 0.0 0.0 1.0
+ 3 0.0 0.0 0.0
+ 4 3.6 0.0 0.0
+ 5 2.0 0.0 1.0
+ 6 4.3 0.0 0.0
+ 7 4.3 0.0 0.75
+ 8 2.9 0.0 0.75
+ 9 2.9 0.0 2.8
+10 0.0 0.0 2.7
+11 0.0 0.0 1.5
+12 0.0 0.0 3.0
+13 2.9 0.0 3.0
+14 2.9 0.0 0.0
+15 2.0 0.0 0.0
+16 3.6 0.0 0.75
+17 2.9 0.0 1.0
+18 2.9 0.0 0.425
+19 2.45 0.0 0.75
+20 0.0 1.0 2.8
+21 0.0 1.0 1.5
+22 0.0 1.0 0.0
+23 3.6 1.0 0.0
+24 2.0 1.0 1.5
+25 4.3 1.0 0.0
+26 4.3 1.0 1.25
+27 2.9 1.0 1.25
+28 2.9 1.0 2.8
+29 0.0 1.0 3.2
+30 0.0 1.0 2.0
+31 0.0 1.0 3.0
+32 2.9 1.0 3.0
+33 2.9 1.0 0.0
+34 2.0 1.0 0.0
+35 3.6 1.0 1.25
+36 2.9 1.0 1.5
+37 2.9 1.0 0.925
+38 2.45 1.0 1.25
+! last point for the water reservoir (instead of 23), which was superposed in 2D
+! to a point for the granular reservoir
+39 3.6 1.0 0.5   
+! auxiliary point to help SPHERA
+40 2.9 0.0 1.25  
+##### END VERTICES #####
+
+##### FACES #####   
+! Domain frontier   
+1 13 14 3 12 1      ! right lateral 1
+2 7 6 14 8 1        ! right lateral 2
+3 31 22 33 32 1     ! left lateral 1
+4 27 33 25 26 1     ! left lateral 2
+5 12 3 22 31 1      ! rear
+6 25 22 3 6 1       ! bottom
+7 31 32 13 12 1     ! top 1
+8 27 26 7 8 1       ! top 2
+9 32 27 40 13 1     ! front 1
+10 27 8 40 0 1      ! front 2
+! Granular bed reservoir
+11 5 4 3 2 2        ! right
+12 21 22 23 24 2    ! left
+13 21 24 5 2 2      ! top
+14 3 4 23 22 2      ! bottom
+15 24 23 4 5 2      ! front
+16 2 3 22 21 2      ! rear
+! Water reservoir
+!    top parallelepiped
+17 9 17 2 1 3       ! right
+18 20 21 36 28 3    ! left
+19 20 28 9 1 3      ! top
+20 36 21 2 17 3     ! bottom
+21 1 2 21 20 3      ! rear
+22 28 36 17 9 3     ! front
+!    bottom parallelepiped
+23 7 6 4 16 3      ! right
+24 35 23 25 26 3   ! left
+25 35 26 7 16 3    ! top
+26 25 23 4 6 3     ! bottom
+27 16 4 23 35 3    ! rear
+28 26 25 6 7 3     ! front
+!    top prism
+29 17 18 5 0 3     ! right
+30 24 37 36 0 3    ! left
+31 24 36 17 5 3    ! top
+32 5 18 37 24 3    ! bottom rear
+33 36 37 18 17 3   ! front
+!    bottom trapezoid
+34 16 4 18 8 3     ! right
+35 27 37 39 35 3   ! left
+36 27 35 16 8 3    ! top
+37 18 4 39 37 3    ! bottom
+38 8 18 37 27 3    ! rear
+39 35 39 4 16 3    ! front
+! Outlet
+40 26 25 6 7 4
+##### END FACES #####
+
+##### BOUNDARIES #####
+wall
+1
+fixed
+1.
+111111
+!
+Granular_bed
+2
+perimeter
+2
+uniform 009EA8
+std 0. 0. 0. 0.
+pl 1
+1 0
+!
+Water_reservoir
+3
+perimeter
+1
+uniform 009EA8
+std 0. 0. 0. 0.
+pl 1
+1 0
+!
+Outlet
+4
+open
+FF0000
+##### END BOUNDARIES #####
+
+##### DBSPH #####
+1. .false. 0.5
+0 0
+0 .false.
+0 0
+##### END DBSPH #####
+
+##### BED LOAD TRANSPORT #####
+1 1 2           
+0.0 2           
+1 0 0           
+1 0.75 0.03 30  
+0.005           
+-999999. 999999.
+-999999. 999999.
+-999999. 999999.
+1               
+-999. 0.        
+##### end BED LOAD TRANSPORT #####
+
+##### medium #####
+liquid
+1
+1000. 1.0e+6
+0.1 0.
+0. 0.
+0. 0. 0.
+.001
+0.
+!
+granular
+2
+1750. 1.75e+6
+0.1 0.
+0. 0.
+0. 0. 0.
+30.
+0.37 0.0001 0.0001
+##### end medium #####
+
+##### BODY DYNAMICS #####
+0 2 0
+##### end BODY DYNAMICS #####
+
+##### RUN PARAMETERS #####
+1. 1000000000
+0.25 1 1 0. .false.
+0.25 0. A
+1. 1.33 0
+5 50
+100000
+0
+##### end RUN PARAMETERS #####
+
+##### general physical properties #####
+0. 0. -9.81
+0.
+##### end general physical properties #####
+
+##### output regulation #####
+results time 99999.
+restart time 99999.
+print partial 100
+control time 0.1
+level time 0.1 medium 1
+depth dt_out 999999.
+##### end output regulation #####
+
+##### draw options #####
+vtkconverter any 0.01
+##### end draw options #####
+
+##### control points #####
+!
+##### end control points #####
+
+##### control lines #####
+H1
+1.900 0. 0.
+1.900 1. 1.
+20
+H2
+2.500 0. 0.
+2.500 1. 1.
+20
+H3
+3.000 0. 0.
+3.000 1. 1.
+20
+H4
+3.600 0. 0.
+3.600 1. 1.
+20
+##### end control lines #####
+
+##### control sections #####
+!
+##### end control sections #####
+
+##### section flow rate #####
+1 0.01 2  
+1         
+4         
+2.9 0.0 0.
+2.9 1.0 0.
+2.9 1.0 4.
+2.9 0.0 4.
+##### end section flow rate #####
