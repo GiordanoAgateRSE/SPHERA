@@ -18,7 +18,7 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: FindCloseBoundaryFaces3D                                       
 ! Description: To finds the "close" boundary faces, i.e. those faces located at 
 !              a distance from the particle npi smaller than or equal to 2h. It 
@@ -31,7 +31,7 @@
 !              cell boxes of the reference frame located all around particle 
 !              npi, and cancels the repeated ones.
 !              (Di Monaco et al., 2011, EACFM)                        
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 subroutine FindCloseBoundaryFaces3D(npi,Ncbf,Clobface,LocX,Nfzn)
 !------------------------
 ! Modules

@@ -18,14 +18,16 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
-!----------------------------------------------------------------------------------------------------------------------------------
-! Program unit: LocalNormalCoordinates  
-! Description: Given the local Cartesian coordinates PX(1:2) of a point P laying on the plane of the boundary face nf, this
-!              procedure assigns to csi(1:3) the non-Cartesian coordinates in a different local reference systems, whose axis are
-!              aligned with the face sides. Scaling provides coordinate values to go from 0 to 1 for internal points. This
-!              procedure applies for triangular faces and simplier works for rectangular faces (not for quadrilateral faces).
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+! Program unit: LocalNormalCoordinates 
+! Description: Given the local Cartesian coordinates PX(1:2) of a point P laying
+!              on the plane of the boundary face nf, this procedure assigns to 
+!              csi(1:3) the non-Cartesian coordinates in a different local 
+!              reference systems, whose axis are aligned with the face sides. 
+!              Scaling provides coordinate values to go from 0 to 1 for internal
+!              points. This procedure applies for triangular faces and simplier 
+!              works for rectangular faces (not for quadrilateral faces).
+!-------------------------------------------------------------------------------
 subroutine LocalNormalCoordinates(PX,csi,nf)
 !------------------------
 ! Modules
@@ -59,9 +61,11 @@ mainod(1,3) = 3
 mainod(2,1) = 1
 mainod(2,2) = 3
 mainod(2,3) = 4
-nodes = 4
-if (BoundaryFace(nf)%Node(4)%name<0) nodes = 3
-fkod = nodes - 2                    ! = 1 (triangle), =2 (quadrilateral)
+nodes = 6
+if (BoundaryFace(nf)%Node(6)%name<=0) nodes = 5
+if (BoundaryFace(nf)%Node(5)%name<=0) nodes = 4
+if (BoundaryFace(nf)%Node(4)%name<=0) nodes = 3
+fkod = nodes - 2
 DueArea = (3 - fkod) * BoundaryFace(nf)%Area
 UsuDueArea = one / DueArea
 !------------------------
