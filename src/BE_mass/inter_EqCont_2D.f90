@@ -18,12 +18,12 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: inter_EqCont_2D 
-! Description: To accumulate contributions for the 2D continuity equation. Computation of velocity gradients and the second 
-!              invariant of the strain-rate tensor.        
-!----------------------------------------------------------------------------------------------------------------------------------
+! Description: To accumulate contributions for the 2D continuity equation. 
+!              Computation of velocity gradients and the second invariant of the
+!              strain-rate tensor.        
+!-------------------------------------------------------------------------------
 subroutine inter_EqCont_2D 
 !------------------------
 ! Modules

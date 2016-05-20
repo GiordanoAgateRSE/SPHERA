@@ -148,7 +148,9 @@ do i_face=1,n_faces
       write(0,*) "Error in reading face vertices from .ply input file. ",      &
          "The program stops here. "
       stop
-   endif   
+   endif
+   vertex_IDs_of_ply_face(1:face_sides) = vertex_IDs_of_ply_face(1:face_sides) &
+                                          + perimeter_first_vertex_ID 
    face_ID = i_face + perimeter_first_face_ID - 1
    if (face_sides<6) vertex_IDs_of_ply_face((face_sides+1):6) = -1. 
    write(13,'(8(i8,1x))',IOSTAT=write_stat) face_ID,                           &

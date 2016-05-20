@@ -763,12 +763,12 @@ type DBSPH_der_type
 end type 
 
 ! Derived type declarations
-type (TyGlobal)     :: Domain
-type (TyGriglia)    :: Grid
-type (TyParticle)   :: PgZero
-type (Tytime_stage) :: ts_pgZero
-type (TyQ_section)  :: Q_sections
-type (TyGranular_flows_options) Granular_flows_options
-type(DBSPH_der_type) :: DBSPH
+type(TyGlobal)                 :: Domain
+type(TyGriglia)                :: Grid
+type(TyParticle)               :: PgZero
+type(Tytime_stage)             :: ts_pgZero
+type(TyQ_section)              :: Q_sections
+type(TyGranular_flows_options) :: Granular_flows_options
+type(DBSPH_der_type)           :: DBSPH
 
 end module Hybrid_allocation_module

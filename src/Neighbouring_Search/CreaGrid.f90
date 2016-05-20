@@ -71,9 +71,9 @@ if (ncord==2) Grid%ncd(2) = 1
 ! domain (a parallelepiped)
 Grid%nmax = Grid%ncd(1) * Grid%ncd(2) * Grid%ncd(3)
 write (nout,'(1x,a)') " "
-write (nout,'(1x,a,3i8)') " Number of grid in x, y, z directions : ",          &
+write (nout,'(1x,a,3i8)') " Number of grid cells in x, y, z directions : ",    &
    Grid%ncd(1),Grid%ncd(2),Grid%ncd(3)
-write (nout,'(1x,a,i10)') " Number of total grid : ",Grid%nmax
+write (nout,'(1x,a,i10)') " Number of total grid cells : ",Grid%nmax
 write (nout,'(1x,a)') " "
 ! Allocation of a 2D matrix to detect free surface (erosion criterion)
 allocate(ind_interfaces(Grid%ncd(1),Grid%ncd(2),5),stat=alloc_stat)

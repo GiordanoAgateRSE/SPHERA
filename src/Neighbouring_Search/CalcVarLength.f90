@@ -638,10 +638,12 @@ if (Granular_flows_options%ID_erosion_criterion>0) then
                if (Granular_flows_options%minimum_saturation_flag(i_grid,j_grid&
                   ).eqv..true.) then
 ! Phreatic zone
-                  Granular_flows_options%saturation_conditions = 1
+                  Granular_flows_options%saturation_conditions(i_grid,j_grid) =&
+                     1
                   else
 ! Dry soil
-                     Granular_flows_options%saturation_conditions = 3
+                     Granular_flows_options%saturation_conditions(i_grid,      &
+                        j_grid) = 3
                endif
                elseif (simulation_time<                                        &
                   Granular_flows_options%time_maximum_saturation) then
@@ -650,24 +652,29 @@ if (Granular_flows_options%ID_erosion_criterion>0) then
                   if (Granular_flows_options%minimum_saturation_flag(i_grid,   &
                      j_grid).eqv..true.) then
 ! Phreatic zone
-                     Granular_flows_options%saturation_conditions = 1
+                     Granular_flows_options%saturation_conditions(i_grid,      &
+                        j_grid) = 1
                      elseif (Granular_flows_options%maximum_saturation_flag    &
                         (i_grid,j_grid).eqv..true.) then
 ! Unsaturated zone
-                        Granular_flows_options%saturation_conditions = 2
+                        Granular_flows_options%saturation_conditions(i_grid,   &
+                           j_grid) = 2
                         else
 ! Dry soil
-                           Granular_flows_options%saturation_conditions = 3
+                           Granular_flows_options%saturation_conditions(i_grid,&
+                              j_grid) = 3
                   endif
                   else
 ! Time higher than time at maximum saturation         
                      if (Granular_flows_options%maximum_saturation_flag(i_grid,&
                         j_grid).eqv..true.) then
 ! Phreatic zone
-                        Granular_flows_options%saturation_conditions = 1
+                        Granular_flows_options%saturation_conditions(i_grid,   &
+                           j_grid) = 1
                         else
 ! Dry soil
-                           Granular_flows_options%saturation_conditions = 3
+                           Granular_flows_options%saturation_conditions(i_grid,&
+                              j_grid) = 3
                      endif
             endif
          endif       
