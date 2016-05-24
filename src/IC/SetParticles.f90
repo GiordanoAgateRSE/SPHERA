@@ -18,11 +18,10 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-
-!----------------------------------------------------------------------------------------------------------------------------------
-! Program unit: SetParticles     
+!-------------------------------------------------------------------------------
+! Program unit: SetParticles    
 ! Description: Particle coordinates (initial conditions).                
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 subroutine SetParticles(Nt,Nz,mate,Xmin,npps,NumParticles,IsopraS)
 !------------------------
 ! Modules
@@ -109,16 +108,20 @@ do i=1,(npps(1)-iaux)
             test = 0
             do Nz_aux=1,NPartZone
                if (Partz(Nz_aux)%IC_source_type==2) test = 1
-            enddo 
+            enddo
             if (test==0) then
                nag = nag + 1 
-! To check the storage for the reached number of particles
-               if (nag>PARTICLEBUFFER) call diagnostic                         &
-                                               (arg1=10,arg2=4,arg3=nomsub)
                nag_aux = nag 
                else
-                  nag_aux = NumParticles 
-            endif    
+                  nag_aux = NumParticles
+            endif
+! Check the storage for the reached number of fluid particles
+            if (nag_aux>size(pg)) then
+               call diagnostic(arg1=10,arg2=4,arg3=nomsub)
+               write(nscr,*) "If you are using a reservoir generated from ",   &
+                  "topography, you may need to increase the input parameter ", &
+                  "nag_aux. " 
+            endif
 ! To modify the coordinates, if random
             if (Domain%RandomPos=='r') then
                call random_number(rnd)
@@ -139,7 +142,7 @@ do i=1,(npps(1)-iaux)
                call SetParticleParameters(nag,Nz,mate)  
                else
                   call SetParticleParameters(NumParticles,Nz,mate)  
-            endif    
+            endif
 ! Nz is the zone ID, PartZ the vector of zones
             if ((Domain%tipo=="bsph").and.                                     &
                (Partz(pg(nag_aux)%izona)%tipo=="sour"))                        &
