@@ -1,11 +1,11 @@
-!----------------------------------------------------------------------------------------------------------------------------------
-! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
-! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-Ricerca di Sistema)
-
-
-
+!-------------------------------------------------------------------------------
+! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
+! Computational Fluid Dynamics code).
+! Copyright 2005-2016 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! formerly CESI-Ricerca di Sistema)
+!
 ! SPHERA authors and email contact are provided on SPHERA documentation.
-
+!
 ! This file is part of SPHERA v.8.0.
 ! SPHERA v.8.0 is free software: you can redistribute it and/or modify
 ! it under the terms of the GNU General Public License as published by
@@ -17,16 +17,14 @@
 ! GNU General Public License for more details.
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
-!----------------------------------------------------------------------------------------------------------------------------------
-
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: MatrixProduct  
 ! Description: Returning in CC the product between matrices AA and BB.
 !              nr: number of rows of AA and CC
 !              nc: number of columns of BB and CC
 !              nrc: number of columns of AA = number of rows of BB    
-!----------------------------------------------------------------------------------------------------------------------------------
-
+!-------------------------------------------------------------------------------
 subroutine MatrixProduct(AA,BB,CC,nr,nrc,nc)
 !------------------------
 ! Modules

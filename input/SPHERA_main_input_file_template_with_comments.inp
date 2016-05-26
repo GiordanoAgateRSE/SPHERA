@@ -1,14 +1,13 @@
 version.subversion   ! 
                      ! SPHERA main input file: template and comments
-
-!----------------------------------------------------------------------------------------------------------------------------------
-! SPHERA (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
-! Copyright 2005-2015 (RSE SpA)
-
-
-
+!------------------------------------------------------------------------------
+! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
+! Computational Fluid Dynamics code).
+! Copyright 2005-2016 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! formerly CESI-Ricerca di Sistema)
+!
 ! SPHERA authors and email contact are providedoin SPHERA documentation.
-
+!
 ! This file is part of SPHERA.
 ! SPHERA is free software: you can redistribute it and/or modify
 ! it under the terms of the GNU General Public License as published by
@@ -20,8 +19,7 @@ version.subversion   !
 ! GNU General Public License for more details.
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
-!----------------------------------------------------------------------------------------------------------------------------------
-
+!------------------------------------------------------------------------------
 ##### TITLE #####
 title                ! title (of the test case, string)
 ##### END TITLE #####
@@ -150,7 +148,10 @@ ID_first_vertex ID_last_vertex
 n_circum nag_aux            ! n_circum(number of vertices circumscribing 
                             ! the horizontal projection of the reservoir)=3,4; 
                             ! nag_aux(rough overestimation of the number of 
-                            ! fluid particles in the reservoir).
+                            ! fluid particles in the reservoir), nag_aux is only
+                            ! related to the very first allocation of the 
+                            ! particle array, in case of reservoir derived from
+                            ! topography.
 circum_1_x circum_1_y       ! First point of the 2D figure circumscribing the 
                             ! horizontal projection of the reservoir. Admitted 
                             ! figures: triangles and convex non-degenerate 
@@ -446,7 +447,18 @@ teta_p, teta_u var                  ! teta_p,teta_u(coefficients for partial
                                     ! smoothing of pressure and velocity); var=A
 COEFNMAXPARTI COEFNMAXPARTJ body_part_reorder
                                     ! COEFNMAXPARTI:max0(max number of fluid 
-                                    ! particles)=COEFNMAXPARTI*nag; 
+                                    ! particles)=COEFNMAXPARTI*nag, 
+                                    ! COEFNMAXPARTI considers that the number of
+                                    ! particles inside the domain can be higher 
+                                    ! than the first assessment of the number of
+                                    ! SPH particles (initial particles or 
+                                    ! reservoir particles -in case reservoir is 
+                                    ! derived from topography-): COEFNMAXPARTI 
+                                    ! takes into account contributions from 
+                                    ! inlet sections and, in case of reservoir 
+                                    ! derived from topography, also the 
+                                    ! particles of the mixture dam/reservoir 
+                                    ! (beyond the main water reservoir); 
                                     ! COEFNMAXPARTJ:maxb(max number of 
                                     ! neighbours)=COEFNMAXPARTJ*(4h/dx)^D;
                                     ! body_part_reorder(DB-SPH)=0(fixed 

@@ -1,11 +1,11 @@
-!----------------------------------------------------------------------------------------------------------------------------------
-! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
-! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-Ricerca di Sistema)
-
-
-
+!-------------------------------------------------------------------------------
+! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
+! Computational Fluid Dynamics code).
+! Copyright 2005-2016 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! formerly CESI-Ricerca di Sistema)
+!
 ! SPHERA authors and email contact are provided on SPHERA documentation.
-
+!
 ! This file is part of SPHERA v.8.0.
 ! SPHERA v.8.0 is free software: you can redistribute it and/or modify
 ! it under the terms of the GNU General Public License as published by
@@ -17,19 +17,20 @@
 ! GNU General Public License for more details.
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
-!----------------------------------------------------------------------------------------------------------------------------------
-
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: SelectCloseBoundarySides2D                                          
-! Description:  Selecting among the close boundary sides, those that really give contribution to the equations of particle 'npi'.
-!               It returns:
-!                  IntNcbs: number of close boundary sides, which give contribution (= 0, 1, 2)
-!                  Intboside(1:IntNcbs): list of close boundary sides, which give contribution
-!                  IntLocXY(1:PLANEDIM,1:Ncbs): local coordinates of particle np with respect each boundary side, which gives
-!                                               contribution                                
-!               (Di Monaco et al., 2011, EACFM)                        
-!----------------------------------------------------------------------------------------------------------------------------------
-
+! Description:  Selecting among the close boundary sides, those that really give
+!               contribution to the equations of particle 'npi'. It returns:
+!                  IntNcbs: number of close boundary sides, which give 
+!                           contribution (= 0, 1, 2)
+!                  Intboside(1:IntNcbs): list of close boundary sides, which 
+!                                        give contribution
+!                  IntLocXY(1:PLANEDIM,1:Ncbs): local coordinates of particle np
+!                                               with respect each boundary side,
+!                                               which gives contribution                                
+!               (Di Monaco et al., 2011, EACFM)           
+!-------------------------------------------------------------------------------
 subroutine SelectCloseBoundarySides2D(npi,Ncbs,Cloboside,LocXY,IntNcbs,        &
    Intboside,IntLocXY)
 !------------------------

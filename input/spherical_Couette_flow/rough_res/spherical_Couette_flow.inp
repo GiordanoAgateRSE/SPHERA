@@ -1,5 +1,5 @@
 8.0
-!----------------------------------------------------------------------------------------------------------------------------------
+!------------------------------------------------------------------------------
 ! File name and copyright: spherical_Couette_flow
 !    Copyright 2015 (RSE SpA, authored by Andrea Amicarelli)
 ! File description: input file for SPHERA v.8.0 (RSE SpA).
@@ -15,7 +15,7 @@
 ! GNU General Public License for more details.
 ! You should have received a copy of the GNU General Public License
 ! along with this file. If not, see <http://www.gnu.org/licenses/>.
-!----------------------------------------------------------------------------------------------------------------------------------
+!------------------------------------------------------------------------------
 
 ##### TITLE #####
 spherical_Couette_flow

@@ -1,11 +1,11 @@
-!----------------------------------------------------------------------------------------------------------------------------------
-! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
-! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-Ricerca di Sistema)
-
-
-
+!-------------------------------------------------------------------------------
+! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
+! Computational Fluid Dynamics code).
+! Copyright 2005-2016 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! formerly CESI-Ricerca di Sistema)
+!
 ! SPHERA authors and email contact are provided on SPHERA documentation.
-
+!
 ! This file is part of SPHERA v.8.0.
 ! SPHERA v.8.0 is free software: you can redistribute it and/or modify
 ! it under the terms of the GNU General Public License as published by
@@ -17,19 +17,18 @@
 ! GNU General Public License for more details.
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
-!----------------------------------------------------------------------------------------------------------------------------------
-
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: ComputeKernelTable                                   
-! Description: To pre-compute and store in kerneltab(0:ktrows,0:ktcols) the following values:
+! Description: To pre-compute and store in kerneltab(0:ktrows,0:ktcols) the 
+!              following values:
 !                 kerneltab(0:ktrows, 0) = rob = rb/h
-!                 kerneltab(0:ktrows, 1) = Int W* ro2 dro         (from rob to 2)
-!                 kerneltab(0:ktrows, 2) = Int dW*/dro ro dro     (from rob to 2)
-!                 kerneltab(0:ktrows, 3) = Int dW*/dro ro^2 dro   (from rob to 2)
-!                 kerneltab(0:ktrows, 4) = Int dW*/dro ro^3 dro   (from rob to 2) 
+!                 kerneltab(0:ktrows, 1) = Int W* ro2 dro       (from rob to 2)
+!                 kerneltab(0:ktrows, 2) = Int dW*/dro ro dro   (from rob to 2)
+!                 kerneltab(0:ktrows, 3) = Int dW*/dro ro^2 dro (from rob to 2)
+!                 kerneltab(0:ktrows, 4) = Int dW*/dro ro^3 dro (from rob to 2) 
 !              (Di Monaco et al., 2011, EACFM)                        
-!----------------------------------------------------------------------------------------------------------------------------------
-
+!-------------------------------------------------------------------------------
 subroutine ComputeKernelTable
 !------------------------
 ! Modules

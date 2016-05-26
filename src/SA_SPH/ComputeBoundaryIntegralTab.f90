@@ -1,11 +1,11 @@
-!----------------------------------------------------------------------------------------------------------------------------------
-! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
-! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-Ricerca di Sistema)
-
-
-
+!-------------------------------------------------------------------------------
+! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
+! Computational Fluid Dynamics code).
+! Copyright 2005-2016 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! formerly CESI-Ricerca di Sistema)
+!
 ! SPHERA authors and email contact are provided on SPHERA documentation.
-
+!
 ! This file is part of SPHERA v.8.0.
 ! SPHERA v.8.0 is free software: you can redistribute it and/or modify
 ! it under the terms of the GNU General Public License as published by
@@ -17,19 +17,21 @@
 ! GNU General Public License for more details.
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
-!----------------------------------------------------------------------------------------------------------------------------------
-
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: ComputeBoundaryIntegralTab                                   
-! Description: To compute local coordinates (x,y,z) of a grid of points, regularly distributed on the semisphere z<0 
-!              (radius = 2h), whose centre is the origin O of local axis. The semisphere will be superposed to the influence 
-!              sphere (kernel support) of a generic particle near a plane boundary face, and oriented in such a way that
-!              the axis (x,y,z) coincide with the face local axes (r,s,n). In the first three columns of the array 
-!              BoundaryIntegralTab() the coordinates (x,y,z) of each point are stored; in the forth column the relative d_alpha
-!              (portion of solid angle relative to the point, necessary for integrations) is stored. BITcols = 4.
+! Description: To compute local coordinates (x,y,z) of a grid of points, 
+!              regularly distributed on the semisphere z<0 (radius = 2h), whose
+!              centre is the origin O of local axis. The semisphere will be 
+!              superposed to the influence sphere (kernel support) of a generic
+!              particle near a plane boundary face, and oriented in such a way
+!              that the axis (x,y,z) coincide with the face local axes (r,s,n).
+!              In the first three columns of the array BoundaryIntegralTab() the
+!              coordinates (x,y,z) of each point are stored; in the forth column
+!              the relative d_alpha (portion of solid angle relative to the
+!              point, necessary for integrations) is stored. BITcols = 4.
 !              (Di Monaco et al., 2011, EACFM)                        
-!----------------------------------------------------------------------------------------------------------------------------------
-
+!-------------------------------------------------------------------------------
 subroutine ComputeBoundaryIntegralTab
 !------------------------
 ! Modules

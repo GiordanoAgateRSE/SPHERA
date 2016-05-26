@@ -1,11 +1,11 @@
-!----------------------------------------------------------------------------------------------------------------------------------
-! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
-! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-)
-
-
-
+!-------------------------------------------------------------------------------
+! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
+! Computational Fluid Dynamics code).
+! Copyright 2005-2016 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! formerly CESI-Ricerca di Sistema)
+!
 ! SPHERA authors and email contact are provided on SPHERA documentation.
-
+!
 ! This file is part of SPHERA v.8.0.
 ! SPHERA v.8.0 is free software: you can redistribute it and/or modify
 ! it under the terms of the GNU General Public License as published by
@@ -17,14 +17,14 @@
 ! GNU General Public License for more details.
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>. 
-!----------------------------------------------------------------------------------------------------------------------------------
-
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: point_inout_hexagon
-! Description: Test to evaluate if a point lies inside or strictly outside a generic hexagon. The hexagon is 
-!              partitioned into 4 triangles (P1P2P6,P2P5P6,P2P3P5,P3P4P5). A point is internal to the hexagon if it is internal to  
-!              one of its triangles.   
-!----------------------------------------------------------------------------------------------------------------------------------
+! Description: Test to evaluate if a point lies inside or strictly outside a
+!              generic hexagon. The hexagon is partitioned into 4 triangles
+!              (P1P2P6,P2P5P6,P2P3P5,P3P4P5). A point is internal to the hexagon
+!              if it is internal to one of its triangles.   
+!-------------------------------------------------------------------------------
 subroutine point_inout_hexagon(point,point_pol_1,point_pol_2,point_pol_3,      &
                                point_pol_4,point_pol_5,point_pol_6,test)
 !------------------------

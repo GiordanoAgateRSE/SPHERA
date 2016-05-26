@@ -1,6 +1,8 @@
-!----------------------------------------------------------------------------------------------------------------------------------
-! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
-! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-Ricerca di Sistema)
+!-------------------------------------------------------------------------------
+! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
+! Computational Fluid Dynamics code).
+! Copyright 2005-2016 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! formerly CESI-Ricerca di Sistema)
 
 
 
@@ -17,14 +19,14 @@
 ! GNU General Public License for more details.
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: BoundaryMassForceMatrix2D                                
 ! Description: Generation of the generalised boundary mass force matrix RN, on the base of the cosine matrix 
 !              T and the parameter Fi.
 !              (Di Monaco et al., 2011, EACFM)                        
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 
 subroutine BoundaryMassForceMatrix2D(T,RN,FiS,FiN) 
 !------------------------

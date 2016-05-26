@@ -1,11 +1,11 @@
-!----------------------------------------------------------------------------------------------------------------------------------
-! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
-! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-Ricerca di Sistema)
-
-
-
+!-------------------------------------------------------------------------------
+! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
+! Computational Fluid Dynamics code).
+! Copyright 2005-2016 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! formerly CESI-Ricerca di Sistema)
+!
 ! SPHERA authors and email contact are provided on SPHERA documentation.
-
+!
 ! This file is part of SPHERA v.8.0.
 ! SPHERA v.8.0 is free software: you can redistribute it and/or modify
 ! it under the terms of the GNU General Public License as published by
@@ -17,19 +17,19 @@
 ! GNU General Public License for more details.
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
-!----------------------------------------------------------------------------------------------------------------------------------
-
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: FindBoundaryIntersection2D                                       
-! Description: To find the intersection segment between the kernel support of particle i, whose local coordinates are
-!              xpi=LocXY(1,icbs) and ypi=LocXY(2,icbs), and the straight boundary side iside=Cloboside(icbs), which lies on the 
-!              local x-axis and extends from x=0 to bsidelen = BoundarySide(iside)%Length. It returns:
+! Description: To find the intersection segment between the kernel support of 
+!              particle i, whose local coordinates are xpi=LocXY(1,icbs) and
+!              ypi=LocXY(2,icbs), and the straight boundary side
+!              iside=Cloboside(icbs), which lies on the local x-axis and extends
+!              from x=0 to bsidelen = BoundarySide(iside)%Length. It returns:
 !                 xpmin: minimum abscissa of intersected segment
 !                 xpmax: maximum abscissa of intersected segment
 !                 interlen: length of the intersected segment   
 !              (Di Monaco et al., 2011, EACFM)                        
-!----------------------------------------------------------------------------------------------------------------------------------
-
+!-------------------------------------------------------------------------------
 subroutine FindBoundaryIntersection2D(icbs,Cloboside,LocXY,BoundarySide,xpmin, &
    xpmax,interlen)
    !------------------------

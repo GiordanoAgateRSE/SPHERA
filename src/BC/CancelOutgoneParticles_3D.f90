@@ -1,11 +1,11 @@
-!----------------------------------------------------------------------------------------------------------------------------------
-! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less Computational Fluid Dynamics code).
-! Copyright 2005-2015 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA, formerly CESI-Ricerca di Sistema)
-
-
-
+!-------------------------------------------------------------------------------
+! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
+! Computational Fluid Dynamics code).
+! Copyright 2005-2016 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! formerly CESI-Ricerca di Sistema)
+!
 ! SPHERA authors and email contact are provided on SPHERA documentation.
-
+!
 ! This file is part of SPHERA v.8.0.
 ! SPHERA v.8.0 is free software: you can redistribute it and/or modify
 ! it under the terms of the GNU General Public License as published by
@@ -17,8 +17,8 @@
 ! GNU General Public License for more details.
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
-!----------------------------------------------------------------------------------------------------------------------------------
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: CancelOutgoneParticles_3D
 ! Description: To count and delete the outgoing particles on boundaries of type 
 !              "leve", "flow", "velo", "crit", "open". Deletion occurs in 2 
@@ -32,7 +32,7 @@
 !                 the zone is changed (Partz(maxzone)%limit(2)).   
 !              b) Otherwise, simply pg(npi)%cella = 0 (particle out of the 
 !                 domain boundaries).
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 subroutine CancelOutgoneParticles_3D  
 !------------------------
 ! Modules
