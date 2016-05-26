@@ -896,6 +896,8 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
             write (nfro,'(4g14.7)') simulation_time, xmax ,ymax, zmax
          endif
    endif
+! To concatenate the ".txt" output files and remove the original ones
+   call cat_post_proc
 ! Paraview output
    if (vtkconv) then
       call result_converter ('loop__')

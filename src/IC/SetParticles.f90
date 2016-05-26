@@ -35,12 +35,12 @@ use I_O_diagnostic_module
 ! Declarations
 !------------------------
 implicit none
-integer(4),intent(in):: Nt,Nz,mate
+integer(4),intent(in) :: Nt,Nz,mate
 integer(4),intent(in) :: npps(SPACEDIM)
 double precision,intent(in) :: Xmin(SPACEDIM)
 integer(4),intent(inout) :: NumParticles,IsopraS
 logical :: particellainterna
-integer(4) :: i,j,k,iaux,test,Nz_aux,nag_aux
+integer(4) :: i,j,k,iaux,test,Nz_aux,nag_aux,pg_size
 double precision :: aux1,aux2,aux3,rnd,tstop
 double precision,dimension(SPACEDIM) :: PX
 character(len=lencard) :: nomsub = "SetParticles"
@@ -81,19 +81,19 @@ endif
 PX(1) = Xmin(1) + aux1
 ! In case the zone is declared, but not used.
 if (npps(1)<0) return
-! Loop over the X direction.
+! Loop over the X direction
 do i=1,(npps(1)-iaux)
    PX(1) = PX(1) + Domain%dd
    PX(2) = Xmin(2) + aux2
-! Loop over the Y direction.
    if (ncord==2) iaux = 0
+! Loop over the Y direction
    do j=1,(npps(2)-iaux)   
       PX(2) = PX(2) + Domain%dd
       PX(3) = Xmin(3) + aux3
-! Loop over the Z direction.
+! Loop over the Z direction
       do k=1,(npps(3)-iaux)
          PX(3) = PX(3) + Domain%dd
-! To check if the particle falls inside the zone.
+! To check if the particle falls inside the zone
          if (ncord==2) then
             particellainterna = IsParticleInternal2D(Nt,PX)
             else 
@@ -101,26 +101,27 @@ do i=1,(npps(1)-iaux)
          endif
 ! In case the particle is inside the zone
          if (particellainterna) then
-! the zone counter is increased
+! The zone counter is increased
             NumParticles = NumParticles + 1
-! the total particle number is increased
+! The total particle number is increased
             if (nagpg==0) cycle
             test = 0
             do Nz_aux=1,NPartZone
                if (Partz(Nz_aux)%IC_source_type==2) test = 1
             enddo
             if (test==0) then
-               nag = nag + 1 
+               nag = nag + 1
                nag_aux = nag 
                else
                   nag_aux = NumParticles
             endif
 ! Check the storage for the reached number of fluid particles
-            if (nag_aux>size(pg)) then
-               call diagnostic(arg1=10,arg2=4,arg3=nomsub)
+            pg_size = size(pg)
+            if (nag_aux>pg_size) then
                write(nscr,*) "If you are using a reservoir generated from ",   &
                   "topography, you may need to increase the input parameter ", &
-                  "nag_aux. " 
+                  "COEFNMAXPARTI. The dimension of the 1D array pg is ",pg_size
+               call diagnostic(arg1=10,arg2=4,arg3=nomsub)
             endif
 ! To modify the coordinates, if random
             if (Domain%RandomPos=='r') then

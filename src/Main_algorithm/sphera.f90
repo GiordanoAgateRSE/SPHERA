@@ -18,10 +18,10 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !----------------------------------------------------------------------------------------------------------------------------------
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 ! Program unit: sphera           
 ! Description: Main program unit.                   
-!----------------------------------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 program sphera
 !------------------------
 ! Modules
@@ -312,29 +312,6 @@ if (nres>0) close(nres)
 if (nplb>0) close(nplb)
 if (nfro>0) close(nfro)
 if (ncpt>0) close(ncpt)
-! To Concatenate the ".txt" output files and remove the original ones
-call system("touch Body_dynamics.tmp")
-call system("cat *Body_dynamics* > Body-dynamics.txt")
-call system("rm -f *Body_dynamics*")
-call system("mv Body-dynamics.txt Body_dynamics.txt")
-call system("touch Body_particles.tmp")
-call system("cat *Body_particles* > Body-particles.txt")
-call system("rm -f *Body_particles*")
-call system("mv Body-particles.txt Body_particles.txt")
-call system("touch Q_sections.tmp")
-call system("cat *Q_sections* > Q-sections.txt")
-call system("rm -f *Q_sections*")
-call system("mv Q-sections.txt Q_sections.txt")
-call system("touch temp.cln")
-call system("cat *.cln > monitoring_lines.txt")
-call system("rm -f *.cln")
-call system("touch temp.cpt")
-call system("cat *.cpt > monitoring_points.txt")
-call system("rm -f *.cpt")
-call system("touch blt_interfaces.tmp")
-call system("cat *blt_interfaces* > blt-interfaces.txt")
-call system("rm -f *blt_interfaces*")
-call system("mv blt-interfaces.txt blt_interfaces.txt")
 stop
 !------------------------
 ! Contains

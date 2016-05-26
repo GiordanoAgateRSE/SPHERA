@@ -156,13 +156,13 @@ second_cycle: do Nz=1,NPartZone
          z_min = max_positive_number
          do i_vertex=Partz(Nz)%ID_first_vertex,Partz(Nz)%ID_last_vertex
             z_min = min(z_min,(Vertice(3,i_vertex)))
-         end do 
+         enddo
          nag_aux = Partz(Nz)%nag_aux
          allocate(pg_aux(nag_aux))
          NumParticles = NumParticles + 1
 ! Loops over Cartesian topography points
          do i_vertex=Partz(Nz)%ID_first_vertex,Partz(Nz)%ID_last_vertex
-! Check if the vertex is inside the plan_reservoir     
+! Check if the vertex is inside the plan_reservoir   
             call point_inout_convex_non_degenerate_polygon(                    &
                Vertice(1:2,i_vertex),Partz(Nz)%plan_reservoir_points,          &
                Partz(Nz)%plan_reservoir_pos(1,1:2),                            &
@@ -236,7 +236,7 @@ second_cycle: do Nz=1,NPartZone
 ! but no face has a preference and test_face cannot come back to zero 
 ! (no actual problem)
                                  test_face = 1
-! Test if the point is invisible (test_z=1, below the topografy) or visible 
+! Test if the point is invisible (test_z=1, below the topography) or visible 
 ! (test_z=0) to the face 
                                  aux_vec(:) = pg_aux(NumParticles)%coord(:)    &
                                     - BoundaryFace(i_face)%Node(1)%GX(:)
@@ -309,7 +309,7 @@ if ((Tratto(BoundaryFace(i_face)%stretch)%zone==Partz(Nz)%dam_zone_ID).and.    &
                                     endif   
                                  endif
                               enddo
-!$omp end parallel do                            
+!$omp end parallel do                      
                            endif   
                         endif
 ! Update fluid particle counter
@@ -338,13 +338,13 @@ if ((Tratto(BoundaryFace(i_face)%stretch)%zone==Partz(Nz)%dam_zone_ID).and.    &
             else
                write (nout,'(1x,a)') "    Array PG successfully allocated "
                pg(:) = PgZero
-         end if
+         endif
 ! Loop over the auxiliary particle array
 !$omp parallel do default(none) shared(pg,pg_aux,NumParticles) private(npi)
          do npi=1,NumParticles
 ! Copy fluid particle array from the corresponding auxiliary array
             pg(npi) = pg_aux(npi)
-         end do
+         enddo
 !$omp end parallel do  
 ! Deallocate auxiliary arrays
          deallocate(z_aux)
@@ -354,7 +354,7 @@ if ((Tratto(BoundaryFace(i_face)%stretch)%zone==Partz(Nz)%dam_zone_ID).and.    &
 ! Loops over fluid particles 
 !$omp parallel do default(none)                                                &
 !$omp shared(nag_reservoir_CartTopog,Nz,Mate,Domain,pg)                        &
-!$omp private(npi,rnd)  
+!$omp private(npi,rnd)
             do npi=1,nag_reservoir_CartTopog
 ! to set particle parameters
                call SetParticleParameters(npi,Nz,Mate)   
@@ -369,7 +369,7 @@ if ((Tratto(BoundaryFace(i_face)%stretch)%zone==Partz(Nz)%dam_zone_ID).and.    &
                   call random_number(rnd)
                   pg(npi)%coord(3) = pg(npi)%coord(3) + (2.d0 * rnd - 1.d0)    &
                                      * 0.1d0 * Domain%dd
-               end if
+               endif
             enddo
 !$omp end parallel do  
             NumParticles = nag_reservoir_CartTopog
@@ -383,7 +383,7 @@ if ((Tratto(BoundaryFace(i_face)%stretch)%zone==Partz(Nz)%dam_zone_ID).and.    &
                 (Xmax(1,nt)== max_negative_number)) then
 ! The zone is declared but is not used
                Npps = -1
-               else 
+               else
                do i=1,SPACEDIM
                   NumPartPrima = nint((Xmin(i,nt) - MinOfMin(i)) / Domain%dd)
                   Xminreset(i) = MinOfMIn(i) + NumPartPrima * Domain%dd
@@ -400,7 +400,7 @@ if ((Tratto(BoundaryFace(i_face)%stretch)%zone==Partz(Nz)%dam_zone_ID).and.    &
                IsopraS = 1   
                else
                   IsopraS = 0
-            end if     
+            endif     
 ! To set the particles in the zone
             call SetParticles(Nt,Nz,Mate,XminReset,Npps,NumParticles,IsopraS)
          enddo
@@ -412,7 +412,7 @@ test_z = 0
 if (IC_loop==2) then
    do Nz=1,NPartZone
       if (Partz(Nz)%IC_source_type==2) test_z = 1
-   enddo 
+   enddo
 endif
 if (test_z==0) nag = NumParticles
 nagpg = nag

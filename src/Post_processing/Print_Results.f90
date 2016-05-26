@@ -56,12 +56,12 @@ double precision  :: modomega,mintau_tauc,maxtau_tauc,mink_BetaGamma
 double precision  :: maxk_BetaGamma,minu_star,maxu_star,time_elapsed_tot_est
 double precision  :: minvelo,maxvelo,laminar_flag_perc,blt_laminar_flag_perc
 integer(4),dimension(1) :: pos
-character(len=42) :: fmt100="(a,i10,a,e18.9,a,e18.9,a,i  ,a,i  ,a,i  )"
-character(len=47) :: fmt101="(a,2(1x,f10.4,1x,a,1x,i6,1x,a,3(1x,f8.2,1x,a)))"
-character(len=47) :: fmt102="(a,2(1x,f10.1,1x,a,1x,i6,1x,a,3(1x,f8.2,1x,a)))"
-character(len=47) :: fmt103="(a,2(1x,f10.6,1x,a,1x,i6,1x,a,3(1x,f8.2,1x,a)))"
-character(len=47) :: fmt104="(a,2(1x,g10.4,1x,a,1x,i6,1x,a,3(1x,f8.2,1x,a)))"
-character(len=47) :: fmt105="(a,2(1x,e10.4,1x,a,1x,i6,1x,a,3(1x,f8.2,1x,a)))"
+character(len=42) :: fmt100="(a,i10,a,e18.9,a,e18.9,a,i,a,i,a,i)"
+character(len=47) :: fmt101="(a,2(1x,f10.4,1x,a,1x,i8,1x,a,3(1x,f8.2,1x,a)))"
+character(len=47) :: fmt102="(a,2(1x,f10.1,1x,a,1x,i8,1x,a,3(1x,f8.2,1x,a)))"
+character(len=47) :: fmt103="(a,2(1x,f10.6,1x,a,1x,i8,1x,a,3(1x,f8.2,1x,a)))"
+character(len=47) :: fmt104="(a,2(1x,g10.4,1x,a,1x,i8,1x,a,3(1x,f8.2,1x,a)))"
+character(len=47) :: fmt105="(a,2(1x,e10.4,1x,a,1x,i8,1x,a,3(1x,f8.2,1x,a)))"
 character(len=12) :: stringa
 character(len=2)  :: coppia
 !------------------------

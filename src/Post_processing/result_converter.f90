@@ -73,7 +73,7 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
    blocchi(nblocchi) = block
    Time_Block(nblocchi) = curtime
    prefix = nomecaso
-   write(cargo,'(i6)') block
+   write(cargo,'(i8)') block
    cargo = adjustl(cargo)
    filevtk =                                                                   &
 "VTKConverter_"//prefix(1:len_trim(prefix))//"_block_"//cargo(1:len_trim(cargo))//".vtu"
@@ -89,7 +89,7 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
    write(unitvtk,'(a)')                                                        &
 '<VTKFile type="UnstructuredGrid" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">'
    write(unitvtk,'(a)') '<UnstructuredGrid>'
-   write(cargo,'(i6)') int(curtime)
+   write(cargo,'(i8)') int(curtime)
    cargo = adjustl(cargo)
    header_string =                                                             &
 "case "//prefix(1:len_trim(prefix))//" * time "//cargo(1:len_trim(cargo))//" (s)"
@@ -102,10 +102,10 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
       k = k + 1
       finger(k) = npi
    enddo
-   write(cargo,'(i6)') numpoints
+   write(cargo,'(i8)') numpoints
    cargo = adjustl(trim(cargo))
    stringa = '  <Piece NumberOfPoints="'//cargo(1:len_trim(cargo))
-   write(cargo,'(i6)') numcells
+   write(cargo,'(i8)') numcells
    cargo = adjustl(trim(cargo))
    stringa = stringa                                                           &
 (1:len_trim(stringa))//'"        NumberOfCells="'//cargo(1:len_trim(cargo))//'"      >'
@@ -273,7 +273,7 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
       k1 = i
       k2 = k1 + 23
       if (k2>numpoints) k2 = numpoints
-      write(unitvtk,'(8x,24(1x,i6))') (finger(k),k=k1,k2)
+      write(unitvtk,'(8x,24(1x,i8))') (finger(k),k=k1,k2)
    enddo
    write(unitvtk,'(a)') '      </DataArray>'
    if (Domain%tipo=="bsph") then
@@ -564,7 +564,7 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
    if ((DBSPH%n_w>0).and.(Domain%tipo=="bsph")) then
 ! Open a vtu file for DB-SPH wall and semi-particle parameters  
 ! VTKConverter_<casename>_wall_<block>.vtk 
-      write (cargo,'(i6)') block
+      write (cargo,'(i8)') block
       cargo = adjustl(cargo)
       filevtk =                                                                &
 "VTKConverter_"//prefix(1:len_trim(prefix))//"_block_wall_"//cargo(1:len_trim(cargo))//".vtu"
@@ -580,7 +580,7 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
       write(unitvtk,'(a)')                                                     &
 '<VTKFile type="UnstructuredGrid" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">'
       write(unitvtk,'(a)') '<UnstructuredGrid>'
-      write(cargo,'(i6)') int(curtime)
+      write(cargo,'(i8)') int(curtime)
       cargo = adjustl(cargo)
       header_string =                                                          &
 "case "//prefix(1:len_trim(prefix))//" * time "//cargo(1:len_trim(cargo))//" (s)"
@@ -593,10 +593,10 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
          k = k + 1
          finger(k) = npi
       enddo
-      write(cargo,'(i6)') numpoints
+      write(cargo,'(i8)') numpoints
       cargo = adjustl(trim(cargo))
       stringa = '  <Piece NumberOfPoints="'//cargo(1:len_trim(cargo))
-      write(cargo,'(i6)') numcells
+      write(cargo,'(i8)') numcells
       cargo = adjustl(trim(cargo))
       stringa = stringa                                                        &
 (1:len_trim(stringa))//'"        NumberOfCells="'//cargo(1:len_trim(cargo))//'"      >'
@@ -779,7 +779,7 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
 ! Body particles
 ! Open the .vtu unstructured grid formatted file 
 ! VTKConverter_<casename>_body-part_<block>.vtk for the results storing
-      write (cargo,'(i6)') block
+      write (cargo,'(i8)') block
       cargo = adjustl(cargo)
       filevtk =                                                                &
 "VTKConverter_"//prefix(1:len_trim(prefix))//"_block_body-part_"//cargo(1:len_trim(cargo))//".vtu"
@@ -795,7 +795,7 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
       write(unitvtk,'(a)')                                                     &
 '<VTKFile type="UnstructuredGrid" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">'
       write(unitvtk,'(a)') '<UnstructuredGrid>'
-      write(cargo,'(i6)') int(curtime)
+      write(cargo,'(i8)') int(curtime)
       cargo = adjustl(cargo)
       header_string =                                                          &
 "case "//prefix(1:len_trim(prefix))//" * time "//cargo(1:len_trim(cargo))//" (s)"
@@ -808,10 +808,10 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
          k = k + 1
          finger(k) = npi
       enddo
-      write(cargo,'(i6)') numpoints
+      write(cargo,'(i8)') numpoints
       cargo = adjustl(trim(cargo))
       stringa = '  <Piece NumberOfPoints="'//cargo(1:len_trim(cargo))
-      write(cargo,'(i6)') numcells
+      write(cargo,'(i8)') numcells
       cargo = adjustl(trim(cargo))
       stringa = stringa                                                        &
 (1:len_trim(stringa))//'"        NumberOfCells="'//cargo(1:len_trim(cargo))//'"      >'
@@ -949,7 +949,7 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
 ! Bodies: start
 ! Open the .vtu unstructured grid formatted file 
 ! VTKConverter_<casename>_body_<block>.vtk for the results storing
-      write (cargo,'(i6)') block
+      write (cargo,'(i8)') block
       cargo = adjustl(cargo)
       filevtk =                                                                &
 "VTKConverter_"//prefix(1:len_trim(prefix))//"_block_body_"//cargo(1:len_trim(cargo))//".vtu"
@@ -965,7 +965,7 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
       write(unitvtk,'(a)')                                                     &
 '<VTKFile type="UnstructuredGrid" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">'
       write(unitvtk,'(a)') '<UnstructuredGrid>'
-      write(cargo,'(i6)') int(curtime)
+      write(cargo,'(i8)') int(curtime)
       cargo = adjustl(cargo)
       header_string =                                                          &
 "case "//prefix(1:len_trim(prefix))//" * time "//cargo(1:len_trim(cargo))//" (s)"
@@ -977,10 +977,10 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
          k = k + 1
          finger(k) = npi
       enddo
-      write(cargo,'(i6)') numpoints
+      write(cargo,'(i8)') numpoints
       cargo = adjustl(trim(cargo))
       stringa = '  <Piece NumberOfPoints="'//cargo(1:len_trim(cargo))
-      write(cargo,'(i6)') numcells
+      write(cargo,'(i8)') numcells
       cargo = adjustl(trim(cargo))
       stringa = stringa                                                        &
 (1:len_trim(stringa))//'"        NumberOfCells="'//cargo(1:len_trim(cargo))//'"      >'

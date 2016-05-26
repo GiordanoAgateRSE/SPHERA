@@ -900,9 +900,11 @@ done_flag = .false.
             write (nfro,'(2g14.7,13x,a,g14.7)') simulation_time,xmax,'-',ymax
          endif
    endif
+! To concatenate the ".txt" output files and remove the original ones
+   call cat_post_proc
 ! Paraview output 
    if (vtkconv) then
-      call result_converter ('loop__')
+      call result_converter('loop__')
    endif
 ! If the "kill file" exists, then the run is stopped and last results are saved.
    inquire (file=nomefilekill, EXIST=kill_flag)
