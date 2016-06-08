@@ -89,7 +89,7 @@ endif
 ! Mixture density for granular SPH particles (bed-load transport) 
 if (Granular_flows_options%ID_erosion_criterion==1) then
    if (Med(pg(npi)%imed)%tipo=="granular") then
-      pg(npi)%dens = Med(Granular_flows_options%ID_granular)%den0_s 
+      pg(npi)%dens = Med(pg(npi)%imed)%den0_s 
 ! IC viscosity from pure fluid, as I cannot calculate the right one at this 
 ! stage.         
       pg(npi)%mu = Med(Granular_flows_options%ID_main_fluid)%visc *            &

@@ -348,7 +348,7 @@ done_flag = .false.
          npi = Array_Flu(ii)
 ! The mixture particles, which are temporarily affected by the frictional 
 ! viscosity threshold are fixed.
-         if (pg(npi)%mu==Med(Granular_flows_options%ID_granular)%mumx) then
+         if (pg(npi)%mu==Med(pg(npi)%imed)%mumx) then
             pg(npi)%acc(:) = zero
             cycle
          endif          
@@ -866,7 +866,7 @@ done_flag = .false.
          Granular_flows_options%it_out_last).or.(on_going_time_step==1)) then
          Granular_flows_options%it_out_last = int(simulation_time /            &
                                               Granular_flows_options%dt_out)
-         call write_Granular_flows_interfaces
+         call interface_post_processing
       endif
    endif
    if (Q_sections%n_sect>0) then
@@ -900,9 +900,7 @@ done_flag = .false.
             write (nfro,'(2g14.7,13x,a,g14.7)') simulation_time,xmax,'-',ymax
          endif
    endif
-! To concatenate the ".txt" output files and remove the original ones
-   call cat_post_proc
-! Paraview output 
+! Paraview output and .txt file concatenation
    if (vtkconv) then
       call result_converter('loop__')
    endif

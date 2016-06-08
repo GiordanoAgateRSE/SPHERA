@@ -38,7 +38,17 @@ use I_O_file_module
 implicit none
 integer(4) :: npi,i_cell,i_aux,i_grid,j_grid,k_grid,alloc_stat
 double precision :: mu_main_fluid,eps_fluid_blt,p_fluid_blt_top,gamma_fluid
-double precision :: z_blt_top_fluid,alfa_TBT,z_soil_bottom,z_inf_sat
+! "alfa_TBT" means “Topographic angle at the Bed-load transport layer Top” 
+! between the local interface normal (computed on the mixture particle, 
+! which locally defines this interface) and the vertical. The formulation for 
+! the fluid pressure depends on this angle, which approximately represents
+! the underground flow direction (Eulerian saturation schemes).
+double precision :: alfa_TBT,z_blt_top_fluid,z_soil_bottom,z_inf_sat,z_sat_top
+! "alfa_WT" means “Water Table slope (computed on the mixture particle, 
+! which locally defines this interface). The formulation for the fluid pressure
+! depends on this angle, which approximately represents the underground flow 
+! direction (Lagrangian saturation scheme).
+double precision :: alfa_WT
 integer(4),external :: ParticleCellNumber,CellIndices 
 !------------------------
 ! Explicit interfaces
@@ -51,9 +61,6 @@ integer(4),external :: ParticleCellNumber,CellIndices
 !------------------------
 mu_main_fluid = Med(Granular_flows_options%ID_main_fluid)%visc *               &
                 Med(Granular_flows_options%ID_main_fluid)%den0
-! Volume fraction of the fluid phase in the bed-load transport layer
-eps_fluid_blt = 1.d0 -                                                         &
-   Med(Granular_flows_options%ID_granular)%gran_vol_frac_max
 ! Specific weight of the fluid phase
 gamma_fluid = Med(Granular_flows_options%ID_main_fluid)%den0 * GI
 !------------------------
@@ -61,63 +68,21 @@ gamma_fluid = Med(Granular_flows_options%ID_main_fluid)%den0 * GI
 !------------------------
 !$omp parallel do default(none) shared(nag,Med,pg)                             &
 !$omp shared(Granular_flows_options,ind_interfaces,simulation_time)            &
-!$omp shared(eps_fluid_blt,gamma_fluid,mu_main_fluid)                          &
+!$omp shared(eps_fluid_blt,gamma_fluid,mu_main_fluid,nout)                     &
 !$omp private(npi,i_cell,i_aux,i_grid,j_grid,k_grid,p_fluid_blt_top)           &
-!$omp private(z_blt_top_fluid,alfa_TBT,z_soil_bottom,z_inf_sat)
+!$omp private(z_blt_top_fluid,alfa_TBT,alfa_WT,z_soil_bottom,z_inf_sat)        &
+!$omp private(z_sat_top)
 do npi=1,nag
    if ((Med(pg(npi)%imed)%tipo=="granular").and.(pg(npi)%state=="flu")) then
       i_cell = ParticleCellNumber(pg(npi)%coord) 
       i_aux = CellIndices(i_cell,i_grid,j_grid,k_grid)
-! Default saturation scheme
-! (dry soil=Granular_flows_options%saturation_scheme=0)
-      pg(npi)%pres_fluid = 0.d0
-      if (Granular_flows_options%saturation_scheme==2) then
-! Saturation scheme depending on t_minimum_saturation and t_maximum_sateration 
-         if (Granular_flows_options%saturation_conditions(i_grid,j_grid)==1)   &
-            then
-! Fluid pressure
-! Phreatic zone (simplifying assumption: 1D filtration with piezometric lines  
-! in the bed-load transport layer parallel to the local 3D slope of the 
-! bed-load transport layer top)
-            p_fluid_blt_top = pg(ind_interfaces(i_grid,j_grid,2))%pres
-            z_blt_top_fluid = pg(ind_interfaces(i_grid,j_grid,2))%coord(3)
-! "alfa_TBT" means “Topographic angle at the Bed-load transport layer Top” 
-! between the local interface normal (computed on the mixture particle, 
-! which locally defines this interface) and the vertical. The formulation for 
-! the fluid pressure only depends on this angle, no matter abut the flow 
-! direction.
-            alfa_TBT = dacos(                                                  &
-               pg(ind_interfaces(i_grid,j_grid,3))%normal_int_mixture_top(3))
-! The limiter of PI/2 simply allows assigning null fluid pressure in case of 
-! "anti-gravity" slopes (very rare and very local in case of bed-load transport)
-            alfa_TBT = min(alfa_TBT,PIGRECO/2.d0) 
-            pg(npi)%pres_fluid = p_fluid_blt_top + gamma_fluid *               &
-                                 (z_blt_top_fluid - pg(npi)%coord(3)) *        &
-                                 ((dcos(alfa_TBT)) ** 2)
-            elseif (Granular_flows_options%saturation_conditions(i_grid,j_grid)&
-               ==2) then
-! Infiltration zone
-               z_blt_top_fluid = pg(ind_interfaces(i_grid,j_grid,2))%coord(3)
-               z_soil_bottom = pg(ind_interfaces(i_grid,j_grid,5))%coord(3)
-               z_inf_sat = z_blt_top_fluid - (simulation_time -                &
-                           Granular_flows_options%time_minimum_saturation) /   &
-                           (Granular_flows_options%time_maximum_saturation -   &
-                           Granular_flows_options%time_minimum_saturation) *   &
-                           (z_blt_top_fluid - z_soil_bottom)
-               if (pg(npi)%coord(3)>=z_inf_sat) then
-                  p_fluid_blt_top = pg(ind_interfaces(i_grid,j_grid,2))%pres
-                  pg(npi)%pres_fluid = p_fluid_blt_top * (1.d0 -               &
-                                       (z_blt_top_fluid - pg(npi)%coord(3)) /  &
-                                       (z_blt_top_fluid - z_soil_bottom))
-                  else
-                     pg(npi)%pres_fluid = 0.d0
-               endif
-               else
+! Volume fraction of the fluid phase in the bed-load transport layer
+      eps_fluid_blt = 1.d0 - Med(pg(npi)%imed)%gran_vol_frac_max
+      select case (Granular_flows_options%saturation_scheme)
+         case(0) 
 ! Dry soil
-                  if (Granular_flows_options%saturation_conditions(i_grid,     &
-                     j_grid)==3) pg(npi)%pres_fluid = 0.d0   
-         endif
-         elseif (Granular_flows_options%saturation_scheme==1) then
+            pg(npi)%pres_fluid = 0.d0         
+         case(1)
 ! Saturation scheme for uniform fully saturated soil
 ! Fluid pressure
 ! Phreatic zone (simplifying assumption: 1D filtration with piezometric lines  
@@ -130,11 +95,6 @@ do npi=1,nag
                   p_fluid_blt_top = 0.d0
                   z_blt_top_fluid = pg(ind_interfaces(i_grid,j_grid,3))%coord(3)
             endif
-! "alfa_TBT" means “Topographic angle at the Bed-load transport layer Top” 
-! between the local interface normal (computed on the mixture particle, 
-! which locally defines this interface) and the vertical. The formulation for 
-! the fluid pressure only depends on this angle, no matter abut the flow 
-! direction.
             alfa_TBT = dacos(                                                  &
                pg(ind_interfaces(i_grid,j_grid,3))%normal_int_mixture_top(3))
 ! The limiter of PI/2 simply allows assigning null fluid pressure in case of 
@@ -143,7 +103,73 @@ do npi=1,nag
             pg(npi)%pres_fluid = p_fluid_blt_top + gamma_fluid *               &
                                  (z_blt_top_fluid - pg(npi)%coord(3)) *        &
                                  ((dcos(alfa_TBT)) ** 2)      
-      endif
+         case(2)
+! Saturation scheme depending on t_minimum_saturation and t_maximum_sateration
+            if (Granular_flows_options%saturation_conditions(i_grid,j_grid)==1)&
+               then
+! Fluid pressure
+! Phreatic zone (simplifying assumption: 1D filtration with piezometric lines  
+! in the bed-load transport layer parallel to the local 3D slope of the 
+! bed-load transport layer top)
+               p_fluid_blt_top = pg(ind_interfaces(i_grid,j_grid,2))%pres
+               z_blt_top_fluid = pg(ind_interfaces(i_grid,j_grid,2))%coord(3)
+               alfa_TBT = dacos(                                               &
+                  pg(ind_interfaces(i_grid,j_grid,3))%normal_int_mixture_top(3))
+! The limiter of PI/2 simply allows assigning null fluid pressure in case of 
+! "anti-gravity" slopes (very rare and very local in case of bed-load transport)
+               alfa_TBT = min(alfa_TBT,PIGRECO/2.d0) 
+               pg(npi)%pres_fluid = p_fluid_blt_top + gamma_fluid *            &
+                                    (z_blt_top_fluid - pg(npi)%coord(3)) *     &
+                                    ((dcos(alfa_TBT)) ** 2)
+               elseif (Granular_flows_options%saturation_conditions(i_grid,    &
+                  j_grid)==2) then
+! Infiltration zone
+                  z_blt_top_fluid = pg(ind_interfaces(i_grid,j_grid,2))%coord(3)
+                  z_soil_bottom = pg(ind_interfaces(i_grid,j_grid,5))%coord(3)
+                  z_inf_sat = z_blt_top_fluid - (simulation_time -             &
+                              Granular_flows_options%time_minimum_saturation) /&
+                              (Granular_flows_options%time_maximum_saturation -&
+                              Granular_flows_options%time_minimum_saturation) *&
+                              (z_blt_top_fluid - z_soil_bottom)
+                  if (pg(npi)%coord(3)>=z_inf_sat) then
+                     p_fluid_blt_top = pg(ind_interfaces(i_grid,j_grid,2))%pres
+                     pg(npi)%pres_fluid = p_fluid_blt_top * (1.d0 -            &
+                                          (z_blt_top_fluid - pg(npi)%coord(3)) &
+                                          / (z_blt_top_fluid - z_soil_bottom))
+                     else
+                        pg(npi)%pres_fluid = 0.d0
+                  endif
+                  else
+! Dry soil
+                     if (Granular_flows_options%saturation_conditions(i_grid,  &
+                        j_grid)==3) pg(npi)%pres_fluid = 0.d0   
+            endif
+         case(3)
+! Lagrangian scheme for saturation condituions under the hypothesis of 
+! stratified flows. Mixture particòes are either fully saturated or dry. 
+! Fluid pressure
+! Phreatic zone (simplifying assumption: 1D filtration with piezometric lines  
+! in the bed-load transport layer parallel to the local 3D slope of the 
+! bed-load transport layer top)
+            pg(npi)%pres_fluid = 0.d0
+            if (ind_interfaces(i_grid,j_grid,6)/=0) then
+               z_sat_top = pg(ind_interfaces(i_grid,j_grid,6))%coord(3)
+               if (z_sat_top>pg(npi)%coord(3)) then
+                  alfa_WT = dacos(                                             &
+                   pg(ind_interfaces(i_grid,j_grid,3))%normal_int_sat_top(3))
+! The limiter of PI/2 simply allows assigning null fluid pressure in case of 
+! "anti-gravity" slopes (very rare and very local in case of bed-load transport)
+                  alfa_WT = min(alfa_WT,PIGRECO/2.d0) 
+                  pg(npi)%pres_fluid = gamma_fluid * (z_sat_top -              &
+                                       pg(npi)%coord(3)) * ((dcos(alfa_WT)) ** &
+                                       2)
+               endif
+            endif
+         case default 
+            write(nout,*) 'The saturation scheme chosen in the input file is ',&
+               'wrong. The program terminates here. '
+            stop
+      endselect
 ! Mean of the effective stresses as the difference between the total pressure 
 ! and the fluid pressure
 ! The mean effective stress cannot be negative
@@ -165,16 +191,15 @@ do npi=1,nag
 ! strain-rate tensor)
 ! Frictional viscosity is the mixture viscosity in the bed-load transport layer
       if (pg(npi)%secinv>1.d-9) then 
-         pg(npi)%mu = pg(npi)%sigma_prime_m * dsin(                            &
-                      Med(Granular_flows_options%ID_granular)%phi) / (2.d0 *   &
-                      pg(npi)%secinv) + mu_main_fluid * eps_fluid_blt                 
+         pg(npi)%mu = pg(npi)%sigma_prime_m * dsin(Med(pg(npi)%imed)%phi) /    &
+                      (2.d0 * pg(npi)%secinv) + mu_main_fluid * eps_fluid_blt                 
          else
 ! Fictitious value representative of perfect uniform flow conditions
             pg(npi)%mu = 0.d0       
       endif
 ! To save computational time in the transition zone of elastic-platic regime
-      if (pg(npi)%mu>Med(Granular_flows_options%ID_granular)%mumx) then
-         pg(npi)%mu = Med(Granular_flows_options%ID_granular)%mumx
+      if (pg(npi)%mu>Med(pg(npi)%imed)%mumx) then
+         pg(npi)%mu = Med(pg(npi)%imed)%mumx
          pg(npi)%vel(:) = 0.d0
 ! No matter about the presence/absence of an erosion criterion, the particles 
 ! in the transition zone of elastic-platic regime are set fixed.

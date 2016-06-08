@@ -40,6 +40,7 @@ logical :: OnlyTriangle
 integer(4) :: npi,ier,i,n,isi,nfc,nt,nrecords,IC_loop,InputErr,alloc_stat
 integer(4) :: machine_Julian_day,machine_hour,machine_minute,machine_second
 integer(4),dimension(20) :: NumberEntities 
+double precision :: eps_f
 character(len=lencard) :: nomsub = "GEST_INPUT"
 character(len=lencard) :: ainp,msg_err
 character(10), external :: ltrim
@@ -295,17 +296,20 @@ if (.not.Restart) then
       endif
       nagpg = 0
       if (Granular_flows_options%ID_erosion_criterion>0) then
-         Med(Granular_flows_options%ID_granular)%den0_s =                      &
-            Med(Granular_flows_options%ID_granular)%den0
-         Med(Granular_flows_options%ID_granular)%den0 = (1.d0 -                &
-            Med(Granular_flows_options%ID_granular)%gran_vol_frac_max) *       &
-            Med(Granular_flows_options%ID_main_fluid)%den0 +                   &
-            Med(Granular_flows_options%ID_granular)%gran_vol_frac_max *        &
-            Med(Granular_flows_options%ID_granular)%den0_s 
-         Med(Granular_flows_options%ID_granular)%eps =                         &
-            Med(Granular_flows_options%ID_granular)%eps *                      &
-            Med(Granular_flows_options%ID_granular)%den0 /                     &
-            Med(Granular_flows_options%ID_granular)%den0_s
+         do i=1,NMedium
+            if (index(Med(i)%tipo,"granular")>0) then
+               Med(i)%den0_s = Med(i)%den0
+               if (Med(i)%saturated_medium_flag.eqv..true.) then
+                  eps_f = 1.d0 - Med(i)%gran_vol_frac_max
+                  else
+                     eps_f = 0.d0
+               endif
+               Med(i)%den0 = eps_f *                                           &
+                             Med(Granular_flows_options%ID_main_fluid)%den0 +  &
+                             Med(i)%gran_vol_frac_max * Med(i)%den0_s 
+               Med(i)%eps = Med(i)%eps * Med(i)%den0 / Med(i)%den0_s
+            endif
+         enddo
       endif
       IC_loop = 1
       call GeneratePart(IC_loop)
@@ -490,7 +494,7 @@ if (.not.Restart) then
       close(nsav)
       do i=1,NMedium
          if (Med(i)%codif/=zero) diffusione = .TRUE.
-         if ((index(Med(i)%tipo,"granular")>0)) then
+         if (index(Med(i)%tipo,"granular")>0) then
             erosione = .TRUE.
             modelloerosione = Med(i)%modelloerosione
          endif

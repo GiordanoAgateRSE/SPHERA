@@ -144,7 +144,7 @@ integer(4),               dimension(:),    allocatable :: EpCount,EpOrdGrid
 ! Array to count fluid particles (but those with status="sol")
 integer(4),               dimension(:),    allocatable :: Array_Flu
 ! Arrays 2D to detect the interfaces (bed-load transport):
-! (i_grid_min:i_grid_max,j_grid_min:j_grid_max,1:4),
+! (i_grid_min:i_grid_max,j_grid_min:j_grid_max,1:6),
 ! ind_interfaces(i_grid,j_grid,1): free surface particle ID in the grid column 
 !    (i_grid,j_grid)
 ! ind_interfaces(i_grid,j_grid,2): liquid particle ID of the "liquid - bedload 
@@ -156,6 +156,10 @@ integer(4),               dimension(:),    allocatable :: Array_Flu
 !    layer - fixed bed" interface in the grid column (i_grid,j_grid)
 ! ind_interfaces(i_grid,j_grid,5): mixture particle ID of the bottom of the 
 !    granular material in the grid column (i_grid,j_grid).
+! ind_interfaces(i_grid,j_grid,6): ID of the highest saturated mixture particle
+!    in the grid column (i_grid,j_grid). It is approximately representative of 
+!    the top of the fully saturated zone (under the hypothesis of stratified 
+!    flows).
 integer(4),               dimension(:,:,:),allocatable :: ind_interfaces 
 ! Only in 3D: the 2D arrays of the maximum values of the fluid particle height
 ! (at the nodes of the grid columns) and the specific flow rate. 

@@ -264,19 +264,21 @@ x_outlet_last y_outlet_last z_outlet_last n_x_outlet_last n_y_outlet_last n_z_ou
 
 ##### BED LOAD TRANSPORT #####
 ! Input parameters for bed-load transport (blt) scheme
-erosion_criterion_ID ID_main_fluid ID granular
+erosion_criterion_ID ID_main_fluid
                                     ! erosion_criterion_ID=0(no bed-load 
                                     ! transport),1(Shields-Seminara),2(Shields 
                                     ! without blt-fixed bed interactions),3
                                     ! (Mohr-Coulomb, not recommended); 
                                     ! ID_main_fluid(medium of 
-                                    ! the main fluid); ID granular
-                                    ! (medium of the blt layer). 
+                                    ! the main fluid). 
 saturation_scheme time_minimum_saturation time_maximum_saturation
                                     ! saturation_scheme=0(dry soil),1(fully 
                                     ! saturated soil),2(saturation zones 
                                     ! depepending on time_minimum_saturation and
-                                    ! time_maximum_saturation);
+                                    ! time_maximum_saturation),3(Lagrangian 
+                                    ! scheme for saturation conditions; mixture
+                                    ! particles are either fully saturated or 
+                                    ! dry).
                                     ! time_minimum_saturation: time related to 
                                     ! a relative minimum saturation of the  
                                     ! granular material.
@@ -344,8 +346,10 @@ roughness_coefficient               ! null recommended value (i.e. inactive
                                     ! parameter)
 ! If (fluid_type==liquid): end
 ! If (fluid_type==granular): start
-phi                                 ! phi(internal friction angle in degrees, 
-                                    ! even if the code works in radians)
+phi saturated_medium_flag           ! phi(internal friction angle in degrees, 
+                                    ! even if the code works in radians); 
+                                    ! saturated_medium_flag=.true.(fully 
+                                    ! saturated medium),.false.(dry medium). 
 cohesion viscosity_max tuned_viscosity
                                     ! cohesion (draft parameter); viscosity_max 
                                     ! (threshold for frictional viscosity), 

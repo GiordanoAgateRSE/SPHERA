@@ -212,6 +212,9 @@ type TyParticle
                                                  ! pure fluid (top of the 
                                                  ! bed-load transport layer, 
                                                  ! mixture side)
+   double precision :: normal_int_sat_top(3) ! Normal of the interface between 
+                                             ! the fully saturated mixture and 
+                                             ! the rest of the domain
    double precision :: vel_old(3) ! Velocity vector before the erosion 
                                   ! criterion (3D erosion criterion)
    double precision :: normal_int_old(3) ! normal_int variable before the 
@@ -432,10 +435,12 @@ end type TyBoundaryStretch
 
 ! Fluid
 type TyMedium
+   logical :: saturated_medium_flag ! saturated_medium_flag=.true.(fully 
+                                    ! saturated medium),.false.(dry medium)  
    integer(4)       :: index ! Fluid ID 
    integer(4)       :: NIterSol ! Number of iterations while the mixture is 
                                 ! completely still (beginning of simulation) 
-   double precision :: den0 ! IC density 
+   double precision :: den0 ! IC density
    double precision :: den0_s ! Solid phase reference density 
                               ! (bed-load transport layer)
    double precision :: eps ! Bulk modulus
@@ -452,7 +457,7 @@ type TyMedium
                             ! (tuning parameter in Manenti et al., 2012, JHE)
    double precision :: taucri ! Critical shear stress (erosion criterion)
    double precision :: cuin ! Exponent of the Constitutive Equation 
-   double precision :: phi ! Internal friction angle
+   double precision :: phi ! Internal friction angle   
    double precision :: cons ! Consistency   
    double precision :: Cs ! Costant of Smagorinsky's model    
    double precision :: RoughCoef ! Roughness coefficient 
@@ -600,7 +605,6 @@ type TyGranular_flows_options
                                             ! (1:Shields-Seminara,
                                             ! 2:Shields,3:Mohr-Coulomb)
    integer(4)       :: ID_main_fluid ! ID of the main flow 
-   integer(4)       :: ID_granular ! ID of the mixture 
    integer(4)       :: monitoring_lines ! Number of monitoring lines aligned 
                                         ! with x- or y-axis
    integer(4)       :: it_out_last ! Auxiliary variable for post-processing
@@ -620,7 +624,8 @@ type TyGranular_flows_options
                                          ! saturated soil),2(saturation zones 
                                          ! depepending on 
                                          ! time_minimum_saturation and
-                                         ! time_maximum_saturation)
+                                         ! time_maximum_saturation),3(Lagrangian 
+                                         ! scheme for saturation conditions)
    double precision :: time_minimum_saturation ! Time related to the minimum 
                                                ! saturation of the granular 
                                                ! material.

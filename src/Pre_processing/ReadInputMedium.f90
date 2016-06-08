@@ -38,6 +38,7 @@ integer(4),dimension(20) :: NumberEntities
 type (TyMedium),dimension(NMedium) :: Med
 character(1) :: comment
 character(100) :: ainp
+logical :: saturated_medium_flag
 integer(4) :: index,nitersol,ioerr
 double precision :: den0,eps,alfaMon,betaMon,visc,viscmx,taucri,cuin,phi,Cs
 double precision :: cons,codif,Settling,coes,Rough,D50,Gamma,InitialIntEn,d_90
@@ -84,6 +85,7 @@ do while (TRIM(lcase(ainp))/="##### end medium #####")
    cuin = zero
    coes = zero
    phi = zero
+   saturated_medium_flag = .false.
    D50 = zero
    nitersol = 0
    porosity = 0.d0
@@ -176,7 +178,7 @@ do while (TRIM(lcase(ainp))/="##### end medium #####")
 ! Non-Newtoniani fluids with apparent viscosity (Chen formula)
       case ("general ")
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         read(ainp,*,iostat=ioerr) den0, eps
+         read(ainp,*,iostat=ioerr) den0,eps
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                             &
             "WATER DENSITY & COMPRIMIBILITY",ninp,nout)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
@@ -211,7 +213,7 @@ do while (TRIM(lcase(ainp))/="##### end medium #####")
 ! Non-Newtonian fluids with apparent viscosity 
       case ("granular")
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         read(ainp,*,iostat=ioerr) den0, eps
+         read(ainp,*,iostat=ioerr) den0,eps
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                             &
             "WATER DENSITY & COMPRIMIBILITY",ninp,nout)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
@@ -227,8 +229,9 @@ do while (TRIM(lcase(ainp))/="##### end medium #####")
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"EXPLOSION COEFF",ninp,      &
             nout)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         read(ainp,*,iostat=ioerr) phi
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"PHI",ninp,nout)) return
+         read(ainp,*,iostat=ioerr) phi,saturated_medium_flag
+         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"PHI, SATURATED_MEDIUM_FLAG",&
+            ninp,nout)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read(ainp,*,iostat=ioerr) coes,viscmx,visc
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                             &
@@ -288,7 +291,7 @@ do while (TRIM(lcase(ainp))/="##### end medium #####")
       Med(index)%NIterSol = nitersol
       Med(index)%den0 = den0
       Med(index)%eps = eps
-      Med(index)%celerita = Dsqrt(eps/den0)
+      Med(index)%celerita = dsqrt(eps/den0)
       Med(index)%alfaMon = alfaMon
       Med(index)%betaMon = betaMon
       Med(index)%visc = visc
@@ -296,7 +299,8 @@ do while (TRIM(lcase(ainp))/="##### end medium #####")
       Med(index)%cons = cons
       Med(index)%taucri = taucri
       Med(index)%cuin = cuin
-      Med(index)%phi = Dabs(phi)
+      Med(index)%phi = phi
+      Med(index)%saturated_medium_flag = saturated_medium_flag
       Med(index)%coes = coes
       Med(index)%Cs = Cs
       Med(index)%RoughCoef = Rough
@@ -331,6 +335,8 @@ do while (TRIM(lcase(ainp))/="##### end medium #####")
             Med(index)%cuin
          write(nout,"(1x,a,1p,e12.4)") "Friction Angle:.............",         &
             Med(index)%phi
+         write(nout,"(1x,a,1p,l12)")   "Saturated medium flag:......",         &
+            Med(index)%saturated_medium_flag
          write(nout,"(1x,a,1p,e12.4)") "Cohesion:...................",         &
             Med(index)%coes
          write(nout,"(1x,a,1p,e12.4)") "Consistency:................",         &
@@ -361,7 +367,7 @@ do while (TRIM(lcase(ainp))/="##### end medium #####")
       Med(index)%numx = viscmx / den0
 ! From degrees to radians 
       Med(index)%phi = Med(index)%phi * PIGRECO / 180.  
-   endif           
+   endif
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"MEDIUM DATA",ninp,nout)) return
 enddo

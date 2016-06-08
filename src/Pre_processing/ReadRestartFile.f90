@@ -96,7 +96,7 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
       if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"Grid",nsav,nout)) return
 ! Allocating the 2D matrix to detect free surface
       if (.not.allocated(ind_interfaces)) then
-         allocate(ind_interfaces(Grid%ncd(1),Grid%ncd(2),5),STAT=alloc_stat)
+         allocate(ind_interfaces(Grid%ncd(1),Grid%ncd(2),6),STAT=alloc_stat)
          if (alloc_stat/=0) then
             write(nout,*)                                                      &
             'Allocation of ind_interfaces in ReadRestartFile failed;',         &

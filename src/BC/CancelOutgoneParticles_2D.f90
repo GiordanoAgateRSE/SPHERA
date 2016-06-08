@@ -65,14 +65,14 @@ do ios=1,NumOpenSides
    do pd=1,PLANEDIM
       OP1(pd) = Vertice(acix(pd),v1)
       OP2(pd) = Vertice(acix(pd),v2)
-   end do
+   enddo
 !$omp parallel do default(none) &
 !$omp private(npi,ios,Plocalnew,Plocalold,detV1PnewV2,detV1PoldV2)             &
 !$omp private(detPoldV1Pnew,detPoldV2Pnew)                                     &
 !$omp shared(nag,pg,acix,OP1,OP2,OpCount)
 ! Loop over all the particles
-   do npi = 1,nag
-      if (pg(npi)%cella == 0) cycle
+   do npi=1,nag
+      if (pg(npi)%cella==0) cycle
 ! Load the particle coordinates
       Plocalnew(1:planedim) = pg(npi)%coord(acix(1:planedim))
       Plocalold(1:planedim) = pg(npi)%CoordOld(acix(1:planedim))
@@ -81,25 +81,25 @@ do ios=1,NumOpenSides
                     (plocalnew(1) - op1(1)) * (op2(2) - op1(2))
 ! If the normal component is smaller than zero, then the particle might be out 
 ! of the boundary side, since the reference normal is oriented inside the domain
-      if (detV1PnewV2 <= zero) then
+      if (detV1PnewV2<=zero) then
 ! So the crossing point between the last path of the particle and the boundary
 ! segment is tested
          detV1PoldV2 = (Plocalold(2) - op1(2)) * (op2(1) - op1(1)) -           &
                        (plocalold(1) - op1(1)) * (op2(2) - op1(2))
-        if (sign(one,detV1PnewV2)==sign(one,detV1PoldV2)) cycle
-        detPoldV1Pnew = (op1(2) - plocalold(2)) * (plocalnew(1) - plocalold(1))&
-                        - (op1(1) - plocalold(1)) * (plocalnew(2) -            &
-                        plocalold(2))
-        detPoldV2Pnew = (op2(2) - plocalold(2)) * (plocalnew(1) - plocalold(1))&
-                        - (op2(1) - plocalold(1)) * (plocalnew(2) -            &
-                        plocalold(2))
-        if (sign(one,detPoldV1Pnew)==sign(one,detPoldV2Pnew)) cycle
-        OpCount(pg(npi)%imed) = OpCount(pg(npi)%imed) + 1 
-        pg(npi)%cella = -1
-      end if
-   end do
+         if (sign(one,detV1PnewV2)==sign(one,detV1PoldV2)) cycle
+         detPoldV1Pnew = (op1(2) - plocalold(2)) * (plocalnew(1) - plocalold(1)&
+                         ) - (op1(1) - plocalold(1)) * (plocalnew(2) -         &
+                         plocalold(2))
+         detPoldV2Pnew = (op2(2) - plocalold(2)) * (plocalnew(1) - plocalold(1)&
+                         ) - (op2(1) - plocalold(1)) * (plocalnew(2) -         &
+                         plocalold(2))
+         if (sign(one,detPoldV1Pnew)==sign(one,detPoldV2Pnew)) cycle
+         OpCount(pg(npi)%imed) = OpCount(pg(npi)%imed) + 1 
+         pg(npi)%cella = -1
+      endif
+   enddo
 !$omp end parallel do
-end do
+enddo
 !------------------------
 ! Deallocations
 !------------------------

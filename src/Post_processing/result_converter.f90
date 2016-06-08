@@ -21,7 +21,8 @@
 !-------------------------------------------------------------------------------
 ! Program unit: result_converter               
 ! Description: Post-processing for .vtu (fluid dynamics parameters) and .vtk 
-!              (geometry) files for Paraview.        
+!              (geometry) files for Paraview. Subroutine call for the 
+!              concatenation of the .txt temporary output files.      
 !-------------------------------------------------------------------------------
 subroutine result_converter(str)
 !------------------------
@@ -58,6 +59,8 @@ curtime = simulation_time
 ! Statements
 !------------------------
 if ((curtime<val_time).and.(index(str,'fine')==0)) return
+! To concatenate the ".txt" output files and remove the original ones
+call cat_post_proc
 ! Rounding current physical time for Paraview .vtu files
    curtime = simulation_time - MOD(simulation_time,abs(freq_time))  
    if (nag>0) then
@@ -458,7 +461,26 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
             pg(finger(k))%normal_int_mixture_top(2),                           &
             pg(finger(k))%normal_int_mixture_top(3),k=k1,k2)
       enddo
-      write(unitvtk,'(a)') '      </DataArray>' 
+      write(unitvtk,'(a)') '      </DataArray>'
+! normal_int_sat_top
+      write(unitvtk,'(a)')                                                     &
+'      <DataArray type="Float32" Name="normal_int_sat_top vector"  NumberOfComponents="3"  format="ascii" >'
+      do i=1,numpoints,6
+         k1 = i
+         k2 = k1 + 5
+         if (k2>numpoints) k2 = numpoints
+! Zeroing the mixture top normal, for those particles, which do not represent 
+! this interface
+         do k=k1,k2
+            if (pg(finger(k))%blt_flag/=5)                                     &
+               pg(finger(k))%normal_int_sat_top(:) = 0.d0
+         enddo
+         write(unitvtk,'(8x,6(3(1x,e12.5)))') (                                &
+            pg(finger(k))%normal_int_sat_top(1),                               &
+            pg(finger(k))%normal_int_sat_top(2),                               &
+            pg(finger(k))%normal_int_sat_top(3),k=k1,k2)
+      enddo
+      write(unitvtk,'(a)') '      </DataArray>'
       if (Granular_flows_options%erosion_flag.ne.1) then
 ! Beta
          write(unitvtk,'(a)')                                                  &

@@ -45,6 +45,7 @@ double precision :: rij_su_h,ke_coef,kacl_coef,rij_su_h_quad,rijtemp,rijtemp2
 double precision :: gradmod,gradmodwacl,wu,denom,normal_int_abs,abs_vel
 double precision :: min_sigma_Gamma,dis_fp_dbsph_inoutlet
 double precision :: dbsph_inoutlet_threshold,normal_int_mixture_top_abs
+double precision :: normal_int_sat_top_abs
 double precision :: ragtemp(3)
 integer(4),dimension(:),allocatable :: bounded
 double precision,dimension(:),allocatable :: dShep_old
@@ -90,6 +91,7 @@ endif
 !$omp private(rij_su_h,rij_su_h_quad,denom,index_rij_su_h,gradmod,gradmodwacl) &
 !$omp private(wu,contliq,fw,normal_int_abs,abs_vel,dis_fp_dbsph_inoutlet)      &
 !$omp private(dbsph_inoutlet_threshold,normal_int_mixture_top_abs)             &
+!$omp private(normal_int_sat_top_abs)                                          &                 
 !$omp shared(nag,pg,Domain,Med,Icont,Npartord,NMAXPARTJ,rag,nPartIntorno)      &
 !$omp shared(Partintorno,PartKernel,ke_coef,kacl_coef,Doubleh,DoubleSquareh)   &
 !$omp shared(squareh,nomsub,ncord,eta,eta2,nout,nscr,erosione,ind_interfaces)  &
@@ -130,7 +132,8 @@ loop_nag: do npi=1,nag
    if (Granular_flows_options%ID_erosion_criterion>0) then
       pg(npi)%normal_int(:) = 0.d0
       pg(npi)%normal_int_mixture_top(:) = 0.d0
-   endif   
+      pg(npi)%normal_int_sat_top(:) = 0.d0
+   endif
    nceli = pg(npi)%cella
    if (nceli==0) cycle
    irestocell = CellIndices (nceli,igridi,jgridi,kgridi)
@@ -287,7 +290,7 @@ loop_nag: do npi=1,nag
 ! normal)              
                   if (pg(npi)%state/=pg(npj)%state) then
                      if (pg(npi)%state=="flu") then
-                        if (pg(npi)%imed==Granular_flows_options%ID_granular)  &
+                        if (index(Med(pg(npi)%imed)%tipo,"granular")>0)  &
                            pg(npi)%normal_int(:) = pg(npi)%normal_int(:)       &
                                                 - (pg(npj)%coord(:) -          &
                                                 pg(npi)%coord(:)) *            &
@@ -297,7 +300,7 @@ loop_nag: do npi=1,nag
                            (npj>pg(npi)%ind_neigh_mix_bed))) then  
                            pg(npi)%ind_neigh_mix_bed = npj
                            pg(npi)%rijtempmin(2) = rijtemp
-                        endif   
+                        endif
                         elseif (pg(npi)%state=="sol") then
                            pg(npi)%normal_int(:) = pg(npi)%normal_int(:) +     &
                                                    (pg(npj)%coord(:) -         &
@@ -324,13 +327,21 @@ loop_nag: do npi=1,nag
                      endif
                   endif              
 ! To estimate the normal to the mixture top
-                  if (pg(npi)%imed==Granular_flows_options%ID_granular) then
-                     if (pg(npi)%imed==pg(npj)%imed) then
+                  if (index(Med(pg(npi)%imed)%tipo,"granular")>0) then
+                     if (Med(pg(npi)%imed)%tipo==Med(pg(npj)%imed)%tipo) then
                         pg(npi)%normal_int_mixture_top(:) =                    &
                            pg(npi)%normal_int_mixture_top(:) -                 &
                            (pg(npj)%coord(:) - pg(npi)%coord(:)) *             &
-                           PartKernel(4,npartint)  
+                           PartKernel(4,npartint)
                      endif
+                  endif
+! To estimate the normal to the top of the saturated zone
+                  if ((Med(pg(npi)%imed)%saturated_medium_flag.eqv..true.).and.&
+                     (Med(pg(npi)%imed)%saturated_medium_flag.eqv.             &
+                     Med(pg(npj)%imed)%saturated_medium_flag)) then
+                     pg(npi)%normal_int_sat_top(:) =                           &
+                        pg(npi)%normal_int_sat_top(:) - (pg(npj)%coord(:) -    &
+                        pg(npi)%coord(:)) * PartKernel(4,npartint)
                   endif
                endif
             enddo loop_mm
@@ -485,7 +496,24 @@ loop_nag: do npi=1,nag
                               ind_interfaces(igridi,jgridi,5) = npi
                   endif
             endif
-!$omp end critical (soil_bottom_detection) 
+!$omp end critical (soil_bottom_detection)
+            if (Med(pg(npi)%imed)%saturated_medium_flag.eqv..true.) then
+!$omp critical (saturated_zone_top_detection)
+               if (ind_interfaces(igridi,jgridi,6)==0) then
+                  ind_interfaces(igridi,jgridi,6) = npi   
+                  else
+                     if (pg(npi)%coord(3)>                                     &
+                        pg(ind_interfaces(igridi,jgridi,6))%coord(3)) then
+                           ind_interfaces(igridi,jgridi,6) = npi 
+                           elseif (pg(npi)%coord(3)==                          &
+                              pg(ind_interfaces(igridi,jgridi,6))%coord(3))    &
+                              then
+                              if (npi>ind_interfaces(igridi,jgridi,6))         &
+                                 ind_interfaces(igridi,jgridi,6) = npi
+                     endif
+               endif
+!$omp end critical (saturated_zone_top_detection)
+            endif
       endif                                     
    endif
 ! In case of bed-load transport with an erosion criterion
@@ -493,7 +521,7 @@ loop_nag: do npi=1,nag
       (Granular_flows_options%erosion_flag/=1)) then
 ! Normalization of the interface normal between the granular mixture and the 
 ! fixed bed (bed-load transport)
-      if (pg(npi)%imed==Granular_flows_options%ID_granular) then 
+      if (index(Med(pg(npi)%imed)%tipo,"granular")>0) then 
          normal_int_abs = dsqrt(dot_product(pg(npi)%normal_int,                &
                           pg(npi)%normal_int)) 
          if (normal_int_abs>zero) then
@@ -503,8 +531,8 @@ loop_nag: do npi=1,nag
    endif
 ! In case of bed-load transport
    if (Granular_flows_options%ID_erosion_criterion>0) then
-! Normalization of the mixture top interface 
-      if (pg(npi)%imed==Granular_flows_options%ID_granular) then 
+      if (index(Med(pg(npi)%imed)%tipo,"granular")>0) then 
+! Normalization of the mixture top interface normal 
          normal_int_mixture_top_abs = dsqrt(dot_product(                       &
             pg(npi)%normal_int_mixture_top,                                    &
             pg(npi)%normal_int_mixture_top)) 
@@ -515,6 +543,16 @@ loop_nag: do npi=1,nag
                pg(npi)%normal_int_mixture_top(1:2) = 0.d0
                pg(npi)%normal_int_mixture_top(3) = 1.d0
          endif    
+! Normalization of the interface normal of the saturated zone top 
+         normal_int_sat_top_abs = dsqrt(dot_product(                           &
+            pg(npi)%normal_int_sat_top,pg(npi)%normal_int_sat_top)) 
+         if (normal_int_sat_top_abs>zero) then
+            pg(npi)%normal_int_sat_top(:) = pg(npi)%normal_int_sat_top(:) /    &
+                                            normal_int_sat_top_abs
+            else
+               pg(npi)%normal_int_sat_top(1:2) = 0.d0
+               pg(npi)%normal_int_sat_top(3) = 1.d0
+         endif
       endif
 !$omp critical (interface_definition)  
 ! Update the local position of the upper interface of the bed-load transport 
@@ -560,8 +598,8 @@ loop_nag: do npi=1,nag
                      ind_interfaces(igridi,jgridi,4))                          &
                      ind_interfaces(igridi,jgridi,4) = pg(npi)%ind_neigh_mix_bed
          endif
-      endif 
-!$omp end critical (interface_definition)   
+      endif
+!$omp end critical (interface_definition) 
    endif
 enddo loop_nag
 !$omp end parallel do
@@ -571,14 +609,14 @@ if (Granular_flows_options%ID_erosion_criterion>0) then
    do npi=1,nag
       nceli = ParticleCellNumber(pg(npi)%coord)
       irestocell = CellIndices(nceli,igridi,jgridi,kgridi)
-      if (pg(npi)%imed==Granular_flows_options%ID_granular) then
+      if (index(Med(pg(npi)%imed)%tipo,"granular")>0) then
          if (ind_interfaces(igridi,jgridi,3)==0) then
-            ind_interfaces(igridi,jgridi,3) = - npi   
+            ind_interfaces(igridi,jgridi,3) = -npi   
             else
                if (ind_interfaces(igridi,jgridi,3)<0) then
                   if (pg(npi)%coord(3)>                                        &
                      pg(-ind_interfaces(igridi,jgridi,3))%coord(3)) then
-                     ind_interfaces(igridi,jgridi,3) = - npi 
+                     ind_interfaces(igridi,jgridi,3) = -npi 
                      elseif (pg(npi)%coord(3)==                                &
                         pg(-ind_interfaces(igridi,jgridi,3))%coord(3)) then
                         if (npi>(-ind_interfaces(igridi,jgridi,3)))            &
@@ -619,6 +657,8 @@ if (Granular_flows_options%ID_erosion_criterion>0) then
             pg(ind_interfaces(i_grid,j_grid,1))%blt_flag = 1
          if (ind_interfaces(i_grid,j_grid,5).ne.0)                             &
             pg(ind_interfaces(i_grid,j_grid,5))%blt_flag = 4
+         if (ind_interfaces(i_grid,j_grid,6).ne.0)                             &
+            pg(ind_interfaces(i_grid,j_grid,6))%blt_flag = 5
 ! Saturation flags
          if (Granular_flows_options%saturation_scheme==2) then
             if ((Granular_flows_options%time_minimum_saturation>=              &

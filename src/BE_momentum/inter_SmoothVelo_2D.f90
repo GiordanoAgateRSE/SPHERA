@@ -85,7 +85,7 @@ do ii=1,indarrayFlu
    pg(npi)%var = zero
 ! The mixture particles, which are temporarily affected by the frictional 
 ! viscosity threshold are fixed.
-   if (pg(npi)%mu==Med(Granular_flows_options%ID_granular)%mumx) cycle
+   if (pg(npi)%mu==Med(pg(npi)%imed)%mumx) cycle
    pg(npi)%Envar = zero
    do contj=1,nPartIntorno(npi)
       npartint = (npi-1)* NMAXPARTJ + contj

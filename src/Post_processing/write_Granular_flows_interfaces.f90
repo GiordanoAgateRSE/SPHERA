@@ -20,12 +20,12 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: write_Granular_flows_interfaces                  
-! Description: Post-processing the interfaces for bed-load transport phenomena.             
+! Description: To print the interfaces for bed-load transport phenomena.             
 !-------------------------------------------------------------------------------
-subroutine write_Granular_flows_interfaces
+subroutine write_Granular_flows_interfaces(i_grid,j_grid,pos_aux)
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
 use I_O_file_module
 use Static_allocation_module
 use Hybrid_allocation_module
@@ -34,12 +34,10 @@ use Dynamic_allocation_module
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: i_grid,j_grid,i_cell,i_aux,i,k_grid,i2_grid,j2_grid
-double precision :: x_grid,y_grid,z_free_surface,z_BedLoad_PureFluid,z_bed
-double precision :: z_soil_bottom
-double precision :: pos_aux(3)
-character(255) :: nomefile_blt_interfaces
-integer(4),external :: CellIndices,ParticleCellNumber
+integer(4),intent(in) :: i_grid,j_grid
+double precision,intent(in) :: pos_aux(3)
+double precision :: z_free_surface,z_BedLoad_PureFluid,z_bed,z_soil_bottom
+double precision :: z_sat_top
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -52,139 +50,37 @@ integer(4),external :: CellIndices,ParticleCellNumber
 !------------------------
 ! Statements
 !------------------------
-! .txt file creation and heading
-write(nomefile_blt_interfaces,"(a,a,i8.8,a)") nomecaso(1:len_trim(nomecaso)),  &
-   '_blt_interfaces_',on_going_time_step,".txt"
-open(ncpt,file=nomefile_blt_interfaces,status="unknown",form="formatted")
-if (on_going_time_step==1) then
-! First step
-   write (ncpt,*) "Bed load transport interfaces "
-   write (ncpt,'((7x,a),(5x,a),(5x,a),(7x,a),(7x,a),(6x,a),(6x,a))')           &
-      " Time(s)"," x_grid(m)"," y_grid(m)"," z_FS(m)"," z_fm(m)"," z_bed(m)",  &
-      " z_bot(m)"
-   flush(ncpt)
+if (ind_interfaces(i_grid,j_grid,1)>0) then
+   z_free_surface = pg(ind_interfaces(i_grid,j_grid,1))%coord(3) + Domain%dd / &
+                    2.d0
    else
-! Other steps 
-! Loop over the monitoring lines
-      do i=1,Granular_flows_options%monitoring_lines
-         if (Granular_flows_options%lines(i,1)==-999.d0) then
-            do i2_grid=1,Grid%ncd(1)
-               pos_aux(1) = (i2_grid - 0.5) * Grid%dcd(1) + grid%extr(1,1)
-               pos_aux(2) = Granular_flows_options%lines(i,2)
-               pos_aux(3) = 0.5d0 * Grid%dcd(3) + grid%extr(3,1) 
-! Note: pos_aux(3) = 0.d0
-               i_cell = ParticleCellNumber(pos_aux) 
-               i_aux = CellIndices(i_cell,i_grid,j_grid,k_grid)
-               if (ind_interfaces(i_grid,j_grid,1)>0) then
-                  z_free_surface = pg(ind_interfaces(i_grid,j_grid,1))%coord(3)&
-                                   + Domain%dd / 2.d0
-                  else
-                     z_free_surface = -999.d0
-               endif
-               if (ind_interfaces(i_grid,j_grid,4)>0) then
-                  z_bed = pg(ind_interfaces(i_grid,j_grid,4))%coord(3) +       &
-                          Domain%dd / 2.d0
-                  else
-                     z_bed = -999.d0
-               endif 
-               if (ind_interfaces(i_grid,j_grid,3)>0) then
-                  z_BedLoad_PureFluid =                                        &
-                     pg(ind_interfaces(i_grid,j_grid,3))%coord(3) + Domain%dd  &
-                     / 2.d0
-                  else
-                     z_BedLoad_PureFluid = z_bed 
-               endif
-               if (ind_interfaces(i_grid,j_grid,5)>0) then
-                  z_soil_bottom =                                              &
-                     pg(ind_interfaces(i_grid,j_grid,5))%coord(3) + Domain%dd  &
-                     / 2.d0
-                  else
-                     z_soil_bottom = -999.d0 
-               endif   
-               write(ncpt,'(7(g14.6,1x))') simulation_time,pos_aux(1),         &
-                  pos_aux(2),z_free_surface,z_BedLoad_PureFluid,z_bed,         &
-                  z_soil_bottom
-            enddo 
-         endif 
-         if (Granular_flows_options%lines(i,2)==-999.d0) then
-            do j2_grid=1,Grid%ncd(2)
-               pos_aux(1) = Granular_flows_options%lines(i,1)
-               pos_aux(2) = (j2_grid - 0.5) * Grid%dcd(2) + grid%extr(2,1)
-               pos_aux(3) = 0.5d0 * Grid%dcd(3) + grid%extr(3,1) 
-! Note: pos_aux(3) = 0.d0
-               i_cell = ParticleCellNumber(pos_aux) 
-               i_aux = CellIndices(i_cell,i_grid,j_grid,k_grid)
-               if (ind_interfaces(i_grid,j_grid,1)>0) then
-                  z_free_surface = pg(ind_interfaces(i_grid,j_grid,1))%coord(3)&
-                                   + Domain%dd / 2.d0
-                  else
-                     z_free_surface = -999.d0
-               endif
-               if (ind_interfaces(i_grid,j_grid,4)>0) then
-                  z_bed = pg(ind_interfaces(i_grid,j_grid,4))%coord(3) +       &
-                          Domain%dd / 2.d0
-                  else
-                     z_bed = -999.d0
-               endif 
-               if (ind_interfaces(i_grid,j_grid,3)>0) then
-                  z_BedLoad_PureFluid =                                        &
-                     pg(ind_interfaces(i_grid,j_grid,3))%coord(3) + Domain%dd  &
-                     / 2.d0
-                  else
-                     z_BedLoad_PureFluid = z_bed 
-               endif   
-               if (ind_interfaces(i_grid,j_grid,5)>0) then
-                  z_soil_bottom =                                              &
-                     pg(ind_interfaces(i_grid,j_grid,5))%coord(3) + Domain%dd  &
-                     / 2.d0
-                  else
-                     z_soil_bottom = -999.d0 
-               endif 
-               write(ncpt,'(7(g14.6,1x))') simulation_time,pos_aux(1),         &
-                  pos_aux(2),z_free_surface,z_BedLoad_PureFluid,z_bed,         &
-                  z_soil_bottom
-            enddo
-         endif
-         if ((Granular_flows_options%lines(i,1).ne.-999.d0).and.               &
-            (Granular_flows_options%lines(i,2).ne.-999.d0)) then
-            pos_aux(1) = Granular_flows_options%lines(i,1)
-            pos_aux(2) = Granular_flows_options%lines(i,2)
-            pos_aux(3) = 0.5d0 * Grid%dcd(3) + grid%extr(3,1) 
-! Note: pos_aux(3) = 0.d0
-            i_cell = ParticleCellNumber(pos_aux) 
-            i_aux = CellIndices(i_cell,i_grid,j_grid,k_grid)
-            if (ind_interfaces(i_grid,j_grid,1)>0) then
-               z_free_surface = pg(ind_interfaces(i_grid,j_grid,1))%coord(3) + &
-                                Domain%dd / 2.d0
-               else
-                  z_free_surface = -999.d0
-            endif
-            if (ind_interfaces(i_grid,j_grid,4)>0) then
-               z_bed = pg(ind_interfaces(i_grid,j_grid,4))%coord(3) +          &
-                       Domain%dd / 2.d0
-               else
-                  z_bed = -999.d0
-            endif 
-            if (ind_interfaces(i_grid,j_grid,3)>0) then
-               z_BedLoad_PureFluid =                                           &
-                  pg(ind_interfaces(i_grid,j_grid,3))%coord(3) + Domain%dd /   &
-                  2.d0
-               else
-                  z_BedLoad_PureFluid = z_bed 
-            endif   
-            if (ind_interfaces(i_grid,j_grid,5)>0) then
-               z_soil_bottom =                                                 &
-                  pg(ind_interfaces(i_grid,j_grid,5))%coord(3) + Domain%dd /   &
-                  2.d0
-               else
-                  z_soil_bottom = -999.d0 
-            endif             
-            write(ncpt,'(7(g14.6,1x))') simulation_time,pos_aux(1),pos_aux(2), &
-               z_free_surface,z_BedLoad_PureFluid,z_bed,z_soil_bottom
-         endif          
-      enddo
-endif 
-close (ncpt)
+      z_free_surface = -999.d0
+endif
+if (ind_interfaces(i_grid,j_grid,4)>0) then
+   z_bed = pg(ind_interfaces(i_grid,j_grid,4))%coord(3) + Domain%dd / 2.d0
+   else
+      z_bed = -999.d0
+endif
+if (ind_interfaces(i_grid,j_grid,3)>0) then
+   z_BedLoad_PureFluid = pg(ind_interfaces(i_grid,j_grid,3))%coord(3) +        &
+                         Domain%dd / 2.d0
+   else
+      z_BedLoad_PureFluid = z_bed 
+endif
+if (ind_interfaces(i_grid,j_grid,5)>0) then
+   z_soil_bottom = pg(ind_interfaces(i_grid,j_grid,5))%coord(3) + Domain%dd /  &
+                   2.d0
+   else
+      z_soil_bottom = -999.d0 
+endif
+if (ind_interfaces(i_grid,j_grid,6)>0) then
+   z_sat_top = pg(ind_interfaces(i_grid,j_grid,6))%coord(3) + Domain%dd / 2.d0
+   else
+      z_sat_top = z_soil_bottom 
+endif
+write(ncpt,'(8(g14.6,1x))') simulation_time,pos_aux(1),pos_aux(2),             &
+                            z_free_surface,z_BedLoad_PureFluid,z_bed,          &
+                            z_soil_bottom,z_sat_top
 !------------------------
 ! Deallocations
 !------------------------
