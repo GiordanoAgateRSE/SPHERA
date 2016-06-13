@@ -1,11 +1,10 @@
 8.0
 
 !-------------------------------------------------------------------------------
-! File name and copyright: dike_breach_2D_expSchHag12JHR_ID13.inp
+! File name and copyright: erosional_dam_break_Karlsruher_sand.inp
 !    Copyright 2016 (RSE SpA, authored by Andrea Amicarelli)
 ! File description: input file for SPHERA v.8.0 (RSE SpA).
-!   Representation of the experimental 2D dike_breach of Schmocker and Hager 
-!   2012 (JHR), test case ID=13. 
+!   Representation of a demonstrative erosional dam break chosen with TUHH. 
 !
 ! This file is free software: you can redistribute it and/or modify
 ! it under the terms of the GNU General Public License as published by
@@ -20,55 +19,53 @@
 !-------------------------------------------------------------------------------
 
 ##### TITLE #####
-dike_breach_2D_expSchHag12JHR_ID13
+09_erosional_dam_break_Bozhana
 ##### END TITLE #####
 
 ##### DOMAIN #####
 2 semi
-0.008 1.3
+0.0125 1.3
 ##### END DOMAIN #####
 
 ##### VERTICES #####
-! Wall frontiers
-1 0. 0.7
-2 0. 0.
-3 4. 0.
-! Dike
-4 1. 0.
-5 1.9 0.
-6 1.5 0.2
-7 1.4 0.2
-! Additional point to complete the water reservoir
-8 0. 0.2
+! Boundary
+1 0.000 0.0
+2 3.000 0.0
+3 0.000 2.0
+! Points to complete the granular bed
+4 0.000 0.2
+5 3.000 0.2
+! Points to complete the water reservoir
+6 1.500 1.5 
+7 1.500 0.2 
+8 3.000 1.5 
+! Point for the down-flow vertical wall
+9 3.000 2.000
 ##### END VERTICES #####
  
 ##### LINES #####
-! Wall frontiers
-1 2 3
-! Dike
-2 4 5 6 7 4
+! Domain frontier
+1 3 1 2 9
+! Graular bed reservoir
+2 2 1 4 5 2
 ! Water reservoir
-3 2 4 7 8 2
-! Inlet section
-4 8 2
-! Left wall over the inlet section
-5 1 8
+3 5 7 6 8 5
 ##### END LINES #####
 
 ##### BOUNDARIES #####
-Wall_frontiers
+Boundary
 1
 fixed
 1.
 111111
 !
-Dike
+Granular_bed
 2
 perimeter
 2
 uniform 009EA8
 std 0. 0. 0. 0.
-pa 0.
+qp 0.2
 1 0 .false.
 !
 Water_reservoir
@@ -77,22 +74,8 @@ perimeter
 1
 uniform 009EA8
 std 0. 0. 0. 0.
-qp 0.2
+qp 1.5
 1 0 .false.
-!
-inlet_section
-4
-source
-1
-0.02 0.
-qp 0.2
-222222
-!
-Left_wall_over_inlet
-5
-fixed
-1.
-111111
 ##### END BOUNDARIES #####
 
 ##### DBSPH #####
@@ -104,22 +87,23 @@ fixed
 ##### END DBSPH #####
 
 ##### BED LOAD TRANSPORT #####
-1 1 2 0.            
-0. 1           
+1 1 2
+1 0. 0.
+0. 1
 0 0
-1 1. 0.03 30   
+1 0.065 0.03 30
 -999999. 999999.
 -999999. 999999.
 -999999. 999999.
 0. 0.
-1                
--999. 0.         
+1
+-999. 0.
 ##### end BED LOAD TRANSPORT #####
 
 ##### medium #####
 liquid
 1
-1000.0 98.0e3
+1000. 1.3e6
 0.1 0.
 0. 0.
 0. 0. 0.
@@ -128,13 +112,13 @@ liquid
 !
 granular
 2
-2650. 260.e3
+2650. 3.44e6
 0.1 0.
-0. 0. 
+0. 0.
 0. 0. 0.
-40.
+30.
 0. 1.e4 0.
-0.37 0.002 0.002
+0.41 0.0007 0.0007
 ##### end medium #####
 
 ##### BODY DYNAMICS #####
@@ -142,7 +126,7 @@ granular
 ##### end BODY DYNAMICS #####
 
 ##### RUN PARAMETERS #####
-50. 1000000000
+0.65 1000000000
 0.05 1 1 0. .false.
 0.25 0. A
 10. 4. 0
@@ -162,15 +146,15 @@ granular
 
 ##### output regulation #####
 results time 99999.
-restart time 1.
+restart time 0.05
 print partial 100
-control time 1.
+control time 0.05
 level time 1. medium 1
 depth dt_out 999999.
 ##### end output regulation #####
 
 ##### draw options #####
-vtkconverter any 1.
+vtkconverter any 0.013
 ##### end draw options #####
 
 ##### control points #####
@@ -186,23 +170,5 @@ vtkconverter any 1.
 ##### end control sections #####
 
 ##### section flow rate #####
-3 1. 2
-1
-4
-1. 0.1 0.
-1. 0.1 0.7
-1. -0.1 0.7
-1. -0.1 0.  
-2
-4
-1.45 0.1 0.
-1.45 0.1 0.7
-1.45 -0.1 0.7
-1.45 -0.1 0.
-3
-4
-1.9 0.1 0.
-1.9 0.1 0.7
-1.9 -0.1 0.7
-1.9 -0.1 0.
+0 1. 1
 ##### end Section flow rate #####
