@@ -152,7 +152,8 @@ do npi=1,nag
 ! in the bed-load transport layer parallel to the local 3D slope of the 
 ! bed-load transport layer top)
             pg(npi)%pres_fluid = 0.d0
-            if (ind_interfaces(i_grid,j_grid,6)/=0) then
+            if ((ind_interfaces(i_grid,j_grid,6)/=0).and.(                     &
+               Med(pg(npi)%imed)%saturated_medium_flag.eqv..true.)) then
                z_sat_top = pg(ind_interfaces(i_grid,j_grid,6))%coord(3)
                if (z_sat_top>pg(npi)%coord(3)) then
                   alfa_WT = dacos(                                             &
