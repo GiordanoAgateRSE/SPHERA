@@ -1,3 +1,3 @@
 21824 41469 4 ! perimeter_first_vertex_ID; perimeter_first_face_ID; perimeter_ID
-0. ! z_offset (to add)
-ICOLD_mobile_bed.ply ! ply_file_name
+12. ! z_offset (to add)
+ICOLD_mobile_bed_small.ply ! ply_file_name

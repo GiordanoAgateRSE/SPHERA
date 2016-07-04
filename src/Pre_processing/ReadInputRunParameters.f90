@@ -36,7 +36,7 @@ integer(4) :: nrighe,ier,ninp,nout,nscr
 character(1) :: comment
 character(100) :: ainp
 integer(4) :: itmax
-double precision :: tmax,CFL,TetaP,TetaV,COEFNMAXPARTJ,COEFNMAXPARTI
+double precision :: tmax,CFL,TetaP,TetaV,COEFNMAXPARTJ,COEFNMAXPARTI,vsc_coeff
 integer(4) :: ioerr,time_split,RKscheme,body_part_reorder,MAXCLOSEBOUNDFACES
 integer(4) :: MAXNUMCONVEXEDGES,GCBFVecDim_loc,density_thresholds
 character(1) :: Psurf
@@ -72,8 +72,10 @@ do while (TRIM(lcase(ainp))/="##### end run parameters #####")
       endif
    endif
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-   read (ainp,*,iostat=ioerr) CFL, time_split, RKscheme, pesodt, dt_alfa_Mon
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"CFL",ninp,nout)) return
+   read (ainp,*,iostat=ioerr) CFL,vsc_coeff,time_split,RKscheme,pesodt,        &
+      dt_alfa_Mon
+   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"TIME INTEGRATION",ninp,nout))     &
+      return
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
    read(ainp,*,iostat=ioerr) TetaP,TetaV
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"TETAP & TETAV",ninp,nout)) return
@@ -115,12 +117,13 @@ do while (TRIM(lcase(ainp))/="##### end run parameters #####")
 enddo
 ! Assigning the values read
 if (ncord>0) then
-   Domain%tmax  = tmax
+   Domain%tmax = tmax
    Domain%itmax = itmax
-   Domain%CFL  = CFL
-   Domain%time_split  = time_split
+   Domain%CFL = CFL
+   Domain%vsc_coeff = vsc_coeff
+   Domain%time_split = time_split
    if (time_split==1) then
-      Domain%RKscheme  = 1
+      Domain%RKscheme = 1
       else
       if (RKscheme==0) then
          write(nscr,"(1x,a)") " "
@@ -150,6 +153,8 @@ if (ncord>0) then
          Domain%itmax
       write(nout,"(1x,a,1p,e12.4)") "CFL                        : ",           &
          Domain%CFL
+      write(nout,"(1x,a,1p,e12.4)") "vsc_coeff                  : ",           &
+         Domain%vsc_coeff
       write(nout,"(1x,a,1p,i1)")    "staggering option          : ",           &
          Domain%time_split
       write(nout,"(1x,a,1p,i1)")    "RKscheme                   : ",           &

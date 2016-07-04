@@ -155,7 +155,7 @@ endif
 ! A restart procedure has been invoked: restart positioning 
 ! (step number / step time)
 if ((Domain%istart>0).or.(Domain%start>zero)) then
-   restart = .True.
+   restart = .true.
 ! To open the restart file from which restart data will be restored
    open(unit=nsav,file=trim(Domain%file),form="unformatted",status="old",      &
       iostat=ier)
@@ -231,7 +231,7 @@ rewind(ninp)
 ! Array initializations
 call Init_Arrays
 ! No restart
-if (.not.Restart) then
+if (.not.restart) then
    call ReadInput(NumberEntities,OnlyTriangle,InputErr,ainp)
    msg_err = trim("readinput")
    if (InputErr/=0) then
@@ -516,7 +516,7 @@ if (Domain%ioutopt<0) then
    enddo
 endif
 ! Management of body dynamics input
-if ((n_bodies>0).and.(.not.Restart)) call Input_Body_Dynamics
+if ((n_bodies>0).and.(.not.restart)) call Input_Body_Dynamics
 ! Memory allocation for the particle ordering arrays
 if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
    allocate(NPartOrd(PARTICLEBUFFER),Icont(grid%nmax+1),stat=ier) 
@@ -545,7 +545,7 @@ if (n_bodies>0) then
          Icont_bp(:) = 0
    endif
 endif
-if ((Domain%tipo=="bsph").and.(.not.Restart)) then
+if ((Domain%tipo=="bsph").and.(.not.restart)) then
    call Import_ply_surface_meshes
    call DBSPH_IC_surface_elements
    if (.not.allocated(NPartOrd_w)) then
@@ -564,12 +564,12 @@ if ((Domain%tipo=="bsph").and.(.not.Restart)) then
    endif
 endif
 call OrdGrid1(nout)
-if ((Domain%tipo=="bsph").and.(.not.Restart)) then
+if ((Domain%tipo=="bsph").and.(.not.restart)) then
    call DBSPH_find_close_faces 
    call semi_particle_volumes
 endif
 ! To initialize pressure and density fields
-if (.not.Restart) call SubCalcPreIdro
+if (.not.restart) call SubCalcPreIdro
 ! To assess and save the sides with condition "open" (2D) 
 if (ncord==2) then     
 ! Searching for the sides with condition "open" 

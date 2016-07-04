@@ -18,7 +18,6 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
-
 !-------------------------------------------------------------------------------
 ! Program unit: inidt2                                           
 ! Description: Initial time step. 
@@ -34,8 +33,8 @@ use Dynamic_allocation_module
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: j,npi,mate,ii
-double precision :: dtmin,dt_CFL,dt_dif,dt_vis,diffmax,U
+integer(4) :: j,npi,ii
+double precision :: dtmin,dt_CFL,dt_dif,dt_vis,diffmax,U,vsc_coeff
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -54,29 +53,27 @@ if (indarrayFlu==0) then
 ! In case there is no fluid (or movable) particle
    dt = 0.d0   
    else
-! Time step depends on 3 conditions:
-! 1) the CFL condition: dt_CFL=(2h/(c+U))
-! 2) viscous stability condition dt_vis=(rho*h**2/(0.5*mu)) 
+! Time step depends on 3 stability criteria:
+! 1) the CFL condition: dt_CFL=CFL*(2h/(c+U))
+! 2) viscous stability condition dt_vis=vsc_coeff*(2*rho*h**2/mu) 
 ! 3) interface diffusion condition dt_diff=(h**2/2*teta)
       do ii=1,indarrayFlu
          npi = Array_Flu(ii)
-         mate = pg(npi)%imed
          U = sqrt(pg(npi)%vel(1) ** 2 + pg(npi)%vel(2) ** 2 + pg(npi)%vel(3)   & 
              ** 2)
-         dt_CFL = 2.d0 * Domain%h / (Med(mate)%celerita+U)
-         dt_vis = pg(npi)%dens * squareh / (half * pg(npi)%mu)
+         dt_CFL = Domain%CFL * 2.d0 * Domain%h / (Med(pg(npi)%imed)%celerita+U)
+         dt_vis = Domain%vsc_coeff * pg(npi)%dens * squareh / (half *          &
+                  pg(npi)%mu)
          dtmin  = min(dtmin,dt_CFL,dt_vis)
       enddo
       do j=1,NMedium
          diffmax = max(diffmax,Med(j)%codif)
       enddo
       dt_dif = half * squareh / (diffmax+0.000000001d0)
-      dtmin = min (dtmin,dt_dif)
+      dtmin = min(dtmin,dt_dif)
 ! Initial dt for a jet
       if (indarrayFlu==0) dtmin = 2.*Domain%h/(Med(1)%celerita)
-! CFL is used as a constant for every condition (the CFL, the viscous and 
-! the diffusive one)
-      dt = Domain%CFL * dtmin
+      dt = dtmin
 endif
 ! To initialize the averaged time step 
 dt_average = dt

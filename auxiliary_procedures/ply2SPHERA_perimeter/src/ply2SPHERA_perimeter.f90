@@ -34,7 +34,7 @@ implicit none
 integer(4) :: open_stat,read_stat,close_stat,write_stat
 integer(4) :: perimeter_first_vertex_ID,perimeter_first_face_ID,perimeter_ID
 integer(4) :: face_ID,vertex_ID,n_vertices,n_faces,face_sides,i_vert,i_face,i
-double precision :: vertex_pos(3)
+double precision :: vertex_pos(3),z_offset
 integer(4) :: vertex_IDs_of_ply_face(6)
 character(100) :: ply_file_name,char_aux_2,char_aux
 !------------------------
@@ -62,7 +62,13 @@ if (read_stat/=0) then
    write(0,*) "Error in reading the first line of ply2SPHERA_perimeter.inp. ", &
       "The program stops here. "
    stop
-endif   
+endif
+read(14,*,IOSTAT=read_stat) z_offset
+if (read_stat/=0) then
+   write(0,*) "Error in reading the second line of ply2SPHERA_perimeter.inp. ",&
+      "The program stops here. "
+   stop
+endif
 read(14,*,IOSTAT=read_stat) ply_file_name
 if (read_stat/=0) then
    write(0,*) "Error in reading the second line of ply2SPHERA_perimeter.inp. ",&
@@ -123,6 +129,7 @@ if (read_stat/=0) then
 endif
 do i_vert=1,n_vertices
    read(11,*,IOSTAT=read_stat) vertex_pos(:)
+   vertex_pos(3) = vertex_pos(3) + z_offset 
    if (read_stat/=0) then
       write(0,*) "Error in reading vertex_pos from .ply input file. ",         &
          "The program stops here. "

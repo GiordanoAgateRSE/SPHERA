@@ -438,15 +438,19 @@ xmin xmax ymin ymax zmin zmax       ! (spatial limits -in the global reference
 ! Input parameters for time integration, partial smoothing and memory management
 final_time final_time_step          ! (the run stops when reaching either the 
                                     ! final time or the final time step)
-CFL Leapfrog_flag scheme_order factor dt_alfa_Mon 
-                                    ! CFL, Leapfrog_flag=1(Leapfrog time 
-                                    ! integration scheme),0(explicit RK time 
-                                    ! integration schemes); scheme_order(time 
-                                    ! integration scheme order, but for Leapfrog
-                                    ! is "1"); factor(=0., weighting factor to 
-                                    ! estimate dt); dt_alfa_Mon(logical flag 
-                                    ! making Monaghan artificial viscosity 
-                                    ! coefficient to influence dt)
+CFL vsc_coeff Leapfrog_flag scheme_order factor dt_alfa_Mon 
+                                    ! CFL;
+                                    ! vsc_coeff(viscous stability condition
+                                    ! coefficient, default value: 0.05); 
+                                    ! Leapfrog_flag=1(Leapfrog time integration 
+                                    ! scheme),0(explicit RK time integration 
+                                    ! schemes);
+                                    ! scheme_order(time integration scheme 
+                                    ! order, but for Leapfrog is "1"); factor
+                                    ! (=0., weighting factor to estimate dt);
+                                    ! dt_alfa_Mon(logical flag making Monaghan 
+                                    ! artificial viscosity coefficient to 
+                                    ! influence dt)
 teta_p, teta_u var                  ! teta_p,teta_u(coefficients for partial
                                     ! smoothing of pressure and velocity); var=A
 COEFNMAXPARTI COEFNMAXPARTJ body_part_reorder

@@ -77,8 +77,8 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
       stop
    endif
    read(nsav,iostat=ioerr) ncord,nag,NMedium,NPartZone,NumVertici,NumFacce,    &
-      NumTratti,NumBVertices,NumBSides,NPointst,NPoints,NPointsl,NPointse,     &
-      NLines,NSections,GCBFVecDim,doubleh
+      NumTratti,NumBVertices,NumBSides,GCBFVecDim,Grid%nmax,NPointst,NPoints,  &
+      NPointsl,NPointse,NLines,NSections,GCBFVecDim,doubleh
    if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"ncord, nag, ...",nsav,nout))    &
       return
    elseif (TRIM(lcase(option))=="reading") then
@@ -207,6 +207,18 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
             read(nsav,iostat=ioerr) BoundarySide(1)
             if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"BoundarySide",nsav, &
                nout)) return
+      endif
+      if (Domain%tipo=="semi") then
+         if (GCBFVecDim>0) then
+            read(nsav,iostat=ioerr) GCBFVector(1:GCBFVecDim)
+            if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"GCBFVector",nsav,nout))&
+               return
+         endif
+         if (Grid%nmax>0) then
+            read(nsav,iostat=ioerr) GCBFPointers(1:Grid%nmax,1:2)
+            if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"GCBFPointers",nsav,    &
+               nout)) return
+         endif
       endif
 ! Restart positions are based on the step number
       it_start = 0 

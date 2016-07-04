@@ -263,6 +263,7 @@ Domain%trunc = zero
 Domain%coefke = zero
 Domain%coefkacl = zero
 Domain%CFL = zero
+Domain%vsc_coeff = zero
 Domain%prif = zero
 Domain%plot_fr = zero
 Domain%memo_fr = zero

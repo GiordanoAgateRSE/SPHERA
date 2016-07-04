@@ -20,8 +20,9 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: rundt2                                          
-! Description: Time step computation according to stability constraints (inertia
-!              terms, visosity term, interface diffusion -not recommended-). 
+! Description: Time step computation according to stability constraints (CFL 
+!              condition, visosity stability criterion, interface diffusion 
+!              criterion -not recommended-). 
 !              Plus, a special treatment for Monaghan artificial viscosity term 
 !              and management of low-velocity SPH mixture particles for bed-load
 !              transport phenomena.
@@ -37,9 +38,9 @@ use Dynamic_allocation_module
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: j,npi,mate,ii
-double precision :: dtmin,dt_CFL,dt_dif,dt_vis,diffmax,U,celiq
-double precision :: visc_Mon_j,dt_Mon_j,dt_Mon
+integer(4) :: j,npi,ii
+double precision :: dtmin,dt_CFL,dt_dif,dt_vis,diffmax,U,celiq,visc_Mon_j
+double precision :: dt_Mon_j,dt_Mon
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -60,8 +61,8 @@ if (indarrayFlu==0) then
    dt = 0.d0   
    else
 ! Time step depends on 3 conditions:
-! 1) the CFL condition: dt_CFL=(2h/(c+U))
-! 2) viscous stability condition dt_vis=(rho*h**2/(0.5*mu)) 
+! 1) the CFL condition: dt_CFL=CFL*(2h/(c+U))
+! 2) viscous stability condition dt_vis=vsc_coeff*(rho*h**2/(0.5*mu)) 
 ! 3) interface diffusion condition dt_diff=(h**2/2*teta)
       do ii=1,indarrayFlu
          npi = Array_Flu(ii)
@@ -76,15 +77,16 @@ if (indarrayFlu==0) then
                (pg(npi)%coord(3)>Granular_flows_options%z_max_dt)) then
                cycle
             endif
-         endif    
-         mate = pg(npi)%imed
+         endif
          U = sqrt(pg(npi)%vel(1) ** 2 + pg(npi)%vel(2) ** 2 + pg(npi)%vel(3)   &
              ** 2)
-         dt_CFL = 2.d0 * Domain%h / (Med(mate)%celerita + U)
-         dt_vis = pg(npi)%dens * squareh / (half * pg(npi)%mu)
+         dt_CFL = Domain%CFL * 2.d0 * Domain%h / (Med(pg(npi)%imed)%celerita + &
+                  U)
+         dt_vis = Domain%vsc_coeff * pg(npi)%dens * squareh / (half *          &
+                  pg(npi)%mu)
          dtmin = min(dtmin,dt_CFL,dt_vis)
-         celiq = Med(mate)%eps / pg(npi)%dens
-         if (celiq>=zero) pg(npi)%Csound = Dsqrt(celiq)
+         celiq = Med(pg(npi)%imed)%eps / pg(npi)%dens
+         if (celiq>=zero) pg(npi)%csound = dsqrt(celiq)
       enddo
       do j=1,NMedium
          diffmax = max(diffmax,Med(j)%codif)
@@ -98,8 +100,7 @@ if (indarrayFlu==0) then
       dt_dif = half * squareh / (diffmax+0.000000001d0)
       dtmin = min(dtmin,dt_dif)
       if (dt_alfa_Mon.eqv..true.) dtmin = min(dtmin,dt_Mon)
-! CFL is used as a constant for each of the 3 stability conditions 
-      dt = (one - pesodt) * Domain%CFL * dtmin + pesodt * dt_average
+      dt = (one - pesodt) * dtmin + pesodt * dt_average
 endif
 dt_average = (dt_average * (on_going_time_step - 1) + dt) / on_going_time_step
 !------------------------

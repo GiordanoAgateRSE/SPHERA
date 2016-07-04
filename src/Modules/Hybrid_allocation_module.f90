@@ -56,7 +56,9 @@ type TyGlobal
    double precision :: PVolume ! dx^D, D: domain dimensionality                        
    double precision :: coefke  
    double precision :: coefkacl  
-   double precision :: CFL ! CFL number                     
+   double precision :: CFL ! CFL number
+   double precision :: vsc_coeff ! viscous stability condition coefficient, 
+                                 ! default value: 0.05
    double precision :: prif ! Reference pressure                          
    double precision :: plot_fr ! Output frequency for log file                       
    double precision :: memo_fr ! Frequency for result saving 
@@ -240,6 +242,7 @@ type TyParticle
                                  ! approximation over fluid particles)
    character(1)     :: slip ! BC conditions for fixed particles (f=free slip;
                             ! n=no slip; c=cont slip)
+
    character(3)     :: vel_type ! Movement type
    character(3)     :: state ! Particle "status" ("sol": fixed; "flu": mobile)
 end type TyParticle

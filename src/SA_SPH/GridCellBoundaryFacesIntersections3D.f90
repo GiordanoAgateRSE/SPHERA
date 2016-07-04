@@ -21,8 +21,8 @@
 !-------------------------------------------------------------------------------
 ! Program unit: GridCellBoundaryFacesIntersections3D                                       
 ! Description: To find the boundary faces intercepted by each frame cell of the 
-!              grid nc[1,NumCells]. In the generic row nc of the vector 
-!              CFBFPointers(1 to NumCells,1 to 2), it sets:
+!              grid nc[1,NumCells]. In the generic row nc of the vector
+!              GCBFPointers(1:NumCells,1:2), it sets:
 !                 in the first column: the number of the intercepted faces
 !                 in the second column: the pointer to CFBFVector, where the 
 !                                       list of intercepted faces begins 

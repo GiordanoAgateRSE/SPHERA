@@ -612,20 +612,23 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
       call start_and_stop(2,5)
       call loop_irre_2D 
       call start_and_stop(3,5)
-      else if (ncord==3) then
+      elseif (ncord==3) then
          NumCellmax = Grid%nmax
-         allocate(GCBFPointers(NumCellmax,2),stat=ier)
-         if (ier/=0) then
-            write(nout,'(1x,a,i2)')                                            &
-               "   Array GCBFPointers not allocated. Error code: ",ier
-            call diagnostic(arg1=4,arg3=nomsub)
-            else
-               write(nout,'(1x,a)')                                            &
-                  "   Array GCBFPointers successfully allocated"
+         if ((restart.eqv..false.).or.(Domain%tipo=="bsph")) then
+            allocate(GCBFPointers(NumCellmax,2),stat=ier)
+            if (ier/=0) then
+               write(nout,'(1x,a,i2)')                                         &
+                  "   Array GCBFPointers not allocated. Error code: ",ier
+               call diagnostic(arg1=4,arg3=nomsub)
+               else
+                  write(nout,'(1x,a)')                                         &
+                     "   Array GCBFPointers successfully allocated"
+            endif
          endif
          if (Domain%tipo=="semi") then
 ! To select the grid cells intercepting a boundary faces
-            call GridCellBoundaryFacesIntersections3D (NumCellmax)
+            if (restart.eqv..false.)                                           &
+               call GridCellBoundaryFacesIntersections3D(NumCellmax)
 ! To compute the local coordinates, solid angle and solid normal, relative 
 ! to a boundary element (SA-SPH)
             call ComputeBoundaryIntegralTab

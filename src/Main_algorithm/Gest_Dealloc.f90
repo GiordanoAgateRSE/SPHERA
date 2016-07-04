@@ -590,7 +590,17 @@ if (allocated(GCBFVector)) then
       else
          write (nout,'(1x,a)') "   Array: GCBFVector successfully deallocated "
    endif
-endif 
+endif
+if (allocated(GCBFPointers)) then
+   deallocate(GCBFPointers,stat=alloc_stat)
+   if (alloc_stat/=0) then
+      write (nout,'(1x,a,i2)')                                                 &
+         "   Array: GCBFPointers not deallocated with error code: ",alloc_stat
+      check = .false.
+      else
+         write (nout,'(1x,a)') "   Array: GCBFPointers successfully deallocated"
+   endif
+endif
 if(allocated(Q_sections%section)) then
    do i=1,Q_sections%n_sect
       if (allocated(Q_sections%section(i)%flow_rate))                          &

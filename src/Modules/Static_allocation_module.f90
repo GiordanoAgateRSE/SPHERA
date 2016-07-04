@@ -118,7 +118,7 @@ integer(4),public, parameter :: MAXPOINTSVLAW  = 50 ! Maximum number of data
                                                     ! for the definition of 
                                                     ! a velocity "LAW"
 logical :: err_flag ! Flag for error file existence in erosion model
-logical :: Restart ! Flag if the run is a restart
+logical :: restart ! Flag if the run is a restart
 logical :: kill_flag ! Flag to kill the execution
 logical :: current_version   
 logical :: diffusione ! Flag to activate the diffusion model

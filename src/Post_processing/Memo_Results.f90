@@ -63,10 +63,14 @@ if (index(str,'inizio')/=0) then
    if (NPartZone>0) nrecords = nrecords + 1
    if (NumBVertices>0) nrecords = nrecords + 1
    if (NumBSides>0) nrecords = nrecords + 1
+   if (Domain%tipo=="semi") then
+      if ((allocated(GCBFVector)).and.(GCBFVecDim>0)) nrecords = nrecords + 1
+      if ((allocated(GCBFPointers)).and.(Grid%nmax>1)) nrecords = nrecords + 1
+   endif
    write(nres) version,nrecords
    write(nres) Ncord,Nag,NMedium,NPartZone,NumVertici,NumFacce,NumTratti,      &   
-      NumBVertices,NumBSides,NPointst,NPoints,NPointsl,NPointse,NLines,        &
-      NSections,GCBFVecDim,doubleh
+      NumBVertices,NumBSides,GCBFVecDim,Grid%nmax,NPointst,NPoints,NPointsl,   &
+      NPointse,NLines,NSections,GCBFVecDim,doubleh
    write(nres) domain
    write(nres) grid
    write(nres) Med(1:NMedium)
@@ -80,7 +84,13 @@ if (index(str,'inizio')/=0) then
       write(nres) BoundarySide(1:NumBSides)
       else
          write(nres) BoundarySide(1)
-   endif   
+   endif
+   if (Domain%tipo=="semi") then
+      if ((allocated(GCBFVector)).and.(GCBFVecDim>0)) write(nres)              &
+         GCBFVector(1:GCBFVecDim)
+      if ((allocated(GCBFPointers)).and.(Grid%nmax>1)) write(nres)             &
+         GCBFPointers(1:Grid%nmax,1:2)
+   endif
    flush(nres)
    write(nout,'(a,i10,a,f15.5)')                                               &
 " ----------------------------------------------------------------------------"
