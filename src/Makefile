@@ -7,7 +7,7 @@ EXECUTION = bin
 COMPILATION_FLAGS = -O1
 #    gfortran, ifort
 COMPILER = ifort
-#    -fopenmp, -openmp, (blank for debug)  
+#    -fopenmp, -openmp 
 OMP_FLAG = -openmp
 EXE_DIR = ../$(EXECUTION)/
 SOURCES = \
@@ -48,7 +48,7 @@ OBJECTS = $(patsubst %.f90,%.o,$(SOURCES))
 # Targets
 #    Correct sequence for compile+link:
 #       make touch
-#       make 
+#       make
 all: compile link remove 
 #    "compiling" cannot be launched together with "touching" as ".o" files
 #    would not be available yet

@@ -128,7 +128,7 @@ if ((on_going_time_step==it_start).and.(Domain%tipo=="bsph")) then
          endif
          Array_Flu(indarrayFlu) = npi
       endif
-   enddo   
+   enddo
    call start_and_stop(3,9)
    call start_and_stop(2,10)
 ! This fictitious value avoid CalcVarlength computing Gamma, sigma and density 
@@ -457,7 +457,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
                call start_and_stop(2,15)
 !$omp parallel do default(none) private(npi,ii,appo1,appo2,appo3)              &
 !$omp shared(nag,pg,Med,indarrayFlu,Array_Flu)
-               do ii = 1,indarrayFlu
+               do ii=1,indarrayFlu
                   npi = Array_Flu(ii)
                   if ((pg(npi)%VolFra==VFmx).and.                              &
                      (pg(npi)%visc==Med(pg(npi)%imed)%mumx/pg(npi)%dens)) then
@@ -671,12 +671,12 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
                         pg(npi)%dens = 0.9d0*med(pg(npi)%imed)%den0
                      if (pg(npi)%dens>(1.1d0*med(pg(npi)%imed)%den0))          &
                         pg(npi)%dens = 1.1d0 * med(pg(npi)%imed)%den0
-                  endif   
+                  endif
                   pg(npi)%densass = zero
 ! Boundary type is "velocity" or "source"
                   elseif (pg(npi)%koddens==2) then
                      pg(npi)%dens = pg(npi)%densass  
-! Density is kept constant'
+! Density is kept constant
                endif
             enddo
 !$omp end parallel do

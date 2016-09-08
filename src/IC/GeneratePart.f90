@@ -273,7 +273,7 @@ second_cycle: do Nz=1,NPartZone
                               do i_face=1,NumFacce
                                  if (test_face==1) cycle
 ! Check if the face belongs to the dam_zone boundary and in particular to its 
-! top                                  
+! top
 if ((Tratto(BoundaryFace(i_face)%stretch)%zone==Partz(Nz)%dam_zone_ID).and.    &
                                        (BoundaryFace(i_face)%T(3,3)<0.)) then 
 ! Test if the particle horizontal coordinates lie inside the horizontal 

@@ -145,7 +145,7 @@ do npi=1,nag
                         j_grid)==3) pg(npi)%pres_fluid = 0.d0   
             endif
          case(3)
-! Lagrangian scheme for saturation condituions under the hypothesis of 
+! Lagrangian scheme for saturation conditions under the hypothesis of 
 ! stratified flows. Mixture particòes are either fully saturated or dry. 
 ! Fluid pressure
 ! Phreatic zone (simplifying assumption: 1D filtration with piezometric lines  

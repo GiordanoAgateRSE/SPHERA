@@ -732,7 +732,7 @@ type DBSPH_der_type
    integer(4)        :: n_monitor_points ! Number of monitoring points
    integer(4)        :: n_monitor_regions ! Number of monitoring regions 
                                           ! (0 or 1) to estimate the Force
-                                          ! along x-direction 
+                                          ! along x-direction
    integer(4)        :: n_inlet ! Number of inlet sections (to impose DBSPH 
                                 ! inlet BC)
    integer(4)        :: n_outlet ! Number of outlet sections (to impose 

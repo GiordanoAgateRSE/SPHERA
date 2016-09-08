@@ -134,7 +134,7 @@ do while (TRIM(lcase(ainp))/="##### end boundaries #####")
    dam_zone_vertices = 0.d0
    select case(tipo)
 ! Boundary condition "leve", "crit" or "open"
-      case("leve", "crit", "open")    
+      case("leve","crit","open")    
          NumberEntities(3) = NumberEntities(3) + 1
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          token = GetToken(ainp,1,ioerr)
@@ -300,7 +300,7 @@ do while (TRIM(lcase(ainp))/="##### end boundaries #####")
                dam_zone_n_vertices
             if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                          &
                "dam_zone_ID and dam_zone_vertices",ninp,nout)) return
-            if (dam_zone_ID>1) then
+            if (dam_zone_ID>0) then
                do i2=1,dam_zone_n_vertices
                   call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
                   if (ioerr==0) read(ainp,*,iostat=ioerr)                      &
@@ -311,7 +311,7 @@ do while (TRIM(lcase(ainp))/="##### end boundaries #####")
             endif
          endif
 ! Boundary condition "tapi"
-      case("tapi")    
+      case("tapi") 
 ! It returns an error if the number of vertices is not 2 (3D)
          if ((numv/=2).and.(NumberEntities(1)==3)) then 
             write(nout,'(a,i15)')                                              &
