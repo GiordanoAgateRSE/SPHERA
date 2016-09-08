@@ -367,8 +367,9 @@ if (nag>0) then
          "Elapsed time (at the end of the simulation, real time estimation): ",&
          time_elapsed_tot_est," hours = ",time_elapsed_tot_est/24.d0," days."
    endif
-   write(nout,fmt101)                                                          &
-" ............. |  Min. val. |  Min.loc.| X coord. | Y coord. | Z coord. ||  Max. val. |  Max.loc.| X coord. | Y coord. | Z coord. |"
+   write(nout,'(a,a)')                                                          &
+      " ............. |  Min. val. |  Min.loc.| X coord. | Y coord. | Z coord.",&
+      " ||  Max. val. |  Max.loc.| X coord. | Y coord. | Z coord. |"
    write(nout,fmt101)                                                         &
       "  Tot velocity |",minvelo,"|",minlocvelo,"|",pg(minlocvelo)%coord(1),"|"&
       ,pg(minlocvelo)%coord(2),"|",pg(minlocvelo)%coord(3),"||",maxvelo,"|",   &
