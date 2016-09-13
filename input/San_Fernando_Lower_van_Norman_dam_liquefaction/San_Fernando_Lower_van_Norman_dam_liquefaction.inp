@@ -4,7 +4,8 @@
 ! File name and copyright: San_Fernando_Lower_van_Norman_dam_liquefaction.inp
 !    Copyright 2016 (RSE SpA, authored by Andrea Amicarelli)
 ! File description: input file for SPHERA v.8.0 (RSE SpA).
-!   Liquefaction of the Lower San Fernando dam. 
+!   Liquefaction of the Lower San Fernando dam. Reference: Amicarelli et al. 
+!   (SPHERIC, 2016).
 !
 ! This file is free software: you can redistribute it and/or modify
 ! it under the terms of the GNU General Public License as published by

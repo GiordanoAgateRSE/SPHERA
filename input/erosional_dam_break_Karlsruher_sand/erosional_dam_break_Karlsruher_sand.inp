@@ -5,6 +5,7 @@
 !    Copyright 2016 (RSE SpA, authored by Andrea Amicarelli)
 ! File description: input file for SPHERA v.8.0 (RSE SpA).
 !   Representation of a demonstrative erosional dam break chosen with TUHH. 
+!   Reference: Amicarelli et al. (SPHERIC, 2016). 
 !
 ! This file is free software: you can redistribute it and/or modify
 ! it under the terms of the GNU General Public License as published by
