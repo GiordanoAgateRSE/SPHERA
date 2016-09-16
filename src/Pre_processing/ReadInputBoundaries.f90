@@ -383,7 +383,7 @@ do while (TRIM(lcase(ainp))/="##### end boundaries #####")
          Partz(Izona)%plan_reservoir_pos = plan_reservoir_pos
          Partz(Izona)%dam_zone_ID = dam_zone_ID
          Partz(Izona)%dam_zone_n_vertices = dam_zone_n_vertices
-         if (dam_zone_ID>1) Partz(Izona)%dam_zone_vertices = dam_zone_vertices
+         if (dam_zone_ID>0) Partz(Izona)%dam_zone_vertices = dam_zone_vertices
       endif
       Partz(Izona)%icol = icolor
       Partz(Izona)%bend = bends
@@ -561,7 +561,7 @@ BoundaryVertex(Tratto(index)%inivertex+Tratto(index)%numvertices-1)
                      Partz(Izona)%dam_zone_ID
                   write(nout,"(1x,a,i12)") "dam_zone_n_vertices  : ",          &
                      Partz(Izona)%dam_zone_n_vertices  
-                  if (dam_zone_ID>1) then
+                  if (dam_zone_ID>0) then
                      do i_point=1,dam_zone_n_vertices
                         write(nout,"(1x,a,3(1pe12.4))")                        &
                            "dam_zone_vertices    : ",                          &

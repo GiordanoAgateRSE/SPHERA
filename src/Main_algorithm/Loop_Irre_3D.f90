@@ -441,7 +441,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
                                                pg(npi)%Envar
                if (pg(npi)%kodvel==0) then                                            
 ! The particle is inside the domain and far from boundaries
-                  pg(npi)%var(:) = pg(npi)%vel(:) + TetaV1 * pg(npi)%var(:)      
+                  pg(npi)%var(:) = pg(npi)%vel(:) + TetaV1 * pg(npi)%var(:)     
                   pg(npi)%vel(:) = pg(npi)%var(:)                                        
                   else
 ! The particle is close to a "source", "level" or "normal velocity boundary
@@ -961,6 +961,7 @@ if (nout>0) then
    enddo
    write (nout,'(a,i15)')                                                      &
       "Number of total escaped particles (OrdGrid1) :  EpOrdGridtot = ",       &
+
       EpOrdGridtot
    write (nout,*) " "
    write (nout,*) " "

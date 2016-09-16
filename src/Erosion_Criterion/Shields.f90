@@ -81,7 +81,7 @@ if (Granular_flows_options%erosion_flag==1) then
    if (ind_interfaces(igridi,jgridi,4).ne.0) then 
       if (pg(npi)%coord(3)>=(pg(ind_interfaces(igridi,jgridi,4))%coord(3)      &
          -2.d0*Domain%h)) then 
-         if (pg(npi)%state=="flu") return   
+         if (pg(npi)%state=="flu") return
          pg(npi)%state = "flu"
          else
             pg(npi)%state = "sol"
