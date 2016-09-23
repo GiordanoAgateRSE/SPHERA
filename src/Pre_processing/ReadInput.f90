@@ -119,7 +119,7 @@ SECTION_LOOP: do while (ioerr==0)
       case("##### bed load transport #####")
          call ReadBedLoadTransport(ainp,comment,nrighe,ier,ninp,nout,nscr)
       case("##### medium #####")
-         call ReadInputMedium (NumberEntities,Med,ainp,comment,nrighe,ier,ninp,&
+         call ReadInputMedium(NumberEntities,Med,ainp,comment,nrighe,ier,ninp, &
             nout,nscr)
       case("##### body dynamics #####")
          call ReadBodyDynamics(ainp,comment,nrighe,ier,ninp,nout)

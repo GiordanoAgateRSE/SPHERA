@@ -325,7 +325,8 @@ x_line y_line                       ! monitoring line is defined by variable or
 
 ##### medium #####
 ! Input parameters for the fluids 
-fluid_type                          ! fluid_type=liquid,granular
+fluid_type                          ! fluid_type=liquid,granular(only if 
+                                    ! erosion_criterion_ID>0)
 fluid_ID                            !
 ! If (fluid_type==liquid): start
 density bulk_modulus
@@ -360,9 +361,8 @@ cohesion viscosity_max tuned_viscosity
 effective_porosity d_50 d_90        !
 ! if ((fluid_type==granular).and.(erosion_criterion_ID==1)): end
 ! if ((fluid_type==granular).and.(erosion_criterion_ID>1)): start
-roughness_coefficient d_50 erosion_model
-                                    ! roughness_coefficient; d_50; erosion_model
-                                    ! =shields,mohr
+roughness_coefficient d_50
+                                    ! roughness_coefficient; d_50
 max_step_still                      ! max_step_still(number of time steps during
                                     ! which mixture particles are kept still)               
 ! if ((fluid_type==granular).and.(erosion_criterion_ID>1)): end

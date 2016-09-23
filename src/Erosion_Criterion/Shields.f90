@@ -299,7 +299,7 @@ end if
 if (Granular_flows_options%ID_erosion_criterion==1) then
    Ks = 3.d0 * med(imed)%d_90
    else
-      Ks = med(imed)%RoughCoef * med(imed)%D50
+      Ks = med(imed)%RoughCoef * med(imed)%d50
 endif
 if (Granular_flows_options%ID_erosion_criterion>1) then     
    Velocity = Dsqrt(Velocity2)
@@ -415,7 +415,7 @@ if (isnan(Ustar)) then
    call diagnostic (arg1=11,arg2=1,arg3=nomsub)
 end if
 Taub = Ustar * Ustar * Med(pg(intliq_id)%imed)%den0
-Restar = Med(pg(intliq_id)%imed)%den0 * Ustar * med(imed)%D50 / pg(intliq_id)%mu
+Restar = Med(pg(intliq_id)%imed)%den0 * Ustar * med(imed)%d50 / pg(intliq_id)%mu
 if (Restar>=500.0D0) then
    Tetacr = 0.068D0
    elseif (Restar<=1.d0) then
@@ -424,7 +424,7 @@ if (Restar>=500.0D0) then
          Tetacr = 0.010595D0 * Dlog(Restar) + 0.110476D0 / Restar + 0.0027197D0
 end if
 ! To compute Shields critical parameter for flat beds 
-Taubcror = Tetacr * GI * med(imed)%D50 * (Med(pg(intsol_id)%imed)%den0_s -     &
+Taubcror = Tetacr * GI * med(imed)%d50 * (Med(pg(intsol_id)%imed)%den0_s -     &
            Med(pg(intliq_id)%imed)%den0)
 if (Granular_flows_options%ID_erosion_criterion==1) then
    pg(npi)%u_star = Ustar

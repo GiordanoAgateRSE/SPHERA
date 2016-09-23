@@ -94,9 +94,9 @@ endif
 !$omp private(normal_int_sat_top_abs)                                          &                 
 !$omp shared(nag,pg,Domain,Med,Icont,Npartord,NMAXPARTJ,rag,nPartIntorno)      &
 !$omp shared(Partintorno,PartKernel,ke_coef,kacl_coef,Doubleh,DoubleSquareh)   &
-!$omp shared(squareh,nomsub,ncord,eta,eta2,nout,nscr,erosione,ind_interfaces)  &
-!$omp shared(DBSPH,pg_w,Icont_w,Npartord_w,rag_fw,nPartIntorno_fw)             &
-!$omp shared(Partintorno_fw,kernel_fw,dShep_old,Granular_flows_options,NMedium)
+!$omp shared(squareh,nomsub,ncord,eta,eta2,nout,nscr,ind_interfaces,DBSPH,pg_w)&
+!$omp shared(Icont_w,Npartord_w,rag_fw,nPartIntorno_fw,Partintorno_fw)         &
+!$omp shared(kernel_fw,dShep_old,Granular_flows_options,NMedium)
 loop_nag: do npi=1,nag
    if (Domain%tipo=="bsph") then
       pg(npi)%rhoSPH_old = pg(npi)%rhoSPH_new

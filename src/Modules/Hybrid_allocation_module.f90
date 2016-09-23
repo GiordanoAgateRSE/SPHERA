@@ -464,7 +464,7 @@ type TyMedium
    double precision :: cons ! Consistency   
    double precision :: Cs ! Costant of Smagorinsky's model    
    double precision :: RoughCoef ! Roughness coefficient 
-   double precision :: D50 ! 50-th percentile diameter of the granular size
+   double precision :: d50 ! 50-th percentile diameter of the granular size
                             ! distribution 
    double precision :: SettlingCoef ! Coefficient for the settling velocity 
                                     ! of the solid grains 
@@ -479,7 +479,6 @@ type TyMedium
                             ! distribution 
    character(8)     :: tipo ! Type: "liquid  "(, "gas     ", 
                             ! "general ", "granular", "smagorin")
-   character(8)     :: modelloerosione ! Erosion criterion (obsolete choice)
 end type TyMedium
 
 ! Boundary side

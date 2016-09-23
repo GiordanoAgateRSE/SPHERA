@@ -68,7 +68,6 @@ Domain%Slip = .FALSE.
 OnlyTriangle = .FALSE.
 diffusione = .FALSE.
 esplosione = .FALSE.
-erosione = .FALSE.
 restart = .FALSE.
 simulation_time = zero
 dt = zero
@@ -241,10 +240,6 @@ if (.not.restart) then
    do i=1,NMedium
       if (Med(i)%codif/=zero) diffusione = .TRUE.
       if (Med(i)%Gamma/=zero) esplosione = .TRUE.
-      if ((index(Med(i)%tipo,"granular")>0)) then
-         erosione = .TRUE.
-         modelloerosione = Med(i)%modelloerosione
-      endif
    enddo
    close(ninp)
    nag = 0
@@ -494,10 +489,6 @@ if (.not.restart) then
       close(nsav)
       do i=1,NMedium
          if (Med(i)%codif/=zero) diffusione = .TRUE.
-         if (index(Med(i)%tipo,"granular")>0) then
-            erosione = .TRUE.
-            modelloerosione = Med(i)%modelloerosione
-         endif
       enddo
 ! To save current time for "result_converter"
       val_time = simulation_time

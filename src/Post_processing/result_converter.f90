@@ -252,16 +252,16 @@ call cat_post_proc
       j = 0
       do k=k1,k2
          j = j + 1
-         if ((pg(finger(k))%state=='flu').and.                                 &
+         if ((pg(finger(k))%state=="flu").and.                                 &
             (index(Med(pg(finger(k))%imed)%tipo,"liquid")>0)) then
             iappo(k-k1+1) = 1
-            elseif ((pg(finger(k))%state=='flu').and.                          &
+            elseif ((pg(finger(k))%state=="flu").and.                          &
                (index(Med(pg(finger(k))%imed)%tipo,"granular")>0) ) then
                iappo(k-k1+1) = 2
-               elseif ((pg(finger(k))%state=='sol').and.                       &
+               elseif ((pg(finger(k))%state=="sol").and.                       &
                   (index(Med(pg(finger(k))%imed)%tipo,"granular")>0) ) then
                   iappo(k-k1+1) = 3
-                  elseif ((pg(finger(k))%state=='flu').and.                    &
+                  elseif ((pg(finger(k))%state=="flu").and.                    &
                      (index(Med(pg(finger(k))%imed)%tipo,"gas")>0) ) then
                      iappo(k-k1+1) = 4
          endif

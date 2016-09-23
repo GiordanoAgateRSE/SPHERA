@@ -68,7 +68,7 @@ if (esplosione) then
             pg(npi)%IntEn = pg(npi)%pres / ((Med(pg(npi)%imed)%gamma - one) *  &
                             pg(npi)%dens)
       endif
-      pg(npi)%state = 'flu'
+      pg(npi)%state = "flu"
    enddo
 endif
 SpCount = 0
@@ -81,6 +81,19 @@ it_eff = it_start
 it_print = it_start
 it_memo = it_start
 it_rest = it_start
+! Variable to count the particles, which are not "sol"
+indarrayFlu = 0
+do npi=1,nag
+   if ((pg(npi)%cella==0).or.(pg(npi)%vel_type/="std")) cycle
+   if (pg(npi)%state=="flu") then
+      indarrayFlu = indarrayFlu + 1
+! To check the maximum dimension of the array and possible resizing
+      if (indarrayFlu>PARTICLEBUFFER) then
+         call diagnostic (arg1=9,arg2=1,arg3=nomsub)
+      endif
+      Array_Flu(indarrayFlu) = npi
+   endif
+enddo
 ! Introductory procedure for inlet conditions
 call PreSourceParticles_3D
 if (Domain%time_split==0) Domain%time_stage = 1
@@ -269,24 +282,22 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
       if ((Domain%time_split==0).and.(Domain%time_stage==1)) then               
 ! Erosion criterium + continuity equation RHS   
          call start_and_stop(2,12)
-         if ((erosione).and.(.not.esplosione)) then  
-! Detection of the mixture particle status ("flu" or "sol") 
-            if (Granular_flows_options%ID_erosion_criterion>1) then
+         if ((Granular_flows_options%ID_erosion_criterion>1).and.              &
+            (.not.esplosione)) then  
 ! Erosion criterion
-               if (index(modelloerosione,"shields")>0) then
+            if (Granular_flows_options%ID_erosion_criterion==2) then
 ! Shields criterion
 !$omp parallel do default(none) shared(pg,nag) private(npi) 
-                  do npi=1,nag
-                     call Shields(npi) 
-                  enddo
+               do npi=1,nag
+                  call Shields(npi) 
+               enddo
 !$omp end parallel do
-                  elseif (index(modelloerosione,"mohr")>0) then
+               elseif (Granular_flows_options%ID_erosion_criterion==3) then
 ! To compute the second invariant of the rate-strain tensor and density 
 ! derivatives
-                     call inter_EqCont_3D 
+                  call inter_EqCont_3D 
 ! Mohr-Coulomb criterion
-                     call MohrC
-               endif
+                  call MohrC
             endif
 ! To update the auxiliary vector, which counts the particles with a status 
 ! different from "sol" 
@@ -329,7 +340,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
 ! The mixture particles, which are temporarily affected by the frictional 
 ! viscosity threshold are fixed.
          if (pg(npi)%mu==Med(pg(npi)%imed)%mumx) cycle
-         call inter_EqMoto (npi,tpres,tdiss,tvisc)  
+         call inter_EqMoto(npi,tpres,tdiss,tvisc)  
 ! Searching for the boundary faces, which are the nearest the npi-th current 
 ! particle
          if ((Domain%time_stage==1).or.(Domain%time_split==1)) then 
@@ -526,7 +537,8 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
 ! Erosion criterion + continuity equation RHS 
       call start_and_stop(2,12)
       Ncbf_Max = 0
-      if (erosione.and..not. esplosione) then  
+      if ((Granular_flows_options%ID_erosion_criterion>0).and.                 &
+         (.not.esplosione)) then  
          if (Domain%time_split==1) then 
 ! Assessing particle status ("flu" or "sol") of the mixture particles
 ! Calling the proper subroutine for the erosion criterion 
@@ -538,7 +550,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
                      pg(npi)%normal_int_old(:) = pg(npi)%normal_int(:)        
                      call initialization_fixed_granular_particle(npi)             
                   enddo
-!$omp end parallel do 
+!$omp end parallel do
 !$omp parallel do default(none) shared(pg,nag) private(npi)
                   do npi=1,nag
                      call Shields(npi) 
@@ -549,14 +561,12 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
                   do npi=1,nag
                      ncel = ParticleCellNumber(pg(npi)%coord)
                      aux = CellIndices(ncel,igridi,jgridi,kgridi)
-                     if (Granular_flows_options%ID_erosion_criterion==1) then
-                        if (pg(npi)%state=="sol") then
-                           pg(npi)%mu =                                        &
-                              Med(Granular_flows_options%ID_main_fluid)%visc * &
-                              Med(Granular_flows_options%ID_main_fluid)%den0
-                           pg(npi)%visc =                                      &
-                              Med(Granular_flows_options%ID_main_fluid)%visc
-                        endif
+                     if (pg(npi)%state=="sol") then
+                        pg(npi)%mu =                                           &
+                           Med(Granular_flows_options%ID_main_fluid)%visc *    &
+                           Med(Granular_flows_options%ID_main_fluid)%den0
+                        pg(npi)%visc =                                         &
+                           Med(Granular_flows_options%ID_main_fluid)%visc
                      endif
                   enddo
 !$omp end parallel do
@@ -575,7 +585,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
             end select
 ! Update auxiliary vector for counting particles, whose status is not "sol"
             indarrayFlu = 0
-            do npi = 1,nag
+            do npi=1,nag
                if (pg(npi)%cella==0.or.pg(npi)%vel_type/="std") cycle
                if (pg(npi)%state=="flu") then
                   indarrayFlu = indarrayFlu + 1
@@ -597,7 +607,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
             call inter_EqCont_3D
             if (Domain%time_split==1) then 
                indarrayFlu = 0
-               do npi = 1,nag
+               do npi=1,nag
                   if (pg(npi)%cella==0.or.pg(npi)%vel_type/="std") cycle
                   indarrayFlu = indarrayFlu + 1
 ! Check array sizes and possible resizing 
@@ -904,7 +914,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
    inquire (file=nomefilekill,EXIST=kill_flag)
    if (kill_flag) exit ITERATION_LOOP
    if (simulation_time>=Domain%tmax) exit ITERATION_LOOP
-enddo  ITERATION_LOOP 
+enddo ITERATION_LOOP 
 ! Post-processing: log file
 if (it_eff/=it_print.and.nout>0) then
    it_print = it_eff
@@ -961,7 +971,6 @@ if (nout>0) then
    enddo
    write (nout,'(a,i15)')                                                      &
       "Number of total escaped particles (OrdGrid1) :  EpOrdGridtot = ",       &
-
       EpOrdGridtot
    write (nout,*) " "
    write (nout,*) " "

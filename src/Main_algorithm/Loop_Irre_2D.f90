@@ -68,7 +68,7 @@ if (esplosione) then
             pg(npi)%IntEn = pg(npi)%pres / ((Med(pg(npi)%imed)%gamma - one) *  &
                             pg(npi)%dens)
       endif
-      pg(npi)%state = 'flu'
+      pg(npi)%state = "flu"
    enddo
 endif
 SpCount = 0
@@ -81,6 +81,19 @@ it_eff = it_start
 it_print = it_start
 it_memo = it_start
 it_rest = it_start
+! Variable to count the particles, which are not "sol"
+indarrayFlu = 0
+do npi=1,nag
+   if ((pg(npi)%cella==0).or.(pg(npi)%vel_type/="std")) cycle
+   if (pg(npi)%state=="flu") then
+      indarrayFlu = indarrayFlu + 1
+! To check the maximum dimension of the array and possible resizing
+      if (indarrayFlu>PARTICLEBUFFER) then
+         call diagnostic (arg1=9,arg2=1,arg3=nomsub)
+      endif
+      Array_Flu(indarrayFlu) = npi
+   endif
+enddo
 ! Introductory procedure for inlet conditions
 call PreSourceParticles_2D
 ! Initializing the time stage for time integration
@@ -265,7 +278,8 @@ done_flag = .false.
       if ((Domain%time_split==0).and.(Domain%time_stage==1)) then               
 ! Erosion criterium + continuity equation RHS  
          call start_and_stop(2,12)
-         if ((erosione).and.(.not.esplosione)) then
+         if ((Granular_flows_options%ID_erosion_criterion>0).and.              &
+            (.not.esplosione)) then
             select case (Granular_flows_options%ID_erosion_criterion)
                case(1)
 !$omp parallel do default(none) shared(pg,nag) private(npi,ncel)
@@ -549,9 +563,10 @@ done_flag = .false.
             endif
       endif
 ! Continuity equation 
-! Erosion criterion + continuity equation RHS  
+! Erosion criterion + continuity equation RHS
       call start_and_stop(2,12)
-      if ((erosione).and.(.not.esplosione)) then 
+      if ((Granular_flows_options%ID_erosion_criterion>0).and.                 &
+         (.not.esplosione)) then 
          if (Domain%time_split==1) then 
 ! Assessing particle status ("flu" or "sol") of the mixture particles
 ! Calling the proper subroutine for the erosion criterion 
@@ -575,14 +590,12 @@ done_flag = .false.
                   do npi=1,nag
                      ncel = ParticleCellNumber(pg(npi)%coord)
                      aux = CellIndices(ncel,igridi,jgridi,kgridi)
-                     if (Granular_flows_options%ID_erosion_criterion==1) then
-                        if (pg(npi)%state=="sol") then
-                           pg(npi)%mu =                                        &
-                              Med(Granular_flows_options%ID_main_fluid)%visc * &
-                              Med(Granular_flows_options%ID_main_fluid)%den0
-                           pg(npi)%visc =                                      &
-                              Med(Granular_flows_options%ID_main_fluid)%visc
-                        endif
+                     if (pg(npi)%state=="sol") then
+                        pg(npi)%mu =                                        &
+                           Med(Granular_flows_options%ID_main_fluid)%visc * &
+                           Med(Granular_flows_options%ID_main_fluid)%den0
+                        pg(npi)%visc =                                      &
+                           Med(Granular_flows_options%ID_main_fluid)%visc
                      endif
                   enddo
 !$omp end parallel do  
