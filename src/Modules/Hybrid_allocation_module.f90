@@ -602,7 +602,7 @@ type TyQ_section
 end type  
 
 ! Derived type for bed-load transport layer 
-type TyGranular_flows_options 
+type TyGranular_flows_options
    integer(4)       :: ID_erosion_criterion ! Erosion criterion ID 
                                             ! (1:Shields-Seminara,
                                             ! 2:Shields,3:Mohr-Coulomb)
@@ -690,7 +690,7 @@ type TyGranular_flows_options
 ! Saturation conditions: 1 (phreatic zone), 2 (infiltration zone), 3 (dry soil)
 ! x and/or y coordinates defining the monitoring line/point   
    double precision,dimension(:,:),allocatable :: lines                  
-end type 
+end type
 
 ! Face (DB-SPH)
 type face_der_type                                                                  

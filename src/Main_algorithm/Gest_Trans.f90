@@ -110,8 +110,8 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph"))  then
    endif
 endif
 NMAXPARTJ = Domain%COEFNMAXPARTJ * (Domain%h * four / Domain%dd) ** Ncord
-write(nout,'(2a,i15)') "     Max num particles surrounding the current ",      &
-   "particle: NMAXPARTJ = ",NMAXPARTJ
+write(nout,'(2a,i15)') "     Maximum number of neighbouring particles: "      &
+   "NMAXPARTJ = ",NMAXPARTJ
 allocate(Array_Flu(1:PARTICLEBUFFER),stat=ier)
 if (ier/=0) then
    write(nout,'(1x,a,i2)') "   Array Array_Flu not allocated. Error code: ",   &

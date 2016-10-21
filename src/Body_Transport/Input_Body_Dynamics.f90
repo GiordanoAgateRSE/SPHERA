@@ -226,7 +226,7 @@ do nbi=1,n_bodies
                if (ncord==2) bp_arr(npi)%normal(2) = 0.d0
 ! Rotations around the centre of rotation provided in input
                bp_arr(npi)%rel_pos(:) = bp_arr(npi)%pos(:) -                   &
-                                        body_arr(nbi)%x_rotC(:) 
+                                        body_arr(nbi)%x_rotC(:)
                call vector_rotation(bp_arr(npi)%rel_pos,body_arr(nbi)%alfa) 
                if (ncord==2) bp_arr(npi)%rel_pos(2) = 0.d0
                bp_arr(npi)%pos(:) = bp_arr(npi)%rel_pos(:) +                   &

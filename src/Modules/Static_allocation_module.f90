@@ -123,7 +123,7 @@ logical :: kill_flag ! Flag to kill the execution
 logical :: current_version   
 logical :: diffusione ! Flag to activate the diffusion model
 logical :: esplosione ! Flag to activate the explosion model
-integer(4) :: NMAXPARTJ ! Max number of particles surrounding the current one
+integer(4) :: NMAXPARTJ ! Max number of neighbouring particles
 integer(4) :: MaxNcbs ! Max number of close boundary sides for the current 
                       ! particle
 integer(4) :: MaxNcbf ! Max number of close boundary faces for the current 

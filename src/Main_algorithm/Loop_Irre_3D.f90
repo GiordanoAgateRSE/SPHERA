@@ -81,19 +81,6 @@ it_eff = it_start
 it_print = it_start
 it_memo = it_start
 it_rest = it_start
-! Variable to count the particles, which are not "sol"
-indarrayFlu = 0
-do npi=1,nag
-   if ((pg(npi)%cella==0).or.(pg(npi)%vel_type/="std")) cycle
-   if (pg(npi)%state=="flu") then
-      indarrayFlu = indarrayFlu + 1
-! To check the maximum dimension of the array and possible resizing
-      if (indarrayFlu>PARTICLEBUFFER) then
-         call diagnostic (arg1=9,arg2=1,arg3=nomsub)
-      endif
-      Array_Flu(indarrayFlu) = npi
-   endif
-enddo
 ! Introductory procedure for inlet conditions
 call PreSourceParticles_3D
 if (Domain%time_split==0) Domain%time_stage = 1
@@ -971,6 +958,7 @@ if (nout>0) then
    enddo
    write (nout,'(a,i15)')                                                      &
       "Number of total escaped particles (OrdGrid1) :  EpOrdGridtot = ",       &
+
       EpOrdGridtot
    write (nout,*) " "
    write (nout,*) " "

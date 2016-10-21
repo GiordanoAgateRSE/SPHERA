@@ -20,7 +20,8 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: calc_pelo              
-! Description: Post-processing to write the free surface height.   
+! Description: Post-processing to write the the time evolution of the free 
+!              surface height at the monitoring lines.   
 !-------------------------------------------------------------------------------
 subroutine calc_pelo
 !------------------------
@@ -51,18 +52,18 @@ allocate(PartCelnum(NMAXPARTJ),PartCel(NMAXPARTJ))
 ! Initializations
 !------------------------
 Pelolib = 0
-! Loop over the lines
 !------------------------
 ! Statements
 !------------------------
+! Loop over the lines
 do i=1,nlines
-! Loop over the line points 
-   POINTS_LOOP: do j=control_lines(i)%Icont(1)+1,control_lines(i)%Icont(2)
+! Loop over the line points
+   do j=control_lines(i)%Icont(1)+1,control_lines(i)%Icont(2)
       ncel = control_points(j)%cella
       if (ncel==0) cycle
       if (Icont(ncel+1)<=Icont(ncel)) cycle
-! Search for the two particles, which are the closest to the point 
-! and to compute the averaged position 
+! Search for the two particles, which are the closest to the monitoring point 
+! and in the same background cell: computation of their averaged position.
       nPartCel = 0
       PartCelnum = 0
       PartCel = 99999
@@ -80,7 +81,7 @@ do i=1,nlines
       minpos2 = minloc(PartCel,1)
       pelolib(1:3,i) = (pg(PartCelnum(minpos1(1)))%coord(1:3) +                &
                        pg(PartCelnum(minpos2(1)))%coord(1:3)) * half
-   end do POINTS_LOOP
+   enddo
 enddo
 write (nplb,'(30g14.7)') simulation_time,pelolib
 !------------------------
