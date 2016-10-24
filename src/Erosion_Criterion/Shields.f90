@@ -76,7 +76,8 @@ if (index(Med(imed)%tipo,"granular")<=0) return
 ncelcorr = ParticleCellNumber(pg(npi)%coord)
 iappo = CellIndices(ncelcorr,igridi,jgridi,kgridi) 
 ! In case of no erosion: simple management of SPH mixture particles
-!  (with or without a velocity threshold)
+! (eventual influence of both a positive velocity threshold and/or the 
+! frictional viscosity threshold).
 if (Granular_flows_options%erosion_flag==1) then
    if (ind_interfaces(igridi,jgridi,4).ne.0) then 
       if (pg(npi)%coord(3)>=(pg(ind_interfaces(igridi,jgridi,4))%coord(3)      &

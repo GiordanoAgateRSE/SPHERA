@@ -604,7 +604,7 @@ done_flag = .false.
                   do npi=1,nag
                      call Shields(npi) 
                   enddo
-!$omp end parallel do 
+!$omp end parallel do
                case(3)
 ! To compute the second invariant of the rate-strain tensor and density 
 ! derivatives

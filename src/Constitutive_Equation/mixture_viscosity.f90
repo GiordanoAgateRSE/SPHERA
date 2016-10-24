@@ -198,13 +198,13 @@ do npi=1,nag
 ! Fictitious value representative of perfect uniform flow conditions
             pg(npi)%mu = 0.d0       
       endif
-! To save computational time in the transition zone of elastic-platic regime
-      if (pg(npi)%mu>Med(pg(npi)%imed)%mumx) then
+! No matter about the presence/absence of an erosion criterion, the particles 
+! in the transition zone of elastic-plastic regime are set fixed. This saves 
+! computational time in the transition zone with the elastic-platic strain 
+! regime.
+      if (pg(npi)%mu>=Med(pg(npi)%imed)%mumx) then
          pg(npi)%mu = Med(pg(npi)%imed)%mumx
          pg(npi)%vel(:) = 0.d0
-! No matter about the presence/absence of an erosion criterion, the particles 
-! in the transition zone of elastic-plastic regime are set fixed.
-         pg(npi)%state = "sol"
       endif
 ! Kinematic viscosity is updated
       pg(npi)%visc = pg(npi)%mu / pg(npi)%dens

@@ -20,7 +20,8 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: ReadInputMedium                          
-! Description:                        
+! Description: to read the input data from the section "medium" of SPHERA main 
+!              input file.                       
 !-------------------------------------------------------------------------------
 subroutine ReadInputMedium(NumberEntities,Med,ainp,comment,nrighe,ier,ninp,    &
                            nout,nscr)
@@ -43,6 +44,7 @@ integer(4) :: index,nitersol,ioerr
 double precision :: den0,eps,alfaMon,betaMon,visc,viscmx,taucri,cuin,phi,Cs
 double precision :: cons,codif,Settling,coes,Rough,d50,Gamma,InitialIntEn,d_90
 double precision :: porosity
+character(8) :: tipo
 character(100) :: token
 character(100),external :: GetToken,lcase
 logical,external :: ReadCheck

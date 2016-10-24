@@ -355,7 +355,7 @@ cohesion viscosity_max tuned_viscosity
                                     ! cohesion (draft parameter); viscosity_max 
                                     ! (threshold for frictional viscosity), 
                                     ! tuned_viscosity (tuned dynamic viscosity -
-                                    ! only for Manenti et al., 2012) 
+                                    ! only for Manenti et al., 2012)
 ! If (fluid_type==granular): end
 ! if ((fluid_type==granular).and.(erosion_criterion_ID==1)): start
 effective_porosity d_50 d_90        !

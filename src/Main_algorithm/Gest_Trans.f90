@@ -110,7 +110,7 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph"))  then
    endif
 endif
 NMAXPARTJ = Domain%COEFNMAXPARTJ * (Domain%h * four / Domain%dd) ** Ncord
-write(nout,'(2a,i15)') "     Maximum number of neighbouring particles: "      &
+write(nout,'(2a,i15)') "     Maximum number of neighbouring particles: ",      &
    "NMAXPARTJ = ",NMAXPARTJ
 allocate(Array_Flu(1:PARTICLEBUFFER),stat=ier)
 if (ier/=0) then
