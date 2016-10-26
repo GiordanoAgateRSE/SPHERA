@@ -334,7 +334,7 @@ if ((Tratto(BoundaryFace(i_face)%stretch)%zone==Partz(Nz)%dam_zone_ID).and.    &
          if (ier/=0) then
             write (nout,'(1x,a,i2)')                                           &
                "    Array PG not allocated. Error code: ",ier
-            call diagnostic (arg1=4,arg3=nomsub)
+            call diagnostic(arg1=4,arg3=nomsub)
             else
                write (nout,'(1x,a)') "    Array PG successfully allocated "
                pg(:) = PgZero

@@ -81,7 +81,7 @@ iappo = CellIndices(ncelcorr,igridi,jgridi,kgridi)
 if (Granular_flows_options%erosion_flag==1) then
    if (ind_interfaces(igridi,jgridi,4).ne.0) then 
       if (pg(npi)%coord(3)>=(pg(ind_interfaces(igridi,jgridi,4))%coord(3)      &
-         -2.d0*Domain%h)) then 
+         -2.d0 * Domain%h)) then 
          if (pg(npi)%state=="flu") return
          pg(npi)%state = "flu"
          else
@@ -413,7 +413,7 @@ iter_ustar: do while ((flagz0).and.                                            &
    endif
 enddo iter_ustar 
 if (isnan(Ustar)) then
-   call diagnostic (arg1=11,arg2=1,arg3=nomsub)
+   call diagnostic(arg1=11,arg2=1,arg3=nomsub)
 end if
 Taub = Ustar * Ustar * Med(pg(intliq_id)%imed)%den0
 Restar = Med(pg(intliq_id)%imed)%den0 * Ustar * med(imed)%d50 / pg(intliq_id)%mu

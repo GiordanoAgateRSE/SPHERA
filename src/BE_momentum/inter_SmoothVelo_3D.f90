@@ -82,7 +82,7 @@ do ii=1,indarrayFlu
 ! viscosity threshold are fixed.
    if (pg(npi)%mu==Med(pg(npi)%imed)%mumx) cycle
    do contj=1,nPartIntorno(npi)
-      npartint = (npi - 1)* NMAXPARTJ + contj
+      npartint = (npi - 1) * NMAXPARTJ + contj
       npj = PartIntorno(npartint)
       rhoi = pg(npi)%dens
       rhoj = pg(npj)%dens

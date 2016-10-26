@@ -34,7 +34,7 @@ use Hybrid_allocation_module
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: nrighe,ier, ninp,nout,nscr
+integer(4) :: nrighe,ier,ninp,nout,nscr
 integer(4),dimension(20) :: NumberEntities
 type (TyMedium),dimension(NMedium) :: Med
 character(1) :: comment

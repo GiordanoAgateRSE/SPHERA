@@ -60,12 +60,12 @@ fine   = Tratto(Nt)%inivertex + Tratto(Nt)%numvertices - 2
 do iv=inizio,fine
 ! To Check for the storage limits
    if (iv>NumBVertices) then
-      call diagnostic (arg1=10,arg2=2,arg3=nomsub)
+      call diagnostic(arg1=10,arg2=2,arg3=nomsub)
    end if
 ! To set the pointer to the current vertex
    n = BoundaryVertex(iv)
    if (n>NumVertici) then
-     call diagnostic (arg1=10,arg2=3,arg3=nomsub)
+     call diagnostic(arg1=10,arg2=3,arg3=nomsub)
    end if
 ! To set the coordinates of the current vertex
    xa = Vertice(1,n)

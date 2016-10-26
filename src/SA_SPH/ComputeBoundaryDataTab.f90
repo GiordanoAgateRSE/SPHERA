@@ -93,7 +93,7 @@ if (ncord==2) then
                ibdt = ibdt + 1
 ! Check array sizes
                if (ibdt>MaxNcbs) then
-                  call diagnostic (arg1=8,arg2=1,arg3=nomsub)
+                  call diagnostic(arg1=8,arg2=1,arg3=nomsub)
                endif
                BoundaryDataTab(ibdt)%CloBoNum  = Intboside(icbs)
                BoundaryDataTab(ibdt)%LocXYZ(1:PLANEDIM) =                      &
@@ -193,7 +193,7 @@ if (ncord==2) then
                BoundaryDataPointer(3,npi) = ibdt + 1
 ! Check array sizes
                if (ibdt>MaxNcbf) then
-                  call diagnostic (arg1=8,arg2=2,arg3=nomsub)
+                  call diagnostic(arg1=8,arg2=2,arg3=nomsub)
                endif
                do icbf=1,Ncbf
                   call ComputeBoundaryVolumeIntegrals_P0(icbf,Cloboface,LocX,  &

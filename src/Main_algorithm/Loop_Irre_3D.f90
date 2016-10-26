@@ -124,7 +124,7 @@ if ((on_going_time_step==it_start).and.(Domain%tipo=="bsph")) then
          indarrayFlu = indarrayFlu + 1
 ! To check the maximum dimension of the array and possible resizing
          if (indarrayFlu>PARTICLEBUFFER) then
-            call diagnostic (arg1=9,arg2=1,arg3=nomsub)
+            call diagnostic(arg1=9,arg2=1,arg3=nomsub)
          endif
          Array_Flu(indarrayFlu) = npi
       endif
@@ -267,56 +267,79 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
          enddo
       endif
       if ((Domain%time_split==0).and.(Domain%time_stage==1)) then               
-! Erosion criterium + continuity equation RHS   
+! Erosion criterium + continuity equation RHS  
          call start_and_stop(2,12)
-         if ((Granular_flows_options%ID_erosion_criterion>1).and.              &
-            (.not.esplosione)) then  
-! Erosion criterion
-            if (Granular_flows_options%ID_erosion_criterion==2) then
-! Shields criterion
+         if ((Granular_flows_options%ID_erosion_criterion>0).and.              &
+            (.not.esplosione)) then
+            select case (Granular_flows_options%ID_erosion_criterion)
+               case(1)
+!$omp parallel do default(none) shared(pg,nag) private(npi,ncel)
+                  do npi=1,nag
+                     pg(npi)%vel_old(:) = pg(npi)%vel(:)
+                     pg(npi)%normal_int_old(:) = pg(npi)%normal_int(:)
+                     call initialization_fixed_granular_particle(npi)             
+                  enddo
+!$omp end parallel do 
 !$omp parallel do default(none) shared(pg,nag) private(npi) 
-               do npi=1,nag
-                  call Shields(npi) 
-               enddo
+                  do npi=1,nag
+                     call Shields(npi) 
+                  enddo
 !$omp end parallel do
-               elseif (Granular_flows_options%ID_erosion_criterion==3) then
+! Initializing viscosity for fixed particles
+!$omp parallel do default(none) shared(pg,nag,Granular_flows_options,Med)      &
+!$omp private(npi,ncel,aux,igridi,jgridi,kgridi)
+                  do npi=1,nag
+                     ncel = ParticleCellNumber(pg(npi)%coord)
+                     aux = CellIndices(ncel,igridi,jgridi,kgridi)
+                     if (pg(npi)%state=="sol") then
+                        pg(npi)%mu = Med(pg(npi)%imed)%mumx
+                        pg(npi)%visc = pg(npi)%mu / pg(npi)%dens
+                     endif
+                  enddo
+!$omp end parallel do
+               case(2)
+!$omp parallel do default(none) shared(pg,nag) private(npi)
+                  do npi=1,nag
+                     call Shields(npi) 
+                  enddo
+!$omp end parallel do 
+               case(3)
 ! To compute the second invariant of the rate-strain tensor and density 
 ! derivatives
                   call inter_EqCont_3D 
-! Mohr-Coulomb criterion
                   call MohrC
-            endif
-! To update the auxiliary vector, which counts the particles with a status 
-! different from "sol" 
+               case default
+            end select
+! Update auxiliary vector for counting particles, whose status is not "sol"
             indarrayFlu = 0
             do npi=1,nag
-               if (pg(npi)%cella==0.or.pg(npi)%vel_type/="std") cycle
+               if ((pg(npi)%cella==0).or.(pg(npi)%vel_type/="std")) cycle
                if (pg(npi)%state=="flu") then
                   indarrayFlu = indarrayFlu + 1
-! Checking not to overpass array sizes and possible resizing
+! Check the boundary sizes and possible resizing
                   if (indarrayFlu>PARTICLEBUFFER) then
-                     call diagnostic (arg1=9,arg2=2,arg3=nomsub)
+                     call diagnostic(arg1=9,arg2=2,arg3=nomsub)
                   endif
                   Array_Flu(indarrayFlu) = npi
                endif
             enddo
             else
-! No erosion criterion  
+! No erosion criterion
                indarrayFlu = 0
                do npi=1,nag
-                  if (pg(npi)%cella==0.or.pg(npi)%vel_type/="std") cycle
+                  if ((pg(npi)%cella==0).or.(pg(npi)%vel_type/="std")) cycle
                   indarrayFlu = indarrayFlu + 1
 ! Checking not to overpass array sizes. Possible resizing.
                   if (indarrayFlu>PARTICLEBUFFER) then
-                     call diagnostic (arg1=9,arg2=2,arg3=nomsub)
+                     call diagnostic(arg1=9,arg2=2,arg3=nomsub)
                   endif
                   Array_Flu(indarrayFlu) = npi
                enddo
          endif
-      endif 
+      endif
 ! Momentum equation 
-      Ncbf_Max = 0
       call start_and_stop(2,6)
+      Ncbf_Max = 0
 !$omp parallel do default(none)                                                &
 !$omp private(npi,ii,tpres,tdiss,tvisc,ncbf,boundreaction)                     &
 !$omp shared(nag,pg,Domain,BoundaryDataPointer,Ncbf_Max,indarrayFlu,Array_Flu) &
@@ -367,7 +390,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
          write (nout,"(a,i5,a,i5)")                                            &
             "Increase parameter MAXCLOSEBOUNDFACES from",                      &
             Domain%MAXCLOSEBOUNDFACES," to ",Ncbf_Max
-         call diagnostic (arg1=9,arg2=3,arg3=nomsub)
+         call diagnostic(arg1=9,arg2=3,arg3=nomsub)
       endif
 ! Time integration for body dynamics
       if (n_bodies>0) then
@@ -549,11 +572,8 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
                      ncel = ParticleCellNumber(pg(npi)%coord)
                      aux = CellIndices(ncel,igridi,jgridi,kgridi)
                      if (pg(npi)%state=="sol") then
-                        pg(npi)%mu =                                           &
-                           Med(Granular_flows_options%ID_main_fluid)%visc *    &
-                           Med(Granular_flows_options%ID_main_fluid)%den0
-                        pg(npi)%visc =                                         &
-                           Med(Granular_flows_options%ID_main_fluid)%visc
+                        pg(npi)%mu = Med(pg(npi)%imed)%mumx
+                        pg(npi)%visc = pg(npi)%mu / pg(npi)%dens
                      endif
                   enddo
 !$omp end parallel do
@@ -578,7 +598,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
                   indarrayFlu = indarrayFlu + 1
 ! Check the boundary sizes and possible resizing
                   if (indarrayFlu>PARTICLEBUFFER) then
-                     call diagnostic (arg1=9,arg2=2,arg3=nomsub)
+                     call diagnostic(arg1=9,arg2=2,arg3=nomsub)
                   endif
                   Array_Flu(indarrayFlu) = npi
                endif
@@ -599,7 +619,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
                   indarrayFlu = indarrayFlu + 1
 ! Check array sizes and possible resizing 
                   if (indarrayFlu>PARTICLEBUFFER) then
-                     call diagnostic (arg1=9,arg2=2,arg3=nomsub)
+                     call diagnostic(arg1=9,arg2=2,arg3=nomsub)
                   endif
                   Array_Flu(indarrayFlu) = npi
                enddo
@@ -644,7 +664,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
          write (nout,"(a,i5,a,i5)")                                            &
             "Increase parameter MAXCLOSEBOUNDFACES from "                      &
             ,Domain%MAXCLOSEBOUNDFACES," to ",Ncbf_Max
-         call diagnostic (arg1=9,arg2=4,arg3=nomsub)
+         call diagnostic(arg1=9,arg2=4,arg3=nomsub)
       endif
 ! Loop over all the active particles
 ! Time integration of the continuity equation 
@@ -769,7 +789,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
                   indarrayFlu = indarrayFlu + 1
 ! Array sizes check and possibile resizing
                if (indarrayFlu>PARTICLEBUFFER) then
-                  call diagnostic (arg1=9,arg2=2,arg3=nomsub)
+                  call diagnostic(arg1=9,arg2=2,arg3=nomsub)
                endif
                Array_Flu(indarrayFlu) = npi
             enddo 

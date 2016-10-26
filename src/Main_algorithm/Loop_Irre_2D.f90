@@ -89,7 +89,7 @@ do npi=1,nag
       indarrayFlu = indarrayFlu + 1
 ! To check the maximum dimension of the array and possible resizing
       if (indarrayFlu>PARTICLEBUFFER) then
-         call diagnostic (arg1=9,arg2=1,arg3=nomsub)
+         call diagnostic(arg1=9,arg2=1,arg3=nomsub)
       endif
       Array_Flu(indarrayFlu) = npi
    endif
@@ -300,17 +300,12 @@ done_flag = .false.
                   do npi=1,nag
                      ncel = ParticleCellNumber(pg(npi)%coord)
                      aux = CellIndices(ncel,igridi,jgridi,kgridi)
-                     if (Granular_flows_options%ID_erosion_criterion==1) then
-                        if (pg(npi)%state=="sol") then
-                           pg(npi)%mu =                                        &
-                              Med(Granular_flows_options%ID_main_fluid)%visc * &
-                              Med(Granular_flows_options%ID_main_fluid)%den0
-                           pg(npi)%visc =                                      &
-                              Med(Granular_flows_options%ID_main_fluid)%visc
-                        endif
+                     if (pg(npi)%state=="sol") then
+                        pg(npi)%mu = Med(pg(npi)%imed)%mumx
+                        pg(npi)%visc = pg(npi)%mu / pg(npi)%dens
                      endif
                   enddo
-!$omp end parallel do  
+!$omp end parallel do
                case(2)
 !$omp parallel do default(none) shared(pg,nag) private(npi)
                   do npi=1,nag
@@ -332,7 +327,7 @@ done_flag = .false.
                   indarrayFlu = indarrayFlu + 1
 ! Check the boundary sizes and possible resizing
                   if (indarrayFlu>PARTICLEBUFFER) then
-                     call diagnostic (arg1=9,arg2=2,arg3=nomsub)
+                     call diagnostic(arg1=9,arg2=2,arg3=nomsub)
                   endif
                   Array_Flu(indarrayFlu) = npi
                endif
@@ -345,7 +340,7 @@ done_flag = .false.
                   indarrayFlu = indarrayFlu + 1
 ! Checking not to overpass array sizes. Possible resizing.
                   if (indarrayFlu>PARTICLEBUFFER) then
-                     call diagnostic (arg1=9,arg2=2,arg3=nomsub)
+                     call diagnostic(arg1=9,arg2=2,arg3=nomsub)
                   endif
                   Array_Flu(indarrayFlu) = npi
                enddo
@@ -591,11 +586,8 @@ done_flag = .false.
                      ncel = ParticleCellNumber(pg(npi)%coord)
                      aux = CellIndices(ncel,igridi,jgridi,kgridi)
                      if (pg(npi)%state=="sol") then
-                        pg(npi)%mu =                                        &
-                           Med(Granular_flows_options%ID_main_fluid)%visc * &
-                           Med(Granular_flows_options%ID_main_fluid)%den0
-                        pg(npi)%visc =                                      &
-                           Med(Granular_flows_options%ID_main_fluid)%visc
+                        pg(npi)%mu = Med(pg(npi)%imed)%mumx
+                        pg(npi)%visc = pg(npi)%mu / pg(npi)%dens
                      endif
                   enddo
 !$omp end parallel do  
@@ -620,7 +612,7 @@ done_flag = .false.
                   indarrayFlu = indarrayFlu + 1
 ! Check the boundary sizes and possible resizing
                   if (indarrayFlu>PARTICLEBUFFER) then
-                     call diagnostic (arg1=9,arg2=2,arg3=nomsub)
+                     call diagnostic(arg1=9,arg2=2,arg3=nomsub)
                   endif
                   Array_Flu(indarrayFlu) = npi
                endif

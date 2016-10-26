@@ -343,7 +343,7 @@ if (nag>0) then
       endif   
    endif 
 ! Final prints
-   write(nout,'(128("."))')
+   write(nout,'(144("."))')
    write(nout,fmt100) " Print at:                   | step: ",it," | time: ",  &
       simulation_time," | Dt: ",dt," | Particles: inside ",dummy," gone out ", &
       OpCountot," gone in ",SpCountot
@@ -367,12 +367,12 @@ if (nag>0) then
          "Elapsed time (at the end of the simulation, real time estimation): ",&
          time_elapsed_tot_est," hours = ",time_elapsed_tot_est/24.d0," days."
    endif
-   write(nout,'(a,a)')                                                         &
+   write(nout,'(a,a,a)')                                                       &
       ".............................|  Min. val. |  Min.loc.| X coord. | ",    &
-      "Y coord. | Z coord."," ||  Max. val. |  Max.loc.| X coord. | ",         &
+      "Y coord. | Z coord. ||  Max. val. |  Max.loc.| X coord. | ",            &
       "Y coord. | Z coord. |"
    write(nout,fmt101)                                                          &
-      "Velocity -abs.val.-|u_|(m/s) |",minvelo,"|",minlocvelo,"|",             &
+      "Velocity abs. val. |u_|(m/s) |",minvelo,"|",minlocvelo,"|",             &
       pg(minlocvelo)%coord(1),"|",pg(minlocvelo)%coord(2),"|",                 &
       pg(minlocvelo)%coord(3),"||",maxvelo,"|",maxlocvelo,"|",                 &
       pg(maxlocvelo)%coord(1),"|",pg(maxlocvelo)%coord(2),"|",                 &

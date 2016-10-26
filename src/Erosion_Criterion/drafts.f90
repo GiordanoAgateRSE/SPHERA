@@ -122,7 +122,7 @@ do npi = 1,nag
       end do
    end if
    if ((intliq_id==0).and.(intsol_id==0)) then
-      call diagnostic (arg1=11,arg2=2,arg3=nomsub)
+      call diagnostic(arg1=11,arg2=2,arg3=nomsub)
    end if
    if (intpl_id==0) then
 ! Detection of free surface 

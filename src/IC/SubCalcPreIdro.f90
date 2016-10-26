@@ -74,7 +74,7 @@ do npi=1,nag
    if (pl_id==0) then
       pl_id = int(partz(Nz)%valp)
       else if (pl_id/=int(partz(Nz)%valp)) then
-         call diagnostic (arg1=10,arg2=8,arg3=nomsub)
+         call diagnostic(arg1=10,arg2=8,arg3=nomsub)
    end if
    pl_quote = max(pl_quote,pg(npi)%coord(3))
 end do 

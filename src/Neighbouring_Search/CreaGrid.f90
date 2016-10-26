@@ -80,7 +80,7 @@ allocate(ind_interfaces(Grid%ncd(1),Grid%ncd(2),6),stat=alloc_stat)
 if (alloc_stat/=0) then
    write (nout,'(1x,a,i2)')                                                    &
       "    Array ind_interfaces not allocated. Error code: ",alloc_stat
-   call diagnostic (arg1=4,arg3=nomsub)
+   call diagnostic(arg1=4,arg3=nomsub)
    else
       write (nout,'(1x,a)') "    Array ind_interfaces successfully allocated "
 endif
