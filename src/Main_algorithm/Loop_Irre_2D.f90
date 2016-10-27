@@ -360,7 +360,7 @@ done_flag = .false.
          if (pg(npi)%mu==Med(pg(npi)%imed)%mumx) then
             pg(npi)%acc(:) = zero
             cycle
-         endif          
+         endif
          call inter_EqMoto(npi,tpres,tdiss,tvisc)
 ! Searching for the boundary sides, which are the nearest the npi-th current 
 ! particle

@@ -349,8 +349,11 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
          npi = Array_Flu(ii)
 ! The mixture particles, which are temporarily affected by the frictional 
 ! viscosity threshold are fixed.
-         if (pg(npi)%mu==Med(pg(npi)%imed)%mumx) cycle
-         call inter_EqMoto(npi,tpres,tdiss,tvisc)  
+         if (pg(npi)%mu==Med(pg(npi)%imed)%mumx) then
+            pg(npi)%acc(:) = zero
+            cycle
+         endif
+         call inter_EqMoto(npi,tpres,tdiss,tvisc)
 ! Searching for the boundary faces, which are the nearest the npi-th current 
 ! particle
          if ((Domain%time_stage==1).or.(Domain%time_split==1)) then 
