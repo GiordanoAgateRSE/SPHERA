@@ -61,7 +61,7 @@ select case (Domain%RKscheme)
          else
             call Heun
       endif
-end select
+endselect
 call start_and_stop(3,17)
 ! Diffusion coefficient update
 if (diffusione) then

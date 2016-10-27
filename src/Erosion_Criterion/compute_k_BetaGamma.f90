@@ -161,7 +161,7 @@ if ((pg(npi)%Beta_slope>=Med(pg(npi)%imed)%Phi).or.                            &
                         pg(npi)%k_BetaGamma = root2
                      case(200,100,0)
                         pg(npi)%k_BetaGamma = k_Beta0   
-                  end select
+                  endselect
             endif
       endif
 endif

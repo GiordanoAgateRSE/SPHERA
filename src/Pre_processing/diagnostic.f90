@@ -91,7 +91,7 @@ select case (ierr)
          case (1); write(nout,'(1x,a)') '  1 - Output file cannot be opened.'
          case (2); write(nout,'(1x,a)') '  2 - Input file does not exist.'
          case (3); write(nout,'(1x,a)') '  3 - Input file cannot be opened.'
-      end select
+      endselect
    case (3)
 ! Error in arrays
       write(nout,'(1x,2a)') 'Array deallocation failed.  Routine -> ',         &
@@ -163,7 +163,7 @@ select case (ierr)
          case (340); write(nout,'(1x,a)')                                      &
 '  340 - Ascii input '//stringa(1:la)//' fails at the record for DB-SPH module'
          case default; write(nout,'(1x,a)') '  ??? - Unknown error type'
-      end select
+      endselect
    case (6)
 ! Error in source
       write(nout,'(1x,a)')                                                     &
@@ -174,7 +174,7 @@ select case (ierr)
 ' 1 - Number of particles nag > PARTICLEBUFFER (a).  Routine ->',stringa(1:la)
          case (2); write(nout,'(1x,2a)')                                       &
 ' 2 - Number of particles nag > PARTICLEBUFFER (b).  Routine ->',stringa(1:la)
-      end select
+      endselect
    case (7); write(nout,'(1x,2a)')                                             &
       'Number of cels in grid: NumCellmax < Grid%nmax.  Routine ->',           &
       stringa(1:la)
@@ -212,7 +212,7 @@ select case (ierr)
          case (10); write(nout,'(1x,2a)')                                      &
 '10 - Number of convex edges NumBEdges > MAXNUMCONVEXEDGES.  Routine ->',      &
             stringa(1:la)
-      end select
+      endselect
    case (9)
 ! Error during the simulation
       write(nout,'(1x,a)') 'An error was detected during the loop'
@@ -226,7 +226,7 @@ select case (ierr)
             PARTICLEBUFFER,' (b).  Routine ->',stringa(1:la)
          case (3); write(nout,'(1x,2a)')                                       &
 ' 3 - Increase parameter MAXCLOSEBOUNDFACES.  Routine ->',stringa(1:la)
-      end select
+      endselect
       print_out = .true.
    case (10)    
 ! Error during the execution of auxiliary subroutines
@@ -262,7 +262,7 @@ select case (ierr)
          case (88); write(nout,'(1x,2a)')                                      &
 '88 - Error deltat law calculation for "law" particles. Routine -> '           &
             ,stringa(1:la)
-      end select
+      endselect
       print_out = .true.
    case (11)
 ! Error in erosion scheme
@@ -276,12 +276,12 @@ select case (ierr)
          case (2); write(nout,'(1x,3a)')                                       &
 ' 2 - It is Impossible to find liquid interface and solid interface for the ', &
             'current particle.  Routine ->',stringa(1:la)
-      end select
+      endselect
       print_out = .true.
    case default 
       write(nout,*) 'Unpredictable error'
       print_out = .true.
-end select
+endselect
 if (ierr/=1) then
    write(nout,'(1x,100(''=''))')
    flush(nout)

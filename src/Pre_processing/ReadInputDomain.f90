@@ -88,7 +88,7 @@ do while (TRIM(lcase(ainp))/="##### end domain #####")
       case default
          ier = 3
          return
-   end select
+   endselect
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
    if (ioerr==0) read(ainp,*,iostat=ioerr) dd,trunc
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DD & TRUNC",ninp,nout)) return

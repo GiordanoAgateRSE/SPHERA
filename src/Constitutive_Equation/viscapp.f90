@@ -87,7 +87,7 @@ if (.not. diffusione) then
          case ( "granular" )
             pg(npi)%visc = pg(npi)%mu / pg(npi)%dens
          case default
-      end select
+      endselect
    end do
 !$omp end parallel do
    else if (diffusione) then

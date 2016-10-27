@@ -99,7 +99,7 @@ do while (TRIM(lcase(ainp))/="##### end faces #####")
          endif
          ier = 2
          return
-   end select
+   endselect
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"FACES DATA",ninp,nout)) return
 enddo

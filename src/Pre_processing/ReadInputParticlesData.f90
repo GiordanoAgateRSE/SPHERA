@@ -143,7 +143,7 @@ select case (lcase(move))
    case default
       if (nout>0) write(nout,*) "Unknown option: ",trim(ainp)
       stop
-end select
+endselect
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 pressu = GetToken(ainp,1,ioerr)
 if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"INITIAL PRESSURE TYPE",ninp,nout))   &

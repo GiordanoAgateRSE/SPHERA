@@ -93,7 +93,7 @@ select case (mod(itime_jet,4))
       pg(nag)%coord(:) = pg(nag)%coord(:) - 0.25d0 * Domain%dd * cos_dir_1(:)
    case (2,0) 
       pg(nag)%coord(:) = pg(nag)%coord(:) + 0.25d0 * Domain%dd * cos_dir_1(:)
-end select
+endselect
 call random_number(rnd)
 pg(nag)%coord(:) = pg(nag)%coord(:) + (two * rnd - one) * 0.1d0 * Domain%dd    &
                    * cos_dir_1(:)

@@ -113,7 +113,7 @@ do while (TRIM(lcase(ainp)) /= "##### end bed load transport #####")
       case (3)
          write(nout,"(1x,a,1p,i12,a)") "ID_erosion_criterion:.........",       &
             ID_erosion_criterion," Mohr-Coulomb bed load transport."
-      end select
+      endselect
       if (ID_erosion_criterion>0) then      
          write(nout,"(1x,a,1p,i12)") "ID_main_fluid:................",         &
             ID_main_fluid

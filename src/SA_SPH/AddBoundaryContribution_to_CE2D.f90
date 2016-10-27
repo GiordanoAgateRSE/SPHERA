@@ -98,7 +98,7 @@ do icbs=1,IntNcbs
                BCrodivV = zero
             endif
             return
-      end select
+      endselect
 ! Boundary contribution to the continuity equation 
       BCrodivV = BCrodivV + two * vin * roi * IntWdS
    endif 

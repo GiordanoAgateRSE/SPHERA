@@ -80,7 +80,7 @@ do while (TRIM(lcase(ainp))/="##### end control sections #####")
          case default
 ! Error for unrecognized case 
             ioerr = -1 
-      end select
+      endselect
    endif
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                                   &
       "CONTROL SECTION "//label//" - CONSTANT COORD. DEFINITION",ninp,nout))   &
@@ -103,7 +103,7 @@ do while (TRIM(lcase(ainp))/="##### end control sections #####")
          case default
 ! Error for unrecognized case 
             ioerr = -1 
-      end select
+      endselect
    endif
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                                   &
       "CONTROL SECTION "//label//" - FIRST LIMIT DEFINITION",ninp,nout)) return
@@ -125,7 +125,7 @@ do while (TRIM(lcase(ainp))/="##### end control sections #####")
          case default
 ! Error for unrecognized case 
             ioerr = -1 
-      end select
+      endselect
    endif
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                                   &
       "CONTROL SECTION "//label//" - SECOND LIMIT DEFINITION",ninp,nout))      &
@@ -141,7 +141,7 @@ do while (TRIM(lcase(ainp))/="##### end control sections #####")
          case default
 ! Error for unrecognized case 
             ioerr = -1 
-      end select
+      endselect
    endif
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                                   &
       "CONTROL SECTION "//label//" - COLOR INDEX",ninp,nout)) return

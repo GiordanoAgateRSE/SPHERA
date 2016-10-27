@@ -252,7 +252,7 @@ do while (TRIM(lcase(ainp))/="##### end medium #####")
                   "N° ITERATION SOLID",ninp,nout)) return
          endif
       case default
-   end select
+   endselect
 ! Assignments 
    if (ncord>0) then
       Med(index)%tipo = tipo
@@ -315,9 +315,9 @@ do while (TRIM(lcase(ainp))/="##### end medium #####")
             Med(index)%RoughCoef
          write(nout,"(1x,a,1p,e12.4)") "d50:........................",         &
             Med(index)%d50
-         write(nout,"(1x,a,1p,e12.4)") "D90:........................",         &
+         write(nout,"(1x,a,1p,e12.4)") "d90:........................",         &
             Med(index)%d_90
-         write(nout,"(1x,a,1p,e12.4)") "(1-prosity):................",         &
+         write(nout,"(1x,a,1p,e12.4)") "Volume fraction (solid):....",         &
             Med(index)%gran_vol_frac_max
          write(nout,"(1x,a,1p,e12.4)") "Diffusion Coeff.:...........",         &
             Med(index)%codif       

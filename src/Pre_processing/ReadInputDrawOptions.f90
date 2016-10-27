@@ -97,13 +97,13 @@ do while (TRIM(lcase(ainp))/="##### end draw options #####")
                val_time = zero
                if ((ncord)>0.and.(nout>0)) write(nout,"(1x,a,1pe12.4,a)")      &
                   "VTKConversion every :",freq_time," second."
-         end select
+         endselect
          if ((ncord>0).and.(nout>0)) write(nout,"(1x,a)") " "
          vtkconv = .TRUE.
       case default
          ier = 4
          return
-   end select
+   endselect
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DRAW OPTIONS DATA",ninp,nout))    &
       return

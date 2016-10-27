@@ -188,16 +188,11 @@ do npi=1,nag
                                     Granular_flows_options%t_liq) 
          endif
       endif
-! secinv=sqrt(I2(e_ij) (secinv is the sqrt of the second inveriant of the 
+! secinv=sqrt(I2(e_ij)) (secinv is the sqrt of the second inveriant of the 
 ! strain-rate tensor)
-! Frictional viscosity is the mixture viscosity in the bed-load transport layer
-      if (pg(npi)%secinv>1.d-9) then 
-         pg(npi)%mu = pg(npi)%sigma_prime_m * dsin(Med(pg(npi)%imed)%phi) /    &
-                      (2.d0 * pg(npi)%secinv) + mu_main_fluid * eps_fluid_blt                 
-         else
-! Fictitious value representative of perfect uniform flow conditions
-            pg(npi)%mu = 0.d0       
-      endif
+! Mixture viscosity in the bed-load transport layer
+      pg(npi)%mu = pg(npi)%sigma_prime_m * dsin(Med(pg(npi)%imed)%phi) / (2.d0 &
+                   * pg(npi)%secinv) + mu_main_fluid * eps_fluid_blt                 
 ! No matter about the presence/absence of an erosion criterion, the particles 
 ! in the transition zone of elastic-plastic regime are set fixed. This saves 
 ! computational time in the transition zone with the elastic-platic strain 

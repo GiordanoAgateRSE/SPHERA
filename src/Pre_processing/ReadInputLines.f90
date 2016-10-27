@@ -112,7 +112,7 @@ do while (TRIM(lcase(ainp))/="##### end lines #####")
          endif
          ier = 2
          return
-   end select
+   endselect
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"LINES DATA",ninp,nout)) return
 enddo

@@ -231,7 +231,7 @@ do while (TRIM(lcase(ainp))/="##### end output regulation #####")
       case default
         ier = 4
         return
-   end select
+   endselect
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"OUTPUT REGULATION DATA",ninp,     &
       nout)) return

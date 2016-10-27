@@ -309,7 +309,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
                   call inter_EqCont_3D 
                   call MohrC
                case default
-            end select
+            endselect
 ! Update auxiliary vector for counting particles, whose status is not "sol"
             indarrayFlu = 0
             do npi=1,nag
@@ -347,8 +347,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
 ! Loop over particles
       do ii = 1,indarrayFlu
          npi = Array_Flu(ii)
-! The mixture particles, which are temporarily affected by the frictional 
-! viscosity threshold are fixed.
+! The mixture particles in the elastic-plastic strain regime are held fixed.
          if (pg(npi)%mu==Med(pg(npi)%imed)%mumx) then
             pg(npi)%acc(:) = zero
             cycle
@@ -592,7 +591,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
                   call inter_EqCont_2D 
                   call MohrC
                case default
-            end select
+            endselect
 ! Update auxiliary vector for counting particles, whose status is not "sol"
             indarrayFlu = 0
             do npi=1,nag

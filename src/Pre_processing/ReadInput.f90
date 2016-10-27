@@ -151,7 +151,7 @@ SECTION_LOOP: do while (ioerr==0)
          call ReadInputDrawOptions(ainp,comment,nrighe,ier,ninp,nout)
       case default 
         ier = 1
-   end select
+   endselect
 ! Reading error was detected
    if (ier/=0) then
       write(nscr,"(/,1x,a,i8,//)")                                             &

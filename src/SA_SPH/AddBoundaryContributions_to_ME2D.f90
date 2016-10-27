@@ -119,7 +119,7 @@ do icbs=1,IntNcbs
          do i=1,PLANEDIM
             sidevel(i) = RifBoundarySide%velocity(acix(i))
          enddo
-   end select
+   endselect
 ! Boundary contribution to "gradP" 
 ! (pressure gradient term in the momentum equation) 
    if ((strtype=="fixe").OR.(strtype=="tapi"))  then

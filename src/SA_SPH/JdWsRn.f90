@@ -121,7 +121,7 @@ select case (kernel)
             endif
          case default
             JdWsRn = zero
-      end select
+      endselect
       select case (SD)
          case (2)      
 ! 2D geometry

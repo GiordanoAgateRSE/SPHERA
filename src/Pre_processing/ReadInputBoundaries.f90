@@ -573,7 +573,7 @@ BoundaryVertex(Tratto(index)%inivertex+Tratto(index)%numvertices-1)
                Tratto(index)%ColorCode = icolor
                if ((nout>0).and.(index==indexi)) write(nout,"(1x,a,z8)")       &
                   "Color           : ",Tratto(index)%colorCode
-         end select
+         endselect
       enddo MULTI_INDEX_LOOP
    endif
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
