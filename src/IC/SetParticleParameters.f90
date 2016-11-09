@@ -104,17 +104,17 @@ endif
 if ((index(Med(Mate)%tipo,"liquid")>0).or.                                     &
    (index(Med(Mate)%tipo,"smagorin")>0)) then
    pg(npi)%state = "flu" 
-   else if ((index(Med(Mate)%tipo,"granular")>0).or.                           &
+   elseif ((index(Med(Mate)%tipo,"granular")>0).or.                           &
       (index(Med(Mate)%tipo,"general")>0)) then
       pg(npi)%state = "sol"
-      else if (index(Med(Mate)%tipo,"gas")>0) then
+      elseif (index(Med(Mate)%tipo,"gas")>0) then
          pg(npi)%state = "flu" 
-end if    
+endif
 if ((index(Med(Mate)%tipo,"granular")>0).or.                                   &
    (index(Med(Mate)%tipo,"general")>0)) then
    if ((pg(npi)%vel(1)/=zero).or.(pg(npi)%vel(2)/=zero).or.                    &
       (pg(npi)%vel(3)/=zero)) pg(npi)%state = "flu"     
-end if
+endif
 ! Motion index
 pg(npi)%vel_type = partz(Nz)%move        
 if (partz(Nz)%move/="std") pg(npi)%visc = zero

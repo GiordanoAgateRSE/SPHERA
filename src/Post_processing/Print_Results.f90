@@ -345,7 +345,7 @@ if (nag>0) then
 ! Final prints
    write(nout,'(144("."))')
    write(nout,fmt100) " Print at:                   | step: ",it," | time: ",  &
-      simulation_time," | Dt: ",dt," | Particles: inside ",dummy," gone out ", &
+      simulation_time," | dt: ",dt,"s| Particles: inside ",dummy," gone out ", &
       OpCountot," gone in ",SpCountot
    if (exetype=="linux") then
       time_elapsed_tot_est = ((Domain%t_pre_iter-Domain%t0) +                  &

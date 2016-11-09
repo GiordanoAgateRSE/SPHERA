@@ -394,7 +394,7 @@ call cat_post_proc
    endif
    if (Granular_flows_options%ID_erosion_criterion>=1) then
 ! sigma_prime_m
-      write(unitvtk,'(a)') '      <DataArray type="Float32" Name="sigma_prime_m" format="ascii" >'
+      write(unitvtk,'(a)') '      <DataArray type="Float32" Name="sigma_prime_m (Pa)" format="ascii" >'
       do i=1,numpoints,16
          k1 = i
          k2 = k1 + 15
@@ -404,7 +404,7 @@ call cat_post_proc
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
 ! pres_fluid
-      write(unitvtk,'(a)') '      <DataArray type="Float32" Name="pres_fluid" format="ascii" >'
+      write(unitvtk,'(a)') '      <DataArray type="Float32" Name="pres_fluid (Pa)" format="ascii" >'
       do i=1,numpoints,16
          k1 = i
          k2 = k1 + 15
@@ -415,7 +415,7 @@ call cat_post_proc
       write(unitvtk,'(a)') '      </DataArray>'
 ! sec_inv
       write(unitvtk,'(a)')                                                     &
-         '      <DataArray type="Float32" Name="sqrt_I2_eij" format="ascii" >'
+         '      <DataArray type="Float32" Name="sqrt_I2_eij (s^-1)" format="ascii" >'
       do i=1,numpoints,16
          k1 = i
          k2 = k1 + 15

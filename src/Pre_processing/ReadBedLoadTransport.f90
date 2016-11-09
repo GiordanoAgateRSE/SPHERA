@@ -103,16 +103,16 @@ do while (TRIM(lcase(ainp)) /= "##### end bed load transport #####")
       select case (ID_erosion_criterion)
       case (0)
          write(nout,"(1x,a,1p,i12,a)") "ID_erosion_criterion:.........",       &
-            ID_erosion_criterion," no bed load transport."
+            ID_erosion_criterion," no-bed load transport."
       case (1)
          write(nout,"(1x,a,1p,i12,a)") "ID_erosion_criterion:.........",       &
-            ID_erosion_criterion," Shields-Seminara bed load transport."
+            ID_erosion_criterion," Shields-Seminara."
       case (2)
          write(nout,"(1x,a,1p,i12,a)") "ID_erosion_criterion:.........",       &
-            ID_erosion_criterion," Shields bed load transport."
+            ID_erosion_criterion," Shields."
       case (3)
          write(nout,"(1x,a,1p,i12,a)") "ID_erosion_criterion:.........",       &
-            ID_erosion_criterion," Mohr-Coulomb bed load transport."
+            ID_erosion_criterion," Mohr-Coulomb."
       endselect
       if (ID_erosion_criterion>0) then      
          write(nout,"(1x,a,1p,i12)") "ID_main_fluid:................",         &

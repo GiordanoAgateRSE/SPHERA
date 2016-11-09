@@ -460,8 +460,6 @@ BoundaryVertex(Tratto(index)%inivertex:Tratto(index)%inivertex+Tratto(index)%num
                      "(1x,a,z8)") "Color           : ",                        &
                      Tratto(index)%colorCode
                   Tratto(index)%ColorCode = icolor
-                  write(nout,"(1x,a,z8)") "Color           : ",                &
-                     Tratto(index)%colorCode
                endif
             case("tapi")
                if (ncord==3) then 
@@ -469,8 +467,6 @@ BoundaryVertex(Tratto(index)%inivertex:Tratto(index)%inivertex+Tratto(index)%num
                   if (nout>0.and.index==indexi) write(nout,"(1x,a,z8)")        &
                      "Color           : ",Tratto(index)%colorCode
                   Tratto(index)%ColorCode = icolor
-                  write(nout,"(1x,a,z8)") "Color           : ",                &
-                     Tratto(index)%colorCode
                   else 
                      numv = Tratto(index)%numvertices
                      if (numv/=2) then 

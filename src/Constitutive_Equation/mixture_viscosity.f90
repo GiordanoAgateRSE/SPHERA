@@ -191,16 +191,17 @@ do npi=1,nag
 ! secinv=sqrt(I2(e_ij)) (secinv is the sqrt of the second inveriant of the 
 ! strain-rate tensor)
 ! Mixture viscosity in the bed-load transport layer
-      if (pg(npi)%secinv>1.d0-36) then
+      if (pg(npi)%secinv>1.d-12) then
          pg(npi)%mu = pg(npi)%sigma_prime_m * dsin(Med(pg(npi)%imed)%phi) /    &
                       (2.d0 * pg(npi)%secinv) + mu_main_fluid * eps_fluid_blt
          else
-            pg(npi)%mu = Med(pg(npi)%imed)%mumx          
-      endif    
+! This condition simply avoids a division by zero (elastic strain rate regime)
+            pg(npi)%mu = Med(pg(npi)%imed)%mumx
+      endif
 ! No matter about the presence/absence of an erosion criterion, the particles 
-! in the transition zone of elastic-plastic regime are set fixed. This saves 
-! computational time in the transition zone with the elastic-platic strain 
-! regime.
+! in the transition zone of elastic-plastic regime are held fixed. This is 
+! consistent with negible strain rates and saves computational time in the 
+! transition zone in the elasto-platic strain rate regime.
       if (pg(npi)%mu>=Med(pg(npi)%imed)%mumx) then
          pg(npi)%mu = Med(pg(npi)%imed)%mumx
          pg(npi)%vel(:) = 0.d0

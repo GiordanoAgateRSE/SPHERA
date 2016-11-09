@@ -270,7 +270,7 @@ erosion_criterion_ID ID_main_fluid
                                     ! without blt-fixed bed interactions),3
                                     ! (Mohr-Coulomb, not recommended); 
                                     ! ID_main_fluid(medium of 
-                                    ! the main fluid). 
+                                    ! the main fluid).
 saturation_scheme time_minimum_saturation time_maximum_saturation
                                     ! saturation_scheme=0(dry soil),1(fully 
                                     ! saturated soil),2(saturation zones 
@@ -499,8 +499,9 @@ reference_pressure                  !
 
 ##### restart #####
 restart_mode restart_time_value     ! restart_mode("time" or "step"); 
-                                    ! restart_time_value(time value in seconds 
-                                    ! or step number, according to restart_mode) 
+                                    ! restart_time_value(positive time value in 
+                                    ! seconds or step number, according to 
+                                    ! restart_mode)
 restart_file                        ! restart_file(restart file name -with 
                                     ! extension-)
 ##### end restart #####

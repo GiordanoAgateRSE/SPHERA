@@ -239,7 +239,7 @@ loop_nag: do npi=1,nag
 ! WendlandC4 kernel, interesting test: end
 ! Gallati anti-cluster kernel, interesting test: start
 !    kernel_fw(2,npartint) = (5.d0/(16.d0*PIGRECO*Domain%h**2)) *              &
-!    ((2.d0-rij_su_h)**3) 
+!    ((2.d0 - rij_su_h)**3) 
 ! Gallati anti-cluster kernel, interesting test: end
                if (Domain%tipo=="bsph") then
 !AA!!! test start
@@ -422,16 +422,16 @@ loop_nag: do npi=1,nag
 !                  endif
 !AA!!!test end                  
 ! Gallati anti-cluster kernel, interesting test: start
-! kernel_fw(3,npartint) =(5.d0/(16.d0*PIGRECO*Domain%h**2))*((2.d0-rij_su_h)**3) 
+! kernel_fw(3,npartint) =(5.d0/(16.d0*PIGRECO*Domain%h**2))*((2.d0 - rij_su_h)**3) 
 ! kernel_fw(4,npartint) = (-12.0d0 - 3.0d0 * rij_su_h_quad + 12.0d0 * rij_su_h)&
 !    * kacl_coef * denom
 ! Gallati anti-cluster kernel, interesting test: end
 ! WendlandC4 kernel, interesting test: start
 ! kernel_fw(1,npartint) = (3.d0/(4.d0*PIGRECO*(Domain%h**2))) *                &
-!    ((1.d0-rij_su_h/2.d0)**6) * (35.d0 * ((rij_su_h/2.d0)**2) + 18.d0*        &
+!    ((1.d0 - rij_su_h/2.d0)**6) * (35.d0 * ((rij_su_h/2.d0)**2) + 18.d0*        &
 !    (rij_su_h/2.d0) + 3.d0)
 ! kernel_fw(2,npartint) = (3.d0/(4.d0*PIGRECO*(2.d0*Domain%h**3))) *           &
-!    ((1.d0-rij_su_h/2.d0)**5) * (-280.d0 * (rij_su_h/2.d0)**2 - 56.d0 *       &
+!    ((1.d0 - rij_su_h/2.d0)**5) * (-280.d0 * (rij_su_h/2.d0)**2 - 56.d0 *       &
 !    (rij_su_h/2.d0))
 ! if (rij_su_h/=0.d0) kernel_fw(2,npartint) = kernel_fw(2,npartint) * denom
 ! WendlandC4 kernel, interesting test: end

@@ -41,7 +41,7 @@ integer(4) :: OpCountot,SpCountot,EpCountot,EpOrdGridtot,ncel,aux,igridi
 integer(4) :: jgridi,kgridi,machine_Julian_day,machine_hour,machine_minute
 integer(4) :: machine_second,alloc_stat
 real :: time_aux_2
-double precision :: BCrodivV, dtvel, DtPreviousStep,TetaV1,xmax,ymax,appo1
+double precision :: BCrodivV,dtvel,dt_previous_step,TetaV1,xmax,ymax,appo1
 double precision :: appo2,appo3,pretot
 real :: time_aux(2)
 double precision,dimension(1:SPACEDIM) :: tpres,tdiss,tvisc,BoundReaction
@@ -211,8 +211,8 @@ done_flag = .false.
    it_eff = it
 ! To store the old time step duration, to evaluate the new value of time step 
 ! duration and the total time value
-   DtPreviousStep = dt
-! Stability condition
+   dt_previous_step = dt
+! Stability criteria
    if (nag>0) call rundt2     
    simulation_time = simulation_time + dt
    if (nscr>0) write (nscr,"(a,i8,a,g13.6,a,g12.4,a,i8,a,i5)") " it= ",it,     &
@@ -420,7 +420,7 @@ done_flag = .false.
 ! Velocity smoothing, trajectory equation, BC, neighboring parameters (start)
          elseif (Domain%time_split==1) then  
 ! dt computation 
-            dtvel = half * (dt + DtPreviousStep)         
+            dtvel = half * (dt + dt_previous_step)         
 !$omp parallel do default(none) private(npi,ii)                                &
 !$omp shared(nag,Pg,dtvel,indarrayFlu,Array_Flu,it)
 ! Loop over particles

@@ -98,7 +98,7 @@ if (Domain%Slip) then
                * pg(npj)%zer(2) + rag(3,npartint) * pg(npj)%zer(3)))
       deltan = min(deltan,denorm)
    end do
-end if 
+endif 
 do contj=1,nPartIntorno(npi)
    npartint = (npi - 1)* NMAXPARTJ + contj
    npj = PartIntorno(npartint)
@@ -135,14 +135,14 @@ do contj=1,nPartIntorno(npi)
          gradmod = -gradmod + rij_su_h_quad - two
          wu = (two - rij_su_h) * (two - rij_su_h) * (two - rij_su_h) *         &
          0.166666666667d0
-      end if 
+      endif 
       gradmod = gradmod * ke_coef
       gradmodwacl = gradmodwacl * kacl_coef
       PartKernel(1,npartint) = gradmod * denom 
       PartKernel(2,npartint) = PartKernel(1,npartint) / (rijtemp2 + eta2)
       PartKernel(3,npartint) = gradmodwacl * denom
       PartKernel(4,npartint) = wu * Domain%coefke
-   end if
+   endif
    rhoi = pg(npi)%dens
    rhoj = pg(npj)%dens
    amassj = pg(npj)%mass
@@ -159,7 +159,7 @@ do contj=1,nPartIntorno(npi)
       dervel(:) = moddervel * pg(npj)%zer(:)   
       if (pg(npj)%slip=="f") then
          dervelmorr(:) = dervel(:)
-         else if (pg(npj)%slip=="c") then
+         elseif (pg(npj)%slip=="c") then
             denorm = max(zero,abs(rag(1,npartint) * pg(npj)%zer(1) +           &
                      rag(3,npartint) * pg(npj)%zer(3)))
             veln = (pg(npi)%vel(1) * pg(npj)%zer(1) + pg(npi)%vel(3) *         &
@@ -170,20 +170,20 @@ do contj=1,nPartIntorno(npi)
             nu = Med(pg(npi)%imed)%visc
             if (index(Med(pg(npi)%imed)%tipo,"liquid")>0) then
                nu = Med(pg(npi)%imed)%visc
-               else if (index(Med(pg(npi)%imed)%tipo,"gas")>0) then
+               elseif (index(Med(pg(npi)%imed)%tipo,"gas")>0) then
                   nu = Med(pg(npi)%imed)%visc
-                  else if (index(Med(pg(npi)%imed)%tipo,"general")>0) then
+                  elseif (index(Med(pg(npi)%imed)%tipo,"general")>0) then
                      nupa = Med(pg(npi)%imed)%taucri / (secinv + 0.0001d0) +   &
                             Med(pg(npi)%imed)%visc * ((secinv + 0.0001d0) **   &
                             (Med(pg(npi)%imed)%cuin-one))
                      nu = min(Med(pg(npi)%imed)%numx,nupa)
-                     else if (index(Med(pg(npi)%imed)%tipo,"granular")>0) then
+                     elseif (index(Med(pg(npi)%imed)%tipo,"granular")>0) then
                         pre = (max(zero,pg(npi)%pres)) / pg(npi)%dens
                         coeff = sin (Med(pg(npi)%imed)%phi)
                         nupa = (pre*coeff) / (secinv + 0.0001d0) +             &
                                Med(pg(npi)%imed)%visc
                         nu = min(nupa,Med(pg(npi)%imed)%numx)
-            end if
+            endif
             dvtdn = (sin(pg(npj)%ang)) * (pg(npi)%dudy + pg(npi)%dvdx) +       &
                     (cos(pg(npj)%ang)) * (pg(npi)%dudx - pg(npi)%dvdy)
             veltj = ( - two * (deltan / (denorm + 0.0001d0)) * nu /            &
@@ -195,10 +195,10 @@ do contj=1,nPartIntorno(npi)
                             pg(npj)%zer(3)
             dervelmorr(3) = modderveln * pg(npj)%zer(3) - moddervelt *         &
                             pg(npj)%zer(1)
-            else if (pg(npj)%slip=="n") then
+            elseif (pg(npj)%slip=="n") then
                dervelmorr(:) = - pg(npi)%vel(:)
-      end if
-   end if
+      endif
+   endif
 ! Momentum equation: start 
    if (Granular_flows_options%ID_erosion_criterion/=1) then
       alpha = pi / (rhoi * rhoi) + pj / (rhoj * rhoj) 
@@ -223,7 +223,7 @@ do contj=1,nPartIntorno(npi)
    endif
    tpres(:) = tpres(:) + appopres(:)
 ! To compute Monaghan term (artificial viscosity)   
-   call viscomon (npi,npj,npartint,dervel,rvwalfa,rvwbeta)
+   call viscomon(npi,npj,npartint,dervel,rvwalfa,rvwbeta)
    appodiss(:) = rvwalfa(:) + rvwbeta(:)
 ! To add Monaghan term (artificial viscosity)
    tdiss(:) = tdiss(:) + appodiss(:)

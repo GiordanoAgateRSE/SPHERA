@@ -71,7 +71,7 @@ type TyGlobal
    double precision :: TetaP ! Partial smoothing parameter for pressure                         
    double precision :: TetaV ! Partial smoothing parameter for velocity                         
    double precision :: h ! Kernel support length scale                              
-   double precision :: start ! Simulation start time                          
+   double precision :: start ! Simulation start time                         
    double precision :: COEFNMAXPARTI ! Max number of fluid 
                                      ! particles=nag*COEFNMAXPARTI                 
    double precision :: COEFNMAXPARTJ ! maxb(maximum number of 
@@ -143,7 +143,7 @@ type TyParticle
                            ! it depends on the input data)                           
    double precision :: vpres ! Pressure correction                          
    double precision :: vden ! Density correction                           
-   double precision :: secinv ! Second invariant of the strain-rate tensor 
+   double precision :: secinv ! Second invariant of the strain rate tensor 
                               ! for incompressible fluids                        
    double precision :: dudx  
    double precision :: dudy 
