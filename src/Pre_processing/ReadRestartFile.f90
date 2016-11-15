@@ -35,7 +35,7 @@ use Dynamic_allocation_module
 !------------------------
 implicit none
 character(7),intent(IN) :: option
-integer(4),intent(INOUT) :: ier,nrecords 
+integer(4),intent(INOUT) :: ier,nrecords
 integer(4) :: restartcode,save_istart,ioerr,i,alloc_stat
 double precision :: save_start
 character(12) :: ainp = "Restart File"
@@ -78,7 +78,7 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
    endif
    read(nsav,iostat=ioerr) ncord,nag,NMedium,NPartZone,NumVertici,NumFacce,    &
       NumTratti,NumBVertices,NumBSides,GCBFVecDim,Grid%nmax,NPointst,NPoints,  &
-      NPointsl,NPointse,NLines,NSections,GCBFVecDim,doubleh
+      NPointsl,NPointse,NLines,NSections,doubleh
    if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"ncord, nag, ...",nsav,nout))    &
       return
    elseif (TRIM(lcase(option))=="reading") then
@@ -170,6 +170,18 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
                   'ReadRestartFile is successfully completed.'
          endif
       endif
+! Allocation of "GCBFVector"
+      if ((Domain%tipo=="semi").and.(GCBFVecDim>0).and.                        &
+         (.not.allocated(GCBFVector))) then
+         allocate(GCBFVector(GCBFVecDim),stat=ier)    
+         if (ier/=0) then
+            write(nout,'(1x,2a)') "Allocation of GCBFVector in ",              &
+               "ReadRestartFile failed. "
+            else
+               write(nout,'(1x,2a)') "Allocation of GCBFVector in ",           &
+               "ReadRestartFile successully completed. "
+         endif
+      endif
       read(nsav,iostat=ioerr) Med(1:NMedium)
       if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"Med",nsav,nout)) return
       if (NumVertici>0) then
@@ -199,17 +211,20 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"BoundaryVertex",nsav,nout))&
            return
       endif
-      if (NumBSides>1) then
+      if (NumBSides>0) then
          read(nsav,iostat=ioerr) BoundarySide(1:NumBSides)     
          if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"BoundarySide",nsav,nout)) &
             return
-         else
-            read(nsav,iostat=ioerr) BoundarySide(1)
-            if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"BoundarySide",nsav, &
-               nout)) return
       endif
       if (Domain%tipo=="semi") then
          if (GCBFVecDim>0) then
+!AA!!! test start
+            write(nout,'(a,i15)') "GCBFVecDim: ",GCBFVecDim
+            write(nout,*) "Med: ",Med(1:NMedium)
+            write(nout,*) "SPACEDIM,NumVertici,NumFacce,NumTratti,NPartZone,", &
+               "NumBVertices,NumBSides",SPACEDIM,NumVertici,NumFacce,NumTratti,&
+               NPartZone,NumBVertices,NumBSides
+!AA!!! test end
             read(nsav,iostat=ioerr) GCBFVector(1:GCBFVecDim)
             if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"GCBFVector",nsav,nout))&
                return

@@ -203,7 +203,7 @@ do nc=1,Grid%nmax
 ! Deallocate the auxiliary array
    deallocate(GCBFVector_cell)
 enddo
-!$omp end parallel do 
+!$omp end parallel do
 ! To save the size of the GCBFVector array
 GCBFVecDim = flpointer
 ! Allocating "GCBFVector" 
@@ -211,7 +211,7 @@ allocate(GCBFVector(GCBFVecDim),stat=ier)
 if (ier/=0) then
    write(nout,'(1x,a,i2)') "   Array GCBFVector not allocated. Error code: ",ier
    call diagnostic(arg1=4,arg3=nomsub)
-      else
+   else
       write(nout,'(1x,a)') "   Array GCBFVector successfully allocated "
 endif
 ! Loop over the reference array "GCBFVector"

@@ -79,7 +79,9 @@ iappo = CellIndices(ncelcorr,igridi,jgridi,kgridi)
 ! (eventual influence of both a positive velocity threshold and/or the 
 ! frictional viscosity threshold).
 if (Granular_flows_options%erosion_flag==1) then
-   if (ind_interfaces(igridi,jgridi,4).ne.0) then 
+   if (ind_interfaces(igridi,jgridi,4).ne.0) then
+! The mixture particles which define the fixed bed have null velocities and 
+! the variable "state" equal to '"flu"', even though they are fixed.
       if (pg(npi)%coord(3)>=(pg(ind_interfaces(igridi,jgridi,4))%coord(3)      &
          -2.d0 * Domain%h)) then 
          if (pg(npi)%state=="flu") return
@@ -103,7 +105,7 @@ if (Granular_flows_options%erosion_flag==1) then
             (-Domain%grav(3)) * med(pg(aux_ID)%imed)%den0 + Velocity2 * half * &
             Med(pg(aux_ID)%imed)%den0
    pg(npi)%dens = med(imed)%den0 + (pretot / (Med(imed)%celerita *             &
-                  Med(imed)%celerita))   
+                  Med(imed)%celerita))  
    return
 endif
 if (Granular_flows_options%ID_erosion_criterion==1) then
