@@ -115,8 +115,8 @@ do iof=1,NumOpenFaces
                LocXYZold(sdi) = LocXYZold(sdi) + BoundaryFace(nfc)%T(sdj,sdi)  &
                                 * (pg(npi)%CoordOld(sdj) -                     &
                                 BoundaryFace(nfc)%Node(nodes)%GX(sdj))
-            end do
-         end do
+            enddo
+         enddo
 ! It evaluates the coordinates of the intersection point in the local coordinate
 ! system; by definition, the z' value is equal to the constant of the plane 
 ! equation z' = c
@@ -134,17 +134,17 @@ do iof=1,NumOpenFaces
             if ((csi(i)<zero).or.(csi(i)>one)) then
                esci = .false.
                exit
-            end if
-         end do
+            endif
+         enddo
 ! The particle projection falls outside the face and therefore must be deleted 
          if (esci) then  
             OpCount(pg(npi)%imed) = OpCount(pg(npi)%imed) + 1    
             pg(npi)%cella = -1
-         end if
-      end if
-   end do
+         endif
+      endif
+   enddo
 !$omp end parallel do
-end do
+enddo
 !------------------------
 ! Deallocations
 !------------------------

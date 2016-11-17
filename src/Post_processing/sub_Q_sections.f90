@@ -220,11 +220,11 @@ if (.not.(allocated(Q_sections%section(1)%flow_rate))) then
             0.0d0    
       enddo
 endif 
-close (ncpt)
-deallocate(n_particles) 
+close(ncpt)
 !------------------------
 ! Deallocations
 !------------------------
+deallocate(n_particles)
 return
 end subroutine sub_Q_sections
 

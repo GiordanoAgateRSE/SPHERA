@@ -280,7 +280,7 @@ call start_and_stop(3,3)
 !------------------------
 ! Deallocations
 !------------------------
-call Gest_Dealloc (nomsub)
+call Gest_Dealloc(nomsub)
 endtime = zero
 if (endtime/=zero) then
    write(nout,*)

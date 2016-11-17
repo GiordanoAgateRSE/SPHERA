@@ -51,7 +51,7 @@ Last_vertex_ID Vertex_x Vertex_y Vertex_z ! (last vertex data)
 ! 2D input parameters for the boundary lines of the fluid domain
 ! 2D boundary lines for wall frontiers, inlet/outlet sections, fluid reservoirs.
 ! In case of DB-SPH boundary treatment scheme, the code requires the lines of 
-! the parallelepiped domain as a "perimeter" and the "air reservoirs".
+! the parallelepiped domain as a "perimeter" and the "fictitious reservoirs".
 ! In case of SA-SPH boundary treatment scheme, the code requires the 
 ! lines of the boundaries
 1 line_1_vertex_1 ... line_1_vertex last line_1_Boundary_ID
@@ -480,7 +480,8 @@ MAXCLOSEBOUNDFACES MAXNUMCONVEXEDGES
                                     ! of edges) 
 GCBFVecDim                          ! GCBFVecDim(rough overestimation of the 
                                     ! number of Grid Cell - Boundary Face 
-                                    ! intersections  (SA-SPH)
+                                    ! intersections  (SA-SPH): this value is 
+                                    ! read, but not used in the restart mode.
 density_thresholds_flag             ! density_thresholds_flag=0(default, no 
                                     ! density limiters),1(density limiters for 
                                     ! debug) - density limiters do not apply to 
@@ -497,14 +498,16 @@ gravity_acceleration_x gravity_acceleration_y gravity_acceleration_z
 ! 2D case: start
 gravity_acceleration_x gravity_acceleration_z
 ! 2D case: stop
-reference_pressure                  !  
+reference_pressure                  !
 ##### end general physical properties #####
 
 ##### restart #####
 restart_mode restart_time_value     ! restart_mode("time" or "step"); 
                                     ! restart_time_value(positive time value in 
                                     ! seconds or step number, according to 
-                                    ! restart_mode)
+                                    ! restart_mode; this value has to be lower 
+                                    ! than the time value of the last restart 
+                                    ! output)
 restart_file                        ! restart_file(restart file name -with 
                                     ! extension-)
 ##### end restart #####

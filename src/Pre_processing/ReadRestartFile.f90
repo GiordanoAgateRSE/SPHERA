@@ -81,6 +81,20 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
       NPointsl,NPointse,NLines,NSections,doubleh
    if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"ncord, nag, ...",nsav,nout))    &
       return
+! The parameter is read from the restart file and not from the input file
+   write(nout,"(1x,a,1p,i12)")   "GCBFVecDim (from restart file): ",GCBFVecDim
+! Allocation of the array "GCBFVector"
+   if ((Domain%tipo=="semi").and.(GCBFVecDim>0).and.                           &
+      (.not.allocated(GCBFVector))) then
+      allocate(GCBFVector(GCBFVecDim),stat=ier)    
+      if (ier/=0) then
+         write(nout,'(1x,2a)') "Allocation of GCBFVector in ",                 &
+            "ReadRestartFile failed. "
+         else
+            write(nout,'(1x,2a)') "Allocation of GCBFVector in ",              &
+            "ReadRestartFile successully completed. "
+      endif
+   endif
    elseif (TRIM(lcase(option))=="reading") then
       write(nout,'(a)')                                                        &
          "---------------------------------------------------------------------"
@@ -159,27 +173,26 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
          allocate(Granular_flows_options%maximum_saturation_flag(Grid%ncd(1),  &
             Grid%ncd(2)),STAT=alloc_stat)
          if (alloc_stat/=0) then
-            write(nout,*)                                                      &
-            'Allocation of Granular_flows_options%maximum_saturation_flag ',   &
-            ' in ReadRestartFile failed; the program stops here.'
+            write(nout,*) "Allocation of ",                                    &
+               "Granular_flows_options%maximum_saturation_flag in ",           &
+               "ReadRestartFile failed; the program stops here."
             stop 
             else
-               write (nout,*)                                                  &
-                  'Allocation of ',                                            &
-                  'Granular_flows_options%maximum_saturation_flag in ',        &
-                  'ReadRestartFile is successfully completed.'
+               write (nout,*) "Allocation of ",                                &
+                  "Granular_flows_options%maximum_saturation_flag in ",        &
+                  "ReadRestartFile is successfully completed."
          endif
       endif
-! Allocation of "GCBFVector"
-      if ((Domain%tipo=="semi").and.(GCBFVecDim>0).and.                        &
-         (.not.allocated(GCBFVector))) then
-         allocate(GCBFVector(GCBFVecDim),stat=ier)    
-         if (ier/=0) then
-            write(nout,'(1x,2a)') "Allocation of GCBFVector in ",              &
-               "ReadRestartFile failed. "
+! Allocation of the array "GCBFPointers"
+      if (Domain%tipo=="semi") then
+         allocate(GCBFPointers(Grid%nmax,2),STAT=alloc_stat)
+         if (alloc_stat/=0) then
+            write(nout,*) "Allocation of GCBFPointers in ReadRestartFile ",    &
+               "failed; the program stops here."
+            stop
             else
-               write(nout,'(1x,2a)') "Allocation of GCBFVector in ",           &
-               "ReadRestartFile successully completed. "
+               write (nout,*) "Allocation of GCBFPointers in ReadRestartFile ",&
+                  "is successfully completed."
          endif
       endif
       read(nsav,iostat=ioerr) Med(1:NMedium)
