@@ -231,13 +231,6 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
       endif
       if (Domain%tipo=="semi") then
          if (GCBFVecDim>0) then
-!AA!!! test start
-            write(nout,'(a,i15)') "GCBFVecDim: ",GCBFVecDim
-            write(nout,*) "Med: ",Med(1:NMedium)
-            write(nout,*) "SPACEDIM,NumVertici,NumFacce,NumTratti,NPartZone,", &
-               "NumBVertices,NumBSides",SPACEDIM,NumVertici,NumFacce,NumTratti,&
-               NPartZone,NumBVertices,NumBSides
-!AA!!! test end
             read(nsav,iostat=ioerr) GCBFVector(1:GCBFVecDim)
             if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"GCBFVector",nsav,nout))&
                return
