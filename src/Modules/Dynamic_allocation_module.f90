@@ -160,9 +160,12 @@ integer(4),               dimension(:),    allocatable :: Array_Flu
 !    in the grid column (i_grid,j_grid). It is approximately representative of 
 !    the top of the fully saturated zone (under the hypothesis of stratified 
 !    flows).
-integer(4),               dimension(:,:,:),allocatable :: ind_interfaces 
-! Only in 3D: the 2D arrays of the maximum values of the fluid particle height
-! (at the nodes of the grid columns) and the specific flow rate. 
-real(kind=kind(1.d0)),    dimension(:),    allocatable :: Z_fluid_max,q_max  
+integer(4),               dimension(:,:,:),allocatable :: ind_interfaces
+! Only in 3D: the 2D array of the maximum values of the fluid particle height
+! (at the nodes of the positioning grid columns) 
+real(kind=kind(1.d0)),    dimension(:),    allocatable :: Z_fluid_max
+! Only in 3D: the 2D array of the maximum values of the specific flow rate (at 
+! the nodes of the topographic grid columns)
+real(kind=kind(1.d0)),    dimension(:),    allocatable :: q_max
 end module
 

@@ -138,7 +138,7 @@ if (on_going_time_step==1) then
          if (Partz(i_zone)%IC_source_type==2) then
 !$omp parallel do default(none)                                                &
 !$omp shared(ncpt,Partz,Vertice,Grid,h_step,Z_fluid_step,i_zone,qx_step)       &
-!$omp shared(qy_step,qx_step_grid,qy_step_grid,n_part_step,q_max,print_flag)   &                                                       &
+!$omp shared(qy_step,qx_step_grid,qy_step_grid,n_part_step,q_max,print_flag)   &
 !$omp private(i_vertex,GridColumn,pos,i_aux)
             do i_vertex=Partz(i_zone)%ID_first_vertex,                         &
                Partz(i_zone)%ID_last_vertex
@@ -156,7 +156,7 @@ if (on_going_time_step==1) then
                   qy_step(i_aux) = qy_step_grid(GridColumn) * h_step(i_aux)
                   q_max(i_aux) = max(q_max(i_aux),dsqrt(qx_step(i_aux) ** 2 +  &
                                  qy_step(i_aux) ** 2))
-               endif    
+               endif
                if (print_flag==1) then
 !$omp critical (omp_write_h_step)
                   write (ncpt,'(7(f14.4,1x))') Vertice(1,i_vertex),            &
@@ -172,7 +172,7 @@ if (on_going_time_step==1) then
       enddo
 endif
 ! Closing the file
-if (print_flag==1) close (ncpt)
+if (print_flag==1) close(ncpt)
 if (allocated(Z_fluid_step)) deallocate(Z_fluid_step)
 if (allocated(h_step)) deallocate(h_step)
 if (allocated(qx_step)) deallocate(qx_step)

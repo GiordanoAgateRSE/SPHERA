@@ -138,7 +138,7 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
       endif
 ! Allocation of the array of the maximum specific flow rate
       if ((Partz(1)%IC_source_type==2).and.(.not.allocated(q_max))) then
-         allocate(q_max(Grid%ncd(1)*Grid%ncd(2)),STAT=alloc_stat)
+         allocate(q_max(Partz(1)%npoints),STAT=alloc_stat)
          if (alloc_stat/=0) then
             write(nout,*)                                                      &
             'Allocation of q_max in ReadRestartFile failed;',                  &
@@ -344,8 +344,7 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
                            "Z_fluid_max",nsav,nout)) return
                      endif
                      if (allocated(q_max)) then
-                        read(nsav,iostat=ioerr)                                &
-                           q_max(1:Grid%ncd(1)*Grid%ncd(2))
+                        read(nsav,iostat=ioerr) q_max(1:size(q_max))
                         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"q_max",nsav&
                            ,nout)) return
                      endif                     
@@ -498,8 +497,7 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
                               "Z_fluid_max",nsav,nout)) return
                         endif
                         if (allocated(q_max)) then
-                           read(nsav,iostat=ioerr) q_max(1:                    &
-                              Grid%ncd(1)*Grid%ncd(2))
+                           read(nsav,iostat=ioerr) q_max(1:size(q_max))
                            if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"q_max", &
                               nsav,nout)) return
                         endif                           

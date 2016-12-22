@@ -73,7 +73,7 @@ do i_zone=1,NPartZone
       do i_vertex=Partz(i_zone)%ID_first_vertex,Partz(i_zone)%ID_last_vertex
          pos(1) = Vertice(1,i_vertex)
          pos(2) = Vertice(2,i_vertex)
-         pos(3) = Grid%extr(3,1)+0.0000001d0
+         pos(3) = Grid%extr(3,1) + 0.0000001d0
          GridColumn = ParticleCellNumber(pos)
          h_max(i_vertex-Partz(i_zone)%ID_first_vertex+1) =                     &
             max((Z_fluid_max(GridColumn) - Vertice(3,i_vertex)),0.d0)

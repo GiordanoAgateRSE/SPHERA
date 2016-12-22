@@ -654,7 +654,7 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
             endif
             Z_fluid_max = -999.d0
             if (.not.allocated(q_max)) then
-               allocate(q_max(Grid%ncd(1)*Grid%ncd(2)),STAT=alloc_stat)
+               allocate(q_max(Partz(i)%npoints),STAT=alloc_stat)
                if (alloc_stat/=0) then
                   write(nout,*)                                                &
                   'Allocation of q_max in Gest_Trans failed;',                 &
