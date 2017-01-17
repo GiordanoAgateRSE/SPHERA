@@ -51,8 +51,8 @@ type TyGlobal
    integer(4)       :: RKscheme ! RK scheme (1,2,3,4) (time_split=0)                      
    integer(4)       :: time_stage ! Stage of RK schemes                                           
    double precision :: tmax ! Maximum physical time                           
-   double precision :: dd ! dx: particle size                             
-   double precision :: trunc ! h/dx, h=dd*trunc                         
+   double precision :: dx ! dx: particle size                             
+   double precision :: trunc ! h/dx, h=dx*trunc                         
    double precision :: PVolume ! dx^D, D: domain dimensionality                        
    double precision :: coefke  
    double precision :: coefkacl  

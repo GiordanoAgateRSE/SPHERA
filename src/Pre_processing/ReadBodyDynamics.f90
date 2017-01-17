@@ -196,7 +196,7 @@ do while (TRIM(lcase(ainp)) /= "##### end body dynamics #####")
                   stop ! Stop the main program
                   else
                      write (nout,*) 'Allocation of body_arr(Id_body)%elem in ',&
-                        'ReadBodyDynamics successfully completed."
+                        'ReadBodyDynamics successfully completed.'
                endif
             endif
             if (.not.allocated(body_arr(Id_body)%body_kinematics)) then
