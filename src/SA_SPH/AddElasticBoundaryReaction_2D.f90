@@ -61,7 +61,7 @@ double precision :: xpi,ypi,ypimin,celer02,vin,normreact
 ! Initializations
 !------------------------
 mate = pg(npi)%imed
-ypimin = ymincoeff * Domain%dd
+ypimin = ymincoeff * Domain%dx
 celer02 = Med(mate)%eps / Med(mate)%den0
 ibdt = BoundaryDataPointer(3,npi)
 !------------------------

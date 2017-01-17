@@ -68,7 +68,7 @@ do isi=1,NumBSides
          ss(sd) = BoundarySide(SourceSide)%T(sd,1)
          nn(sd) = BoundarySide(SourceSide)%T(sd,3)
       end do
-      deltapart = Domain%dd
+      deltapart = Domain%dx
       sidelen = BoundarySide(SourceSide)%length
       NumPartperLine(i_source) = Int(sidelen / deltapart + 0.01d0)
       eps = -half
@@ -82,7 +82,7 @@ do isi=1,NumBSides
       end do
       ParticleVolume = Domain%PVolume
       RowPeriod = ParticleVolume * NumPartperLine(i_source) / Tratto(nt)%FlowRate 
-      RowVelocity(i_source) = Domain%dd / RowPeriod
+      RowVelocity(i_source) = Domain%dx / RowPeriod
       Tratto(nt)%NormVelocity = RowVelocity(i_source)
       partz(irz)%vel(1) = RowVelocity(i_source) * nn(1)
       partz(irz)%vel(2) = RowVelocity(i_source) * nn(2)

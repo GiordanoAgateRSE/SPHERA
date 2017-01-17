@@ -389,7 +389,7 @@ loop_nag: do npi=1,nag
                                   pg(npi)%var(2)) + pg_w(npj)%normal(3) *      &
                                   (pg_w(npj)%vel(3) - pg(npi)%var(3))) 
                   if ((rij_su_h*Domain%h)<=                                    &
-                     (1.3d0*Domain%dd+pg_w(npj)%weight/2.d0)) then
+                     (1.3d0*Domain%dx+pg_w(npj)%weight/2.d0)) then
                      pg_w(npj)%wet = 1
                   endif
                   denom = one / (Dsqrt(rijtemp) + eta)

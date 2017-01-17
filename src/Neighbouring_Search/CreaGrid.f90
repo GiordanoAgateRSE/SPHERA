@@ -48,7 +48,7 @@ double precision, dimension(3) :: dextr
 !------------------------
 ! Initializations
 !------------------------
-epsi = 0.01d0 * Domain%dd
+epsi = 0.01d0 * Domain%dx
 !------------------------
 ! Statements
 !------------------------

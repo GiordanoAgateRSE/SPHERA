@@ -89,12 +89,12 @@ do npi=1,nag
    pos(3) = Grid%extr(3,1) + 0.0000001d0
    GridColumn = ParticleCellNumber(pos)
    Z_fluid_step(GridColumn) = max(Z_fluid_step(GridColumn),(pg(npi)%coord(3) + &
-                              0.5d0 * Domain%dd)) 
+                              0.5d0 * Domain%dx)) 
    qx_step_grid(GridColumn) = qx_step_grid(GridColumn) + pg(npi)%vel(1)
    qy_step_grid(GridColumn) = qy_step_grid(GridColumn) + pg(npi)%vel(2)
    n_part_step(GridColumn) = n_part_step(GridColumn) + 1
    Z_fluid_max(GridColumn) = max(Z_fluid_max(GridColumn),(pg(npi)%coord(3) +   &
-                             0.5d0 * Domain%dd))
+                             0.5d0 * Domain%dx))
 enddo
 !$omp end parallel do
 !$omp parallel do default(none)                                                &

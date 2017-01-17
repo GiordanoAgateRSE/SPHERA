@@ -186,7 +186,7 @@ do npi = 1,nag
          if ((index(Med(pg(npj)%imed)%tipo,"liquid")>0).or.                    &
             ((index(Med(pg(npj)%imed)%tipo,"granular")>0).and.                 &
             (pg(npi)%state=="flu"))) then
-            if (appo1>=Domain%dd) then
+            if (appo1>=Domain%dx) then
                flag = 1
                exit
             end if

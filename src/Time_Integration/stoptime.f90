@@ -62,10 +62,10 @@ if (partzlocal%move=="fix") then
       icord = icoordp(n,ncord-1)
       if (partzlocal%vel(icord)>zero) then
          tstopc = (Domain%coord(icord,2) - partzlocal%coordMM(icord,2) - one * &
-            Domain%dd) / partzlocal%vel(icord)
+            Domain%dx) / partzlocal%vel(icord)
          elseif (partzlocal%vel(icord)<zero) then
             tstopc = (Domain%coord(icord,1) - partzlocal%coordMM(icord,1) +    & 
-               one * Domain%dd) / partzlocal%vel(icord)
+               one * Domain%dx) / partzlocal%vel(icord)
             else
                tstopc = Domain%tmax
       endif

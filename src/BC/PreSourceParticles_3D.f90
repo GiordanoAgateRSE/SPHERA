@@ -71,7 +71,7 @@ do isi=1,NumFacce
       izone = Tratto(nt)%zone
 ! Note: to insert a check in case of nodes=/4
       nodes = BoundaryFace(SourceFace)%nodes    
-      deltapart = Domain%dd
+      deltapart = Domain%dx
 ! LenR and LenS are the length scales of the inlet section: they are computed
 ! as the distance between the first and the last inlet vertices and the third
 ! and the last inlet vertices, respectively. Particles are aligned with Plast-P1
@@ -118,7 +118,7 @@ do isi=1,NumFacce
       NumPartFace(i_source) = ip
       ParticleVolume = Domain%PVolume
       RowPeriod = ParticleVolume * NumPartFace(i_source) / Tratto(nt)%FlowRate 
-      RowVelocity(i_source) = Domain%dd / RowPeriod
+      RowVelocity(i_source) = Domain%dx / RowPeriod
       Tratto(nt)%NormVelocity = RowVelocity(i_source)
       pinttimeratio = -1
    end if

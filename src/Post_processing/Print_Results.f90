@@ -453,24 +453,24 @@ if (nag>0) then
          pg_w(maxlocpres_w)%coord(2),"|",pg_w(maxlocpres_w)%coord(3),"|"
    endif
    if (n_bodies>0) then
-      write(nout,fmt101)  "Body part. veloc.|u_s_|(m/s)|",minvelo_bp,"|",      &
+      write(nout,fmt101)  "Body part. veloc.|u_s_|(m/s) |",minvelo_bp,"|",     &
          minlocvelo_bp,"|",bp_arr(minlocvelo_bp)%pos(1),"|",                   &
          bp_arr(minlocvelo_bp)%pos(2),"|",bp_arr(minlocvelo_bp)%pos(3),"||",   &
          maxvelo_bp,"|",maxlocvelo_bp,"|",bp_arr(maxlocvelo_bp)%pos(1),"|",    &
          bp_arr(maxlocvelo_bp)%pos(2),"|",bp_arr(maxlocvelo_bp)%pos(3),"|"
-      write(nout,fmt102)  "Body part. pressure p_s(Pa) |",minpres_bp,"|",      &
+      write(nout,fmt102)  "Body part. pressure p_s(Pa)  |",minpres_bp,"|",     &
          minlocpres_bp,"|",bp_arr(minlocpres_bp)%pos(1),"|",                   &
          bp_arr(minlocpres_bp)%pos(2),"|",bp_arr(minlocpres_bp)%pos(3),"||",   &
          maxpres_bp,"|",maxlocpres_bp,"|",bp_arr(maxlocpres_bp)%pos(1),"|",    &
          bp_arr(maxlocpres_bp)%pos(2),"|",bp_arr(maxlocpres_bp)%pos(3),"|"
-      write(nout,fmt101)  "Body velocity |u_C_M|(m/s)  |",minvelo_body,"|",    &
+      write(nout,fmt101)  "Body velocity |u_C_M|(m/s)   |",minvelo_body,"|",   &
          minlocvelo_body,"|",body_arr(minlocvelo_body)%x_CM(1),"|",            &
          body_arr(minlocvelo_body)%x_CM(2),"|",                                &
          body_arr(minlocvelo_body)%x_CM(3),"||",maxvelo_body,"|",              &
          maxlocvelo_body,"|",body_arr(maxlocvelo_body)%x_CM(1),"|",            &
          body_arr(maxlocvelo_body)%x_CM(2),"|",                                &
          body_arr(maxlocvelo_body)%x_CM(3),"|"
-      write(nout,fmt101)  "Body ang.vel. chi_C_M(rad/s)|",minomega_body,"|",   & 
+      write(nout,fmt101)  "Body ang.vel. chi_C_M(rad/s) |",minomega_body,"|",  & 
          minlocomega_body,"|",body_arr(minlocomega_body)%x_CM(1),"|",          &
          body_arr(minlocomega_body)%x_CM(2),"|",                               &
          body_arr(minlocomega_body)%x_CM(3),"||",maxomega_body,"|",            &

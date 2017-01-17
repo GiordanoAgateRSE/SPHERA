@@ -51,30 +51,30 @@ double precision :: z_sat_top
 ! Statements
 !------------------------
 if (ind_interfaces(i_grid,j_grid,1)>0) then
-   z_free_surface = pg(ind_interfaces(i_grid,j_grid,1))%coord(3) + Domain%dd / &
+   z_free_surface = pg(ind_interfaces(i_grid,j_grid,1))%coord(3) + Domain%dx / &
                     2.d0
    else
       z_free_surface = -999.d0
 endif
 if (ind_interfaces(i_grid,j_grid,4)>0) then
-   z_bed = pg(ind_interfaces(i_grid,j_grid,4))%coord(3) + Domain%dd / 2.d0
+   z_bed = pg(ind_interfaces(i_grid,j_grid,4))%coord(3) + Domain%dx / 2.d0
    else
       z_bed = -999.d0
 endif
 if (ind_interfaces(i_grid,j_grid,3)>0) then
    z_BedLoad_PureFluid = pg(ind_interfaces(i_grid,j_grid,3))%coord(3) +        &
-                         Domain%dd / 2.d0
+                         Domain%dx / 2.d0
    else
       z_BedLoad_PureFluid = z_bed 
 endif
 if (ind_interfaces(i_grid,j_grid,5)>0) then
-   z_soil_bottom = pg(ind_interfaces(i_grid,j_grid,5))%coord(3) + Domain%dd /  &
+   z_soil_bottom = pg(ind_interfaces(i_grid,j_grid,5))%coord(3) + Domain%dx /  &
                    2.d0
    else
       z_soil_bottom = -999.d0 
 endif
 if (ind_interfaces(i_grid,j_grid,6)>0) then
-   z_sat_top = pg(ind_interfaces(i_grid,j_grid,6))%coord(3) + Domain%dd / 2.d0
+   z_sat_top = pg(ind_interfaces(i_grid,j_grid,6))%coord(3) + Domain%dx / 2.d0
    else
       z_sat_top = z_soil_bottom
 endif

@@ -54,7 +54,7 @@ do n=1,SPACEDIM
    if ((n==1).AND.(opt=="x")) cycle
    if ((n==2).AND.(opt=="y")) cycle
    if ((n==3).AND.(opt=="z")) cycle
-   Nmesh(n) = nint((values(n,2) - values(n,1)) / Domain%dd)
+   Nmesh(n) = nint((values(n,2) - values(n,1)) / Domain%dx)
 end do
 NumberSectionPoints = Product(Nmesh)
 !------------------------

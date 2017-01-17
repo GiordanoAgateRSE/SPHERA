@@ -166,7 +166,7 @@ enddo SECTION_LOOP
 ! To assign the kernel support 
 if (ncord>0) then
    write(nout,"(/,1x,a,//)") ">> END OF INPUT FILE"
-   Domain%h = Domain%dd * Domain%trunc
+   Domain%h = Domain%dx * Domain%trunc
    doubleh = two * Domain%h
    squareh = Domain%h * Domain%h
    doublesquareh = doubleh * doubleh

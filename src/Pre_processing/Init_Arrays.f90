@@ -257,7 +257,7 @@ do j=1,3
    Domain%grav(j) = zero
 enddo
 Domain%tmax = zero
-Domain%dd = zero
+Domain%dx = zero
 Domain%trunc = zero
 Domain%coefke = zero
 Domain%coefkacl = zero

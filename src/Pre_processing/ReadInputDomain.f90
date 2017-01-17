@@ -38,7 +38,7 @@ integer(4),dimension(20) :: NumberEntities
 character(1) :: comment
 character(100) :: ainp
 integer(4) :: ioerr
-double precision :: dd, trunc
+double precision :: dx, trunc
 character(100) :: token
 logical,external :: ReadCheck
 character(100),external :: lcase, GetToken
@@ -90,9 +90,9 @@ do while (TRIM(lcase(ainp))/="##### end domain #####")
          return
    endselect
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-   if (ioerr==0) read(ainp,*,iostat=ioerr) dd,trunc
+   if (ioerr==0) read(ainp,*,iostat=ioerr) dx,trunc
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DD & TRUNC",ninp,nout)) return
-   Domain%dd = dd
+   Domain%dx = dx
    Domain%trunc = trunc
    token = lcase(GetToken(ainp,3,ioerr))
    if (token(1:1)=='r') then
@@ -101,7 +101,7 @@ do while (TRIM(lcase(ainp))/="##### end domain #####")
          Domain%RandomPos = 'n'
    endif
    if ((ncord>0).and.(nout>0)) then
-      write(nout,"(1x,a,1pe12.4)") "Dd                     : ",dd
+      write(nout,"(1x,a,1pe12.4)") "dx                     : ",dx
       write(nout,"(1x,a,1pe12.4)") "Trunc                  : ",trunc
       write(nout,"(1x,a,1x,a)") "Random Initial Position: ",Domain%RandomPos
       write(nout,"(1x,a)")  " "

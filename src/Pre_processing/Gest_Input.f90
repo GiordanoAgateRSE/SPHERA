@@ -249,14 +249,14 @@ if (.not.restart) then
 ! 5 / (16 * pigreco)/(h**2)
       Domain%coefkacl = 0.099472d0 / squareh   
 ! Particle volume
-      Domain%PVolume = Domain%dd * Domain%dd
+      Domain%PVolume = Domain%dx * Domain%dx
       elseif (ncord==3)then
 ! 1 / pigreco/(h**3)
          Domain%coefke    = 0.477464d0 / cubich   
 ! 15 / (64 * pigreco)/(h**3)
          Domain%coefkacl = 0.074603d0 / cubich    
 ! Particle volume
-         Domain%PVolume = Domain%dd * Domain%dd * Domain%dd
+         Domain%PVolume = Domain%dx * Domain%dx * Domain%dx
    endif
    Control_Sections(NSections+1)%XYZRange(1:3,1) = Domain%coord(1:3,1)
    Control_Sections(NSections+1)%XYZRange(1:3,2) = Domain%coord(1:3,2)

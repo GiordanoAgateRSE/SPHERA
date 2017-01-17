@@ -18,12 +18,12 @@
 !-------------------------------------------------------------------------------
 
 ##### TITLE #####
-ICOLD_Erosional_Dam_Break_test78e
+ICOLD_Erosional_Dam_Break_test79e
 ##### END TITLE #####
 
 ##### DOMAIN #####
 3 semi
-6. 1.2
+4. 1.2
 ##### END DOMAIN #####
 
 ##### VERTICES #####
