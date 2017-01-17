@@ -316,16 +316,15 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
                      if (n_bodies>0) then
                         do i=1,n_bodies
                            read(nsav,iostat=ioerr) body_arr(i)%npart,          &
-                              body_arr(i)%Ic_imposed,body_arr(i)%n_elem,       &
+                              body_arr(i)%Ic_imposed,                          &
                               body_arr(i)%imposed_kinematics,                  &
                               body_arr(i)%n_records,body_arr%mass,             &
                               body_arr(i)%umax,body_arr(i)%pmax,               &
                               body_arr(i)%x_CM,body_arr(i)%alfa,               &
-                              body_arr(i)%x_rotC,body_arr(i)%u_CM,             &
-                              body_arr(i)%omega,body_arr(i)%Force,             &
-                              body_arr(i)%Moment,body_arr(i)%Ic,               &
-                              body_arr(i)%Ic_inv,body_arr(i)%body_kinematics,  &
-                              body_arr(i)%elem
+                              body_arr(i)%u_CM,body_arr(i)%omega,              &
+                              body_arr(i)%Force,body_arr(i)%Moment,            &
+                              body_arr(i)%Ic,body_arr(i)%Ic_inv,               &
+                              body_arr(i)%body_kinematics
                         enddo
                         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"body_arr", &
                            nsav,nout)) return
@@ -469,16 +468,15 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
                         if (n_bodies>0) then
                            do i=1,n_bodies
                               read(nsav,iostat=ioerr) body_arr(i)%npart,       &
-                                 body_arr(i)%Ic_imposed,body_arr(i)%n_elem,    &
+                                 body_arr(i)%Ic_imposed,                       &
                                  body_arr(i)%imposed_kinematics,               &
                                  body_arr(i)%n_records,body_arr%mass,          &
                                  body_arr(i)%umax,body_arr(i)%pmax,            &
                                  body_arr(i)%x_CM,body_arr(i)%alfa,            &
-                                 body_arr(i)%x_rotC,body_arr(i)%u_CM,          &
-                                 body_arr(i)%omega,body_arr(i)%Force,          &
-                                 body_arr(i)%Moment,body_arr(i)%Ic,            &
-                                 body_arr(i)%Ic_inv,body_arr(i)%body_kinematics&
-                                 ,body_arr(i)%elem
+                                 body_arr(i)%u_CM,body_arr(i)%omega,           &
+                                 body_arr(i)%Force,body_arr(i)%Moment,         &
+                                 body_arr(i)%Ic,body_arr(i)%Ic_inv,            &
+                                 body_arr(i)%body_kinematics
                            enddo
                            if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,         &
                               "body_arr",nsav,nout)) return
