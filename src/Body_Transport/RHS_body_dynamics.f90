@@ -253,8 +253,6 @@ do npi=1,n_body_part
                         call reference_system_change(bp_arr(npi)%pos,          &
                            BoundaryFace(j)%Node(3)%GX,aux_mat,loc_pos)
                   endif
-                  call reference_system_change(bp_arr(npi)%pos,                &
-                     BoundaryFace(j)%Node(4)%GX,aux_mat,loc_pos)
                   call point_inout_convex_non_degenerate_polygon(loc_pos(1:2), &
                      BoundaryFace(j)%nodes,BoundaryFace(j)%Node(1)%LX(1:2),    &
                      BoundaryFace(j)%Node(2)%LX(1:2),                          &

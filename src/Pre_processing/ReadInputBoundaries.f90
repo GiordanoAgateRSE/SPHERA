@@ -405,7 +405,7 @@ do while (TRIM(lcase(ainp))/="##### end boundaries #####")
       if ((pool_plane=="Y").or.(pool_plane=="y")) Partz(Izona)%ipool = 2
       if ((pool_plane=="Z").or.(pool_plane=="z")) Partz(Izona)%ipool = 3
       Partz(Izona)%pool = pool_value
-! Constraints 
+! Constraints
       MULTI_INDEX_LOOP: do index=indexi, indexf       
          Tratto(index)%tipo = tipo
          if (ncord==3) then

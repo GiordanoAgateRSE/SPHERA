@@ -116,7 +116,7 @@ if (Domain%imemo_fr>0) then
 endif
 if ((it_rest==it).or.(index(str,'inizio')/=0).or.(index(str,'fine')/=0)) then
 ! If restartcode=1, then to save the whole arrays "pg","pg_w"
-   restartcode = 1 
+   restartcode = 1
    write(nres) it,simulation_time,dt,nag,ncord,restartcode
    write(nres) pg(1:nag)
    if (allocated(pg_w)) write(nres)                                            &
@@ -151,7 +151,7 @@ if ((it_rest==it).or.(index(str,'inizio')/=0).or.(index(str,'fine')/=0)) then
    endif
    elseif (it_memo==it) then
 ! If restartcode=0, then to save "pg" only for visualizations
-      restartcode = 0  
+      restartcode = 0
       write(nres) it,simulation_time,dt,nag,ncord,restartcode
       write(nres) pg(1:nag)%coord(1),pg(1:nag)%coord(2),pg(1:nag)%coord(3),    &
          pg(1:nag)%vel(1),pg(1:nag)%vel(2),pg(1:nag)%vel(3),pg(1:nag)%pres,    &

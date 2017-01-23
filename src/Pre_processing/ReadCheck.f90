@@ -54,7 +54,7 @@ if (IoErr==0) then
       write(nout,"(1x,a)")  
       write(nout,"(1x,a,i5)") "Error reading unit:  ",ninp
       write(nout,"(1x,a,a)")  "Expected data:       ",listadati
-      write(nout,"(1x,a,i5,a)")                                                &
+      write(nout,"(1x,a,i8,a)")                                                &
          "Last input line read:"//trim(ainp)//"(line number:",Nrighe,")"
 endif
 !------------------------

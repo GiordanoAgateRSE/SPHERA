@@ -371,7 +371,7 @@ if ((Tratto(BoundaryFace(i_face)%stretch)%zone==Partz(Nz)%dam_zone_ID).and.    &
                                      * 0.1d0 * Domain%dx
                endif
             enddo
-!$omp end parallel do  
+!$omp end parallel do
             NumParticles = nag_reservoir_CartTopog
       endif
       else

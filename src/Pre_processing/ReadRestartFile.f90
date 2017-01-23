@@ -36,7 +36,8 @@ use Dynamic_allocation_module
 implicit none
 character(7),intent(IN) :: option
 integer(4),intent(INOUT) :: ier,nrecords
-integer(4) :: restartcode,save_istart,ioerr,i,alloc_stat
+logical :: aux_logical
+integer(4) :: restartcode,save_istart,ioerr,i,alloc_stat,i_aux
 double precision :: save_start
 character(12) :: ainp = "Restart File"
 character(len=8) :: versionerest
@@ -52,6 +53,7 @@ character(100),external :: lcase
 ! Initializations
 !------------------------
 ier = 0
+aux_logical = .false.
 !------------------------
 ! Statements
 !------------------------
@@ -122,67 +124,6 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
                   'successfully completed.'
          endif
       endif
-! Allocation of the array of the maximum water depth
-      if ((Partz(1)%IC_source_type==2).and.(.not.allocated(Z_fluid_max))) then
-         allocate(Z_fluid_max(Grid%ncd(1)*Grid%ncd(2)),STAT=alloc_stat)
-         if (alloc_stat/=0) then
-            write(nout,*)                                                      &
-            'Allocation of Z_fluid_max in ReadRestartFile failed;',            &
-            ' the program terminates here.'
-            stop
-            else
-               write (nout,*)                                                  &
-                  'Allocation of Z_fluid_max in ReadRestartFile successfully', &
-                  ' completed.'
-         endif
-      endif
-! Allocation of the array of the maximum specific flow rate
-      if ((Partz(1)%IC_source_type==2).and.(.not.allocated(q_max))) then
-         allocate(q_max(Partz(1)%npoints),STAT=alloc_stat)
-         if (alloc_stat/=0) then
-            write(nout,*)                                                      &
-            'Allocation of q_max in ReadRestartFile failed;',                  &
-            ' the program terminates here.'
-            stop
-            else
-               write (nout,*)                                                  &
-                  'Allocation of q_max in ReadRestartFile successfully ',      &
-                  'completed.'
-         endif
-      endif
-! Allocation of the 2D array of the minimum saturation flag (bed-load transport)
-      if ((Granular_flows_options%ID_erosion_criterion>0).and.                 &
-         (.not.allocated(Granular_flows_options%minimum_saturation_flag))) then
-         allocate(Granular_flows_options%minimum_saturation_flag(Grid%ncd(1),  &
-            Grid%ncd(2)),STAT=alloc_stat)
-         if (alloc_stat/=0) then
-            write(nout,*)                                                      &
-            'Allocation of Granular_flows_options%minimum_saturation_flag ',   &
-            ' in ReadRestartFile failed; the program stops here.'
-            stop 
-            else
-               write (nout,*)                                                  &
-                  'Allocation of ',                                            &
-                  'Granular_flows_options%minimum_saturation_flag in ',        &
-                  'ReadRestartFile is successfully completed.'
-         endif
-      endif
-! Allocation of the 2D array of the maximum saturation flag (bed-load transport)
-      if ((Granular_flows_options%ID_erosion_criterion>0).and.                 &
-         (.not.allocated(Granular_flows_options%maximum_saturation_flag))) then
-         allocate(Granular_flows_options%maximum_saturation_flag(Grid%ncd(1),  &
-            Grid%ncd(2)),STAT=alloc_stat)
-         if (alloc_stat/=0) then
-            write(nout,*) "Allocation of ",                                    &
-               "Granular_flows_options%maximum_saturation_flag in ",           &
-               "ReadRestartFile failed; the program stops here."
-            stop 
-            else
-               write (nout,*) "Allocation of ",                                &
-                  "Granular_flows_options%maximum_saturation_flag in ",        &
-                  "ReadRestartFile is successfully completed."
-         endif
-      endif
 ! Allocation of the array "GCBFPointers"
       if (Domain%tipo=="semi") then
          allocate(GCBFPointers(Grid%nmax,2),STAT=alloc_stat)
@@ -241,6 +182,73 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
                nout)) return
          endif
       endif
+! Allocation of the array of the maximum water depth
+      do i_aux=1,NPartZone
+         if(Partz(i_aux)%IC_source_type==2) then
+            aux_logical = .true.
+            exit
+         endif
+      enddo
+      if ((aux_logical.eqv..true.).and.(.not.allocated(Z_fluid_max))) then
+         allocate(Z_fluid_max(Grid%ncd(1)*Grid%ncd(2)),STAT=alloc_stat)
+         if (alloc_stat/=0) then
+            write(nout,*)                                                      &
+            'Allocation of Z_fluid_max in ReadRestartFile failed;',            &
+            ' the program terminates here.'
+            stop
+            else
+               write (nout,*)                                                  &
+                  'Allocation of Z_fluid_max in ReadRestartFile successfully', &
+                  ' completed.'
+         endif
+      endif
+! Allocation of the array of the maximum specific flow rate
+      if ((aux_logical.eqv..true.).and.(.not.allocated(q_max))) then
+         allocate(q_max(Partz(1)%npoints),STAT=alloc_stat)
+         if (alloc_stat/=0) then
+            write(nout,*)                                                      &
+            'Allocation of q_max in ReadRestartFile failed;',                  &
+            ' the program terminates here.'
+            stop
+            else
+               write (nout,*)                                                  &
+                  'Allocation of q_max in ReadRestartFile successfully ',      &
+                  'completed.'
+         endif
+      endif
+! Allocation of the 2D array of the minimum saturation flag (bed-load transport)
+      if ((Granular_flows_options%ID_erosion_criterion>0).and.                 &
+         (.not.allocated(Granular_flows_options%minimum_saturation_flag))) then
+         allocate(Granular_flows_options%minimum_saturation_flag(Grid%ncd(1),  &
+            Grid%ncd(2)),STAT=alloc_stat)
+         if (alloc_stat/=0) then
+            write(nout,*)                                                      &
+            'Allocation of Granular_flows_options%minimum_saturation_flag ',   &
+            ' in ReadRestartFile failed; the program stops here.'
+            stop 
+            else
+               write (nout,*)                                                  &
+                  'Allocation of ',                                            &
+                  'Granular_flows_options%minimum_saturation_flag in ',        &
+                  'ReadRestartFile is successfully completed.'
+         endif
+      endif
+! Allocation of the 2D array of the maximum saturation flag (bed-load transport)
+      if ((Granular_flows_options%ID_erosion_criterion>0).and.                 &
+         (.not.allocated(Granular_flows_options%maximum_saturation_flag))) then
+         allocate(Granular_flows_options%maximum_saturation_flag(Grid%ncd(1),  &
+            Grid%ncd(2)),STAT=alloc_stat)
+         if (alloc_stat/=0) then
+            write(nout,*) "Allocation of ",                                    &
+               "Granular_flows_options%maximum_saturation_flag in ",           &
+               "ReadRestartFile failed; the program stops here."
+            stop 
+            else
+               write (nout,*) "Allocation of ",                                &
+                  "Granular_flows_options%maximum_saturation_flag in ",        &
+                  "ReadRestartFile is successfully completed."
+         endif
+      endif      
 ! Restart positions are based on the step number
       it_start = 0 
       if (save_istart>0) then
