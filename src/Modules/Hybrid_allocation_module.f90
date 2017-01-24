@@ -454,6 +454,8 @@ type TyMedium
                                ! (artificial viscosity)
    double precision :: visc ! Kinematic viscosity  
    double precision :: coes ! Cohesion  
+   double precision :: limiting_viscosity ! Kinematic viscosity threshold 
+                                          ! to save comput. time
    double precision :: numx ! Maximum value for the kinematic viscosity 
                             ! (tuning parameter in Manenti et al., 2012, JHE)
    double precision :: mumx ! Maximum value for the dynamic viscosity 

@@ -42,6 +42,7 @@ logical :: saturated_medium_flag
 integer(4) :: index,nitersol,ioerr
 double precision :: den0,eps,alfaMon,betaMon,visc,viscmx,taucri,cuin,phi,Cs
 double precision :: cons,codif,Settling,coes,Rough,D50,Gamma,InitialIntEn,d_90
+double precision :: limiting_viscosity
 double precision :: porosity
 character(8) :: tipo,erosionmodel
 character(100) :: token
@@ -84,6 +85,7 @@ do while (TRIM(lcase(ainp))/="##### end medium #####")
    taucri = zero
    cuin = zero
    coes = zero
+   limiting_viscosity = zero
    phi = zero
    saturated_medium_flag = .false.
    D50 = zero
@@ -233,9 +235,9 @@ do while (TRIM(lcase(ainp))/="##### end medium #####")
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"PHI, SATURATED_MEDIUM_FLAG",&
             ninp,nout)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         read(ainp,*,iostat=ioerr) coes,viscmx,visc
+         read(ainp,*,iostat=ioerr) coes,viscmx,visc,limiting_viscosity
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                             &
-            "COHESION, VISCO MAX & VISCO",ninp,nout)) return            
+            "COHESION, VISCO MAX, VISCO & LIMITING VISCOSITY",ninp,nout)) return            
          if (Granular_flows_options%ID_erosion_criterion==1) then
             call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
             read(ainp,*,iostat=ioerr) porosity,D50,d_90
@@ -302,6 +304,7 @@ do while (TRIM(lcase(ainp))/="##### end medium #####")
       Med(index)%phi = phi
       Med(index)%saturated_medium_flag = saturated_medium_flag
       Med(index)%coes = coes
+      Med(index)%limiting_viscosity = limiting_viscosity
       Med(index)%Cs = Cs
       Med(index)%RoughCoef = Rough
       Med(index)%D50 = D50
@@ -339,6 +342,8 @@ do while (TRIM(lcase(ainp))/="##### end medium #####")
             Med(index)%saturated_medium_flag
          write(nout,"(1x,a,1p,e12.4)") "Cohesion:...................",         &
             Med(index)%coes
+         write(nout,"(1x,a,1p,e12.4)") "Limiting visco. (save time):",         &
+            Med(index)%limiting_viscosity
          write(nout,"(1x,a,1p,e12.4)") "Consistency:................",         &
             Med(index)%cons
          write(nout,"(1x,a,1p,e12.4)") "Smagorinsky Constant:.......",         &

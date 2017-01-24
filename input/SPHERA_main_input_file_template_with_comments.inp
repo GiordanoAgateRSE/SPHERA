@@ -336,7 +336,7 @@ solid_phase_density solid_phase_bulk_modulus
 ! If (fluid_type==granular): end
 Monaghan_alpha Monaghan_beta        ! Monaghan alpha (artificial viscosity), 
                                     ! Monaghan beta (=0, artificial viscosity)
-diffusion_coefficient settling velocity coefficient
+diffusion_coefficient settling_velocity_coefficient
                                     ! null recommended values (i.e. inactive 
                                     ! parameters)
 0. 0. 0.                            
@@ -350,11 +350,12 @@ phi saturated_medium_flag           ! phi(internal friction angle in degrees,
                                     ! even if the code works in radians); 
                                     ! saturated_medium_flag=.true.(fully 
                                     ! saturated medium),.false.(dry medium). 
-cohesion viscosity_max tuned_viscosity
+cohesion viscosity_max tuned_viscosity limiting_viscosity
                                     ! cohesion (draft parameter); viscosity_max 
                                     ! (threshold for frictional viscosity), 
                                     ! tuned_viscosity (tuned dynamic viscosity -
                                     ! only for Manenti et al., 2012) 
+                                    ! limiting_viscosity 
 ! If (fluid_type==granular): end
 ! if ((fluid_type==granular).and.(erosion_criterion_ID==1)): start
 effective_porosity d_50 d_90        !

@@ -205,6 +205,8 @@ do npi=1,nag
 ! No matter about the presence/absence of an erosion criterion, the particles 
 ! in the transition zone of elastic-platic regime are set fixed.
          pg(npi)%state = "sol"
+         elseif(pg(npi)%mu>Med(pg(npi)%imed)%limiting_viscosity) then
+            pg(npi)%mu = Med(pg(npi)%imed)%limiting_viscosity
       endif
 ! Kinematic viscosity is updated
       pg(npi)%visc = pg(npi)%mu / pg(npi)%dens
