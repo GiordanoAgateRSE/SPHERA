@@ -64,10 +64,10 @@ if (vel_type/="std") then
    anuitilde = two * kin_visc_comput_part
    else
       amassj = mass_neighbour
-      rhotilde  = (kin_visc_comput_part * dens_comput_part + kin_visc_neighbour&
+      rhotilde = (kin_visc_comput_part * dens_comput_part + kin_visc_neighbour &
                   * dens_neighbour + 0.001d0)
       anuitilde = 4.0d0 * (kin_visc_comput_part * kin_visc_neighbour)
-endif   
+endif
 factivis = amassj * anuitilde / rhotilde
 rvw(1:3) = factivis * (-dervel(1:3) * kernel_der * dot_product(rel_dis,rel_dis))
 !------------------------

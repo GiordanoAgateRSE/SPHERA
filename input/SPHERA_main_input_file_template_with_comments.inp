@@ -51,7 +51,7 @@ Last_vertex_ID Vertex_x Vertex_y Vertex_z ! (last vertex data)
 ! 2D input parameters for the boundary lines of the fluid domain
 ! 2D boundary lines for wall frontiers, inlet/outlet sections, fluid reservoirs.
 ! In case of DB-SPH boundary treatment scheme, the code requires the lines of 
-! the parallelepiped domain as a "perimeter" and the "air reservoirs".
+! the parallelepiped domain as a "perimeter" and the "fictitious reservoirs".
 ! In case of SA-SPH boundary treatment scheme, the code requires the 
 ! lines of the boundaries
 1 line_1_vertex_1 ... line_1_vertex last line_1_Boundary_ID
@@ -270,7 +270,7 @@ erosion_criterion_ID ID_main_fluid
                                     ! without blt-fixed bed interactions),3
                                     ! (Mohr-Coulomb, not recommended); 
                                     ! ID_main_fluid(medium of 
-                                    ! the main fluid). 
+                                    ! the main fluid).
 saturation_scheme time_minimum_saturation time_maximum_saturation
                                     ! saturation_scheme=0(dry soil),1(fully 
                                     ! saturated soil),2(saturation zones 
@@ -325,7 +325,8 @@ x_line y_line                       ! monitoring line is defined by variable or
 
 ##### medium #####
 ! Input parameters for the fluids 
-fluid_type                          ! fluid_type=liquid,granular
+fluid_type                          ! fluid_type=liquid,granular(only if 
+                                    ! erosion_criterion_ID>0)
 fluid_ID                            !
 ! If (fluid_type==liquid): start
 density bulk_modulus
@@ -339,7 +340,7 @@ Monaghan_alpha Monaghan_beta        ! Monaghan alpha (artificial viscosity),
 diffusion_coefficient settling_velocity_coefficient
                                     ! null recommended values (i.e. inactive 
                                     ! parameters)
-0. 0. 0.                            
+0. 0. 0.                   
 ! If (fluid_type==liquid): start                                    
 dynamic_viscosity                   !
 roughness_coefficient               ! null recommended value (i.e. inactive 
@@ -352,18 +353,19 @@ phi saturated_medium_flag           ! phi(internal friction angle in degrees,
                                     ! saturated medium),.false.(dry medium). 
 cohesion viscosity_max tuned_viscosity limiting_viscosity
                                     ! cohesion (draft parameter); viscosity_max 
-                                    ! (threshold for frictional viscosity), 
+                                    ! (threshold for the mixture viscosity to 
+                                    ! held particles fixed in the 
+                                    ! elastic-plastic strain regime); 
                                     ! tuned_viscosity (tuned dynamic viscosity -
-                                    ! only for Manenti et al., 2012) 
+                                    ! only for Manenti et al., 2012)
                                     ! limiting_viscosity 
 ! If (fluid_type==granular): end
 ! if ((fluid_type==granular).and.(erosion_criterion_ID==1)): start
 effective_porosity d_50 d_90        !
 ! if ((fluid_type==granular).and.(erosion_criterion_ID==1)): end
 ! if ((fluid_type==granular).and.(erosion_criterion_ID>1)): start
-roughness_coefficient d_50 erosion_model
-                                    ! roughness_coefficient; d_50; erosion_model
-                                    ! =shields,mohr
+roughness_coefficient d_50
+                                    ! roughness_coefficient; d_50
 max_step_still                      ! max_step_still(number of time steps during
                                     ! which mixture particles are kept still)               
 ! if ((fluid_type==granular).and.(erosion_criterion_ID>1)): end
@@ -372,7 +374,7 @@ max_step_still                      ! max_step_still(number of time steps during
 ##### BODY DYNAMICS #####
 ! Input parameters for the scheme on body transport in fluid flows
 ! Bodies with imposed kinematics are listed after all the bodies with computed 
-! kinematics 
+! kinematics
 n_bodies dx/dx_body imping_body_grav
                                     ! n_bodies(number of transported solid 
                                     ! bodies); dx/dx_body(ratio between fluid 
@@ -391,8 +393,8 @@ Ic_flag                             ! Ic_flag=0,1(mass moment of inertia is
                                     ! imposed)
 ! if(Ic_flag==1): start
 Ic(1,1) Ic(1,2) Ic(1,3)             !
-Ic(2,1) Ic(2,2) Ic(2,3)             ! 
-Ic(3,1) Ic(3,2) Ic(3,3)             ! 
+Ic(2,1) Ic(2,2) Ic(2,3)             !
+Ic(3,1) Ic(3,2) Ic(3,3)             !
 ! if(Ic_flag==1): end
 alfa_x alfa_y alfa_z                ! alfa(rotation angles of the body axis with
                                     ! respect to the reference system axis at 
@@ -411,9 +413,9 @@ L_x L_y L_z                         ! L_x,L_y,L_z(side lengths of the element)
 pos_CM_elem_x pos_CM_elem_y pos_CM_elem_z
                                     ! pos_CM_elem(position of the centre of mass
                                     ! of the element at t=0)
-alfa_elem_x alfa_elem_y alfa_elem_z ! alfa_elem(rotation angles of the body axis 
-                                    ! with respect to the reference system axis  
-                                    ! at t=0)
+alfa_elem_x alfa_elem_y alfa_elem_z ! alfa_elem(rotation angles of the element 
+                                    ! axis with respect to the reference system 
+                                    ! axis at t=0)
 face_xmin_flag face_xmax_flag face_ymin_flag face_ymax_flag face_zmin_flag face_zmax_flag
                                     ! (integer flags to activate the normal 
                                     ! vectors of surface body particles only 
@@ -479,10 +481,14 @@ MAXCLOSEBOUNDFACES MAXNUMCONVEXEDGES
                                     ! of edges) 
 GCBFVecDim                          ! GCBFVecDim(rough overestimation of the 
                                     ! number of Grid Cell - Boundary Face 
-                                    ! intersections  (SA-SPH)
+                                    ! intersections  (SA-SPH): this value is 
+                                    ! read, but not used in the restart mode.
 density_thresholds_flag             ! density_thresholds_flag=0(default, no 
                                     ! density limiters),1(density limiters for 
-                                    ! debug)
+                                    ! debug) - density limiters do not apply to 
+                                    ! the mixture particles which are held 
+                                    ! fixed (elasto-plastic strain rate 
+                                    ! regime) -
 ##### end RUN PARAMETERS #####
 
 ##### general physical properties #####
@@ -493,13 +499,16 @@ gravity_acceleration_x gravity_acceleration_y gravity_acceleration_z
 ! 2D case: start
 gravity_acceleration_x gravity_acceleration_z
 ! 2D case: stop
-reference_pressure                  !  
+reference_pressure                  !
 ##### end general physical properties #####
 
 ##### restart #####
 restart_mode restart_time_value     ! restart_mode("time" or "step"); 
-                                    ! restart_time_value(time value in seconds 
-                                    ! or step number, according to restart_mode) 
+                                    ! restart_time_value(positive time value in 
+                                    ! seconds or step number, according to 
+                                    ! restart_mode; this value has to be lower 
+                                    ! than the time value of the last restart 
+                                    ! output)
 restart_file                        ! restart_file(restart file name -with 
                                     ! extension-)
 ##### end restart #####

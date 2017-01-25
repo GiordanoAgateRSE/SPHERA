@@ -149,7 +149,7 @@ second_cycle: do Nz=1,NPartZone
 ! Update number of points/vertices of the zone
          Partz(Nz)%npoints = Partz(Nz)%ID_last_vertex -                        &
                              Partz(Nz)%ID_first_vertex + 1
-         aux_factor = anint(Partz(Nz)%dx_CartTopog / Domain%dd) 
+         aux_factor = anint(Partz(Nz)%dx_CartTopog / Domain%dx) 
 ! Allocate the auxiliary arrays 
          allocate(z_aux(Partz(Nz)%npoints))
 ! Loops over Cartesian topography points
@@ -185,7 +185,7 @@ second_cycle: do Nz=1,NPartZone
                enddo
 ! Generating daughter points of the Cartesian topography, according to dx
 ! (maybe the function "ceiling" would be better than "int" here)
-               n_levels = int((h_reservoir(Nz) - z_aux(i_vertex)) / Domain%dd)
+               n_levels = int((h_reservoir(Nz) - z_aux(i_vertex)) / Domain%dx)
                do i=1,aux_factor
                   do j=1,aux_factor
                      do k=1,n_levels
@@ -196,17 +196,17 @@ second_cycle: do Nz=1,NPartZone
 ! but no problem remains anymore)
                         pg_aux(NumParticles)%coord(1) = Vertice(1,i_vertex)    &
                                                         - aux_factor / 2.d0    &
-                                                        * Domain%dd + (i -     &
+                                                        * Domain%dx + (i -     &
                                                         1 + 0.501d0) *         &
-                                                        Domain%dd
+                                                        Domain%dx
                         pg_aux(NumParticles)%coord(2) = Vertice(2,i_vertex)    &
                                                         - aux_factor / 2.d0    &
-                                                        * Domain%dd + (j -     &
+                                                        * Domain%dx + (j -     &
                                                         1 + 0.5d0) *           &
-                                                        Domain%dd
+                                                        Domain%dx
                         pg_aux(NumParticles)%coord(3) = (h_reservoir(Nz) -     &
-                                                        Domain%dd / 2.d0) -    &
-                                                        (k - 1) * Domain%dd
+                                                        Domain%dx / 2.d0) -    &
+                                                        (k - 1) * Domain%dx
 ! Test if the particle is below the reservoir
 ! Loop over boundaries 
                         test_z = 0
@@ -334,7 +334,7 @@ if ((Tratto(BoundaryFace(i_face)%stretch)%zone==Partz(Nz)%dam_zone_ID).and.    &
          if (ier/=0) then
             write (nout,'(1x,a,i2)')                                           &
                "    Array PG not allocated. Error code: ",ier
-            call diagnostic (arg1=4,arg3=nomsub)
+            call diagnostic(arg1=4,arg3=nomsub)
             else
                write (nout,'(1x,a)') "    Array PG successfully allocated "
                pg(:) = PgZero
@@ -362,16 +362,16 @@ if ((Tratto(BoundaryFace(i_face)%stretch)%zone==Partz(Nz)%dam_zone_ID).and.    &
                if (Domain%RandomPos=='r') then
                   call random_number(rnd)
                   pg(npi)%coord(1) = pg(npi)%coord(1) + (2.d0 * rnd - 1.d0)    &
-                                     * 0.1d0 * Domain%dd
+                                     * 0.1d0 * Domain%dx
                   call random_number(rnd)
                   pg(npi)%coord(2) = pg(npi)%coord(2) + (2.d0 * rnd - 1.d0)    &
-                                     * 0.1d0 * Domain%dd
+                                     * 0.1d0 * Domain%dx
                   call random_number(rnd)
                   pg(npi)%coord(3) = pg(npi)%coord(3) + (2.d0 * rnd - 1.d0)    &
-                                     * 0.1d0 * Domain%dd
+                                     * 0.1d0 * Domain%dx
                endif
             enddo
-!$omp end parallel do  
+!$omp end parallel do
             NumParticles = nag_reservoir_CartTopog
       endif
       else
@@ -385,9 +385,9 @@ if ((Tratto(BoundaryFace(i_face)%stretch)%zone==Partz(Nz)%dam_zone_ID).and.    &
                Npps = -1
                else
                do i=1,SPACEDIM
-                  NumPartPrima = nint((Xmin(i,nt) - MinOfMin(i)) / Domain%dd)
-                  Xminreset(i) = MinOfMIn(i) + NumPartPrima * Domain%dd
-                  Npps(i) = nint((Xmax(i,nt) - XminReset(i)) / Domain%dd)
+                  NumPartPrima = nint((Xmin(i,nt) - MinOfMin(i)) / Domain%dx)
+                  Xminreset(i) = MinOfMIn(i) + NumPartPrima * Domain%dx
+                  Npps(i) = nint((Xmax(i,nt) - XminReset(i)) / Domain%dx)
                enddo
             endif
 ! To force almost one particle if the domain width in a direction is smaller  

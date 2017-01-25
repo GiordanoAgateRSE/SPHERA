@@ -68,7 +68,6 @@ Domain%Slip = .FALSE.
 OnlyTriangle = .FALSE.
 diffusione = .FALSE.
 esplosione = .FALSE.
-erosione = .FALSE.
 restart = .FALSE.
 simulation_time = zero
 dt = zero
@@ -241,10 +240,6 @@ if (.not.restart) then
    do i=1,NMedium
       if (Med(i)%codif/=zero) diffusione = .TRUE.
       if (Med(i)%Gamma/=zero) esplosione = .TRUE.
-      if ((index(Med(i)%tipo,"granular")>0)) then
-         erosione = .TRUE.
-         modelloerosione = Med(i)%modelloerosione
-      endif
    enddo
    close(ninp)
    nag = 0
@@ -254,14 +249,14 @@ if (.not.restart) then
 ! 5 / (16 * pigreco)/(h**2)
       Domain%coefkacl = 0.099472d0 / squareh   
 ! Particle volume
-      Domain%PVolume = Domain%dd * Domain%dd
+      Domain%PVolume = Domain%dx * Domain%dx
       elseif (ncord==3)then
 ! 1 / pigreco/(h**3)
          Domain%coefke    = 0.477464d0 / cubich   
 ! 15 / (64 * pigreco)/(h**3)
          Domain%coefkacl = 0.074603d0 / cubich    
 ! Particle volume
-         Domain%PVolume = Domain%dd * Domain%dd * Domain%dd
+         Domain%PVolume = Domain%dx * Domain%dx * Domain%dx
    endif
    Control_Sections(NSections+1)%XYZRange(1:3,1) = Domain%coord(1:3,1)
    Control_Sections(NSections+1)%XYZRange(1:3,2) = Domain%coord(1:3,2)
@@ -494,10 +489,6 @@ if (.not.restart) then
       close(nsav)
       do i=1,NMedium
          if (Med(i)%codif/=zero) diffusione = .TRUE.
-         if (index(Med(i)%tipo,"granular")>0) then
-            erosione = .TRUE.
-            modelloerosione = Med(i)%modelloerosione
-         endif
       enddo
 ! To save current time for "result_converter"
       val_time = simulation_time

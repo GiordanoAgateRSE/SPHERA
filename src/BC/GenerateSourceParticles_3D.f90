@@ -71,7 +71,7 @@ if (inttimeratio>pinttimeratio) then
             nag = nag + 1
             SpCount(mat) = SpCount(mat) + 1
             if (nag>PARTICLEBUFFER) then         
-               call diagnostic (arg1=6,arg2=2,arg3=nomsub)
+               call diagnostic(arg1=6,arg2=2,arg3=nomsub)
 ! To insert message on overpassing the limit or to automatically reallocation 
 ! of the arrays pg, nPartintorno and associated arrays 
             end if

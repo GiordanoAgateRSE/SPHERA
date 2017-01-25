@@ -187,8 +187,32 @@ do while (TRIM(lcase(ainp)) /= "##### end body dynamics #####")
 ! Allocating body elements
       if (ncord>0) then
          else
-            allocate(body_arr(Id_body)%elem(body_arr(Id_body)%n_elem))
-            allocate(body_arr(Id_body)%body_kinematics(n_records,7))
+            if (.not.allocated(body_arr(Id_body)%elem)) then
+               allocate(body_arr(Id_body)%elem(body_arr(Id_body)%n_elem),      &
+                  STAT=alloc_stat)
+               if (alloc_stat/=0) then
+                  write(nout,*) 'Allocation of body_arr(Id_body)%elem in ',    &
+                     'ReadBodyDynamics failed; the program terminates here.'
+                  stop ! Stop the main program
+                  else
+                     write (nout,*) 'Allocation of body_arr(Id_body)%elem in ',&
+                        'ReadBodyDynamics successfully completed.'
+               endif
+            endif
+            if (.not.allocated(body_arr(Id_body)%body_kinematics)) then
+               allocate(body_arr(Id_body)%body_kinematics(n_records,7),        &
+                  STAT=alloc_stat)
+               if (alloc_stat/=0) then
+                  write(nout,*) 'Allocation of ',                              &
+                     'body_arr(Id_body)%body_kinematics in ReadBodyDynamics ', &
+                     'failed; the program terminates here.'
+                  stop ! Stop the main program
+                  else
+                     write (nout,*) 'Allocation of ',                          &
+                        'body_arr(Id_body)%body_kinematics in ',               &
+                        'ReadBodyDynamics successfully completed.'
+               endif
+            endif
       endif
 ! Reading the eventual imposed kinematics
       do j=1,n_records

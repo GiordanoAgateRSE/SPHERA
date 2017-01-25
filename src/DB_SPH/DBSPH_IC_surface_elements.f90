@@ -55,7 +55,7 @@ if (.not.allocated(pg_w)) then
    if (alloc_stat/=0) then
       write(nout,*) 'Allocation of pg_w in DBSPH_IC_surface_elements failed;', &
                     ' the program terminates here.'
-      call diagnostic (arg1=5,arg2=340)
+      call diagnostic(arg1=5,arg2=340)
       stop ! Stop the main program
       else
          write(nout,*) "Allocation of pg_w in DBSPH_IC_surface_elements ",     &

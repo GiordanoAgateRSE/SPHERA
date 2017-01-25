@@ -28,6 +28,7 @@ subroutine inidt2
 !------------------------ 
 use Static_allocation_module
 use Hybrid_allocation_module
+use I_O_file_module
 use Dynamic_allocation_module
 !------------------------
 ! Declarations
@@ -44,35 +45,36 @@ double precision :: dtmin,dt_CFL,dt_dif,dt_vis,diffmax,U,vsc_coeff
 !------------------------
 ! Initializations
 !------------------------
-dtmin   = 1.0d+30                                                        
+dtmin = 1.0d+30                                                        
 diffmax = zero
 !------------------------
 ! Statements
 !------------------------
 if (indarrayFlu==0) then
-! In case there is no fluid (or movable) particle
-   dt = 0.d0   
+! In case there is no fluid (or mobile) particle
+   dt = 0.d0
    else
 ! Time step depends on 3 stability criteria:
-! 1) the CFL condition: dt_CFL=CFL*(2h/(c+U))
-! 2) viscous stability condition dt_vis=vsc_coeff*(2*rho*h**2/mu) 
-! 3) interface diffusion condition dt_diff=(h**2/2*teta)
+! 1) CFL criterion: dt_CFL=CFL*(2h/(c+U))
+! 2) viscous term criterion: dt_vis=vsc_coeff*(rho*h**2/(0.5*mu)) 
+! 3) interface diffusion criterion: dt_diff=(h**2/2*teta)
       do ii=1,indarrayFlu
          npi = Array_Flu(ii)
          U = sqrt(pg(npi)%vel(1) ** 2 + pg(npi)%vel(2) ** 2 + pg(npi)%vel(3)   & 
              ** 2)
-         dt_CFL = Domain%CFL * 2.d0 * Domain%h / (Med(pg(npi)%imed)%celerita+U)
+         dt_CFL = Domain%CFL * 2.d0 * Domain%h / (Med(pg(npi)%imed)%celerita + &
+                  U)
          dt_vis = Domain%vsc_coeff * pg(npi)%dens * squareh / (half *          &
                   pg(npi)%mu)
-         dtmin  = min(dtmin,dt_CFL,dt_vis)
+         dtmin = min(dtmin,dt_CFL,dt_vis)
       enddo
       do j=1,NMedium
          diffmax = max(diffmax,Med(j)%codif)
       enddo
-      dt_dif = half * squareh / (diffmax+0.000000001d0)
-      dtmin = min(dtmin,dt_dif)
-! Initial dt for a jet
-      if (indarrayFlu==0) dtmin = 2.*Domain%h/(Med(1)%celerita)
+      if (diffusione) then
+         dt_dif = half * squareh / (diffmax+0.000000001d0)
+         dtmin = min(dtmin,dt_dif)
+      endif
       dt = dtmin
 endif
 ! To initialize the averaged time step 

@@ -57,11 +57,11 @@ double precision  :: maxk_BetaGamma,minu_star,maxu_star,time_elapsed_tot_est
 double precision  :: minvelo,maxvelo,laminar_flag_perc,blt_laminar_flag_perc
 integer(4),dimension(1) :: pos
 character(len=42) :: fmt100="(a,i10,a,e18.9,a,e18.9,a,i  ,a,i  ,a,i  )"
-character(len=47) :: fmt101="(a,2(1x,f10.4,1x,a,1x,i8,1x,a,3(1x,f8.2,1x,a)))"
-character(len=47) :: fmt102="(a,2(1x,f10.1,1x,a,1x,i8,1x,a,3(1x,f8.2,1x,a)))"
-character(len=47) :: fmt103="(a,2(1x,f10.6,1x,a,1x,i8,1x,a,3(1x,f8.2,1x,a)))"
-character(len=47) :: fmt104="(a,2(1x,g10.4,1x,a,1x,i8,1x,a,3(1x,f8.2,1x,a)))"
-character(len=47) :: fmt105="(a,2(1x,e10.4,1x,a,1x,i8,1x,a,3(1x,f8.2,1x,a)))"
+character(len=47) :: fmt101="(a,2(1x,f11.4,1x,a,1x,i8,1x,a,3(1x,f8.2,1x,a)))"
+character(len=47) :: fmt102="(a,2(1x,f11.1,1x,a,1x,i8,1x,a,3(1x,f8.2,1x,a)))"
+character(len=47) :: fmt103="(a,2(1x,f11.6,1x,a,1x,i8,1x,a,3(1x,f8.2,1x,a)))"
+character(len=47) :: fmt104="(a,2(1x,g11.4,1x,a,1x,i8,1x,a,3(1x,f8.2,1x,a)))"
+character(len=47) :: fmt105="(a,2(1x,e11.4,1x,a,1x,i8,1x,a,3(1x,f8.2,1x,a)))"
 character(len=12) :: stringa
 character(len=2) :: coppia
 !------------------------
@@ -343,10 +343,10 @@ if (nag>0) then
       endif   
    endif 
 ! Final prints
-   write(nout,'(128("."))')
-   write(nout,fmt100) " Print at:     | step: ",it," | time: ",simulation_time,&
-      " | Dt: ",dt," | Particles: inside ",dummy," gone out ",OpCountot,       &
-      " gone in ",SpCountot
+   write(nout,'(144("."))')
+   write(nout,fmt100) " Print at:                   | step: ",it," | time:  ", &
+      simulation_time," | dt:  ",dt,"s| Particles: inside ",dummy," gone out ",&
+      OpCountot," gone in ",SpCountot
    if (exetype=="linux") then
       time_elapsed_tot_est = ((Domain%t_pre_iter-Domain%t0) +                  &
                              (machine_Julian_day * 24 * 60 * 60 + machine_hour &
@@ -367,102 +367,110 @@ if (nag>0) then
          "Elapsed time (at the end of the simulation, real time estimation): ",&
          time_elapsed_tot_est," hours = ",time_elapsed_tot_est/24.d0," days."
    endif
-   write(nout,'(a,a)')                                                          &
-      " ............. |  Min. val. |  Min.loc.| X coord. | Y coord. | Z coord.",&
-      " ||  Max. val. |  Max.loc.| X coord. | Y coord. | Z coord. |"
-   write(nout,fmt101)                                                         &
-      "  Tot velocity |",minvelo,"|",minlocvelo,"|",pg(minlocvelo)%coord(1),"|"&
-      ,pg(minlocvelo)%coord(2),"|",pg(minlocvelo)%coord(3),"||",maxvelo,"|",   &
-      maxlocvelo,"|",pg(maxlocvelo)%coord(1),"|",pg(maxlocvelo)%coord(2),"|",  &
+   write(nout,'(a,a,a)')                                                       &
+      ".............................|  Min. val.  |  Min.loc.| X coord. | ",   &
+      "Y coord. | Z coord. ||  Max. val.  |  Max.loc.| X coord. | ",           &
+      "Y coord. | Z coord. |"
+   write(nout,fmt101)                                                          &
+      "Velocity abs. val. |u_|(m/s) |",minvelo,"|",minlocvelo,"|",             &
+      pg(minlocvelo)%coord(1),"|",pg(minlocvelo)%coord(2),"|",                 &
+      pg(minlocvelo)%coord(3),"||",maxvelo,"|",maxlocvelo,"|",                 &
+      pg(maxlocvelo)%coord(1),"|",pg(maxlocvelo)%coord(2),"|",                 &
       pg(maxlocvelo)%coord(3),"|"
-   write(nout,fmt101)                                                         &
-      "  velocity x   |",minvelx,"|",minlocvelx,"|",pg(minlocvelx)%coord(1),"|"&
-      ,pg(minlocvelx)%coord(2),"|",pg(minlocvelx)%coord(3),"||",maxvelx,"|",   &
-      maxlocvelx,"|",pg(maxlocvelx)%coord(1),"|",pg(maxlocvelx)%coord(2),"|",  &
+   write(nout,fmt101)                                                          &
+      "Velocity x-component u(m/s)  |",minvelx,"|",minlocvelx,"|",             &
+      pg(minlocvelx)%coord(1),"|",pg(minlocvelx)%coord(2),"|",                 &
+      pg(minlocvelx)%coord(3),"||",maxvelx,"|",maxlocvelx,"|",                 &
+      pg(maxlocvelx)%coord(1),"|",pg(maxlocvelx)%coord(2),"|",                 &
       pg(maxlocvelx)%coord(3),"|"
-   write(nout,fmt101)                                                         &
-      "  velocity y   |",minvely,"|",minlocvely,"|",pg(minlocvely)%coord(1),"|"&
-      ,pg(minlocvely)%coord(2),"|",pg(minlocvely)%coord(3),"||",maxvely,"|",   &
+   write(nout,fmt101)                                                          &
+      "Velocity y-component v(m/s)  |",minvely,"|",minlocvely,"|",             &
+      pg(minlocvely)%coord(1),"|",pg(minlocvely)%coord(2),"|",                 &
+      pg(minlocvely)%coord(3),"||",maxvely,"|",                                &
       maxlocvely,"|",pg(maxlocvely)%coord(1),"|",pg(maxlocvely)%coord(2),"|",  &
       pg(maxlocvely)%coord(3),"|"
-   write(nout,fmt101)                                                         &
-      "  velocity z   |",minvelz,"|",minlocvelz,"|",pg(minlocvelz)%coord(1),"|"&
-      ,pg(minlocvelz)%coord(2),"|",pg(minlocvelz)%coord(3),"||",maxvelz,"|",   &
-      maxlocvelz,"|",pg(maxlocvelz)%coord(1),"|",pg(maxlocvelz)%coord(2),"|",  &
+   write(nout,fmt101)                                                          &
+      "Velocity z-component w(m/s)  |",minvelz,"|",minlocvelz,"|",             &
+      pg(minlocvelz)%coord(1),"|",pg(minlocvelz)%coord(2),"|",                 &
+      pg(minlocvelz)%coord(3),"||",maxvelz,"|",maxlocvelz,"|",                 &
+      pg(maxlocvelz)%coord(1),"|",pg(maxlocvelz)%coord(2),"|",                 &
       pg(maxlocvelz)%coord(3),"|"
    if (esplosione) then
       write(nout,fmt104)                                                       &
-         "  pressure     |",minpres,"|",minlocpres,"|",pg(minlocpres)%coord(1),&
-         "|",pg(minlocpres)%coord(2),"|",pg(minlocpres)%coord(3),              &
-         "||",maxpres,"|",maxlocpres,"|",pg(maxlocpres)%coord(1),"|",          &
-         pg(maxlocpres)%coord(2),"|",pg(maxlocpres)%coord(3),"|"
+         "Pressure p(Pa)               |",minpres,"|",minlocpres,"|",          &
+         pg(minlocpres)%coord(1),"|",pg(minlocpres)%coord(2),"|",              &
+         pg(minlocpres)%coord(3),"||",maxpres,"|",maxlocpres,"|",              &
+         pg(maxlocpres)%coord(1),"|",pg(maxlocpres)%coord(2),"|",              &
+         pg(maxlocpres)%coord(3),"|"
       write(nout,fmt104)                                                       &
-         "  Int.Energy   |",minInEn,"|",minlocInEn,"|",pg(minlocInEn)%coord(1),&
-         "|",pg(minlocInEn)%coord(2),"|",pg(minlocInEn)%coord(3),"||",maxInEn, &
-         "|",maxlocInEn,"|",pg(maxlocInEn)%coord(1),"|",pg(maxlocInEn)%coord(2)&
-         ,"|",pg(maxlocInEn)%coord(3),"|"
+         "Int.Energy                   |",minInEn,"|",minlocInEn,"|",          &
+         pg(minlocInEn)%coord(1),"|",pg(minlocInEn)%coord(2),"|",              &
+         pg(minlocInEn)%coord(3),"||",maxInEn,"|",maxlocInEn,"|",              &
+         pg(maxlocInEn)%coord(1),"|",pg(maxlocInEn)%coord(2),"|",              &
+         pg(maxlocInEn)%coord(3),"|"
       write(nout,fmt104)                                                       &
-         "  density      |",mindens,"|",minlocdens,"|",pg(minlocdens)%coord(1),&
-         "|",pg(minlocdens)%coord(2),"|",pg(minlocdens)%coord(3),"||",maxdens, & 
-         "|",maxlocdens,"|",pg(maxlocdens)%coord(1),"|",pg(maxlocdens)%coord(2)&
-         ,"|",pg(maxlocdens)%coord(3),"|"
+         "Density rho(kg/m^3)          |",mindens,"|",minlocdens,"|",          &
+         pg(minlocdens)%coord(1),"|",pg(minlocdens)%coord(2),"|",              &
+         pg(minlocdens)%coord(3),"||",maxdens,"|",maxlocdens,"|",              &
+         pg(maxlocdens)%coord(1),"|",pg(maxlocdens)%coord(2),"|",              &
+         pg(maxlocdens)%coord(3),"|"
       else
          write(nout,fmt102)                                                    &
-            "  pressure     |",minpres,"|",minlocpres,"|",                     &
+            "Pressure p(Pa)               |",minpres,"|",minlocpres,"|",       &
             pg(minlocpres)%coord(1),"|",pg(minlocpres)%coord(2),"|",           &
             pg(minlocpres)%coord(3),"||",maxpres,"|",maxlocpres,"|",           &
             pg(maxlocpres)%coord(1),"|",pg(maxlocpres)%coord(2),"|",           &
             pg(maxlocpres)%coord(3),"|"
          write(nout,fmt102)                                                    &
-            "  density      |",mindens,"|",minlocdens,"|",                     &
+            "Density rho(kg/m^3)          |",mindens,"|",minlocdens,"|",       &
             pg(minlocdens)%coord(1),"|",pg(minlocdens)%coord(2),"|",           &
             pg(minlocdens)%coord(3),"||",maxdens,"|",maxlocdens,"|",           &
             pg(maxlocdens)%coord(1),"|",pg(maxlocdens)%coord(2),"|",           &
             pg(maxlocdens)%coord(3),"|"
    endif
-   write(nout,fmt105)  "  viscosity    |",minvisc,"|",minlocvisc,"|",          &
-      pg(minlocvisc)%coord(1),"|",pg(minlocvisc)%coord(2),"|",                 &
+   write(nout,fmt105)  "Kinem. viscosity ni(m/s^2)   |",minvisc,"|",minlocvisc,&
+      "|",pg(minlocvisc)%coord(1),"|",pg(minlocvisc)%coord(2),"|",             &
       pg(minlocvisc)%coord(3),"||",maxvisc,"|",maxlocvisc,"|",                 &
       pg(maxlocvisc)%coord(1),"|",pg(maxlocvisc)%coord(2),"|",                 &
       pg(maxlocvisc)%coord(3),"|"
    if (diffusione) then
-      write(nout,fmt103)  "  coef.diff.   |",mincodi,"|",minloccodi,"|",       &
-      pg(minloccodi)%coord(1),"|",pg(minloccodi)%coord(2),"|",                 &
+      write(nout,fmt103)  "Coef. diff.                  |",mincodi,"|",        &
+      minloccodi,"|",pg(minloccodi)%coord(1),"|",pg(minloccodi)%coord(2),"|",  &
       pg(minloccodi)%coord(3),"||",maxcodi,"|",maxloccodi,"|",                 &
       pg(maxloccodi)%coord(1),"|",pg(maxloccodi)%coord(2),"|",                 &
       pg(maxloccodi)%coord(3),"|"
    endif
    if ((Domain%tipo=="bsph").and.(DBSPH%n_w>0)) then
-      write(nout,fmt101)  "  Wall velocity|",minvelo_w,"|",minlocvelo_w,"|",   &
-         pg_w(minlocvelo_w)%coord(1),"|",pg_w(minlocvelo_w)%coord(2),"|",      &
-         pg_w(minlocvelo_w)%coord(3),"||",maxvelo_w,"|",maxlocvelo_w,"|",      &
-         pg_w(maxlocvelo_w)%coord(1),"|",pg_w(maxlocvelo_w)%coord(2),"|",      &
-         pg_w(maxlocvelo_w)%coord(3),"|"
-      write(nout,fmt102)  "  Wall pressure|",minpres_w,"|",minlocpres_w,"|",   &
-         pg_w(minlocpres_w)%coord(1),"|",pg_w(minlocpres_w)%coord(2),"|",      &
-         pg_w(minlocpres_w)%coord(3),"||",maxpres_w,"|",maxlocpres_w,"|",      &
-         pg_w(maxlocpres_w)%coord(1),"|",pg_w(maxlocpres_w)%coord(2),          &
-         "|",pg_w(maxlocpres_w)%coord(3),"|"
+      write(nout,fmt101)  "Wall velocity |u_a_|(m/s)   |",minvelo_w,"|",       &
+         minlocvelo_w,"|",pg_w(minlocvelo_w)%coord(1),"|",                     &
+         pg_w(minlocvelo_w)%coord(2),"|",pg_w(minlocvelo_w)%coord(3),"||",     &
+         maxvelo_w,"|",maxlocvelo_w,"|",pg_w(maxlocvelo_w)%coord(1),"|",       &
+         pg_w(maxlocvelo_w)%coord(2),"|",pg_w(maxlocvelo_w)%coord(3),"|"
+      write(nout,fmt102)  "Wall pressure p_a(Pa)       |",minpres_w,"|",       &
+         minlocpres_w,"|",pg_w(minlocpres_w)%coord(1),"|",                     &
+         pg_w(minlocpres_w)%coord(2),"|",pg_w(minlocpres_w)%coord(3),"||",     &
+         maxpres_w,"|",maxlocpres_w,"|",pg_w(maxlocpres_w)%coord(1),"|",       &
+         pg_w(maxlocpres_w)%coord(2),"|",pg_w(maxlocpres_w)%coord(3),"|"
    endif
    if (n_bodies>0) then
-      write(nout,fmt101)  "Body part.vel. |",minvelo_bp,"|",minlocvelo_bp,"|", &
-         bp_arr(minlocvelo_bp)%pos(1),"|",bp_arr(minlocvelo_bp)%pos(2),"|",    &
-         bp_arr(minlocvelo_bp)%pos(3),"||",maxvelo_bp,"|",maxlocvelo_bp,"|",   &
-         bp_arr(maxlocvelo_bp)%pos(1),"|",bp_arr(maxlocvelo_bp)%pos(2),"|",    &
-         bp_arr(maxlocvelo_bp)%pos(3),"|"
-      write(nout,fmt102)  "Body part.pres.|",minpres_bp,"|",minlocpres_bp,"|", &
-         bp_arr(minlocpres_bp)%pos(1),"|",bp_arr(minlocpres_bp)%pos(2),"|",    &
-         bp_arr(minlocpres_bp)%pos(3),"||",maxpres_bp,"|",maxlocpres_bp,"|",   &
-         bp_arr(maxlocpres_bp)%pos(1),"|",bp_arr(maxlocpres_bp)%pos(2),"|",    &
-         bp_arr(maxlocpres_bp)%pos(3),"|"
-      write(nout,fmt101)  "Body velocity  |",minvelo_body,"|",minlocvelo_body, &
-         "|",body_arr(minlocvelo_body)%x_CM(1),"|",                            &
+      write(nout,fmt101)  "Body part. veloc.|u_s_|(m/s) |",minvelo_bp,"|",     &
+         minlocvelo_bp,"|",bp_arr(minlocvelo_bp)%pos(1),"|",                   &
+         bp_arr(minlocvelo_bp)%pos(2),"|",bp_arr(minlocvelo_bp)%pos(3),"||",   &
+         maxvelo_bp,"|",maxlocvelo_bp,"|",bp_arr(maxlocvelo_bp)%pos(1),"|",    &
+         bp_arr(maxlocvelo_bp)%pos(2),"|",bp_arr(maxlocvelo_bp)%pos(3),"|"
+      write(nout,fmt102)  "Body part. pressure p_s(Pa)  |",minpres_bp,"|",     &
+         minlocpres_bp,"|",bp_arr(minlocpres_bp)%pos(1),"|",                   &
+         bp_arr(minlocpres_bp)%pos(2),"|",bp_arr(minlocpres_bp)%pos(3),"||",   &
+         maxpres_bp,"|",maxlocpres_bp,"|",bp_arr(maxlocpres_bp)%pos(1),"|",    &
+         bp_arr(maxlocpres_bp)%pos(2),"|",bp_arr(maxlocpres_bp)%pos(3),"|"
+      write(nout,fmt101)  "Body velocity |u_C_M|(m/s)   |",minvelo_body,"|",   &
+         minlocvelo_body,"|",body_arr(minlocvelo_body)%x_CM(1),"|",            &
          body_arr(minlocvelo_body)%x_CM(2),"|",                                &
          body_arr(minlocvelo_body)%x_CM(3),"||",maxvelo_body,"|",              &
          maxlocvelo_body,"|",body_arr(maxlocvelo_body)%x_CM(1),"|",            &
          body_arr(maxlocvelo_body)%x_CM(2),"|",                                &
          body_arr(maxlocvelo_body)%x_CM(3),"|"
-      write(nout,fmt101)  "Body omega     |",minomega_body,"|",                & 
+      write(nout,fmt101)  "Body ang.vel. chi_C_M(rad/s) |",minomega_body,"|",  & 
          minlocomega_body,"|",body_arr(minlocomega_body)%x_CM(1),"|",          &
          body_arr(minlocomega_body)%x_CM(2),"|",                               &
          body_arr(minlocomega_body)%x_CM(3),"||",maxomega_body,"|",            &
@@ -472,24 +480,24 @@ if (nag>0) then
    endif
    if ((Granular_flows_options%erosion_flag.ne.1).and.                         &
       (Granular_flows_options%ID_erosion_criterion==1)) then
-      write(nout,fmt101)  "tau_tauc       |",mintau_tauc,"|",minloctau_tauc,"|"&
-         ,pg(minloctau_tauc)%coord(1),"|",pg(minloctau_tauc)%coord(2),"|",     &
-         pg(minloctau_tauc)%coord(3),"||",maxtau_tauc,"|",maxloctau_tauc,"|",  &
-         pg(maxloctau_tauc)%coord(1),"|",pg(maxloctau_tauc)%coord(2),"|",      &
-         pg(maxloctau_tauc)%coord(3),"|"
-      write(nout,fmt101)  "u_star         |",minu_star,"|",minlocu_star,"|",   &
-         pg(minlocu_star)%coord(1),"|",pg(minlocu_star)%coord(2),"|",          &
-         pg(minlocu_star)%coord(3),"||",maxu_star,"|",maxlocu_star,"|",        &
-         pg(maxlocu_star)%coord(1),"|",pg(maxlocu_star)%coord(2),"|",          &
-         pg(maxlocu_star)%coord(3),"|"  
+      write(nout,fmt101)  "Shear stress ratio tau/tauc |",mintau_tauc,"|",     &
+         minloctau_tauc,"|",pg(minloctau_tauc)%coord(1),"|",                   &
+         pg(minloctau_tauc)%coord(2),"|",pg(minloctau_tauc)%coord(3),"||",     &
+         maxtau_tauc,"|",maxloctau_tauc,"|",pg(maxloctau_tauc)%coord(1),"|",   &
+         pg(maxloctau_tauc)%coord(2),"|",pg(maxloctau_tauc)%coord(3),"|"
+      write(nout,fmt101)  "Friction velocity u_*(m/s)  |",minu_star,"|",       &
+         minlocu_star,"|",pg(minlocu_star)%coord(1),"|",                       &
+         pg(minlocu_star)%coord(2),"|",pg(minlocu_star)%coord(3),"||",         &
+         maxu_star,"|",maxlocu_star,"|",pg(maxlocu_star)%coord(1),"|",         &
+         pg(maxlocu_star)%coord(2),"|",pg(maxlocu_star)%coord(3),"|"  
       if (Granular_flows_options%ID_erosion_criterion==1) then       
-         write(nout,fmt101)  "k_BetaGamma    |",mink_BetaGamma,"|",            &
-            minlock_BetaGamma,"|",pg(minlock_BetaGamma)%coord(1),"|",          &
+         write(nout,fmt101)  "3D eros.coeff. (k_BetaGamma)|",mink_BetaGamma,   &
+            "|",minlock_BetaGamma,"|",pg(minlock_BetaGamma)%coord(1),"|",      &
             pg(minlock_BetaGamma)%coord(2),"|",pg(minlock_BetaGamma)%coord(3), &
             "||",maxk_BetaGamma,"|",maxlock_BetaGamma,"|",                     &
             pg(maxlock_BetaGamma)%coord(1),"|",pg(maxlock_BetaGamma)%coord(2), &
             "|",pg(maxlock_BetaGamma)%coord(3),"|"
-      endif   
+      endif
    endif
    if (.not.((Domain%tipo=="bsph").and.(DBSPH%slip_ID<2))) then   
       write(nout,'(a,g12.3,a)') "The ",laminar_flag_perc,                      &

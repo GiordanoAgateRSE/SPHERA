@@ -19,8 +19,8 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: Vector_Product    
-! Description: To return in ww the cross product of vectors uu and vv.           
+! Program unit: Vector_Product
+! Description: To return in ww the cross product of vectors uu and vv.
 !-------------------------------------------------------------------------------
 subroutine Vector_Product(uu,VV,ww,SPACEDIM)
 !------------------------
@@ -51,7 +51,7 @@ do i=1,SPACEDIM
    j = iseg(i)
    k = iseg(j)
    ww(i) = uu(j) * VV(k) - uu(k) * VV(j)
-end do
+enddo
 !------------------------
 ! Deallocations
 !------------------------

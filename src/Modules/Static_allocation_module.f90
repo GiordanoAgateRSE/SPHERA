@@ -123,8 +123,7 @@ logical :: kill_flag ! Flag to kill the execution
 logical :: current_version   
 logical :: diffusione ! Flag to activate the diffusion model
 logical :: esplosione ! Flag to activate the explosion model
-logical :: erosione ! Flag to activate the erosion criterion 
-integer(4) :: NMAXPARTJ ! Max number of particles surrounding the current one
+integer(4) :: NMAXPARTJ ! Max number of neighbouring particles
 integer(4) :: MaxNcbs ! Max number of close boundary sides for the current 
                       ! particle
 integer(4) :: MaxNcbf ! Max number of close boundary faces for the current 
@@ -163,7 +162,6 @@ character(255) :: LicenseFile ! File name for license
 character(255) :: nomefilekill ! Killer file name 
 character(10) :: exetype ! Type of machine: "windows" or "linux"
 character(255) :: nomefileerr ! File name for error file in erosion model
-character(8) :: modelloerosione ! type of erosion criterion (shields, mohr)
 ! "original" or "euristic"
 character(len=8) :: dt_opt = "original" 
 character(100),dimension(MAXTIT) :: title  

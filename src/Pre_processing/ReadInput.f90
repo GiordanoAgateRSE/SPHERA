@@ -119,7 +119,7 @@ SECTION_LOOP: do while (ioerr==0)
       case("##### bed load transport #####")
          call ReadBedLoadTransport(ainp,comment,nrighe,ier,ninp,nout,nscr)
       case("##### medium #####")
-         call ReadInputMedium (NumberEntities,Med,ainp,comment,nrighe,ier,ninp,&
+         call ReadInputMedium(NumberEntities,Med,ainp,comment,nrighe,ier,ninp, &
             nout,nscr)
       case("##### body dynamics #####")
          call ReadBodyDynamics(ainp,comment,nrighe,ier,ninp,nout)
@@ -151,7 +151,7 @@ SECTION_LOOP: do while (ioerr==0)
          call ReadInputDrawOptions(ainp,comment,nrighe,ier,ninp,nout)
       case default 
         ier = 1
-   end select
+   endselect
 ! Reading error was detected
    if (ier/=0) then
       write(nscr,"(/,1x,a,i8,//)")                                             &
@@ -166,7 +166,7 @@ enddo SECTION_LOOP
 ! To assign the kernel support 
 if (ncord>0) then
    write(nout,"(/,1x,a,//)") ">> END OF INPUT FILE"
-   Domain%h = Domain%dd * Domain%trunc
+   Domain%h = Domain%dx * Domain%trunc
    doubleh = two * Domain%h
    squareh = Domain%h * Domain%h
    doublesquareh = doubleh * doubleh

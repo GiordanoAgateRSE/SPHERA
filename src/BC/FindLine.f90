@@ -56,7 +56,7 @@ character(len=lencard) :: nomsub = "FindLine"
 do iv=Tratto(Nt)%inivertex,(Tratto(Nt)%inivertex+Tratto(Nt)%numvertices-1)
 ! It checks for the maximum boundary lines storage
    if (iv>NumBVertices) then
-      call diagnostic (arg1=10,arg2=2,arg3=nomsub)
+      call diagnostic(arg1=10,arg2=2,arg3=nomsub)
    end if
 ! It evaluates the minimum and maximum coordinates with respect the current 
 ! vertex nf in the line nt

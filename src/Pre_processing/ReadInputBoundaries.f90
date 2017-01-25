@@ -405,7 +405,7 @@ do while (TRIM(lcase(ainp))/="##### end boundaries #####")
       if ((pool_plane=="Y").or.(pool_plane=="y")) Partz(Izona)%ipool = 2
       if ((pool_plane=="Z").or.(pool_plane=="z")) Partz(Izona)%ipool = 3
       Partz(Izona)%pool = pool_value
-! Constraints 
+! Constraints
       MULTI_INDEX_LOOP: do index=indexi, indexf       
          Tratto(index)%tipo = tipo
          if (ncord==3) then
@@ -460,8 +460,6 @@ BoundaryVertex(Tratto(index)%inivertex:Tratto(index)%inivertex+Tratto(index)%num
                      "(1x,a,z8)") "Color           : ",                        &
                      Tratto(index)%colorCode
                   Tratto(index)%ColorCode = icolor
-                  write(nout,"(1x,a,z8)") "Color           : ",                &
-                     Tratto(index)%colorCode
                endif
             case("tapi")
                if (ncord==3) then 
@@ -469,8 +467,6 @@ BoundaryVertex(Tratto(index)%inivertex:Tratto(index)%inivertex+Tratto(index)%num
                   if (nout>0.and.index==indexi) write(nout,"(1x,a,z8)")        &
                      "Color           : ",Tratto(index)%colorCode
                   Tratto(index)%ColorCode = icolor
-                  write(nout,"(1x,a,z8)") "Color           : ",                &
-                     Tratto(index)%colorCode
                   else 
                      numv = Tratto(index)%numvertices
                      if (numv/=2) then 
@@ -573,7 +569,7 @@ BoundaryVertex(Tratto(index)%inivertex+Tratto(index)%numvertices-1)
                Tratto(index)%ColorCode = icolor
                if ((nout>0).and.(index==indexi)) write(nout,"(1x,a,z8)")       &
                   "Color           : ",Tratto(index)%colorCode
-         end select
+         endselect
       enddo MULTI_INDEX_LOOP
    endif
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)

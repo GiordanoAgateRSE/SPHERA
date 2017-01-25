@@ -51,8 +51,8 @@ type TyGlobal
    integer(4)       :: RKscheme ! RK scheme (1,2,3,4) (time_split=0)                      
    integer(4)       :: time_stage ! Stage of RK schemes                                           
    double precision :: tmax ! Maximum physical time                           
-   double precision :: dd ! dx: particle size                             
-   double precision :: trunc ! h/dx, h=dd*trunc                         
+   double precision :: dx ! dx: particle size                             
+   double precision :: trunc ! h/dx, h=dx*trunc                         
    double precision :: PVolume ! dx^D, D: domain dimensionality                        
    double precision :: coefke  
    double precision :: coefkacl  
@@ -71,7 +71,7 @@ type TyGlobal
    double precision :: TetaP ! Partial smoothing parameter for pressure                         
    double precision :: TetaV ! Partial smoothing parameter for velocity                         
    double precision :: h ! Kernel support length scale                              
-   double precision :: start ! Simulation start time                          
+   double precision :: start ! Simulation start time                         
    double precision :: COEFNMAXPARTI ! Max number of fluid 
                                      ! particles=nag*COEFNMAXPARTI                 
    double precision :: COEFNMAXPARTJ ! maxb(maximum number of 
@@ -143,7 +143,7 @@ type TyParticle
                            ! it depends on the input data)                           
    double precision :: vpres ! Pressure correction                          
    double precision :: vden ! Density correction                           
-   double precision :: secinv ! Second invariant of the strain-rate tensor 
+   double precision :: secinv ! Second invariant of the strain rate tensor 
                               ! for incompressible fluids                        
    double precision :: dudx  
    double precision :: dudy 
@@ -466,7 +466,7 @@ type TyMedium
    double precision :: cons ! Consistency   
    double precision :: Cs ! Costant of Smagorinsky's model    
    double precision :: RoughCoef ! Roughness coefficient 
-   double precision :: D50 ! 50-th percentile diameter of the granular size
+   double precision :: d50 ! 50-th percentile diameter of the granular size
                             ! distribution 
    double precision :: SettlingCoef ! Coefficient for the settling velocity 
                                     ! of the solid grains 
@@ -481,7 +481,6 @@ type TyMedium
                             ! distribution 
    character(8)     :: tipo ! Type: "liquid  "(, "gas     ", 
                             ! "general ", "granular", "smagorin")
-   character(8)     :: modelloerosione ! Erosion criterion (obsolete choice)
 end type TyMedium
 
 ! Boundary side
@@ -605,7 +604,7 @@ type TyQ_section
 end type  
 
 ! Derived type for bed-load transport layer 
-type TyGranular_flows_options 
+type TyGranular_flows_options
    integer(4)       :: ID_erosion_criterion ! Erosion criterion ID 
                                             ! (1:Shields-Seminara,
                                             ! 2:Shields,3:Mohr-Coulomb)
@@ -693,7 +692,7 @@ type TyGranular_flows_options
 ! Saturation conditions: 1 (phreatic zone), 2 (infiltration zone), 3 (dry soil)
 ! x and/or y coordinates defining the monitoring line/point   
    double precision,dimension(:,:),allocatable :: lines                  
-end type 
+end type
 
 ! Face (DB-SPH)
 type face_der_type                                                                  

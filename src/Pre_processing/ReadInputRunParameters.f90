@@ -144,7 +144,7 @@ if (ncord>0) then
    Domain%body_part_reorder = body_part_reorder
    Domain%MAXCLOSEBOUNDFACES = MAXCLOSEBOUNDFACES
    Domain%MAXNUMCONVEXEDGES = MAXNUMCONVEXEDGES 
-   GCBFVecDim = GCBFVecDim_loc
+   if (.not.restart) GCBFVecDim = GCBFVecDim_loc
    Domain%density_thresholds = density_thresholds
    if (nout>0) then
       write(nout,"(1x,a,1p,e12.4)") "TMAX                       : ",           &
@@ -182,8 +182,10 @@ if (ncord>0) then
          Domain%MAXCLOSEBOUNDFACES
       write(nout,"(1x,a,1p,i12)")   "MAXNUMCONVEXEDGES          : ",           &
          Domain%MAXNUMCONVEXEDGES
-      write(nout,"(1x,a,1p,i12)")   "GCBFVecDim_loc             : ",           &
+      if (.not.restart) then
+      write(nout,"(1x,a,1p,i12)")   "GCBFVecDim (input file)    : ",           &
          GCBFVecDim
+      endif
       write(nout,"(1x,a,1p,i1)")    "density_thresholds         : ",           &
          Domain%density_thresholds       
       write(nout,"(1x,a)") " "

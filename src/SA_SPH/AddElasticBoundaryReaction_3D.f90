@@ -65,7 +65,7 @@ logical,external :: IsPointInternal
 !------------------------
 BoundReaction = zero
 mate = pg(npi)%imed
-zimin = zmincoeff * Domain%dd
+zimin = zmincoeff * Domain%dx
 celer02 = Med(mate)%eps / Med(mate)%den0
 ibdt = BoundaryDataPointer(3,npi)
 !------------------------

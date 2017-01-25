@@ -76,11 +76,14 @@ if (index(Med(imed)%tipo,"granular")<=0) return
 ncelcorr = ParticleCellNumber(pg(npi)%coord)
 iappo = CellIndices(ncelcorr,igridi,jgridi,kgridi) 
 ! In case of no erosion: simple management of SPH mixture particles
-!  (with or without a velocity threshold)
+! (eventual influence of both a positive velocity threshold and/or the 
+! frictional viscosity threshold).
 if (Granular_flows_options%erosion_flag==1) then
-   if (ind_interfaces(igridi,jgridi,4).ne.0) then 
+   if (ind_interfaces(igridi,jgridi,4).ne.0) then
+! The mixture particles which define the fixed bed have null velocities and 
+! the variable "state" equal to '"flu"', even though they are fixed.
       if (pg(npi)%coord(3)>=(pg(ind_interfaces(igridi,jgridi,4))%coord(3)      &
-         -2.d0*Domain%h)) then 
+         -2.d0 * Domain%h)) then 
          if (pg(npi)%state=="flu") return
          pg(npi)%state = "flu"
          else
@@ -102,7 +105,7 @@ if (Granular_flows_options%erosion_flag==1) then
             (-Domain%grav(3)) * med(pg(aux_ID)%imed)%den0 + Velocity2 * half * &
             Med(pg(aux_ID)%imed)%den0
    pg(npi)%dens = med(imed)%den0 + (pretot / (Med(imed)%celerita *             &
-                  Med(imed)%celerita))   
+                  Med(imed)%celerita))  
    return
 endif
 if (Granular_flows_options%ID_erosion_criterion==1) then
@@ -299,7 +302,7 @@ end if
 if (Granular_flows_options%ID_erosion_criterion==1) then
    Ks = 3.d0 * med(imed)%d_90
    else
-      Ks = med(imed)%RoughCoef * med(imed)%D50
+      Ks = med(imed)%RoughCoef * med(imed)%d50
 endif
 if (Granular_flows_options%ID_erosion_criterion>1) then     
    Velocity = Dsqrt(Velocity2)
@@ -412,10 +415,10 @@ iter_ustar: do while ((flagz0).and.                                            &
    endif
 enddo iter_ustar 
 if (isnan(Ustar)) then
-   call diagnostic (arg1=11,arg2=1,arg3=nomsub)
+   call diagnostic(arg1=11,arg2=1,arg3=nomsub)
 end if
 Taub = Ustar * Ustar * Med(pg(intliq_id)%imed)%den0
-Restar = Med(pg(intliq_id)%imed)%den0 * Ustar * med(imed)%D50 / pg(intliq_id)%mu
+Restar = Med(pg(intliq_id)%imed)%den0 * Ustar * med(imed)%d50 / pg(intliq_id)%mu
 if (Restar>=500.0D0) then
    Tetacr = 0.068D0
    elseif (Restar<=1.d0) then
@@ -424,7 +427,7 @@ if (Restar>=500.0D0) then
          Tetacr = 0.010595D0 * Dlog(Restar) + 0.110476D0 / Restar + 0.0027197D0
 end if
 ! To compute Shields critical parameter for flat beds 
-Taubcror = Tetacr * GI * med(imed)%D50 * (Med(pg(intsol_id)%imed)%den0_s -     &
+Taubcror = Tetacr * GI * med(imed)%d50 * (Med(pg(intsol_id)%imed)%den0_s -     &
            Med(pg(intliq_id)%imed)%den0)
 if (Granular_flows_options%ID_erosion_criterion==1) then
    pg(npi)%u_star = Ustar

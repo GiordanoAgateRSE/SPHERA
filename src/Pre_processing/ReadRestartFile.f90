@@ -35,8 +35,9 @@ use Dynamic_allocation_module
 !------------------------
 implicit none
 character(7),intent(IN) :: option
-integer(4),intent(INOUT) :: ier,nrecords 
-integer(4) :: restartcode,save_istart,ioerr,i,alloc_stat
+integer(4),intent(INOUT) :: ier,nrecords
+logical :: aux_logical
+integer(4) :: restartcode,save_istart,ioerr,i,alloc_stat,i_aux
 double precision :: save_start
 character(12) :: ainp = "Restart File"
 character(len=8) :: versionerest
@@ -52,6 +53,7 @@ character(100),external :: lcase
 ! Initializations
 !------------------------
 ier = 0
+aux_logical = .false.
 !------------------------
 ! Statements
 !------------------------
@@ -78,9 +80,23 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
    endif
    read(nsav,iostat=ioerr) ncord,nag,NMedium,NPartZone,NumVertici,NumFacce,    &
       NumTratti,NumBVertices,NumBSides,GCBFVecDim,Grid%nmax,NPointst,NPoints,  &
-      NPointsl,NPointse,NLines,NSections,GCBFVecDim,doubleh
+      NPointsl,NPointse,NLines,NSections,doubleh
    if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"ncord, nag, ...",nsav,nout))    &
       return
+! The parameter is read from the restart file and not from the input file
+   write(nout,"(1x,a,1p,i12)")   "GCBFVecDim (from restart file): ",GCBFVecDim
+! Allocation of the array "GCBFVector"
+   if ((Domain%tipo=="semi").and.(GCBFVecDim>0).and.                           &
+      (.not.allocated(GCBFVector))) then
+      allocate(GCBFVector(GCBFVecDim),stat=ier)    
+      if (ier/=0) then
+         write(nout,'(1x,2a)') "Allocation of GCBFVector in ",                 &
+            "ReadRestartFile failed. "
+         else
+            write(nout,'(1x,2a)') "Allocation of GCBFVector in ",              &
+            "ReadRestartFile successully completed. "
+      endif
+   endif
    elseif (TRIM(lcase(option))=="reading") then
       write(nout,'(a)')                                                        &
          "---------------------------------------------------------------------"
@@ -108,8 +124,72 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
                   'successfully completed.'
          endif
       endif
+! Allocation of the array "GCBFPointers"
+      if (Domain%tipo=="semi") then
+         allocate(GCBFPointers(Grid%nmax,2),STAT=alloc_stat)
+         if (alloc_stat/=0) then
+            write(nout,*) "Allocation of GCBFPointers in ReadRestartFile ",    &
+               "failed; the program stops here."
+            stop
+            else
+               write (nout,*) "Allocation of GCBFPointers in ReadRestartFile ",&
+                  "is successfully completed."
+         endif
+      endif
+      read(nsav,iostat=ioerr) Med(1:NMedium)
+      if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"Med",nsav,nout)) return
+      if (NumVertici>0) then
+         read(nsav,iostat=ioerr) Vertice(1:SPACEDIM,1:NumVertici)
+         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"Vertice",nsav,nout)) return
+      endif
+      if (NumFacce>0) then 
+         read(nsav,iostat=ioerr) BoundaryFace(1:NumFacce)
+         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"BoundaryFace",nsav,nout)) &
+            return
+      endif
+      if (NumFacce>0) then
+         read(nsav,iostat=ioerr) BFaceList(1:NumFacce)
+         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"BFaceList",nsav,nout))    &
+            return
+      endif
+      if (NumTratti>0) then
+         read(nsav,iostat=ioerr) Tratto(1:NumTratti)
+         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"Tratto",nsav,nout)) return
+      endif
+      if (NPartZone>0) then
+         read(nsav,iostat=ioerr) Partz(1:NPartZone)
+         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"Partz",nsav,nout)) return
+      endif
+      if (NumBVertices>0) then
+        read(nsav,iostat=ioerr) BoundaryVertex(1:NumBVertices)
+        if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"BoundaryVertex",nsav,nout))&
+           return
+      endif
+      if (NumBSides>0) then
+         read(nsav,iostat=ioerr) BoundarySide(1:NumBSides)     
+         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"BoundarySide",nsav,nout)) &
+            return
+      endif
+      if (Domain%tipo=="semi") then
+         if (GCBFVecDim>0) then
+            read(nsav,iostat=ioerr) GCBFVector(1:GCBFVecDim)
+            if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"GCBFVector",nsav,nout))&
+               return
+         endif
+         if (Grid%nmax>0) then
+            read(nsav,iostat=ioerr) GCBFPointers(1:Grid%nmax,1:2)
+            if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"GCBFPointers",nsav,    &
+               nout)) return
+         endif
+      endif
 ! Allocation of the array of the maximum water depth
-      if ((Partz(1)%IC_source_type==2).and.(.not.allocated(Z_fluid_max))) then
+      do i_aux=1,NPartZone
+         if(Partz(i_aux)%IC_source_type==2) then
+            aux_logical = .true.
+            exit
+         endif
+      enddo
+      if ((aux_logical.eqv..true.).and.(.not.allocated(Z_fluid_max))) then
          allocate(Z_fluid_max(Grid%ncd(1)*Grid%ncd(2)),STAT=alloc_stat)
          if (alloc_stat/=0) then
             write(nout,*)                                                      &
@@ -123,8 +203,8 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
          endif
       endif
 ! Allocation of the array of the maximum specific flow rate
-      if ((Partz(1)%IC_source_type==2).and.(.not.allocated(q_max))) then
-         allocate(q_max(Grid%ncd(1)*Grid%ncd(2)),STAT=alloc_stat)
+      if ((aux_logical.eqv..true.).and.(.not.allocated(q_max))) then
+         allocate(q_max(Partz(1)%npoints),STAT=alloc_stat)
          if (alloc_stat/=0) then
             write(nout,*)                                                      &
             'Allocation of q_max in ReadRestartFile failed;',                  &
@@ -159,67 +239,16 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
          allocate(Granular_flows_options%maximum_saturation_flag(Grid%ncd(1),  &
             Grid%ncd(2)),STAT=alloc_stat)
          if (alloc_stat/=0) then
-            write(nout,*)                                                      &
-            'Allocation of Granular_flows_options%maximum_saturation_flag ',   &
-            ' in ReadRestartFile failed; the program stops here.'
+            write(nout,*) "Allocation of ",                                    &
+               "Granular_flows_options%maximum_saturation_flag in ",           &
+               "ReadRestartFile failed; the program stops here."
             stop 
             else
-               write (nout,*)                                                  &
-                  'Allocation of ',                                            &
-                  'Granular_flows_options%maximum_saturation_flag in ',        &
-                  'ReadRestartFile is successfully completed.'
+               write (nout,*) "Allocation of ",                                &
+                  "Granular_flows_options%maximum_saturation_flag in ",        &
+                  "ReadRestartFile is successfully completed."
          endif
-      endif
-      read(nsav,iostat=ioerr) Med(1:NMedium)
-      if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"Med",nsav,nout)) return
-      if (NumVertici>0) then
-         read(nsav,iostat=ioerr) Vertice(1:SPACEDIM,1:NumVertici)
-         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"Vertice",nsav,nout)) return
-      endif
-      if (NumFacce>0) then 
-         read(nsav,iostat=ioerr) BoundaryFace(1:NumFacce)
-         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"BoundaryFace",nsav,nout)) &
-            return
-      endif
-      if (NumFacce>0) then
-         read(nsav,iostat=ioerr) BFaceList(1:NumFacce)
-         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"BFaceList",nsav,nout))    &
-            return
-      endif
-      if (NumTratti>0) then
-         read(nsav,iostat=ioerr) Tratto(1:NumTratti)
-         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"Tratto",nsav,nout)) return
-      endif
-      if (NPartZone>0) then
-         read(nsav,iostat=ioerr) Partz(1:NPartZone)
-         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"Partz",nsav,nout)) return
-      endif
-      if (NumBVertices>0) then
-        read(nsav,iostat=ioerr) BoundaryVertex(1:NumBVertices)
-        if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"BoundaryVertex",nsav,nout))&
-           return
-      endif
-      if (NumBSides>1) then
-         read(nsav,iostat=ioerr) BoundarySide(1:NumBSides)     
-         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"BoundarySide",nsav,nout)) &
-            return
-         else
-            read(nsav,iostat=ioerr) BoundarySide(1)
-            if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"BoundarySide",nsav, &
-               nout)) return
-      endif
-      if (Domain%tipo=="semi") then
-         if (GCBFVecDim>0) then
-            read(nsav,iostat=ioerr) GCBFVector(1:GCBFVecDim)
-            if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"GCBFVector",nsav,nout))&
-               return
-         endif
-         if (Grid%nmax>0) then
-            read(nsav,iostat=ioerr) GCBFPointers(1:Grid%nmax,1:2)
-            if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"GCBFPointers",nsav,    &
-               nout)) return
-         endif
-      endif
+      endif      
 ! Restart positions are based on the step number
       it_start = 0 
       if (save_istart>0) then
@@ -295,16 +324,15 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
                      if (n_bodies>0) then
                         do i=1,n_bodies
                            read(nsav,iostat=ioerr) body_arr(i)%npart,          &
-                              body_arr(i)%Ic_imposed,body_arr(i)%n_elem,       &
+                              body_arr(i)%Ic_imposed,                          &
                               body_arr(i)%imposed_kinematics,                  &
                               body_arr(i)%n_records,body_arr%mass,             &
                               body_arr(i)%umax,body_arr(i)%pmax,               &
                               body_arr(i)%x_CM,body_arr(i)%alfa,               &
-                              body_arr(i)%x_rotC,body_arr(i)%u_CM,             &
-                              body_arr(i)%omega,body_arr(i)%Force,             &
-                              body_arr(i)%Moment,body_arr(i)%Ic,               &
-                              body_arr(i)%Ic_inv,body_arr(i)%body_kinematics,  &
-                              body_arr(i)%elem
+                              body_arr(i)%u_CM,body_arr(i)%omega,              &
+                              body_arr(i)%Force,body_arr(i)%Moment,            &
+                              body_arr(i)%Ic,body_arr(i)%Ic_inv,               &
+                              body_arr(i)%body_kinematics
                         enddo
                         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"body_arr", &
                            nsav,nout)) return
@@ -323,8 +351,7 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
                            "Z_fluid_max",nsav,nout)) return
                      endif
                      if (allocated(q_max)) then
-                        read(nsav,iostat=ioerr)                                &
-                           q_max(1:Grid%ncd(1)*Grid%ncd(2))
+                        read(nsav,iostat=ioerr) q_max(1:size(q_max))
                         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"q_max",nsav&
                            ,nout)) return
                      endif                     
@@ -449,16 +476,15 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
                         if (n_bodies>0) then
                            do i=1,n_bodies
                               read(nsav,iostat=ioerr) body_arr(i)%npart,       &
-                                 body_arr(i)%Ic_imposed,body_arr(i)%n_elem,    &
+                                 body_arr(i)%Ic_imposed,                       &
                                  body_arr(i)%imposed_kinematics,               &
                                  body_arr(i)%n_records,body_arr%mass,          &
                                  body_arr(i)%umax,body_arr(i)%pmax,            &
                                  body_arr(i)%x_CM,body_arr(i)%alfa,            &
-                                 body_arr(i)%x_rotC,body_arr(i)%u_CM,          &
-                                 body_arr(i)%omega,body_arr(i)%Force,          &
-                                 body_arr(i)%Moment,body_arr(i)%Ic,            &
-                                 body_arr(i)%Ic_inv,body_arr(i)%body_kinematics&
-                                 ,body_arr(i)%elem
+                                 body_arr(i)%u_CM,body_arr(i)%omega,           &
+                                 body_arr(i)%Force,body_arr(i)%Moment,         &
+                                 body_arr(i)%Ic,body_arr(i)%Ic_inv,            &
+                                 body_arr(i)%body_kinematics
                            enddo
                            if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,         &
                               "body_arr",nsav,nout)) return
@@ -477,8 +503,7 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
                               "Z_fluid_max",nsav,nout)) return
                         endif
                         if (allocated(q_max)) then
-                           read(nsav,iostat=ioerr) q_max(1:                    &
-                              Grid%ncd(1)*Grid%ncd(2))
+                           read(nsav,iostat=ioerr) q_max(1:size(q_max))
                            if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"q_max", &
                               nsav,nout)) return
                         endif                           

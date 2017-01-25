@@ -135,7 +135,7 @@ do i=(ic-1),(ic+1)
                               LocX(3, Ncbf) = pin
                               pg(npi)%CloseBcOut = 1
                               else
-                                 call diagnostic (arg1=8,arg2=6,arg3=nomsub)
+                                 call diagnostic(arg1=8,arg2=6,arg3=nomsub)
                            endif
                         endif
                         else
@@ -144,7 +144,7 @@ do i=(ic-1),(ic+1)
                               Clobface(Ncbf) = intbf
                               LocX(3, Ncbf) = pin
                               else
-                                 call diagnostic (arg1=8,arg2=7,arg3=nomsub)
+                                 call diagnostic(arg1=8,arg2=7,arg3=nomsub)
                            endif
                      endif
                      elseif (pin<pinmin) then   

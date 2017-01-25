@@ -75,7 +75,7 @@ ro0 = Med(imed)%den0
 cinvisci = pg(npi)%visc
 roi = pg(npi)%dens
 pressi = pg(npi)%pres
-distpimin = Domain%dd
+distpimin = Domain%dx
 tpres_save1 = zero
 ViscoMon_save1 = zero
 RHS(1) = -tpres(1)
@@ -119,7 +119,7 @@ do icbs=1,IntNcbs
          do i=1,PLANEDIM
             sidevel(i) = RifBoundarySide%velocity(acix(i))
          enddo
-   end select
+   endselect
 ! Boundary contribution to "gradP" 
 ! (pressure gradient term in the momentum equation) 
    if ((strtype=="fixe").OR.(strtype=="tapi"))  then

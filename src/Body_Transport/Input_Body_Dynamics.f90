@@ -66,7 +66,7 @@ do i=1,n_bodies
    do j=1,body_arr(i)%n_elem
 ! Particle length scales for the element
       body_arr(i)%elem(j)%dx(:) = body_arr(i)%elem(j)%L_geom(:) /              &
-         (int(body_arr(i)%elem(j)%L_geom(:) / (Domain%dd/dx_dxbodies)))
+         (int(body_arr(i)%elem(j)%L_geom(:) / (Domain%dx/dx_dxbodies)))
 ! Number of body particles of the element
       if (ncord==3) then
          body_arr(i)%elem(j)%npart = int(body_arr(i)%elem(j)%L_geom(1) /       &
@@ -226,7 +226,7 @@ do nbi=1,n_bodies
                if (ncord==2) bp_arr(npi)%normal(2) = 0.d0
 ! Rotations around the centre of rotation provided in input
                bp_arr(npi)%rel_pos(:) = bp_arr(npi)%pos(:) -                   &
-                                        body_arr(nbi)%x_rotC(:) 
+                                        body_arr(nbi)%x_rotC(:)
                call vector_rotation(bp_arr(npi)%rel_pos,body_arr(nbi)%alfa) 
                if (ncord==2) bp_arr(npi)%rel_pos(2) = 0.d0
                bp_arr(npi)%pos(:) = bp_arr(npi)%rel_pos(:) +                   &

@@ -82,7 +82,7 @@ do while (TRIM(lcase(ainp))/="##### end geometry file #####")
             call ReadInputFaces(NumberEntities,ainp,comment,nrighe,ier,.FALSE.,&
                                 ninp2,nout)
          case default
-      end select
+      endselect
       call ReadRiga(ainp,comment,nrighe,ioerr,ninp2)
 ! In case of EOF, then it exits, otherwise it checks the error 
       if (ioerr==-1) cycle SECTION_LOOP

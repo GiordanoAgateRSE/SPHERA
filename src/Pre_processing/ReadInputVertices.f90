@@ -96,7 +96,7 @@ do while (TRIM(lcase(ainp))/="##### end vertices #####")
          endif
          ier = 2
          return
-   end select
+   endselect
    if ((ncord>0).and.(nout>0).and.(prtopt)) then
       write(nout,"(i6,1p,3(2x,a,e12.4))") i,(xyzlabel(icoordp(n,ncord-1)),     &
          Vertice(icoordp(n,ncord-1),i),n=1,ncord)

@@ -48,7 +48,6 @@ integer(4) :: i,j,n,i1
 !------------------------
 do i=1,size(Med)
    Med(i)%tipo = "Empty   "
-   Med(i)%modelloerosione = "        "
    Med(i)%index = 0
    Med(i)%NIterSol = 0
    Med(i)%den0 = zero
@@ -66,7 +65,7 @@ do i=1,size(Med)
    Med(i)%cons = zero
    Med(i)%Cs = zero
    Med(i)%RoughCoef = zero
-   Med(i)%D50 = zero
+   Med(i)%d50 = zero
    Med(i)%SettlingCoef = zero
    Med(i)%Codif = zero
    Med(i)%Gamma = zero
@@ -258,7 +257,7 @@ do j=1,3
    Domain%grav(j) = zero
 enddo
 Domain%tmax = zero
-Domain%dd = zero
+Domain%dx = zero
 Domain%trunc = zero
 Domain%coefke = zero
 Domain%coefkacl = zero

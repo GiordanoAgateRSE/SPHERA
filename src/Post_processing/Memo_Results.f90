@@ -68,9 +68,9 @@ if (index(str,'inizio')/=0) then
       if ((allocated(GCBFPointers)).and.(Grid%nmax>1)) nrecords = nrecords + 1
    endif
    write(nres) version,nrecords
-   write(nres) Ncord,Nag,NMedium,NPartZone,NumVertici,NumFacce,NumTratti,      &   
+   write(nres) ncord,Nag,NMedium,NPartZone,NumVertici,NumFacce,NumTratti,      &   
       NumBVertices,NumBSides,GCBFVecDim,Grid%nmax,NPointst,NPoints,NPointsl,   &
-      NPointse,NLines,NSections,GCBFVecDim,doubleh
+      NPointse,NLines,NSections,doubleh
    write(nres) domain
    write(nres) grid
    write(nres) Med(1:NMedium)
@@ -80,11 +80,7 @@ if (index(str,'inizio')/=0) then
    if (NumTratti>0) write(nres) Tratto(1:NumTratti)
    if (NPartZone>0) write(nres) Partz(1:NPartZone)
    if (NumBVertices>0) write(nres) BoundaryVertex(1:NumBVertices)
-   if (NumBSides>1) then
-      write(nres) BoundarySide(1:NumBSides)
-      else
-         write(nres) BoundarySide(1)
-   endif
+   if (NumBSides>0) write(nres) BoundarySide(1:NumBSides)
    if (Domain%tipo=="semi") then
       if ((allocated(GCBFVector)).and.(GCBFVecDim>0)) write(nres)              &
          GCBFVector(1:GCBFVecDim)
@@ -120,27 +116,24 @@ if (Domain%imemo_fr>0) then
 endif
 if ((it_rest==it).or.(index(str,'inizio')/=0).or.(index(str,'fine')/=0)) then
 ! If restartcode=1, then to save the whole arrays "pg","pg_w"
-   restartcode = 1 
+   restartcode = 1
    write(nres) it,simulation_time,dt,nag,ncord,restartcode
    write(nres) pg(1:nag)
    if (allocated(pg_w)) write(nres)                                            &
       pg_w(1:DBSPH%n_w+DBSPH%n_inlet+DBSPH%n_outlet)
    do i=1,n_bodies
       write(nres) body_arr(i)%npart,body_arr(i)%Ic_imposed,                    &
-         body_arr(i)%n_elem,body_arr(i)%imposed_kinematics,                    &
-         body_arr(i)%n_records,body_arr%mass,body_arr(i)%umax,                 &
-         body_arr(i)%pmax,body_arr(i)%x_CM,                                    &
-         body_arr(i)%alfa,body_arr(i)%x_rotC,                                  &
-         body_arr(i)%u_CM,body_arr(i)%omega,                                   &
-         body_arr(i)%Force,body_arr(i)%Moment,                                 &
-         body_arr(i)%Ic,body_arr(i)%Ic_inv,                                    &
-         body_arr(i)%body_kinematics,body_arr(i)%elem
+         body_arr(i)%imposed_kinematics,body_arr(i)%n_records,body_arr%mass,   &
+         body_arr(i)%umax,body_arr(i)%pmax,body_arr(i)%x_CM,body_arr(i)%alfa,  &
+         body_arr(i)%u_CM,body_arr(i)%omega,body_arr(i)%Force,                 &
+         body_arr(i)%Moment,body_arr(i)%Ic,body_arr(i)%Ic_inv,                 &
+         body_arr(i)%body_kinematics
    enddo
    if (allocated(bp_arr)) write(nres) bp_arr(1:n_body_part)
    if (allocated(surf_body_part)) write(nres) surf_body_part(1:n_surf_body_part)
    if (allocated(Z_fluid_max)) write(nres)                                     &
       Z_fluid_max(1:Grid%ncd(1)*Grid%ncd(2))
-   if (allocated(q_max)) write(nres) q_max(1:Grid%ncd(1)*Grid%ncd(2))
+   if (allocated(q_max)) write(nres) q_max(1:size(q_max))
    if (allocated(Granular_flows_options%minimum_saturation_flag)) write(nres)  &
       Granular_flows_options%minimum_saturation_flag(1:Grid%ncd(1),            &
       1:Grid%ncd(2))
@@ -158,7 +151,7 @@ if ((it_rest==it).or.(index(str,'inizio')/=0).or.(index(str,'fine')/=0)) then
    endif
    elseif (it_memo==it) then
 ! If restartcode=0, then to save "pg" only for visualizations
-      restartcode = 0  
+      restartcode = 0
       write(nres) it,simulation_time,dt,nag,ncord,restartcode
       write(nres) pg(1:nag)%coord(1),pg(1:nag)%coord(2),pg(1:nag)%coord(3),    &
          pg(1:nag)%vel(1),pg(1:nag)%vel(2),pg(1:nag)%vel(3),pg(1:nag)%pres,    &

@@ -96,7 +96,7 @@ if (ncord==3) then
          ID_face1_iso = 3
       case default
          ID_face1_iso = 0
-   end select
+   endselect
    else
       select case(test_face1)
          case(13,20,25)
@@ -107,7 +107,7 @@ if (ncord==3) then
             ID_face1_iso = 3
          case default
             ID_face1_iso = 0
-      end select   
+      endselect   
 endif
 ! The only/first vertex (in 3D/2D) of the 2nd face, not contributing to   
 ! test_face2, is finally found
@@ -121,7 +121,7 @@ if (ncord==3) then
          ID_face2_iso = 3
       case default
          ID_face2_iso = 0
-   end select  
+   endselect  
    else
       select case(test_face2)
          case(13,20,25)
@@ -132,7 +132,7 @@ if (ncord==3) then
             ID_face2_iso = 3
          case default
             ID_face2_iso = 0
-      end select 
+      endselect 
 endif
 if ((ID_face1_iso==0).or.(ID_face2_iso==0)) false_hyp = .true.
 !------------------------

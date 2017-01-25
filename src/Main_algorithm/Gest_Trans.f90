@@ -109,9 +109,9 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph"))  then
          endif
    endif
 endif
-NMAXPARTJ = Domain%COEFNMAXPARTJ * (Domain%h * four / Domain%dd) ** Ncord
-write(nout,'(2a,i15)') "     Max num particles surrounding the current ",      &
-   "particle: NMAXPARTJ = ",NMAXPARTJ
+NMAXPARTJ = Domain%COEFNMAXPARTJ * (Domain%h * four / Domain%dx) ** Ncord
+write(nout,'(2a,i15)') "     Maximum number of neighbouring particles: ",      &
+   "NMAXPARTJ = ",NMAXPARTJ
 allocate(Array_Flu(1:PARTICLEBUFFER),stat=ier)
 if (ier/=0) then
    write(nout,'(1x,a,i2)') "   Array Array_Flu not allocated. Error code: ",   &
@@ -654,7 +654,7 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
             endif
             Z_fluid_max = -999.d0
             if (.not.allocated(q_max)) then
-               allocate(q_max(Grid%ncd(1)*Grid%ncd(2)),STAT=alloc_stat)
+               allocate(q_max(Partz(i)%npoints),STAT=alloc_stat)
                if (alloc_stat/=0) then
                   write(nout,*)                                                &
                   'Allocation of q_max in Gest_Trans failed;',                 &

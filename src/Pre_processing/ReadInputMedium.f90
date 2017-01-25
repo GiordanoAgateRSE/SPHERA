@@ -20,7 +20,8 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: ReadInputMedium                          
-! Description:                        
+! Description: to read the input data from the section "medium" of SPHERA main 
+!              input file.                       
 !-------------------------------------------------------------------------------
 subroutine ReadInputMedium(NumberEntities,Med,ainp,comment,nrighe,ier,ninp,    &
                            nout,nscr)
@@ -33,7 +34,7 @@ use Hybrid_allocation_module
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: nrighe,ier, ninp,nout,nscr
+integer(4) :: nrighe,ier,ninp,nout,nscr
 integer(4),dimension(20) :: NumberEntities
 type (TyMedium),dimension(NMedium) :: Med
 character(1) :: comment
@@ -41,10 +42,10 @@ character(100) :: ainp
 logical :: saturated_medium_flag
 integer(4) :: index,nitersol,ioerr
 double precision :: den0,eps,alfaMon,betaMon,visc,viscmx,taucri,cuin,phi,Cs
-double precision :: cons,codif,Settling,coes,Rough,D50,Gamma,InitialIntEn,d_90
+double precision :: cons,codif,Settling,coes,Rough,d50,Gamma,InitialIntEn,d_90
 double precision :: limiting_viscosity
 double precision :: porosity
-character(8) :: tipo,erosionmodel
+character(8) :: tipo
 character(100) :: token
 character(100),external :: GetToken,lcase
 logical,external :: ReadCheck
@@ -88,11 +89,10 @@ do while (TRIM(lcase(ainp))/="##### end medium #####")
    limiting_viscosity = zero
    phi = zero
    saturated_medium_flag = .false.
-   D50 = zero
+   d50 = zero
    nitersol = 0
    porosity = 0.d0
    d_90 = 0.d0
-   erosionmodel = "-"
    tipo = lcase(tipo)
    select case (tipo)
 ! Imposed dynamic viscosity for gases (explosion)
@@ -240,52 +240,21 @@ do while (TRIM(lcase(ainp))/="##### end medium #####")
             "COHESION, VISCO MAX, VISCO & LIMITING VISCOSITY",ninp,nout)) return            
          if (Granular_flows_options%ID_erosion_criterion==1) then
             call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-            read(ainp,*,iostat=ioerr) porosity,D50,d_90
+            read(ainp,*,iostat=ioerr) porosity,d50,d_90
             if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                          &
-               "POROSITY, D50 and D_90",ninp,nout)) return
+               "POROSITY, d50 and D_90",ninp,nout)) return
             else
                call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-               token = lcase(GetToken(ainp,1,ioerr))
-               read(token,*,iostat=ioerr) Rough
-               if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"ROUGH COEFFICIENT",   &
-                  ninp,nout)) return
-               token = lcase(GetToken(ainp,2,ioerr))
-               if (token=="") then
-                  D50 = zero
-                  erosionmodel = "mohr    "
-                  write(nout,"(a)") " !!!!!!!!!!!!!!!!!!!!!"
-                  write(nscr,"(a)") " !!!!!!!!!!!!!!!!!!!!!"
-                  write(nout,"(a,a)")                                          &
-" ATTENTION!!! The erosion model has not been declared,",                      &
-                     " the Mohr-Coulomb model will be used."
-                  write(nscr,"(a,a)")                                          &
-" ATTENTION!!! The erosion model has not been declared,",                      &
-                     " the Mohr-Coulomb model will be used."
-                  write(nout,"(a)") " !!!!!!!!!!!!!!!!!!!!!"
-                  write(nscr,"(a)") " !!!!!!!!!!!!!!!!!!!!!"
-                  else
-                     read(token,*,iostat=ioerr) D50
-                     if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                 &
-                        "D50 granular dimension",ninp,nout)) return
-                     token = lcase(GetToken(ainp,3,ioerr)) 
-                     if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                 &
-                        "EROSION MODEL",ninp,nout)) return
-                     if (token(1:7)=="shields") then
-                        erosionmodel = "shields "
-                        elseif (token(1:4)=="mohr") then
-                           erosionmodel = "mohr    "
-                           else
-                              ier = 6
-                              return
-                     endif
-               endif
+               read(ainp,*,iostat=ioerr) Rough,d50
+               if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                       &
+                  "ROUGH COEFFICIENT, d50",ninp,nout)) return
                call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
                read(ainp,*,iostat=ioerr) nitersol
                if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                       &
                   "N° ITERATION SOLID",ninp,nout)) return
          endif
       case default
-   end select
+   endselect
 ! Assignments 
    if (ncord>0) then
       Med(index)%tipo = tipo
@@ -307,10 +276,9 @@ do while (TRIM(lcase(ainp))/="##### end medium #####")
       Med(index)%limiting_viscosity = limiting_viscosity
       Med(index)%Cs = Cs
       Med(index)%RoughCoef = Rough
-      Med(index)%D50 = D50
+      Med(index)%d50 = d50
       Med(index)%gran_vol_frac_max = (1.d0 - porosity)
       Med(index)%d_90 = d_90
-      Med(index)%modelloerosione = erosionmodel
       Med(index)%codif = codif
       Med(index)%SettlingCoef = Settling
       Med(index)%gamma = gamma
@@ -350,14 +318,12 @@ do while (TRIM(lcase(ainp))/="##### end medium #####")
             Med(index)%Cs
          write(nout,"(1x,a,1p,e12.4)") "Roughness Coeff.:...........",         &
             Med(index)%RoughCoef
-         write(nout,"(1x,a,1p,e12.4)") "D50:........................",         &
-            Med(index)%D50
-         write(nout,"(1x,a,1p,e12.4)") "D90:........................",         &
+         write(nout,"(1x,a,1p,e12.4)") "d50:........................",         &
+            Med(index)%d50
+         write(nout,"(1x,a,1p,e12.4)") "d90:........................",         &
             Med(index)%d_90
-         write(nout,"(1x,a,1p,e12.4)") "(1-prosity):................",         &
+         write(nout,"(1x,a,1p,e12.4)") "Volume fraction (solid):....",         &
             Med(index)%gran_vol_frac_max
-         write(nout,"(1x,a,1x,a)")     "Erosion Model:..............",         &
-            Med(index)%modelloerosione
          write(nout,"(1x,a,1p,e12.4)") "Diffusion Coeff.:...........",         &
             Med(index)%codif       
          write(nout,"(1x,a,1p,e12.4)") "Settling Velocity Coeff.:...",         & 

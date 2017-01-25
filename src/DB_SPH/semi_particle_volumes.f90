@@ -108,11 +108,11 @@ DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(pg_w(i)%adjacent_faces(j))%vert_l
                        " Face2: ",pg_w(i)%adjacent_faces(j),                   &
                        "; the run terminates here."
          stop
-      endif 
+      endif
 ! Compute the angle between the normal vectors
       aux_scalar = dot_product(pg_w(i)%normal,                                 &
                                pg_w(pg_w(i)%adjacent_faces(j))%normal)
-      aux_vec(:) = aux_face2(ID_P_b_iso,:) - aux_face1(ID_P_0_iso,:) 
+      aux_vec(:) = aux_face2(ID_P_b_iso,:) - aux_face1(ID_P_0_iso,:)
       aux_scalar_2 = dot_product(pg_w(i)%normal,aux_vec)
       if (aux_scalar_2>=0.000001d0) then
           alfa = PIGRECO + dacos(aux_scalar) 
@@ -120,17 +120,17 @@ DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(pg_w(i)%adjacent_faces(j))%vert_l
              alfa = PIGRECO - dacos(aux_scalar)
              else
                 alfa = PIGRECO 
-      endif       
+      endif
 ! Update alfa_summation (algebric sum)
       alfa_sum = alfa_sum + alfa
-   end do
+   enddo
 ! Compute k_d (shape coefficient) and semi-particle volume (area in 2D) and mass
    if (alfa_sum>(aux_adjacent_faces*PIGRECO*0.5d0)) then
       pg_w(i)%k_d = alfa_sum/(PIGRECO*0.5d0*aux_adjacent_faces)-1.d0
       else
          pg_w(i)%k_d = 0.d0
    endif
-   pg_w(i)%volume = pg_w(i)%k_d * DBSPH%k_w * pg_w(i)%weight * Domain%dd /     &
+   pg_w(i)%volume = pg_w(i)%k_d * DBSPH%k_w * pg_w(i)%weight * Domain%dx /     &
                     DBSPH%dx_dxw   
    pg_w(i)%mass = pg_w(i)%volume * Med(1)%den0  
 end do

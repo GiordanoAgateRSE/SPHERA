@@ -74,9 +74,9 @@ do icbs=1,Ncbs
    nt = BoundarySide(isi)%stretch
 ! The boundary is of type "source": the side is considered only if the particle 
 ! is in front of the side itself and inside the domain or very closest the 
-! side (<0.5*Domain%dd)
+! side (<0.5*Domain%dx)
    if (Tratto(nt)%tipo=="sour") then
-      yxpmin = -eps * Domain%dd
+      yxpmin = -eps * Domain%dx
       if ((LocXY(2,icbs)>yxpmin).and.(LocXY(1,icbs)>zero).and.                 &
          (LocXY(1,icbs)<sidelen)) then
          IntNcbs = IntNcbs + 1

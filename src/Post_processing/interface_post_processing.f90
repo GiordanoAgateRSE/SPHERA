@@ -57,12 +57,12 @@ open(ncpt,file=nomefile_blt_interfaces,status="unknown",form="formatted")
 if (on_going_time_step==1) then
 ! First step
    write (ncpt,*) "Bed load transport interfaces "
-   write (ncpt,'((7x,a),(5x,a),(5x,a),(7x,a),(7x,a),(6x,a),(6x,a))')           &
+   write (ncpt,'((7x,a),(5x,a),(5x,a),(7x,a),(7x,a),(6x,a),(6x,a),(2x,a))')    &
       " Time(s)"," x_grid(m)"," y_grid(m)"," z_FS(m)"," z_fm(m)"," z_bed(m)",  &
-      " z_bot(m)"
+      " z_bot(m)"," z_sat_top(m)"
    flush(ncpt)
    else
-! Other steps 
+! Other steps
 ! Loop over the monitoring lines
       do i=1,Granular_flows_options%monitoring_lines
          if (Granular_flows_options%lines(i,1)==-999.d0) then
@@ -96,7 +96,7 @@ if (on_going_time_step==1) then
             i_cell = ParticleCellNumber(pos_aux) 
             i_aux = CellIndices(i_cell,i_grid,j_grid,k_grid)
             call write_Granular_flows_interfaces(i_grid,j_grid,pos_aux)
-         endif          
+         endif        
       enddo
 endif
 close(ncpt)

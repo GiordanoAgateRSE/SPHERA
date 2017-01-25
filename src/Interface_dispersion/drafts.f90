@@ -170,13 +170,13 @@ do ii=1,indarrayFlu
       tirhow = zero
       pg(npi)%VolFra = VFmx
       pg(npi)%rhoc = pg(npi)%dens
-      pg(npi)%mass = pg(npi)%dens * (Domain%dd ** ncord)
+      pg(npi)%mass = pg(npi)%dens * (Domain%dx ** ncord)
       elseif (tirhoc<=zero) then
          tirhoc = zero
          tirhow = pg(npi)%dens
          pg(npi)%rhow = pg(npi)%dens
          pg(npi)%VolFra = VFmn
-         pg(npi)%mass = pg(npi)%dens * (Domain%dd ** ncord)
+         pg(npi)%mass = pg(npi)%dens * (Domain%dx ** ncord)
          else
             tirhow = pg(npi)%dens - tirhoc
             a1 = med(2)%den0 * med(2)%celerita * med(2)%celerita - med(1)%den0 &
@@ -190,18 +190,18 @@ do ii=1,indarrayFlu
                pg(npi)%VolFra  = VFmx
                pg(npi)%rhoc = pg(npi)%dens 
                pg(npi)%rhow = Med(1)%den0 
-               pg(npi)%mass = pg(npi)%dens * (Domain%dd**ncord)
+               pg(npi)%mass = pg(npi)%dens * (Domain%dx**ncord)
                elseif (pg(npi)%VolFra<=VFmn) then
                   pg(npi)%VolFra = VFmn
                   pg(npi)%rhoc = Med(2)%den0 
                   pg(npi)%rhow = pg(npi)%dens
-                  pg(npi)%mass = pg(npi)%dens * (Domain%dd ** ncord)
+                  pg(npi)%mass = pg(npi)%dens * (Domain%dx ** ncord)
                   else
                      pg(npi)%rhoc = tirhoc / pg(npi)%VolFra  
                      pg(npi)%rhow = tirhow / (one - pg(npi)%VolFra)  
                      pg(npi)%mass = (pg(npi)%VolFra * pg(npi)%rhoc + (one -    &
                                     pg(npi)%VolFra) * pg(npi)%rhow) *          &
-                                    (Domain%dd ** ncord)
+                                    (Domain%dx ** ncord)
             endif
    endif
 enddo       

@@ -53,7 +53,7 @@ character(100), external :: lcase
 ! Creating a mesh of side dx
 Nmesh = 1
 npse = Control_Sections(seccor)%icont(1)
-CcStart(:) = vp(:) - Domain%dd
+CcStart(:) = vp(:) - Domain%dx
 !------------------------
 ! Statements
 !------------------------
@@ -61,18 +61,18 @@ do n=1,SPACEDIM
    if ((n==1).AND.(lcase(opt)=="x")) cycle
    if ((n==2).AND.(lcase(opt)=="y")) cycle
    if ((n==3).AND.(lcase(opt)=="z")) cycle
-   Nmesh(n) = nint((values(n,2) - values(n,1)) / Domain%dd )
-   CcStart(n) = values(n,1) - Domain%dd * half
+   Nmesh(n) = nint((values(n,2) - values(n,1)) / Domain%dx )
+   CcStart(n) = values(n,1) - Domain%dx * half
 enddo
 Cc(1) = CcStart(1)
 do i=1,Nmesh(1)
-   Cc(1) = Cc(1) + Domain%dd
+   Cc(1) = Cc(1) + Domain%dx
    Cc(2) = CcStart(2)
    do j=1,Nmesh(2)
-      Cc(2) = Cc(2) + Domain%dd
+      Cc(2) = Cc(2) + Domain%dx
       Cc(3) = CcStart(3)
       do k=1,Nmesh(3)
-         Cc(3) = Cc(3) + Domain%dd
+         Cc(3) = Cc(3) + Domain%dx
          npse = npse + 1
          Control_Points(npse)%coord(:) = Cc(:)
       enddo

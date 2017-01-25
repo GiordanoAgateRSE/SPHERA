@@ -33,6 +33,7 @@ subroutine rundt2
 !------------------------ 
 use Static_allocation_module
 use Hybrid_allocation_module
+use I_O_file_module
 use Dynamic_allocation_module
 !------------------------
 ! Declarations
@@ -50,24 +51,25 @@ double precision :: dt_Mon_j,dt_Mon
 !------------------------
 ! Initializations
 !------------------------
-dtmin = 1.0d+30                                                        
+dtmin = 1.0d+30                                              
 diffmax = zero
 dt_Mon = max_positive_number 
 !------------------------
 ! Statements
 !------------------------
 if (indarrayFlu==0) then
-! In case there is no fluid (or movable) particle
-   dt = 0.d0   
+! In case there is no fluid (or mobile) particle
+   dt = 0.d0
    else
-! Time step depends on 3 conditions:
-! 1) the CFL condition: dt_CFL=CFL*(2h/(c+U))
-! 2) viscous stability condition dt_vis=vsc_coeff*(rho*h**2/(0.5*mu)) 
-! 3) interface diffusion condition dt_diff=(h**2/2*teta)
+! Time step depends on 3 stability criteria:
+! 1) CFL criterion: dt_CFL=CFL*(2h/(c+U))
+! 2) viscous term criterion: dt_vis=vsc_coeff*(rho*h**2/(0.5*mu)) 
+! 3) interface diffusion criterion: dt_diff=(h**2/2*teta)
       do ii=1,indarrayFlu
          npi = Array_Flu(ii)
          if ((Granular_flows_options%ID_erosion_criterion==1).and.             &
             (Med(pg(npi)%imed)%tipo=="granular")) then
+! Redundant and safety check
             if (pg(npi)%state=="sol") cycle
             if ((pg(npi)%coord(1)<Granular_flows_options%x_min_dt).or.         &
                (pg(npi)%coord(1)>Granular_flows_options%x_max_dt).or.          &
@@ -97,8 +99,10 @@ if (indarrayFlu==0) then
             dt_Mon = min(dt_Mon,dt_Mon_j)
          endif
       enddo
-      dt_dif = half * squareh / (diffmax+0.000000001d0)
-      dtmin = min(dtmin,dt_dif)
+      if (diffusione) then
+         dt_dif = half * squareh / (diffmax+0.000000001d0)
+         dtmin = min(dtmin,dt_dif)
+      endif
       if (dt_alfa_Mon.eqv..true.) dtmin = min(dtmin,dt_Mon)
       dt = (one - pesodt) * dtmin + pesodt * dt_average
 endif

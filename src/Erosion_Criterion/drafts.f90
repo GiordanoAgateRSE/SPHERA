@@ -122,7 +122,7 @@ do npi = 1,nag
       end do
    end if
    if ((intliq_id==0).and.(intsol_id==0)) then
-      call diagnostic (arg1=11,arg2=2,arg3=nomsub)
+      call diagnostic(arg1=11,arg2=2,arg3=nomsub)
    end if
    if (intpl_id==0) then
 ! Detection of free surface 
@@ -186,7 +186,7 @@ do npi = 1,nag
          if ((index(Med(pg(npj)%imed)%tipo,"liquid")>0).or.                    &
             ((index(Med(pg(npj)%imed)%tipo,"granular")>0).and.                 &
             (pg(npi)%state=="flu"))) then
-            if (appo1>=Domain%dd) then
+            if (appo1>=Domain%dx) then
                flag = 1
                exit
             end if

@@ -67,7 +67,7 @@ if (ncord==3) then
      kerneltab(nr,4) = JdWsRn(rob,3,3,1)
    enddo
    elseif (ncord==2) then
-      call diagnostic (arg1=8,arg2=3,arg3=nomsub)
+      call diagnostic(arg1=8,arg2=3,arg3=nomsub)
 endif
 !------------------------
 ! Deallocations

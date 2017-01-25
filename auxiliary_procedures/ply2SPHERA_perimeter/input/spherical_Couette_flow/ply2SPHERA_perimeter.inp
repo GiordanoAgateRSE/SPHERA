@@ -1,3 +1,0 @@
-9 6 2 ! perimeter_first_vertex_ID; perimeter_first_face_ID; perimeter_ID
-0. ! z_offset (to add)
-spherical_Couette_flow_0-1_SHM_PV_perimeter.ply ! ply_file_name

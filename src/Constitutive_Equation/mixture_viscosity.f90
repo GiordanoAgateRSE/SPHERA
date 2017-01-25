@@ -188,23 +188,23 @@ do npi=1,nag
                                     Granular_flows_options%t_liq) 
          endif
       endif
-! secinv=sqrt(I2(e_ij) (secinv is the sqrt of the second inveriant of the 
+! secinv=sqrt(I2(e_ij)) (secinv is the sqrt of the second inveriant of the 
 ! strain-rate tensor)
-! Frictional viscosity is the mixture viscosity in the bed-load transport layer
-      if (pg(npi)%secinv>1.d-9) then 
+! Mixture viscosity in the bed-load transport layer
+      if (pg(npi)%secinv>1.d-12) then
          pg(npi)%mu = pg(npi)%sigma_prime_m * dsin(Med(pg(npi)%imed)%phi) /    &
-                      (2.d0 * pg(npi)%secinv) + mu_main_fluid * eps_fluid_blt                 
+                      (2.d0 * pg(npi)%secinv) + mu_main_fluid * eps_fluid_blt
          else
-! Fictitious value representative of perfect uniform flow conditions
-            pg(npi)%mu = 0.d0       
+! This condition simply avoids a division by zero (elastic strain rate regime)
+            pg(npi)%mu = Med(pg(npi)%imed)%mumx
       endif
-! To save computational time in the transition zone of elastic-platic regime
-      if (pg(npi)%mu>Med(pg(npi)%imed)%mumx) then
+! No matter about the presence/absence of an erosion criterion, the particles 
+! in the transition zone of elastic-plastic regime are held fixed. This is 
+! consistent with negible strain rates and saves computational time in the 
+! transition zone in the elasto-platic strain rate regime.
+      if (pg(npi)%mu>=Med(pg(npi)%imed)%mumx) then
          pg(npi)%mu = Med(pg(npi)%imed)%mumx
          pg(npi)%vel(:) = 0.d0
-! No matter about the presence/absence of an erosion criterion, the particles 
-! in the transition zone of elastic-platic regime are set fixed.
-         pg(npi)%state = "sol"
          elseif(pg(npi)%mu>Med(pg(npi)%imed)%limiting_viscosity) then
             pg(npi)%mu = Med(pg(npi)%imed)%limiting_viscosity
       endif

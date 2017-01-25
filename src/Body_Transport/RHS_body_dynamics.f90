@@ -158,7 +158,7 @@ do npi=1,n_body_part
                            bp_arr(npj)%normal(:)  
             r_par = dsqrt(r_par_vec(1) * r_par_vec(1) + r_par_vec(2) *         &
                     r_par_vec(2) + r_par_vec(3) * r_par_vec(3))
-            if ((r_per>0.d0).and.((r_par/(Domain%dd/dx_dxbodies))<=1.d0)) then
+            if ((r_per>0.d0).and.((r_par/(Domain%dx/dx_dxbodies))<=1.d0)) then
                u_rel(:) = bp_arr(npi)%vel(:) - bp_arr(npj)%vel(:) 
                x_rel(:) = - rag_bp_bp(:,npartint) /                            &
                  dsqrt(dot_product(rag_bp_bp(:,npartint),rag_bp_bp(:,npartint)))
@@ -189,9 +189,9 @@ do npi=1,n_body_part
                                     (impact_vel(aux2,bp_arr(npj)%body) ** 2) / &
                                     r_per) * k_masses *                        &
                                     Gamma_boun(r_per,Domain%h) * (1 - r_par /  &
-                                    (Domain%dd / dx_dxbodies)) *               &
+                                    (Domain%dx / dx_dxbodies)) *               &
                                     bp_arr(npj)%normal(:)
-                  if (r_per<((Domain%dd/dx_dxbodies)/10.d0)) then   
+                  if (r_per<((Domain%dx/dx_dxbodies)/10.d0)) then   
                      write(file_name_test,"(a,a,i8.8,a,i8.8,a,i8.8,a)")        &
                         nomecaso(1:len_trim(nomecaso)),'_close_impact_',       &
                         on_going_time_step,'_',npi,'_',npj,".txt"
@@ -226,7 +226,7 @@ do npi=1,n_body_part
                   Force_mag_sum(bp_arr(npi)%body,bp_arr(npj)%body) =           &
                      Force_mag_sum(bp_arr(npi)%body,bp_arr(npj)%body) +        &
                      (1.d0 / r_per) * k_masses * Gamma_boun(r_per,Domain%h) *  &
-                     (1.d0 - r_par / (Domain%dd / dx_dxbodies))
+                     (1.d0 - r_par / (Domain%dx / dx_dxbodies))
                   r_per_min(bp_arr(npi)%body,bp_arr(npj)%body) =               &
                      min(r_per,r_per_min(bp_arr(npi)%body,bp_arr(npj)%body)) 
                endif
@@ -253,8 +253,6 @@ do npi=1,n_body_part
                         call reference_system_change(bp_arr(npi)%pos,          &
                            BoundaryFace(j)%Node(3)%GX,aux_mat,loc_pos)
                   endif
-                  call reference_system_change(bp_arr(npi)%pos,                &
-                     BoundaryFace(j)%Node(4)%GX,aux_mat,loc_pos)
                   call point_inout_convex_non_degenerate_polygon(loc_pos(1:2), &
                      BoundaryFace(j)%nodes,BoundaryFace(j)%Node(1)%LX(1:2),    &
                      BoundaryFace(j)%Node(2)%LX(1:2),                          &

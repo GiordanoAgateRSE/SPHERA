@@ -58,7 +58,7 @@ do npi=1,n_body_part
        npartint = (npi - 1) * NMAXPARTJ + j
        npj = PartIntorno_bp_f(npartint)
        dis = dsqrt(dot_product(rag_bp_f(:,npartint),rag_bp_f(:,npartint)))
-       W_vol = w(dis,Domain%h,Domain%coefke) * ((Domain%dd / dx_dxbodies) **   &
+       W_vol = w(dis,Domain%h,Domain%coefke) * ((Domain%dx / dx_dxbodies) **   &
                ncord)
        unity_vec(npj) = unity_vec(npj) + W_vol
        dervel_mat(npj,:) = dervel_mat(npj,:) +                                 &

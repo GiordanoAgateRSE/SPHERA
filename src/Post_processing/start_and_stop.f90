@@ -153,7 +153,7 @@ select case(iset)
       time_increment = time_increment / dfloat(counts_per_second)
       tot_times(itot,2) = tot_times(itot,2) + time_increment
 ! To end the execution of the binary restart file converter
-end select
+endselect
 !------------------------
 ! Deallocations
 !------------------------

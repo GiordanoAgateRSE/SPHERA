@@ -81,8 +81,8 @@ if (ncord==2) then
       end do
       Length1 = Dsqrt(Length1)
       Length2 = Dsqrt(Length2)
-      npart1 = Int(Length1 / Domain%dd+0.01d0)
-      npart2 = Int(Length2 / Domain%dd+0.01d0)
+      npart1 = Int(Length1 / Domain%dx+0.01d0)
+      npart2 = Int(Length2 / Domain%dx+0.01d0)
       npart1 = npart1 * npart2 
       cos_dir_1(:) = BoundaryFace(i_inlet)%T(:,1)
 endif
@@ -90,12 +90,12 @@ endif
 ! inlet section)
 select case (mod(itime_jet,4))
    case (1,3)  
-      pg(nag)%coord(:) = pg(nag)%coord(:) - 0.25d0 * Domain%dd * cos_dir_1(:)
+      pg(nag)%coord(:) = pg(nag)%coord(:) - 0.25d0 * Domain%dx * cos_dir_1(:)
    case (2,0) 
-      pg(nag)%coord(:) = pg(nag)%coord(:) + 0.25d0 * Domain%dd * cos_dir_1(:)
-end select
+      pg(nag)%coord(:) = pg(nag)%coord(:) + 0.25d0 * Domain%dx * cos_dir_1(:)
+endselect
 call random_number(rnd)
-pg(nag)%coord(:) = pg(nag)%coord(:) + (two * rnd - one) * 0.1d0 * Domain%dd    &
+pg(nag)%coord(:) = pg(nag)%coord(:) + (two * rnd - one) * 0.1d0 * Domain%dx    &
                    * cos_dir_1(:)
 !------------------------
 ! Deallocations

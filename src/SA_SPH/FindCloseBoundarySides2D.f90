@@ -131,7 +131,7 @@ side_loop: do isi=1,NumBSides
                   ' has more than two boundary sides: reduce dd and restart.'
                write(nscr,'(1x,a,3f15.10)') '        Coordinate: ',            &
                   pg(npi)%coord(:)
-               call diagnostic (arg1=8,arg2=8,arg3=nomsub)
+               call diagnostic(arg1=8,arg2=8,arg3=nomsub)
             endif
 ! To save the boundary ID and the local coordinates on the boundary segment
             Cloboside(Ncbs) = isi
@@ -186,7 +186,7 @@ if (isous>0) then
 endif
 ! To check if more than two sides are close to the particle
 if (Ncbs>LIMCLOSEBOUNDSIDES) then
-   call diagnostic (arg1=8,arg2=9,arg3=nomsub)
+   call diagnostic(arg1=8,arg2=9,arg3=nomsub)
 endif
 ! There are two close boundaries: to change the origin of the local abscissa in 
 ! one of the two adjacent boundary sides, so that the abscissa origin coincides 

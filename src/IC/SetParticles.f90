@@ -65,34 +65,34 @@ if (nagpg>0) then
 endif
 if (Domain%tipo=="bsph") then
    if (ncord==3) then
-      aux1 = + 0.25d0 * Domain%dd
+      aux1 = + 0.25d0 * Domain%dx
       else
-         aux1 = - 0.25d0 * Domain%dd
+         aux1 = - 0.25d0 * Domain%dx
    endif
-   aux2 = - 0.25d0 * Domain%dd 
-   aux3 = - 0.25d0 * Domain%dd 
+   aux2 = - 0.25d0 * Domain%dx 
+   aux3 = - 0.25d0 * Domain%dx 
    iaux = 0
    else
       iaux = 0
-      aux1 = - Domain%dd * half
-      aux2 = - Domain%dd * half
-      aux3 = - Domain%dd * half
+      aux1 = - Domain%dx * half
+      aux2 = - Domain%dx * half
+      aux3 = - Domain%dx * half
 endif
 PX(1) = Xmin(1) + aux1
 ! In case the zone is declared, but not used.
 if (npps(1)<0) return
 ! Loop over the X direction
 do i=1,(npps(1)-iaux)
-   PX(1) = PX(1) + Domain%dd
+   PX(1) = PX(1) + Domain%dx
    PX(2) = Xmin(2) + aux2
    if (ncord==2) iaux = 0
 ! Loop over the Y direction
    do j=1,(npps(2)-iaux)   
-      PX(2) = PX(2) + Domain%dd
+      PX(2) = PX(2) + Domain%dx
       PX(3) = Xmin(3) + aux3
 ! Loop over the Z direction
       do k=1,(npps(3)-iaux)
-         PX(3) = PX(3) + Domain%dd
+         PX(3) = PX(3) + Domain%dx
 ! To check if the particle falls inside the zone
          if (ncord==2) then
             particellainterna = IsParticleInternal2D(Nt,PX)
@@ -127,13 +127,13 @@ do i=1,(npps(1)-iaux)
             if (Domain%RandomPos=='r') then
                call random_number(rnd)
                pg(nag_aux)%coord(1) = PX(1) + (two * rnd - one) * 0.1d0 *      &
-                                      Domain%dd
+                                      Domain%dx
                call random_number(rnd)
                pg(nag_aux)%coord(2) = PX(2) + (two * rnd - one) * 0.1d0 *      &
-                                      Domain%dd
+                                      Domain%dx
                call random_number(rnd)
                pg(nag_aux)%coord(3) = PX(3) + (two * rnd - one) * 0.1d0 *      &
-                                      Domain%dd
+                                      Domain%dx
                else
                   pg(nag_aux)%coord = PX
             endif

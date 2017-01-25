@@ -102,7 +102,7 @@ do while (TRIM(lcase(ainp))/="##### end restart #####")
                      " not found!"
             endif
          endif
-   end select
+   endselect
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"RESTART DATA",ninp,nout)) return
 enddo
