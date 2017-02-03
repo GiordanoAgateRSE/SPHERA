@@ -182,8 +182,7 @@ if (ncord==2) then
             BoundaryDataPointer(:,npi) = 0
             else
 ! Some nearest boundaries have been detected
-! In EpCount, it counts particles exited from the frontier, but still within 
-! the grid 
+! EpCount counts particles exited from the frontier, but still within the grid
                if (Nfzn==Ncbf) then
                   EpCount(pg(npi)%imed) = EpCount(pg(npi)%imed) + 1
                endif

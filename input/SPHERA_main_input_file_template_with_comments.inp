@@ -397,10 +397,13 @@ Ic(3,1) Ic(3,2) Ic(3,3)             !
 ! if(Ic_flag==1): end
 alfa_x alfa_y alfa_z                ! alfa(rotation angles of the body axis with
                                     ! respect to the reference system axis at 
-                                    ! t=0)
-pos_rotC_x pos_rotC_y pos_rotC_z    ! pos_rotC(centre of rotation just to 
-                                    ! configure the initial orientation in the 
-                                    ! global reference system)  
+                                    ! t=0). This rotation is cumulative with 
+                                    ! respect to the element initial rotation 
+                                    ! (alfa_elem).
+pos_rotC_x pos_rotC_y pos_rotC_z    ! pos_rotC(centre of rotation for the 
+                                    ! vector alfa just to configure the initial 
+                                    ! orientation in the global reference 
+                                    ! system)  
 vel_CM_x vel_CM_y vel_CM_z          ! vel_CM(velocity of the centre of mass at 
                                     ! t=0)
 omega_x omega_y omega_z             ! omega(angular velocity of the body at t=0)
@@ -414,7 +417,9 @@ pos_CM_elem_x pos_CM_elem_y pos_CM_elem_z
                                     ! of the element at t=0)
 alfa_elem_x alfa_elem_y alfa_elem_z ! alfa_elem(rotation angles of the element 
                                     ! axis with respect to the reference system 
-                                    ! axis at t=0)
+                                    ! axis at t=0). This rotation is cumulative 
+                                    ! with respect to the body initial rotation 
+                                    ! (alfa).
 face_xmin_flag face_xmax_flag face_ymin_flag face_ymax_flag face_zmin_flag face_zmax_flag
                                     ! (integer flags to activate the normal 
                                     ! vectors of surface body particles only 
