@@ -205,6 +205,8 @@ do npi=1,nag
       if (pg(npi)%mu>=Med(pg(npi)%imed)%mumx) then
          pg(npi)%mu = Med(pg(npi)%imed)%mumx
          pg(npi)%vel(:) = 0.d0
+         elseif(pg(npi)%mu>Med(pg(npi)%imed)%limiting_viscosity) then
+            pg(npi)%mu = Med(pg(npi)%imed)%limiting_viscosity
       endif
 ! Kinematic viscosity is updated
       pg(npi)%visc = pg(npi)%mu / pg(npi)%dens
