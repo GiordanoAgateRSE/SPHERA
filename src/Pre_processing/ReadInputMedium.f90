@@ -310,7 +310,7 @@ do while (TRIM(lcase(ainp))/="##### end medium #####")
             Med(index)%saturated_medium_flag
          write(nout,"(1x,a,1p,e12.4)") "Cohesion:...................",         &
             Med(index)%coes
-         write(nout,"(1x,a,1p,e12.4)") "Limiting visco. (save time):",         &
+         write(nout,"(1x,a,1p,e12.4)") "Limiting viscosity:.........",         &
             Med(index)%limiting_viscosity
          write(nout,"(1x,a,1p,e12.4)") "Consistency:................",         &
             Med(index)%cons

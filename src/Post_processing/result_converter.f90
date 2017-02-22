@@ -207,6 +207,16 @@ call cat_post_proc
       write(unitvtk,'(8x,16(1x,e12.5))') (pg(finger(k))%visc,k=k1,k2)
    enddo
    write(unitvtk,'(a)') '      </DataArray>'
+! z-coordinate
+   write(unitvtk,'(a)')                                                        &
+      '      <DataArray type="Float32" Name="z(m)" format="ascii" >'
+   do i=1,numpoints,16
+      k1 = i
+      k2 = k1 + 15
+      if (k2>numpoints) k2 = numpoints
+      write(unitvtk,'(8x,16(1x,e12.5))') (pg(finger(k))%coord(3),k=k1,k2)
+   enddo
+   write(unitvtk,'(a)') '      </DataArray>' 
 ! Volume Fraction
    if (diffusione) then
       write(unitvtk,'(a)')                                                     &
@@ -433,16 +443,6 @@ call cat_post_proc
          write(unitvtk,'(8x,16(1x,i8))') (pg(finger(k))%blt_flag,k=k1,k2)
       enddo
       write(unitvtk,'(a)') '      </DataArray>'  
-! z-coordinate for top view 2D field of free surface
-      write(unitvtk,'(a)')                                                     &
-         '      <DataArray type="Float32" Name="z(m)" format="ascii" >'
-      do i=1,numpoints,16
-         k1 = i
-         k2 = k1 + 15
-         if (k2>numpoints) k2 = numpoints
-         write(unitvtk,'(8x,16(1x,e12.5))') (pg(finger(k))%coord(3),k=k1,k2)
-      enddo
-      write(unitvtk,'(a)') '      </DataArray>' 
 ! normal_int_mixture_top
       write(unitvtk,'(a)')                                                     &
 '      <DataArray type="Float32" Name="normal_int_mixture_top vector"  NumberOfComponents="3"  format="ascii" >'
