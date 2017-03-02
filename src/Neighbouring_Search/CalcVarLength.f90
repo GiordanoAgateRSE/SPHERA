@@ -162,7 +162,7 @@ loop_nag: do npi=1,nag
                   write (nscr,'(1x,a,i12,a,i12,a)')                            &
                      ' The computational particle ',npi,' has reached ',       &
                      NMAXPARTJ,' fluid particle neighbours.'
-                  write (nscr,'(1x,a,3f15.10)') '        Coordinate: ',        &
+                  write (nscr,'(1x,a,3f25.10)') '        Coordinate: ',        &
                      pg(npi)%coord(:)
                   cycle
                endif

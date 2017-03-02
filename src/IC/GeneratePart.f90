@@ -38,7 +38,7 @@ implicit none
 integer(4),intent(IN) :: IC_loop
 integer(4) :: Nt,Nz,Mate,IsopraS,NumParticles,i,j,k,dimensioni,NumPartPrima    
 integer(4) :: aux_factor,i_vertex,j_vertex,test_xy,test_z,n_levels,nag_aux
-integer(4) :: i_face,j_node,npi,ier,test_face,test_dam,test_xy_2
+integer(4) :: i_face,j_node,npi,ier,test_face,test_dam,test_xy_2,alloc_stat
 double precision :: distance_hor,z_min,aux_scal,rnd
 double precision :: aux_vec(3)
 integer(4),dimension(SPACEDIM) :: Npps
@@ -150,15 +150,30 @@ second_cycle: do Nz=1,NPartZone
          Partz(Nz)%npoints = Partz(Nz)%ID_last_vertex -                        &
                              Partz(Nz)%ID_first_vertex + 1
          aux_factor = anint(Partz(Nz)%dx_CartTopog / Domain%dx) 
-! Allocate the auxiliary arrays 
-         allocate(z_aux(Partz(Nz)%npoints))
+! Allocation of the auxiliary array z_aux
+         if (.not.allocated(z_aux)) then
+            allocate(z_aux(Partz(Nz)%npoints),STAT=alloc_stat)
+            if (alloc_stat/=0) then
+               write(nout,*) 'Allocation of the auxiliary array z_aux ',       &
+                 'failed; the program stops here (subroutine GeneratePart). '
+               stop
+            endif
+         endif
 ! Loops over Cartesian topography points
          z_min = max_positive_number
          do i_vertex=Partz(Nz)%ID_first_vertex,Partz(Nz)%ID_last_vertex
             z_min = min(z_min,(Vertice(3,i_vertex)))
          enddo
-         nag_aux = Partz(Nz)%nag_aux
-         allocate(pg_aux(nag_aux))
+         nag_aux = Domain%nag_aux
+! Allocation of the auxiliary array pg_aux
+         if (.not.allocated(pg_aux)) then
+            allocate(pg_aux(nag_aux),STAT=alloc_stat)
+            if (alloc_stat/=0) then
+               write(nout,*) 'Allocation of the auxiliary array pg_aux',       &
+                 'failed; the program stops here (subroutine GeneratePart). '
+               stop
+            endif
+         endif
          NumParticles = NumParticles + 1
 ! Loops over Cartesian topography points
          do i_vertex=Partz(Nz)%ID_first_vertex,Partz(Nz)%ID_last_vertex
@@ -208,7 +223,7 @@ second_cycle: do Nz=1,NPartZone
                                                         Domain%dx / 2.d0) -    &
                                                         (k - 1) * Domain%dx
 ! Test if the particle is below the reservoir
-! Loop over boundaries 
+! Loop over boundaries
                         test_z = 0
                         test_face = 0
 !$omp parallel do default(none)                                                &
@@ -325,54 +340,32 @@ if ((Tratto(BoundaryFace(i_face)%stretch)%zone==Partz(Nz)%dam_zone_ID).and.    &
                   enddo
                enddo
             endif
-         enddo 
-! Allocate fluid particle array       
-         NumParticles = NumParticles - 1
-         PARTICLEBUFFER = NumParticles * Domain%COEFNMAXPARTI
-         nag_reservoir_CartTopog = NumParticles
-         allocate(pg(PARTICLEBUFFER),stat=ier)
-         if (ier/=0) then
-            write (nout,'(1x,a,i2)')                                           &
-               "    Array PG not allocated. Error code: ",ier
-            call diagnostic(arg1=4,arg3=nomsub)
-            else
-               write (nout,'(1x,a)') "    Array PG successfully allocated "
-               pg(:) = PgZero
-         endif
-! Loop over the auxiliary particle array
-!$omp parallel do default(none) shared(pg,pg_aux,NumParticles) private(npi)
-         do npi=1,NumParticles
-! Copy fluid particle array from the corresponding auxiliary array
-            pg(npi) = pg_aux(npi)
          enddo
-!$omp end parallel do  
-! Deallocate auxiliary arrays
-         deallocate(z_aux)
-         deallocate(pg_aux)
-! Second IC loop
+         Partz(Nz)%limit(2) = NumParticles - 1
          else
+! Second IC loop
 ! Loops over fluid particles 
 !$omp parallel do default(none)                                                &
-!$omp shared(nag_reservoir_CartTopog,Nz,Mate,Domain,pg)                        &
+!$omp shared(Domain,Nz,Mate,pg,Partz)                                          &
 !$omp private(npi,rnd)
-            do npi=1,nag_reservoir_CartTopog
-! to set particle parameters
-               call SetParticleParameters(npi,Nz,Mate)   
-! To modify random coordinates 
+            do npi=Partz(Nz)%limit(1),Partz(Nz)%limit(2)
+! To set particle parameters
+               call SetParticleParameters(npi,Nz,Mate)
+! To impose a white noise to particle positions
                if (Domain%RandomPos=='r') then
                   call random_number(rnd)
-                  pg(npi)%coord(1) = pg(npi)%coord(1) + (2.d0 * rnd - 1.d0)    &
-                                     * 0.1d0 * Domain%dx
+                  pg(npi)%coord(1) = pg(npi)%coord(1) + (2.d0 * rnd - 1.d0) *  &
+                                     0.1d0 * Domain%dx
                   call random_number(rnd)
-                  pg(npi)%coord(2) = pg(npi)%coord(2) + (2.d0 * rnd - 1.d0)    &
-                                     * 0.1d0 * Domain%dx
+                  pg(npi)%coord(2) = pg(npi)%coord(2) + (2.d0 * rnd - 1.d0) *  &
+                                     0.1d0 * Domain%dx
                   call random_number(rnd)
-                  pg(npi)%coord(3) = pg(npi)%coord(3) + (2.d0 * rnd - 1.d0)    &
-                                     * 0.1d0 * Domain%dx
+                  pg(npi)%coord(3) = pg(npi)%coord(3) + (2.d0 * rnd - 1.d0) *  &
+                                     0.1d0 * Domain%dx
                endif
             enddo
 !$omp end parallel do
-            NumParticles = nag_reservoir_CartTopog
+            NumParticles = Partz(Nz)%limit(2)
       endif
       else
 ! Loop over the different regions belonging to a same zone
@@ -408,6 +401,42 @@ if ((Tratto(BoundaryFace(i_face)%stretch)%zone==Partz(Nz)%dam_zone_ID).and.    &
          Partz(Nz)%limit(2) = NumParticles
    endif
 enddo second_cycle
+if (allocated(pg_aux)) then
+! Allocation of the fluid particle array in the presence of at least one  
+! reservoir extruded from topography       
+   NumParticles = NumParticles - 1
+   PARTICLEBUFFER = NumParticles * Domain%COEFNMAXPARTI
+   allocate(pg(PARTICLEBUFFER),stat=ier)
+   if (ier/=0) then
+      write (nout,'(1x,a,i2)')                                                 &
+         "    Array PG not allocated. Error code: ",ier
+      call diagnostic(arg1=4,arg3=nomsub)
+      else
+         write (nout,'(1x,a)') "    Array PG successfully allocated "
+         pg(:) = PgZero
+   endif
+! Loop over the auxiliary particle array
+!$omp parallel do default(none) shared(pg,pg_aux,NumParticles) private(npi)
+   do npi=1,NumParticles
+! Copy fluid particle array from the corresponding auxiliary array
+      pg(npi) = pg_aux(npi)
+   enddo
+!$omp end parallel do  
+! Deallocation of the auxiliary array z_aux
+   deallocate(z_aux,STAT=alloc_stat)
+   if (alloc_stat/=0) then
+      write(nout,*) 'Deallocation of the auxiliary array z_aux ',              &
+         'failed; the program stops here (subroutine GeneratePart). '
+      stop
+   endif
+! Deallocation of the auxiliary array pg_aux
+   deallocate(pg_aux,STAT=alloc_stat)
+   if (alloc_stat/=0) then
+      write(nout,*) 'Deallocation of the auxiliary array pg_aux ',             &
+         'failed; the program stops here (subroutine GeneratePart). '
+      stop
+   endif
+endif
 test_z = 0
 if (IC_loop==2) then
    do Nz=1,NPartZone

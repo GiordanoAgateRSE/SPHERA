@@ -29,7 +29,7 @@ module Hybrid_allocation_module
 use Static_allocation_module
 type TyGlobal
    logical          :: NormFix                        
-   logical          :: Slip   
+   logical          :: Slip
    integer(4)       :: iplot_fr ! Output frequency on log file                      
    integer(4)       :: imemo_fr ! Saving frequency                      
    integer(4)       :: irest_fr ! Restart file frequency                      
@@ -39,7 +39,10 @@ type TyGlobal
    integer(4)       :: istart ! Initial time step ID                         
    integer(4)       :: ioutopt ! Printing code for log file                       
    integer(4)       :: itmax ! Maximum step number   
-   integer(4)       :: body_part_reorder ! Flag for body particles reordering             
+   integer(4)       :: body_part_reorder ! Flag for body particles reordering
+   integer(4)       :: nag_aux ! Rough and slight overestimation of the number 
+                               ! of fluid particles in the reservoir (auxiliary 
+                               ! parameter useful for extruded reservoir IC)           
    integer(4)       :: MAXCLOSEBOUNDFACES ! Maximum number of neighbouring 
                                           ! SA-SPH faces for a computational 
                                           ! particle
@@ -370,9 +373,6 @@ type TyZone
                                     ! (0 if IC_source_type=1)
    integer(4)       :: plan_reservoir_points ! Number of points describing the
                                              ! reservoir, if(IC_source_type==2)
-   integer(4)       :: nag_aux ! Rough overestimation of the number of fluid
-                               ! particles in the reservoir, if 
-                               ! (IC_source_type==2)
    integer(4)       :: ID_first_vertex ! ID first vertex in case of Cartesian
                                        ! topography
    integer(4)       :: ID_last_vertex ! ID last vertex in case of Cartesian

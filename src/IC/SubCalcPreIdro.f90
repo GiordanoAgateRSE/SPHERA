@@ -130,15 +130,15 @@ particle_loop: do npi=1,nag
                ZQuotaMediumCorr = max(ZQuotaMediumCorr,pg(nnlocal)%coord(3))
                ZQuotaColonna    = max(ZQuotaColonna,pg(nnlocal)%coord(3))
          end if
-      end do
-   end do
+      enddo
+   enddo
 ! To check if the current particles is inside the intermediate cell, but it is 
 ! of the upper medium type
    if (abs(ZQuotaMediumCorr-ZQuotaColonna)<xyz_tolerance) foundcell = .false.
 ! To set the reference pressure quote depending on the condition type
    if (partz(Nz)%pressure=="qp") ZQuotaColonna = partz(Nz)%valp
    if (partz(Nz)%pressure=="pl") ZQuotaColonna = pl_quote
-! An upper medium interface cell has been found 
+! An upper medium interface cell has been found
    if (foundcell) then
 ! The average quote of the medium interface in the cell is calculated
       ZQuotaMediumCorr  = (ZquotaMediumCorr + ZQuotaSecondMedium) * half
@@ -148,7 +148,7 @@ particle_loop: do npi=1,nag
                 pg(nnsave)%coord(1) * senhor
       affond2 = (ZQuotaMediumCorr - pg(npi)%coord(3)) * coshor +               &
                 pg(npi)%coord(1) * senhor 
-      if (Domain%tipo == "bsph") then  
+      if (Domain%tipo=="bsph") then  
 ! To check this line 
          pg(npi)%pres = 0.d0 * (affond1 * med(pg(npi)%imed)%den0 * gravmod) *  &
                        (1.d0 - pg(npi)%coord(1) / 0.5925d0)

@@ -51,7 +51,7 @@ integer(4), external :: ParticleCellNumber
 ! Statements
 !------------------------
 if (Domain%RKscheme>1) ts0_pg(npi) = ts_pgZero
-pg(npi)%izona = Nz      
+pg(npi)%izona = Nz     
 if (ncord == 2) then
    pg(npi)%mass = Domain%PVolume * Med(Mate)%den0 
    pg(npi)%coord(2) = zero              

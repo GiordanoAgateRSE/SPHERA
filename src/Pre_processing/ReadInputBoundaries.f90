@@ -44,7 +44,7 @@ type (TyZone),dimension(NPartZone) :: Partz
 type (TyBoundaryStretch),dimension(NumTratti) :: Tratto
 integer(4) :: n,index,numv,indexi,indexf,Izona,ipointer,Medium,icolor,icord    
 integer(4) :: ioerr,npointv,IC_source_type,Car_top_zone
-integer(4) :: plan_reservoir_points,nag_aux,i,i1,i2,i_point,ID_first_vertex
+integer(4) :: plan_reservoir_points,i,i1,i2,i_point,ID_first_vertex
 integer(4) :: ID_last_vertex,dam_zone_ID,dam_zone_n_vertices
 double precision :: pool_value,shear,velocity,trampa,valp,flowrate,H_res
 double precision :: dx_CartTopog
@@ -127,7 +127,6 @@ do while (TRIM(lcase(ainp))/="##### end boundaries #####")
    ID_first_vertex = 0
    ID_last_vertex = 0
    plan_reservoir_points = 0
-   nag_aux = 0
    dam_zone_ID = 0
    dam_zone_n_vertices = 0
    plan_reservoir_pos = 0.d0 
@@ -284,10 +283,9 @@ do while (TRIM(lcase(ainp))/="##### end boundaries #####")
             if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                          &
                "ID_first_vertex,ID_last_vertex",ninp,nout)) return
             call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-            if (ioerr==0) read(ainp,*,iostat=ioerr) plan_reservoir_points,     &
-               nag_aux
+            if (ioerr==0) read(ainp,*,iostat=ioerr) plan_reservoir_points
             if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                          &
-               "plan_reservoir_points and nag_aux",ninp,nout)) return
+               "plan_reservoir_points",ninp,nout)) return
             do i2=1,plan_reservoir_points
                call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
                if (ioerr==0) read(ainp,*,iostat=ioerr) plan_reservoir_pos(i2,1)&
@@ -379,7 +377,6 @@ do while (TRIM(lcase(ainp))/="##### end boundaries #####")
          Partz(Izona)%ID_first_vertex = ID_first_vertex
          Partz(Izona)%ID_last_vertex = ID_last_vertex
          Partz(Izona)%plan_reservoir_points = plan_reservoir_points
-         Partz(Izona)%nag_aux = nag_aux
          Partz(Izona)%plan_reservoir_pos = plan_reservoir_pos
          Partz(Izona)%dam_zone_ID = dam_zone_ID
          Partz(Izona)%dam_zone_n_vertices = dam_zone_n_vertices
@@ -547,8 +544,6 @@ BoundaryVertex(Tratto(index)%inivertex+Tratto(index)%numvertices-1)
                      Partz(Izona)%ID_last_vertex
                   write(nout,"(1x,a,i12)") "plan_reservoir_points: ",          &
                      Partz(Izona)%plan_reservoir_points
-                  write(nout,"(1x,a,i12)") "nag_aux         : ",               &
-                     Partz(Izona)%nag_aux
                   do i_point=1,plan_reservoir_points
                      write(nout,"(1x,a,3(1pe12.4))") "plan_reservoir_pos   : " &
                         ,Partz(Izona)%plan_reservoir_pos(i_point,:)                  

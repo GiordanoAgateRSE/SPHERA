@@ -69,7 +69,7 @@ logical :: dt_alfa_Mon
 integer(4) :: Ncord,NMedium,NPartZone
 integer(4) :: NPointst,NPoints,NPointsl,NPointse,NLines,NSections,GCBFVecDim
 integer(4) :: NumVertici,NumFacce,NumTratti,NumBVertices,NumBSides
-integer(4) :: Nag,nagpg,PARTICLEBUFFER,nag_reservoir_CartTopog
+integer(4) :: Nag,nagpg,PARTICLEBUFFER
 integer(4) :: it_start,on_going_time_step,it_eff,indarrayFlu,indarraySol
 double precision :: simulation_time,dt,pesodt,dt_average,DTminBER
 ! Global variables: end

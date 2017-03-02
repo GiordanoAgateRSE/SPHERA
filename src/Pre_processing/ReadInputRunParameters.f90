@@ -38,7 +38,7 @@ character(100) :: ainp
 integer(4) :: itmax
 double precision :: tmax,CFL,TetaP,TetaV,COEFNMAXPARTJ,COEFNMAXPARTI,vsc_coeff
 integer(4) :: ioerr,time_split,RKscheme,body_part_reorder,MAXCLOSEBOUNDFACES
-integer(4) :: MAXNUMCONVEXEDGES,GCBFVecDim_loc,density_thresholds
+integer(4) :: MAXNUMCONVEXEDGES,GCBFVecDim_loc,density_thresholds,nag_aux
 character(1) :: Psurf
 character(100) :: token
 logical,external :: ReadCheck
@@ -101,12 +101,11 @@ do while (TRIM(lcase(ainp))/="##### end run parameters #####")
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"COEFNMAXPARTI and COEFNMAXPARTJ ",&
       ninp,nout)) return
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-   read (ainp,*,iostat=ioerr) MAXCLOSEBOUNDFACES,MAXNUMCONVEXEDGES
+   read (ainp,*,iostat=ioerr) nag_aux,MAXCLOSEBOUNDFACES,MAXNUMCONVEXEDGES,    &
+      GCBFVecDim_loc
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                                   &
-      "MAXCLOSEBOUNDFACES and MAXNUMCONVEXEDGES ",ninp,nout)) return
-   call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-   read (ainp,*,iostat=ioerr) GCBFVecDim_loc
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"GCBFVecDim_loc ",ninp,nout)) return
+      "NAG_AUX, MAXCLOSEBOUNDFACES, MAXNUMCONVEXEDGES, GCBFVECDIM_LOC ",ninp,  &
+      nout)) return
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
    read (ainp,*,iostat=ioerr) density_thresholds
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DENSITY_THRESHOLDS ",ninp,nout))  &
@@ -143,7 +142,8 @@ if (ncord>0) then
    Domain%COEFNMAXPARTJ = COEFNMAXPARTJ
    Domain%body_part_reorder = body_part_reorder
    Domain%MAXCLOSEBOUNDFACES = MAXCLOSEBOUNDFACES
-   Domain%MAXNUMCONVEXEDGES = MAXNUMCONVEXEDGES 
+   Domain%MAXNUMCONVEXEDGES = MAXNUMCONVEXEDGES
+   Domain%nag_aux = nag_aux
    if (.not.restart) GCBFVecDim = GCBFVecDim_loc
    Domain%density_thresholds = density_thresholds
    if (nout>0) then
@@ -178,6 +178,8 @@ if (ncord>0) then
          Domain%COEFNMAXPARTJ
       write(nout,"(1x,a,1p,i1)")    "body_part_reorder          : ",           &
          Domain%body_part_reorder
+      write(nout,"(1x,a,1p,i12)")   "NAG_AUX                    : ",           &
+         Domain%nag_aux
       write(nout,"(1x,a,1p,i12)")   "MAXCLOSEBOUNDFACES         : ",           &
          Domain%MAXCLOSEBOUNDFACES
       write(nout,"(1x,a,1p,i12)")   "MAXNUMCONVEXEDGES          : ",           &
