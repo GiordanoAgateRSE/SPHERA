@@ -44,7 +44,7 @@ double precision :: aux_vec(3)
 integer(4),dimension(SPACEDIM) :: Npps
 double precision,dimension(NPartZone) :: h_reservoir
 double precision,dimension(SPACEDIM) :: MinOfMin,XminReset
-double precision,dimension(:),allocatable    :: z_aux
+double precision,dimension(:),allocatable :: z_aux
 double precision,dimension(:,:),allocatable :: Xmin,Xmax
 character(len=lencard)  :: nomsub = "GeneratePart"
 type(TyParticle),dimension(:),allocatable    :: pg_aux
@@ -89,7 +89,7 @@ if (IC_loop==2) then
       if (Partz(Nz)%IC_source_type==2) then
          test_z = 1
       endif
-   enddo   
+   enddo
 endif
 if (test_z==0) nag = 0
 do Nz=1,NPartZone
@@ -152,7 +152,9 @@ second_cycle: do Nz=1,NPartZone
          aux_factor = anint(Partz(Nz)%dx_CartTopog / Domain%dx) 
 ! Allocation of the auxiliary array z_aux
          if (.not.allocated(z_aux)) then
-            allocate(z_aux(Partz(Nz)%npoints),STAT=alloc_stat)
+! The number of points is increased due to the eventual presence of the 
+! fictitious vertex n.1
+            allocate(z_aux(Partz(Nz)%npoints+1),STAT=alloc_stat)
             if (alloc_stat/=0) then
                write(nout,*) 'Allocation of the auxiliary array z_aux ',       &
                  'failed; the program stops here (subroutine GeneratePart). '
@@ -188,7 +190,9 @@ second_cycle: do Nz=1,NPartZone
                Partz(Nz)%plan_reservoir_pos(4,1:2),test_xy)
             if (test_xy==1) then
 ! Set the minimum topography height among the closest 9 points
-               z_aux(i_vertex) = max_positive_number 
+               z_aux(i_vertex) = max_positive_number
+! Suggestion.
+! This loop could be optimized not to consider all the DTM points.
                do j_vertex=1,Partz(Nz)%npoints
                   distance_hor = dsqrt((Vertice(1,i_vertex) -                  &
                                  Vertice(1,j_vertex)) ** 2 +                   &
@@ -252,7 +256,7 @@ second_cycle: do Nz=1,NPartZone
 ! (no actual problem)
                                  test_face = 1
 ! Test if the point is invisible (test_z=1, below the topography) or visible 
-! (test_z=0) to the face 
+! (test_z=0) to the face
                                  aux_vec(:) = pg_aux(NumParticles)%coord(:)    &
                                     - BoundaryFace(i_face)%Node(1)%GX(:)
                                  aux_scal = dot_product                        &
@@ -264,7 +268,7 @@ second_cycle: do Nz=1,NPartZone
                               endif
                            endif
                         enddo 
-!$omp end parallel do 
+!$omp end parallel do
 ! Check the presence of a dam zone
                         test_dam = 0
                         if (Partz(Nz)%dam_zone_ID>0) then

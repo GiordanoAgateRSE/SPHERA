@@ -58,7 +58,7 @@ if (ncord == 2) then
    pg(npi)%CoordOld(2) = zero              
    else 
       pg(npi)%mass = Domain%PVolume * Med(Mate)%den0
-end if
+endif
 ! Current velocity and initial velocity
 pg(npi)%vel = partz(Nz)%vel
 pg(npi)%vstart = partz(Nz)%vel
