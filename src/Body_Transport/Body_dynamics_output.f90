@@ -86,19 +86,21 @@ write(nomefilectl_Body_dynamics,"(a,a,i8.8,a)") nomecaso(1:len_trim(nomecaso)),&
 open (ncpt,file=nomefilectl_Body_dynamics,status="unknown",form="formatted")
 if (on_going_time_step==1) then
    write (ncpt,*) "Body dynamics values "
-   write (ncpt,'(5(7x,a),3(5x,a),3(9x,a),3(1x,a),3(8x,a),(9x,a),2(7x,a))')     &
+   write (ncpt,                                                                &
+      '(5(7x,a),3(5x,a),3(9x,a),3(3x,a),3(1x,a),3(8x,a),(9x,a),2(7x,a))')      &
       " Time(s)"," Body_ID"," x_CM(m)"," y_CM(m)"," z_CM(m)"," u_CM(m/s)",     &
-      " v_CM(m/s)"," w_CM(m/s)"," Fx(N)"," Fy(N)"," Fz(N)", "omega_x(rad/s)",  &
-      "omega_y(rad/s)","omega_z(rad/s)","Mx(N*m)","My(N*m)","Mz(N*m)",         &
-      "pmax(Pa)","pmax_R(Pa)","pmax_L(Pa)"
+      " v_CM(m/s)"," w_CM(m/s)"," Fx(N)"," Fy(N)"," Fz(N)"," alfa_x(rad)",     &
+      " alfa_y(rad)"," alfa_z(rad)","omega_x(rad/s)","omega_y(rad/s)",         &
+      "omega_z(rad/s)","Mx(N*m)","My(N*m)","Mz(N*m)","pmax(Pa)","pmax_R(Pa)",  &
+      "pmax_L(Pa)"
 endif
 flush(ncpt)
 ! Loop over the bodies
 do nbi=1,n_bodies
-   write (ncpt,'(g14.7,1x,i14,1x,18(g14.7,1x))') simulation_time,nbi,          &
+   write (ncpt,'(g14.7,1x,i14,1x,21(g14.7,1x))') simulation_time,nbi,          &
       body_arr(nbi)%x_CM(:),body_arr(nbi)%u_CM(:),body_arr(nbi)%Force(:),      &
-      body_arr(nbi)%omega(:),body_arr(nbi)%Moment(:),body_arr(nbi)%pmax,       &
-      pmax_R(nbi),pmax_L(nbi)
+      body_arr(nbi)%alfa(:),body_arr(nbi)%omega(:),body_arr(nbi)%Moment(:),    &
+      body_arr(nbi)%pmax,pmax_R(nbi),pmax_L(nbi)
 enddo
 close (ncpt)
 ! Monitoring the surface body particles
