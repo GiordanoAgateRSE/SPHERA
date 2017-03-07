@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2016 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -271,13 +271,13 @@ if (nag>0) then
             maxlocvelo_bp = npi
          endif
       enddo
-      minvelo_bp = Dsqrt(minvelo_bp)
-      maxvelo_bp = Dsqrt(maxvelo_bp)
+      minvelo_bp = dsqrt(minvelo_bp)
+      maxvelo_bp = dsqrt(maxvelo_bp)
 ! Velocity (bodies)
       do nbi=1,n_bodies
-         modvel = body_arr(nbi)%u_CM(1) * body_arr(nbi)%u_CM(1) +              &
+         modvel = dsqrt(body_arr(nbi)%u_CM(1) * body_arr(nbi)%u_CM(1) +        &
                   body_arr(nbi)%u_CM(2) * body_arr(nbi)%u_CM(2)+               &
-                  body_arr(nbi)%u_CM(3)*body_arr(nbi)%u_CM(3)
+                  body_arr(nbi)%u_CM(3)*body_arr(nbi)%u_CM(3))
          if (modvel<minvelo_body) then
             minvelo_body = modvel
             minlocvelo_body = nbi
@@ -287,8 +287,6 @@ if (nag>0) then
             maxlocvelo_body = nbi
          endif
       enddo
-      minvelo_body = Dsqrt(minvelo_body)
-      maxvelo_body = Dsqrt(maxvelo_body)
 ! Angular velocity (bodies)
       do nbi = 1,n_bodies
          modomega = dsqrt(dot_product(body_arr(nbi)%omega,body_arr(nbi)%omega))
@@ -301,8 +299,6 @@ if (nag>0) then
             maxlocomega_body = nbi
          endif
       enddo
-      minomega_body = Dsqrt(minomega_body)
-      maxomega_body = Dsqrt(maxomega_body)
    endif
 ! Limits for supplementary bed-load transport parameters 
    if ((Granular_flows_options%erosion_flag.ne.1).and.                         &

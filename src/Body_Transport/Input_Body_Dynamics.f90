@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2016 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -19,7 +19,7 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: Input_Body_Dynamics  
+! Program unit: Input_Body_Dynamics
 ! Description: Input management for body transport in fluid flows.      
 !-------------------------------------------------------------------------------
 subroutine Input_Body_Dynamics
@@ -190,7 +190,7 @@ do nbi=1,n_bodies
 ! element origin, in the world/global reference system 
 ! (not in the element reference system)
                call vector_rotation(bp_arr(npi)%rel_pos,                       &
-                  body_arr(nbi)%elem(nei)%alfa) 
+                  body_arr(nbi)%elem(nei)%alfa)
                if (ncord==2) bp_arr(npi)%rel_pos(2) = 0.d0 
 ! Preliminary value of the absolute positions after
 ! translation of rel_pos of the distance "corresponding element - 
@@ -232,14 +232,14 @@ do nbi=1,n_bodies
                bp_arr(npi)%pos(:) = bp_arr(npi)%rel_pos(:) +                   &
                                     body_arr(nbi)%x_rotC(:) 
                bp_arr(npi)%rel_pos(:) = bp_arr(npi)%pos(:) -                   &
-                  body_arr(nbi)%x_CM(:) 
+                  body_arr(nbi)%x_CM(:)
                call vector_rotation(bp_arr(npi)%normal,body_arr(nbi)%alfa)
                if (ncord==2) bp_arr(npi)%normal(2) = 0.d0 
-! Initial cell                                                       
+! Initial cell
                bp_arr(npi)%cell =  ParticleCellNumber(bp_arr(npi)%pos)
 ! Velocity
                call Vector_Product(body_arr(nbi)%omega,bp_arr(npi)%rel_pos,    &
-                  vec2_temp,3) 
+                  vec2_temp,3)
                bp_arr(npi)%vel(:) = body_arr(nbi)%u_CM(:) + vec2_temp(:) 
                if (ncord==2) bp_arr(npi)%vel(2) = 0.d0 
 ! Update of umax

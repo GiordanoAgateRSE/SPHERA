@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2016 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -113,10 +113,10 @@ do i=1,n_bodies
    endif
 ! Non-staggered parameters     
    body_arr(i)%x_CM(:) = body_arr(i)%x_CM(:) + body_arr(i)%u_CM(:) * dt 
-   teta(i,:) =  body_arr(i)%omega(:) * dt 
-   body_arr(i)%alfa(:) = body_arr(i)%alfa(:) + teta(i,:) 
+   teta(i,:) = body_arr(i)%omega(:) * dt
+   body_arr(i)%alfa(:) = body_arr(i)%alfa(:) + teta(i,:)
 ! Initializing umax (maximum particle velocity of the body)
-   body_arr(i)%umax = zero 
+   body_arr(i)%umax = zero
 enddo
 !$omp end parallel do
 ! Loop over body particles (static kinematics)
@@ -124,27 +124,27 @@ enddo
 !$omp private(npi,vec_temp,mod_normal,vec2_temp,aux_vel)                       &
 !$omp shared(n_body_part,body_arr,bp_arr,dt,ncord,teta,dtvel)
 do npi=1,n_body_part
-! Staggered parameters  
+! Staggered parameters
    call Vector_Product(body_arr(bp_arr(npi)%body)%omega,bp_arr(npi)%rel_pos,   &
       vec_temp,3)
    aux_vel(:) = bp_arr(npi)%vel(:) 
    bp_arr(npi)%vel(:) = body_arr(bp_arr(npi)%body)%u_CM(:) + vec_temp(:)
    if (ncord==2) bp_arr(npi)%vel(2) = zero 
    bp_arr(npi)%acc(:) = (bp_arr(npi)%vel(:) - aux_vel(:)) / dtvel
-! Non-staggered parameters     
+! Non-staggered parameters
    vec2_temp(:) = teta(bp_arr(npi)%body,:)
    call vector_rotation(bp_arr(npi)%rel_pos,vec2_temp)
-   if (ncord==2) bp_arr(npi)%rel_pos(2) = zero     
+   if (ncord==2) bp_arr(npi)%rel_pos(2) = zero
    bp_arr(npi)%pos(:) = bp_arr(npi)%rel_pos(:) +                               &
       body_arr(bp_arr(npi)%body)%x_CM(:)
    call vector_rotation(bp_arr(npi)%normal,vec2_temp)
    mod_normal = dsqrt(dot_product(bp_arr(npi)%normal,bp_arr(npi)%normal))
    if (mod_normal>one) bp_arr(npi)%normal(:) = bp_arr(npi)%normal(:) /         &
-      mod_normal    
+      mod_normal
    if (ncord==2) then
       bp_arr(npi)%rel_pos(2) = zero
       bp_arr(npi)%normal(2) = zero
-   endif 
+   endif
 enddo
 !$omp end parallel do
 ! Updating max velocity within every body
@@ -208,7 +208,7 @@ enddo
 !     if (ncord==2) then
 !        bp_arr(npi)%vel(2) = zero 
 !        bp_arr(npi)%rel_pos(2) = zero
-!        bp_arr(npi)%normal(2) = zero 
+!        bp_arr(npi)%normal(2) = zero
 !     endif 
 ! Update of umax
 !     aux_umax = dsqrt(dot_product(bp_arr(npi)%vel,bp_arr(npi)%vel))        

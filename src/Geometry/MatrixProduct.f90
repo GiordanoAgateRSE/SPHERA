@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2016 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -57,10 +57,10 @@ do i=1,nr
       sum = zero
       do k=1,nrc
          sum = sum + AA(i,k) * BB(k,j)
-      end do
+      enddo
       CC(i,j) = sum
-   end do
-end do
+   enddo
+enddo
 !------------------------
 ! Deallocations
 !------------------------

@@ -140,8 +140,8 @@ IC_reservoir_type Car_top_zone DBSPH_fictitious_reservoir_flag
                             ! .false.(no fictitious fluid particles)
 ! If (IC_reservoir_type==2): start
 dx_CartTopog H_res          ! dx_CartTopog(spatial resolution of the Cartesian 
-                            ! topography); H_res(height of the reservoir free 
-                            ! surface)
+                            ! topography; dx_CartTopog>=dx); H_res(height of 
+                            ! the reservoir free surface)
 ID_first_vertex ID_last_vertex
                             ! ID_first_vertex,ID_last_vertex(ID of the first and
                             ! and the last vertices of the reference topography)
@@ -406,6 +406,13 @@ omega_x omega_y omega_z             ! omega(angular velocity of the body at t=0)
 imposed_kinematics_flag n_records   ! imposed_kinematics_flag=0,1(kinematics is
                                     ! imposed); n_records(number of records, 
                                     ! which desrcibe the imposed kinematics)
+! do i=1,n_records
+time_i velocity_x_i velocity_y_i velocity_z_i omega_x_i omega_y_i omega_z_i 
+                                    ! i-th record for the imposed  
+                                    ! kinematics of the body (the time of the 
+                                    ! last record should be slightly higher 
+                                    ! than time at the end of the simulation) 
+! enddo
 first_ID_element                    ! first_ID_element=1(of body 1)
 L_x L_y L_z                         ! L_x,L_y,L_z(side lengths of the element)
 pos_CM_elem_x pos_CM_elem_y pos_CM_elem_z

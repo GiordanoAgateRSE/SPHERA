@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2016 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -52,32 +52,32 @@ mat1_temp(1,1) = 1.d0
 mat1_temp(1,2) = 0.d0
 mat1_temp(1,3) = 0.d0
 mat1_temp(2,1) = 0.d0
-mat1_temp(2,2) = cos(angle(1))
-mat1_temp(2,3) = sin( - angle(1))
+mat1_temp(2,2) = dcos(angle(1))
+mat1_temp(2,3) = - dsin(angle(1))
 mat1_temp(3,1) = 0.d0
-mat1_temp(3,2) = -sin( - angle(1))
-mat1_temp(3,3) = cos( - angle(1))
-mat2_temp(1,1) = cos( - angle(2))
+mat1_temp(3,2) = dsin(angle(1))
+mat1_temp(3,3) = dcos(angle(1))
+mat2_temp(1,1) = dcos(angle(2))
 mat2_temp(1,2) = 0.d0
-mat2_temp(1,3) = - sin( - angle(2))
-mat2_temp(2,1) = 0.d0 
+mat2_temp(1,3) = dsin(angle(2))
+mat2_temp(2,1) = 0.d0
 mat2_temp(2,2) = 1.d0
 mat2_temp(2,3) = 0.d0
-mat2_temp(3,1) = sin( - angle(2)) 
+mat2_temp(3,1) = - dsin(angle(2)) 
 mat2_temp(3,2) = 0.d0
-mat2_temp(3,3) = cos( - angle(2))
-mat3_temp(1,1) = cos( - angle(3))
-mat3_temp(1,2) = sin( - angle(3))
+mat2_temp(3,3) = dcos(angle(2))
+mat3_temp(1,1) = dcos(angle(3))
+mat3_temp(1,2) = - dsin(angle(3))
 mat3_temp(1,3) = 0.d0
-mat3_temp(2,1) = - sin( - angle(3))
-mat3_temp(2,2) = cos( - angle(3))
+mat3_temp(2,1) = dsin(angle(3))
+mat3_temp(2,2) = dcos(angle(3))
 mat3_temp(2,3) = 0.d0
 mat3_temp(3,1) = 0.d0 
 mat3_temp(3,2) = 0.d0
 mat3_temp(3,3) = 1.d0    
 call MatrixProduct(mat1_temp,mat2_temp,mat4_temp,3,3,3)
 call MatrixProduct(mat4_temp,mat3_temp,cos_dir,3,3,3)
-vec_temp(:) = vector(:) 
+vec_temp(:) = vector(:)
 vector(1) = dot_product(cos_dir(1,:),vec_temp)
 vector(2) = dot_product(cos_dir(2,:),vec_temp)
 vector(3) = dot_product(cos_dir(3,:),vec_temp)
