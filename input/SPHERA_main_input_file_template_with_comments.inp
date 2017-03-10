@@ -391,11 +391,14 @@ Ic(1,1) Ic(1,2) Ic(1,3)             !
 Ic(2,1) Ic(2,2) Ic(2,3)             !
 Ic(3,1) Ic(3,2) Ic(3,3)             !
 ! if(Ic_flag==1): end
-alfa_x alfa_y alfa_z                ! alfa(rotation angles of the body axis with
-                                    ! respect to the reference system axis at 
-                                    ! t=0). This rotation is cumulative with 
-                                    ! respect to the element initial rotation 
-                                    ! (alfa_elem).
+n_R_IO_x n_R_IO_y n_R_IO_z teta_R_IO
+                                    ! n_R_IO(rotation axis -unit vector-);
+                                    ! teta_R_IO(rotation angle). Rotation of 
+                                    ! the body with respect to the reference 
+                                    ! system at t=0. This rotation is 
+                                    ! cumulative with respect to the element 
+                                    ! initial rotation. This rotation is 
+                                    ! relevant only for IC and I/O purposes.
 pos_rotC_x pos_rotC_y pos_rotC_z    ! pos_rotC(centre of rotation for the 
                                     ! vector alfa just to configure the initial 
                                     ! orientation in the global reference 
@@ -418,11 +421,14 @@ L_x L_y L_z                         ! L_x,L_y,L_z(side lengths of the element)
 pos_CM_elem_x pos_CM_elem_y pos_CM_elem_z
                                     ! pos_CM_elem(position of the centre of mass
                                     ! of the element at t=0)
-alfa_elem_x alfa_elem_y alfa_elem_z ! alfa_elem(rotation angles of the element 
-                                    ! axis with respect to the reference system 
-                                    ! axis at t=0). This rotation is cumulative 
-                                    ! with respect to the body initial rotation 
-                                    ! (alfa).
+n_R_IO_elem_x n_R_IO_elem_y n_R_IO_elem_z teta_R_IO_elem
+                                    ! n_R_IO_elem(rotation axis -unit vector-);
+                                    ! teta_R_IO_elem(rotation angle). Rotation 
+                                    ! of the body element with respect to the 
+                                    ! reference system at t=0. This rotation is 
+                                    ! cumulative with respect to the body 
+                                    ! IC rotation. This rotation is relevant 
+                                    ! only for IC and I/O purposes.
 face_xmin_flag face_xmax_flag face_ymin_flag face_ymax_flag face_zmin_flag face_zmax_flag
                                     ! (integer flags to activate the normal 
                                     ! vectors of surface body particles only 

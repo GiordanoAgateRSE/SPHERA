@@ -34,16 +34,24 @@ use I_O_file_module
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: i,nbi,npi,j,k,nei,erased_part,alloc_stat
+integer(4) :: i,nbi,npi,j,k,nei,erased_part,alloc_stat,aux_integer
 double precision :: xmin,xmax,ymin,ymax,zmin,zmax,mod_normal,aux_umax
 integer(4) :: vec_temp(3)
 double precision :: vec2_temp(3)
 double precision, dimension(:), allocatable  ::  aux_mass
 type (body_particle), dimension(:), allocatable :: aux_bp_arr 
-integer(4), external :: ParticleCellNumber
+integer(4),external :: ParticleCellNumber
 !------------------------
 ! Explicit interfaces
 !------------------------
+interface
+   subroutine vector_rotation_Rodrigues(n_R,teta_R,vector)
+      implicit none
+      double precision,intent(in) :: teta_R
+      double precision,intent(in) :: n_R(3)
+      double precision,intent(inout) :: vector(3)
+   end subroutine vector_rotation_Rodrigues
+end interface
 !------------------------
 ! Allocations
 !------------------------
@@ -55,6 +63,7 @@ n_body_part = 0
 aux_mass = 0.d0
 erased_part = 0
 n_surf_body_part = 0
+aux_integer = 0
 !------------------------
 ! Statements
 !------------------------
@@ -189,9 +198,10 @@ do nbi=1,n_bodies
 ! to the centre of mass of the element); "relative" means with respect to the 
 ! element origin, in the world/global reference system 
 ! (not in the element reference system)
-               call vector_rotation(bp_arr(npi)%rel_pos,                       &
-                  body_arr(nbi)%elem(nei)%alfa)
-               if (ncord==2) bp_arr(npi)%rel_pos(2) = 0.d0 
+               call vector_rotation_Rodrigues(                                 &
+                  body_arr(nbi)%elem(nei)%n_R_IO(:),                           &
+                  body_arr(nbi)%elem(nei)%teta_R_IO,bp_arr(npi)%rel_pos(:))
+               if (ncord==2) bp_arr(npi)%rel_pos(2) = 0.d0
 ! Preliminary value of the absolute positions after
 ! translation of rel_pos of the distance "corresponding element - 
 ! reference system origin")
@@ -221,20 +231,23 @@ do nbi=1,n_bodies
                bp_arr(npi)%rel_pos(:) = bp_arr(npi)%pos(:) -                   &
                                         body_arr(nbi)%x_CM(:)              
 ! Initial normal (after rotation around the centre of mass of the element)
-               call vector_rotation(bp_arr(npi)%normal,                        &
-                  body_arr(nbi)%elem(nei)%alfa)
+               call vector_rotation_Rodrigues(                                 &
+                  body_arr(nbi)%elem(nei)%n_R_IO(:),                           &
+                  body_arr(nbi)%elem(nei)%teta_R_IO,bp_arr(npi)%normal(:))
                if (ncord==2) bp_arr(npi)%normal(2) = 0.d0
 ! Rotations around the centre of rotation provided in input
                bp_arr(npi)%rel_pos(:) = bp_arr(npi)%pos(:) -                   &
                                         body_arr(nbi)%x_rotC(:)
-               call vector_rotation(bp_arr(npi)%rel_pos,body_arr(nbi)%alfa) 
+               call vector_rotation_Rodrigues(body_arr(nbi)%n_R_IO(:),         &
+               body_arr(nbi)%teta_R_IO,bp_arr(npi)%rel_pos(:))
                if (ncord==2) bp_arr(npi)%rel_pos(2) = 0.d0
                bp_arr(npi)%pos(:) = bp_arr(npi)%rel_pos(:) +                   &
                                     body_arr(nbi)%x_rotC(:) 
                bp_arr(npi)%rel_pos(:) = bp_arr(npi)%pos(:) -                   &
                   body_arr(nbi)%x_CM(:)
-               call vector_rotation(bp_arr(npi)%normal,body_arr(nbi)%alfa)
-               if (ncord==2) bp_arr(npi)%normal(2) = 0.d0 
+               call vector_rotation_Rodrigues(body_arr(nbi)%n_R_IO(:),         &
+               body_arr(nbi)%teta_R_IO,bp_arr(npi)%normal(:))
+               if (ncord==2) bp_arr(npi)%normal(2) = 0.d0
 ! Initial cell
                bp_arr(npi)%cell =  ParticleCellNumber(bp_arr(npi)%pos)
 ! Velocity
@@ -312,12 +325,13 @@ enddo
 !------------------------
 ! Deallocations
 !------------------------
-deallocate(aux_bp_arr)  
-!$omp parallel do default(none) private(i) shared(n_bodies,body_arr,aux_mass)
+deallocate(aux_bp_arr)
 do i=1,n_bodies
-   deallocate(body_arr(i)%elem) 
-end do
-!$omp end parallel do 
+! To initialize rel_pos_part1_t0
+   body_arr(i)%rel_pos_part1_t0(:) = bp_arr(aux_integer+1)%rel_pos(:)
+   aux_integer = aux_integer + body_arr(i)%npart
+   deallocate(body_arr(i)%elem)
+enddo
 deallocate(aux_mass)
 return
 end subroutine Input_Body_Dynamics

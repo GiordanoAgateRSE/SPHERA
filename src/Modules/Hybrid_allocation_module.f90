@@ -292,13 +292,13 @@ end type TyParticle_w
 
 ! Body elements
 type body_element
-   integer(4)       :: npart ! Number of body particles 
+   integer(4)       :: npart ! Number of body particles
+   double precision :: teta_R_IO ! rotation angle for IC and I/O purposes
    double precision :: L_geom(3) ! Element dimensions (Lx,Ly,Lz): a 
-                                 ! paralelepiped 
+                                 ! paralelepiped
    double precision :: dx(3) ! Body particle spacing  
    double precision :: x_CM(3) ! Position of the centre of mass
-   double precision :: alfa(3) ! Rotation angle of the element with
-                               ! respect to the reference system
+   double precision :: n_R_IO(3) ! rotation axis for IC and I/O purposes
    integer(4)       :: normal_act(6) ! Boolean value to activate 
                                      ! normals if the element side 
                                      ! is a body side
@@ -318,6 +318,7 @@ type body
    double precision :: umax ! Maximum among the absolute values of the  
                             ! particle velocities
    double precision :: pmax ! Maximum value of pressure
+   double precision :: teta_R_IO ! rotation angle for IC and I/O purposes
    double precision :: x_CM(3) ! Position of the centre of mass
    double precision :: alfa(3) ! Rotation angle of the body with respect to 
                                ! the reference system
@@ -327,6 +328,10 @@ type body
    double precision :: omega(3) ! Angular velocity 
    double precision :: Force(3) ! Force
    double precision :: Moment(3) ! Moment / torque
+   double precision :: n_R_IO(3) ! rotation axis for IC and I/O purposes
+   double precision :: rel_pos_part1_t0(3) ! relative position of the first 
+                                           ! particle of the body at the 
+                                           ! beginning of the simulation
    double precision :: Ic(3,3) ! Moment of inertia
    double precision :: Ic_inv(3,3) ! Inverse of the moment of inertia
 ! Array for the imposed body kinematics (n_records*7) 

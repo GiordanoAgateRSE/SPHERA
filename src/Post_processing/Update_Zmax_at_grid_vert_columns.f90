@@ -24,7 +24,7 @@
 !              height, for each grid columns (only in 3D).
 !              Printing the 2D field of the water depth (current time step), 
 !              according to the output frequency chosen in the input file (only 
-!              in 3D). 
+!              in 3D).
 !              Printing the 2D fields of the specific flow rate components 
 !              (current time step), at the same frequency of the water depth 
 !              (only in 3D).            
@@ -45,7 +45,8 @@ integer(4),intent(in) :: print_flag
 integer(4) :: npi,GridColumn,i_zone,i_vertex,i_aux,i_grid,j_grid
 double precision :: pos(3)
 double precision,allocatable,dimension(:) :: Z_fluid_step,h_step,qx_step
-double precision,allocatable,dimension(:) :: qy_step,qx_step_grid,qy_step_grid,n_part_step 
+double precision,allocatable,dimension(:) :: qy_step,qx_step_grid,qy_step_grid
+double precision,allocatable,dimension(:) :: n_part_step 
 character(255) :: nomefile_h_step
 integer(4),external :: ParticleCellNumber
 !------------------------

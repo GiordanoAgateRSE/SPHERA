@@ -19,11 +19,11 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: vector_rotation     
-! Description: Rotation of a given vector, provided the vector of the rotation
-!              angles (3D).           
+! Program unit: vector_rotation_Euler_angles
+! Description: 3D rotation of a given vector, provided the vector of Euler's 
+!              angles (3D).
 !-------------------------------------------------------------------------------
-subroutine vector_rotation(vector,angle)
+subroutine vector_rotation_Euler_angles(vector,angle)
 !------------------------
 ! Modules
 !------------------------ 
@@ -85,5 +85,5 @@ vector(3) = dot_product(cos_dir(3,:),vec_temp)
 ! Deallocations
 !------------------------
 return
-end subroutine vector_rotation
+end subroutine vector_rotation_Euler_angles
 

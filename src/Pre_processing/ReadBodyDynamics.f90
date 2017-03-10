@@ -23,7 +23,7 @@
 ! Description: Reading input data for body trasnport in fluid flows (Amicarelli
 !              et al., 2015, CAF).                  
 !-------------------------------------------------------------------------------
-subroutine ReadBodyDynamics (ainp,comment,nrighe,ier,ninp,nout)
+subroutine ReadBodyDynamics(ainp,comment,nrighe,ier,ninp,nout)
 !------------------------
 ! Modules
 !------------------------ 
@@ -36,9 +36,9 @@ use Dynamic_allocation_module
 implicit none
 integer(4) :: nrighe,ier,ninp,nout,ioerr,i,Id_body,n_elem,j,Id_elem,alloc_stat
 integer(4) :: imposed_kinematics,n_records,Ic_imposed 
-double precision :: mass
+double precision :: mass,teta_R_IO
 integer(4) :: normal_act(6)
-double precision :: L_geom(3),x_CM(3),alfa(3),u_CM(3),omega(3),x_rotC(3)
+double precision :: L_geom(3),x_CM(3),n_R_IO(3),u_CM(3),omega(3),x_rotC(3)
 double precision :: mass_deact(6)
 double precision :: Ic(3,3)
 character(1) :: comment
@@ -121,8 +121,9 @@ do while (TRIM(lcase(ainp)) /= "##### end body dynamics #####")
             return
       endif
       call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
-      read(ainp,*,iostat=ioerr) alfa(1),alfa(2),alfa(3)
-      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"ALFA",ninp,nout)) return
+      read(ainp,*,iostat=ioerr) n_R_IO(1),n_R_IO(2),n_R_IO(3),teta_R_IO
+      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                                &
+         'BODY ROTATION AXIS AND ANGLE FOR IC',ninp,nout)) return
       call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
       read(ainp,*,iostat=ioerr) x_rotC(1),x_rotC(2),x_rotC(3)
       if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"X_ROTC",ninp,nout)) return
@@ -146,7 +147,8 @@ do while (TRIM(lcase(ainp)) /= "##### end body dynamics #####")
          else
             body_arr(Id_body)%Ic = 0.d0
       endif   
-      body_arr(Id_body)%alfa = alfa
+      body_arr(Id_body)%n_R_IO(:) = n_R_IO(:)
+      body_arr(Id_body)%teta_R_IO = teta_R_IO   
       body_arr(Id_body)%x_rotC = x_rotC
       body_arr(Id_body)%u_CM = u_CM
       body_arr(Id_body)%omega = omega
@@ -169,10 +171,12 @@ do while (TRIM(lcase(ainp)) /= "##### end body dynamics #####")
                write(nout,"(1x,a,1p,3e12.4)") "Ic(3,1-3):..................",  &
                   Ic(3,1),Ic(3,2),Ic(3,3)
             endif
-            write(nout,"(1x,a,1p,3e12.4)") "alfa:.......................",     &
-               alfa(1),alfa(2),alfa(3) 
+            write(nout,"(1x,a,1p,3e12.4)") "n_R_IO:.....................",     &
+               n_R_IO(1),n_R_IO(2),n_R_IO(3)
+            write(nout,"(1x,a,1p,e12.4)") "teta_R_IO:..................",      &
+               teta_R_IO
             write(nout,"(1x,a,1p,3e12.4)") "x_rotC:.....................",     &
-               x_rotC 
+               x_rotC(:)
             write(nout,"(1x,a,1p,3e12.4)") "u_CM:.......................",     &
                u_CM
             write(nout,"(1x,a,1p,3e12.4)") "omega:......................",     &
@@ -234,9 +238,9 @@ do while (TRIM(lcase(ainp)) /= "##### end body dynamics #####")
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"X_CM_ELEM",ninp,nout))      &
             return
          call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
-         read(ainp,*,iostat=ioerr) alfa(1),alfa(2),alfa(3)
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"ALFA_ELEM",ninp,nout))      &
-            return
+         read(ainp,*,iostat=ioerr) n_R_IO(1),n_R_IO(2),n_R_IO(3),teta_R_IO
+         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                             &
+            "ELEMENT ROTATION AXIS AND ANGLE FOR IC",ninp,nout)) return         
          call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
          read(ainp,*,iostat=ioerr) normal_act(1),normal_act(2),normal_act(3),  &
             normal_act(4),normal_act(5),normal_act(6)
@@ -250,7 +254,8 @@ do while (TRIM(lcase(ainp)) /= "##### end body dynamics #####")
 ! Assignment of the element parameters
          body_arr(Id_body)%elem(Id_elem)%L_geom = L_geom
          body_arr(Id_body)%elem(Id_elem)%x_CM = x_CM
-         body_arr(Id_body)%elem(Id_elem)%alfa = alfa
+         body_arr(Id_body)%elem(Id_elem)%n_R_IO(:) = n_R_IO(:)
+         body_arr(Id_body)%elem(Id_elem)%teta_R_IO = teta_R_IO
          body_arr(Id_body)%elem(Id_elem)%normal_act = normal_act
          body_arr(Id_body)%elem(Id_elem)%mass_deact = mass_deact          
 ! Writing on the log file
@@ -261,9 +266,11 @@ do while (TRIM(lcase(ainp)) /= "##### end body dynamics #####")
                write(nout,"(1x,a,1p,3e12.4)") "L_geom:.....................",  &
                   L_geom
                write(nout,"(1x,a,1p,3e12.4)") "x_CM_elem:..................",  &
-                  x_CM
-               write(nout,"(1x,a,1p,3e12.4)") "alfa_elem:..................",  &
-                  alfa(1),alfa(2),alfa(3)    
+                  x_CM(:)
+               write(nout,"(1x,a,1p,3e12.4)") "n_R_IO_elem:................",  &
+                  n_R_IO(1),n_R_IO(2),n_R_IO(3)
+               write(nout,"(1x,a,1p,e12.4)") "teta_R_IO_elem:.............",   &
+                  teta_R_IO
                write(nout,"(1x,a,1p,6i12)") "normal_act:.................",    &
                   normal_act    
                write(nout,"(1x,a,1p,6e12.4)") "mass_deact:.................",  &

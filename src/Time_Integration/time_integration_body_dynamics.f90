@@ -133,11 +133,11 @@ do npi=1,n_body_part
    bp_arr(npi)%acc(:) = (bp_arr(npi)%vel(:) - aux_vel(:)) / dtvel
 ! Non-staggered parameters
    vec2_temp(:) = teta(bp_arr(npi)%body,:)
-   call vector_rotation(bp_arr(npi)%rel_pos,vec2_temp)
+   call vector_rotation_Euler_angles(bp_arr(npi)%rel_pos,vec2_temp)
    if (ncord==2) bp_arr(npi)%rel_pos(2) = zero
    bp_arr(npi)%pos(:) = bp_arr(npi)%rel_pos(:) +                               &
       body_arr(bp_arr(npi)%body)%x_CM(:)
-   call vector_rotation(bp_arr(npi)%normal,vec2_temp)
+   call vector_rotation_Euler_angles(bp_arr(npi)%normal,vec2_temp)
    mod_normal = dsqrt(dot_product(bp_arr(npi)%normal,bp_arr(npi)%normal))
    if (mod_normal>one) bp_arr(npi)%normal(:) = bp_arr(npi)%normal(:) /         &
       mod_normal
@@ -201,7 +201,7 @@ enddo
 !     bp_arr(npi)%rel_pos(:) = bp_arr(npi)%pos(:) -       &
 !        body_arr(bp_arr(npi)%body)%x_CM(:)
 !     vec2_temp(:) = teta(bp_arr(npi)%body,:)
-!     call vector_rotation(bp_arr(npi)%normal,vec2_temp)
+!     call vector_rotation_Euler_angles(bp_arr(npi)%normal,vec2_temp)
 !     mod_normal = dsqrt(dot_product(bp_arr(npi)%normal,bp_arr(npi)%normal))
 !     if (mod_normal>1.) bp_arr(npi)%normal(:) = bp_arr(npi)%normal(:) / &
 !         mod_normal    

@@ -25,7 +25,7 @@
 subroutine Body_dynamics_output
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
 use I_O_file_module
 use Static_allocation_module
 use Hybrid_allocation_module
@@ -34,8 +34,9 @@ use Dynamic_allocation_module
 ! Declarations
 !------------------------
 implicit none
-integer(4)       :: nbi,npi,j,nsi
-double precision :: aux
+integer(4) :: nbi,npi,j,nsi,aux_integer
+double precision :: aux,teta_R_IO
+double precision :: n_R_IO(3)
 ! 2 auxiliary parameters: pmax_R (x>0) and pmax_L (x<0), involving boundaries 
 ! pointing towards positive z
 double precision, allocatable, dimension(:) :: pmax_R,pmax_L
@@ -43,6 +44,14 @@ character(255) :: nomefilectl_Body_dynamics,nomefilectl_Body_particles
 !------------------------
 ! Explicit interfaces
 !------------------------
+interface
+   subroutine vector_rotation_axis_angle(vector1,vector2,n_R,teta_R)
+      implicit none
+      double precision,intent(in) :: vector1(3),vector2(3)
+      double precision,intent(out) :: teta_R
+      double precision,intent(out) :: n_R(3)
+   end subroutine vector_rotation_axis_angle
+end interface
 !------------------------
 ! Allocations
 !------------------------
@@ -51,6 +60,7 @@ allocate(pmax_L(n_bodies))
 !------------------------
 ! Initializations
 !------------------------
+aux_integer = 0
 !------------------------
 ! Statements
 !------------------------
@@ -87,19 +97,25 @@ open (ncpt,file=nomefilectl_Body_dynamics,status="unknown",form="formatted")
 if (on_going_time_step==1) then
    write (ncpt,*) "Body dynamics values "
    write (ncpt,                                                                &
-      '(5(7x,a),3(5x,a),3(9x,a),3(3x,a),3(1x,a),3(8x,a),(9x,a),2(7x,a))')      &
+      '(5(7x,a),3(5x,a),3(9x,a),3(6x,a),(a),3(1x,a),3(8x,a),(9x,a),2(7x,a))')  &
       " Time(s)"," Body_ID"," x_CM(m)"," y_CM(m)"," z_CM(m)"," u_CM(m/s)",     &
-      " v_CM(m/s)"," w_CM(m/s)"," Fx(N)"," Fy(N)"," Fz(N)"," alfa_x(rad)",     &
-      " alfa_y(rad)"," alfa_z(rad)","omega_x(rad/s)","omega_y(rad/s)",         &
-      "omega_z(rad/s)","Mx(N*m)","My(N*m)","Mz(N*m)","pmax(Pa)","pmax_R(Pa)",  &
-      "pmax_L(Pa)"
+      " v_CM(m/s)"," w_CM(m/s)"," Fx(N)"," Fy(N)"," Fz(N)"," n_R_IO_x",        &
+      " n_R_IO_y"," n_R_IO_z"," teta_R_IO(rad)","omega_x(rad/s)",              &
+      "omega_y(rad/s)","omega_z(rad/s)","Mx(N*m)","My(N*m)","Mz(N*m)",         &
+      "pmax(Pa)","pmax_R(Pa)","pmax_L(Pa)"
 endif
 flush(ncpt)
 ! Loop over the bodies
 do nbi=1,n_bodies
-   write (ncpt,'(g14.7,1x,i14,1x,21(g14.7,1x))') simulation_time,nbi,          &
+! To compute the the rotation axis n_R_IO and the rotation angle teta_R_IO from 
+! the relative positions of the first particle (reference times: initial time,
+! current time)
+   call vector_rotation_axis_angle(body_arr(nbi)%rel_pos_part1_t0(:),          &
+      bp_arr(aux_integer+1)%rel_pos(:),n_R_IO(:),teta_R_IO)
+   aux_integer = aux_integer + body_arr(nbi)%npart
+   write (ncpt,'(g14.7,1x,i14,1x,22(g14.7,1x))') simulation_time,nbi,          &
       body_arr(nbi)%x_CM(:),body_arr(nbi)%u_CM(:),body_arr(nbi)%Force(:),      &
-      body_arr(nbi)%alfa(:),body_arr(nbi)%omega(:),body_arr(nbi)%Moment(:),    &
+      n_R_IO(:),teta_R_IO,body_arr(nbi)%omega(:),body_arr(nbi)%Moment(:),      &
       body_arr(nbi)%pmax,pmax_R(nbi),pmax_L(nbi)
 enddo
 close(ncpt)
