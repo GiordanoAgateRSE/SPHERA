@@ -129,7 +129,7 @@ do i=1,n_bodies
          body_arr(i)%Ic = 0.d0
       endif
    endif 
-end do
+enddo
 !$omp end parallel do
 ! Loop over the body particles  
 do npi=1,n_body_part
@@ -137,7 +137,7 @@ do npi=1,n_body_part
 ! Only body particles at the body surface     
       if (bp_arr(npi)%area>0.d0) then  
 ! Computation of the ID of the surface body particles
-         aux2 = aux2+1 
+         aux2 = aux2+1
 ! Fluid pressure forces
          f_pres(:) = bp_arr(npi)%pres * bp_arr(npi)%area * bp_arr(npi)%normal(:)
          body_arr(bp_arr(npi)%body)%Force(:) =                                 &
@@ -212,8 +212,9 @@ do npi=1,n_body_part
                   endif
                   Force(bp_arr(npi)%body,bp_arr(npj)%body,:) =                 &
                     Force(bp_arr(npi)%body,bp_arr(npj)%body,:) + f_coll_bp_bp(:)
-! Zeroing gravity component perpendicular to the normal if required  
-                  if (imping_body_grav==0) then
+! Zeroing gravity component perpendicular to the normal if required
+                  if ((imping_body_grav==0).and.                               &
+                     (simulation_time>time_max_no_body_gravity_force)) then
                      aux_gravity(bp_arr(npi)%body,:) = 0.d0
 ! interesting test
 !aux_vec(:) = dot_product(aux_gravity(bp_arr(npi)%body,:),bp_arr(npj)%normal)  &
@@ -231,8 +232,9 @@ do npi=1,n_body_part
                      min(r_per,r_per_min(bp_arr(npi)%body,bp_arr(npj)%body)) 
                endif
             endif                            
-         end do
+         enddo
 ! Loop over boundaries (body-boundary impacts, partial contributions) (3D case) 
+         if (simulation_time>time_max_no_body_frontier_impingements) then
          if (ncord==3) then
             do j=1,NumFacce
             if ((Tratto(BoundaryFace(j)%stretch)%tipo=="fixe") .or.            &
@@ -278,7 +280,8 @@ do npi=1,n_body_part
                            Force(bp_arr(npi)%body,n_bodies+j,:) +              &
                            f_coll_bp_boun(:) 
 ! Zeroing gravity component perpendicular to the normal, if requested.
-                        if (imping_body_grav==0) then  
+                        if ((imping_body_grav==0).and.                         &
+                          (simulation_time>time_max_no_body_gravity_force)) then
                            aux_gravity(bp_arr(npi)%body,:) = 0.d0
 ! Interesting test            
 ! aux_vec(:) = dot_product(aux_gravity(bp_arr(npi)%body,:),normal_plane) *     &
@@ -303,7 +306,7 @@ do npi=1,n_body_part
                      endif
                   endif  
                endif
-            end do 
+            enddo 
          endif
 ! AA!!! test start
          inter_front(bp_arr(npi)%body) = max(inter_front(bp_arr(npi)%body),    &
@@ -363,7 +366,8 @@ do npi=1,n_body_part
                            Force(bp_arr(npi)%body,n_bodies+j,:) +              &
                            f_coll_bp_boun(:) 
 ! Zeroing gravity component perpendicular to the normal, if requested.    
-                        if (imping_body_grav==0) then
+                        if ((imping_body_grav==0).and.                         &
+                          (simulation_time>time_max_no_body_gravity_force)) then
                            aux_gravity(bp_arr(npi)%body,:) = 0.d0
 ! Interesting test
 ! aux_vec(:) = dot_product(aux_gravity(bp_arr(npi)%body,:),normal_plane) *     &
@@ -387,6 +391,7 @@ do npi=1,n_body_part
                   endif
                endif
             enddo 
+         endif
          endif
       endif
    endif

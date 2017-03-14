@@ -681,6 +681,7 @@ type TyGranular_flows_options
                                                                  ! (presence of 
                                                                  ! the free 
                                                                  ! surface along
+
                                                                  ! the vertical)
                                                                  ! at the time 
                                                                  ! of minimum 

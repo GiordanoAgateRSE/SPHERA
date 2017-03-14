@@ -145,7 +145,14 @@ double precision :: cubich ! Domain%h*Domain%h*Domain%h
 double precision :: unosuh ! 1./Domain%h
 double precision :: unosusquareh ! 1./(Domain%h*Domain%h)
 double precision :: dx_dxbodies ! Ratio between fluid particle and body
-                                ! particle size 
+                                ! particle size
+double precision :: time_max_no_body_gravity_force ! gravity force is   
+                                                   ! deactivated for body 
+                                                   ! dynamics until this time
+double precision :: time_max_no_body_frontier_impingements ! body-frontier 
+                                                           ! impingements 
+                                                           ! are deactivated 
+                                                           ! until this time
 ! Indices of cells that must be considered around the current one 
 ! in subrutine "CalcVarLength"
 integer(4),dimension(14,3) :: indicecelle 
