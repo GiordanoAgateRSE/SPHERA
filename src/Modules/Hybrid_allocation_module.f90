@@ -366,10 +366,13 @@ type TyZone
                                                        ! free surface in
                                                        ! pre-processing)
    integer(4)       :: ipool 
-   integer(4)       :: npoints
+   integer(4)       :: npoints ! number of topographic vertices used for 
+                               ! extrusion (only for a fluid zone extruded from 
+                               ! topography)
    integer(4)       :: icol ! Particle colour or number of vertical strips
    integer(4)       :: Medium ! Fluid ID
-   integer(4)       :: npointv ! Number of vertices 
+   integer(4)       :: npointv ! Number of records at imposed kinematics 
+                               ! (only for fluid zones)  
    integer(4)       :: IC_source_type ! IC fluid particle distribution from 
                                       ! reservoir vertices and faces (1) or 
                                       ! from Cartesian topography (2)
@@ -378,10 +381,12 @@ type TyZone
                                     ! (0 if IC_source_type=1)
    integer(4)       :: plan_reservoir_points ! Number of points describing the
                                              ! reservoir, if(IC_source_type==2)
-   integer(4)       :: ID_first_vertex ! ID first vertex in case of Cartesian
-                                       ! topography
-   integer(4)       :: ID_last_vertex ! ID last vertex in case of Cartesian
-                                      ! topography
+   integer(4)       :: ID_first_vertex ! ID first vertex of topography 
+                                       ! (only for a fluid zone 
+                                       ! extruded from topography)
+   integer(4)       :: ID_last_vertex ! ID last vertex of topography
+                                      ! (only for a fluid zone 
+                                      ! extruded from topography)
    integer(4)       :: dam_zone_ID ! ID of the dam zone, related to the
                                    ! eventual reservoir (0 if no dam is 
                                    ! present), if (IC_source_type==2) 

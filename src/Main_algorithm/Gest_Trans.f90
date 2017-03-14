@@ -37,6 +37,7 @@ use I_O_diagnostic_module
 implicit none
 integer(4),parameter :: ner0 = 0
 integer(4) :: npi,NumCellmax,i,ier,k,kk,k1,k2,nlinee,nvalori,alloc_stat
+integer(4) :: aux_integer
 character(len=lencard) :: nomsub = "GEST_TRANS"
 character(len=lencard) :: filename,stringa,prefix,filevtk
 character(len=200)     :: cargo
@@ -638,47 +639,49 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
 ! Allocation and initialization of the Z_fluid_max array
 ! Loop over the zones
          do i=1,NPartZone
-         if (Partz(i)%IC_source_type==2) then
-            if (.not.allocated(Z_fluid_max)) then
-               allocate(Z_fluid_max(Grid%ncd(1)*Grid%ncd(2)),STAT=alloc_stat)
-               if (alloc_stat/=0) then
-                  write(nout,*)                                                &
-                  'Allocation of Z_fluid_max in Gest_Trans failed;',           &
-                  ' the program terminates here.'
-                  stop ! Stop the main program
-                  else
+            if (Partz(i)%IC_source_type==2) then
+               if (.not.allocated(Z_fluid_max)) then
+                  allocate(Z_fluid_max(Grid%ncd(1)*Grid%ncd(2)),STAT=alloc_stat)
+                  if (alloc_stat/=0) then
                      write(nout,*)                                             &
-                        'Allocation of Z_fluid_max in Gest_Trans successfully',&
-                        ' completed.'
+                     'Allocation of Z_fluid_max in Gest_Trans failed;',        &
+                     ' the program terminates here.'
+                     stop ! Stop the main program
+                     else
+                        write(nout,*)                                          &
+                           'Allocation of Z_fluid_max in Gest_Trans ',         &
+                           'successfully completed.'
+                  endif
                endif
-            endif
-            Z_fluid_max = -999.d0
-            if (.not.allocated(q_max)) then
-               allocate(q_max(Partz(i)%npoints),STAT=alloc_stat)
-               if (alloc_stat/=0) then
-                  write(nout,*)                                                &
-                  'Allocation of q_max in Gest_Trans failed;',                 &
-                  ' the program terminates here.'
-                  stop ! Stop the main program
-                  else
+               Z_fluid_max(:) = -999.d0
+               aux_integer = Partz(i)%ID_last_vertex -                         &
+                             Partz(i)%ID_first_vertex + 1  
+               if (.not.allocated(q_max)) then
+                  allocate(q_max(aux_integer),STAT=alloc_stat)
+                  if (alloc_stat/=0) then
                      write(nout,*)                                             &
-                        'Allocation of q_max in Gest_Trans successfully ',     &
-                        'completed.'
+                     'Allocation of q_max in Gest_Trans failed;',              &
+                     ' the program terminates here.'
+                     stop ! Stop the main program
+                     else
+                        write(nout,*)                                          &
+                           'Allocation of q_max in Gest_Trans successfully ',  &
+                           'completed.'
+                  endif
                endif
+               q_max(:) = 0.d0
+               exit
             endif
-            q_max = 0.d0
-            exit
-         endif
-      enddo     
-      call start_and_stop(2,5)
+         enddo  
+         call start_and_stop(2,5)
 ! Main loop
-      call loop_irre_3D
-      call start_and_stop(3,5)
+         call loop_irre_3D
+         call start_and_stop(3,5)
 ! Writing the h_max array and deallocation of the Z_fluid_max array
-      if (allocated(Z_fluid_max)) then
-         call write_h_max        
-         if (allocated(Z_fluid_max)) deallocate(Z_fluid_max)
-      endif
+         if (allocated(Z_fluid_max)) then
+            call write_h_max        
+            if (allocated(Z_fluid_max)) deallocate(Z_fluid_max)
+         endif
    endif 
    else
       call diagnostic(arg1=10,arg2=5,arg3=nomsub)

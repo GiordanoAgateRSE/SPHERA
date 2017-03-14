@@ -461,8 +461,8 @@ if (.not.restart) then
          if (Domain%tipo=="semi") then   
            allocate(ts0_pg(PARTICLEBUFFER),stat=ier)  
            else
-           call diagnostic(arg1=10,arg2=5,arg3=nomsub)
-         endif   
+              call diagnostic(arg1=10,arg2=5,arg3=nomsub)
+         endif
          if (ier/=0) then
             write(nout,'(1x,a,i2)')                                            &
                "    Array ts0_pg not allocated. Error code: ",ier

@@ -37,7 +37,7 @@ use I_O_file_module
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: i_zone,i_vertex,GridColumn
+integer(4) :: i_zone,i_vertex,GridColumn,alloc_stat,dealloc_stat,aux_integer
 double precision :: pos(3)
 double precision,dimension(:),allocatable :: h_max 
 character(255) :: nomefile_h_max
@@ -63,8 +63,18 @@ write(ncpt,'(6(a))') "           x(m)","           y(m)","       h_max(m)",    &
 flush(ncpt) 
 do i_zone=1,NPartZone
    if (Partz(i_zone)%IC_source_type==2) then
-! Allocating h_max 
-      allocate(h_max(Partz(i_zone)%npoints))
+! Allocating h_max
+      if (.not.allocated(h_max)) then
+         aux_integer = Partz(i_zone)%ID_last_vertex -                          &
+                       Partz(i_zone)%ID_first_vertex + 1
+         allocate(h_max(aux_integer),STAT=alloc_stat)
+         if (alloc_stat/=0) then
+            write(nout,*) 'Subroutine "write_h_max". ',                        &
+               'Allocation of the array "h_max" failed; the simulation ',      &
+               'stops here. '
+            stop
+         endif
+      endif
 ! Initializing h_max
       h_max = 0.d0
 !$omp parallel do default(none)                                                &
@@ -90,8 +100,22 @@ do i_zone=1,NPartZone
 enddo
 ! h_max .txt file: closing
 close (ncpt)
-if (allocated(h_max)) deallocate(h_max)
-if (allocated(q_max)) deallocate(q_max)
+if (allocated(h_max)) then
+   deallocate(h_max,STAT=dealloc_stat)
+   if (dealloc_stat/=0) then
+      write(nout,*) 'Subroutine "write_h_max". ',                              &
+         'Deallocation of the array "h_max" failed; the simulation stops here.'
+      stop
+   endif
+endif
+if (allocated(q_max)) then
+   deallocate(q_max,STAT=dealloc_stat)
+   if (dealloc_stat/=0) then
+      write(nout,*) 'Subroutine "write_h_max". ',                              &
+         'Deallocation of the array "q_max" failed; the simulation stops here.'
+      stop
+   endif
+endif
 !------------------------
 ! Deallocations
 !------------------------

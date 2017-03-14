@@ -42,7 +42,8 @@ use I_O_file_module
 !------------------------
 implicit none
 integer(4),intent(in) :: print_flag
-integer(4) :: npi,GridColumn,i_zone,i_vertex,i_aux,i_grid,j_grid
+integer(4) :: npi,GridColumn,i_zone,i_vertex,i_aux,i_grid,j_grid,aux_integer
+integer(4) :: alloc_stat,dealloc_stat
 double precision :: pos(3)
 double precision,allocatable,dimension(:) :: Z_fluid_step,h_step,qx_step
 double precision,allocatable,dimension(:) :: qy_step,qx_step_grid,qy_step_grid
@@ -57,16 +58,74 @@ integer(4),external :: ParticleCellNumber
 !------------------------
 do i_zone=1,NPartZone
    if (Partz(i_zone)%IC_source_type==2) then
-      allocate(h_step(Partz(i_zone)%npoints))
-      allocate(qx_step(Partz(i_zone)%npoints))
-      allocate(qy_step(Partz(i_zone)%npoints))
+      aux_integer = Partz(i_zone)%ID_last_vertex -                             &
+                      Partz(i_zone)%ID_first_vertex + 1
+      if (.not.allocated(h_step)) then
+         allocate(h_step(aux_integer),STAT=alloc_stat)
+         if (alloc_stat/=0) then
+            write(nout,*) 'Subroutine "Update_Zmax_at_grid_vert_columns". ',   &
+               'Allocation of the array "h_step" failed; the simulation ',     &
+               'stops here. '
+            stop
+         endif
+      endif
+      if (.not.allocated(qx_step)) then
+         allocate(qx_step(aux_integer),STAT=alloc_stat)
+         if (alloc_stat/=0) then
+            write(nout,*) 'Subroutine "Update_Zmax_at_grid_vert_columns". ',   &
+               'Allocation of the array "qx_step" failed; the simulation ',    &
+               'stops here.'
+            stop
+         endif
+      endif
+      if (.not.allocated(qy_step)) then
+         allocate(qy_step(aux_integer),STAT=alloc_stat)
+         if (alloc_stat/=0) then
+            write(nout,*) 'Subroutine "Update_Zmax_at_grid_vert_columns". ',   &
+               'Allocation of the array "qy_step" failed; the simulation ',    &
+               'stops here.'
+            stop
+         endif
+      endif
       exit
    endif
 enddo
-allocate(Z_fluid_step(Grid%ncd(1)*Grid%ncd(2)))
-allocate(qx_step_grid(Grid%ncd(1)*Grid%ncd(2)))
-allocate(qy_step_grid(Grid%ncd(1)*Grid%ncd(2)))
-allocate(n_part_step(Grid%ncd(1)*Grid%ncd(2)))
+if (.not.allocated(Z_fluid_step)) then
+   allocate(Z_fluid_step(Grid%ncd(1)*Grid%ncd(2)),STAT=alloc_stat)
+   if (alloc_stat/=0) then
+      write(nout,*) 'Subroutine "Update_Zmax_at_grid_vert_columns". ',         &
+         'Allocation of the array "Z_fluid_step" failed; the simulation ',     &
+         'stops here.'
+      stop
+   endif
+endif
+if (.not.allocated(qx_step_grid)) then
+   allocate(qx_step_grid(Grid%ncd(1)*Grid%ncd(2)),STAT=alloc_stat)
+   if (alloc_stat/=0) then
+      write(nout,*) 'Subroutine "Update_Zmax_at_grid_vert_columns". ',         &
+         'Allocation of the array "qx_step_grid" failed; the simulation ',     &
+         'stops here.'
+      stop
+   endif
+endif
+if (.not.allocated(qy_step_grid)) then
+   allocate(qy_step_grid(Grid%ncd(1)*Grid%ncd(2)),STAT=alloc_stat)
+   if (alloc_stat/=0) then
+      write(nout,*) 'Subroutine "Update_Zmax_at_grid_vert_columns". ',         &
+         'Allocation of the array "qy_step_grid" failed; the simulation ',     &
+         'stops here.'
+      stop
+   endif
+endif
+if (.not.allocated(n_part_step)) then
+   allocate(n_part_step(Grid%ncd(1)*Grid%ncd(2)),STAT=alloc_stat)
+   if (alloc_stat/=0) then
+      write(nout,*) 'Subroutine "Update_Zmax_at_grid_vert_columns". ',         &
+         'Allocation of the array "n_part_step" failed; the simulation stops ',&
+         'here.'
+      stop
+   endif
+endif
 !------------------------
 ! Initializations
 !------------------------
@@ -174,13 +233,69 @@ if (on_going_time_step==1) then
 endif
 ! Closing the file
 if (print_flag==1) close(ncpt)
-if (allocated(Z_fluid_step)) deallocate(Z_fluid_step)
-if (allocated(h_step)) deallocate(h_step)
-if (allocated(qx_step)) deallocate(qx_step)
-if (allocated(qy_step)) deallocate(qy_step)
-if (allocated(qx_step_grid)) deallocate(qx_step_grid)
-if (allocated(qy_step_grid)) deallocate(qy_step_grid)
-if (allocated(n_part_step)) deallocate(n_part_step)
+if (allocated(Z_fluid_step)) then
+   deallocate(Z_fluid_step,STAT=dealloc_stat)
+   if (dealloc_stat/=0) then
+      write(nout,*) 'Subroutine "Update_Zmax_at_grid_vert_columns". ',         &
+         'Deallocation of the array "Z_fluid_step" failed; the simulation ',   &
+         'stops here.'
+      stop
+   endif
+endif
+if (allocated(h_step)) then
+   deallocate(h_step,STAT=dealloc_stat)
+   if (dealloc_stat/=0) then
+      write(nout,*) 'Subroutine "Update_Zmax_at_grid_vert_columns". ',         &
+         'Deallocation of the array "h_step" failed; the simulation ',         &
+         'stops here.'
+      stop
+   endif
+endif
+if (allocated(qx_step)) then
+   deallocate(qx_step,STAT=dealloc_stat)
+   if (dealloc_stat/=0) then
+      write(nout,*) 'Subroutine "Update_Zmax_at_grid_vert_columns". ',         &
+         'Deallocation of the array "qx_step" failed; the simulation ',        &
+         'stops here.'
+      stop
+   endif
+endif
+if (allocated(qy_step)) then
+   deallocate(qy_step,STAT=dealloc_stat)
+   if (dealloc_stat/=0) then
+      write(nout,*) 'Subroutine "Update_Zmax_at_grid_vert_columns". ',         &
+         'Deallocation of the array qy_step failed; the simulation ',          &
+         'stops here.'
+      stop
+   endif
+endif
+if (allocated(qx_step_grid)) then
+   deallocate(qx_step_grid,STAT=dealloc_stat)
+   if (dealloc_stat/=0) then
+      write(nout,*) 'Subroutine "Update_Zmax_at_grid_vert_columns". ',         &
+         'Deallocation of the array "qx_step_grid" failed; the simulation ',   &
+         'stops here.'
+      stop
+   endif
+endif
+if (allocated(qy_step_grid)) then
+   deallocate(qy_step_grid,STAT=dealloc_stat)
+   if (dealloc_stat/=0) then
+      write(nout,*) 'Subroutine "Update_Zmax_at_grid_vert_columns". ',         &
+         'Deallocation of the array "qy_step_grid" failed; the simulation ',   &
+         'stops here.'
+      stop
+   endif
+endif
+if (allocated(n_part_step)) then
+   deallocate(n_part_step,STAT=dealloc_stat)
+   if (dealloc_stat/=0) then
+      write(nout,*) 'Subroutine "Update_Zmax_at_grid_vert_columns". ',         &
+         'Deallocation of the array "n_part_step" failed; the simulation ',    &
+         'stops here.'
+      stop
+   endif
+endif
 !------------------------
 ! Deallocations
 !------------------------

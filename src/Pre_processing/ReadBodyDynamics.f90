@@ -203,7 +203,8 @@ do while (TRIM(lcase(ainp)) /= "##### end body dynamics #####")
                         'ReadBodyDynamics successfully completed.'
                endif
             endif
-            if (.not.allocated(body_arr(Id_body)%body_kinematics)) then
+            if ((n_records>0) .and.                                            &
+               (.not.allocated(body_arr(Id_body)%body_kinematics)) ) then
                allocate(body_arr(Id_body)%body_kinematics(n_records,7),        &
                   STAT=alloc_stat)
                if (alloc_stat/=0) then

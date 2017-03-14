@@ -36,8 +36,7 @@ use Dynamic_allocation_module
 implicit none
 character(7),intent(IN) :: option
 integer(4),intent(INOUT) :: ier,nrecords
-logical :: aux_logical
-integer(4) :: restartcode,save_istart,ioerr,i,alloc_stat,i_aux
+integer(4) :: restartcode,save_istart,ioerr,i,alloc_stat,i_aux,aux_integer
 double precision :: save_start
 character(12) :: ainp = "Restart File"
 character(len=8) :: versionerest
@@ -53,7 +52,7 @@ character(100),external :: lcase
 ! Initializations
 !------------------------
 ier = 0
-aux_logical = .false.
+aux_integer = 0
 !------------------------
 ! Statements
 !------------------------
@@ -185,11 +184,12 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
 ! Allocation of the array of the maximum water depth
       do i_aux=1,NPartZone
          if(Partz(i_aux)%IC_source_type==2) then
-            aux_logical = .true.
+            aux_integer = Partz(i_aux)%ID_last_vertex -                        &
+                          Partz(i_aux)%ID_first_vertex + 1
             exit
          endif
       enddo
-      if ((aux_logical.eqv..true.).and.(.not.allocated(Z_fluid_max))) then
+      if ((aux_integer>0).and.(.not.allocated(Z_fluid_max))) then
          allocate(Z_fluid_max(Grid%ncd(1)*Grid%ncd(2)),STAT=alloc_stat)
          if (alloc_stat/=0) then
             write(nout,*)                                                      &
@@ -203,8 +203,8 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
          endif
       endif
 ! Allocation of the array of the maximum specific flow rate
-      if ((aux_logical.eqv..true.).and.(.not.allocated(q_max))) then
-         allocate(q_max(Partz(1)%npoints),STAT=alloc_stat)
+      if ((aux_integer>0).and.(.not.allocated(q_max))) then
+         allocate(q_max(aux_integer),STAT=alloc_stat)
          if (alloc_stat/=0) then
             write(nout,*)                                                      &
             'Allocation of q_max in ReadRestartFile failed;',                  &
@@ -275,10 +275,15 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
                   endif
                   if (n_bodies>0) then
                      do i=1,n_bodies
-                        read(nsav,iostat=ioerr) 
+                        read(nsav,iostat=ioerr)
+                        if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,            &
+                           "body_arr_1_of_2",nsav,nout)) return
+                        if (body_arr(i)%n_records>0) then
+                           read(nsav,iostat=ioerr)
+                           if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,         &
+                              "body_arr_2_of_2",nsav,nout)) return
+                        endif                  
                      enddo
-                     if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,               &
-                              "body_arr",nsav,nout)) return
                      read(nsav,iostat=ioerr) 
                      if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"bp_arr",      &
                               nsav,nout)) return
@@ -328,21 +333,29 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
                               body_arr(i)%imposed_kinematics,                  &
                               body_arr(i)%n_records,body_arr%mass,             &
                               body_arr(i)%umax,body_arr(i)%pmax,               &
-                              body_arr(i)%x_CM,body_arr(i)%alfa,               &
-                              body_arr(i)%u_CM,body_arr(i)%omega,              &
-                              body_arr(i)%Force,body_arr(i)%Moment,            &
-                              body_arr(i)%Ic,body_arr(i)%Ic_inv,               &
-                              body_arr(i)%body_kinematics
+                              body_arr(i)%x_CM(1:3),body_arr(i)%alfa(1:3),     &
+                              body_arr(i)%u_CM(1:3),body_arr(i)%omega(1:3),    &
+                              body_arr(i)%Force(1:3),body_arr(i)%Moment(1:3),  &
+                              body_arr(i)%Ic(1:3,1:3),                         &
+                              body_arr(i)%Ic_inv(1:3,1:3)
+                           if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,         &
+                              "body_arr_1_of_2",nsav,nout)) return                              
+                           if (body_arr(i)%n_records>0) then
+                              if (.not.allocated(body_arr(i)%body_kinematics)) &
+allocate(body_arr(i)%body_kinematics(body_arr(i)%n_records,7))
+                              read(nsav,iostat=ioerr)                          &
+body_arr(i)%body_kinematics(1:body_arr(i)%n_records,1:7)
+                              if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,      &
+                                 "body_arr_2_of_2",nsav,nout)) return
+                           endif
                         enddo
-                        if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"body_arr", &
-                           nsav,nout)) return
                         read(nsav,iostat=ioerr) bp_arr(1:n_body_part)
                         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"bp_arr",   &
                            nsav,nout)) return
                         read(nsav,iostat=ioerr) surf_body_part(1:              &
                            n_surf_body_part)
                         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,            &
-                           "surf_body_part",nsav,nout)) return
+                          "surf_body_part",nsav,nout)) return
                      endif
                      if (allocated(Z_fluid_max)) then
                         read(nsav,iostat=ioerr)                                &
@@ -427,14 +440,19 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
                      endif
                      if (n_bodies>0) then
                         do i=1,n_bodies
-                           read(nsav,iostat=ioerr) 
+                           read(nsav,iostat=ioerr)
+                           if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,         &
+                              "body_arr_1_of_2",nsav,nout)) return
+                           if (body_arr(i)%n_records>0) then   
+                              read(nsav,iostat=ioerr)
+                              if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,      &
+                                 "body_arr_2_of_2",nsav,nout)) return
+                           endif
                         enddo
-                        if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,            &
-                                 "body_arr",nsav,nout)) return
                         read(nsav,iostat=ioerr) 
                         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"bp_arr",   &
                                  nsav,nout)) return
-                        read(nsav,iostat=ioerr) 
+                        read(nsav,iostat=ioerr)
                         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,            &
                                  "surf_body_part",nsav,nout)) return
                      endif
@@ -480,14 +498,23 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
                                  body_arr(i)%imposed_kinematics,               &
                                  body_arr(i)%n_records,body_arr%mass,          &
                                  body_arr(i)%umax,body_arr(i)%pmax,            &
-                                 body_arr(i)%x_CM,body_arr(i)%alfa,            &
-                                 body_arr(i)%u_CM,body_arr(i)%omega,           &
-                                 body_arr(i)%Force,body_arr(i)%Moment,         &
-                                 body_arr(i)%Ic,body_arr(i)%Ic_inv,            &
-                                 body_arr(i)%body_kinematics
+                                 body_arr(i)%x_CM(1:3),body_arr(i)%alfa(1:3),  &
+                                 body_arr(i)%u_CM(1:3),body_arr(i)%omega(1:3), &
+                                 body_arr(i)%Force(1:3),                       &
+                                 body_arr(i)%Moment(1:3),                      &
+                                 body_arr(i)%Ic(1:3,1:3),                      &
+                                 body_arr(i)%Ic_inv(1:3,1:3)
+                              if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,      &
+                                 "body_arr_1_of_2",nsav,nout)) return
+                              if (body_arr(i)%n_records>0) then
+                               if (.not.allocated(body_arr(i)%body_kinematics))&
+allocate(body_arr(i)%body_kinematics(body_arr(i)%n_records,7))
+                                 read(nsav,iostat=ioerr)                       &
+body_arr(i)%body_kinematics(1:body_arr(i)%n_records,1:7)
+                                 if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,   &
+                                 "body_arr_2_of_2",nsav,nout)) return
+                              endif
                            enddo
-                           if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,         &
-                              "body_arr",nsav,nout)) return
                            read(nsav,iostat=ioerr) bp_arr(1:n_body_part)
                            if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"bp_arr",&
                               nsav,nout)) return
@@ -506,10 +533,8 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
                            read(nsav,iostat=ioerr) q_max(1:size(q_max))
                            if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"q_max", &
                               nsav,nout)) return
-                        endif                           
-                        if (allocated                                          &
-                           (Granular_flows_options%minimum_saturation_flag)) &
-                           then
+                        endif
+if (allocated(Granular_flows_options%minimum_saturation_flag)) then
                            read(nsav,iostat=ioerr)                             &
                               Granular_flows_options%minimum_saturation_flag(  &
                               1:Grid%ncd(1),1:Grid%ncd(2))
