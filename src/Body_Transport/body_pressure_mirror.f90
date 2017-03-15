@@ -55,7 +55,7 @@ double precision, external :: w
 !$omp parallel do default(none)                                                &
 !$omp private(npi,Sum_W_vol,j,npartint,npj,aux_acc,pres_mir,dis,W_vol,aux)     &
 !$omp shared(n_body_part,bp_arr,nPartIntorno_bp_f,NMAXPARTJ,PartIntorno_bp_f)  &
-!$omp shared(Domain,pg,rag_bp_f)
+!$omp shared(Domain,pg,rag_bp_f,body_surface_pressure_limiter)
 do npi=1,n_body_part
    bp_arr(npi)%pres = 0.
    Sum_W_vol = 0.  
@@ -76,9 +76,12 @@ do npi=1,n_body_part
       W_vol = w(dis,Domain%h,Domain%coefke) * (pg(npj)%mass / pg(npj)%dens)
       bp_arr(npi)%pres = bp_arr(npi)%pres + pres_mir * W_vol
       Sum_W_vol = Sum_W_vol + W_vol  
-   end do
-   if (Sum_W_vol>0.) bp_arr(npi)%pres = bp_arr(npi)%pres / Sum_W_vol      
-end do
+   enddo
+   if (Sum_W_vol>0.) bp_arr(npi)%pres = bp_arr(npi)%pres / Sum_W_vol
+   if (body_surface_pressure_limiter.eqv..true.) then
+      if (bp_arr(npi)%pres<0.d0) bp_arr(npi)%pres = 0.d0 
+   endif   
+enddo
 ! Draft for omp parallelization with critical section 
 !$omp end parallel do
 !------------------------

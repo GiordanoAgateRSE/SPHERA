@@ -113,8 +113,8 @@ do npi=1,n_body_part
       pg(npj)%acc(:) = pg(npj)%acc(:) + ( - pg(npj)%mass / (dx_dxbodies **     &
                        ncord) * temp_acc * ( - rag_bp_f(:,npartint)) *         &
                        KerDer_bp_f_Gal(npartint))    
-   end do
-end do
+   enddo
+enddo
 ! Loop over the transported bodies (gravity forces and Ic initialization)
 !$omp parallel do default(none) private(i)                                     &
 !$omp shared(n_bodies,body_arr,Domain,it_start,on_going_time_step,ncord)       &

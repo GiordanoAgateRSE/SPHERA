@@ -370,7 +370,7 @@ max_step_still                      ! max_step_still(number of time steps during
 ! Input parameters for the scheme on body transport in fluid flows
 ! Bodies with imposed kinematics are listed after all the bodies with computed 
 ! kinematics
-n_bodies dx/dx_body imping_body_grav time_max_no_gravity_gravity_force time_max_no_body_frontier_impingements
+n_bodies dx/dx_body imping_body_grav time_max_no_gravity_gravity_force time_max_no_body_frontier_impingements body_surface_pressure_limiter
                                     ! n_bodies(number of transported solid 
                                     ! bodies); dx/dx_body(ratio between fluid 
                                     ! particle size and body particle size); 
@@ -384,7 +384,10 @@ n_bodies dx/dx_body imping_body_grav time_max_no_gravity_gravity_force time_max_
                                     ! time_max_no_body_frontier_impingements
                                     ! (body-frontier impingements are 
                                     ! deactivated until this time, no 
-                                    ! deactivation in case of negative value)
+                                    ! deactivation in case of negative value);
+                                    ! body_surface_pressure_limiter=.true.(no 
+                                    ! negative pressure on the body surface),
+                                    ! .false.(no limiter)
 ! if (n_bodies>0): start
 ID_first_body n_elem                ! ID_first_body=1; n_elem(number of 
                                     ! elements of the body)

@@ -63,7 +63,8 @@ do while (TRIM(lcase(ainp)) /= "##### end body dynamics #####")
 ! Reading the number of bodies and the ratio between fluid and body particle 
 ! size
    read(ainp,*,iostat=ioerr) n_bodies,dx_dxbodies,imping_body_grav,            &
-      time_max_no_body_gravity_force,time_max_no_body_frontier_impingements
+      time_max_no_body_gravity_force,time_max_no_body_frontier_impingements,   &
+      body_surface_pressure_limiter
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"BODY DYNAMICS GENERAL INPUT",ninp,&
       nout)) return
 ! Writing the number of bodies and "dx_dxbodies" on the log file
@@ -79,6 +80,8 @@ do while (TRIM(lcase(ainp)) /= "##### end body dynamics #####")
          time_max_no_body_gravity_force
       write(nout,"(1x,a,1p,e12.4)") "time_max_no_body_frontier_imp.",          &
          time_max_no_body_frontier_impingements
+      write(nout,"(1x,a,1p,l12)") "body_surface_pressure_limiter:",            &
+         body_surface_pressure_limiter
       write(nout,"(1x,a)")  " "
    endif
 ! Allocation of the array of the bodies

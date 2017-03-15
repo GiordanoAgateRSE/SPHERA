@@ -123,6 +123,10 @@ logical :: kill_flag ! Flag to kill the execution
 logical :: current_version   
 logical :: diffusione ! Flag to activate the diffusion model
 logical :: esplosione ! Flag to activate the explosion model
+logical :: body_surface_pressure_limiter ! Flag to activate/deactivate a 
+                                         ! pressure limiter on the body 
+                                         ! surfaces not to have pressure 
+                                         ! negative values
 integer(4) :: NMAXPARTJ ! Max number of neighbouring particles
 integer(4) :: MaxNcbs ! Max number of close boundary sides for the current 
                       ! particle
