@@ -28,7 +28,7 @@ subroutine ReadInputMedium(NumberEntities,Med,ainp,comment,nrighe,ier,ninp,    &
 !------------------------
 ! Modules
 !------------------------ 
-use Static_allocation_module                            
+use Static_allocation_module
 use Hybrid_allocation_module
 !------------------------
 ! Declarations

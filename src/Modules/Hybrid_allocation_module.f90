@@ -319,6 +319,8 @@ type body
                             ! particle velocities
    double precision :: pmax ! Maximum value of pressure
    double precision :: teta_R_IO ! rotation angle for IC and I/O purposes
+   double precision :: p_max_limiter ! Maximum pressure value for the maximum 
+                                     ! pressure limiter
    double precision :: x_CM(3) ! Position of the centre of mass
    double precision :: alfa(3) ! Rotation angle of the body with respect to 
                                ! the reference system
@@ -681,6 +683,7 @@ type TyGranular_flows_options
                                                                  ! (presence of 
                                                                  ! the free 
                                                                  ! surface along
+
 
                                                                  ! the vertical)
                                                                  ! at the time 

@@ -97,12 +97,12 @@ open (ncpt,file=nomefilectl_Body_dynamics,status="unknown",form="formatted")
 if (on_going_time_step==1) then
    write (ncpt,*) "Body dynamics values "
    write (ncpt,                                                                &
-      '(5(7x,a),3(5x,a),3(9x,a),3(6x,a),(a),3(1x,a),3(8x,a),(9x,a),2(7x,a))')  &
+ '(5(7x,a),3(5x,a),3(9x,a),3(6x,a),(a),3(1x,a),3(8x,a),(9x,a),2(7x,a),(1x,a))')&
       " Time(s)"," Body_ID"," x_CM(m)"," y_CM(m)"," z_CM(m)"," u_CM(m/s)",     &
       " v_CM(m/s)"," w_CM(m/s)"," Fx(N)"," Fy(N)"," Fz(N)"," n_R_IO_x",        &
       " n_R_IO_y"," n_R_IO_z"," teta_R_IO(rad)","omega_x(rad/s)",              &
       "omega_y(rad/s)","omega_z(rad/s)","Mx(N*m)","My(N*m)","Mz(N*m)",         &
-      "pmax(Pa)","pmax_R(Pa)","pmax_L(Pa)"
+      "pmax(Pa)","pmax_R(Pa)","pmax_L(Pa)","pmax_limit(Pa)"
 endif
 flush(ncpt)
 ! Loop over the bodies
@@ -113,10 +113,10 @@ do nbi=1,n_bodies
    call vector_rotation_axis_angle(body_arr(nbi)%rel_pos_part1_t0(:),          &
       bp_arr(aux_integer+1)%rel_pos(:),n_R_IO(:),teta_R_IO)
    aux_integer = aux_integer + body_arr(nbi)%npart
-   write (ncpt,'(g14.7,1x,i14,1x,22(g14.7,1x))') simulation_time,nbi,          &
+   write (ncpt,'(g14.7,1x,i14,1x,23(g14.7,1x))') simulation_time,nbi,          &
       body_arr(nbi)%x_CM(:),body_arr(nbi)%u_CM(:),body_arr(nbi)%Force(:),      &
       n_R_IO(:),teta_R_IO,body_arr(nbi)%omega(:),body_arr(nbi)%Moment(:),      &
-      body_arr(nbi)%pmax,pmax_R(nbi),pmax_L(nbi)
+      body_arr(nbi)%pmax,pmax_R(nbi),pmax_L(nbi),body_arr(nbi)%p_max_limiter
 enddo
 close(ncpt)
 ! Monitoring the surface body particles

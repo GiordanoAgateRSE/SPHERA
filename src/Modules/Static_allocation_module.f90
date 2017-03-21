@@ -69,7 +69,7 @@ logical :: dt_alfa_Mon
 integer(4) :: Ncord,NMedium,NPartZone
 integer(4) :: NPointst,NPoints,NPointsl,NPointse,NLines,NSections,GCBFVecDim
 integer(4) :: NumVertici,NumFacce,NumTratti,NumBVertices,NumBSides
-integer(4) :: Nag,nagpg,PARTICLEBUFFER
+integer(4) :: nag,nagpg,PARTICLEBUFFER
 integer(4) :: it_start,on_going_time_step,it_eff,indarrayFlu,indarraySol
 double precision :: simulation_time,dt,pesodt,dt_average,DTminBER
 ! Global variables: end
@@ -123,10 +123,14 @@ logical :: kill_flag ! Flag to kill the execution
 logical :: current_version   
 logical :: diffusione ! Flag to activate the diffusion model
 logical :: esplosione ! Flag to activate the explosion model
-logical :: body_surface_pressure_limiter ! Flag to activate/deactivate a 
+logical :: body_minimum_pressure_limiter ! Flag to activate/deactivate a 
                                          ! pressure limiter on the body 
                                          ! surfaces not to have pressure 
                                          ! negative values
+logical :: body_maximum_pressure_limiter ! Flag to activate/deactivate a 
+                                         ! pressure limiter on the body 
+                                         ! surfaces not to have unphysical 
+                                         ! maximum pressure values
 integer(4) :: NMAXPARTJ ! Max number of neighbouring particles
 integer(4) :: MaxNcbs ! Max number of close boundary sides for the current 
                       ! particle

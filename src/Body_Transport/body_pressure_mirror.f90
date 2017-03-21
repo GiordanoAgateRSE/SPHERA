@@ -34,8 +34,9 @@ use Dynamic_allocation_module
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: npi,j,npartint,npj
-double precision :: Sum_W_vol,W_vol,dis,pres_mir,aux
+integer(4) :: npi,j,npartint,npj,i
+double precision :: Sum_W_vol,W_vol,dis,pres_mir,aux,rho_ref,z_max,c_ref
+double precision :: abs_u_max,abs_u,z_s_min_body,abs_gravity_acc
 double precision :: aux_acc(3)
 double precision, external :: w
 !------------------------
@@ -50,12 +51,37 @@ double precision, external :: w
 !------------------------
 ! Statements
 !------------------------
-! Loop over body particles 
+! Rough approximation of the maximum admissible pressure value on each body
+if (body_maximum_pressure_limiter.eqv..true.) then
+   rho_ref = maxval(Med(1:size(Med))%den0)
+   z_max = maxval(pg(1:size(pg))%coord(3),mask=pg(1:nag)%cella/=0)
+   c_ref = maxval(Med(1:size(Med))%celerita)
+   abs_gravity_acc = dsqrt(dot_product(Domain%grav(:),Domain%grav(:)))
+   abs_u_max = 0.d0
+   do npi=1,nag
+      if (pg(npi)%cella==0) cycle
+      abs_u = pg(npi)%vel(1) * pg(npi)%vel(1) + pg(npi)%vel(2) *               &
+              pg(npi)%vel(2) + pg(npi)%vel(3) * pg(npi)%vel(3)
+      if (abs_u>abs_u_max) then
+         abs_u_max = abs_u
+      endif
+   enddo
+   do i=1,n_bodies
+      z_s_min_body = minval(bp_arr(1:size(bp_arr))%pos(3),                     &
+                     mask=bp_arr(1:size(bp_arr))%body==i)
+      body_arr(i)%p_max_limiter = rho_ref * abs_gravity_acc * (z_max -         &
+                         z_s_min_body + 2.d0 * Domain%h) + (1.05d0 * rho_ref)  &
+                         * c_ref * (body_arr(i)%umax + abs_u_max)
+      if (body_arr(i)%p_max_limiter<0.d0) body_arr(i)%p_max_limiter = 0.d0             
+   enddo
+endif
+! Loop over body particles
 ! Draft for omp parallelization with critical section 
 !$omp parallel do default(none)                                                &
 !$omp private(npi,Sum_W_vol,j,npartint,npj,aux_acc,pres_mir,dis,W_vol,aux)     &
 !$omp shared(n_body_part,bp_arr,nPartIntorno_bp_f,NMAXPARTJ,PartIntorno_bp_f)  &
-!$omp shared(Domain,pg,rag_bp_f,body_surface_pressure_limiter)
+!$omp shared(Domain,pg,rag_bp_f,body_minimum_pressure_limiter)                 &
+!$omp shared(body_maximum_pressure_limiter,body_arr)
 do npi=1,n_body_part
    bp_arr(npi)%pres = 0.
    Sum_W_vol = 0.  
@@ -78,9 +104,14 @@ do npi=1,n_body_part
       Sum_W_vol = Sum_W_vol + W_vol  
    enddo
    if (Sum_W_vol>0.) bp_arr(npi)%pres = bp_arr(npi)%pres / Sum_W_vol
-   if (body_surface_pressure_limiter.eqv..true.) then
+   if (body_minimum_pressure_limiter.eqv..true.) then
       if (bp_arr(npi)%pres<0.d0) bp_arr(npi)%pres = 0.d0 
-   endif   
+   endif
+   if (body_maximum_pressure_limiter.eqv..true.) then
+      if (bp_arr(npi)%pres>body_arr(bp_arr(npi)%body)%p_max_limiter) then
+         bp_arr(npi)%pres = body_arr(bp_arr(npi)%body)%p_max_limiter
+      endif
+   endif
 enddo
 ! Draft for omp parallelization with critical section 
 !$omp end parallel do
