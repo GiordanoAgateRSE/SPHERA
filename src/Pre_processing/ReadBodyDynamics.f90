@@ -64,7 +64,8 @@ do while (TRIM(lcase(ainp)) /= "##### end body dynamics #####")
 ! size
    read(ainp,*,iostat=ioerr) n_bodies,dx_dxbodies,imping_body_grav,            &
       time_max_no_body_gravity_force,time_max_no_body_frontier_impingements,   &
-      body_minimum_pressure_limiter,body_maximum_pressure_limiter
+      body_minimum_pressure_limiter,body_maximum_pressure_limiter,             &
+      FSI_free_slip_conditions
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"BODY DYNAMICS GENERAL INPUT",ninp,&
       nout)) return
 ! Writing the number of bodies and "dx_dxbodies" on the log file
@@ -84,6 +85,8 @@ do while (TRIM(lcase(ainp)) /= "##### end body dynamics #####")
          body_minimum_pressure_limiter
       write(nout,"(1x,a,1p,l12)") "body_maximum_pressure_limiter:",            &
          body_maximum_pressure_limiter
+      write(nout,"(1x,a,1p,l12)") "FSI_free_slip_conditions:.....",            &
+         FSI_free_slip_conditions
       write(nout,"(1x,a)")  " "
    endif
 ! Allocation of the array of the bodies

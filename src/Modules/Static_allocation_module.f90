@@ -131,6 +131,9 @@ logical :: body_maximum_pressure_limiter ! Flag to activate/deactivate a
                                          ! pressure limiter on the body 
                                          ! surfaces not to have unphysical 
                                          ! maximum pressure values
+logical :: FSI_free_slip_conditions ! slip conditions for FSI: .true. 
+                                    ! (free-slip), .false. (no-slip, Adami et 
+                                    ! al., 2012, JCP)
 integer(4) :: NMAXPARTJ ! Max number of neighbouring particles
 integer(4) :: MaxNcbs ! Max number of close boundary sides for the current 
                       ! particle
