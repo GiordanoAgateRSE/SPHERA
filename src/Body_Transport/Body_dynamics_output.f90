@@ -69,14 +69,14 @@ aux_integer = 0
 !$omp parallel do default(none) private(nbi) shared(n_bodies,body_arr,pmax_R)  &
 !$omp shared(pmax_L)
 do nbi=1,n_bodies
-   body_arr(nbi)%pmax = -999999.
-   pmax_R(nbi) = -999999.
-   pmax_L(nbi) = -999999.
+   body_arr(nbi)%pmax = -999999.d0
+   pmax_R(nbi) = -999999.d0
+   pmax_L(nbi) = -999999.d0
 enddo
 !$omp end parallel do
 ! Loop over body particles to estimate the 2 auxiliary parameters 
 do npi=1,n_body_part
-   if (bp_arr(npi)%area>0.) then
+   if (bp_arr(npi)%area>0.d0) then
       body_arr(bp_arr(npi)%body)%pmax =                                        &
          max(body_arr(bp_arr(npi)%body)%pmax,bp_arr(npi)%pres)
       if (bp_arr(npi)%normal(3)>0.) then

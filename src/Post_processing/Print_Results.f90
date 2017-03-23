@@ -47,14 +47,16 @@ integer(4) :: minlocvelo_body,maxlocvelo_body,minlocomega_body,maxlocomega_body
 integer(4) :: minloctau_tauc,maxloctau_tauc,minlock_BetaGamma,maxlock_BetaGamma
 integer(4) :: minlocu_star,maxlocu_star,laminar_flag_count,mixture_count
 integer(4) :: machine_Julian_day,machine_hour,machine_minute,machine_second
+integer(4) :: minlocacc_bp,maxlocacc_bp
 double precision :: minvelx,maxvelx,minvely,maxvely,minvelz,maxvelz,minpres
 double precision :: maxpres,mindens,maxdens,minvisc,maxvisc,mincodi,maxcodi
 double precision :: minInEn,maxInEn,modvel,minvelo_w,maxvelo_w,minpres_w
 double precision :: maxpres_w,minvelo_bp,maxvelo_bp,minpres_bp,maxpres_bp
-double precision  :: minvelo_body,maxvelo_body,minomega_body,maxomega_body
-double precision  :: modomega,mintau_tauc,maxtau_tauc,mink_BetaGamma
-double precision  :: maxk_BetaGamma,minu_star,maxu_star,time_elapsed_tot_est
-double precision  :: minvelo,maxvelo,laminar_flag_perc,blt_laminar_flag_perc
+double precision :: minvelo_body,maxvelo_body,minomega_body,maxomega_body
+double precision :: modomega,mintau_tauc,maxtau_tauc,mink_BetaGamma
+double precision :: maxk_BetaGamma,minu_star,maxu_star,time_elapsed_tot_est
+double precision :: minvelo,maxvelo,laminar_flag_perc,blt_laminar_flag_perc
+double precision :: modacc,minacc_bp,maxacc_bp
 integer(4),dimension(1) :: pos
 character(len=42) :: fmt100="(a,i10,a,e18.9,a,e18.9,a,i  ,a,i  ,a,i  )"
 character(len=47) :: fmt101="(a,2(1x,f11.4,1x,a,1x,i8,1x,a,3(1x,f8.2,1x,a)))"
@@ -118,6 +120,8 @@ if (nag>0) then
    if (n_bodies>0) then
       minvelo_bp = max_positive_number
       maxvelo_bp = max_negative_number
+      minacc_bp = max_positive_number
+      maxacc_bp = max_negative_number
       minvelo_body = max_positive_number
       maxvelo_body = max_negative_number
       minomega_body = max_positive_number
@@ -273,6 +277,22 @@ if (nag>0) then
       enddo
       minvelo_bp = dsqrt(minvelo_bp)
       maxvelo_bp = dsqrt(maxvelo_bp)
+! Acceleration (body particles)
+      do npi=1,n_body_part
+         if (bp_arr(npi)%cell==0) cycle
+         modacc = bp_arr(npi)%acc(1) * bp_arr(npi)%acc(1) + bp_arr(npi)%acc(2) &
+                  * bp_arr(npi)%acc(2) + bp_arr(npi)%acc(3) * bp_arr(npi)%acc(3)
+         if (modacc<minacc_bp) then
+            minacc_bp = modacc
+            minlocacc_bp = npi
+         endif
+         if (modacc>maxacc_bp) then
+            maxacc_bp = modacc
+            maxlocacc_bp = npi
+         endif
+      enddo
+      minacc_bp = dsqrt(minacc_bp)
+      maxacc_bp = dsqrt(maxacc_bp)
 ! Velocity (bodies)
       do nbi=1,n_bodies
          modvel = dsqrt(body_arr(nbi)%u_CM(1) * body_arr(nbi)%u_CM(1) +        &
@@ -454,6 +474,11 @@ if (nag>0) then
          bp_arr(minlocvelo_bp)%pos(2),"|",bp_arr(minlocvelo_bp)%pos(3),"||",   &
          maxvelo_bp,"|",maxlocvelo_bp,"|",bp_arr(maxlocvelo_bp)%pos(1),"|",    &
          bp_arr(maxlocvelo_bp)%pos(2),"|",bp_arr(maxlocvelo_bp)%pos(3),"|"
+      write(nout,fmt101)  "Body part.acc.|a_s_|(m/s**2) |",minacc_bp,"|",      &
+         minlocacc_bp,"|",bp_arr(minlocacc_bp)%pos(1),"|",                     &
+         bp_arr(minlocacc_bp)%pos(2),"|",bp_arr(minlocacc_bp)%pos(3),"||",     &
+         maxacc_bp,"|",maxlocacc_bp,"|",bp_arr(maxlocacc_bp)%pos(1),"|",       &
+         bp_arr(maxlocacc_bp)%pos(2),"|",bp_arr(maxlocacc_bp)%pos(3),"|"
       write(nout,fmt102)  "Body part. pressure p_s(Pa)  |",minpres_bp,"|",     &
          minlocpres_bp,"|",bp_arr(minlocpres_bp)%pos(1),"|",                   &
          bp_arr(minlocpres_bp)%pos(2),"|",bp_arr(minlocpres_bp)%pos(3),"||",   &

@@ -36,9 +36,9 @@ use Dynamic_allocation_module
 implicit none
 integer(4) :: npi,j,npartint,npj,i
 double precision :: Sum_W_vol,W_vol,dis,pres_mir,aux,rho_ref,z_max,c_ref
-double precision :: abs_u_max,abs_u,z_s_min_body,abs_gravity_acc
+double precision :: abs_u_max,abs_u,z_s_min_body,abs_gravity_acc,aux_scalar
 double precision :: aux_acc(3)
-double precision, external :: w
+double precision,external :: w
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -79,22 +79,24 @@ endif
 ! Draft for omp parallelization with critical section 
 !$omp parallel do default(none)                                                &
 !$omp private(npi,Sum_W_vol,j,npartint,npj,aux_acc,pres_mir,dis,W_vol,aux)     &
+!$omp private(aux_scalar)                                                      &
 !$omp shared(n_body_part,bp_arr,nPartIntorno_bp_f,NMAXPARTJ,PartIntorno_bp_f)  &
 !$omp shared(Domain,pg,rag_bp_f,body_minimum_pressure_limiter)                 &
 !$omp shared(body_maximum_pressure_limiter,body_arr,FSI_free_slip_conditions)
 do npi=1,n_body_part
-   bp_arr(npi)%pres = 0.
-   Sum_W_vol = 0.  
+   bp_arr(npi)%pres = 0.d0
+   Sum_W_vol = 0.d0
    do j=1,nPartIntorno_bp_f(npi)
       npartint = (npi - 1) * NMAXPARTJ + j
       npj = PartIntorno_bp_f(npartint)
-      aux = dsqrt(dot_product(bp_arr(npi)%acc,bp_arr(npi)%acc))
+      aux = dsqrt(dot_product(bp_arr(npi)%acc(:),bp_arr(npi)%acc(:)))
 ! Wall acceleration should be less than 100m/2^2, otherwise an impulse is 
 ! assumed to occur and the formulation with acc_body is not valid
-      if (aux<=100.) then
+      aux_scalar = 10.d0 * dsqrt(dot_product(Domain%grav(:),Domain%grav(:)))
+      if (aux<=aux_scalar) then
          aux_acc(:) = Domain%grav(:) - bp_arr(npi)%acc(:)
          else
-            aux_acc(:) = Domain%grav(:) - (100./aux) * bp_arr(npi)%acc(:)
+            aux_acc(:) = Domain%grav(:) - aux_scalar / aux * bp_arr(npi)%acc(:)
       endif
       if (FSI_free_slip_conditions.eqv..true.) then
          pres_mir = pg(npj)%pres + pg(npj)%dens *                              &
@@ -109,7 +111,7 @@ do npi=1,n_body_part
       bp_arr(npi)%pres = bp_arr(npi)%pres + pres_mir * W_vol
       Sum_W_vol = Sum_W_vol + W_vol
    enddo
-   if (Sum_W_vol>0.) bp_arr(npi)%pres = bp_arr(npi)%pres / Sum_W_vol
+   if (Sum_W_vol>1.d-3) bp_arr(npi)%pres = bp_arr(npi)%pres / Sum_W_vol
    if (body_minimum_pressure_limiter.eqv..true.) then
       if (bp_arr(npi)%pres<0.d0) bp_arr(npi)%pres = 0.d0 
    endif
