@@ -217,7 +217,8 @@ do npi=1,n_body_part
                   Force(bp_arr(npi)%body,bp_arr(npj)%body,:) =                 &
                     Force(bp_arr(npi)%body,bp_arr(npj)%body,:) + f_coll_bp_bp(:)
 ! Zeroing gravity component perpendicular to the normal if required
-                  if (imping_body_grav==0) then
+                  if ((imping_body_grav==0).or.((imping_body_grav_dry==0).and. &
+                     (body_arr(bp_arr(npi)%body)%pmax<1.d-5))) then
                      aux_gravity(bp_arr(npi)%body,:) = 0.d0
 ! interesting test
 !aux_vec(:) = dot_product(aux_gravity(bp_arr(npi)%body,:),bp_arr(npj)%normal)  &
@@ -283,7 +284,9 @@ do npi=1,n_body_part
                            Force(bp_arr(npi)%body,n_bodies+j,:) +              &
                            f_coll_bp_boun(:) 
 ! Zeroing gravity component perpendicular to the normal, if requested.
-                        if (imping_body_grav==0) then
+                        if ((imping_body_grav==0).or.                          &
+                           ((imping_body_grav_dry==0).and.                     &
+                           (body_arr(bp_arr(npi)%body)%pmax<1.d-5))) then
                            aux_gravity(bp_arr(npi)%body,:) = 0.d0
 ! Interesting test
 ! aux_vec(:) = dot_product(aux_gravity(bp_arr(npi)%body,:),normal_plane) *     &
@@ -368,7 +371,9 @@ do npi=1,n_body_part
                            Force(bp_arr(npi)%body,n_bodies+j,:) +              &
                            f_coll_bp_boun(:) 
 ! Zeroing gravity component perpendicular to the normal, if requested.    
-                        if (imping_body_grav==0) then
+                        if ((imping_body_grav==0).or.                          &
+                           ((imping_body_grav_dry==0).and.                     &
+                           (body_arr(bp_arr(npi)%body)%pmax<1.d-5))) then
                            aux_gravity(bp_arr(npi)%body,:) = 0.d0
 ! Interesting test
 ! aux_vec(:) = dot_product(aux_gravity(bp_arr(npi)%body,:),normal_plane) *     &
