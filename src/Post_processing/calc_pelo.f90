@@ -51,7 +51,7 @@ allocate(PartCelnum(NMAXPARTJ),PartCel(NMAXPARTJ))
 !------------------------
 ! Initializations
 !------------------------
-Pelolib = 0
+pelolib = 0
 !------------------------
 ! Statements
 !------------------------
@@ -83,7 +83,7 @@ do i=1,nlines
                        pg(PartCelnum(minpos2(1)))%coord(1:3)) * half
    enddo
 enddo
-write (nplb,'(30g14.7)') simulation_time,pelolib
+write(nplb,'(30g14.7)') simulation_time,pelolib
 !------------------------
 ! Deallocations
 !------------------------

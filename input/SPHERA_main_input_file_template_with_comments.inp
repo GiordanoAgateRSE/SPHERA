@@ -3,7 +3,7 @@ version.subversion   !
 !------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2016 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are providedoin SPHERA documentation.
@@ -76,8 +76,9 @@ line_last_ID line_last_vertex_1 ... line_last_vertex_last line_last_Boundary_ID
 ! (clockwise list of points if looking from outside the fluid domain). For 
 ! "perimeter" boundaries: the vertices have to be adjacent, but there is no rule
 ! about the vertex order (better anticlockwise).
-! Faces can only be triangles or rectangles. Only "perimeter" faces can also be 
-! quadrilateral, pentagons and hexagons.
+! Faces can only be triangles or rectangles (generic quadrilaterals are not 
+! permitted). Only "perimeter" faces can also be generic quadrilaterals (not 
+! only rectangles), pentagons and hexagons.
 1 face_1_vertex_1 ... face_1_vertex_6 face_1_Boundary_ID
                                            ! first face data ("-1" is mandatory 
                                            ! for meaningless vertex IDs (e.g., 
