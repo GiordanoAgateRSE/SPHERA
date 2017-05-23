@@ -213,11 +213,12 @@ enddo face_loop
 ! Adding boundary contributions to the momentum equation
   tpres(:) = tpres(:) - RHS(:)
   tdiss(:) = tdiss(:) - ViscoMon(:)
-! Important note: this 3D boundary term has not been tested and seems not to 
-! work properly (it is erased at the moment)
-! It seems useless at this stage to comment all the other lines involved as 
-! they are sparse and do not cause relevant computational time.
-!  tvisc(:) = tvisc(:) - ViscoShear(:)
+! Important note: this 3D boundary term is under assessment and does not 
+! represent a default choice
+! In case one needs to deactivate this term, it seems useless at this stage to 
+! comment all the other lines involved as they are sparse and do not cause 
+! relevant computational time.
+  tvisc(:) = tvisc(:) - ViscoShear(:)
 ! Contribution for specific internal energy
 if (esplosione) then
    pg(npi)%dEdT = - half * (tpres_save1 - ViscoMon_save1)

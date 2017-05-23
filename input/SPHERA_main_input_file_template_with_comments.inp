@@ -102,8 +102,9 @@ Boundary_type               ! Boundary_type = fixed(wall frontier),perimeter
                             ! (fluid reservoir),source(inlet section),open, 
                             ! tapis (not recommended)
 ! If (Boundary_type=="fixed"): start
-Shear_stress_coefficient    ! Shear_stress_coefficient=1.0(no-slip),           
-                            ! 0.(free-slip)
+Shear_stress_coefficient    ! Shear_stress_coefficient=1.0(no-slip, under 
+                            ! assessment in 3D with SA-SPH),0.(free-slip, 
+                            ! default choice in 3D with SA-SPH)
 RGBColor                    ! 
 ! If (Boundary_type=="fixed"): end
 ! If (Boundary_type=="perimeter"): start
