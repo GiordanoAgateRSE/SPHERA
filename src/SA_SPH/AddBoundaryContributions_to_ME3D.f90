@@ -142,7 +142,8 @@ face_loop: do icbf = 1,Ncbf
 ! Explosion
          endif
          if (cinvisci>zero) then
-            if (pg(npi)%laminar_flag==1) then
+            if ((pg(npi)%laminar_flag==1).or.                                  &
+                (Tratto(stretch)%laminar_no_slip_check.eqv..false.)) then
                cinviscmult = two * cinvisci * IntdWrm1dV *                     &
                              Tratto(stretch)%ShearCoeff
                ViscoShear(:) = ViscoShear(:) + cinviscmult * dvij(:)

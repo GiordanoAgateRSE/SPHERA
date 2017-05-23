@@ -136,7 +136,7 @@ type TyParticle
    integer(4)       :: imed ! Fluid ID                          
    integer(4)       :: FS ! Free Surface (0,3: no free surface; 1,2: free 
                           ! surface) (2,3: deactivated for Shep evolution) 
-   integer(4)       :: laminar_flag ! Laminar flag (for bed-load transport)                                                     
+   integer(4)       :: laminar_flag ! Laminar flag
    double precision :: densass                        
    double precision :: mass ! Mass                          
    double precision :: dens ! Density                          
@@ -428,6 +428,7 @@ end type TyZone
 
 ! Boundary stretch
 type TyBoundaryStretch
+   logical          :: laminar_no_slip_check ! Input variable
    integer(4)       :: ColorCode
    integer(4)       :: numvertices
    integer(4)       :: inivertex

@@ -304,7 +304,8 @@ do icbs=1,IntNcbs
             TT(i) = TN * nnlocal(i)
          enddo
 ! Shear viscosity force (with changed sign)
-         if (pg(npi)%laminar_flag==1) then
+         if ((pg(npi)%laminar_flag==1).or.                                     &
+            (Tratto(sidestr)%laminar_no_slip_check.eqv..false.)) then
             SVforce = SVcoeff * (cinvisci + cinvisci) * IntWd1s0
             else
                SVforce = 0.d0

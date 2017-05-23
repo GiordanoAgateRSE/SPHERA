@@ -7,8 +7,8 @@ EXECUTION = bin
 COMPILATION_FLAGS = -O1
 #    gfortran, ifort
 COMPILER = ifort
-#    -fopenmp, -openmp 
-OMP_FLAG = -openmp
+#    -fopenmp, -qopenmp (formerly -openmp) 
+OMP_FLAG = -qopenmp
 EXE_DIR = ../$(EXECUTION)/
 SOURCES = \
 ./Modules/Static_allocation_module.f90 \

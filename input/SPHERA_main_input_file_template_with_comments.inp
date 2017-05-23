@@ -102,10 +102,18 @@ Boundary_type               ! Boundary_type = fixed(wall frontier),perimeter
                             ! (fluid reservoir),source(inlet section),open, 
                             ! tapis (not recommended)
 ! If (Boundary_type=="fixed"): start
-Shear_stress_coefficient    ! Shear_stress_coefficient=1.0(no-slip, under 
-                            ! assessment in 3D with SA-SPH),0.(free-slip, 
-                            ! default choice in 3D with SA-SPH)
-RGBColor                    ! 
+Shear_stress_coefficient laminar_flag_check ! Shear_stress_coefficient=1.0
+                                            ! (no-slip, under assessment in 3D 
+                                            ! with SA-SPH),0.(free-slip, 
+                                            ! default choice in 3D with SA-SPH);
+                                            ! laminar_no-slip_check=.true.(check 
+                                            ! on laminar regime to activate 
+                                            ! shear stress terms at boundaries 
+                                            ! in case of no-slip conditions; 
+                                            ! check on laminar regime always 
+                                            ! works in the inner domain),
+                                            ! .false.(no check)
+RGBColor                    !
 ! If (Boundary_type=="fixed"): end
 ! If (Boundary_type=="perimeter"): start
 fluid_ID                    !

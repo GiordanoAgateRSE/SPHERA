@@ -34,7 +34,7 @@ use Hybrid_allocation_module
 ! Declarations
 !------------------------
 implicit none
-logical :: DBSPH_fictitious_reservoir_flag
+logical :: DBSPH_fictitious_reservoir_flag,laminar_no_slip_check
 integer(4) :: nrighe,ier,ninp,nout
 integer(4),dimension(20) :: NumberEntities
 integer(4),dimension(NumBVertices) :: BoundaryVertex
@@ -147,9 +147,10 @@ do while (TRIM(lcase(ainp))/="##### end boundaries #####")
       case("fixe")    
          NumberEntities(3) = NumberEntities(3) + 1
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         if (ioerr==0) read(ainp,*,iostat=ioerr) shear
+         if (ioerr==0) read(ainp,*,iostat=ioerr) shear,laminar_no_slip_check
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                             &
-            "FIXED: SHEAR STRESS COEFFICIENT",ninp,nout)) return
+            "FIXED: SHEAR STRESS COEFFICIENT, LAMINAR NO-SLIP CHECK",ninp,     &
+            nout)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          token = GetToken(ainp,1,ioerr)
          token_color(1:2) = token(5:6)
@@ -410,6 +411,7 @@ do while (TRIM(lcase(ainp))/="##### end boundaries #####")
             Tratto(index)%inivertex = ipointer
          endif
          Tratto(index)%ShearCoeff = shear
+         Tratto(index)%laminar_no_slip_check = laminar_no_slip_check
          Tratto(index)%Medium = Medium
          Tratto(index)%velocity = values1
          Tratto(index)%NormVelocity = velocity
@@ -427,6 +429,8 @@ do while (TRIM(lcase(ainp))/="##### end boundaries #####")
             if (tipo=="fixe") then
                write(nout,"(1x,a,1pe12.4)") "Shear coeff.    : ",              &
                   Tratto(index)%ShearCoeff
+               write(nout,"(1x,a,l12)")     "Laminar no-slip check: ",         &
+                  Tratto(index)%laminar_no_slip_check
                elseif (tipo=="peri") then
                   write(nout,"(1x,a,i3,1x,a)") "Medium Index    : ",           &
                      Tratto(index)%Medium
