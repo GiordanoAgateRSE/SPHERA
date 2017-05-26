@@ -367,7 +367,7 @@ body_arr(i)%body_kinematics(1:body_arr(i)%n_records,1:7)
                         read(nsav,iostat=ioerr) q_max(1:size(q_max))
                         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"q_max",nsav&
                            ,nout)) return
-                     endif                     
+                     endif   
                      if (allocated                                             &
                         (Granular_flows_options%minimum_saturation_flag)) then
                         read(nsav,iostat=ioerr)                                &

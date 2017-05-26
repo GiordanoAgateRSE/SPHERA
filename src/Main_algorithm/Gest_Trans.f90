@@ -652,8 +652,8 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
                            'Allocation of Z_fluid_max in Gest_Trans ',         &
                            'successfully completed.'
                   endif
+                  Z_fluid_max(:) = -999.d0
                endif
-               Z_fluid_max(:) = -999.d0
                aux_integer = Partz(i)%ID_last_vertex -                         &
                              Partz(i)%ID_first_vertex + 1  
                if (.not.allocated(q_max)) then
@@ -668,8 +668,8 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
                            'Allocation of q_max in Gest_Trans successfully ',  &
                            'completed.'
                   endif
+                  q_max(:) = 0.d0
                endif
-               q_max(:) = 0.d0
                exit
             endif
          enddo  
@@ -679,7 +679,7 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
          call start_and_stop(3,5)
 ! Writing the h_max array and deallocation of the Z_fluid_max array
          if (allocated(Z_fluid_max)) then
-            call write_h_max        
+            call write_h_max      
             if (allocated(Z_fluid_max)) deallocate(Z_fluid_max)
          endif
    endif 

@@ -837,7 +837,6 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
          call Update_Zmax_at_grid_vert_columns(1) 
          else
             call Update_Zmax_at_grid_vert_columns(0)
-
       endif
    endif
    if (Domain%time_split==0) dtvel = dt
