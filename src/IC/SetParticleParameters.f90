@@ -69,7 +69,7 @@ call vellaw (partz(Nz)%vlaw,partz(Nz)%vel,partz(Nz)%npointv)
 ! Stopping time for blocks in movement
 pg(npi)%tstop = tstop                    
 ! Material ID
-pg(npi)%imed = Mate          
+pg(npi)%imed = Mate
 ! Viscosities
 pg(npi)%visc = Med(Mate)%visc
 pg(npi)%mu   = Med(Mate)%visc * Med(Mate)%den0

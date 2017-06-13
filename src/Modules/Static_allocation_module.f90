@@ -142,15 +142,8 @@ integer(4) :: MaxNcbf ! Max number of close boundary faces for the current
 integer(4) :: n_body_part ! Total number of body particles
 integer(4) :: n_surf_body_part ! Total number of surface body particles 
 integer(4) :: n_bodies ! Total number of bodies
-integer(4) :: imping_body_grav ! Flag to deactivate gravity during any 
-                               ! impingement: imping_body_grav=0(gravity 
-                               ! deactivated during any impingement),1(gravity 
-                               ! always active, recommended value)
-integer(4) :: imping_body_grav_dry ! Flag to deactivate gravity during any dry 
-                                   ! impingement: imping_body_grav_dry=0(gravity 
-                                   ! deactivated during any dry impingement),
-                                   ! 1(gravity always active, recommended value)              
 integer(4) :: NumBEdges ! Number of convex edges
+double precision :: friction_angle ! Input variable 
 double precision :: eta ! 0.001 * Domain%h
 double precision :: eta2 ! 0.01 * Domain%h * Domain%h
 double precision :: doubleh ! 2.*Domain%h

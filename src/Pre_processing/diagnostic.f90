@@ -299,7 +299,7 @@ if (print_out) then
    dtvel = 99999.0d0
 ! Result saving and restart file
    if (nout>0) then
-      call print_results(it1,it2,'fine__')
+      call Print_Results(it1,it2,'fine__')
    endif
    if (nres>0) then
       call memo_results(it1,it2,it3,dtvel,'fine__')

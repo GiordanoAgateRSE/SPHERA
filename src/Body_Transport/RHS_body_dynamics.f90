@@ -23,7 +23,7 @@
 ! Description:  To estimate the RHS of the body dynamics equations (Amicarelli 
 !               et al.,2015,CAF).     
 !-------------------------------------------------------------------------------
-subroutine RHS_body_dynamics
+subroutine RHS_body_dynamics(dtvel)
 !------------------------
 ! Modules
 !------------------------ 
@@ -34,21 +34,25 @@ use Dynamic_allocation_module
 ! Declarations
 !------------------------
 implicit none
+double precision,intent(in) :: dtvel
 integer(4) :: npartint,i,j,npi,npj,Ncb,Nfzn,aux,nbi,npk,k,nbj,nbk
 integer(4) :: n_interactions,aux2,aux3,test,aux_locx_min,aux_locx_max,aux_int
 ! AA!!! test
 integer(4) :: aux_scal_test
 double precision :: c2,k_masses,r_per,r_par,temp_dden,temp_acc,alfa_boun
-double precision :: aux_impact_vel,aux4,pres_mir
+double precision :: aux_impact_vel,aux4,pres_mir,aux_scalar,aux_scalar_2
+double precision :: friction_limiter
 double precision :: f_pres(3),temp(3),r_par_vec(3),f_coll_bp_bp(3)          
 double precision :: f_coll_bp_boun(3),dvar(3),pos_aux(3),normal_plane(3)
 double precision :: u_rel(3),x_rel(3),aux_acc(3),aux_vec(3),aux_vec2(3)
-double precision :: loc_pos(3),aux_locx_vert(3)
+double precision :: loc_pos(3),aux_locx_vert(3),sliding_friction_dir(3)
+double precision :: sliding_friction(3)
 ! AA!!! test
 double precision :: aux_mat(3,3)
 integer(4),dimension(:),allocatable :: inter_front
+double precision,dimension(:),allocatable :: interface_sliding_vel_max
 double precision,dimension(:,:),allocatable :: Force_mag_sum,r_per_min
-double precision,dimension(:,:),allocatable :: aux_gravity
+double precision,dimension(:,:),allocatable :: aux_gravity,sum_normal_plane
 double precision,dimension(:,:,:),allocatable :: Force,Moment
 character(255) :: file_name_test
 double precision, external :: Gamma_boun
@@ -83,8 +87,10 @@ allocate(Moment(n_bodies,aux,3))
 allocate(Force_mag_sum(n_bodies,aux))
 allocate(r_per_min(n_bodies,aux))
 allocate(aux_gravity(n_bodies,3))
+allocate(sum_normal_plane(n_bodies,3))
 ! AA!!! test
 allocate(inter_front(n_bodies))
+allocate(interface_sliding_vel_max(n_bodies))
 !------------------------
 ! Initializations
 !------------------------
@@ -97,6 +103,8 @@ aux2 = 0
 inter_front(:) = 0
 aux_scal_test = 0
 ! AA!!! test end
+sum_normal_plane(:,:) = 0.d0
+interface_sliding_vel_max(:) = 0.d0
 !------------------------
 ! Statements
 !------------------------
@@ -132,7 +140,7 @@ do i=1,n_bodies
          ((it_start+1)==on_going_time_step)) ) then
          body_arr(i)%Ic = 0.d0
       endif
-   endif 
+   endif
 enddo
 !$omp end parallel do
 ! Loop over the body particles  
@@ -216,14 +224,12 @@ do npi=1,n_body_part
                   endif
                   Force(bp_arr(npi)%body,bp_arr(npj)%body,:) =                 &
                     Force(bp_arr(npi)%body,bp_arr(npj)%body,:) + f_coll_bp_bp(:)
-! Zeroing gravity component perpendicular to the normal if required
-                  if ((imping_body_grav==0).or.((imping_body_grav_dry==0).and. &
-                     (body_arr(bp_arr(npi)%body)%pmax<1.d-5))) then
+! Body-body interactions: in the absence of neighburing fluid particles (dry 
+! stage), sliding friction force depends on the interaction interface angle 
+! (instead of the friction angle) and the normal reaction force under 
+! sliding is correct. These forces exactly balance the gravity components.
+                  if (body_arr(bp_arr(npi)%body)%pmax<1.d-5) then
                      aux_gravity(bp_arr(npi)%body,:) = 0.d0
-! interesting test
-!aux_vec(:) = dot_product(aux_gravity(bp_arr(npi)%body,:),bp_arr(npj)%normal)  &
-!* bp_arr(npj)%normal(:)
-!aux_gravity(bp_arr(npi)%body,:) = aux_gravity(bp_arr(npi)%body,:) - aux_vec(:)
                   endif
                   call Vector_Product(bp_arr(npi)%rel_pos,f_coll_bp_bp,temp,3)
                   Moment(bp_arr(npi)%body,bp_arr(npj)%body,:) =                &
@@ -235,7 +241,7 @@ do npi=1,n_body_part
                   r_per_min(bp_arr(npi)%body,bp_arr(npj)%body) =               &
                      min(r_per,r_per_min(bp_arr(npi)%body,bp_arr(npj)%body)) 
                endif
-            endif                            
+            endif                      
          enddo
 ! Loop over boundaries (body-boundary impacts, partial contributions) (3D case) 
          if (simulation_time>time_max_no_body_frontier_impingements) then
@@ -275,23 +281,39 @@ do npi=1,n_body_part
                         impact_vel(aux2,n_bodies+j) = aux_impact_vel
                      endif
                      if (impact_vel(aux2,n_bodies+j)>0.d0) then 
-                        k_masses = bp_arr(npi)%mass 
+                        k_masses = bp_arr(npi)%mass
                         f_coll_bp_boun(:) = (2.d0 *                            &
                            (impact_vel(aux2,n_bodies+j) ** 2) / r_per) *       &
                            k_masses * Gamma_boun(r_per,Domain%h)               &
                            * normal_plane(:)
                         Force(bp_arr(npi)%body,n_bodies+j,:) =                 &
                            Force(bp_arr(npi)%body,n_bodies+j,:) +              &
-                           f_coll_bp_boun(:) 
-! Zeroing gravity component perpendicular to the normal, if requested.
-                        if ((imping_body_grav==0).or.                          &
-                           ((imping_body_grav_dry==0).and.                     &
-                           (body_arr(bp_arr(npi)%body)%pmax<1.d-5))) then
-                           aux_gravity(bp_arr(npi)%body,:) = 0.d0
-! Interesting test
-! aux_vec(:) = dot_product(aux_gravity(bp_arr(npi)%body,:),normal_plane) *     &
-! normal_plane(:)
-! aux_gravity(bp_arr(npi)%body,:) = aux_gravity(bp_arr(npi)%body,:) - aux_vec(:)
+                           f_coll_bp_boun(:)
+! Body-frontier interactions. In the absence of neighburing fluid particles
+! (dry stage), sliding friction force and explicit normal reaction force under 
+! sliding.
+                        if (body_arr(bp_arr(npi)%body)%pmax<1.d-5) then
+                           if ((friction_angle>(0.d0-1.d-9)).and.              &
+                              (simulation_time>time_max_no_body_gravity_force))&
+                              then
+! Sum of the normal vectors of the neighbouring frontiers
+                              sum_normal_plane(bp_arr(npi)%body,:) =           &
+                                 sum_normal_plane(bp_arr(npi)%body,:) +        & 
+                                 normal_plane(:)
+! To update the maximum tangential velocity
+                              aux_vec(:) = dot_product(bp_arr(npi)%vel,        &
+                                           normal_plane) * normal_plane(:)
+                              aux_vec(:) = bp_arr(npi)%vel(:) - aux_vec(:)
+                              aux_scalar = dsqrt(dot_product(aux_vec,aux_vec))
+                              interface_sliding_vel_max(bp_arr(npi)%body) = max&
+                                 (interface_sliding_vel_max(bp_arr(npi)%body), &
+                                 aux_scalar)
+                              else
+! Contribution of the normal reaction force under sliding and of the sliding 
+! friction force depending on the local slope angle (instead of the friction 
+! angle)
+                                 aux_gravity(bp_arr(npi)%body,:) = 0.d0
+                           endif
                         endif
                         call Vector_Product(bp_arr(npi)%rel_pos,               &
                            f_coll_bp_boun,temp,3)
@@ -369,17 +391,33 @@ do npi=1,n_body_part
                            * normal_plane(:)
                         Force(bp_arr(npi)%body,n_bodies+j,:) =                 &
                            Force(bp_arr(npi)%body,n_bodies+j,:) +              &
-                           f_coll_bp_boun(:) 
-! Zeroing gravity component perpendicular to the normal, if requested.    
-                        if ((imping_body_grav==0).or.                          &
-                           ((imping_body_grav_dry==0).and.                     &
-                           (body_arr(bp_arr(npi)%body)%pmax<1.d-5))) then
-                           aux_gravity(bp_arr(npi)%body,:) = 0.d0
-! Interesting test
-! aux_vec(:) = dot_product(aux_gravity(bp_arr(npi)%body,:),normal_plane) *     &
-! normal_plane(:)
-! aux_gravity(bp_arr(npi)%body,:) = aux_gravity(bp_arr(npi)%body,:) - aux_vec(:)  
-                        endif                    
+                           f_coll_bp_boun(:)
+! Body-frontier interactions. In the absence of neighburing fluid particles
+! (dry stage), sliding friction force and explicit normal reaction force under 
+! sliding.
+                        if (body_arr(bp_arr(npi)%body)%pmax<1.d-5) then
+                           if ((friction_angle>(0.d0-1.d-9)).and.              &
+                              (simulation_time>time_max_no_body_gravity_force))&
+                              then
+! Sum of the normal vectors of the neighbouring frontiers
+                              sum_normal_plane(bp_arr(npi)%body,:) =           &
+                                 sum_normal_plane(bp_arr(npi)%body,:) +        & 
+                                 normal_plane(:)
+! To update the maximum tangential velocity
+                              aux_vec(:) = dot_product(bp_arr(npi)%vel,        &
+                                           normal_plane) * normal_plane(:)
+                              aux_vec(:) = bp_arr(npi)%vel(:) - aux_vec(:)
+                              aux_scalar = dsqrt(dot_product(aux_vec,aux_vec))
+                              interface_sliding_vel_max(bp_arr(npi)%body) = max&
+                                 (interface_sliding_vel_max(bp_arr(npi)%body), &
+                                 aux_scalar)
+                              else
+! Contribution of the normal reaction force under sliding and of the sliding 
+! friction force depending on the local slope angle (instead of the friction 
+! angle)
+                                 aux_gravity(bp_arr(npi)%body,:) = 0.d0
+                           endif
+                        endif
                         call Vector_Product(bp_arr(npi)%rel_pos,               &
                            f_coll_bp_boun,temp,3)
                         Moment(bp_arr(npi)%body,n_bodies+j,:) =                &
@@ -428,7 +466,7 @@ do npi=1,n_body_part
             body_arr(bp_arr(npi)%body)%Ic(2,3) =                               &
                body_arr(bp_arr(npi)%body)%Ic(2,3) - bp_arr(npi)%mass *         &
                (bp_arr(npi)%rel_pos(2) * bp_arr(npi)%rel_pos(3)) 
-         endif 
+         endif
          if ((ncord==2).and.((it_start+1)==on_going_time_step)) then
             body_arr(bp_arr(npi)%body)%Ic(2,2) =                               &
                body_arr(bp_arr(npi)%body)%Ic(2,2) + bp_arr(npi)%mass *         &
@@ -457,7 +495,6 @@ do i=1,n_bodies
             if (Force_mag_sum(i,j)>0.d0) then
                alfa_boun = (Gamma_boun(r_per_min(i,j),Domain%h) /              &
                            r_per_min(i,j) * k_masses) / Force_mag_sum(i,j)
-! AA!!! test      
                if (j>n_bodies) alfa_boun = alfa_boun / inter_front(i)
                Force(i,j,:) = Force(i,j,:) * alfa_boun
                body_arr(i)%Force(:) = body_arr(i)%Force(:) + Force(i,j,:)
@@ -465,8 +502,8 @@ do i=1,n_bodies
                body_arr(i)%Moment(:) = body_arr(i)%Moment(:) + Moment(i,j,:)
             endif
          endif
-      end do
-! Ic and its inverse     
+      enddo
+! Ic and its inverse 
       if (ncord==3) then
          body_arr(i)%Ic(2,1) = body_arr(i)%Ic(1,2)
          body_arr(i)%Ic(3,1) = body_arr(i)%Ic(1,3)
@@ -478,19 +515,74 @@ do i=1,n_bodies
          body_arr(i)%Ic_inv(2,2) = 1.d0/body_arr(i)%Ic(2,2)
       endif
    endif
-end do
+enddo
 !$omp end parallel do     
 ! Check body-body interactions and eventually zeroing impact velocities; 
 ! adding gravity 
 !$omp parallel do default(none)                                                &
-!$omp private(j,k,nbi,npk,nbk,n_interactions,aux2)                             &
-!$omp shared(n_bodies,Moment,Force,body_arr,impact_vel,aux,Domain)             &
-!$omp shared(n_surf_body_part,surf_body_part,aux_gravity)
+!$omp shared(n_bodies,Moment,Force,body_arr,impact_vel,aux,Domain,aux_gravity) &
+!$omp shared(n_surf_body_part,surf_body_part,sum_normal_plane,friction_angle)  &
+!$omp shared(inter_front,simulation_time,time_max_no_body_gravity_force)       &
+!$omp shared(interface_sliding_vel_max,dtvel)                                  &
+!$omp private(j,k,nbi,npk,nbk,n_interactions,aux2,aux_scalar,aux_vec)          &
+!$omp private(sliding_friction_dir,aux_scalar_2,sliding_friction)              &
+!$omp private(friction_limiter)  
 do nbi=1,n_bodies
-   if (body_arr(nbi)%imposed_kinematics==0) then  
-!gravity contribution
-      body_arr(nbi)%Force(:) = body_arr(nbi)%Force(:) + aux_gravity(nbi,:) 
-!impact velocity  
+   if (body_arr(nbi)%imposed_kinematics==0) then
+      if ((friction_angle>(0.d0-1.d-9)).and.(inter_front(nbi)>0).and.          &
+         (simulation_time>time_max_no_body_gravity_force)) then
+! Overall normal representing the neighbouring frontiers
+         aux_scalar = dsqrt(dot_product(sum_normal_plane(nbi,:),               &
+                      sum_normal_plane(nbi,:)))
+         if (aux_scalar>1.d-9) then
+            sum_normal_plane(nbi,:) = sum_normal_plane(nbi,:) / aux_scalar
+            else
+               sum_normal_plane(nbi,:) = 0.d0
+         endif
+! Gravity component normal to the overall normal representing the neighbouring 
+! frontiers
+         aux_vec(:) = dot_product(aux_gravity(nbi,:),sum_normal_plane(nbi,:))  &
+                      * sum_normal_plane(nbi,:)
+! Absolute value of the gravity component normal to the overall surface
+         aux_scalar = dsqrt(dot_product(aux_vec,aux_vec))
+! Gravity + normal reaction force under sliding (aligned with the overall normal
+! of the neighbouring frontiers)
+         aux_gravity(nbi,:) = aux_gravity(nbi,:) - aux_vec(:)
+! Direction of the sliding friction force
+         aux_vec(:) = dot_product(body_arr(nbi)%u_CM,sum_normal_plane(nbi,:)) *&
+                      sum_normal_plane(nbi,:)
+         sliding_friction_dir(:) = body_arr(nbi)%u_CM(:) - aux_vec(:)
+         aux_scalar_2 = dsqrt(dot_product(sliding_friction_dir,                &
+                        sliding_friction_dir))
+         if (aux_scalar_2>1.d-9) then
+            sliding_friction_dir(:) = - sliding_friction_dir(:) / aux_scalar_2
+            else
+               sliding_friction_dir(:) = 0.d0
+         endif
+! Sliding friction force: first estimation
+         sliding_friction(:) = aux_scalar * dtan(friction_angle) *             &
+                               sliding_friction_dir(:)
+! Limiter to the sliding friction force
+         aux_scalar = dsqrt(dot_product(sliding_friction(:),                   &
+                      sliding_friction(:)))
+         if (dtvel>1.d-9) then
+            friction_limiter = interface_sliding_vel_max(nbi) / dtvel *        &
+                               body_arr(nbi)%mass
+            else
+               friction_limiter = 0.d0
+         endif
+         aux_scalar_2 = min(aux_scalar,friction_limiter)
+         if (aux_scalar>1.d-9) then
+            sliding_friction(:) = sliding_friction(:) * aux_scalar_2 /         &
+                                  aux_scalar
+         endif
+! Contribution of the sliding friction force to the global force
+         body_arr(nbi)%Force(:) = body_arr(nbi)%Force(:) + sliding_friction(:)
+      endif
+! To update the resultant force with gravity + normal reaction force under 
+! sliding
+      body_arr(nbi)%Force(:) = body_arr(nbi)%Force(:) + aux_gravity(nbi,:)
+!impact velocity
       n_interactions = 0
       do j=1,aux
          if (nbi==j) cycle
@@ -500,7 +592,7 @@ do nbi=1,n_bodies
             if (j<=n_bodies) then
                k = 0
                nbk = 1
-               do while (nbk.ne.nbi) 
+               do while (nbk.ne.nbi)
                   k = k + body_arr(nbk)%npart
                   nbk = nbk + 1
                enddo
@@ -516,7 +608,7 @@ do nbi=1,n_bodies
             else
                n_interactions = n_interactions + 1 
          endif
-      end do
+      enddo
    endif
 enddo
 !$omp end parallel do     
@@ -528,8 +620,10 @@ deallocate(Moment)
 deallocate(Force_mag_sum)
 deallocate(r_per_min)
 deallocate(aux_gravity)
+deallocate(sum_normal_plane)
 ! AA!!! test
 deallocate(inter_front)
+deallocate(interface_sliding_vel_max)
 return
 end subroutine RHS_body_dynamics
 

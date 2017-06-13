@@ -183,7 +183,7 @@ if (Domain%NormFix) call NormFix
 if (nscr>0) write (nscr,"(a,1x,a)") " Running case:",trim(nomecas2)
 if (nout>0) then
    it_print = it_eff
-   call print_results(it_eff,it_print,'inizio')
+   call Print_Results(it_eff,it_print,'inizio')
 endif
 if (nres>0) then
    it_memo = it_eff
@@ -412,7 +412,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
       if (n_bodies>0) then
          call start_and_stop(3,6)
          call start_and_stop(2,19)
-         call RHS_body_dynamics
+         call RHS_body_dynamics(dtvel)
          call start_and_stop(3,19)
          call start_and_stop(2,6)
       endif
@@ -540,8 +540,8 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
             if (NumOpenFaces>0) call CancelOutgoneParticles_3D
 ! Adding new particles from the inlet sections
             if (SourceFace/=0) call GenerateSourceParticles_3D
-! Particle reordering 
-            call OrdGrid1 (nout)
+! Particle reordering
+            call OrdGrid1(nout)
             call start_and_stop(3,9)
 ! Set the parameters for the fixed particles 
             if (Domain%NormFix) call NormFix
@@ -841,7 +841,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
    endif
    if (Domain%time_split==0) dtvel = dt
    if (nout>0) then
-      call print_results (it_eff, it_print, 'loop__')
+      call Print_Results(it_eff,it_print,'loop__')
    endif
    if (nres>0) then
       call Memo_Results(it_eff,it_memo,it_rest,dtvel,'loop__')
@@ -940,7 +940,7 @@ enddo ITERATION_LOOP
 ! Post-processing: log file
 if (it_eff/=it_print.and.nout>0) then
    it_print = it_eff
-   call print_results (it_eff,it_print,'fine__')
+   call Print_Results(it_eff,it_print,'fine__')
 endif
 ! Post-processing: restart file
 if (it_eff/=it_memo.and.nres>0) then

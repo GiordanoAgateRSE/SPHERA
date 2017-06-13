@@ -177,7 +177,7 @@ if (nscr>0) write (nscr,"(a,1x,a)") " Running case:",trim(nomecas2)
 ! To initialize the output files
 if (nout>0) then
    it_print = it_eff
-   call print_results ( it_eff, it_print, 'inizio' )
+   call Print_Results(it_eff,it_print,'inizio')
 endif
 if (nres>0) then
    it_memo = it_eff
@@ -409,7 +409,7 @@ done_flag = .false.
       if (n_bodies>0) then
          call start_and_stop(3,6)
          call start_and_stop(2,19)
-         call RHS_body_dynamics
+         call RHS_body_dynamics(dtvel)
          call start_and_stop(3,19)
          call start_and_stop(2,6)         
       endif
@@ -821,7 +821,7 @@ done_flag = .false.
 ! Post-processing
    if (Domain%time_split==0) dtvel = dt
    if (nout>0) then
-      call print_results(it_eff,it_print,'loop__')
+      call Print_Results(it_eff,it_print,'loop__')
    endif
    if (nres>0) then
       call Memo_Results(it_eff,it_memo,it_rest,dtvel,'loop__')   
@@ -916,7 +916,7 @@ enddo  ITERATION_LOOP
 ! Post-processing: log file 
 if ((it_eff/=it_print).AND.(nout>0)) then
    it_print = it_eff
-   call print_results(it_eff,it_print,'fine__')
+   call Print_Results(it_eff,it_print,'fine__')
 endif
 ! Post-processing: restart file
 if ((it_eff/=it_memo).AND.(nres>0)) then

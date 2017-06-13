@@ -380,17 +380,15 @@ max_step_still                      ! max_step_still(number of time steps during
 ! Input parameters for the scheme on body transport in fluid flows
 ! Bodies with imposed kinematics are listed after all the bodies with computed 
 ! kinematics
-n_bodies dx/dx_body imping_body_grav imping_body_grav_dry time_max_no_gravity_force time_max_no_body_frontier_impingements body_minimum_pressure_limiter body_maximum_pressure_limiter FSI_free_slip_conditions
+n_bodies dx/dx_body friction_angle time_max_no_gravity_force time_max_no_body_frontier_impingements body_minimum_pressure_limiter body_maximum_pressure_limiter FSI_free_slip_conditions
                                     ! n_bodies(number of transported solid 
                                     ! bodies); dx/dx_body(ratio between fluid 
                                     ! particle size and body particle size); 
-                                    ! imping_body_grav=0(gravity deactivated 
-                                    ! during any impingement),1(gravity 
-                                    ! always active, recommended value);
-                                    ! imping_body_grav_dry=0(gravity 
-                                    ! deactivated during any dry impingement),
-                                    ! 1(gravity always active, recommended 
-                                    ! value);
+                                    ! friction_angle(in radians; non-negative 
+                                    ! value: friction angle for body-frontier 
+                                    ! interactions; negative value: sliding 
+                                    ! friction depends on the local slope angle 
+                                    ! instead of the friction angle); 
                                     ! time_max_no_gravity_force(gravity 
                                     ! force is deactivated until this time, no 
                                     ! deactivation in case of negative value); 
@@ -484,7 +482,7 @@ xmin xmax ymin ymax zmin zmax       ! (spatial limits -in the global reference
 ! Input parameters for time integration, partial smoothing and memory management
 final_time final_time_step          ! (the run stops when reaching either the 
                                     ! final time or the final time step)
-CFL vsc_coeff Leapfrog_flag scheme_order factor dt_alfa_Mon 
+CFL vsc_coeff Leapfrog_flag scheme_order factor dt_alfa_Mon
                                     ! CFL;
                                     ! vsc_coeff(viscous stability condition
                                     ! coefficient, default value: 0.05); 

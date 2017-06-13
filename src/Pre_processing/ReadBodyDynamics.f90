@@ -62,10 +62,10 @@ if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"BODY DYNAMICS DATA",ninp,nout))      &
 do while (TRIM(lcase(ainp)) /= "##### end body dynamics #####")
 ! Reading the number of bodies and the ratio between fluid and body particle 
 ! size
-   read(ainp,*,iostat=ioerr) n_bodies,dx_dxbodies,imping_body_grav,            &
-      imping_body_grav_dry,time_max_no_body_gravity_force,                     &
-      time_max_no_body_frontier_impingements,body_minimum_pressure_limiter,    &
-      body_maximum_pressure_limiter,FSI_free_slip_conditions
+   read(ainp,*,iostat=ioerr) n_bodies,dx_dxbodies,friction_angle,              &
+      time_max_no_body_gravity_force,time_max_no_body_frontier_impingements,   &
+      body_minimum_pressure_limiter,body_maximum_pressure_limiter,             &
+      FSI_free_slip_conditions
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"BODY DYNAMICS GENERAL INPUT",ninp,&
       nout)) return
 ! Writing the number of bodies and "dx_dxbodies" on the log file
@@ -75,10 +75,8 @@ do while (TRIM(lcase(ainp)) /= "##### end body dynamics #####")
       write(nout,"(1x,a,1p,i12)") "n_bodies:.....................",n_bodies
       write(nout,"(1x,a,1p,e12.4)") "dx_dxbodies:..................",          &
          dx_dxbodies
-      write(nout,"(1x,a,1p,i12)") "imping_body_grav:.............",            &
-         imping_body_grav
-      write(nout,"(1x,a,1p,i12)") "imping_body_grav_dry:.........",            &
-         imping_body_grav_dry
+      write(nout,"(1x,a,1p,e12.4)") "friction_angle................",          &
+         friction_angle
       write(nout,"(1x,a,1p,e12.4)") "time_max_no_body_gravity_force",          &
          time_max_no_body_gravity_force
       write(nout,"(1x,a,1p,e12.4)") "time_max_no_body_frontier_imp.",          &
