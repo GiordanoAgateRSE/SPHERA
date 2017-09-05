@@ -184,7 +184,7 @@ do ii=1,indarrayFlu
             b1 = - (med(2)%celerita * med(2)%celerita) * (tirhoc + med(2)%den0)&
                  - (med(1)%celerita * med(1)%celerita) * (tirhow - med(1)%den0)
             c1 = (med(2)%celerita * med(2)%celerita) * tirhoc
-            pg(npi)%VolFra = ( - b1 - Dsqrt( b1 * b1 - 4.d0 * a1 * c1)) / (two &
+            pg(npi)%VolFra = ( - b1 - dsqrt( b1 * b1 - 4.d0 * a1 * c1)) / (two &
                              * a1)   
             if (pg(npi)%VolFra >= VFmx) then
                pg(npi)%VolFra  = VFmx

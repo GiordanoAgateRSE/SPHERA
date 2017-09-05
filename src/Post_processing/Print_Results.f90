@@ -161,8 +161,8 @@ if (nag>0) then
    enddo
    laminar_flag_perc = (100.d0 * laminar_flag_count) / nag
    blt_laminar_flag_perc = (100.d0 * blt_laminar_flag_count) / mixture_count
-   minvelo = Dsqrt(minvelo)
-   maxvelo = Dsqrt(maxvelo)
+   minvelo = dsqrt(minvelo)
+   maxvelo = dsqrt(maxvelo)
    minvelx = minval(pg(1:nag)%vel(1),mask=pg(1:nag)%cella/=0)
    maxvelx = maxval(pg(1:nag)%vel(1),mask=pg(1:nag)%cella/=0)
    pos = minloc(pg(1:nag)%vel(1),mask=pg(1:nag)%cella/=0)
@@ -245,8 +245,8 @@ if (nag>0) then
             maxlocvelo_w = npi
          endif
       enddo
-      minvelo_w = Dsqrt(minvelo_w)
-      maxvelo_w = Dsqrt(maxvelo_w)
+      minvelo_w = dsqrt(minvelo_w)
+      maxvelo_w = dsqrt(maxvelo_w)
    endif
 ! Limits for body particles and bodies: start
    if (n_bodies>0) then

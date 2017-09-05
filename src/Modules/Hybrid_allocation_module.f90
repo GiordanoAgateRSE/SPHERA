@@ -28,7 +28,7 @@
 module Hybrid_allocation_module
 use Static_allocation_module
 type TyGlobal
-   logical          :: NormFix                        
+   logical          :: NormFix
    logical          :: Slip
    integer(4)       :: iplot_fr ! Output frequency on log file                      
    integer(4)       :: imemo_fr ! Saving frequency                      
@@ -466,13 +466,13 @@ type TyMedium
    double precision :: betaMon ! Monaghan's beta parameter 
                                ! (artificial viscosity)
    double precision :: visc ! Kinematic viscosity  
-   double precision :: coes ! Cohesion  
-   double precision :: limiting_viscosity ! Kinematic viscosity threshold 
+   double precision :: coes ! Cohesion
+   double precision :: limiting_viscosity ! Dynamic viscosity threshold 
                                           ! to save comput. time
    double precision :: numx ! Maximum value for the kinematic viscosity 
                             ! (tuning parameter in Manenti et al., 2012, JHE)
    double precision :: mumx ! Maximum value for the dynamic viscosity 
-                            ! (tuning parameter in Manenti et al., 2012, JHE)
+                            ! to detect the elasto-plastic regime
    double precision :: taucri ! Critical shear stress (erosion criterion)
    double precision :: cuin ! Exponent of the Constitutive Equation 
    double precision :: phi ! Internal friction angle   

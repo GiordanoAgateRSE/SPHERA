@@ -1,13 +1,21 @@
-# Variables to be updated 
+# Variables to be updated
 VERSION = 8_0_AA
-#    bin, debug
+# Suggested values for EXECUTION
+#    bin
+#    debug
 EXECUTION = bin
-#    -O1 (bin), -g -O0 -fbacktrace -C (gfortran debug),
-#    -g -O0 -traceback -C -check bounds -check noarg_temp_created -debug all (ifort debug)
+# Suggested values for COMPILATION_FLAGS
+#   -O1 (bin)
+#   -g -O0 -fbacktrace -C (gfortran debug),
+#   -g -O0 -traceback -C -check bounds -check noarg_temp_created -debug all (ifort debug)
 COMPILATION_FLAGS = -O1
-#    gfortran, ifort
+# Suggested values for COMPILER
+#    gfortran
+#    ifort
 COMPILER = ifort
-#    -fopenmp, -qopenmp (formerly -openmp) 
+# Suggested values for OMP_FLAG
+#    -fopenmp (gfortran omp)
+#    -qopenmp (ifort omp; formerly -openmp) 
 OMP_FLAG = -qopenmp
 EXE_DIR = ../$(EXECUTION)/
 SOURCES = \
@@ -15,10 +23,7 @@ SOURCES = \
 ./Modules/Hybrid_allocation_module.f90 \
 ./Modules/Dynamic_allocation_module.f90 \
 ./Modules/I_O_diagnostic_module.f90 \
-./Modules/I_O_ENG_module.f90 \
 ./Modules/I_O_file_module.f90 \
-./Modules/I_O_ITA_module.f90 \
-./Modules/I_O_language_module.f90 \
 ./Modules/SA_SPH_module.f90 \
 ./Modules/Time_module.f90 \
 $(wildcard ./BC/*.f90) \
@@ -46,7 +51,7 @@ MAIN_FILE_ROOT = ./Main_algorithm/sphera
 CODE = $(EXE_DIR)SPHERA_v_$(VERSION)_$(COMPILER)_$(EXECUTION)
 OBJECTS = $(patsubst %.f90,%.o,$(SOURCES))
 # Targets
-#    Correct sequence for compile+link:
+#    Correct sequence to compile+link:
 #       make touch
 #       make
 all: compile link remove 

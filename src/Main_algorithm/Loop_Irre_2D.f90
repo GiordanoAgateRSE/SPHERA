@@ -56,12 +56,13 @@ integer(4),external :: ParticleCellNumber,CellIndices,CellNumber
 !------------------------
 ! Initializations
 !------------------------
+on_going_time_step = -999
 if (esplosione) then
    do npi=1,nag
       if (index(Med(pg(npi)%imed)%tipo,"gas")>0) then
          pg(npi)%pres = (Med(pg(npi)%imed)%gamma - one) * pg(npi)%IntEn *      &
                         pg(npi)%dens
-         pg(npi)%Csound = Dsqrt(Med(pg(npi)%imed)%gamma *                      &
+         pg(npi)%Csound = dsqrt(Med(pg(npi)%imed)%gamma *                      &
                           (Med(pg(npi)%imed)%gamma - one) * pg(npi)%IntEn)
          else
             pg(npi)%Csound = Med(pg(npi)%imed)%Celerita
@@ -103,8 +104,7 @@ if (Domain%time_split==0) Domain%time_stage = 1
 !------------------------
 ! SPH parameters 
 call start_and_stop(2,10)
-if ((on_going_time_step==it_start).and.(Domain%tipo=="bsph"))                  &
-   on_going_time_step = -2  
+if (Domain%tipo=="bsph") on_going_time_step = -2 
 call CalcVarLength
 if ((on_going_time_step==-2).and.(Domain%tipo=="bsph"))                        &
    on_going_time_step = it_start  
@@ -188,12 +188,12 @@ if (vtkconv) then
    call result_converter ('inizio')
 endif
 ! To assess the initial time step 
-if (it_start==0) call inidt2 
+if (it_start==0) call time_step_duration
 ! Computing the time elapsed before the actual simulation 
 if (exetype=="linux") then
    if (Domain%tmax>0.d0) then
       call system("date +%j%H%M%S > date_pre_iterations.txt")
-      open (unit_time_elapsed,file='date_pre_iterations.txt',                  &
+      open(unit_time_elapsed,file='date_pre_iterations.txt',                   &
          status="unknown",form="formatted")
       read (unit_time_elapsed,'(i3,i2,i2,i2)') machine_Julian_day,             &
          machine_hour,machine_minute,machine_second
@@ -213,7 +213,7 @@ done_flag = .false.
 ! duration and the total time value
    dt_previous_step = dt
 ! Stability criteria
-   if (nag>0) call rundt2     
+   if (nag>0) call time_step_duration
    simulation_time = simulation_time + dt
    if (nscr>0) write (nscr,"(a,i8,a,g13.6,a,g12.4,a,i8,a,i5)") " it= ",it,     &
       "   time= ",simulation_time,"  dt= ",dt,"    npart= ",nag,"   out= ",    &
@@ -315,7 +315,7 @@ done_flag = .false.
                case(3)
 ! To compute the second invariant of the rate-strain tensor and density 
 ! derivatives
-                  call inter_EqCont_2D 
+                  call Continuity_Equation
                   call MohrC
                case default
             endselect
@@ -458,7 +458,7 @@ done_flag = .false.
             endif
 ! Partial smoothing for velocity: start 
             call start_and_stop(2,7)
-            call inter_SmoothVelo_2D
+            call velocity_smoothing
 !$omp parallel do default(none) private(npi,ii,TetaV1)                         &
 !$omp shared(nag,Pg,Med,Domain,dt,indarrayFlu,Array_Flu,esplosione,it)
 ! Loop over all the active particles
@@ -506,7 +506,7 @@ done_flag = .false.
                                 (pg(npi)%veldif(2) - pg(npi)%var(2))
                         appo3 = (pg(npi)%veldif(3) - pg(npi)%var(3)) *         &
                                 (pg(npi)%veldif(3) - pg(npi)%var(3))
-                        pg(npi)%coefdif = pg(npi)%coefdif * Dsqrt(appo1 +      &
+                        pg(npi)%coefdif = pg(npi)%coefdif * dsqrt(appo1 +      &
                                           appo2 + appo3)
                  endif
                enddo
@@ -599,7 +599,7 @@ done_flag = .false.
                case(3)
 ! To compute the second invariant of the rate-strain tensor and density 
 ! derivatives
-                  call inter_EqCont_2D 
+                  call Continuity_Equation 
                   call MohrC
                case default
             endselect
@@ -619,12 +619,12 @@ done_flag = .false.
          endif
 ! To compute the second invariant of the strain-rate tensor and density 
 ! derivatives'
-         call inter_EqCont_2D
+         call Continuity_Equation
          else 
 ! No erosion criterion  
 ! To compute the second invariant of the strain-rate tensor and density 
 ! derivatives
-            call inter_EqCont_2D 
+            call Continuity_Equation 
             if (Domain%time_split==1) then 
                indarrayFlu = 0
                do npi=1,nag
@@ -972,6 +972,7 @@ if (nout>0) then
       EpOrdGridtot
    write (nout,*) " "
    write (nout,*) " "
+
    write (nout,*) "Final number of particles:       NAG = ",nag
    if (Domain%tipo=="bsph") write (nout,*)                                     &
       "Final number of wall particles:       DBSPH%n_w = ",DBSPH%n_w

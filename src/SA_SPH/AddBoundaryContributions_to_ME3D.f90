@@ -160,7 +160,7 @@ face_loop: do icbf = 1,Ncbf
                   pg(npi)%velass(:) = Tratto(stretch)%NormVelocity * nnlocal(:) 
             endif
          endif
-         return   
+         return
          elseif (stretchtype=="flow") then 
             if ((Domain%time_stage==1).or.(Domain%time_split==1)) then 
                pg(npi)%kodvel = 2
@@ -195,7 +195,7 @@ face_loop: do icbf = 1,Ncbf
                         nnlocal(:) 
                endif
             endif
-            return   
+            return
 ! Inlet sections 
             elseif (stretchtype=="sour") then         
                if ((Domain%time_stage==1).or.(Domain%time_split==1)) then 

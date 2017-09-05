@@ -87,8 +87,8 @@ do isi=1,NumFacce
          LenS = LenS + (BoundaryFace(SourceFace)%Node(3)%GX(sd) -              &
                 BoundaryFace(SourceFace)%Node(nodes)%GX(sd)) ** 2
       end do
-      LenR = Dsqrt(LenR)
-      LenS = Dsqrt(LenS)
+      LenR = dsqrt(LenR)
+      LenS = dsqrt(LenS)
       NumPartR = Int(LenR / deltapart + 0.01d0)
       NumPartS = Int(LenS / deltapart + 0.01d0)
       deltaR = LenR / NumPartR 
@@ -121,9 +121,9 @@ do isi=1,NumFacce
       RowVelocity(i_source) = Domain%dx / RowPeriod
       Tratto(nt)%NormVelocity = RowVelocity(i_source)
       pinttimeratio = -1
-   end if
-end if 
-end do 
+   endif
+endif 
+enddo 
 !------------------------
 ! Deallocations
 !------------------------

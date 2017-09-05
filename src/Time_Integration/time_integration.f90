@@ -83,7 +83,7 @@ if (diffusione) then
                - pg(npi)%var(2))
             appo3 = (pg(npi)%veldif(3) - pg(npi)%var(3)) * (pg(npi)%veldif(3)  &
                - pg(npi)%var(3))
-            pg(npi)%coefdif = pg(npi)%coefdif * Dsqrt(appo1 + appo2 + appo3)
+            pg(npi)%coefdif = pg(npi)%coefdif * dsqrt(appo1 + appo2 + appo3)
       endif
    enddo
 !$omp end parallel do

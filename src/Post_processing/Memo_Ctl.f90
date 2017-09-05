@@ -76,9 +76,8 @@ if (Nlines>0) then
       on_going_time_step,".cln"
    open(ncpt,file=nomefilectl,status="unknown",form="formatted")
    write (ncpt,*) "Control lines "
-   write (ncpt,'(1x,2(a,10x),3(a,8x),3(a,5x),a,7x,a)') " Time","Iter",         &
-      "X Coord","Y Coord","Z Coord","X Velocity","Y Velocity","Z Velocity",    &
-      " Pressure","Density "
+   write (ncpt,'(5(11x,a),3(9x,a),(10x,a),(5x,a))') "t(s)","step","x(m)",      &
+      "y(m)","z(m)","u(m/s)","v(m/s)","w(m/s)","p(Pa)","rho(kg/m3)"
   flush(ncpt)
   do i=1,Nlines
      write (ncpt,*) "line #", i,"    Label ",Control_Lines(i)%label
@@ -101,13 +100,13 @@ if (Nsections>0) then
    write(nomefilectl,"(a,a,i8.8,a)") nomecaso(1:len_trim(nomecaso)),'_',       &
       on_going_time_step,".csc"
    open(ncpt,file=nomefilectl,status="unknown",form="formatted")
-   write (ncpt,*) "Control sections "
-   write (ncpt,'(1x,2(a,10x),3(a,8x),3(a,5x),a,7x,a)') " Time","Iter",         &
+   write(ncpt,*) "Control sections "
+   write(ncpt,'(1x,2(a,10x),3(a,8x),3(a,5x),a,7x,a)') " Time","Iter",          &
       "X Coord","Y Coord","Z Coord","X Velocity","Y Velocity","Z Velocity",    &
       " Pressure","Density "
   flush(ncpt)
   do i=1,Nsections
-     write (ncpt,*) "section #", i,"    Label ",Control_sections(i)%label,     &
+     write(ncpt,*) "section #", i,"    Label ",Control_sections(i)%label,      &
         "    Type ",Control_sections(i)%Tipo
      do j=Control_sections(i)%icont(1),Control_sections(i)%icont(2)
         if (control_points(j)%cella==0) then

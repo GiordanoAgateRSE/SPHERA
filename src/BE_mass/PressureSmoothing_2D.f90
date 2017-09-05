@@ -21,7 +21,9 @@
 !-------------------------------------------------------------------------------
 ! Program unit: PressureSmoothing_2D
 ! Description: Partial smoothing for pressure (Di Monaco et al., 2011), also 
-!              with DB-SPH boundary treatment scheme. 
+!              with DB-SPH boundary treatment scheme. This subroutine is not 
+!              just the formal 2D extension of PressureSmoothing_3D: 
+!              differences are appreciable.
 !-------------------------------------------------------------------------------
 subroutine PressureSmoothing_2D
 !------------------------

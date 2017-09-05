@@ -66,7 +66,7 @@ double precision,public,parameter :: vKconst = 0.41 ! von Karman constant
 ! Global constants: end
 ! Global variables: start 
 logical :: dt_alfa_Mon
-integer(4) :: Ncord,NMedium,NPartZone
+integer(4) :: ncord,NMedium,NPartZone
 integer(4) :: NPointst,NPoints,NPointsl,NPointse,NLines,NSections,GCBFVecDim
 integer(4) :: NumVertici,NumFacce,NumTratti,NumBVertices,NumBSides
 integer(4) :: nag,nagpg,PARTICLEBUFFER

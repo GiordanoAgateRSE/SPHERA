@@ -236,7 +236,7 @@ do icbs=1,IntNcbs
                   elseif (strtype=="crit") then     
 ! Non-stationary critical flow
                      Qsi = pressi / roi                          
-                     velix = pg(npi)%vel(1)         
+                     velix = pg(npi)%vel(1)
                      veliz = pg(npi)%vel(3)         
                      veliq = velix * velix + veliz * veliz  
                      hcrit = veliq / Abs(Domain%grav(3))        

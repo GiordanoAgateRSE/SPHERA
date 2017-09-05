@@ -90,7 +90,7 @@ do while (TRIM(lcase(ainp))/="##### end control lines #####")
       control_lines(NumberEntities(5))%icont(2) = npts + ndiv
       npts = npts + ndiv
       values3(:) = (values2(:) - values1(:)) / (ndiv - 1)
-      vp = Dsqrt(values3(1) * values3(1) + values3(2) * values3(2) +           &
+      vp = dsqrt(values3(1) * values3(1) + values3(2) * values3(2) +           &
            values3(3) * values3(3))
       if (nout>0) then
          write (nout,"(1x,a,i3,1x,a)") "Control line      ",NumberEntities(5), &

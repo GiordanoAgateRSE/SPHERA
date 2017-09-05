@@ -79,8 +79,8 @@ if (ncord==2) then
          Length2 = Length2 + (BoundaryFace(i_inlet)%Node(3)%GX(i) -            &
             BoundaryFace(i_inlet)%Node(BoundaryFace(i_inlet)%nodes)%GX(i)) ** 2
       end do
-      Length1 = Dsqrt(Length1)
-      Length2 = Dsqrt(Length2)
+      Length1 = dsqrt(Length1)
+      Length2 = dsqrt(Length2)
       npart1 = Int(Length1 / Domain%dx+0.01d0)
       npart2 = Int(Length2 / Domain%dx+0.01d0)
       npart1 = npart1 * npart2 

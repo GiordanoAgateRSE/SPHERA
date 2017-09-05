@@ -85,7 +85,7 @@ if (ypi>=yplimite) then
    do ipt=1,ndiv
       alfa = alfa + dalfa
       tanalfa = Tan(alfa)
-      ris = ypi * Dsqrt(one + tanalfa * tanalfa)
+      ris = ypi * dsqrt(one + tanalfa * tanalfa)
       VIntWdV = VIntWdV + WIntegr(ris, Domain%h) * dalfa
    enddo
    elseif (ypi<yplimite.and.Ncbslocal==1) then        

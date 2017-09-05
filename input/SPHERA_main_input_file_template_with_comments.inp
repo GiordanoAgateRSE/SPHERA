@@ -75,9 +75,9 @@ line_last_ID line_last_vertex_1 ... line_last_vertex_last line_last_Boundary_ID
 ! SA-SPH boundary normal vectors and reservoir face normal vectors point inward
 ! (clockwise list of points if looking from outside the fluid domain). For 
 ! "perimeter" boundaries: the vertices have to be adjacent, but there is no rule
-! about the vertex order (better anticlockwise).
+! about the vertex order (better clockwise to keep coherence with SA-SPH walls).
 ! Faces can only be triangles or rectangles (generic quadrilaterals are not 
-! permitted). Only "perimeter" faces can also be generic quadrilaterals (not 
+! permitted), but only "perimeter" faces can also be generic quadrilaterals (not 
 ! only rectangles), pentagons and hexagons.
 1 face_1_vertex_1 ... face_1_vertex_6 face_1_Boundary_ID
                                            ! first face data ("-1" is mandatory 
@@ -99,7 +99,8 @@ face_last_ID face_last_vertex_1 ... face_last_vertex_6 face_last_Boundary_ID
 Boundary_name               !
 Boundary_ID                 !
 Boundary_type               ! Boundary_type = fixed(wall frontier),perimeter
-                            ! (fluid reservoir),source(inlet section),open, 
+                            ! (fluid reservoir),source(inlet section),open(only 
+                            ! removal of the particles crossing the boundary), 
                             ! tapis (not recommended)
 ! If (Boundary_type=="fixed"): start
 Shear_stress_coefficient laminar_flag_check ! Shear_stress_coefficient=1.0
@@ -110,9 +111,11 @@ Shear_stress_coefficient laminar_flag_check ! Shear_stress_coefficient=1.0
                                             ! on laminar regime to activate 
                                             ! shear stress terms at boundaries 
                                             ! in case of no-slip conditions; 
-                                            ! check on laminar regime always 
-                                            ! works in the inner domain),
-                                            ! .false.(no check)
+                                            ! laminar regime check has no 
+                                            ! effect in the inner domain),
+                                            ! .false.(no check: always apply 
+                                            ! no-slip conditions in case 
+                                            ! Shear_stress_coefficient=1.0)
 RGBColor                    !
 ! If (Boundary_type=="fixed"): end
 ! If (Boundary_type=="perimeter"): start
@@ -347,7 +350,7 @@ diffusion_coefficient settling_velocity_coefficient
                                     ! parameters)
 0. 0. 0.                   
 ! If (fluid_type==liquid): start                                    
-dynamic_viscosity                   !
+dynamic_viscosity                   ! >0.
 roughness_coefficient               ! null recommended value (i.e. inactive 
                                     ! parameter)
 ! If (fluid_type==liquid): end
@@ -363,7 +366,7 @@ cohesion viscosity_max tuned_viscosity limiting_viscosity
                                     ! elastic-plastic strain regime); 
                                     ! tuned_viscosity (tuned dynamic viscosity -
                                     ! only for Manenti et al., 2012)
-                                    ! limiting_viscosity 
+                                    ! limiting dynamic viscosity 
 ! If (fluid_type==granular): end
 ! if ((fluid_type==granular).and.(erosion_criterion_ID==1)): start
 effective_porosity d_50 d_90        !
@@ -430,7 +433,7 @@ n_R_IO_x n_R_IO_y n_R_IO_z teta_R_IO
 pos_rotC_x pos_rotC_y pos_rotC_z    ! pos_rotC(centre of rotation for the 
                                     ! vector alfa just to configure the initial 
                                     ! orientation in the global reference 
-                                    ! system)  
+                                    ! system)
 vel_CM_x vel_CM_y vel_CM_z          ! vel_CM(velocity of the centre of mass at 
                                     ! t=0)
 omega_x omega_y omega_z             ! omega(angular velocity of the body at t=0)
@@ -462,7 +465,7 @@ face_xmin_flag face_xmax_flag face_ymin_flag face_ymax_flag face_zmin_flag face_
                                     ! vectors of surface body particles only 
                                     ! if face_..._flag=1; x/y/z_min/max 
                                     ! indicates the 6 faces of the element 
-                                    ! -parallelepiped-) 
+                                    ! -parallelepiped-)
 xmin xmax ymin ymax zmin zmax       ! (spatial limits -in the global reference
                                     ! system before the initial rotation- to 
                                     ! deactivate particle masses if((x>=xmin).       
@@ -481,7 +484,11 @@ xmin xmax ymin ymax zmin zmax       ! (spatial limits -in the global reference
 ##### RUN PARAMETERS #####
 ! Input parameters for time integration, partial smoothing and memory management
 final_time final_time_step          ! (the run stops when reaching either the 
-                                    ! final time or the final time step)
+                                    ! final time or the final time step; in 
+                                    ! case of a restarted simulation, these 
+                                    ! values are reported in the log file, but 
+                                    ! they are actually overwritten by the 
+                                    ! values read from the input restart file)
 CFL vsc_coeff Leapfrog_flag scheme_order factor dt_alfa_Mon
                                     ! CFL;
                                     ! vsc_coeff(viscous stability condition
@@ -495,7 +502,7 @@ CFL vsc_coeff Leapfrog_flag scheme_order factor dt_alfa_Mon
                                     ! dt_alfa_Mon(logical flag making Monaghan 
                                     ! artificial viscosity coefficient to 
                                     ! influence dt)
-teta_p, teta_u var                  ! teta_p,teta_u(coefficients for partial
+teta_p teta_u var                   ! teta_p,teta_u(coefficients for partial
                                     ! smoothing of pressure and velocity); var=A
 COEFNMAXPARTI COEFNMAXPARTJ body_part_reorder
                                     ! COEFNMAXPARTI:max0(max number of fluid 
@@ -518,17 +525,27 @@ COEFNMAXPARTI COEFNMAXPARTJ body_part_reorder
 nag_aux MAXCLOSEBOUNDFACES MAXNUMCONVEXEDGES GCBFVecDim
                                     ! nag_aux(rough overestimation of the 
                                     ! number of fluid particles in the 
-                                    ! domain), nag_aux is only related to 
-                                    ! the very first allocation of the particle 
-                                    ! array, in case of reservoir derived from
-                                    ! topography; MAXCLOSEBOUNDFACES(max  
-                                    ! number of neighbouring boundary face per  
-                                    ! fluid particle); MAXNUMCONVEXEDGES(max  
-                                    ! number of edges); GCBFVecDim(rough 
+                                    ! domain, it is only related to the very 
+                                    ! first allocation of the particle array, 
+                                    ! it is influent only in case of reservoir 
+                                    ! derived from topography); 
+                                    ! MAXCLOSEBOUNDFACES(max number of 
+                                    ! neighbouring boundary face per fluid 
+                                    ! particle); MAXNUMCONVEXEDGES(max number 
+                                    ! of edges); GCBFVecDim (rough 
                                     ! overestimation of the number of Grid Cell 
-                                    ! - Boundary Face intersections  (SA-SPH):  
-                                    ! this value is read, but not used in the 
-                                    ! restart mode. 
+                                    ! - Boundary Face intersections  (SA-SPH;  
+                                    ! in case of restart, this value is only 
+                                    ! read, not used; in case its value is too 
+                                    ! little, crashes occur without code  
+                                    ! warnings/errors; GCBFVecDim only occupies 
+                                    ! 4B times the number of elements, thus, it 
+                                    ! is sufficient to overestimate this number 
+                                    ! as the number of faces times the number 
+                                    ! of the positioning grid cells, further, 
+                                    ! reducing GCBFVecDim does not imply any 
+                                    ! appreciable variation in the computational
+                                    ! time).
 density_thresholds_flag             ! density_thresholds_flag=0(default, no 
                                     ! density limiters),1(density limiters for 
                                     ! debug) - density limiters do not apply to 
@@ -554,15 +571,16 @@ restart_mode restart_time_value     ! restart_mode("time" or "step");
                                     ! seconds or step number, according to 
                                     ! restart_mode; this value has to be lower 
                                     ! than the time value of the last restart 
-                                    ! output)
+                                    ! output; default value: 2.*dt_out_PV)
 restart_file                        ! restart_file(restart file name -with 
-                                    ! extension-)
+                                    ! file extension-)
 ##### end restart #####
 
 ##### output regulation #####
 ! Post-processing parameters for .txt files. The first two words (and the 
 ! possible fourth) of each line are keywords.
-results time dt_out                 ! dt_out(writing time step)
+results time dt_out                 ! dt_out(writing time step for the water 
+                                    ! front: output file ".fro")
 restart time dt_restart             ! dt_restart(restart time frequency)
 print partial log_file_frequency    ! log_file_frequency (log file writing time 
                                     ! step in terms of time step number) 
@@ -571,11 +589,11 @@ control time dt_out_mon             ! dt_out_mon(writing time step for
 level time dt_out_FS medium fluid_ID
                                     ! dt_out_FS(writing time step for free 
                                     ! surface post-processing); fluid_ID 
-! if (IC_source_type==2): start        
+! if (IC_reservoir_type==2): start        
 depth dt_out dt_out_depth           ! dt_out_depth(writing time step for 2D 
                                     ! fields of water depth (h) and specific 
                                     ! flow rate components (q_x=u_m*h,q_y=v_m*h))
-! if (IC_source_type==2): end
+! if (IC_reservoir_type==2): end
 ##### end output regulation #####
 
 ##### draw options #####
@@ -593,10 +611,12 @@ x_monitor_point_n y_monitor_point_n z_monitor_point_n
 ##### end control points #####
 
 ##### control lines #####
-! Input parameters for monitoring lines
+! Input parameters for monitoring lines.
 line_1_label
 ! if(D==2D): start
-edge_1_line_1_x edge_1_line_1_z 
+edge_1_line_1_x edge_1_line_1_z ! The edge order is not arbitrary to detect the 
+                                ! free surface. Edge 1 is the farest from the 
+                                ! free surface. 
 edge_2_line_1_x edge_2_line_1_z
 ! if(D==2D): end
 ! if(D==3D): start
@@ -631,6 +651,8 @@ vertex_3_x vertex_3_y vertex_3_z
 vertex_4_x vertex_4_y vertex_4_z 
                                     ! vertices of the first section (in case of 
                                     ! 3 vertices do not mind about the fourth 
-                                    ! point)
+                                    ! point; anti-clock wise sense viewing the 
+                                    ! section face from the outside of the 
+                                    ! fluid domain)
 ...                                 ! other possible section records
 ##### end section flow rate #####

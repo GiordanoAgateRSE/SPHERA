@@ -75,7 +75,7 @@ if (interlen>zero) then
       xpip = xpip + deltas
       dxpip = xpip - xpi
       risq = dxpip * dxpip + ypiq
-      ris = Dsqrt(risq)
+      ris = dsqrt(risq)
       Wds = w(ris, Domain%h, Domain%coefke) * deltas
       SIntWds = SIntWds + Wds
    enddo

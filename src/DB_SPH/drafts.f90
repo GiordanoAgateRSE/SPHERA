@@ -64,7 +64,7 @@ if (vrij>zero) then
       TermMon = Med(pg(npi)%imed)%alfaMon * celtilde * Domain%h / rhotilde
       rvwalfa(1:3) = rhoWw * TermMon * vrij * pg_w(npj)%normal(:) / dis2
       rvwbeta(1:3) = zero
-end if
+endif
 !------------------------
 ! Deallocations
 !------------------------

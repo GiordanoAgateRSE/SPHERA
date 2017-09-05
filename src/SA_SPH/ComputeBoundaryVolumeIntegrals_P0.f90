@@ -104,7 +104,7 @@ do ipk=1,BITrows
             deltaPiPx = PXLoc(SD) - LocPi(SD)
             PiPxdist = PiPxdist + deltaPiPx * deltaPiPx
          enddo
-         PiPxdist = Dsqrt(PiPxdist)
+         PiPxdist = dsqrt(PiPxdist)
 ! Normalised distance and related functions 
          delta_alpha = BoundIntegralTab(ipk, 4)
          rob = PiPxdist / Domain%h

@@ -90,8 +90,8 @@ if (Granular_flows_options%erosion_flag==1) then
             pg(npi)%state = "sol"
             pg(npi)%var = 0.d0
             pg(npi)%vel = 0.d0
-            pg(npi)%sigma_prime_m = 0.0d0
-            pg(npi)%pres_fluid = 0.0d0
+            pg(npi)%sigma_prime_m = 0.d0
+            pg(npi)%pres_fluid = 0.d0
       endif
       else
          if (pg(npi)%state=="flu") return   
@@ -125,8 +125,8 @@ if (Granular_flows_options%ID_erosion_criterion==1) then
          pg(npi)%state="sol"
          pg(npi)%var = 0.d0
          pg(npi)%vel = 0.d0
-         pg(npi)%sigma_prime_m = 0.0d0
-         pg(npi)%pres_fluid = 0.0d0
+         pg(npi)%sigma_prime_m = 0.d0
+         pg(npi)%pres_fluid = 0.d0
          if (pg(npi)%indneighliqsol.ne.0) then
             aux_ID = pg(npi)%indneighliqsol
             else 
@@ -174,8 +174,8 @@ if (Granular_flows_options%ID_erosion_criterion==1) then
                pg(npi)%state="sol"
                pg(npi)%var = 0.d0
                pg(npi)%vel = 0.d0
-               pg(npi)%sigma_prime_m = 0.0d0
-               pg(npi)%pres_fluid = 0.0d0
+               pg(npi)%sigma_prime_m = 0.d0
+               pg(npi)%pres_fluid = 0.d0
                indpeloloc = ind_interfaces(igridi,jgridi,3)
                if (indpeloloc.ne.0) then
                   pretot = pg(indpeloloc)%pres  + (pg(indpeloloc)%coord(3) -   &
@@ -216,8 +216,8 @@ if (ind_neigh==0) then
    pg(npi)%var = zero
 ! Deposition or no erosion for particles with no neighbours 
    if (Granular_flows_options%ID_erosion_criterion==1) then
-      pg(npi)%sigma_prime_m = 0.0d0
-      pg(npi)%pres_fluid = 0.0d0
+      pg(npi)%sigma_prime_m = 0.d0
+      pg(npi)%pres_fluid = 0.d0
       indpeloloc = ind_interfaces(igridi,jgridi,3)
       else
          indpeloloc = ind_interfaces(igridi,jgridi,1)
@@ -292,8 +292,8 @@ if (Velocity2==zero) then
    pg(npi)%dens = med(imed)%den0 + (pretot / (Med(imed)%celerita *             &
                   Med(imed)%celerita))
    if (Granular_flows_options%ID_erosion_criterion==1) then
-      pg(npi)%sigma_prime_m = 0.0d0
-      pg(npi)%pres_fluid = 0.0d0
+      pg(npi)%sigma_prime_m = 0.d0
+      pg(npi)%pres_fluid = 0.d0
    endif
    return 
 end if
@@ -305,7 +305,7 @@ if (Granular_flows_options%ID_erosion_criterion==1) then
       Ks = med(imed)%RoughCoef * med(imed)%d50
 endif
 if (Granular_flows_options%ID_erosion_criterion>1) then     
-   Velocity = Dsqrt(Velocity2)
+   Velocity = dsqrt(Velocity2)
    else
       if (Granular_flows_options%erosion_flag==2) then
 ! Default value for interface normal (in case of no free surface)           
@@ -454,7 +454,7 @@ if (Granular_flows_options%ID_erosion_criterion==1) then
             Kgamma = one - Dtan(gamma) * Dtan(gamma) / (Dtan(phi) *            &
                      Dtan(phi))
             if (kgamma>zero) then
-               Kgamma = Dcos(gamma) * Dsqrt(kgamma)
+               Kgamma = Dcos(gamma) * dsqrt(kgamma)
                else
                   kgamma = zero
             end if
@@ -486,8 +486,8 @@ if ((Taub>Taubcr).and.(on_going_time_step>Med(imed)%NIterSol)) then
          if (diffusione) pg(npi)%dens = med(imed)%den0 
 ! Initializing some SPH parameters for fixed mixture particles.
          if (Granular_flows_options%ID_erosion_criterion==1) then
-            pg(npi)%sigma_prime_m = 0.0d0
-            pg(npi)%pres_fluid = 0.0d0
+            pg(npi)%sigma_prime_m = 0.d0
+            pg(npi)%pres_fluid = 0.d0
          endif
       endif
 endif

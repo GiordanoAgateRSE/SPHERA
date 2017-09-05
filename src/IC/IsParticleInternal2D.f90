@@ -22,7 +22,7 @@
 ! Program unit: IsParticleInternal2D
 ! Description: To check whether a particle is internal to the 2D domain. 
 !-------------------------------------------------------------------------------
-logical function IsParticleInternal2D (Nt,PX)
+logical function IsParticleInternal2D(Nt,PX)
 !------------------------
 ! Modules
 !------------------------ 
@@ -52,7 +52,7 @@ character(len=lencard) :: nomsub = "IsParticleInternal2D"
 IsParticleInternal2D = .FALSE.
 ni = 0
 inizio = Tratto(Nt)%inivertex
-fine   = Tratto(Nt)%inivertex + Tratto(Nt)%numvertices - 2
+fine = Tratto(Nt)%inivertex + Tratto(Nt)%numvertices - 2
 !------------------------
 ! Statements
 !------------------------
@@ -61,12 +61,12 @@ do iv=inizio,fine
 ! To Check for the storage limits
    if (iv>NumBVertices) then
       call diagnostic(arg1=10,arg2=2,arg3=nomsub)
-   end if
+   endif
 ! To set the pointer to the current vertex
    n = BoundaryVertex(iv)
    if (n>NumVertici) then
      call diagnostic(arg1=10,arg2=3,arg3=nomsub)
-   end if
+   endif
 ! To set the coordinates of the current vertex
    xa = Vertice(1,n)
    za = Vertice(3,n)
@@ -84,27 +84,27 @@ do iv=inizio,fine
          else
 ! The segment is horizontal: the X value of the mean point is assumed
             xi = half * (xa+xba)
-      end if
+      endif
       else
 ! The segment is vertical: the X value of the vertices is assumed
          xi = xa
-   end if
+   endif
 ! To order the vertices to have the first one with the lower Z value
    if (za>zba) then
       zs=za
       za=zba
       zba=zs
-   end if
+   endif
 ! The Z value of the particle is inside the segment Z values
    if (((PX(3)-za)>xyz_tolerance).AND.((PX(3)-zba)<xyz_tolerance)) then
       if (xi>PX(1)) then
          ni = ni + 1
-      end if
-   end if
-end do
+      endif
+   endif
+enddo
 if (MOD(ni,2)==1) then
    IsParticleInternal2D = .TRUE.
-end if
+endif
 !------------------------
 ! Deallocations
 !------------------------

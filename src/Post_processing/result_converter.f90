@@ -136,7 +136,7 @@ call cat_post_proc
       k1 = i
       k2 = k1 + 29
       if (k2>numpoints) k2 = numpoints
-      write (stringa,'(30i8)') (k,k=k1,k2)
+      write(stringa,'(30i8)') (k,k=k1,k2)
       stringa = adjustl(trim(stringa))
       write(unitvtk,'(8x,a)') stringa(1:len_trim(stringa))
    enddo

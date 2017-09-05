@@ -23,7 +23,7 @@
 ! Description: Contributions of body particles to velocity partial smoothing
 !              (Amicarelli et al., 2015, CAF).    
 !-------------------------------------------------------------------------------
-subroutine body_to_smoothing_vel(dervel_mat,unity_vec)
+subroutine body_to_smoothing_vel(dervel_mat)
 !------------------------
 ! Modules
 !------------------------ 
@@ -34,7 +34,6 @@ use Dynamic_allocation_module
 ! Declarations
 !------------------------
 implicit none
-double precision,dimension(nag),intent(inout) :: unity_vec
 double precision,dimension(nag,3),intent(inout) :: dervel_mat
 integer(4) :: npi,j,npartint,npj
 double precision :: W_vol,dis
@@ -60,7 +59,6 @@ do npi=1,n_body_part
        dis = dsqrt(dot_product(rag_bp_f(:,npartint),rag_bp_f(:,npartint)))
        W_vol = w(dis,Domain%h,Domain%coefke) * ((Domain%dx / dx_dxbodies) **   &
                ncord)
-       unity_vec(npj) = unity_vec(npj) + W_vol
        dervel_mat(npj,:) = dervel_mat(npj,:) +                                 &
                            (bp_arr(npi)%vel_mir(:)-pg(npj)%vel(:)) * W_vol
    enddo

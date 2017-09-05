@@ -56,12 +56,13 @@ integer(4),external :: ParticleCellNumber,CellIndices,CellNumber
 !------------------------
 ! Initializations
 !------------------------
+on_going_time_step = -999
 if (esplosione) then
    do npi=1,nag
       if (index(Med(pg(npi)%imed)%tipo,"gas")>0) then
          pg(npi)%pres = (Med(pg(npi)%imed)%gamma - one) * pg(npi)%IntEn *      &
                         pg(npi)%dens
-         pg(npi)%Csound = Dsqrt(Med(pg(npi)%imed)%gamma *                      &
+         pg(npi)%Csound = dsqrt(Med(pg(npi)%imed)%gamma *                      &
                           (Med(pg(npi)%imed)%gamma - one) * pg(npi)%IntEn)
          else
             pg(npi)%Csound = Med(pg(npi)%imed)%Celerita
@@ -103,8 +104,7 @@ if (Domain%time_split==0) Domain%time_stage = 1
 !------------------------
 ! SPH parameters 
 call start_and_stop(2,10)
-if ((on_going_time_step==it_start).and.(Domain%tipo=="bsph"))                  &
-   on_going_time_step = -2
+if (Domain%tipo=="bsph") on_going_time_step = -2
 call CalcVarLength
 if ((on_going_time_step==-2).and.(Domain%tipo=="bsph")) on_going_time_step =   &
    it_start
@@ -129,7 +129,7 @@ if ((on_going_time_step==it_start).and.(Domain%tipo=="bsph")) then
       endif
    enddo
 !$omp end parallel do
-   call OrdGrid1 (nout)
+   call OrdGrid1(nout)
 ! Variable to count the particles, which are not "sol"
    indarrayFlu = 0
    do npi=1,nag
@@ -194,7 +194,7 @@ if (vtkconv) then
    call result_converter('inizio')
 endif
 ! To assess the initial time step
-if (it_start==0) call inidt2
+if (it_start==0) call time_step_duration
 it = it_start
 if (exetype=="linux") then
    if (Domain%tmax>0.d0) then
@@ -214,10 +214,9 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
    on_going_time_step = it
    it_eff = it
 ! To store the old time step duration, to evaluate the new value of time step 
-! duration and the total time value
+! duration and update the simulation time
    dt_previous_step = dt
-! Stability criteria
-   if (nag>0) call rundt2
+   if (nag>0) call time_step_duration
    simulation_time = simulation_time + dt
    if (nscr>0) write (nscr,"(a,i8,a,g13.6,a,g12.4,a,i8,a,i5)") " it= ",it,     &
       "   time= ",simulation_time,"  dt= ",dt,"    npart= ",nag,"   out= ",    &
@@ -320,7 +319,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
                case(3)
 ! To compute the second invariant of the rate-strain tensor and density 
 ! derivatives
-                  call inter_EqCont_3D 
+                  call Continuity_Equation
                   call MohrC
                case default
             endselect
@@ -379,7 +378,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
                Ncbf = 0
          endif
          if ((Domain%tipo=="semi").and.(Ncbf>0)) then
-               Ncbf_Max = max(Ncbf_Max, Ncbf)
+               Ncbf_Max = max(Ncbf_Max,Ncbf)
                call AddBoundaryContributions_to_ME3D(npi,Ncbf,tpres,tdiss,tvisc)
                if (pg(npi)%kodvel==0) then
                   BoundReaction = zero
@@ -461,7 +460,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
             endif
 ! Partial smoothing for velocity: start 
             call start_and_stop(2,7)
-            call inter_SmoothVelo_3D
+            call velocity_smoothing
 !$omp parallel do default(none) private(npi,ii,TetaV1)                         &
 !$omp shared(nag,Pg,Med,Domain,dt,indarrayFlu,Array_Flu,esplosione)
 ! Loop over all the active particles
@@ -509,7 +508,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
                                 (pg(npi)%veldif(2) - pg(npi)%var(2))
                         appo3 = (pg(npi)%veldif(3) - pg(npi)%var(3)) *         &
                                 (pg(npi)%veldif(3) - pg(npi)%var(3))
-                        pg(npi)%coefdif = pg(npi)%coefdif * Dsqrt(appo1 + appo2&
+                        pg(npi)%coefdif = pg(npi)%coefdif * dsqrt(appo1 + appo2&
                                           + appo3)
                   endif
                enddo
@@ -602,7 +601,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
                case(3)
 ! To compute the second invariant of the rate-strain tensor and density 
 ! derivatives
-                  call inter_EqCont_2D 
+                  call Continuity_Equation
                   call MohrC
                case default
             endselect
@@ -622,12 +621,12 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
          endif
 ! To compute the second invariant of the strain-rate tensor and density 
 ! derivatives
-         call inter_EqCont_3D
+         call Continuity_Equation
          else 
 ! No erosion criterion  
 ! To compute the second invariant of the strain-rate tensor and density 
 ! derivatives
-            call inter_EqCont_3D
+            call Continuity_Equation
             if (Domain%time_split==1) then 
                indarrayFlu = 0
                do npi=1,nag
@@ -663,7 +662,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
 ! Detecting the faces with actual contributions
             if (Ncbf>0) then        
                Ncbf_Max = max(Ncbf_Max, Ncbf)
-               Call AddBoundaryContribution_to_CE3D (npi, Ncbf, BCtorodivV)
+               call AddBoundaryContribution_to_CE3D(npi,Ncbf,BCtorodivV)
             endif
             if (pg(npi)%koddens==0) then
                pg(npi)%dden = pg(npi)%dden - BCtorodivV
@@ -912,7 +911,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
             ymax = max(ymax,pg(npi)%coord(2))
             zmax = max(zmax,pg(npi)%coord(3))
          enddo
-         write (nfro,'(4g14.7)') simulation_time,xmax,ymax,zmax
+         write(nfro,'(4g14.7)') simulation_time,xmax,ymax,zmax
       endif
       elseif (Domain%memo_fr>zero) then
          if (it>1.and.mod(simulation_time,Domain%memo_fr) <= dtvel) then
@@ -925,15 +924,15 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
                ymax = max(ymax,pg(npi)%coord(2))
                zmax = max(zmax,pg(npi)%coord(3))
             enddo
-            write (nfro,'(4g14.7)') simulation_time, xmax ,ymax, zmax
+            write(nfro,'(4g14.7)') simulation_time,xmax,ymax,zmax
          endif
    endif
 ! Paraview output and .txt file concatenation
    if (vtkconv) then
-      call result_converter ('loop__')
+      call result_converter('loop__')
    endif
 ! If the "kill file" exists, then the run is stopped and last results are saved.
-   inquire (file=nomefilekill,EXIST=kill_flag)
+   inquire(file=nomefilekill,EXIST=kill_flag)
    if (kill_flag) exit ITERATION_LOOP
    if (simulation_time>=Domain%tmax) exit ITERATION_LOOP
 enddo ITERATION_LOOP 

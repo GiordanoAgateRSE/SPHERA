@@ -48,13 +48,13 @@ double precision,dimension(3) :: appo
 !------------------------
 ! Statements
 !------------------------
-if (Ncord==2) then
+if (ncord==2) then
 !$omp parallel do default(none) private(npi,appo,unity) shared(nag,Pg)
    do npi=1,nag
       if ((pg(npi)%cella==0).or.(pg(npi)%vel_type=="std")) cycle
       call InterFix(npi,appo,unity)
 ! Components of the generic normal  
-      pg(npi)%mno = Dsqrt((appo(1)*appo(1)) + (appo(3)*appo(3)))
+      pg(npi)%mno = dsqrt((appo(1)*appo(1)) + (appo(3)*appo(3)))
       pg(npi)%zer(1) = appo(1) / (pg(npi)%mno + 0.0001d0)
       pg(npi)%zer(2) = zero
       pg(npi)%zer(3) = appo(2) / (pg(npi)%mno + 0.0001d0)
@@ -63,22 +63,22 @@ if (Ncord==2) then
          pg(npi)%zer(1) = zero
          pg(npi)%zer(2) = zero
          pg(npi)%zer(3) = zero
-         pg(npi)%mno    = zero
-         pg(npi)%ang    = zero
-      end if
-   end do
+         pg(npi)%mno = zero
+         pg(npi)%ang = zero
+      endif
+   enddo
 !$omp end parallel do
-   else if (Ncord==3) then
+   elseif (ncord==3) then
 !$omp parallel do default(none) private(npi,appo,unity) shared(nag,Pg)
    do npi=1,nag
       if ((pg(npi)%cella==0).or.(pg(npi)%vel_type=="std")) cycle
       call InterFix(npi,appo,unity)
-      pg(npi)%mno = Dsqrt((appo(1) * appo(1)) + (appo(2) * appo(2)) + (appo(3) &
+      pg(npi)%mno = dsqrt((appo(1) * appo(1)) + (appo(2) * appo(2)) + (appo(3) &
                     * appo(3)))
       pg(npi)%zer(:) = appo(:) / (pg(npi)%mno + 0.0001d0)
-   end do
+   enddo
 !$omp end parallel do
-end if
+endif
 !------------------------
 ! Deallocations
 !------------------------

@@ -79,11 +79,7 @@ enddo
 call start_and_stop(3,17)
 ! Velocity and energy partial smoothing
 call start_and_stop(2,7)
-if (ncord==2) then 
-   call inter_SmoothVelo_2D
-   else
-      call inter_SmoothVelo_3D
-endif
+call velocity_smoothing
 !$omp parallel do default(none)                                                &
 !$omp private(npi,ii,TetaV1)                                                   &
 !$omp shared(nag,Pg,Med,Domain,dt,indarrayFlu,Array_Flu,esplosione)

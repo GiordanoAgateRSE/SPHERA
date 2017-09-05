@@ -71,7 +71,7 @@ endif
 ! Statements
 !------------------------
 ypiq = ypi * ypi
-halfchord = Dsqrt(doublesquareh - ypiq)
+halfchord = dsqrt(doublesquareh - ypiq)
 XA = xpi - halfchord
 XB = xpi + halfchord
 iside = Cloboside(icbs)

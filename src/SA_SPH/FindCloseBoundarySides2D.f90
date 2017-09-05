@@ -105,7 +105,7 @@ side_loop: do isi=1,NumBSides
       if (((xpmin<xp).AND.(xp<xpmax)).AND.((ypmin<yp).AND.(yp<ypmax))) then
          if (xp<zero) then
             xpq = xp * xp
-            ypmx = Dsqrt(doublesquareh - xpq)
+            ypmx = dsqrt(doublesquareh - xpq)
             ypmn = -ypmx 
 ! The particle falls on the segment 
             elseif (xp<=sidel) then
@@ -113,7 +113,7 @@ side_loop: do isi=1,NumBSides
                ypmn = ypmin 
                elseif (xp<xpmax) then
                   Lmxpq = (sidel - xp) * (sidel - xp)
-                  ypmx = Dsqrt(doublesquareh - Lmxpq)
+                  ypmx = dsqrt(doublesquareh - Lmxpq)
                   ypmn = -ypmx 
          endif
 ! The boundary must be considered for the current particle as a close boundary

@@ -19,15 +19,15 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: rundt2                                          
-! Description: Time step computation according to stability constraints (CFL 
-!              condition, visosity stability criterion, interface diffusion 
-!              criterion -not recommended-). 
+! Program unit: time_step_duration                                 
+! Description: Computation of the time step duration (dt) according to 
+!              stability constraints (CFL condition, viscosity term stability 
+!              criterion, interface diffusion criterion -not recommended-). 
 !              Plus, a special treatment for Monaghan artificial viscosity term 
-!              and management of low-velocity SPH mixture particles for bed-load
-!              transport phenomena.
+!              and management of low-velocity SPH mixture particles for 
+!              bed-load transport phenomena.
 !-------------------------------------------------------------------------------
-subroutine rundt2
+subroutine time_step_duration
 !------------------------
 ! Modules
 !------------------------ 
@@ -51,7 +51,7 @@ double precision :: dt_Mon_j,dt_Mon
 !------------------------
 ! Initializations
 !------------------------
-dtmin = 1.0d+30                                              
+dtmin = 1.d30                                              
 diffmax = zero
 dt_Mon = max_positive_number 
 !------------------------
@@ -62,9 +62,9 @@ if (indarrayFlu==0) then
    dt = 0.d0
    else
 ! Time step depends on 3 stability criteria:
-! 1) CFL criterion: dt_CFL=CFL*(2h/(c+U))
-! 2) viscous term criterion: dt_vis=vsc_coeff*(rho*h**2/(0.5*mu)) 
-! 3) interface diffusion criterion: dt_diff=(h**2/2*teta)
+! 1) CFL criterion: dt_CFL<=CFL*(2h/(c+U))
+! 2) viscous term criterion: dt_vis<=vsc_coeff*(rho*h**2/(0.5*mu)) 
+! 3) interface diffusion criterion: dt_diff<=(h**2/2*teta)
       do ii=1,indarrayFlu
          npi = Array_Flu(ii)
          if ((Granular_flows_options%ID_erosion_criterion==1).and.             &
@@ -100,16 +100,25 @@ if (indarrayFlu==0) then
          endif
       enddo
       if (diffusione) then
-         dt_dif = half * squareh / (diffmax+0.000000001d0)
+         dt_dif = half * squareh / (diffmax+1.d-9)
          dtmin = min(dtmin,dt_dif)
       endif
       if (dt_alfa_Mon.eqv..true.) dtmin = min(dtmin,dt_Mon)
-      dt = (one - pesodt) * dtmin + pesodt * dt_average
+      if (on_going_time_step==0) then
+         dt = dtmin
+         else
+            dt = (one - pesodt) * dtmin + pesodt * dt_average
+      endif
 endif
-dt_average = (dt_average * (on_going_time_step - 1) + dt) / on_going_time_step
+if (on_going_time_step==0) then
+   dt_average = dt
+   else
+      dt_average = (dt_average * (on_going_time_step - 1) + dt) /              &
+                   on_going_time_step
+endif
 !------------------------
 ! Deallocations
 !------------------------
 return
-end subroutine rundt2
+end subroutine time_step_duration
 

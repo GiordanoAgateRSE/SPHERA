@@ -88,8 +88,8 @@ do isi=1,NumBSides
       partz(irz)%vel(2) = RowVelocity(i_source) * nn(2)
       partz(irz)%vel(3) = RowVelocity(i_source) * nn(3)
       pinttimeratio = -1
-   end if 
-end do
+   endif 
+enddo
 !------------------------
 ! Deallocations
 !------------------------

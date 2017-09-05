@@ -99,7 +99,7 @@ do npi = 1,DBSPH%n_w
 ! Distance check
               if (rijtemp > doublesquareh) cycle
               rijtemp2 = rijtemp
-              rij_su_h = Dsqrt(rijtemp) / Domain%h
+              rij_su_h = dsqrt(rijtemp) / Domain%h
               rij_su_h_quad = rijtemp2 / squareh
               index_rij_su_h = int(rij_su_h)
 ! Kernel computation
@@ -129,7 +129,7 @@ end do
 if (DBSPH%n_monitor_regions==1) then
    write(nomefilectl_wall,"(a,a,i8.8,a)") nomecaso(1:len_trim(nomecaso)),      &
                                           '_wall_Fx_',on_going_time_step,".txt"
-   open (unit_dbsph_Fx,file=nomefilectl_wall,status="unknown",form="formatted")
+   open(unit_dbsph_Fx,file=nomefilectl_wall,status="unknown",form="formatted")
    write (unit_dbsph_Fx,*) "Force "
    write (unit_dbsph_Fx,'(1x,2(a,10x))') " Time(s)","Fx(kgm/s^2)"
    call flush(unit_dbsph_Fx)
@@ -153,7 +153,7 @@ endif
 if (DBSPH%n_monitor_regions==1) then
    write(nomefilectl_wall,"(a,a,i8.8,a)") nomecaso(1:len_trim(nomecaso)),      &
       '_wall_region_',on_going_time_step,".txt"
-   open (unit_dbsph_se_reg,file=nomefilectl_wall,status="unknown",             &
+   open(unit_dbsph_se_reg,file=nomefilectl_wall,status="unknown",              &
       form="formatted")
    write (unit_dbsph_se_reg,*) "Wall element values "
    write (unit_dbsph_se_reg,'(1x,2(a,10x),3(a,8x),3(a,5x),a,7x,a)')            &
@@ -180,7 +180,7 @@ endif
 if (DBSPH%n_monitor_points>0) then
    write(nomefilectl_wall,"(a,a,i8.8,a)") nomecaso(1:len_trim(nomecaso)),      &
       '_wall_IDs_',on_going_time_step,".txt"
-   open (unit_dbsph_se_ID,file=nomefilectl_wall,status="unknown",              &
+   open(unit_dbsph_se_ID,file=nomefilectl_wall,status="unknown",               &
       form="formatted")
    write (unit_dbsph_se_ID,*) "Wall element values "
    write (unit_dbsph_se_ID,'(1x,2(a,10x),3(a,8x),3(a,5x),a,7x,a)')             &

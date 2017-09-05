@@ -116,7 +116,7 @@ do contj=1,nPartIntorno(npi)
       if (rijtemp>doublesquareh) cycle
 ! Saving inter-particle distance 
       rijtemp2 = rijtemp
-      rijtemp = Dsqrt(rijtemp)
+      rijtemp = dsqrt(rijtemp)
       rij_su_h = rijtemp / Domain%h
       rij_su_h_quad = rijtemp2 / squareh
       index_rij_su_h = int(rij_su_h)

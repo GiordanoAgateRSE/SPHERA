@@ -18,12 +18,10 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
-
 !-------------------------------------------------------------------------------
 ! Program unit: stoptime                                          
 ! Description: Stopping time.
 !-------------------------------------------------------------------------------
-
 subroutine stoptime(partzlocal,tstop)
 !------------------------
 ! Modules
@@ -110,7 +108,7 @@ if (partzlocal%move=="fix") then
                      rad  = partzlocal%vlaw(icord,k-1) *                       &
                         partzlocal%vlaw(icord,k-1) - 4.0d0 * 0.5d0 * acc * dspo
                      if (rad>=zero) then
-                        rad = Dsqrt(rad)  
+                        rad = dsqrt(rad)  
                         deltat = (partzlocal%vlaw(icord,k-1) + rad) / (2.d0 *  &
                            0.5d0 * acc)
                         else
@@ -136,7 +134,7 @@ if (partzlocal%move=="fix") then
                   rad = partzlocal%vlaw(icord,k-1) * partzlocal%vlaw(icord,k-1)&
                      - 4.0d0 * 0.5d0 * acc * dspo
                   if (rad>=zero) then
-                     rad = Dsqrt(rad)  
+                     rad = dsqrt(rad)  
                      deltat = (-partzlocal%vlaw(icord,k-1) + rad) / (2.d0 *    &
                         0.5d0 * acc)
                      else

@@ -84,7 +84,7 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph"))  then
          write(nout,'(1x,a)')                                                  &
             "   Array BoundaryDataPointer successfully allocated "
    endif
-   if (Ncord==2) then
+   if (ncord==2) then
       write(nout,'(a,i15)') "     Max num of close boundary sides: MaxNcbs = ",&
          MaxNcbs
       allocate(BoundaryDataTab(1:MaxNcbs),stat=ier)
@@ -110,7 +110,7 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph"))  then
          endif
    endif
 endif
-NMAXPARTJ = Domain%COEFNMAXPARTJ * (Domain%h * four / Domain%dx) ** Ncord
+NMAXPARTJ = Domain%COEFNMAXPARTJ * (Domain%h * four / Domain%dx) ** ncord
 write(nout,'(2a,i15)') "     Maximum number of neighbouring particles: ",      &
    "NMAXPARTJ = ",NMAXPARTJ
 allocate(Array_Flu(1:PARTICLEBUFFER),stat=ier)
@@ -406,20 +406,20 @@ write(nout,*) "Transient loop begins..."
 write(nout,*)
 ! To initialize the post-processing file 
 if ((Domain%imemo_fr>0).OR.(Domain%memo_fr>zero)) then
-   open (nres,file=nomefile(2),status="unknown",access="sequential"            &
+   open(nres,file=nomefile(2),status="unknown",access="sequential"             &
       ,form="unformatted")
    else
       nres = -nres
 endif
 if ((Domain%ipllb_fr>0).OR.(Domain%pllb_fr>zero)) then
-   open (nplb,file=nomefile(4),status="unknown",access="sequential",           &
+   open(nplb,file=nomefile(4),status="unknown",access="sequential",            &
       form="formatted")
    write(nplb,"(a)") "time          free_surface_quota"
    else
       nplb = - nplb
 endif
 if ((Domain%imemo_fr>0).OR.(Domain%memo_fr>zero)) then
-   open (nfro,file=nomefile(5),status="unknown",access="sequential"            &
+   open(nfro,file=nomefile(5),status="unknown",access="sequential"             &
       ,form="formatted")
    write(nfro,"(a)") "time          x fronte      (y fronte)    z fronte"
    else
@@ -429,7 +429,7 @@ endif
 if (vtkconv) then
    prefix = nomecaso
    filevtk = "VTKConverter_"//prefix(1:len_trim(prefix))//"_domain.vtk"
-   open (unit=unitvtk,file=filevtk,form='formatted',access='sequential',       &
+   open(unit=unitvtk,file=filevtk,form='formatted',access='sequential',        &
       status='unknown')
    write(unitvtk,'(a)') '# vtk DataFile Version 2.0'
    write(unitvtk,'(a,a)') 'Domain limits for the case:',                       &
@@ -690,7 +690,7 @@ endif
 if (vtkconv) then
    prefix = nomecaso
    filevtk = "VTKConverter_"//prefix(1:len_trim(prefix))//".pvd"
-   open (unit=unitvtk,file=filevtk,form='formatted',access='sequential',       &
+   open(unit=unitvtk,file=filevtk,form='formatted',access='sequential',        &
       status='unknown')
    write(unitvtk,'(a)') '<?xml version="1.0"?>'
    write(unitvtk,'(2a)') '<VTKFile type="Collection" version="0.1" ',          &
@@ -722,7 +722,7 @@ endif
 if ((Domain%tipo=="bsph").and.(DBSPH%n_w>0)) then
    if (vtkconv) then
       filevtk = "VTKConverter_wall_"//prefix(1:len_trim(prefix))//".pvd"
-      open (unit=unitvtk,file=filevtk,form='formatted',access='sequential',    &
+      open(unit=unitvtk,file=filevtk,form='formatted',access='sequential',     &
          status='unknown')
       write(unitvtk,'(a)') '<?xml version="1.0"?>'
       write(unitvtk,'(2a)') '<VTKFile type="Collection" version="0.1" ',       &
@@ -755,7 +755,7 @@ if (n_bodies>0) then
 ! Creation of the .pvd file for body particles (Body Transport)
    if (vtkconv) then
       filevtk = "VTKConverter_body-part_"//prefix(1:len_trim(prefix))//".pvd"
-      open (unit=unitvtk,file=filevtk,form='formatted',access='sequential',    &
+      open(unit=unitvtk,file=filevtk,form='formatted',access='sequential',     &
          status='unknown')
       write(unitvtk,'(a)') '<?xml version="1.0"?>'
       write(unitvtk,'(2a)') '<VTKFile type="Collection" version="0.1" ',       &
@@ -786,7 +786,7 @@ stringa(1:len_trim(stringa))//cargo(1:len_trim(cargo))//'" file="'//filename(1:l
 ! Creation of the .pvd file for bodies (Body Transport)
    if (vtkconv) then
       filevtk = "VTKConverter_body_"//prefix(1:len_trim(prefix))//".pvd"
-      open (unit=unitvtk,file=filevtk,form='formatted',access='sequential',    &
+      open(unit=unitvtk,file=filevtk,form='formatted',access='sequential',     &
          status='unknown')
       write(unitvtk,'(a)') '<?xml version="1.0"?>'
       write(unitvtk,'(2a)') '<VTKFile type="Collection" version="0.1" ',       &

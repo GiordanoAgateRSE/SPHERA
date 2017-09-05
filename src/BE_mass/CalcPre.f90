@@ -120,8 +120,8 @@ end subroutine CalcPre
 ! amachnumb2 = vmod2 / cel2
 !
 ! if ( amachnumb2 > amaxnmach2 )then    ! -------------------------------
-!    amachnumb = Dsqrt(amachnumb2)
-!!   pg(k)%vel(:)=(amaxnmach*celmax/Dsqrt(vmod2))*pg(k)%vel(:) 
+!    amachnumb = dsqrt(amachnumb2)
+!!   pg(k)%vel(:)=(amaxnmach*celmax/dsqrt(vmod2))*pg(k)%vel(:) 
 ! end if        ! -------------------------------
 !
 !return

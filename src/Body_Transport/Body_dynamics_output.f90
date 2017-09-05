@@ -93,7 +93,7 @@ enddo
 ! File creation and heading
 write(nomefilectl_Body_dynamics,"(a,a,i8.8,a)") nomecaso(1:len_trim(nomecaso)),&
    '_Body_dynamics_',on_going_time_step,".txt"
-open (ncpt,file=nomefilectl_Body_dynamics,status="unknown",form="formatted")
+open(ncpt,file=nomefilectl_Body_dynamics,status="unknown",form="formatted")
 if (on_going_time_step==1) then
    write (ncpt,*) "Body dynamics values "
    write (ncpt,                                                                &
@@ -122,7 +122,7 @@ close(ncpt)
 ! Monitoring the surface body particles
 write(nomefilectl_Body_particles,"(a,a,i8.8,a)")                               &
    nomecaso(1:len_trim(nomecaso)),'_Body_particles_',on_going_time_step,".txt"
-open (ncpt,file=nomefilectl_Body_particles,status="unknown",form="formatted")
+open(ncpt,file=nomefilectl_Body_particles,status="unknown",form="formatted")
 if (on_going_time_step==1) then
    write (ncpt,*) " Body particle parameters"
    write (ncpt,'((7x,a),(3x,a),(7x,a),3(10x,a),3(8x,a),(6x,a),4(1x,a))')       &

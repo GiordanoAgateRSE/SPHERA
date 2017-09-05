@@ -266,7 +266,7 @@ do while (TRIM(lcase(ainp))/="##### end boundaries #####")
          call ReadInputParticlesData(NumberEntities,Medium,icolor,bends,move,  &
             slip,npointv,valuev,values3,pressu,valp,ainp,comment,nrighe,ier,   &
             ninp,nout)
-         if (ier/=0) return  
+         if (ier/=0) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          if (ioerr==0) read(ainp,*,iostat=ioerr) IC_source_type,Car_top_zone,  &
             DBSPH_fictitious_reservoir_flag

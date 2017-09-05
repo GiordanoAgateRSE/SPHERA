@@ -66,7 +66,7 @@ do i=1,nlines
 ! and in the same background cell: computation of their averaged position.
       nPartCel = 0
       PartCelnum = 0
-      PartCel = 99999
+      PartCel = 99999.d0
 ! Loop over the cell particles 
       do mm = Icont(ncel),Icont(ncel+1)-1  
          jj = NPartOrd(mm)
@@ -77,10 +77,11 @@ do i=1,nlines
                              + ragtemp(3) * ragtemp(3)
       enddo
       minpos1 = minloc(PartCel,1)
-      PartCel(minpos1) = 9999.
+      PartCel(minpos1) = 9999.d0
       minpos2 = minloc(PartCel,1)
       pelolib(1:3,i) = (pg(PartCelnum(minpos1(1)))%coord(1:3) +                &
-                       pg(PartCelnum(minpos2(1)))%coord(1:3)) * half
+                       pg(PartCelnum(minpos2(1)))%coord(1:3)) * half +         &
+                       Domain%dx / 2.d0
    enddo
 enddo
 write(nplb,'(30g14.7)') simulation_time,pelolib

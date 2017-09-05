@@ -137,7 +137,7 @@ do ne=1,NumBEdges
       do sd=1,SPACEDIM
          edgedist2 = edgedist2 + QP(sd) * QP(sd)
       enddo
-      zi = Dsqrt(edgedist2)
+      zi = dsqrt(edgedist2)
       if (zi<zimin) then
          vin = zero
          QPcosdir(:) = QP(:) / zi

@@ -43,7 +43,6 @@ integer(4),dimension(20) :: NumberEntities
 double precision :: eps_f
 character(len=lencard) :: nomsub = "GEST_INPUT"
 character(len=lencard) :: ainp,msg_err
-character(10), external :: ltrim
 character(100), external :: lcase
 !------------------------
 ! Explicit interfaces

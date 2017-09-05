@@ -128,7 +128,7 @@ do kf=1,NBFfin
                            BoundaryConvexEdge(NumBEdges)%component(sd) = delta
                            length2 = length2 + delta * delta
                         enddo
-                        BoundaryConvexEdge(NumBEdges)%length = Dsqrt(length2)
+                        BoundaryConvexEdge(NumBEdges)%length = dsqrt(length2)
 !$omp end critical (omp_FBCE3D)
                         EdgeFound = .True.
                         exit 

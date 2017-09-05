@@ -207,7 +207,7 @@ do npi=1,n_body_part
                      write(file_name_test,"(a,a,i8.8,a,i8.8,a,i8.8,a)")        &
                         nomecaso(1:len_trim(nomecaso)),'_close_impact_',       &
                         on_going_time_step,'_',npi,'_',npj,".txt"
-                     open (60,file=file_name_test,status="unknown",            &
+                     open(60,file=file_name_test,status="unknown",             &
                         form="formatted")
                      write (60,                                                &
               '((10x,a),4(11x,a),(2x,a),(9x,a),(6x,a),(4x,a),(9x,a),3(11x,a))')&

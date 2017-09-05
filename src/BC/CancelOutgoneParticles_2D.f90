@@ -66,10 +66,10 @@ do ios=1,NumOpenSides
       OP1(pd) = Vertice(acix(pd),v1)
       OP2(pd) = Vertice(acix(pd),v2)
    enddo
-!$omp parallel do default(none) &
+!$omp parallel do default(none)                                                &
+!$omp shared(nag,pg,acix,OP1,OP2,OpCount)                                      &
 !$omp private(npi,ios,Plocalnew,Plocalold,detV1PnewV2,detV1PoldV2)             &
-!$omp private(detPoldV1Pnew,detPoldV2Pnew)                                     &
-!$omp shared(nag,pg,acix,OP1,OP2,OpCount)
+!$omp private(detPoldV1Pnew,detPoldV2Pnew)
 ! Loop over all the particles
    do npi=1,nag
       if (pg(npi)%cella==0) cycle
@@ -94,7 +94,9 @@ do ios=1,NumOpenSides
                          ) - (op2(1) - plocalold(1)) * (plocalnew(2) -         &
                          plocalold(2))
          if (sign(one,detPoldV1Pnew)==sign(one,detPoldV2Pnew)) cycle
+!$omp critical (omp_outgone_particle_counting_2D)
          OpCount(pg(npi)%imed) = OpCount(pg(npi)%imed) + 1 
+!$omp end critical (omp_outgone_particle_counting_2D)
          pg(npi)%cella = -1
       endif
    enddo

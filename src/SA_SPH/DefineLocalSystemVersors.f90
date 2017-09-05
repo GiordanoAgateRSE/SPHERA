@@ -80,13 +80,13 @@ U1(1:SPACEDIM) = BoundaryFace(Nf)%Node(nindex(sidek,1))%GX(1:SPACEDIM) -       &
 U2(1:SPACEDIM) = BoundaryFace(Nf)%Node(nindex(sidek,2))%GX(1:SPACEDIM) -       &
    BoundaryFace(Nf)%Node(nindex(sidek,3))%GX(1:SPACEDIM)
 ! Length of side U1
-U1len = Dsqrt(U1(1) * U1(1) + U1(2) * U1(2) + U1(3) * U1(3)) 
+U1len = dsqrt(U1(1) * U1(1) + U1(2) * U1(2) + U1(3) * U1(3)) 
 ! To compute directional cosines of side W12
 RR(1:SPACEDIM) = U1(1:SPACEDIM) / U1len     
 ! Vector product W12=W12xU2 
 call Vector_Product(U1,U2,W12,SPACEDIM) 
 ! Length of vector W12
-W12len = Dsqrt(W12(1) * W12(1) + W12(2) * W12(2) + W12(3) * W12(3))
+W12len = dsqrt(W12(1) * W12(1) + W12(2) * W12(2) + W12(3) * W12(3))
 ! Area of the face "nf" (denominator=2 for triangles, =1 for parallelograms) 
 ! The estimation of pentagon and hexagon face areas is not mandatory as they are
 ! only considered for "perimeter" zones, not for SASPH frontiers.

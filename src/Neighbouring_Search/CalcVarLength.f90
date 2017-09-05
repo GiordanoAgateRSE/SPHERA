@@ -202,7 +202,7 @@ loop_nag: do npi=1,nag
                endif
                PartIntorno(npartint) = npj
                rijtemp2 = rijtemp
-               rijtemp = Dsqrt(rijtemp)
+               rijtemp = dsqrt(rijtemp)
                rij_su_h = rijtemp / Domain%h
                rij_su_h_quad = rijtemp2 / squareh
                index_rij_su_h = int(rij_su_h)
@@ -370,7 +370,7 @@ loop_nag: do npi=1,nag
 ! Savings
                   PartIntorno_fw(npartint) = npj
                   rijtemp2 = rijtemp
-                  rij_su_h = Dsqrt(rijtemp) / Domain%h
+                  rij_su_h = dsqrt(rijtemp) / Domain%h
                   rij_su_h_quad = rijtemp2 / squareh
                   index_rij_su_h = int(rij_su_h)
                   rag_fw(1:3,npartint) = ragtemp(1:3)
@@ -392,7 +392,7 @@ loop_nag: do npi=1,nag
                      (1.3d0*Domain%dx+pg_w(npj)%weight/2.d0)) then
                      pg_w(npj)%wet = 1
                   endif
-                  denom = one / (Dsqrt(rijtemp) + eta)
+                  denom = one / (dsqrt(rijtemp) + eta)
                   gradmod = -two * rij_su_h + 1.5d0 * rij_su_h_quad
                   if (index_rij_su_h>0) then
                      gradmod = - gradmod + rij_su_h_quad - two
@@ -849,7 +849,7 @@ if (n_bodies>0) then
                   PartIntorno_bp_f(npartint) = npj
 ! Relative distance
                   rijtemp2 = rijtemp
-                  rijtemp = Dsqrt(rijtemp)
+                  rijtemp = dsqrt(rijtemp)
                   rij_su_h = rijtemp / Domain%h
                   rij_su_h_quad = rijtemp2 / squareh
                   index_rij_su_h = int(rij_su_h)

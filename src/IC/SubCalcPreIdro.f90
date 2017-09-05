@@ -56,7 +56,7 @@ integer(4),external :: CellNumber,ParticleCellNumber,CellIndices
 !------------------------
 ! To evaluate the absolute value of gravity and the unity vector aligned with 
 ! the vertical direction.
-gravmod = Dsqrt(Domain%grav(1) * Domain%grav(1) + Domain%grav(2) *             &
+gravmod = dsqrt(Domain%grav(1) * Domain%grav(1) + Domain%grav(2) *             &
           Domain%grav(2) + Domain%grav(3) * Domain%grav(3))
 if (gravmod>zero) then
    coshor = - Domain%grav(3) / gravmod
