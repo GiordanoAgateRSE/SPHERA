@@ -23,7 +23,7 @@
 ! Description: To calculate the array to store close boundaries and integrals.
 !              (Di Monaco et al., 2011, EACFM)                        
 !-------------------------------------------------------------------------------
-subroutine ComputeBoundaryDataTab 
+subroutine ComputeBoundaryDataTab
 !------------------------
 ! Modules
 !------------------------ 
@@ -72,12 +72,12 @@ if (ncord==2) then
 !$omp private(xpmin,xpmax,interlen,Ncols,Colmn,deltai,Func,ypi)                &
 !$omp private(IntWdS,IntWdV,IntDpWdV,IntWdV1,IntWd1s0,IntWd3s0,IntWd1s2)       &
 !$omp shared(nag,pg,Domain,BoundaryDataTab,BoundaryDataPointer,MaxNcbs,nomsub) &
-!$omp shared(nout,nscr,BoundarySide,squareh)
+!$omp shared(BoundarySide,squareh)
    do npi=1,nag
       if (pg(npi)%cella==0.or.pg(npi)%vel_type/="std") cycle
 ! Searching for the boundary sides, which are the nearest the current          
 ! particle "npi"
-      call FindCloseBoundarySides2D (npi,Ncbs, Cloboside, LocXY)
+      call FindCloseBoundarySides2D(npi,Ncbs,Cloboside,LocXY)
 ! Some nearest boundaries have been detected
       if (Ncbs>0) then
 ! To select the boundary sides that effectively contribute to the 
@@ -95,7 +95,7 @@ if (ncord==2) then
                if (ibdt>MaxNcbs) then
                   call diagnostic(arg1=8,arg2=1,arg3=nomsub)
                endif
-               BoundaryDataTab(ibdt)%CloBoNum  = Intboside(icbs)
+               BoundaryDataTab(ibdt)%CloBoNum = Intboside(icbs)
                BoundaryDataTab(ibdt)%LocXYZ(1:PLANEDIM) =                      &
                   IntLocXY(1:PLANEDIM,icbs)
                BoundaryDataTab(ibdt)%LocXYZ(3) = zero
@@ -171,8 +171,8 @@ if (ncord==2) then
 !$omp parallel do default(none)                                                &
 !$omp private(npi,Ncbf,Cloboface,LocX,Nfzn,icbf,ibdt)                          &
 !$omp private(IntWdV,IntdWrm1dV,IntGWZrm1dV,IntGWdV,IntGWrRdV)                 &
-!$omp shared(nag,pg,BoundaryDataTab,BoundaryDataPointer,EpCount,MaxNcbf,nout)  &
-!$omp shared(nscr,nomsub,Domain)
+!$omp shared(nag,pg,BoundaryDataTab,BoundaryDataPointer,EpCount,MaxNcbf)       &
+!$omp shared(nomsub,Domain)
       loop_particle: do npi=1,nag
          if (pg(npi)%cella==0.or.pg(npi)%vel_type/="std") cycle loop_particle
 ! Searching for the boundary faces, which are the nearest the current          
@@ -184,7 +184,9 @@ if (ncord==2) then
 ! Some nearest boundaries have been detected
 ! EpCount counts particles exited from the frontier, but still within the grid
                if (Nfzn==Ncbf) then
+!$omp critical (omp_ComputeBoundaryDataTab)
                   EpCount(pg(npi)%imed) = EpCount(pg(npi)%imed) + 1
+!$omp end critical (omp_ComputeBoundaryDataTab)
                endif
                BoundaryDataPointer(1,npi) = Ncbf
                BoundaryDataPointer(2,npi) = 0

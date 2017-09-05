@@ -242,9 +242,9 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
 ! Possible imposed velocities
 ! Stop particles belonging to a rigid block and moving with a fixed 
 ! velocity.
-! One may loop over particles instead of over zones
+! One might loop over particles instead of over zones
       if (Domain%tipo=="semi") then
-         do ir = 1,NPartZone 
+         do ir=1,NPartZone 
             if (Partz(ir)%move/="fix") cycle
 ! It assigns the movement with an imposed kinematics ("npointv" velocity data)
             if (Partz(ir)%npointv>1) then
@@ -354,9 +354,8 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
       call start_and_stop(2,6)
       Ncbf_Max = 0
 !$omp parallel do default(none)                                                &
-!$omp private(npi,ii,tpres,tdiss,tvisc,ncbf,boundreaction)                     &
-!$omp shared(nag,pg,Domain,BoundaryDataPointer,Ncbf_Max,indarrayFlu,Array_Flu) &
-!$omp shared(it,Med,Granular_flows_options)
+!$omp private(npi,ii,tpres,tdiss,tvisc,Ncbf,BoundReaction)                     &
+!$omp shared(pg,Domain,BoundaryDataPointer,Ncbf_Max,indarrayFlu,Array_Flu,Med)
 ! Loop over particles
       do ii = 1,indarrayFlu
          npi = Array_Flu(ii)
@@ -378,7 +377,9 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
                Ncbf = 0
          endif
          if ((Domain%tipo=="semi").and.(Ncbf>0)) then
+!$omp critical (omp_Ncbf_Max)
                Ncbf_Max = max(Ncbf_Max,Ncbf)
+!$omp end critical (omp_Ncbf_Max)
                call AddBoundaryContributions_to_ME3D(npi,Ncbf,tpres,tdiss,tvisc)
                if (pg(npi)%kodvel==0) then
                   BoundReaction = zero
@@ -425,7 +426,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
             dtvel = half * (dt + dt_previous_step) 
 !$omp parallel do default(none)                                                &
 !$omp private(npi,ii)                                                          &
-!$omp shared(nag,Pg,dtvel,indarrayFlu,Array_Flu)
+!$omp shared(pg,dtvel,indarrayFlu,Array_Flu)
             do ii=1,indarrayFlu
                npi = Array_Flu(ii)
 ! kodvel = 0: the particle is internal to the domain. 
@@ -462,7 +463,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
             call start_and_stop(2,7)
             call velocity_smoothing
 !$omp parallel do default(none) private(npi,ii,TetaV1)                         &
-!$omp shared(nag,Pg,Med,Domain,dt,indarrayFlu,Array_Flu,esplosione)
+!$omp shared(pg,Med,Domain,dt,indarrayFlu,Array_Flu,esplosione)
 ! Loop over all the active particles
             do ii=1,indarrayFlu
                npi = Array_Flu(ii)
@@ -660,8 +661,10 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
             BCtorodivV = zero
             Ncbf = BoundaryDataPointer(1,npi)
 ! Detecting the faces with actual contributions
-            if (Ncbf>0) then        
-               Ncbf_Max = max(Ncbf_Max, Ncbf)
+            if (Ncbf>0) then
+!$omp critical (omp_Ncbf_Max_2)
+               Ncbf_Max = max(Ncbf_Max,Ncbf)
+!$omp end critical (omp_Ncbf_Max_2)
                call AddBoundaryContribution_to_CE3D(npi,Ncbf,BCtorodivV)
             endif
             if (pg(npi)%koddens==0) then
@@ -674,7 +677,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
              endif
           enddo
 !$omp end parallel do
-      endif  
+      endif
       if (Ncbf_Max>Domain%MAXCLOSEBOUNDFACES) then
          write (nout,"(a,i5,a,i5)")                                            &
             "Increase parameter MAXCLOSEBOUNDFACES from "                      &
@@ -689,7 +692,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
          elseif (Domain%time_split==1) then 
 ! Leapfrog scheme
 !$omp parallel do default(none) private(npi,ii)                                &
-!$omp shared(nag,pg,dt,indarrayFlu,Array_Flu,Domain,med)
+!$omp shared(pg,dt,indarrayFlu,Array_Flu,Domain,Med)
             do ii=1,indarrayFlu
                npi = Array_Flu(ii)
                if (pg(npi)%cella==0.or.pg(npi)%vel_type/="std") cycle
@@ -699,10 +702,10 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
                   if (Domain%tipo=="semi") pg(npi)%dens = pg(npi)%dens + dt *  &
                      pg(npi)%dden
                   if (Domain%density_thresholds==1) then        
-                     if (pg(npi)%dens<(0.9d0*med(pg(npi)%imed)%den0))          &
-                        pg(npi)%dens = 0.9d0*med(pg(npi)%imed)%den0
-                     if (pg(npi)%dens>(1.1d0*med(pg(npi)%imed)%den0))          &
-                        pg(npi)%dens = 1.1d0 * med(pg(npi)%imed)%den0
+                     if (pg(npi)%dens<(0.9d0*Med(pg(npi)%imed)%den0))          &
+                        pg(npi)%dens = 0.9d0*Med(pg(npi)%imed)%den0
+                     if (pg(npi)%dens>(1.1d0*Med(pg(npi)%imed)%den0))          &
+                        pg(npi)%dens = 1.1d0 * Med(pg(npi)%imed)%den0
                   endif
                   pg(npi)%densass = zero
 ! Boundary type is "velocity" or "source"

@@ -133,7 +133,7 @@ select case (kernel)
             JdWsRn = zero
       end Select
    case default
-end Select
+end select
 !------------------------
 ! Deallocations
 !------------------------

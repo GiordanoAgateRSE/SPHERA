@@ -70,9 +70,9 @@ endif
 !$omp parallel do default(none)                                                &
 !$omp private(npi,ii,Nsp,DiffP,p0i,pi,sompW,Appunity)                          &
 !$omp private(j,npartint,npj,pesoj,Ncbf,ibdt,icbf,ibdp,intWdV)                 &
-!$omp shared(nag,Pg,Med,Domain,nPartIntorno,PartIntorno,NMAXPARTJ,PartKernel)  &
+!$omp shared(pg,Domain,nPartIntorno,PartIntorno,NMAXPARTJ,PartKernel)          &
 !$omp shared(BoundaryDataPointer,BoundaryDataTab,indarrayFlu,Array_Flu)        &
-!$omp shared(sompW_vec,AppUnity_vec,n_bodies,dt)
+!$omp shared(sompW_vec,AppUnity_vec,n_bodies)
 do ii=1,indarrayFlu
    npi = Array_Flu(ii)
 ! Excluding particles close to the face with conditions "flow", "velo" and "sour"
@@ -127,7 +127,7 @@ enddo
 !$omp end parallel do
 !$omp parallel do default(none)                                                &
 !$omp private(npi,ii,smoothpi,TetaP1)                                          &
-!$omp shared(nag,pg,Med,Domain,dt,indarrayFlu,Array_Flu,esplosione)
+!$omp shared(pg,Med,Domain,dt,indarrayFlu,Array_Flu,esplosione)
 do ii=1,indarrayFlu
    npi = Array_Flu(ii)
 ! Excluding particles close to the face with conditions "flow", "velo" and "sour"

@@ -81,16 +81,16 @@ do kf=1,NBFfin
       do kf1 = NBFini,NumFacce
          nf1 = BFaceList(kf1)
          nt1 = BoundaryFace(nf1)%stretch
-         EdgeFound = .False.
+         EdgeFound = .false.
          if ((Tratto(nt1)%tipo=="fixe").or.(Tratto(nt1)%tipo=="tapi")) then
             nodes1 = BoundaryFace(nf1)%nodes
             fk1 = nodes1 - 2
             do i=1,nodes
-               j = iseg(fk, i)
+               j = iseg(fk,i)
                nodi = BoundaryFace(nf)%node(i)%name 
                nodj = BoundaryFace(nf)%node(j)%name 
                do ii=1,nodes1
-                  jj = iseg(fk1, ii)
+                  jj = iseg(fk1,ii)
                   nodii = BoundaryFace(nf1)%node(ii)%name 
                   nodjj = BoundaryFace(nf1)%node(jj)%name 
                   if (((nodi==nodii).and.(nodj==nodjj)).or.((nodi==nodjj).and. &
@@ -129,9 +129,9 @@ do kf=1,NBFfin
                            length2 = length2 + delta * delta
                         enddo
                         BoundaryConvexEdge(NumBEdges)%length = dsqrt(length2)
+                        EdgeFound = .true.
 !$omp end critical (omp_FBCE3D)
-                        EdgeFound = .True.
-                        exit 
+                        exit
                      endif
                   endif
                enddo

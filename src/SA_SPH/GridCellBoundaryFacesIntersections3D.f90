@@ -123,7 +123,7 @@ do nc=1,Grid%nmax
          (Tratto(BoundaryFace(nf)%stretch)%tipo/="pool")) then
          nodes = BoundaryFace(nf)%nodes
 ! First phase of exclusion 
-         Found = .True.
+         Found = .true.
          do sd=1,SPACEDIM
             Signcount(-2:2) = 0
 ! Loop over the face vertices (3 or 4)
@@ -143,11 +143,11 @@ do nc=1,Grid%nmax
             enddo
             if (((Signcount(-2)+Signcount(-1))==nodes).and.                    &
                (.not.(Signcount(-1)==nodes))) then
-               Found = .False.
+               Found = .false.
                exit
                elseif (((Signcount(2)+Signcount(1))==nodes).and.               &
                   (.not.(Signcount(1)==nodes))) then
-                  Found = .False.
+                  Found = .false.
                   exit
             endif
          enddo
@@ -193,13 +193,13 @@ do nc=1,Grid%nmax
          endif
       endif
    enddo
-!$omp critical (cs_GridCellBoundaryFacesIntersections3D)
+!$omp critical (omp_GridCellBoundaryFacesIntersections3D)
    do i_flpointer=1,flpointer_cell    
       flpointer = flpointer + 1
       GCBFVector_aux(flpointer) = GCBFVector_cell(i_flpointer)
       if (i_flpointer==1) GCBFPointers(nc,2) = flpointer
    enddo
-!$omp end critical (cs_GridCellBoundaryFacesIntersections3D)
+!$omp end critical (omp_GridCellBoundaryFacesIntersections3D)
 ! Deallocate the auxiliary array
    deallocate(GCBFVector_cell)
 enddo
@@ -222,7 +222,7 @@ do i=1,GCBFVecDim
 ! Copy the auxiliary array in the reference array
    GCBFVector(i) = GCBFVector_aux(i)
 enddo
-!$omp end parallel do  
+!$omp end parallel do
 !------------------------
 ! Deallocations
 !------------------------

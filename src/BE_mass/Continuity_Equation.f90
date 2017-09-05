@@ -96,7 +96,7 @@ do npi=1,nag
                 (dvar(1)*rag(1,npartint) + dvar(2)*rag(2,npartint) +           &
                 dvar(3)*rag(3,npartint))
          else
-            appo = rhoi * PartKernel(1,npartint) * (amassj/rhoj) *             &
+            appo = rhoi * PartKernel(1,npartint) * (amassj / rhoj) *           &
                    (dvar(1) * rag(1,npartint) + dvar(2) * rag(2,npartint) +    &
                    dvar(3) * rag(3,npartint))
       endif
