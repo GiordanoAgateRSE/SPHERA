@@ -182,13 +182,13 @@ do nc=1,Grid%nmax
 ! cell "nc" and is counted.
             if (Found) then        
                flpointer_cell = flpointer_cell + 1
-               GCBFVector_cell(flpointer_cell) = nf
-               GCBFPointers(nc,1) = GCBFPointers(nc,1) + 1
                if (flpointer_cell>Domain%MAXCLOSEBOUNDFACES) then
                   write(nout,'(1x,a)')                                         &
 " Too many faces crossing a given cell. Please increase the parameter MAXCLOSEBOUNDFACES. "
                   call diagnostic(arg1=4,arg3=nomsub)
                endif
+               GCBFVector_cell(flpointer_cell) = nf
+               GCBFPointers(nc,1) = GCBFPointers(nc,1) + 1
             endif
          endif
       endif

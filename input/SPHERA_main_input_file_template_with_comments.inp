@@ -42,8 +42,9 @@ dx h/dx r     ! The third parameter ("r") is optional and provides a white noise
 ! In absence of a declared origin, the first vertex is fictitious,  
 ! and does not belong to any boundary (only useful for Paraview) 
 1 Vertex_x Vertex_y Vertex_z              ! (first vertex data) 
-! ...                                     ! (other vertices)
-Last_vertex_ID Vertex_x Vertex_y Vertex_z ! (last vertex data) 
+! ...                                     ! (other vertices; no gaps on vertex 
+                                          ! IDs)
+Last_vertex_ID Vertex_x Vertex_y Vertex_z ! (last vertex data)
 ##### END VERTICES #####
 
 ! If (D==2D): start
@@ -56,7 +57,8 @@ Last_vertex_ID Vertex_x Vertex_y Vertex_z ! (last vertex data)
 ! lines of the boundaries
 1 line_1_vertex_1 ... line_1_vertex last line_1_Boundary_ID
                                            ! first line data
-...                                        ! other records
+...                                        ! other records (no gaps on line 
+                                           ! IDs)
 line_last_ID line_last_vertex_1 ... line_last_vertex_last line_last_Boundary_ID
 ##### END LINES #####
 ! If (D==2D): end
@@ -84,7 +86,7 @@ line_last_ID line_last_vertex_1 ... line_last_vertex_last line_last_Boundary_ID
                                            ! for meaningless vertex IDs (e.g., 
                                            ! 5th and 6th vertices of a 
                                            ! quadrilateral) 
-...                                        ! other records 
+...                                        ! other records; no gaps on face IDs)
 face_last_ID face_last_vertex_1 ... face_last_vertex_6 face_last_Boundary_ID
 ##### END FACES #####
 ! If (D==3D): end
