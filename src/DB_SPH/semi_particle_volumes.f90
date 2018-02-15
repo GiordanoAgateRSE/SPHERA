@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -25,7 +25,7 @@
 subroutine semi_particle_volumes
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
 use I_O_file_module
 use Static_allocation_module
 use Hybrid_allocation_module
@@ -69,7 +69,7 @@ endif
 !------------------------
 ! Loop over the DBSPH surface elements
 !$omp parallel do default(none)                                                &
-!$omp shared(DBSPH,pg_w,ncord,Domain,Med,pg,nout,n_adj_faces_max)              &
+!$omp shared(DBSPH,pg_w,ncord,Domain,Med,pg,ulog,n_adj_faces_max)              &
 !$omp private(aux_scalar,i,j,k_parameter,alfa,alfa_sum,aux_adjacent_faces)     &
 !$omp private(aux_face1,aux_face2,aux_false_hyp,aux_scalar_2,aux_vec)          &
 !$omp private(ID_P_b_iso,ID_P_0_iso)
@@ -103,7 +103,7 @@ DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(pg_w(i)%adjacent_faces(j))%vert_l
       call adjacent_faces_isolated_points(aux_face1,aux_face2,ID_P_0_iso,      &
                                           ID_P_b_iso,aux_false_hyp)
       if (aux_false_hyp.eqv..true.) then
-         write(nout,*) "Error! Two faces are not adjacent, but they should be "&
+         write(ulog,*) "Error! Two faces are not adjacent, but they should be "&
                        ,"(subroutine semi_particle_volume), Face1: ",i,        &
                        " Face2: ",pg_w(i)%adjacent_faces(j),                   &
                        "; the run terminates here."
@@ -138,7 +138,7 @@ end do
 if (allocated(DBSPH%surf_mesh%vertices)) then
    deallocate(DBSPH%surf_mesh%vertices,STAT=dealloc_stat) 
    if (dealloc_stat/=0) then
-      write(nout,*) 'Deallocation of DBSPH%surf_mesh%vertices in ',            &
+      write(ulog,*) 'Deallocation of DBSPH%surf_mesh%vertices in ',            &
                     'DBSPH_find_close_faces failed; the program terminates here'
 ! Stop the main program
       stop 
@@ -147,7 +147,7 @@ endif
 if (allocated(DBSPH%surf_mesh%faces)) then
    deallocate(DBSPH%surf_mesh%faces,STAT=dealloc_stat) 
    if (dealloc_stat/=0) then
-      write(nout,*) 'Deallocation of DBSPH%surf_mesh%faces in ',               &
+      write(ulog,*) 'Deallocation of DBSPH%surf_mesh%faces in ',               &
                     'DBSPH_find_close_faces failed; the program terminates here'
 ! Stop the main program
       stop 

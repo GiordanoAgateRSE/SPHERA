@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -22,15 +22,15 @@
 ! Program unit: s_ctime                
 ! Description:         
 !-------------------------------------------------------------------------------
-subroutine s_ctime(nout)
+subroutine s_ctime
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
+use I_O_file_module
 !------------------------
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: nout
 integer(4),dimension(8) :: dat_array
 character(LEN=8) :: dat
 character(LEN=10) :: ct
@@ -54,7 +54,7 @@ data mesi/"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov",   &
 call DATE_AND_TIME(dat,ct,zone,dat_array)
 date_exec = mesi(dat_array(2))//" "//dat(7:8)//", "//dat(1:4)//          &
             " at "//ct(1:2)//":"//ct(3:4)//":"//ct(5:10)//" "//zone//" GMT"
-write(nout,'(a)') trim(date_exec)
+write(ulog,'(a)') trim(date_exec)
 !------------------------
 ! Deallocations
 !------------------------

@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -25,7 +25,7 @@
 subroutine Gest_Input
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
 use I_O_file_module
 use Static_allocation_module
 use Dynamic_allocation_module
@@ -53,7 +53,7 @@ character(100), external :: lcase
 !------------------------
 ! Initializations
 !------------------------
-write(nout,'(1x,a)') ">> Input data management starts... "
+write(ulog,'(1x,a)') ">> Input data management starts... "
 ! Array deallocation
 call Gest_Dealloc(nomsub)
 ! Spatial dimensionality
@@ -84,27 +84,27 @@ if (exetype=="linux") then
                machine_minute * 60 + machine_second
 endif
 ! Allocations of temporary arrays
-write(nout,'(1x,a)') ">> Temporary storage allocation in routine "//trim(nomsub)
+write(ulog,'(1x,a)') ">> Temporary storage allocation in routine "//trim(nomsub)
 allocate(Vertice(SPACEDIM,1),BoundaryFace(1),Tratto(1),BoundaryVertex(1),      &
    stat=ier)
    if (ier/=0) then
-      write(nout,'(1x,a,i2)')                                                  &
+      write(ulog,'(1x,a,i2)')                                                  &
 "    Arrays VERTICE, BoundaryFace, TRATTO, BOUNDARYVERTEX not allocated. Error code: "&
          ,ier
    call diagnostic(arg1=4,arg3=nomsub)
    else
-      write(nout,'(1x,a)')                                                     &
+      write(ulog,'(1x,a)')                                                     &
 "    Arrays VERTICE, BoundaryFace, TRATTO, BOUNDARYVERTEX successfully allocated "
 endif
 allocate(Partz(1),Med(1),Control_Sections(0:1),Control_Points(1),              &
    Control_Lines(1),stat=ier)
    if (ier/=0) then
-      write(nout,'(1x,a,i2)')                                                  &
+      write(ulog,'(1x,a,i2)')                                                  &
 "    Arrays PARTZ, MED, Control_Sections, Control_Points, Control_Lines not allocated. Error code: "&
          ,ier
       call diagnostic(arg1=4,arg3=nomsub)
       else
-         write(nout,'(1x,a)')                                                  &
+         write(ulog,'(1x,a)')                                                  &
 "    Arrays PARTZ, MED, Control_Sections, Control_Points, Control_Lines successfully allocated "
 endif
 ! Input data reading
@@ -126,28 +126,28 @@ if (InputErr/=0) then
    InputErr = InputErr + 300
    call diagnostic(arg1=5,arg2=InputErr,arg3=msg_err)
 endif
-write(nout,'(1x,a)')                                                           &
+write(ulog,'(1x,a)')                                                           &
    ">Data are read from an ASCII input file in the routine ReadInput"
 ! Deallocations of temporary arrays
-write(nout,'(1x,a)') ">> Deallocation of temporary arrays "
+write(ulog,'(1x,a)') ">> Deallocation of temporary arrays "
 deallocate(Vertice,BoundaryFace,Tratto,BoundaryVertex,stat=ier)
 if (ier/=0) then
-   write(nout,'(1x,a,i2)')                                                     &
+   write(ulog,'(1x,a,i2)')                                                     &
 "    Arrays VERTICE, BoundaryFace, TRATTO, BOUNDARYVERTEX not deallocated. Error code: "&
       ,ier
       call diagnostic(arg1=4,arg3=nomsub)
       else
-         write(nout,'(1x,a)')                                                  &
+         write(ulog,'(1x,a)')                                                  &
 "    Arrays VERTICE, BoundaryFace, TRATTO, BOUNDARYVERTEX successfully deallocated "
 endif
 deallocate(Partz,Med,Control_Sections,Control_Points,Control_Lines,stat=ier)
 if (ier/=0) then
-   write(nout,'(1x,a,i2)')                                                     &
+   write(ulog,'(1x,a,i2)')                                                     &
 "    Arrays PARTZ, MED, Control_Sections, Control_Points, Control_Lines not deallocated. Error code: "&
       ,ier
    call diagnostic(arg1=4,arg3=nomsub)
    else
-      write(nout,'(1x,a)')                                                     &
+      write(ulog,'(1x,a)')                                                     &
 "    Arrays PARTZ, MED, Control_Sections, Control_Points, Control_Lines successfully deallocated "
 endif
 ! A restart procedure has been invoked: restart positioning 
@@ -161,7 +161,7 @@ if ((Domain%istart>0).or.(Domain%start>zero)) then
       ainp = Domain%file
       call diagnostic(arg1=5,arg2=201,arg3=trim(ainp))
       else
-         write(nout,'(1x,a)')                                                  &
+         write(ulog,'(1x,a)')                                                  &
 ">Data are read from the restart file "//trim(Domain%file)//" in the routine ReadRestartFile"
    endif
 ! To restore data from the restart file
@@ -199,17 +199,17 @@ if ((Domain%istart>0).or.(Domain%start>zero)) then
       if (NumberEntities(20)==1) Domain%NormFix = .TRUE.
 endif
 ! Array allocations 
-write(nout,'(1x,a)') ">> Final storage allocation in routine "//trim(nomsub)
+write(ulog,'(1x,a)') ">> Final storage allocation in routine "//trim(nomsub)
 allocate(Vertice(SPACEDIM,max(1,NumVertici)),BoundaryFace(max(1,NumFacce)),    &
    Tratto(max(1,NumTratti)),BoundaryVertex(max(1,NumBVertices)),               & 
    BoundarySide(max(1,NumBSides)),stat=ier)
 if (ier/=0) then
-   write(nout,'(1x,a,i2)')                                                     &
+   write(ulog,'(1x,a,i2)')                                                     &
 "    Arrays VERTICE, BoundaryFace, TRATTO, BOUNDARYVERTEX, BOUNDARYSIDE not allocated. Error code: "&
       ,ier
    call diagnostic(arg1=4,arg3=nomsub)
    else
-      write(nout,'(1x,a)')                                                     &
+      write(ulog,'(1x,a)')                                                     &
 "    Arrays VERTICE, BoundaryFace, TRATTO, BOUNDARYVERTEX, BOUNDARYSIDE successfully allocated "
 endif
 allocate(Partz(NPartZone),Med(NMedium),OpCount(NMedium),SpCount(NMedium),      &
@@ -217,12 +217,12 @@ allocate(Partz(NPartZone),Med(NMedium),OpCount(NMedium),SpCount(NMedium),      &
    Control_Points(max(1,NPointst)),Control_Lines(max(1,NLines)),               &
    Section_Points(1),stat=ier)
 if (ier/=0) then
-   write(nout,'(1x,a,i2)')                                                     &
+   write(ulog,'(1x,a,i2)')                                                     &
 "    Arrays PARTZ, MED, Control_Sections, Control_Points, Control_Lines, Section_Points not allocated. Error code: "&
       ,ier
    call diagnostic(arg1=4,arg3=nomsub)
    else
-      write(nout,'(1x,a)')                                                     &
+      write(ulog,'(1x,a)')                                                     &
 "    Arrays PARTZ, MED, Control_Sections, Control_Points, Control_Lines, Section_Points successfully allocated "
 endif
 rewind(ninp)
@@ -268,22 +268,22 @@ if (.not.restart) then
             if (OnlyTriangle) call ModifyFaces(NumberEntities)
             allocate(BFaceList(NumFacce),stat=ier) 
             if (ier/=0) then
-               write(nout,'(1x,a,i2)')                                         &
+               write(ulog,'(1x,a,i2)')                                         &
                   "    Array BFACELIST not allocated. Error code: ",ier
                call diagnostic(arg1=4,arg3=nomsub)
                else
-                  write(nout,'(1x,a)')                                         &
+                  write(ulog,'(1x,a)')                                         &
                      "    Array BFACELIST successfully allocated "
             endif
             call CompleteBoundaries3D
             call DefineBoundaryFaceGeometry3D
             allocate(BoundaryConvexEdge(1:Domain%MAXNUMCONVEXEDGES),stat=ier)
             if (ier/=0) then
-               write(nout,'(1x,a,i2)')                                         &
+               write(ulog,'(1x,a,i2)')                                         &
                   "   Array BoundaryConvexEdge not allocated. Error code: ",ier
                call diagnostic(arg1=4,arg3=nomsub)
                else
-                  write(nout,'(1x,a)')                                         &
+                  write(ulog,'(1x,a)')                                         &
                      "   Array BoundaryConvexEdge successfully allocated "
             endif
             call FindBoundaryConvexEdges3D
@@ -322,11 +322,11 @@ if (.not.restart) then
                call diagnostic(arg1=10,arg2=5,arg3=nomsub)
          endif   
          if (ier/=0) then
-            write(nout,'(1x,a,i2)') "    Array PG not allocated. Error code: ",&
+            write(ulog,'(1x,a,i2)') "    Array PG not allocated. Error code: ",&
                ier
             call diagnostic(arg1=4,arg3=nomsub)
             else
-               write(nout,'(1x,a)') "    Array PG successfully allocated "
+               write(ulog,'(1x,a)') "    Array PG successfully allocated "
                Pg(:) = PgZero
          endif
       endif
@@ -337,11 +337,11 @@ if (.not.restart) then
                call diagnostic(arg1=10,arg2=5,arg3=nomsub)
          endif   
          if (ier/=0) then
-            write(nout,'(1x,a,i2)')                                            &
+            write(ulog,'(1x,a,i2)')                                            &
                "    Array ts0_pg not allocated. Error code: ",ier
             call diagnostic(arg1=4,arg3=nomsub)
             else
-               write(nout,'(1x,a)') "    Array ts0_pg successfully allocated "
+               write(ulog,'(1x,a)') "    Array ts0_pg successfully allocated "
                ts0_pg(:) = ts_pgZero
          endif
       endif
@@ -373,10 +373,10 @@ if (.not.restart) then
             call diagnostic(arg1=10,arg2=5,arg3=nomsub)
       endif   
       if (ier/=0) then
-         write(nout,'(1x,a,i2)') "    Array PG not allocated. Error code: ",ier
+         write(ulog,'(1x,a,i2)') "    Array PG not allocated. Error code: ",ier
          call diagnostic(arg1=4,arg3=nomsub)
          else
-            write(nout,'(1x,a)') "    Array PG successfully allocated "
+            write(ulog,'(1x,a)') "    Array PG successfully allocated "
             Pg(:) = PgZero
       endif
       if (Domain%tipo=="bsph") then
@@ -387,11 +387,11 @@ if (.not.restart) then
             allocate(NPartOrd_w(DBSPH%n_w+DBSPH%n_inlet+DBSPH%n_outlet),       &
                Icont_w(grid%nmax+1),stat=ier)
             if (ier/=0) then
-               write(nout,*)                                                   &
+               write(ulog,*)                                                   &
                   'Error! Allocation of NPartOrd_w or Icont_w Gest_Input failed'
                call diagnostic(arg1=5,arg2=340)
                else
-                  write(nout,'(1x,a)')                                         &
+                  write(ulog,'(1x,a)')                                         &
                      "Arrays NPARTORD_w and ICONT_w successfully allocated."
                   NPartOrd_w(:) = 0
                   Icont_w(:) = 0
@@ -402,12 +402,12 @@ if (.not.restart) then
             allocate(pg_w(DBSPH%n_w+DBSPH%n_inlet+DBSPH%n_outlet),STAT=        &
                alloc_stat)
             if (alloc_stat/=0) then
-               write(nout,*)                                                   &
+               write(ulog,*)                                                   &
                   'Allocation of pg_w in Gest_Input failed;',                  &
                   ' the program terminates here.'
                stop ! Stop the main program
                else
-                  write (nout,*)                                               &
+                  write(ulog,*)                                                &
                      "Allocation of pg_w in Gest_Input successfully completed."
             endif
          endif
@@ -417,12 +417,12 @@ if (.not.restart) then
          if (.not.allocated(body_arr)) then
             allocate(body_arr(n_bodies),STAT=alloc_stat)
             if (alloc_stat/=0) then
-               write(nout,*)                                                   &
+               write(ulog,*)                                                   &
                   'Allocation of body_arr in Gest_Input failed;',              &
                   ' the program terminates here.'
                stop ! Stop the main program
                else
-                  write (nout,*)                                               &
+                  write(ulog,*)                                                &
                      "Allocation of body_arr in Gest_Input well completed. "
             endif
          endif
@@ -432,12 +432,12 @@ if (.not.restart) then
          if (.not.allocated(bp_arr)) then
             allocate(bp_arr(n_body_part),STAT=alloc_stat)
             if (alloc_stat/=0) then
-               write(nout,*)                                                   &
+               write(ulog,*)                                                   &
                   'Allocation of bp_arr in Gest_Input failed;',                &
                   ' the program terminates here.'
                stop ! Stop the main program
                else
-                  write (nout,*)                                               &
+                  write(ulog,*)                                                &
                      "Allocation of bp_arr in Gest_Input successfully completed"
             endif
          endif
@@ -445,12 +445,12 @@ if (.not.restart) then
          if (.not.allocated(surf_body_part)) then
             allocate(surf_body_part(n_surf_body_part),STAT=alloc_stat)
             if (alloc_stat/=0) then
-               write(nout,*)                                                   &
+               write(ulog,*)                                                   &
                   'Allocation of surf_body_part in Gest_Input failed;',        &
                   ' the program terminates here.'
                stop ! Stop the main program
                else
-                  write (nout,*)                                               &
+                  write(ulog,*)                                                &
                      'Allocation of surf_body_part in Gest_Input',             &
                      ' successfully completed.'
             endif
@@ -463,21 +463,21 @@ if (.not.restart) then
               call diagnostic(arg1=10,arg2=5,arg3=nomsub)
          endif
          if (ier/=0) then
-            write(nout,'(1x,a,i2)')                                            &
+            write(ulog,'(1x,a,i2)')                                            &
                "    Array ts0_pg not allocated. Error code: ",ier
             call diagnostic(arg1=4,arg3=nomsub)
             else
-               write(nout,'(1x,a)') "    Array ts0_pg successfully allocated "
+               write(ulog,'(1x,a)') "    Array ts0_pg successfully allocated "
                ts0_pg(:) = ts_pgZero
          endif
       endif
       allocate(BFaceList(NumFacce),stat=ier)
       if (ier/=0) then
-         write(nout,'(1x,a,i2)')                                               &
+         write(ulog,'(1x,a,i2)')                                               &
             "    Array BFACELIST not allocated. Error code: ",ier
          call diagnostic(arg1=4,arg3=nomsub)
          else
-            write(nout,'(1x,a)') "    Array BFACELIST successfully allocated "
+            write(ulog,'(1x,a)') "    Array BFACELIST successfully allocated "
       endif
       call ReadRestartFile(trim("reading"),ier,nrecords)
       msg_err = trim("reading")
@@ -495,13 +495,13 @@ if (.not.restart) then
 endif
 ! Writing on the log file 
 if (Domain%ioutopt<0) then
-   write(nout,*) 
-   write(nout,*) "======== PARTICLES COORDINATES =========="
+   write(ulog,*) 
+   write(ulog,*) "======== PARTICLES COORDINATES =========="
    do n=1,NPartZone
-      write(nout,*) 
-      write(nout,"(a,i5,3x,a)") "ZONE",n,Partz(n)%label
+      write(ulog,*) 
+      write(ulog,"(a,i5,3x,a)") "ZONE",n,Partz(n)%label
       do npi=Partz(n)%limit(1),Partz(n)%limit(2)
-         write(nout,"(i10,4f14.5)") npi,pg(npi)%coord,pg(npi)%tstop  
+         write(ulog,"(i10,4f14.5)") npi,pg(npi)%coord,pg(npi)%tstop  
       enddo
    enddo
 endif
@@ -514,22 +514,22 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
       call diagnostic(arg1=10,arg2=5,arg3=nomsub)
 endif    
 if (ier/=0) then
-   write(nout,'(1x,a,i2)')                                                     &
+   write(ulog,'(1x,a,i2)')                                                     &
       "    Array NPARTORD,ICONT not allocated. Error code: ",ier
    call diagnostic(arg1=4,arg3=nomsub)
    else
-      write(nout,'(1x,a)') "    Array NPARTORD,ICONT successfully allocated "
+      write(ulog,'(1x,a)') "    Array NPARTORD,ICONT successfully allocated "
       NPartOrd(:) = 0
       Icont(:) = 0
 endif
 if (n_bodies>0) then
    allocate(NPartOrd_bp(n_body_part),Icont_bp(grid%nmax+1),stat=ier) 
    if (ier/=0) then
-      write(nout,'(1x,a,i2)')                                                  &
+      write(ulog,'(1x,a,i2)')                                                  &
          "    Arrays NPARTORD_bp and ICONT_bp not allocated. Error code: ",ier
       call diagnostic(arg1=4,arg3=nomsub)
       else
-         write(nout,'(1x,a)')                                                  &
+         write(ulog,'(1x,a)')                                                  &
             "    Arrays NPARTORD_bp and ICONT_bp successfully allocated "
          NPartOrd_bp(:) = 0
          Icont_bp(:) = 0
@@ -542,18 +542,18 @@ if ((Domain%tipo=="bsph").and.(.not.restart)) then
       allocate(NPartOrd_w(DBSPH%n_w+DBSPH%n_inlet+DBSPH%n_outlet),             &
          Icont_w(grid%nmax+1),stat=ier) 
       if (ier/=0) then
-         write(nout,*)                                                         &
+         write(ulog,*)                                                         &
             'Error! Allocation of NPartOrd_w or Icont_w Gest_Input failed.'           
          call diagnostic(arg1=5,arg2=340)
          else
-            write(nout,'(1x,a)')                                               &
+            write(ulog,'(1x,a)')                                               &
                "Arrays NPARTORD_w and ICONT_w successfully allocated."
             NPartOrd_w(:) = 0
             Icont_w(:) = 0
       endif
    endif
 endif
-call OrdGrid1(nout)
+call OrdGrid1
 if ((Domain%tipo=="bsph").and.(.not.restart)) then
    call DBSPH_find_close_faces 
    call semi_particle_volumes

@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -23,10 +23,10 @@
 ! Description:                        
 !-------------------------------------------------------------------------------
 subroutine ReadInputExternalFile(NumberEntities,ainp,comment,nrighe,ier,       &
-                                 OnlyTriangle,ninp,nout,ninp2)
+                                 OnlyTriangle,ninp,ulog,ninp2)
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
 use Static_allocation_module
 use Hybrid_allocation_module
 use Dynamic_allocation_module
@@ -34,7 +34,7 @@ use Dynamic_allocation_module
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: nrighe,ier,ninp,nout,ninp2
+integer(4) :: nrighe,ier,ninp,ulog,ninp2
 integer(4),dimension(20) :: NumberEntities
 character(1) :: comment
 character(100) :: ainp
@@ -55,46 +55,46 @@ character(100),external :: lcase, GetToken
 ! Statements
 !------------------------
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"GEOMETRY FILE",ninp,nout)) return
+if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"GEOMETRY FILE",ninp,ulog)) return
 OnlyTriangle = .TRUE.
 do while (TRIM(lcase(ainp))/="##### end geometry file #####")
    open(ninp2,file=trim(ainp),form="formatted",status="old",iostat=ioerr)
-   if (nout>0) then
+   if (ulog>0) then
       if (ioerr==0) then
-         write (nout,"(1x,3a)") "Geometry File: ",trim(ainp)
+         write(ulog,"(1x,3a)") "Geometry File: ",trim(ainp)
          else
-            write (nout,"(1x,3a)") "Geometry File: ",trim(ainp)," not found!"
+            write(ulog,"(1x,3a)") "Geometry File: ",trim(ainp)," not found!"
             return
       endif
    endif
 ! To read the first line of the file 
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp2)
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"GEOMETRY FILE",ninp2,nout)) return
+   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"GEOMETRY FILE",ninp2,ulog)) return
    SECTION_LOOP: do while (ioerr==0)
       select case (TRIM(lcase(trim(ainp))))
          case ("##### vertices #####")
             call ReadInputVertices (NumberEntities,Vertice,ainp,comment,       &
-                                    nrighe,ier,.FALSE.,ninp2,nout)
+                                    nrighe,ier,.FALSE.,ninp2,ulog)
          case ("##### lines #####")
             call ReadInputLines(NumberEntities,BoundaryVertex,Tratto,ainp,     &
-                                comment,nrighe,ier,ninp2,nout)
+                                comment,nrighe,ier,ninp2,ulog)
          case ("##### faces #####")
             call ReadInputFaces(NumberEntities,ainp,comment,nrighe,ier,.FALSE.,&
-                                ninp2,nout)
+                                ninp2,ulog)
          case default
       endselect
       call ReadRiga(ainp,comment,nrighe,ioerr,ninp2)
 ! In case of EOF, then it exits, otherwise it checks the error 
       if (ioerr==-1) cycle SECTION_LOOP
-      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"GEOMETRY FILE",ninp,nout))     &
+      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"GEOMETRY FILE",ninp,ulog))     &
          return
    enddo SECTION_LOOP
    close (ninp2)
-   if (nout>0) then
-      write (nout,"(1x,3a)") "End Reading Geometry File"
+   if (ulog>0) then
+      write(ulog,"(1x,3a)") "End Reading Geometry File"
    endif
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"GEOMETRY FILE",ninp,nout)) return
+   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"GEOMETRY FILE",ninp,ulog)) return
 enddo
 !------------------------
 ! Deallocations

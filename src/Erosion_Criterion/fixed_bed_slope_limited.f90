@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -29,7 +29,7 @@
 subroutine fixed_bed_slope_limited(npi,igridi,jgridi,test)
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
 use Static_allocation_module 
 use Hybrid_allocation_module
 use Dynamic_allocation_module
@@ -38,7 +38,7 @@ use Dynamic_allocation_module
 !------------------------
 implicit none
 integer(4),intent(in) :: npi,igridi,jgridi
-logical,intent(inout) :: test
+logical,intent(INOUT) :: test
 integer(4) :: aux_ID
 double precision :: Velocity2,fixed_bed_tolerance,pretot
 double precision :: aux_vec(3)

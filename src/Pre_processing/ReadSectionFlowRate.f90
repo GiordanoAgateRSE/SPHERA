@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -22,10 +22,11 @@
 ! Program unit: ReadSectionFlowRate                                
 ! Description: Input management for the flow rate monitoring sections.                         
 !-------------------------------------------------------------------------------
-subroutine ReadSectionFlowRate(ainp,comment,nrighe,ier,ninp,nout)
+subroutine ReadSectionFlowRate(ainp,comment,nrighe,ier)
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
+use I_O_file_module
 use Static_allocation_module                            
 use Hybrid_allocation_module
 use Dynamic_allocation_module
@@ -33,7 +34,7 @@ use Dynamic_allocation_module
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: nrighe,ier,ninp,nout
+integer(4) :: nrighe,ier,alloc_stat
 character(1) :: comment
 character(100) :: ainp,lcase
 integer(4) :: n_fluid_types,ioerr,i,n_sect,n_vertices,section_ID
@@ -55,58 +56,65 @@ logical,external :: ReadCheck
 ! Statements
 !------------------------
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"Section_flow_rate DATA",ninp,nout))  &
+if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"Section_flow_rate DATA",ninp,ulog))  &
    return
 do while (TRIM(lcase(ainp))/="##### end section flow rate #####")
 ! Reading the number of monitoring sections for the flow rate and their writing 
 ! time step
    read (ainp,*,iostat=ioerr) n_sect,dt_out,n_fluid_types
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"Section_flow_rate GENERAL INPUT", &
-      ninp,nout)) return
+      ninp,ulog)) return
 ! Writing the number of sections and the writing time step on the log file
-   if (nout>0) then
-      write (nout,"(1x,a,1p,i12)")    "n_sect:.............................",  &
+   if (ulog>0) then
+      write(ulog,"(1x,a,1p,i12)")   "n_sect:.............................",    &
          n_sect
-      write (nout,"(1x,a,1p,e12.4)") "dt_out:.............................",   &
+      write(ulog,"(1x,a,1p,e12.4)") "dt_out:.............................",    &
          dt_out
-      write (nout,"(1x,a,1p,i12)")   "n_sect:.............................",   &
+      write(ulog,"(1x,a,1p,i12)")   "n_fluid_types:......................",    &
          n_fluid_types
-      write (nout,"(1x,a)")  " "
+      write(ulog,"(1x,a)")  " "
    endif
 ! Allocation of the array of the flow rate monitoring sections
-   if (allocated(Q_sections%section)) then
-      else
-         allocate(Q_sections%section(n_sect)) 
-         Q_sections%n_sect = n_sect
-         Q_sections%dt_out = dt_out
-         Q_sections%n_fluid_types = n_fluid_types
+   if (.not.allocated(Q_sections%section)) then
+      allocate(Q_sections%section(n_sect),STAT=alloc_stat)
+      if (alloc_stat/=0) then
+         write(uerr,*) 'Allocation of Q_sections%section failed; the ',        &
+            'execution terminates here.'
+         stop
+         else
+            write(ulog,*) 'Allocation of Q_sections%section is successfully ', &
+               'completed.'
+      endif
+      Q_sections%n_sect = n_sect
+      Q_sections%dt_out = dt_out
+      Q_sections%n_fluid_types = n_fluid_types
 ! Initializing the auxiliary variable to print results
-         Q_sections%it_out_last = 0
+      Q_sections%it_out_last = 0
    endif
 ! Loop over the monitoring sections for flow rate
    do i=1,n_sect
-! Reading the section parameters
+! Reading the section variables
       call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
       read (ainp,*,iostat=ioerr) section_ID
-      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"section_ID",ninp,nout)) return
+      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"section_ID",ninp,ulog)) return
       call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
       read (ainp,*,iostat=ioerr) n_vertices
-      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"n_vertices",ninp,nout)) return
+      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"n_vertices",ninp,ulog)) return
       call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
       read (ainp,*,iostat=ioerr) vertex(1,1),vertex(1,2),vertex(1,3)
-      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"vertex_1",ninp,nout)) return
+      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"vertex_1",ninp,ulog)) return
       call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
       read (ainp,*,iostat=ioerr) vertex(2,1),vertex(2,2),vertex(2,3)
-      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"vertex_2",ninp,nout)) return
+      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"vertex_2",ninp,ulog)) return
       call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
       read (ainp,*,iostat=ioerr) vertex(3,1),vertex(3,2),vertex(3,3)
-      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"vertex_3",ninp,nout)) return
+      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"vertex_3",ninp,ulog)) return
       if (n_vertices==4) then
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read (ainp,*,iostat=ioerr) vertex(4,1),vertex(4,2),vertex(4,3)
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"vertex_4",ninp,nout)) return           
+         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"vertex_4",ninp,ulog)) return           
       endif
-! Assignation to the section parameters 
+! Assignation to the section variables 
       Q_sections%section(i)%n_vertices = n_vertices
       Q_sections%section(i)%vertex(:,:) = vertex(:,:)
 ! Computation of the section areas       
@@ -121,31 +129,31 @@ do while (TRIM(lcase(ainp))/="##### end section flow rate #####")
       Q_sections%section(i)%normal(:) = plane_normal(:)
 ! Writing on the log file
       if (ncord>0) then
-         if (nout>0) then
-            write (nout,"(1x,a,i12)")       "n_vertices:.................",    &
+         if (ulog>0) then
+            write(ulog,"(1x,a,i12)")       "n_vertices:.................",     &
                n_vertices
-            write (nout,"(1x,a,1p,e12.4)")  "area:.......................",    &
+            write(ulog,"(1x,a,1p,e12.4)")  "area:.......................",     &
                Q_sections%section(i)%area
-            write (nout,"(1x,a,1p,3e12.4)") "normal:.....................",    &
+            write(ulog,"(1x,a,1p,3e12.4)") "normal:.....................",     &
                Q_sections%section(i)%normal(1),Q_sections%section(i)%normal(2) &
                ,Q_sections%section(i)%normal(3)
-            write (nout,"(1x,a,1p,3e12.4)") "vertex(1,1-3):..............",    &
+            write(ulog,"(1x,a,1p,3e12.4)") "vertex(1,1-3):..............",     &
                vertex(1,1),vertex(1,2),vertex(1,3)
-            write (nout,"(1x,a,1p,3e12.4)") "vertex(2,1-3):..............",    &
+            write(ulog,"(1x,a,1p,3e12.4)") "vertex(2,1-3):..............",     &
                vertex(2,1),vertex(2,2),vertex(2,3)
-            write (nout,"(1x,a,1p,3e12.4)") "vertex(3,1-3):..............",    &
+            write(ulog,"(1x,a,1p,3e12.4)") "vertex(3,1-3):..............",     &
                vertex(3,1),vertex(3,2),vertex(3,3)
             if (n_vertices==4) then
-               write (nout,"(1x,a,1p,3e12.4)") "vertex(4,1-3):..............", &
+               write(ulog,"(1x,a,1p,3e12.4)") "vertex(4,1-3):..............",  &
                   vertex(4,1),vertex(4,2),vertex(4,3)       
             endif
-            write (nout,"(1x,a)")  " "
+            write(ulog,"(1x,a)")  " "
          endif
       endif
    enddo         
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"Section_flow_rate DATA",ninp,     &
-      nout)) return
+      ulog)) return
 enddo
 !------------------------
 ! Deallocations

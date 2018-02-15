@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -25,7 +25,7 @@
 subroutine ReadRestartFile(option,ier,nrecords)
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
 use I_O_file_module
 use Static_allocation_module
 use Hybrid_allocation_module
@@ -59,66 +59,66 @@ aux_integer = 0
 ! Restart heading 
 if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
    rewind(nsav)
-   write(nout,'(a)')    "-------------------"
-   write(nout,"(1x,a)") ">> Restart heading."
-   write(nout,'(a)')    "-------------------"
+   write(ulog,'(a)')    "-------------------"
+   write(ulog,"(1x,a)") ">> Restart heading."
+   write(ulog,'(a)')    "-------------------"
    read(nsav,iostat=ioerr) versionerest,nrecords
    if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"versionerest,nrecords",nsav,    &
-      nout)) return
+      ulog)) return
 ! Check the program version
    if (TRIM(lcase(version))/=TRIM(lcase(versionerest))) then
-      write(nscr,'(a)')                                                        &
+      write(uerr,'(a)')                                                        &
          "---------------------------------------------------------------"
-      write(nscr,"(1x,a)")                                                     &
+      write(uerr,"(1x,a)")                                                     &
          ">> ERROR! The Restart version is not equal the current version."
-      write(nscr,"(1x,a)") ">>        The Run is stopped."
-      write(nscr,'(a)')                                                        &
+      write(uerr,"(1x,a)") ">>        The Run is stopped."
+      write(uerr,'(a)')                                                        &
          "---------------------------------------------------------------"
-      flush(nscr)
+      flush(uerr)
       stop
    endif
    read(nsav,iostat=ioerr) ncord,nag,NMedium,NPartZone,NumVertici,NumFacce,    &
       NumTratti,NumBVertices,NumBSides,GCBFVecDim,Grid%nmax,NPointst,NPoints,  &
       NPointsl,NPointse,NLines,NSections,doubleh
-   if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"ncord, nag, ...",nsav,nout))    &
+   if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"ncord, nag, ...",nsav,ulog))    &
       return
 ! The parameter is read from the restart file and not from the input file
-   write(nout,"(1x,a,1p,i12)")   "GCBFVecDim (from restart file): ",GCBFVecDim
+   write(ulog,"(1x,a,1p,i12)")   "GCBFVecDim (from restart file): ",GCBFVecDim
 ! Allocation of the array "GCBFVector"
    if ((Domain%tipo=="semi").and.(GCBFVecDim>0).and.                           &
       (.not.allocated(GCBFVector))) then
       allocate(GCBFVector(GCBFVecDim),stat=ier)    
       if (ier/=0) then
-         write(nout,'(1x,2a)') "Allocation of GCBFVector in ",                 &
+         write(ulog,'(1x,2a)') "Allocation of GCBFVector in ",                 &
             "ReadRestartFile failed. "
          else
-            write(nout,'(1x,2a)') "Allocation of GCBFVector in ",              &
+            write(ulog,'(1x,2a)') "Allocation of GCBFVector in ",              &
             "ReadRestartFile successully completed. "
       endif
    endif
    elseif (TRIM(lcase(option))=="reading") then
-      write(nout,'(a)')                                                        &
+      write(ulog,'(a)')                                                        &
          "---------------------------------------------------------------------"
-      write(nout,"(1x,a)")                                                     &
+      write(ulog,"(1x,a)")                                                     &
          ">> Restart reading:  step         time      interval    num.particles"
       save_istart = Domain%istart
       save_start = Domain%start
 ! Since here, Domain%istart and Domain%start are zeroed, until next reading of 
 ! the main input file.
       read(nsav,iostat=ioerr) Domain
-      if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"domain",nsav,nout)) return
+      if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"domain",nsav,ulog)) return
       read(nsav,iostat=ioerr) Grid
-      if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"Grid",nsav,nout)) return
+      if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"Grid",nsav,ulog)) return
 ! Allocating the 2D matrix to detect free surface
       if (.not.allocated(ind_interfaces)) then
          allocate(ind_interfaces(Grid%ncd(1),Grid%ncd(2),6),STAT=alloc_stat)
          if (alloc_stat/=0) then
-            write(nout,*)                                                      &
+            write(ulog,*)                                                      &
             'Allocation of ind_interfaces in ReadRestartFile failed;',         &
             ' the program terminates here.'
             stop
             else
-               write (nout,*)                                                  &
+               write(ulog,*)                                                   &
                   'Allocation of ind_interfaces in ReadRestartFile ',          &
                   'successfully completed.'
          endif
@@ -127,58 +127,58 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
       if (Domain%tipo=="semi") then
          allocate(GCBFPointers(Grid%nmax,2),STAT=alloc_stat)
          if (alloc_stat/=0) then
-            write(nout,*) "Allocation of GCBFPointers in ReadRestartFile ",    &
+            write(ulog,*) "Allocation of GCBFPointers in ReadRestartFile ",    &
                "failed; the program stops here."
             stop
             else
-               write (nout,*) "Allocation of GCBFPointers in ReadRestartFile ",&
+               write(ulog,*) "Allocation of GCBFPointers in ReadRestartFile ", &
                   "is successfully completed."
          endif
       endif
       read(nsav,iostat=ioerr) Med(1:NMedium)
-      if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"Med",nsav,nout)) return
+      if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"Med",nsav,ulog)) return
       if (NumVertici>0) then
          read(nsav,iostat=ioerr) Vertice(1:SPACEDIM,1:NumVertici)
-         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"Vertice",nsav,nout)) return
+         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"Vertice",nsav,ulog)) return
       endif
       if (NumFacce>0) then 
          read(nsav,iostat=ioerr) BoundaryFace(1:NumFacce)
-         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"BoundaryFace",nsav,nout)) &
+         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"BoundaryFace",nsav,ulog)) &
             return
       endif
       if (NumFacce>0) then
          read(nsav,iostat=ioerr) BFaceList(1:NumFacce)
-         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"BFaceList",nsav,nout))    &
+         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"BFaceList",nsav,ulog))    &
             return
       endif
       if (NumTratti>0) then
          read(nsav,iostat=ioerr) Tratto(1:NumTratti)
-         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"Tratto",nsav,nout)) return
+         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"Tratto",nsav,ulog)) return
       endif
       if (NPartZone>0) then
          read(nsav,iostat=ioerr) Partz(1:NPartZone)
-         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"Partz",nsav,nout)) return
+         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"Partz",nsav,ulog)) return
       endif
       if (NumBVertices>0) then
         read(nsav,iostat=ioerr) BoundaryVertex(1:NumBVertices)
-        if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"BoundaryVertex",nsav,nout))&
+        if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"BoundaryVertex",nsav,ulog))&
            return
       endif
       if (NumBSides>0) then
          read(nsav,iostat=ioerr) BoundarySide(1:NumBSides)     
-         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"BoundarySide",nsav,nout)) &
+         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"BoundarySide",nsav,ulog)) &
             return
       endif
       if (Domain%tipo=="semi") then
          if (GCBFVecDim>0) then
             read(nsav,iostat=ioerr) GCBFVector(1:GCBFVecDim)
-            if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"GCBFVector",nsav,nout))&
+            if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"GCBFVector",nsav,ulog))&
                return
          endif
          if (Grid%nmax>0) then
             read(nsav,iostat=ioerr) GCBFPointers(1:Grid%nmax,1:2)
             if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"GCBFPointers",nsav,    &
-               nout)) return
+               ulog)) return
          endif
       endif
 ! Allocation of the array of the maximum water depth
@@ -192,12 +192,12 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
       if ((aux_integer>0).and.(.not.allocated(Z_fluid_max))) then
          allocate(Z_fluid_max(Grid%ncd(1)*Grid%ncd(2)),STAT=alloc_stat)
          if (alloc_stat/=0) then
-            write(nout,*)                                                      &
+            write(ulog,*)                                                      &
             'Allocation of Z_fluid_max in ReadRestartFile failed;',            &
             ' the program terminates here.'
             stop
             else
-               write (nout,*)                                                  &
+               write(ulog,*)                                                   &
                   'Allocation of Z_fluid_max in ReadRestartFile successfully', &
                   ' completed.'
          endif
@@ -206,12 +206,12 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
       if ((aux_integer>0).and.(.not.allocated(q_max))) then
          allocate(q_max(aux_integer),STAT=alloc_stat)
          if (alloc_stat/=0) then
-            write(nout,*)                                                      &
+            write(ulog,*)                                                      &
             'Allocation of q_max in ReadRestartFile failed;',                  &
             ' the program terminates here.'
             stop
             else
-               write (nout,*)                                                  &
+               write(ulog,*)                                                   &
                   'Allocation of q_max in ReadRestartFile successfully ',      &
                   'completed.'
          endif
@@ -222,12 +222,12 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
          allocate(Granular_flows_options%minimum_saturation_flag(Grid%ncd(1),  &
             Grid%ncd(2)),STAT=alloc_stat)
          if (alloc_stat/=0) then
-            write(nout,*)                                                      &
+            write(ulog,*)                                                      &
             'Allocation of Granular_flows_options%minimum_saturation_flag ',   &
             ' in ReadRestartFile failed; the program stops here.'
             stop 
             else
-               write (nout,*)                                                  &
+               write(ulog,*)                                                   &
                   'Allocation of ',                                            &
                   'Granular_flows_options%minimum_saturation_flag in ',        &
                   'ReadRestartFile is successfully completed.'
@@ -239,12 +239,12 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
          allocate(Granular_flows_options%maximum_saturation_flag(Grid%ncd(1),  &
             Grid%ncd(2)),STAT=alloc_stat)
          if (alloc_stat/=0) then
-            write(nout,*) "Allocation of ",                                    &
+            write(ulog,*) "Allocation of ",                                    &
                "Granular_flows_options%maximum_saturation_flag in ",           &
                "ReadRestartFile failed; the program stops here."
             stop 
             else
-               write (nout,*) "Allocation of ",                                &
+               write(ulog,*) "Allocation of ",                                 &
                   "Granular_flows_options%maximum_saturation_flag in ",        &
                   "ReadRestartFile is successfully completed."
          endif
@@ -258,60 +258,71 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
             read(nsav,iostat=ioerr) it_start,simulation_time,dt,nag,ncord,     &
                restartcode
             if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,                        &
-               "it_start,simulation_time,dt,nag,ncord,restartcode",nsav,nout)) &
+               "it_start,simulation_time,dt,nag,ncord,restartcode",nsav,ulog)) &
                return
-            write(nout,"(16x,i10,2(2x,g12.5),7x,i10)") it_start,               &
+            write(ulog,"(16x,i10,2(2x,g12.5),7x,i10)") it_start,               &
                simulation_time,dt,nag
-            flush(nout)
+            flush(ulog)
             if (it_start<save_istart) then
                read(nsav,iostat=ioerr) 
-               if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"...",nsav,nout))    &
+               if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"...",nsav,ulog))    &
                   return  
                if (restartcode==1) then                 
                   if (allocated(pg_w)) then
                      read(nsav,iostat=ioerr) 
                      if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"pg_w",        &
-                        nsav,nout)) return
+                        nsav,ulog)) return
                   endif
                   if (n_bodies>0) then
                      do i=1,n_bodies
                         read(nsav,iostat=ioerr)
                         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,            &
-                           "body_arr_1_of_2",nsav,nout)) return
+                           "body_arr_1_of_2",nsav,ulog)) return
                         if (body_arr(i)%n_records>0) then
                            read(nsav,iostat=ioerr)
                            if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,         &
-                              "body_arr_2_of_2",nsav,nout)) return
+                              "body_arr_2_of_2",nsav,ulog)) return
                         endif                  
                      enddo
                      read(nsav,iostat=ioerr) 
                      if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"bp_arr",      &
-                              nsav,nout)) return
+                              nsav,ulog)) return
                      read(nsav,iostat=ioerr) 
                      if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,               &
-                              "surf_body_part",nsav,nout)) return
+                              "surf_body_part",nsav,ulog)) return
                   endif
                   if (allocated(Z_fluid_max)) then
                      read(nsav,iostat=ioerr)
                      if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,               &
-                        "Z_fluid_max",nsav,nout)) return
+                        "Z_fluid_max",nsav,ulog)) return
                   endif
                   if (allocated(q_max)) then
-                     read(nsav,iostat=ioerr) 
+                     read(nsav,iostat=ioerr)
                      if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"q_max",       &
-                        nsav,nout)) return
-                  endif  
+                        nsav,ulog)) return
+                  endif
+                  if (allocated(substations%sub)) then
+                     read(nsav,iostat=ioerr)
+                     if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,               &
+                        "POS_fsumq_max",nsav,ulog)) return
+                     read(nsav,iostat=ioerr)
+                     if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,               &
+                        "Ymax",nsav,ulog)) return
+                     read(nsav,iostat=ioerr)
+                     if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,               &
+                        "EOT",nsav,ulog)) return
+                  endif
                   if (allocated(Granular_flows_options%minimum_saturation_flag)&
                      ) then
                      read(nsav,iostat=ioerr) 
                      if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,               &
-                        "minimum_saturation_flag",nsav,nout)) return
+                        "minimum_saturation_flag",nsav,ulog)) return
                   endif
                   if (allocated(Granular_flows_options%maximum_saturation_flag)&
                      ) then
                      read(nsav,iostat=ioerr) 
                      if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,               &
-                        "maximum_saturation_flag",nsav,nout)) return
+                        "maximum_saturation_flag",nsav,ulog)) return
                   endif  
                endif              
                else
@@ -319,12 +330,12 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
                   if (restartcode==1) then
                      read(nsav,iostat=ioerr) pg(1:nag)
                      if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"pg",nsav,     &
-                        nout)) return
+                        ulog)) return
                      if (allocated(pg_w)) then
                         read(nsav,iostat=ioerr) pg_w(1:DBSPH%n_w+DBSPH%n_inlet+&
                            DBSPH%n_outlet)
                         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"pg_w",nsav,&
-                           nout)) return
+                           ulog)) return
                      endif
                      if (n_bodies>0) then
                         do i=1,n_bodies
@@ -339,42 +350,56 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
                               body_arr(i)%Ic(1:3,1:3),                         &
                               body_arr(i)%Ic_inv(1:3,1:3)
                            if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,         &
-                              "body_arr_1_of_2",nsav,nout)) return                              
+                              "body_arr_1_of_2",nsav,ulog)) return                              
                            if (body_arr(i)%n_records>0) then
                               if (.not.allocated(body_arr(i)%body_kinematics)) &
 allocate(body_arr(i)%body_kinematics(body_arr(i)%n_records,7))
                               read(nsav,iostat=ioerr)                          &
 body_arr(i)%body_kinematics(1:body_arr(i)%n_records,1:7)
                               if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,      &
-                                 "body_arr_2_of_2",nsav,nout)) return
+                                 "body_arr_2_of_2",nsav,ulog)) return
                            endif
                         enddo
                         read(nsav,iostat=ioerr) bp_arr(1:n_body_part)
                         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"bp_arr",   &
-                           nsav,nout)) return
+                           nsav,ulog)) return
                         read(nsav,iostat=ioerr) surf_body_part(1:              &
                            n_surf_body_part)
                         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,            &
-                          "surf_body_part",nsav,nout)) return
+                          "surf_body_part",nsav,ulog)) return
                      endif
                      if (allocated(Z_fluid_max)) then
                         read(nsav,iostat=ioerr)                                &
                            Z_fluid_max(1:Grid%ncd(1)*Grid%ncd(2))
                         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,            &
-                           "Z_fluid_max",nsav,nout)) return
+                           "Z_fluid_max",nsav,ulog)) return
                      endif
                      if (allocated(q_max)) then
                         read(nsav,iostat=ioerr) q_max(1:size(q_max))
                         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"q_max",nsav&
-                           ,nout)) return
+                           ,ulog)) return
                      endif   
+                     if (allocated(substations%sub)) then
+                        read(nsav,iostat=ioerr)                                &
+                           substations%sub(1:substations%n_sub)%POS_fsum
+                        if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,            &
+                           "POS_fsum_max",nsav,ulog)) return
+                        read(nsav,iostat=ioerr)                                &
+                           substations%sub(1:substations%n_sub)%Ymax
+                        if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,            &
+                           "Ymax",nsav,ulog)) return
+                        read(nsav,iostat=ioerr)                                &
+                           substations%sub(1:substations%n_sub)%EOT
+                        if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,            &
+                           "EOT",nsav,ulog)) return
+                     endif
                      if (allocated                                             &
                         (Granular_flows_options%minimum_saturation_flag)) then
                         read(nsav,iostat=ioerr)                                &
                            Granular_flows_options%minimum_saturation_flag(     &
                            1:Grid%ncd(1),1:Grid%ncd(2))
                         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,            &
-                           "minimum_saturation_flag",nsav,nout)) return
+                           "minimum_saturation_flag",nsav,ulog)) return
                      endif 
                      if (allocated                                             &
                         (Granular_flows_options%maximum_saturation_flag)) then
@@ -382,12 +407,12 @@ body_arr(i)%body_kinematics(1:body_arr(i)%n_records,1:7)
                            Granular_flows_options%maximum_saturation_flag(     &
                            1:Grid%ncd(1),1:Grid%ncd(2))
                         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,            &
-                           "maximum_saturation_flag",nsav,nout)) return
+                           "maximum_saturation_flag",nsav,ulog)) return
                      endif                                           
-                     write(nout,'(a)') " "
-                     write(nout,'(a,i10,a,g12.5)') "   Located Restart Step :",&
+                     write(ulog,'(a)') " "
+                     write(ulog,'(a,i10,a,g12.5)') "   Located Restart Step :",&
                         it_start,"   Time :",simulation_time
-                     flush(nout)
+                     flush(ulog)
 ! Reading for post-processing
                      elseif (restartcode==0) then
                         read(nsav,iostat=ioerr) pg(1:nag)%coord(1),            &
@@ -397,23 +422,23 @@ body_arr(i)%body_kinematics(1:body_arr(i)%n_records,1:7)
                            pg(1:nag)%visc,pg(1:nag)%IntEn,pg(1:nag)%VolFra,    &
                            pg(1:nag)%imed,pg(1:nag)%icol
                         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"pg",nsav,  &
-                           nout)) return
-                        write(nscr,'(a)') " "
-                        write(nscr,'(a,i10,a,g12.5)')                          &
+                           ulog)) return
+                        write(uerr,'(a)') " "
+                        write(uerr,'(a,i10,a,g12.5)')                          &
                            "   Located Result Step :",it_start,"   Time :",    &
                            simulation_time
-                        flush(nscr)
-                        write(nscr,'(a)')                                      &
+                        flush(uerr)
+                        write(uerr,'(a)')                                      &
 "       But this step is not a restart step. Check the correct step for restart in the restart file."
-                        flush(nscr)
-                        write(nscr,'(a)') " The program is terminated."
-                        flush(nscr)
+                        flush(uerr)
+                        write(uerr,'(a)') " The program is terminated."
+                        flush(uerr)
                         stop
                   endif
                   return
             endif
          enddo
-         write(nscr,'(a,i10,a)') "   Restart Step Number:",it_start,           &
+         write(uerr,'(a,i10,a)') "   Restart Step Number:",it_start,           &
             " has not been found"
          ier = 3
 ! Restart positions are based on the step number
@@ -424,59 +449,70 @@ body_arr(i)%body_kinematics(1:body_arr(i)%n_records,1:7)
                   restartcode
                if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,                     &
                   "it_start,simulation_time,dt,nag,ncord,restartcode",nsav,    &
-                  nout)) return
-               write(nout,"(16x,i10,2(2x,g12.5),7x,i10)") it_start,            &
+                  ulog)) return
+               write(ulog,"(16x,i10,2(2x,g12.5),7x,i10)") it_start,            &
                   simulation_time,dt,nag
-               flush(nout)
+               flush(ulog)
                if (simulation_time<save_start) then
                   read(nsav,iostat=ioerr)
-                  if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"...",nsav,nout)) &
+                  if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"...",nsav,ulog)) &
                      return
                   if (restartcode==1) then
                      if (allocated(pg_w)) then
                         read(nsav,iostat=ioerr) 
                         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"pg_w",     &
-                           nsav,nout)) return
+                           nsav,ulog)) return
                      endif
                      if (n_bodies>0) then
                         do i=1,n_bodies
                            read(nsav,iostat=ioerr)
                            if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,         &
-                              "body_arr_1_of_2",nsav,nout)) return
+                              "body_arr_1_of_2",nsav,ulog)) return
                            if (body_arr(i)%n_records>0) then   
                               read(nsav,iostat=ioerr)
                               if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,      &
-                                 "body_arr_2_of_2",nsav,nout)) return
+                                 "body_arr_2_of_2",nsav,ulog)) return
                            endif
                         enddo
                         read(nsav,iostat=ioerr) 
                         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"bp_arr",   &
-                                 nsav,nout)) return
+                                 nsav,ulog)) return
                         read(nsav,iostat=ioerr)
                         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,            &
-                                 "surf_body_part",nsav,nout)) return
+                                 "surf_body_part",nsav,ulog)) return
                      endif
                      if (allocated(Z_fluid_max)) then
                         read(nsav,iostat=ioerr)
                         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,            &
-                           "Z_fluid_max",nsav,nout)) return
+                           "Z_fluid_max",nsav,ulog)) return
                      endif
                      if (allocated(q_max)) then
                         read(nsav,iostat=ioerr) 
                         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"q_max",    &
-                           nsav,nout)) return
+                           nsav,ulog)) return
+                     endif
+                     if (allocated(substations%sub)) then
+                        read(nsav,iostat=ioerr)
+                        if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,            &
+                           "POS_fsum_max",nsav,ulog)) return
+                        read(nsav,iostat=ioerr)
+                        if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,            &
+                           "Ymax",nsav,ulog)) return
+                        read(nsav,iostat=ioerr)
+                        if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,            &
+                           "EOT",nsav,ulog)) return
                      endif
                      if (allocated                                             &
                         (Granular_flows_options%minimum_saturation_flag)) then
                         read(nsav,iostat=ioerr) 
                         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,            &
-                        "minimum_saturation_flag",nsav,nout)) return
+                        "minimum_saturation_flag",nsav,ulog)) return
                      endif
                      if (allocated                                             &
                         (Granular_flows_options%maximum_saturation_flag)) then
                         read(nsav,iostat=ioerr) 
                         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,            &
-                        "maximum_saturation_flag",nsav,nout)) return
+                        "maximum_saturation_flag",nsav,ulog)) return
                      endif
                   endif 
                   else
@@ -484,12 +520,12 @@ body_arr(i)%body_kinematics(1:body_arr(i)%n_records,1:7)
                      if (restartcode==1) then
                         read(nsav,iostat=ioerr) pg(1:nag)
                         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"pg",nsav,  &
-                           nout)) return
+                           ulog)) return
                         if (allocated(pg_w)) then
                            read(nsav,iostat=ioerr) pg_w(1:                     &
                               DBSPH%n_w+DBSPH%n_inlet+DBSPH%n_outlet)
                            if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"pg_w",  &
-                              nsav,nout)) return
+                              nsav,ulog)) return
                         endif
                         if (n_bodies>0) then
                            do i=1,n_bodies
@@ -505,41 +541,55 @@ body_arr(i)%body_kinematics(1:body_arr(i)%n_records,1:7)
                                  body_arr(i)%Ic(1:3,1:3),                      &
                                  body_arr(i)%Ic_inv(1:3,1:3)
                               if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,      &
-                                 "body_arr_1_of_2",nsav,nout)) return
+                                 "body_arr_1_of_2",nsav,ulog)) return
                               if (body_arr(i)%n_records>0) then
                                if (.not.allocated(body_arr(i)%body_kinematics))&
 allocate(body_arr(i)%body_kinematics(body_arr(i)%n_records,7))
                                  read(nsav,iostat=ioerr)                       &
 body_arr(i)%body_kinematics(1:body_arr(i)%n_records,1:7)
                                  if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,   &
-                                 "body_arr_2_of_2",nsav,nout)) return
+                                 "body_arr_2_of_2",nsav,ulog)) return
                               endif
                            enddo
                            read(nsav,iostat=ioerr) bp_arr(1:n_body_part)
                            if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"bp_arr",&
-                              nsav,nout)) return
+                              nsav,ulog)) return
                            read(nsav,iostat=ioerr) surf_body_part(1:           &
                               n_surf_body_part)
                            if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,         &
-                              "surf_body_part",nsav,nout)) return
+                              "surf_body_part",nsav,ulog)) return
                         endif
                         if (allocated(Z_fluid_max)) then
                            read(nsav,iostat=ioerr) Z_fluid_max(1:Grid%ncd(1)*  &
                               Grid%ncd(2))
                            if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,         &
-                              "Z_fluid_max",nsav,nout)) return
+                              "Z_fluid_max",nsav,ulog)) return
                         endif
                         if (allocated(q_max)) then
                            read(nsav,iostat=ioerr) q_max(1:size(q_max))
                            if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"q_max", &
-                              nsav,nout)) return
+                              nsav,ulog)) return
+                        endif
+                        if (allocated(substations%sub)) then
+                           read(nsav,iostat=ioerr)                             &
+                              substations%sub(1:substations%n_sub)%POS_fsum  
+                           if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,         &
+                              "POS_fsum_max",nsav,ulog)) return              
+                           read(nsav,iostat=ioerr)                             &
+                              substations%sub(1:substations%n_sub)%Ymax      
+                           if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,         &
+                              "Ymax",nsav,ulog)) return                      
+                           read(nsav,iostat=ioerr)                             &
+                              substations%sub(1:substations%n_sub)%EOT       
+                           if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,         &
+                              "EOT",nsav,ulog)) return
                         endif
 if (allocated(Granular_flows_options%minimum_saturation_flag)) then
                            read(nsav,iostat=ioerr)                             &
                               Granular_flows_options%minimum_saturation_flag(  &
                               1:Grid%ncd(1),1:Grid%ncd(2))
                            if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,         &
-                              "minimum_saturation_flag",nsav,nout)) return
+                              "minimum_saturation_flag",nsav,ulog)) return
                         endif 
                         if (allocated                                          &
                            (Granular_flows_options%maximum_saturation_flag)) &
@@ -548,13 +598,13 @@ if (allocated(Granular_flows_options%minimum_saturation_flag)) then
                               Granular_flows_options%maximum_saturation_flag(  &
                               1:Grid%ncd(1),1:Grid%ncd(2))
                            if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,         &
-                              "maximum_saturation_flag",nsav,nout)) return
+                              "maximum_saturation_flag",nsav,ulog)) return
                         endif
-                        write(nout,'(a)') 
-                        write(nout,'(a,i10,a,g12.5)')                          &
+                        write(ulog,'(a)') 
+                        write(ulog,'(a,i10,a,g12.5)')                          &
                            "   Located Restart Step :",it_start,"   Time :",   &
                            simulation_time
-                        flush(nout)
+                        flush(ulog)
 ! Reading for post-processing
                         elseif (restartcode==0) then
                            read(nsav,iostat=ioerr) pg(1:nag)%coord(1),         &
@@ -564,31 +614,31 @@ if (allocated(Granular_flows_options%minimum_saturation_flag)) then
                               pg(1:nag)%mass,pg(1:nag)%visc,pg(1:nag)%IntEn,   &
                               pg(1:nag)%VolFra,pg(1:nag)%imed,pg(1:nag)%icol
                            if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"pg",    &
-                              nsav,nout)) return
-                           write(nout,'(a)') 
-                           write(nout,'(a,i10,a,g12.5)')                       &
+                              nsav,ulog)) return
+                           write(ulog,'(a)') 
+                           write(ulog,'(a,i10,a,g12.5)')                       &
                               "   Located Result Time :",it_start,"   Time :", &
                               simulation_time
-                           flush(nout)
-                           write(nscr,'(a)')                                   &
+                           flush(ulog)
+                           write(uerr,'(a)')                                   &
 "       But this time is not a restart time. Check the correct time for restart in the restart file."
-                           flush(nscr)
-                           write(nscr,'(a)') " The program is terminated."
-                           flush(nscr)
+                           flush(uerr)
+                           write(uerr,'(a)') " The program is terminated."
+                           flush(uerr)
                            stop
                   endif 
                   return
                endif
             enddo
-            write(nscr,'(a,i10,a)') "   Restart Time Step:",save_start,        &
+            write(uerr,'(a,i10,a)') "   Restart Time Step:",save_start,        &
                " has not been found"
             ier = 3
             else
-               write (nscr,'(a)') "  > Restart cannot be read at step:",       &
+               write(uerr,'(a)') "  > Restart cannot be read at step:",        &
                   it_start,"  time:",simulation_time
                ier = 4
       endif
-      write (nout,'(a)') "  > Restart read successfully at step:",it_start,    &
+      write(ulog,'(a)') "  > Restart read successfully at step:",it_start,     &
          "  time:",simulation_time
       else
          ier = 5

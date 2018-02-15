@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -25,7 +25,7 @@
 subroutine Memo_Results(it,it_memo,it_rest,dtvel,str)
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
 use I_O_file_module
 use Static_allocation_module
 use Hybrid_allocation_module
@@ -37,8 +37,7 @@ implicit none
 integer(4),intent(IN) :: it
 double precision,intent(IN) :: dtvel
 character(6),intent(IN) :: str
-integer(4),intent(INOUT) :: it_memo
-integer(4),intent(INOUT) :: it_rest
+integer(4),intent(INOUT) :: it_memo,it_rest
 integer(4) :: nrecords,restartcode,i
 !------------------------
 ! Explicit interfaces
@@ -72,7 +71,7 @@ if (index(str,'inizio')/=0) then
       NumBVertices,NumBSides,GCBFVecDim,Grid%nmax,NPointst,NPoints,NPointsl,   &
       NPointse,NLines,NSections,doubleh
    write(nres) domain
-   write(nres) grid
+   write(nres) Grid
    write(nres) Med(1:NMedium)
    if (NumVertici>0) write(nres) Vertice(1:SPACEDIM,1:NumVertici)
    if (NumFacce>0) write(nres) BoundaryFace(1:NumFacce)
@@ -88,11 +87,11 @@ if (index(str,'inizio')/=0) then
          GCBFPointers(1:Grid%nmax,1:2)
    endif
    flush(nres)
-   write(nout,'(a,i10,a,f15.5)')                                               &
+   write(ulog,'(a,i10,a,f15.5)')                                               &
 " ----------------------------------------------------------------------------"
-   write(nout,'(a,i10,a,f15.5)') " Results and restart heading saved   step: ",&
+   write(ulog,'(a,i10,a,f15.5)') " Results and restart heading saved   step: ",&
       it,"   time: ",simulation_time
-   write(nout,'(a,i10,a,f15.5)')                                               &
+   write(ulog,'(a,i10,a,f15.5)')                                               &
 " ----------------------------------------------------------------------------"
 endif
 if (Domain%irest_fr>0) then
@@ -138,6 +137,11 @@ if ((it_rest==it).or.(index(str,'inizio')/=0).or.(index(str,'fine')/=0)) then
    if (allocated(Z_fluid_max)) write(nres)                                     &
       Z_fluid_max(1:Grid%ncd(1)*Grid%ncd(2))
    if (allocated(q_max)) write(nres) q_max(1:size(q_max))
+   if (allocated(substations%sub)) then
+      write(nres) substations%sub(1:substations%n_sub)%POS_fsum
+      write(nres) substations%sub(1:substations%n_sub)%Ymax
+      write(nres) substations%sub(1:substations%n_sub)%EOT
+   endif
    if (allocated(Granular_flows_options%minimum_saturation_flag)) write(nres)  &
       Granular_flows_options%minimum_saturation_flag(1:Grid%ncd(1),            &
       1:Grid%ncd(2))
@@ -146,11 +150,11 @@ if ((it_rest==it).or.(index(str,'inizio')/=0).or.(index(str,'fine')/=0)) then
       1:Grid%ncd(2))
    flush(nres)
    if (index(str,'inizio')==0) then
-      write(nout,'(a,i10,a,f15.5)')                                            &
+      write(ulog,'(a,i10,a,f15.5)')                                            &
       " --------------------------------------------------------------------"
-      write(nout,'(a,i10,a,f15.5)') " Results and restart saved   step: ",it,  &
+      write(ulog,'(a,i10,a,f15.5)') " Results and restart saved   step: ",it,  &
          "   time: ",simulation_time
-      write(nout,'(a,i10,a,f15.5)')                                            &
+      write(ulog,'(a,i10,a,f15.5)')                                            &
       " --------------------------------------------------------------------"
    endif
    elseif (it_memo==it) then
@@ -163,11 +167,11 @@ if ((it_rest==it).or.(index(str,'inizio')/=0).or.(index(str,'fine')/=0)) then
          pg(1:nag)%VolFra,pg(1:nag)%imed,pg(1:nag)%icol
       flush(nres)
       if (index(str,'inizio')==0) then
-         write(nout,'(a,i10,a,f15.5)')                                         &
+         write(ulog,'(a,i10,a,f15.5)')                                         &
             " --------------------------------------------------------"
-         write(nout,'(a,i10,a,f15.5)') " Results saved   step: ",it,"   time: "&
+         write(ulog,'(a,i10,a,f15.5)') " Results saved   step: ",it,"   time: "&
             ,simulation_time
-         write(nout,'(a,i10,a,f15.5)')                                         &
+         write(ulog,'(a,i10,a,f15.5)')                                         &
             " --------------------------------------------------------"
       endif
 endif

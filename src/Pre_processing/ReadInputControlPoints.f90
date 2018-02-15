@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -23,17 +23,17 @@
 ! Description: Reading monitoring points.                      
 !-------------------------------------------------------------------------------
 subroutine ReadInputControlPoints(NumberEntities,Control_Points,ainp,comment,  &
-                                  nrighe,ier,ninp,nout)
+                                  nrighe,ier,ninp,ulog)
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
 use Static_allocation_module
 use Hybrid_allocation_module
 !------------------------
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: nrighe,ier,ninp,nout
+integer(4) :: nrighe,ier,ninp,ulog
 integer(4),dimension(20) :: NumberEntities
 type (TyCtlPoint),dimension(NPointst) :: Control_Points
 character(1) :: comment
@@ -55,13 +55,13 @@ character(100),external :: lcase
 ! Statements
 !------------------------
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"CONTROL POINTS DATA",ninp,nout))     &
+if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"CONTROL POINTS DATA",ninp,ulog))     &
    return
 do while (TRIM(lcase(ainp))/="##### end control points #####" )
    NumberEntities(4) = NumberEntities(4) + 1
    read(ainp,*,iostat=ioerr) values1(1:ncord)
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"CONTROL POINT COORDINATES",ninp,  &
-      nout)) return
+      ulog)) return
    if (ncord>0) then
       Control_Points(NumberEntities(4))%coord(1:3) = zero
       Control_Points(NumberEntities(4))%dist = zero
@@ -69,15 +69,15 @@ do while (TRIM(lcase(ainp))/="##### end control points #####" )
          icord = icoordp(n,ncord-1)
          Control_Points(NumberEntities(4))%coord(icord) = values1(n)
       enddo
-      if (nout>0) then
+      if (ulog>0) then
          i = NumberEntities(4)
-         write (nout,"(1x,a,i5,3(3x,a,1p,e12.4))") "Control point ",i,         &
+         write(ulog,"(1x,a,i5,3(3x,a,1p,e12.4))") "Control point ",i,          &
             (xyzlabel(icoordp(n,ncord-1))//" = ",                              &
             Control_Points(i)%coord(icoordp(n,ncord-1)),n=1,ncord)
        endif
     endif
     call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"CONTROL POINTS DATA",ninp,nout)) &
+    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"CONTROL POINTS DATA",ninp,ulog)) &
        return
 enddo
 !------------------------

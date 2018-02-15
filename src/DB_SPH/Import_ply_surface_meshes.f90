@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -31,7 +31,7 @@
 subroutine Import_ply_surface_meshes
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
 use I_O_file_module
 use Static_allocation_module
 use Hybrid_allocation_module
@@ -74,13 +74,13 @@ surface_mesh_file_ID = 0
 ! Open the file name list (surface_mesh_list.inp)
 open(unit_file_list,file="surface_mesh_list.inp",IOSTAT=file_stat)
 if (file_stat/=0) then
-   write(nscr,*) 'Error in opening surface_mesh_list.inp in ',                 &
+   write(uerr,*) 'Error in opening surface_mesh_list.inp in ',                 &
       'Import_pl_surface_meshes; the program stops here'
    stop
 endif
 read(unit_file_list,*,IOSTAT=file_stat) 
 if (file_stat/=0) then
-   write(nscr,*) 'Error in reading surface_mesh_list.inp in ',                 &
+   write(uerr,*) 'Error in reading surface_mesh_list.inp in ',                 &
       'Import_pl_surface_meshes; the program stops here'
    stop
 endif
@@ -95,53 +95,53 @@ do
 ! Open the on-going mesh file
    open(unit_DBSPH_mesh,file=file_name,IOSTAT=file_stat)
    if (file_stat/=0) then
-      write(nscr,*) 'Error in opening a surface mesh file in ',                &
+      write(uerr,*) 'Error in opening a surface mesh file in ',                &
          'Import_pl_surface_meshes; the program stops here'
       stop
    endif   
    read(unit_DBSPH_mesh,"(3/)",IOSTAT=file_stat)
    if (file_stat/=0) then
-      write(nscr,*) 'Error in reading a surface mesh file in ',                &
+      write(uerr,*) 'Error in reading a surface mesh file in ',                &
          'Import_pl_surface_meshes; the program stops here'
       stop
    endif   
 ! Read the number of vertices in the file    
    read(unit_DBSPH_mesh,*,IOSTAT=file_stat) aux_char_1,aux_char_2,n_vertices
    if (file_stat/=0) then
-      write(nscr,*) 'Error in reading a surface mesh file in ',                &
+      write(uerr,*) 'Error in reading a surface mesh file in ',                &
          'Import_pl_surface_meshes; the program stops here'
       stop
    endif
    read(unit_DBSPH_mesh,"(2/)",IOSTAT=file_stat)
    if (file_stat/=0) then
-      write(nscr,*) 'Error in reading a surface mesh file in ',                &
+      write(uerr,*) 'Error in reading a surface mesh file in ',                &
          'Import_pl_surface_meshes; the program stops here'
       stop
    endif
 ! Read the number of faces in the file
    read(unit_DBSPH_mesh,*,IOSTAT=file_stat) aux_char_1,aux_char_2,n_faces
    if (file_stat/=0) then
-      write(nscr,*) 'Error in reading a surface mesh file in ',                &
+      write(uerr,*) 'Error in reading a surface mesh file in ',                &
          'Import_pl_surface_meshes; the program stops here'
       stop
    endif   
    read(unit_DBSPH_mesh,"(1/)",IOSTAT=file_stat)
    if (file_stat/=0) then
-      write(nscr,*) 'Error in reading a surface mesh file in ',                &
+      write(uerr,*) 'Error in reading a surface mesh file in ',                &
          'Import_pl_surface_meshes; the program stops here.'
       stop
    endif   
    if (.not.allocated(DBSPH%surf_mesh%vertices)) then
       allocate(DBSPH%surf_mesh%vertices(n_vertices),STAT=alloc_stat)
       if (alloc_stat/=0) then
-         write(nscr,*) 'Allocation of DBSPH%surf_mesh%vertices in ',           &
+         write(uerr,*) 'Allocation of DBSPH%surf_mesh%vertices in ',           &
             'Import_ply_surface_mesh failed; the program stops here.'
          stop 
       endif
       if (.not.allocated(aux_der_type_vert)) then
           allocate(aux_der_type_vert(n_vertices),STAT=alloc_stat)
           if (alloc_stat/=0) then
-             write(nscr,*) 'Allocation of aux_der_type_vert in ',              &
+             write(uerr,*) 'Allocation of aux_der_type_vert in ',              &
                 'Import_ply_surface_mesh failed; the program stops here.'
              stop 
           endif
@@ -153,13 +153,13 @@ do
          aux_der_type_vert(:) = DBSPH%surf_mesh%vertices(:)
          deallocate(DBSPH%surf_mesh%vertices,STAT=dealloc_stat)
          if (dealloc_stat/=0) then
-            write(nscr,*) 'Deallocation of DBSPH%surf_mesh%vertices in ',      &
+            write(uerr,*) 'Deallocation of DBSPH%surf_mesh%vertices in ',      &
                'Import_ply_surface_mesh failed; the program stops here.'
             stop 
          endif          
          allocate(DBSPH%surf_mesh%vertices(new_size_vert),STAT=alloc_stat)
          if (alloc_stat/=0) then
-            write(nscr,*) 'Allocation of DBSPH%surf_mesh%vertices in ',        &
+            write(uerr,*) 'Allocation of DBSPH%surf_mesh%vertices in ',        &
                'Import_ply_surface_mesh failed; the program stops here'
             stop 
          endif         
@@ -167,14 +167,14 @@ do
          if (allocated(aux_der_type_vert)) then
             deallocate(aux_der_type_vert,STAT=dealloc_stat)
             if (dealloc_stat/=0) then
-               write(nscr,*) 'Deallocation of aux_der_type_vert in ',          &
+               write(uerr,*) 'Deallocation of aux_der_type_vert in ',          &
                   'Import_ply_surface_mesh failed; the program stops here.'
                stop 
             endif   
          endif         
          allocate(aux_der_type_vert(new_size_vert),STAT=alloc_stat)
          if (alloc_stat/=0) then
-            write(nscr,*) 'Allocation of aux_der_type_vert in ',               &
+            write(uerr,*) 'Allocation of aux_der_type_vert in ',               &
                'Import_ply_surface_mesh failed; the program stops here.'
             stop 
          endif
@@ -194,7 +194,7 @@ do
             allocate(DBSPH%surf_mesh%faces(n_faces),STAT=alloc_stat)
       endif
       if (alloc_stat/=0) then
-         write(nscr,*) 'Allocation of DBSPH%surf_mesh%faces in ',              &
+         write(uerr,*) 'Allocation of DBSPH%surf_mesh%faces in ',              &
             'Import_ply_surface_mesh failed; the program stops here.'
          stop 
       endif
@@ -206,7 +206,7 @@ do
                allocate(aux_der_type_faces(n_faces),STAT=alloc_stat)
          endif
          if (alloc_stat/=0) then
-            write(nscr,*) 'Allocation of aux_der_type_faces in ',              &
+            write(uerr,*) 'Allocation of aux_der_type_faces in ',              &
                'Import_ply_surface_mesh failed; the program stops here.'
             stop 
          endif
@@ -220,7 +220,7 @@ do
                   STAT=alloc_stat)
          endif
          if (alloc_stat/=0) then
-            write(nscr,*) 'Allocation of DBSPH%surf_mesh%surface_mesh_file_ID',&
+            write(uerr,*) 'Allocation of DBSPH%surf_mesh%surface_mesh_file_ID',&
                ' in Import_ply_surface_mesh failed; the program stops here.'
             stop
          endif
@@ -233,7 +233,7 @@ do
                allocate(aux_surface_mesh_file_ID(n_faces),STAT=alloc_stat)
          endif
          if (alloc_stat/=0) then
-            write(nscr,*) 'Allocation of aux_surface_mesh_file_ID ',           &
+            write(uerr,*) 'Allocation of aux_surface_mesh_file_ID ',           &
                'in Import_ply_surface_mesh failed; the program stops here.'
             stop
          endif
@@ -250,13 +250,13 @@ do
          aux_der_type_faces(:) = DBSPH%surf_mesh%faces(:)
          deallocate(DBSPH%surf_mesh%faces,STAT=dealloc_stat)
          if (dealloc_stat/=0) then
-            write(nscr,*) 'Deallocation of DBSPH%surf_mesh%faces in ',         &
+            write(uerr,*) 'Deallocation of DBSPH%surf_mesh%faces in ',         &
                'Import_ply_surface_mesh failed; the program stops here'
             stop 
          endif          
          allocate(DBSPH%surf_mesh%faces(new_size_face),STAT=alloc_stat)
          if (alloc_stat/=0) then
-            write(nscr,*) 'Allocation of DBSPH%surf_mesh%faces in ',           &
+            write(uerr,*) 'Allocation of DBSPH%surf_mesh%faces in ',           &
                'Import_ply_surface_mesh failed; the program stops here'
             stop 
          endif         
@@ -264,21 +264,21 @@ do
          if (allocated(aux_der_type_faces)) then
             deallocate(aux_der_type_faces,STAT=dealloc_stat)
             if (dealloc_stat/=0) then
-               write(nscr,*) 'Deallocation of aux_der_type_faces in ',         &
+               write(uerr,*) 'Deallocation of aux_der_type_faces in ',         &
                   'Import_ply_surface_mesh failed; the program stops here.'
                stop 
             endif   
          endif         
          allocate(aux_der_type_faces(new_size_face),STAT=alloc_stat)
          if (alloc_stat/=0) then
-            write(nscr,*) 'Allocation of aux_der_type_faces in ',              &
+            write(uerr,*) 'Allocation of aux_der_type_faces in ',              &
                'Import_ply_surface_mesh failed; the program stops here.'
             stop
          endif
          aux_surface_mesh_file_ID(:) = DBSPH%surf_mesh%surface_mesh_file_ID(:)
          deallocate(DBSPH%surf_mesh%surface_mesh_file_ID,STAT=dealloc_stat)
          if (dealloc_stat/=0) then
-            write(nscr,*) 'Deallocation of ',                                  &
+            write(uerr,*) 'Deallocation of ',                                  &
                'DBSPH%surf_mesh%surface_mesh_file_ID in ',                     &
                'Import_ply_surface_mesh failed; the program stops here. '
             stop
@@ -286,7 +286,7 @@ do
          allocate(DBSPH%surf_mesh%surface_mesh_file_ID(new_size_face),         &
             STAT=alloc_stat)
          if (alloc_stat/=0) then
-            write(nscr,*) 'Allocation of DBSPH%surf_mesh%surface_mesh_file_ID',&
+            write(uerr,*) 'Allocation of DBSPH%surf_mesh%surface_mesh_file_ID',&
                ' in Import_ply_surface_mesh failed; the program stops here. '
             stop
          endif
@@ -295,14 +295,14 @@ do
          if (allocated(aux_surface_mesh_file_ID)) then
             deallocate(aux_surface_mesh_file_ID,STAT=dealloc_stat)
             if (dealloc_stat/=0) then
-               write(nscr,*) 'Deallocation of aux_surface_mesh_file_ID in ',   &
+               write(uerr,*) 'Deallocation of aux_surface_mesh_file_ID in ',   &
                   'Import_ply_surface_mesh failed; the program stops here.'
                stop
             endif
          endif
          allocate(aux_surface_mesh_file_ID(new_size_face),STAT=alloc_stat)
          if (alloc_stat/=0) then
-            write(nout,*) 'Allocation of aux_surface_mesh_file_ID in ',        &
+            write(ulog,*) 'Allocation of aux_surface_mesh_file_ID in ',        &
                'Import_ply_surface_mesh failed; the program stops here.'
             stop 
          endif
@@ -477,7 +477,7 @@ DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(k-1)%vert_list(1))%pos          &
    enddo  
    close(unit_DBSPH_mesh,IOSTAT=file_stat)
    if (file_stat/=0) then
-      write(nscr,*) 'Error in closing a surface mesh file in ',                &
+      write(uerr,*) 'Error in closing a surface mesh file in ',                &
          'Import_pl_surface_meshes; the program stops here. '
       stop
    endif
@@ -496,13 +496,13 @@ DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(k-1)%vert_list(1))%pos          &
       aux_der_type_faces(:) = DBSPH%surf_mesh%faces(:)
       deallocate(DBSPH%surf_mesh%faces,STAT=dealloc_stat)
       if (dealloc_stat/=0) then
-         write(nscr,*) 'Deallocation of DBSPH%surf_mesh%faces in ',            &
+         write(uerr,*) 'Deallocation of DBSPH%surf_mesh%faces in ',            &
             'Import_ply_surface_mesh failed; the program stops here.'
          stop 
       endif          
       allocate(DBSPH%surf_mesh%faces(new_size_face),STAT=alloc_stat)
       if (alloc_stat/=0) then
-         write(nscr,*) 'Allocation of DBSPH%surf_mesh%faces in ',              &
+         write(uerr,*) 'Allocation of DBSPH%surf_mesh%faces in ',              &
             'Import_ply_surface_mesh failed; the program stops here.'
          stop 
       endif         
@@ -510,21 +510,21 @@ DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(k-1)%vert_list(1))%pos          &
       if (allocated(aux_der_type_faces)) then
          deallocate(aux_der_type_faces,STAT=dealloc_stat)
          if (dealloc_stat/=0) then
-            write(nscr,*) 'Deallocation of aux_der_type_faces in ',            &
+            write(uerr,*) 'Deallocation of aux_der_type_faces in ',            &
                'Import_ply_surface_mesh failed; the program stops here.'
             stop 
          endif   
       endif         
       allocate(aux_der_type_faces(new_size_face),STAT=alloc_stat)
       if (alloc_stat/=0) then
-         write(nscr,*) 'Allocation of aux_der_type_faces in ',                 &
+         write(uerr,*) 'Allocation of aux_der_type_faces in ',                 &
             'Import_ply_surface_mesh failed; the program stops here.'
          stop
       endif
       aux_surface_mesh_file_ID(:) = DBSPH%surf_mesh%surface_mesh_file_ID(:)
       deallocate(DBSPH%surf_mesh%surface_mesh_file_ID,STAT=dealloc_stat)
       if (dealloc_stat/=0) then
-         write(nscr,*) 'Deallocation of ',                                     &
+         write(uerr,*) 'Deallocation of ',                                     &
             'DBSPH%surf_mesh%surface_mesh_file_ID in Import_ply_surface_mesh ',&
             'failed; the program stops here.'
          stop
@@ -532,7 +532,7 @@ DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(k-1)%vert_list(1))%pos          &
       allocate(DBSPH%surf_mesh%surface_mesh_file_ID(new_size_face),            &
          STAT=alloc_stat)
       if (alloc_stat/=0) then
-         write(nscr,*) 'Allocation of DBSPH%surf_mesh%surface_mesh_file_ID in',&
+         write(uerr,*) 'Allocation of DBSPH%surf_mesh%surface_mesh_file_ID in',&
             ' Import_ply_surface_mesh failed; the program stops here.'
          stop
       endif
@@ -541,14 +541,14 @@ DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(k-1)%vert_list(1))%pos          &
       if (allocated(aux_surface_mesh_file_ID)) then
          deallocate(aux_surface_mesh_file_ID,STAT=dealloc_stat)
          if (dealloc_stat/=0) then
-            write(nscr,*) 'Deallocation of aux_surface_mesh_file_ID in ',      &
+            write(uerr,*) 'Deallocation of aux_surface_mesh_file_ID in ',      &
                'Import_ply_surface_mesh failed; the program stops here.'
             stop
          endif
       endif
       allocate(aux_surface_mesh_file_ID(new_size_face),STAT=alloc_stat)
       if (alloc_stat/=0) then
-         write(nscr,*) 'Allocation of aux_surface_mesh_file_ID in ',           &
+         write(uerr,*) 'Allocation of aux_surface_mesh_file_ID in ',           &
             'Import_ply_surface_mesh failed; the program stops here.'
          stop 
       endif
@@ -556,7 +556,7 @@ DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(k-1)%vert_list(1))%pos          &
 enddo   
 close(unit_file_list,IOSTAT=file_stat)
 if (file_stat/=0) then
-   write(nscr,*) 'Error in closing surface_mesh_list.inp in ',                 &
+   write(uerr,*) 'Error in closing surface_mesh_list.inp in ',                 &
       'Import_pl_surface_meshes; the program stops here.'
    stop
 endif
@@ -568,7 +568,7 @@ DBSPH%n_w = new_size_face
 if (allocated(aux_der_type_vert)) then
    deallocate(aux_der_type_vert,STAT=dealloc_stat)
    if (dealloc_stat/=0) then
-      write(nscr,*) 'Deallocation of aux_der_type_vert in ',                   &
+      write(uerr,*) 'Deallocation of aux_der_type_vert in ',                   &
          'Import_ply_surface_mesh failed; the program stops here.'
       stop 
    endif   
@@ -576,7 +576,7 @@ endif
 if (allocated(aux_der_type_faces)) then
    deallocate(aux_der_type_faces,STAT=dealloc_stat)
    if (dealloc_stat/=0) then
-      write(nscr,*) 'Deallocation of aux_der_type_faces in ',                  &
+      write(uerr,*) 'Deallocation of aux_der_type_faces in ',                  &
          'Import_ply_surface_mesh failed; the program stops here.'
       stop
    endif
@@ -584,7 +584,7 @@ endif
 if (allocated(aux_surface_mesh_file_ID)) then
    deallocate(aux_surface_mesh_file_ID,STAT=dealloc_stat)
    if (dealloc_stat/=0) then
-      write(nscr,*) 'Deallocation of aux_surface_mesh_file_ID in ',            &
+      write(uerr,*) 'Deallocation of aux_surface_mesh_file_ID in ',            &
          'Import_ply_surface_mesh failed; the program stops here.'
       stop 
    endif   

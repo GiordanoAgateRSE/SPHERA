@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -54,6 +54,10 @@ call system("mv Body-particles.txt Body_particles.txt")
 call system("touch Q_sections.txt Q_sections_.tmp")
 call system("cat Q_sections.txt *Q_sections_* > Q-sections.txt")
 call system("rm -f *Q_sections*")
+call system("mv Q-sections.txt Q_sections.txt")
+call system("touch substations.txt substations_.tmp")
+call system("cat substations.txt *substations_* > substations-.txt")
+call system("rm -f *substations*")
 call system("mv Q-sections.txt Q_sections.txt")
 call system("touch monitoring_lines.txt temp.cln")
 call system("cat monitoring_lines.txt *.cln > monitoring-lines.txt")

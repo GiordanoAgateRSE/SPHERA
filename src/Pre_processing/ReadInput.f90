@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -25,7 +25,7 @@
 subroutine ReadInput(NumberEntities,OnlyTriangle,ier,ainp)
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
 use I_O_file_module
 use Static_allocation_module
 use Hybrid_allocation_module
@@ -82,7 +82,7 @@ current_version = .TRUE.
 ! Statements
 !------------------------
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"INPUT VERSION",ninp,nout)) return
+if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"INPUT VERSION",ninp,ulog)) return
 if (trim(ainp)/=trim(version)) then
    ier = 2
    current_version = .FALSE.
@@ -93,79 +93,81 @@ SECTION_LOOP: do while (ioerr==0)
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 ! If EOF is reached, then exit, otherwise to check the error code
    if (ioerr==-1) cycle SECTION_LOOP
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"INPUT FILE SECTIONS",ninp,nout))  &
+   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"INPUT FILE SECTIONS",ninp,ulog))  &
       return
-   if (ncord>0) write(nout,"(//,1x,a,/)") lcase(ainp) 
+   if (ncord>0) write(ulog,"(//,1x,a,/)") lcase(ainp) 
    select case(trim(lcase(trim(ainp))))
       case("##### title #####")
-         call ReadInputTitle(ainp,comment,nrighe,ier,ninp,nout)
+         call ReadInputTitle(ainp,comment,nrighe,ier,ninp,ulog)
       case("##### restart #####")
-         call ReadInputRestart(ainp,comment,nrighe,ier,ninp,nout)
+         call ReadInputRestart(ainp,comment,nrighe,ier,ninp,ulog)
       case("##### domain #####")
          call ReadInputDomain(NumberEntities,ainp,comment,nrighe,ier,ninp,     &
-            nout,nscr)
+            ulog,uerr)
       case("##### vertices #####")
          call ReadInputVertices(NumberEntities,Vertice, ainp,comment,nrighe,   &
-            ier,.TRUE.,ninp,nout)
+            ier,.TRUE.,ninp,ulog)
       case("##### lines #####")
          call ReadInputLines(NumberEntities,BoundaryVertex,Tratto,ainp,        &
-            comment,nrighe,ier,ninp,nout)
+            comment,nrighe,ier,ninp,ulog)
       case("##### faces #####")
         call ReadInputFaces(NumberEntities,ainp,comment,nrighe,ier,.TRUE.,     &
-           ninp,nout)
+           ninp,ulog)
       case("##### geometry file #####")
          call ReadInputExternalFile(NumberEntities,ainp,comment,nrighe,ier,    &
-            OnlyTriangle,ninp,nout,ninp2)
+            OnlyTriangle,ninp,ulog,ninp2)
       case("##### bed load transport #####")
-         call ReadBedLoadTransport(ainp,comment,nrighe,ier,ninp,nout,nscr)
+         call ReadBedLoadTransport(ainp,comment,nrighe,ier,ninp,ulog,uerr)
       case("##### medium #####")
          call ReadInputMedium(NumberEntities,Med,ainp,comment,nrighe,ier,ninp, &
-            nout,nscr)
+            ulog,uerr)
       case("##### body dynamics #####")
-         call ReadBodyDynamics(ainp,comment,nrighe,ier,ninp,nout)
+         call ReadBodyDynamics(ainp,comment,nrighe,ier,ninp,ulog)
 ! Lower case letters are required
       case("##### dbsph #####") 
-         call ReadDBSPH(ainp,comment,nrighe,ier,ninp,nout)
+         call ReadDBSPH(ainp,comment,nrighe,ier,ninp,ulog)
       case("##### boundaries #####")
          call ReadInputBoundaries(NumberEntities,Partz,Tratto,BoundaryVertex,  &
-            ainp,comment,nrighe,ier,ninp,nout)
+            ainp,comment,nrighe,ier,ninp,ulog)
       case("##### run parameters #####")
-         call ReadInputRunParameters (ainp,comment,nrighe,ier,ninp,nout,nscr)
+         call ReadInputRunParameters (ainp,comment,nrighe,ier,ninp,ulog,uerr)
       case("##### general physical properties #####")
          call ReadInputGeneralPhysical(NumberEntities,ainp,comment,nrighe,ier, &
-            ninp,nout)
+            ninp,ulog)
       case("##### output regulation #####")
-         call ReadInputOutputRegulation (Med,ainp,comment,nrighe,ier,ninp,nout)
+         call ReadInputOutputRegulation (Med,ainp,comment,nrighe,ier,ninp,ulog)
       case("##### control points #####")
          call ReadInputControlPoints(NumberEntities,Control_Points,ainp,       &
-            comment,nrighe,ier,ninp,nout)
+            comment,nrighe,ier,ninp,ulog)
       case("##### control lines #####")
          call ReadInputControlLines(NumberEntities,Control_Points,             &
-            Control_Lines,ainp,comment,nrighe,ier, ninp,nout)
+            Control_Lines,ainp,comment,nrighe,ier, ninp,ulog)
       case("##### control sections #####")
          call ReadInputControlSections(NumberEntities,Control_Sections,ainp,   &
-            comment,nrighe,ier,ninp,nout)
+            comment,nrighe,ier,ninp,ulog)
       case("##### section flow rate #####")
-         call ReadSectionFlowRate(ainp,comment,nrighe,ier,ninp,nout)
+         call ReadSectionFlowRate(ainp,comment,nrighe,ier)
+      case("##### substations #####")
+         call ReadSubstations(ainp,comment,nrighe,ier)
       case("##### draw options #####")
-         call ReadInputDrawOptions(ainp,comment,nrighe,ier,ninp,nout)
+         call ReadInputDrawOptions(ainp,comment,nrighe,ier,ninp,ulog)
       case default 
         ier = 1
    endselect
 ! Reading error was detected
    if (ier/=0) then
-      write(nscr,"(/,1x,a,i8,//)")                                             &
+      write(uerr,"(/,1x,a,i8,//)")                                             &
          ">> Reading error was detected in INPUT FILE.  error code= ",ier
-      write(nout,"(/,1x,a,i8,//)")                                             &
+      write(ulog,"(/,1x,a,i8,//)")                                             &
          ">> Reading error was detected in INPUT FILE.  error code= ",ier
       return
       elseif (ncord>0) then
-         write(nout,"(1x,a,/)") lcase(ainp)
+         write(ulog,"(1x,a,/)") lcase(ainp)
    endif
 enddo SECTION_LOOP 
 ! To assign the kernel support 
 if (ncord>0) then
-   write(nout,"(/,1x,a,//)") ">> END OF INPUT FILE"
+   write(ulog,"(/,1x,a,//)") ">> END OF INPUT FILE"
    Domain%h = Domain%dx * Domain%trunc
    doubleh = two * Domain%h
    squareh = Domain%h * Domain%h

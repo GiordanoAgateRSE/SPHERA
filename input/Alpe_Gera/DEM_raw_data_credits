@@ -1,0 +1,9 @@
+The raw DEM data refers to:
+SRTM3/DTED1 (USGS); http://earthexplorer.usgs.gov/
+and are elborated and modified using the following software (either FOSS or freeware):
+GDAL (OSGEO); https://github.com/OSGeo/gdal
+DEM2xyz v.1.0 (RSE SpA), https://github.com/AndreaAmicarelliRSE/DEM2xyz
+Paraview (Kitware), https://github.com/Kitware/ParaView
+ply2SPHERA_perimeter v.1.0 (RSE SpA), https://github.com/AndreaAmicarelliRSE/ply2SPHERA_perimeter
+SPHERA v.8.0 (RSE SpA), https://github.com/AndreaAmicarelliRSE/SPHERA
+Grid Interpolator v.1.0 (RSE SpA), https://github.com/AndreaAmicarelliRSE/Grid_Interpolator

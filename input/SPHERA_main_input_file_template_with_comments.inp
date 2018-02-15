@@ -3,7 +3,7 @@ version.subversion   !
 !------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are providedoin SPHERA documentation.
@@ -490,7 +490,9 @@ final_time final_time_step          ! (the run stops when reaching either the
                                     ! case of a restarted simulation, these 
                                     ! values are reported in the log file, but 
                                     ! they are actually overwritten by the 
-                                    ! values read from the input restart file)
+                                    ! values read from the input restart file);
+                                    ! this line has no influence in case of 
+                                    ! restart
 CFL vsc_coeff Leapfrog_flag scheme_order factor dt_alfa_Mon
                                     ! CFL;
                                     ! vsc_coeff(viscous stability condition
@@ -521,7 +523,10 @@ COEFNMAXPARTI COEFNMAXPARTJ body_part_reorder
                                     ! particles of the mixture dam/reservoir 
                                     ! (beyond the main water reservoir); 
                                     ! COEFNMAXPARTJ:maxb(max number of 
-                                    ! neighbours)=COEFNMAXPARTJ*(4h/dx)^D;
+                                    ! neighbours)=COEFNMAXPARTJ*(4h/dx)^D (the 
+                                    ! same number applies both for fluid 
+                                    ! neighbours and DB-SPH wall element 
+                                    ! neighbours; 
                                     ! body_part_reorder(DB-SPH)=0(fixed 
                                     ! frontiers),1(mobile frontiers)
 nag_aux MAXCLOSEBOUNDFACES MAXNUMCONVEXEDGES GCBFVecDim
@@ -650,11 +655,38 @@ n_vertices                          ! n_vertices(number of vertices describing a
 vertex_1_x vertex_1_y vertex_1_z
 vertex_2_x vertex_2_y vertex_2_z
 vertex_3_x vertex_3_y vertex_3_z
-vertex_4_x vertex_4_y vertex_4_z 
-                                    ! vertices of the first section (in case of 
-                                    ! 3 vertices do not mind about the fourth 
-                                    ! point; anti-clock wise sense viewing the 
-                                    ! section face from the outside of the 
-                                    ! fluid domain)
+vertex_4_x vertex_4_y vertex_4_z    ! to be omitted in case of triangles
+                                    ! vertices of the first section (anti-clock 
+                                    ! wise sense viewing the section face from 
+                                    ! the outside of the fluid domain)
 ...                                 ! other possible section records
 ##### end section flow rate #####
+
+##### substations #####
+! Input variables for monitoring the electrical substations (both high-voltage 
+! transmission substations, medium-voltage distribution substations and 
+! low-voltage distribution substations). From a plan view, each substation is 
+! described by a polygon (either triangle, quadrilateral, pentagon or hexagon). 
+n_sub dt_out_sub                    ! n_sub(number of the substations); 
+                                    ! dt_out_sub(writing time step duration for 
+                                    ! monitoring the substations)
+first_substation_ID                 ! first_substation_ID=1
+type_ID n_vertices                  ! type_ID(substation type ID)=1
+                                    ! (high-voltage),2(medium-voltage),3
+                                    ! (low-voltage);
+                                    ! n_vertices(number of vertices describing 
+                                    ! the substation)=3,4,5,6
+vertex_1_x vertex_1_y vertex_1_z
+vertex_2_x vertex_2_y vertex_2_z
+vertex_3_x vertex_3_y vertex_3_z
+vertex_4_x vertex_4_y vertex_4_z    ! to be omitted in case of triangles 
+vertex_5_x vertex_5_y vertex_5_z    ! to be omitted in case of 
+!                                   !    triangles/quadrilaterals
+vertex_6_x vertex_6_y vertex_6_z    ! to be omitted in case of 
+!                                   !    triangles/quadrilaterals/pentagons
+                                    ! vertices of the first section (anti-clock 
+                                    ! wise sense viewing the substation from 
+                                    ! the outside of the fluid domain: clock 
+                                    ! wise sense in plan view)
+...                                 ! other possible section records
+##### end substations #####

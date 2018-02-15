@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -30,7 +30,7 @@ subroutine ComputeVolumeIntegral_WdV2D(icbs,Ncbslocal,Cloboside,LocXY,         &
    BoundarySide,xpmin,xpmax,interlen,VIntWdV)
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
 use I_O_file_module
 use Static_allocation_module
 use Hybrid_allocation_module
@@ -110,7 +110,7 @@ if (ypi>=yplimite) then
                   then
                   angle = BoundarySide(Cloboside(2))%angle
                   else
-                     write(nout,'(a,2i10)') 'ERROR!! Sides not consecutive',   &
+                     write(ulog,'(a,2i10)') 'ERROR!! Sides not consecutive',   &
                         Cloboside(1),Cloboside(2)
                      call diagnostic(arg1=8,arg2=4,arg3=nomsub)
             endif

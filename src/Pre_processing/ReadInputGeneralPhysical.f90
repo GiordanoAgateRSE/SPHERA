@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -22,17 +22,17 @@
 ! Program unit: ReadInputGeneralPhysical                          
 ! Description:                        
 !-------------------------------------------------------------------------------
-subroutine ReadInputGeneralPhysical(NumberEntities,ainp,comment,nrighe,ier,ninp,nout)
+subroutine ReadInputGeneralPhysical(NumberEntities,ainp,comment,nrighe,ier,ninp,ulog)
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
 use Static_allocation_module                                     
 use Hybrid_allocation_module
 !------------------------
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: nrighe,ier, ninp,nout
+integer(4) :: nrighe,ier, ninp,ulog
 integer(4),dimension(20) :: NumberEntities
 character(1) :: comment
 character(100) :: ainp
@@ -55,30 +55,30 @@ logical,external :: ReadCheck
 !------------------------
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"GENERAL PHYSICAL PROPERTIES DATA",   &
-   ninp,nout)) return
+   ninp,ulog)) return
 do while (TRIM(lcase(ainp))/="##### end general physical properties #####")
    read (ainp,*,iostat=ioerr) values1(1:NumberEntities(1))
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"GRAVITAL ACCELERATION VECTOR",ninp&
-      ,nout)) return
+      ,ulog)) return
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
    read (ainp,*,iostat=ioerr) prif
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"REFERENCE PRESSURE",ninp,nout))   &
+   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"REFERENCE PRESSURE",ninp,ulog))   &
       return
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"GENERAL PHYSICAL PROPERTIES DATA",&
-      ninp,nout)) return
+      ninp,ulog)) return
 enddo
 if (ncord>0) then
    Domain%grav(:) = zero            
    do n=1,NumberEntities(1)
       icord = icoordp(n,ncord-1)
       Domain%grav(icord) = values1(n)
-      if (nout>0) write (nout,"(1x,a,a,1p,e12.4)") xyzlabel(icord),            &
+      if (ulog>0) write(ulog,"(1x,a,a,1p,e12.4)") xyzlabel(icord),             &
          "gravity acceler. :",Domain%grav(icord)
    enddo
    Domain%prif = prif
-   if (nout>0) write (nout,"(1x,a,1p,e12.4)") "P rif:            :",Domain%prif
-   if (nout>0) write (nout,"(1x,a)") " "
+   if (ulog>0) write(ulog,"(1x,a,1p,e12.4)") "P rif:            :",Domain%prif
+   if (ulog>0) write(ulog,"(1x,a)") " "
 endif
 !------------------------
 ! Deallocations

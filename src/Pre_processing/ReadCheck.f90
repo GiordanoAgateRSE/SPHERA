@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -22,15 +22,15 @@
 ! Program unit: ReadCheck                    
 ! Description:                   
 !-------------------------------------------------------------------------------
-logical function ReadCheck(IoErr,Ier,Nrighe,ainp,listadati,ninp,nout)
+logical function ReadCheck(IoErr,Ier,Nrighe,ainp,listadati,ninp,ulog)
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
 !------------------------
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: IoErr,Ier,Nrighe,ninp,nout
+integer(4) :: IoErr,Ier,Nrighe,ninp,ulog
 character(*) :: ainp,listadati
 !------------------------
 ! Explicit interfaces
@@ -50,11 +50,11 @@ if (IoErr==0) then
    else
       Ier = 4
       ReadCheck = .FALSE.
-      write(nout,"(1x,a)")    ">>>>>>>>>>>>>> Warning:"
-      write(nout,"(1x,a)")  
-      write(nout,"(1x,a,i5)") "Error reading unit:  ",ninp
-      write(nout,"(1x,a,a)")  "Expected data:       ",listadati
-      write(nout,"(1x,a,i8,a)")                                                &
+      write(ulog,"(1x,a)")    ">>>>>>>>>>>>>> Warning:"
+      write(ulog,"(1x,a)")  
+      write(ulog,"(1x,a,i5)") "Error reading unit:  ",ninp
+      write(ulog,"(1x,a,a)")  "Expected data:       ",listadati
+      write(ulog,"(1x,a,i8,a)")                                                &
          "Last input line read:"//trim(ainp)//"(line number:",Nrighe,")"
 endif
 !------------------------

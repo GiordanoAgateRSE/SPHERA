@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -26,14 +26,14 @@
 subroutine vector_rotation_Rodrigues(n_R,teta_R,vector)
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
 !------------------------
 ! Declarations
 !------------------------
 implicit none
 double precision,intent(in) :: teta_R
 double precision,intent(in) :: n_R(3)
-double precision,intent(inout) :: vector(3)
+double precision,intent(INOUT) :: vector(3)
 double precision :: aux_vector(3)
 double precision :: R_Rodrigues(3,3)
 !------------------------

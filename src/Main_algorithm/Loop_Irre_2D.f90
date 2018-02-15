@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -25,7 +25,7 @@
 subroutine Loop_Irre_2D
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
 use I_O_file_module
 use Static_allocation_module
 use Hybrid_allocation_module
@@ -121,7 +121,7 @@ if ((on_going_time_step==it_start).and.(Domain%tipo=="bsph")) then
       endif
    enddo
 !$omp end parallel do
-   call OrdGrid1(nout)
+   call OrdGrid1
 ! Variable to count the particles, which are not "sol"
    indarrayFlu = 0
    do npi=1,nag
@@ -173,9 +173,9 @@ if (Domain%tipo=="semi") then
 endif
 ! To evaluate the properties that must be attributed to the fixed particles
 if (Domain%NormFix)  call NormFix
-if (nscr>0) write (nscr,"(a,1x,a)") " Running case:",trim(nomecas2)
+if (uerr>0) write(uerr,"(a,1x,a)") " Running case:",trim(nomecas2)
 ! To initialize the output files
-if (nout>0) then
+if (ulog>0) then
    it_print = it_eff
    call Print_Results(it_eff,it_print,'inizio')
 endif
@@ -215,7 +215,7 @@ done_flag = .false.
 ! Stability criteria
    if (nag>0) call time_step_duration
    simulation_time = simulation_time + dt
-   if (nscr>0) write (nscr,"(a,i8,a,g13.6,a,g12.4,a,i8,a,i5)") " it= ",it,     &
+   if (uerr>0) write(uerr,"(a,i8,a,g13.6,a,g12.4,a,i8,a,i5)") " it= ",it,      &
       "   time= ",simulation_time,"  dt= ",dt,"    npart= ",nag,"   out= ",    &
       num_out
    do while ((done_flag.eqv.(.false.)).or.((Domain%RKscheme>1).and.            &
@@ -245,7 +245,7 @@ done_flag = .false.
 ! It assigns the movement with an imposed kinematics ("npointv" velocity data)
             if (Partz(ir)%npointv>1) then
                call vellaw(Partz(ir)%vlaw,Partz(ir)%vel,Partz(ir)%npointv)
-               write(nout,"(f12.4,a,i2,a,3f14.9)") simulation_time,"  zona",ir,&
+               write(ulog,"(f12.4,a,i2,a,3f14.9)") simulation_time,"  zona",ir,&
                   "  vel.",Partz(ir)%vel
 ! As an alternative, one may loop over particles 
                do npi = Partz(ir)%limit(1),Partz(ir)%limit(2) 
@@ -538,7 +538,7 @@ done_flag = .false.
 ! Adding new particles from the inlet sections
             if (SourceSide/=0) call GenerateSourceParticles_2D 
 ! Particle reordering 
-            call OrdGrid1(nout)
+            call OrdGrid1
             call start_and_stop(3,9)
 ! Set the parameters for the fixed particles 
             if (Domain%NormFix) call NormFix
@@ -785,7 +785,7 @@ done_flag = .false.
 ! Adding new particles at the inlet sections
             if (SourceSide/=0) call GenerateSourceParticles_2D 
 ! Particle reordering on the background positioning grid
-            call OrdGrid1 (nout)
+            call OrdGrid1
             call start_and_stop(3,9)
 ! Set the parameters for the fixed particles 
             if (Domain%NormFix) call NormFix
@@ -820,7 +820,7 @@ done_flag = .false.
    enddo
 ! Post-processing
    if (Domain%time_split==0) dtvel = dt
-   if (nout>0) then
+   if (ulog>0) then
       call Print_Results(it_eff,it_print,'loop__')
    endif
    if (nres>0) then
@@ -890,7 +890,7 @@ done_flag = .false.
             xmax = max(xmax,pg(npi)%coord(1))
             ymax = max(ymax,pg(npi)%coord(3))
          enddo
-         write (nfro,'(2g14.7,13x,a,g14.7)') simulation_time,xmax,'-',ymax
+         write(nfro,'(2g14.7,13x,a,g14.7)') simulation_time,xmax,'-',ymax
       endif
       elseif (Domain%memo_fr>zero) then
          if ((it>1).AND.(mod(simulation_time,Domain%memo_fr)<=dtvel)) then
@@ -901,7 +901,7 @@ done_flag = .false.
                xmax = max(xmax,pg(npi)%coord(1))
                ymax = max(ymax,pg(npi)%coord(3))
             enddo
-            write (nfro,'(2g14.7,13x,a,g14.7)') simulation_time,xmax,'-',ymax
+            write(nfro,'(2g14.7,13x,a,g14.7)') simulation_time,xmax,'-',ymax
          endif
    endif
 ! Paraview output and .txt file concatenation
@@ -914,7 +914,7 @@ done_flag = .false.
    if (simulation_time>=Domain%tmax) exit ITERATION_LOOP
 enddo  ITERATION_LOOP 
 ! Post-processing: log file 
-if ((it_eff/=it_print).AND.(nout>0)) then
+if ((it_eff/=it_print).AND.(ulog>0)) then
    it_print = it_eff
    call Print_Results(it_eff,it_print,'fine__')
 endif
@@ -925,61 +925,61 @@ endif
 if (vtkconv) then
    call result_converter ('fine__')
 endif
-if (nout>0) then
-   write (nout,*) " "
-   write (nout,'(a)')                                                          &
+if (ulog>0) then
+   write(ulog,*) " "
+   write(ulog,'(a)')                                                          &
 "----------------------------------------------------------------------------------------"
-   write (nout,*) " "
+   write(ulog,*) " "
    SpCountot = 0
    do i=1,NMedium
       SpCountot = SpCountot + SpCount(i)
-      write (nout,'(a,i15,a,a)')                                               &
+      write(ulog,'(a,i15,a,a)')                                               &
          "Number of source particles        :  SpCount = ",SpCount(i),         &
          " medium ",Med(i)%tipo
    enddo
-   write (nout,'(a,i15)') "Number of total source particles  :  SpCountot = ", &
+   write(ulog,'(a,i15)') "Number of total source particles  :  SpCountot = ", &
       SpCountot
-   write (nout,*) " "
+   write(ulog,*) " "
    OpCountot = 0
    do i=1,NMedium
       OpCountot = OpCountot + OpCount(i)
-      write (nout,'(a,i15,a,a)')                                               &
+      write(ulog,'(a,i15,a,a)')                                               &
          "Number of outgone particles       :  OpCount = ",OpCount(i),         &
          " medium ",Med(i)%tipo
    enddo
-   write (nout,'(a,i15)') "Number of total outgone particles :  OpCountot = ", &
+   write(ulog,'(a,i15)') "Number of total outgone particles :  OpCountot = ", &
       OpCountot
-   write (nout,*) " "
+   write(ulog,*) " "
    EpCountot = 0
    do i=1,NMedium
       EpCountot = EpCountot + EpCount(i)
-      write (nout,'(a,i15,a,a)')                                               &
+      write(ulog,'(a,i15,a,a)')                                               &
          "Number of escaped particles       :  EpCount = ",EpCount(i),         &
          " medium ",Med(i)%tipo
    enddo
-   write (nout,'(a,i15)') "Number of total escaped particles :  EpCountot = ", &
+   write(ulog,'(a,i15)') "Number of total escaped particles :  EpCountot = ", &
       EpCountot
-   write (nout,*) " "
+   write(ulog,*) " "
    EpOrdGridtot = 0
    do i=1,NMedium
       EpOrdGridtot = EpOrdGridtot + EpOrdGrid(i)
-      write (nout,'(a,i15,a,a)')                                               &
+      write(ulog,'(a,i15,a,a)')                                               &
          "Number of escaped particles (OrdGrid1)      :  EpOrdGrid = ",        &
          EpOrdGrid(i)," medium ",Med(i)%tipo
    enddo
-   write (nout,'(a,i15)')                                                      &
+   write(ulog,'(a,i15)')                                                      &
       "Number of total escaped particles (OrdGrid1):  EpOrdGridtot = ",        &
       EpOrdGridtot
-   write (nout,*) " "
-   write (nout,*) " "
+   write(ulog,*) " "
+   write(ulog,*) " "
 
-   write (nout,*) "Final number of particles:       NAG = ",nag
-   if (Domain%tipo=="bsph") write (nout,*)                                     &
+   write(ulog,*) "Final number of particles:       NAG = ",nag
+   if (Domain%tipo=="bsph") write(ulog,*)                                     &
       "Final number of wall particles:       DBSPH%n_w = ",DBSPH%n_w
-   write (nout,*) " "
-   write (nout,'(a)')                                                          &
+   write(ulog,*) " "
+   write(ulog,'(a)')                                                          &
 "----------------------------------------------------------------------------------------"
-   write (nout,*) " "
+   write(ulog,*) " "
 endif
 !------------------------
 ! Deallocations

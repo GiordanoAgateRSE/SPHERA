@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -23,17 +23,17 @@
 ! Description: Reading monitoring lines.                      
 !-------------------------------------------------------------------------------
 subroutine ReadInputControlLines(NumberEntities,Control_Points,Control_Lines,  &
-                                 ainp,comment,nrighe,ier,ninp,nout)
+                                 ainp,comment,nrighe,ier,ninp,ulog)
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
 use Static_allocation_module
 use Hybrid_allocation_module
 !------------------------
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: nrighe,ier,ninp,nout
+integer(4) :: nrighe,ier,ninp,ulog
 integer(4),dimension(20) :: NumberEntities
 type (TyCtlPoint),dimension(NPointst) :: Control_Points
 type (TyCtlLine),dimension(NLines) :: Control_Lines
@@ -59,7 +59,7 @@ character(100), external :: lcase
 ! Statements
 !------------------------
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"CONTROL LINES DATA",ninp,nout))      &
+if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"CONTROL LINES DATA",ninp,ulog))      &
    return
 npts = npoints
 do while (TRIM(lcase(ainp))/="##### end control lines #####")
@@ -67,22 +67,22 @@ do while (TRIM(lcase(ainp))/="##### end control lines #####")
    values2 = zero
    values3 = zero
    NumberEntities(5) = NumberEntities(5) + 1
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"CONTROL LINE LABEL",ninp,nout))   &
+   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"CONTROL LINE LABEL",ninp,ulog))   &
       return
    label(1:8) = ainp(1:8)
    write(txt,"(i5)") NumberEntities(5)
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
    read(ainp,*,iostat=ioerr) values1(1:ncord)
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                                   &
-      "CONTROL LINE"//txt//" - FIRST POINT",ninp,nout)) return
+      "CONTROL LINE"//txt//" - FIRST POINT",ninp,ulog)) return
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
    read(ainp,*,iostat=ioerr) values2(1:ncord)
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                                   &
-      "CONTROL LINE"//txt//" - SECOND POINT",ninp,nout)) return
+      "CONTROL LINE"//txt//" - SECOND POINT",ninp,ulog)) return
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
    read(ainp,*,iostat=ioerr) ndiv
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                                   &
-      "CONTROL LINE"//txt//" - POINTS NUMBER",ninp,nout)) return
+      "CONTROL LINE"//txt//" - POINTS NUMBER",ninp,ulog)) return
    NumberEntities(6) = NumberEntities(6) + ndiv
    if (ncord>0) then
       control_lines(NumberEntities(5))%label = label
@@ -92,12 +92,12 @@ do while (TRIM(lcase(ainp))/="##### end control lines #####")
       values3(:) = (values2(:) - values1(:)) / (ndiv - 1)
       vp = dsqrt(values3(1) * values3(1) + values3(2) * values3(2) +           &
            values3(3) * values3(3))
-      if (nout>0) then
-         write (nout,"(1x,a,i3,1x,a)") "Control line      ",NumberEntities(5), &
+      if (ulog>0) then
+         write(ulog,"(1x,a,i3,1x,a)") "Control line      ",NumberEntities(5), &
             "("//control_lines(NumberEntities(5))%label//")"
-         write (nout,"(1x,a,i12)") "First Point:      ",                       &
+         write(ulog,"(1x,a,i12)") "First Point:      ",                       &
             control_lines(NumberEntities(5))%icont(1)
-         write (nout,"(1x,a,i12)") "Last  Point:      ",                       &
+         write(ulog,"(1x,a,i12)") "Last  Point:      ",                       &
             control_lines(NumberEntities(5))%icont(2)
       endif
       do i=control_lines(NumberEntities(5))%icont(1),                          &
@@ -112,16 +112,16 @@ do while (TRIM(lcase(ainp))/="##### end control lines #####")
                control_points(i)%dist = control_points(i-1)%dist + vp
          endif
          values1 = values1 + values3
-         if (nout>0) then
-            write (nout,"(1x,a,i5,1pe12.4,3(3x,a,e12.4))") "Point ",i,         &
+         if (ulog>0) then
+            write(ulog,"(1x,a,i5,1pe12.4,3(3x,a,e12.4))") "Point ",i,         &
                control_points(i)%dist,(xyzlabel(icoordp(n,ncord-1))//" = ",    &
                control_points(i)%coord(icoordp(n,ncord-1)),n=1,ncord)
          endif
       enddo
-      write (nout,"(1x,a)") " "
+      write(ulog,"(1x,a)") " "
    endif
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"CONTROL LINES DATA",ninp,nout))   &
+   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"CONTROL LINES DATA",ninp,ulog))   &
       return
 enddo
 !------------------------

@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -27,7 +27,7 @@
 subroutine result_converter(str)
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
 use I_O_file_module
 use Static_allocation_module
 use Hybrid_allocation_module
@@ -67,9 +67,9 @@ call cat_post_proc
       block = block + 1
       nblocchi = nblocchi + 1
       if (nblocchi>maxnumblock) then
-         write(nscr,'(a)')                                                     &
+         write(uerr,'(a)')                                                     &
 ' Warning! nblocchi>maxnumblock in subroutine result_converter.'
-         write(nscr,'(a)')                                                     &
+         write(uerr,'(a)')                                                     &
          '    Increase maxnumblock or decrease output frequency for vtu files.'
       nblocchi = maxnumblock
    endif
@@ -80,7 +80,7 @@ call cat_post_proc
    cargo = adjustl(cargo)
    filevtk =                                                                   &
 "VTKConverter_"//prefix(1:len_trim(prefix))//"_block_"//cargo(1:len_trim(cargo))//".vtu"
-   write(nout,'(a)')                                                           &
+   write(ulog,'(a)')                                                           &
       "VTK formatted converted file  : "//filevtk(1:len_trim(filevtk))
    open(unit=unitvtk,file=filevtk,form='formatted',access='sequential',        &
       status='unknown')
@@ -121,7 +121,7 @@ call cat_post_proc
       k1 = i
       k2 = k1 + 5
       if (k2>numpoints) k2 = numpoints
-      write (stringa,'(6(3(e12.5,1x)))')                                       &
+      write(stringa,'(6(3(e12.5,1x)))')                                       &
          (pg(finger(k))%coord(1),pg(finger(k))%coord(2),pg(finger(k))%coord(3),k=k1,k2)
       stringa = adjustl(trim(stringa))
       write(unitvtk,'(8x,a)') stringa(1:len_trim(stringa))
@@ -586,11 +586,11 @@ call cat_post_proc
    if ((DBSPH%n_w>0).and.(Domain%tipo=="bsph")) then
 ! Open a vtu file for DB-SPH wall and semi-particle parameters  
 ! VTKConverter_<casename>_wall_<block>.vtk 
-      write (cargo,'(i8)') block
+      write(cargo,'(i8)') block
       cargo = adjustl(cargo)
       filevtk =                                                                &
 "VTKConverter_"//prefix(1:len_trim(prefix))//"_block_wall_"//cargo(1:len_trim(cargo))//".vtu"
-      write(nout,'(a)')                                                        &
+      write(ulog,'(a)')                                                        &
          "VTK formatted converted file  : "//filevtk(1:len_trim(filevtk))
       open(unit=unitvtk,file=filevtk,form='formatted',access='sequential',     &
          status='unknown')
@@ -631,7 +631,7 @@ call cat_post_proc
          k1 = i
          k2 = k1 + 5
          if (k2>numpoints) k2 = numpoints
-         write (stringa,'(6(3(e12.5,1x)))') (pg_w(finger(k))%coord(1),         &
+         write(stringa,'(6(3(e12.5,1x)))') (pg_w(finger(k))%coord(1),          &
          pg_w(finger(k))%coord(2),pg_w(finger(k))%coord(3),k=k1,k2)
          stringa = adjustl(trim(stringa))
          write(unitvtk,'(8x,a)') stringa(1:len_trim(stringa))
@@ -646,7 +646,7 @@ call cat_post_proc
          k1 = i
          k2 = k1 + 29
          if (k2>numpoints) k2 = numpoints
-         write (stringa,'(30i8)') (k,k=k1,k2)
+         write(stringa,'(30i8)') (k,k=k1,k2)
          stringa = adjustl(trim(stringa))
          write(unitvtk,'(8x,a)') stringa(1:len_trim(stringa))
       enddo
@@ -801,11 +801,11 @@ call cat_post_proc
 ! Body particles
 ! Open the .vtu unstructured grid formatted file 
 ! VTKConverter_<casename>_body-part_<block>.vtk for the results storing
-      write (cargo,'(i8)') block
+      write(cargo,'(i8)') block
       cargo = adjustl(cargo)
       filevtk =                                                                &
 "VTKConverter_"//prefix(1:len_trim(prefix))//"_block_body-part_"//cargo(1:len_trim(cargo))//".vtu"
-      write (nout,'(a)')                                                       &
+      write(ulog,'(a)')                                                        &
           "VTK formatted converted file  : "//filevtk(1:len_trim(filevtk))
       open(unit=unitvtk,file=filevtk,form='formatted',access='sequential',     &
          status='unknown')
@@ -846,7 +846,7 @@ call cat_post_proc
          k1 = i
          k2 = k1 + 5
          if (k2>numpoints) k2 = numpoints
-         write (stringa,'(6(3(e12.5,1x)))') (bp_arr(finger(k))%pos(1),         &
+         write(stringa,'(6(3(e12.5,1x)))') (bp_arr(finger(k))%pos(1),          &
             bp_arr(finger(k))%pos(2),bp_arr(finger(k))%pos(3),k=k1,k2)
          stringa = adjustl(trim(stringa))
          write(unitvtk,'(8x,a)') stringa(1:len_trim(stringa))
@@ -861,7 +861,7 @@ call cat_post_proc
          k1 = i
          k2 = k1 + 29
          if (k2>numpoints) k2 = numpoints
-         write (stringa,'(30i8)') (k,k=k1,k2)
+         write(stringa,'(30i8)') (k,k=k1,k2)
          stringa = adjustl(trim(stringa))
          write(unitvtk,'(8x,a)') stringa(1:len_trim(stringa))
       enddo
@@ -971,11 +971,11 @@ call cat_post_proc
 ! Bodies: start
 ! Open the .vtu unstructured grid formatted file 
 ! VTKConverter_<casename>_body_<block>.vtk for the results storing
-      write (cargo,'(i8)') block
+      write(cargo,'(i8)') block
       cargo = adjustl(cargo)
       filevtk =                                                                &
 "VTKConverter_"//prefix(1:len_trim(prefix))//"_block_body_"//cargo(1:len_trim(cargo))//".vtu"
-      write(nout,'(a)')                                                        &
+      write(ulog,'(a)')                                                        &
          "VTK formatted converted file  : "//filevtk(1:len_trim(filevtk))
       open(unit=unitvtk,file=filevtk,form='formatted',access='sequential',     &
          status='unknown')
@@ -1015,7 +1015,7 @@ call cat_post_proc
          k1 = i
          k2 = k1 + 5
          if (k2>numpoints) k2 = numpoints
-         write (stringa,'(6(3(e12.5,1x)))') (body_arr(finger(k))%x_CM(1),      &
+         write(stringa,'(6(3(e12.5,1x)))') (body_arr(finger(k))%x_CM(1),       &
                                              body_arr(finger(k))%x_CM(2),      &
                                              body_arr(finger(k))%x_CM(3),      &
                                              k=k1,k2)
@@ -1032,7 +1032,7 @@ call cat_post_proc
          k1 = i
          k2 = k1 + 29
          if (k2>numpoints) k2 = numpoints
-         write (stringa,'(30i8)') (k,k=k1,k2)
+         write(stringa,'(30i8)') (k,k=k1,k2)
          stringa = adjustl(trim(stringa))
          write(unitvtk,'(8x,a)') stringa(1:len_trim(stringa))
       enddo

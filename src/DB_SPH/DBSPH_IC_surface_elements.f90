@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -26,7 +26,7 @@
 subroutine DBSPH_IC_surface_elements
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
 use I_O_file_module
 use Static_allocation_module
 use Hybrid_allocation_module
@@ -53,12 +53,12 @@ integer(4),external :: ParticleCellNumber
 if (.not.allocated(pg_w)) then
    allocate(pg_w(DBSPH%n_w+DBSPH%n_inlet+DBSPH%n_outlet),STAT=alloc_stat) 
    if (alloc_stat/=0) then
-      write(nout,*) 'Allocation of pg_w in DBSPH_IC_surface_elements failed;', &
+      write(ulog,*) 'Allocation of pg_w in DBSPH_IC_surface_elements failed;', &
                     ' the program terminates here.'
       call diagnostic(arg1=5,arg2=340)
       stop ! Stop the main program
       else
-         write(nout,*) "Allocation of pg_w in DBSPH_IC_surface_elements ",     &
+         write(ulog,*) "Allocation of pg_w in DBSPH_IC_surface_elements ",     &
                         "successfully completed."
    endif   
 endif

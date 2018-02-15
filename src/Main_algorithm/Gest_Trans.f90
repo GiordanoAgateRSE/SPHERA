@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -25,7 +25,7 @@
 subroutine Gest_Trans 
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
 use Hybrid_allocation_module
 use I_O_file_module
 use Static_allocation_module
@@ -57,14 +57,14 @@ character(100), external :: lcase
 !------------------------
 ! Statements
 !------------------------
-write(nout,"(/)")
-write(nout,*) "Initial number of particles      NAG= ",nag
-write( nout,"(/)" )
+write(ulog,"(/)")
+write(ulog,*) "Initial number of particles      NAG= ",nag
+write( ulog,"(/)" )
 if (Domain%ioutopt<0) then
-   write(nout,*)
-   write(nout,*) "======== PARTICLES COORDINATES =========="
+   write(ulog,*)
+   write(ulog,*) "======== PARTICLES COORDINATES =========="
    do npi=1,nag
-      write(nout,"(i10,4f14.5)") npi,pg(npi)%coord,pg(npi)%tstop
+      write(ulog,"(i10,4f14.5)") npi,pg(npi)%coord,pg(npi)%tstop
    enddo
 endif
 ! Array initialization for vtkconverter
@@ -77,333 +77,333 @@ MaxNcbf = int(Domain%MAXCLOSEBOUNDFACES * PARTICLEBUFFER)
 if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph"))  then
    allocate(BoundaryDataPointer(1:3,1:PARTICLEBUFFER),stat=ier)
    if (ier/=0) then
-      write(nout,'(1x,a,i2)')                                                  &
+      write(ulog,'(1x,a,i2)')                                                  &
          "   Array BoundaryDataPointer not allocated. Error code: ",ier
       call diagnostic(arg1=4,arg3=nomsub)
       else
-         write(nout,'(1x,a)')                                                  &
+         write(ulog,'(1x,a)')                                                  &
             "   Array BoundaryDataPointer successfully allocated "
    endif
    if (ncord==2) then
-      write(nout,'(a,i15)') "     Max num of close boundary sides: MaxNcbs = ",&
+      write(ulog,'(a,i15)') "     Max num of close boundary sides: MaxNcbs = ",&
          MaxNcbs
       allocate(BoundaryDataTab(1:MaxNcbs),stat=ier)
       if (ier/=0) then
-         write(nout,'(1x,a,i2)')                                               &
+         write(ulog,'(1x,a,i2)')                                               &
             "   Array BoundaryDataTab not allocated. Error code: ",ier
           call diagnostic(arg1=4,arg3=nomsub)
          else
-            write(nout,'(1x,a)')                                               &
+            write(ulog,'(1x,a)')                                               &
                "   Array BoundaryDataTab successfully allocated "
       endif
       else
-         write(nout,'(a,i15)')                                                 &
+         write(ulog,'(a,i15)')                                                 &
             "     Max num of close boundary faces: MaxNcbf = ",MaxNcbf
          allocate(BoundaryDataTab(1:MaxNcbf),stat=ier)
          if (ier/=0) then
-            write(nout,'(1x,a,i2)')                                            &
+            write(ulog,'(1x,a,i2)')                                            &
                "   Array BoundaryDataTab not allocated. Error code: ",ier
             call diagnostic(arg1=4,arg3=nomsub)
             else
-               write(nout,'(1x,a)')                                            &
+               write(ulog,'(1x,a)')                                            &
                   "   Array BoundaryDataTab successfully allocated"
          endif
    endif
 endif
 NMAXPARTJ = Domain%COEFNMAXPARTJ * (Domain%h * four / Domain%dx) ** ncord
-write(nout,'(2a,i15)') "     Maximum number of neighbouring particles: ",      &
+write(ulog,'(2a,i15)') "     Maximum number of neighbouring particles: ",      &
    "NMAXPARTJ = ",NMAXPARTJ
 allocate(Array_Flu(1:PARTICLEBUFFER),stat=ier)
 if (ier/=0) then
-   write(nout,'(1x,a,i2)') "   Array Array_Flu not allocated. Error code: ",   &
+   write(ulog,'(1x,a,i2)') "   Array Array_Flu not allocated. Error code: ",   &
       ier
    call diagnostic(arg1=4,arg3=nomsub)
    else
-      write(nout,'(1x,a)') "   Array Array_Flu successfully allocated "
+      write(ulog,'(1x,a)') "   Array Array_Flu successfully allocated "
 endif
 allocate(nPartIntorno(1:PARTICLEBUFFER),stat=ier)
 if (ier/=0) then
-   write(nout,'(1x,a,i2)')"   Array NPARTINTORNO not allocated. Error code: "  &
+   write(ulog,'(1x,a,i2)')"   Array NPARTINTORNO not allocated. Error code: "  &
    ,ier
    call diagnostic(arg1=4,arg3=nomsub)
    else
-      write(nout,'(1x,a)') "   Array NPARTINTORNO successfully allocated "
+      write(ulog,'(1x,a)') "   Array NPARTINTORNO successfully allocated "
 endif
 allocate(PartIntorno(1:NMAXPARTJ*PARTICLEBUFFER),stat=ier)
 if (ier/=0) then
-   write(nout,'(1x,a,i2)') "   Array PARTINTORNO not allocated. Error code: "  &
+   write(ulog,'(1x,a,i2)') "   Array PARTINTORNO not allocated. Error code: "  &
       ,ier
    call diagnostic(arg1=4,arg3=nomsub)
    else
-      write(nout,'(1x,a)') "   Array PARTINTORNO successfully allocated "
+      write(ulog,'(1x,a)') "   Array PARTINTORNO successfully allocated "
 endif
 allocate(PartKernel(1:4,1:NMAXPARTJ*PARTICLEBUFFER),stat=ier)
 if (ier/=0) then
-   write(nout,'(1x,a,i2)') "   Array PARTKERNEL not allocated. Error code: ",  &
+   write(ulog,'(1x,a,i2)') "   Array PARTKERNEL not allocated. Error code: ",  &
       ier
    call diagnostic(arg1=4,arg3=nomsub)
    else
-      write(nout,'(1x,a)') "   Array PARTKERNEL successfully allocated "
+      write(ulog,'(1x,a)') "   Array PARTKERNEL successfully allocated "
 endif
 allocate(rag(1:3,1:NMAXPARTJ*PARTICLEBUFFER),stat=ier)
 if (ier/=0) then
-   write(nout,'(1x,a,i2)') "   Array RAG not allocated. Error code: ",ier
+   write(ulog,'(1x,a,i2)') "   Array RAG not allocated. Error code: ",ier
    call diagnostic(arg1=4,arg3=nomsub)
    else
-      write(nout,'(1x,a)') "   Array RAG successfully allocated "
+      write(ulog,'(1x,a)') "   Array RAG successfully allocated "
 endif
 if (Domain%tipo=="bsph") then
    allocate(nPartIntorno_fw(1:PARTICLEBUFFER),stat=ier)
    if (ier/=0) then
-      write(nout,'(1x,a,i2)')                                                  &
+      write(ulog,'(1x,a,i2)')                                                  &
          "   Array NPARTINTORNO_fw not allocated. Error code: ",ier
       call diagnostic(arg1=4,arg3=nomsub)
       else
-         write(nout,'(1x,a)')                                                  &
+         write(ulog,'(1x,a)')                                                  &
             "   Array NPARTINTORNO_fw successfully allocated "
    endif
    allocate(PartIntorno_fw(1:NMAXPARTJ*PARTICLEBUFFER),stat=ier)
    if (ier/=0) then
-      write(nout,'(1x,a,i2)')                                                  &
+      write(ulog,'(1x,a,i2)')                                                  &
          "   Array PARTINTORNO_fw not allocated. Error code: ",ier
       call diagnostic(arg1=4,arg3=nomsub)
       else
-         write(nout,'(1x,a)') "   Array PARTINTORNO_fw successfully allocated"
+         write(ulog,'(1x,a)') "   Array PARTINTORNO_fw successfully allocated"
    endif
    allocate(grad_vel_VSL_fw(1:3,1:NMAXPARTJ*PARTICLEBUFFER),stat=ier)
    if (ier/=0) then
-      write(nout,'(1x,a,i2)')                                                  &
+      write(ulog,'(1x,a,i2)')                                                  &
          "   Array grad_vel_VSL_fw not allocated. Error code: ",ier
       call diagnostic(arg1=4,arg3=nomsub)
       else
-         write(nout,'(1x,a)') "   Array grad_vel_VSL_fw successfully allocated "
+         write(ulog,'(1x,a)') "   Array grad_vel_VSL_fw successfully allocated "
    endif
    allocate(kernel_fw(2,1:NMAXPARTJ*PARTICLEBUFFER),stat=ier)
    if (ier/=0) then
-      write(nout,'(1x,a,i2)')                                                  &
+      write(ulog,'(1x,a,i2)')                                                  &
          "   Array kernel_fw not allocated. Error code: ",ier
       call diagnostic(arg1=4,arg3=nomsub)
       else
-         write(nout,'(1x,a)') "   Array kernel_fw successfully allocated "
+         write(ulog,'(1x,a)') "   Array kernel_fw successfully allocated "
    endif
    allocate(rag_fw(1:3,1:NMAXPARTJ*PARTICLEBUFFER),stat=ier)
    if (ier/=0) then
-      write(nout,'(1x,a,i2)') "   Array RAG_fw not allocated. Error code: ",   &
+      write(ulog,'(1x,a,i2)') "   Array RAG_fw not allocated. Error code: ",   &
          ier
       call diagnostic(arg1=4,arg3=nomsub)
       else
-         write(nout,'(1x,a)') "   Array RAG_fw successfully allocated "
+         write(ulog,'(1x,a)') "   Array RAG_fw successfully allocated "
    endif
 endif
 if (n_bodies>0) then
    allocate(nPartIntorno_bp_f(n_body_part),stat=ier)
    if (ier/=0) then
-      write(nout,'(1x,a,i2)')                                                  &
+      write(ulog,'(1x,a,i2)')                                                  &
          "   Array nPartIntorno_bp_f not allocated. Error code: ",ier
       call diagnostic(arg1=4,arg3=nomsub)
       else
-         write(nout,'(1x,a)')                                                  &
+         write(ulog,'(1x,a)')                                                  &
             "   Array nPartIntorno_bp_f successfully allocated "
    endif
    allocate(PartIntorno_bp_f(NMAXPARTJ*n_body_part),stat=ier)
    if (ier/=0) then
-      write(nout,'(1x,a,i2)')                                                  &
+      write(ulog,'(1x,a,i2)')                                                  &
          "   Array PartIntorno_bp_f not allocated. Error code: ",ier
       call diagnostic(arg1=4,arg3=nomsub)
       else
-         write(nout,'(1x,a)')                                                  &
+         write(ulog,'(1x,a)')                                                  &
             "   Array PartIntorno_bp_f successfully allocated "
    endif
    allocate(KerDer_bp_f_cub_spl(NMAXPARTJ*n_body_part),stat=ier)
    if (ier/=0) then
-      write(nout,'(1x,a,i2)')                                                  &
+      write(ulog,'(1x,a,i2)')                                                  &
          "   Array KerDer_bp_f_cub_spl not allocated. Error code: ",ier
       call diagnostic(arg1=4,arg3=nomsub)
       else
-         write(nout,'(1x,a)')                                                  &
+         write(ulog,'(1x,a)')                                                  &
             "   Array KerDer_bp_f_cub_spl successfully allocated "
    endif
    allocate(KerDer_bp_f_Gal(NMAXPARTJ*n_body_part),stat=ier)
    if (ier/=0) then
-      write(nout,'(1x,a,i2)')                                                  &
+      write(ulog,'(1x,a,i2)')                                                  &
          "   Array KerDer_bp_f_Gal not allocated. Error code: ",ier
       call diagnostic(arg1=4,arg3=nomsub)
       else
-         write(nout,'(1x,a)')                                                  &
+         write(ulog,'(1x,a)')                                                  &
             "   Array KerDer_bp_f_Gal successfully allocated "
    endif 
    allocate(rag_bp_f(3,NMAXPARTJ*n_body_part),stat=ier)
    if (ier/=0) then
-      write(nout,'(1x,a,i2)') "   Array rag_bp_f not allocated. Error code: "  &
+      write(ulog,'(1x,a,i2)') "   Array rag_bp_f not allocated. Error code: "  &
          ,ier
       call diagnostic(arg1=4,arg3=nomsub)
       else
-         write(nout,'(1x,a)') "   Array rag_bp_f successfully allocated "
+         write(ulog,'(1x,a)') "   Array rag_bp_f successfully allocated "
    endif
    allocate(nPartIntorno_bp_bp(n_surf_body_part),stat=ier)
    if (ier/=0) then
-      write(nout,'(1x,a,i2)')                                                  &
+      write(ulog,'(1x,a,i2)')                                                  &
          "   Array nPartIntorno_bp_bp not allocated. Error code: ",ier
       call diagnostic(arg1=4,arg3=nomsub)
       else
-      write(nout,'(1x,a)')                                                     &
+      write(ulog,'(1x,a)')                                                     &
          "   Array nPartIntorno_bp_bp successfully allocated "
    endif
    allocate(PartIntorno_bp_bp(n_surf_body_part*NMAXPARTJ),stat=ier)
    if (ier/=0) then
-      write(nout,'(1x,a,i2)')                                                  &
+      write(ulog,'(1x,a,i2)')                                                  &
          "   Array PartIntorno_bp_bp not allocated. Error code: ",ier
       call diagnostic(arg1=4,arg3=nomsub)
       else
-         write(nout,'(1x,a)')                                                  &
+         write(ulog,'(1x,a)')                                                  &
             "   Array PartIntorno_bp_bp successfully allocated "
    endif
    allocate(rag_bp_bp(3,n_surf_body_part*NMAXPARTJ),stat=ier)
    if (ier/=0) then
-      write(nout,'(1x,a,i2)')                                                  &
+      write(ulog,'(1x,a,i2)')                                                  &
          "   Array rag_bp_bp not allocated. Error code: ",ier
       call diagnostic(arg1=4,arg3=nomsub)
       else
-         write(nout,'(1x,a)') "   Array rag_bp_bp successfully allocated "
+         write(ulog,'(1x,a)') "   Array rag_bp_bp successfully allocated "
    endif
    if (ncord==2)                                                               &
       allocate(impact_vel(n_surf_body_part,(n_bodies+NumBSides)),stat=ier)
    if (ncord==3)                                                               &
       allocate(impact_vel(n_surf_body_part,(n_bodies+NumFacce)),stat=ier)
    if (ier/=0) then
-      write(nout,'(1x,a,i2)')                                                  &
+      write(ulog,'(1x,a,i2)')                                                  &
          "   Array impact_vel not allocated. Error code: ",ier
       call diagnostic(arg1=4,arg3=nomsub)
       else
-         write(nout,'(1x,a)') "   Array impact_vel successfully allocated "
+         write(ulog,'(1x,a)') "   Array impact_vel successfully allocated "
    endif
    impact_vel = 0.d0
 endif
-write(nout,'(1x,a)') "..."
-write(nout,'(a,i15)') " Max number of particles  : PARTICLEBUFFER = ",         &
+write(ulog,'(1x,a)') "..."
+write(ulog,'(a,i15)') " Max number of particles  : PARTICLEBUFFER = ",         &
    PARTICLEBUFFER
-write(nout,*) " Size # of elements in array pg                  : ",size(pg)
-write(nout,*) " Size # of elements in array BoundaryDataTab     : ",           &
+write(ulog,*) " Size # of elements in array pg                  : ",size(pg)
+write(ulog,*) " Size # of elements in array BoundaryDataTab     : ",           &
    size(BoundaryDataTab)
-write(nout,*) " Size # of elements in array BoundaryDataPointer : ",           &
+write(ulog,*) " Size # of elements in array BoundaryDataPointer : ",           &
    size(BoundaryDataPointer)
-write(nout,*) " Size # of elements in array Array_Flu           : ",           &
+write(ulog,*) " Size # of elements in array Array_Flu           : ",           &
    size(Array_Flu)
-write(nout,*) " Size # of elements in array nPartIntorno        : ",           &
+write(ulog,*) " Size # of elements in array nPartIntorno        : ",           &
    size(nPartIntorno)
-write(nout,*) " Size # of elements in array PartIntorno         : ",           &
+write(ulog,*) " Size # of elements in array PartIntorno         : ",           &
    size(PartIntorno)
-write(nout,*) " Size # of elements in array PartKernel          : ",           &
+write(ulog,*) " Size # of elements in array PartKernel          : ",           &
    size(PartKernel)
-write(nout,*) " Size # of elements in array rag                 : ",           &
+write(ulog,*) " Size # of elements in array rag                 : ",           &
    size(rag)
 if ((Domain%tipo=="bsph").and.(DBSPH%n_w>0)) then
-   write(nout,*) " Size # of elements in array pg_w                : ",        &
+   write(ulog,*) " Size # of elements in array pg_w                : ",        &
       size(pg_w)
-   write(nout,*) " Size # of elements in array nPartIntorno_fw     : ",        &
+   write(ulog,*) " Size # of elements in array nPartIntorno_fw     : ",        &
       size(nPartIntorno_fw)
-   write(nout,*) " Size # of elements in array PartIntorno_fw      : ",        &
+   write(ulog,*) " Size # of elements in array PartIntorno_fw      : ",        &
       size(PartIntorno_fw)
-   write(nout,*) " Size # of elements in array kernel_fw           : ",        &
+   write(ulog,*) " Size # of elements in array kernel_fw           : ",        &
       size(kernel_fw)
-   write(nout,*) " Size # of elements in array rag_fw              : ",        &
+   write(ulog,*) " Size # of elements in array rag_fw              : ",        &
       size(rag_fw)
-   write(nout,*) " Size # of elements in array grad_vel_VSL_fw     : ",        &
+   write(ulog,*) " Size # of elements in array grad_vel_VSL_fw     : ",        &
       size(grad_vel_VSL_fw)
 endif
 if (n_bodies>0) then
-   write(nout,*) " Size # of elements in array nPartIntorno_bp_f   : ",        &
+   write(ulog,*) " Size # of elements in array nPartIntorno_bp_f   : ",        &
       size(nPartIntorno_bp_f)
-   write(nout,*) " Size # of elements in array PartIntorno_bp_f    : ",        &
+   write(ulog,*) " Size # of elements in array PartIntorno_bp_f    : ",        &
       size(PartIntorno_bp_f)
-   write(nout,*) " Size # of elements in array KerDer_bp_f_cub_spl : ",        &
+   write(ulog,*) " Size # of elements in array KerDer_bp_f_cub_spl : ",        &
       size(KerDer_bp_f_cub_spl)
-   write(nout,*) " Size # of elements in array KerDer_bp_f_Gal     : ",        &
+   write(ulog,*) " Size # of elements in array KerDer_bp_f_Gal     : ",        &
       size(KerDer_bp_f_Gal) 
-   write(nout,*) " Size # of elements in array rag_bp_f            : ",        &
+   write(ulog,*) " Size # of elements in array rag_bp_f            : ",        &
       size(rag_bp_f)
-   write(nout,*) " Size # of elements in array surf_body_part      : ",        &
+   write(ulog,*) " Size # of elements in array surf_body_part      : ",        &
       size(surf_body_part) 
-   write(nout,*) " Size # of elements in array nPartIntorno_bp_bp  : ",        &
+   write(ulog,*) " Size # of elements in array nPartIntorno_bp_bp  : ",        &
       size(nPartIntorno_bp_bp)
-   write(nout,*) " Size # of elements in array PartIntorno_bp_bp   : ",        &
+   write(ulog,*) " Size # of elements in array PartIntorno_bp_bp   : ",        &
       size(PartIntorno_bp_bp)
-   write(nout,*) " Size # of elements in array rag_bp_bp           : ",        &
+   write(ulog,*) " Size # of elements in array rag_bp_bp           : ",        &
       size(rag_bp_bp)
 endif
-write(nout,'(1x,a)') "..."
-write(nout,*) " Size in bytes of array pg                       : ",sizeof(pg)
-write(nout,*) " Size in bytes of array BoundaryDataTab          : ",           &
+write(ulog,'(1x,a)') "..."
+write(ulog,*) " Size in bytes of array pg                       : ",sizeof(pg)
+write(ulog,*) " Size in bytes of array BoundaryDataTab          : ",           &
    sizeof(BoundaryDataTab)
-write(nout,*) " Size in bytes of array BoundaryDataPointer      : ",           &
+write(ulog,*) " Size in bytes of array BoundaryDataPointer      : ",           &
    sizeof(BoundaryDataPointer)
-write(nout,*) " Size in bytes of array Array_Flu                : ",           &
+write(ulog,*) " Size in bytes of array Array_Flu                : ",           &
    sizeof(Array_Flu)
-write(nout,*) " Size in bytes of array nPartIntorno             : ",           &
+write(ulog,*) " Size in bytes of array nPartIntorno             : ",           &
    sizeof(nPartIntorno)
-write(nout,*) " Size in bytes of array PartIntorno              : ",           &
+write(ulog,*) " Size in bytes of array PartIntorno              : ",           &
    sizeof(PartIntorno)
-write(nout,*) " Size in bytes of array PartKernel               : ",           &
+write(ulog,*) " Size in bytes of array PartKernel               : ",           &
    sizeof(PartKernel)
-write(nout,*) " Size in bytes of array rag                      : ",sizeof(rag)
+write(ulog,*) " Size in bytes of array rag                      : ",sizeof(rag)
 if ((Domain%tipo=="bsph").and.(DBSPH%n_w>0)) then
-   write(nout,*) " Size in bytes of array pg_w                     : ",        &
+   write(ulog,*) " Size in bytes of array pg_w                     : ",        &
       sizeof(pg_w)
-   write(nout,*) " Size in bytes of array nPartIntorno_fw          : ",        &
+   write(ulog,*) " Size in bytes of array nPartIntorno_fw          : ",        &
       sizeof(nPartIntorno_fw)
-   write(nout,*) " Size in bytes of array PartIntorno_fw           : ",        &
+   write(ulog,*) " Size in bytes of array PartIntorno_fw           : ",        &
       sizeof(PartIntorno_fw)
-   write(nout,*) " Size in bytes of array kernel_fw                : ",        &
+   write(ulog,*) " Size in bytes of array kernel_fw                : ",        &
       sizeof(kernel_fw)
-   write(nout,*) " Size in bytes of array rag_fw                   : ",        &
+   write(ulog,*) " Size in bytes of array rag_fw                   : ",        &
       sizeof(rag_fw)
-   write(nout,*) " Size in bytes of array grad_vel_VSL_fw          : ",        &
+   write(ulog,*) " Size in bytes of array grad_vel_VSL_fw          : ",        &
       sizeof(grad_vel_VSL_fw)      
 endif
 if (n_bodies>0) then
-   write(nout,*) " Size in bytes of array nPartIntorno_bp_f        : ",        &
+   write(ulog,*) " Size in bytes of array nPartIntorno_bp_f        : ",        &
       sizeof(nPartIntorno_bp_f)
-   write(nout,*) " Size in bytes of array PartIntorno_bp_f         : ",        &
+   write(ulog,*) " Size in bytes of array PartIntorno_bp_f         : ",        &
       sizeof(PartIntorno_bp_f)
-   write(nout,*) " Size in bytes of array KerDer_bp_f_cub_spl      : ",        &
+   write(ulog,*) " Size in bytes of array KerDer_bp_f_cub_spl      : ",        &
       sizeof(KerDer_bp_f_cub_spl)
-   write(nout,*) " Size in bytes of array KerDer_bp_f_Gal          : ",        &
+   write(ulog,*) " Size in bytes of array KerDer_bp_f_Gal          : ",        &
       sizeof(KerDer_bp_f_Gal)
-   write(nout,*) " Size in bytes of array rag_bp_f                 : ",        &
+   write(ulog,*) " Size in bytes of array rag_bp_f                 : ",        &
       sizeof(rag_bp_f)
-   write(nout,*) " Size in bytes of array surf_body_part           : ",        &
+   write(ulog,*) " Size in bytes of array surf_body_part           : ",        &
       sizeof(surf_body_part) 
-   write(nout,*) " Size in bytes of array nPartIntorno_bp_bp       : ",        &
+   write(ulog,*) " Size in bytes of array nPartIntorno_bp_bp       : ",        &
       sizeof(nPartIntorno_bp_bp)
-   write(nout,*) " Size in bytes of array PartIntorno_bp_bp        : ",        &
+   write(ulog,*) " Size in bytes of array PartIntorno_bp_bp        : ",        &
       sizeof(PartIntorno_bp_bp)
-   write(nout,*) " Size in bytes of array rag_bp_bp                : ",        &
+   write(ulog,*) " Size in bytes of array rag_bp_bp                : ",        &
       sizeof(rag_bp_bp)
 endif
-write(nout,'(1x,a)') "..."
-write(nout,'(1x,a)') " "
-write(nout,'(1x,a)') "   end allocation step. "
-write(nout,'(1x,a)') " "
+write(ulog,'(1x,a)') "..."
+write(ulog,'(1x,a)') " "
+write(ulog,'(1x,a)') "   end allocation step. "
+write(ulog,'(1x,a)') " "
 ! Writing the cell number and particles within the cell 
 if (Domain%ioutopt<0) then
-   write(nout,*) 
-   write(nout,*) "Number of cells           NCELLS= ",grid%nmax
-   write(nout,*) 
-   write(nout,*) "======== CELLS AND RELATED PARTICLES =========="
+   write(ulog,*) 
+   write(ulog,*) "Number of cells           NCELLS= ",grid%nmax
+   write(ulog,*) 
+   write(ulog,*) "======== CELLS AND RELATED PARTICLES =========="
    do i=1,grid%nmax   
       if (Icont(i+1)>Icont(i)) then  
-         write(nout,"(3(a,i5),a)") " cell", i," from",Icont(i)," to",          &
+         write(ulog,"(3(a,i5),a)") " cell", i," from",Icont(i)," to",          &
             Icont(i+1),"  particles:"
-         write(nout,"(5i8)") NPartOrd(Icont(i):Icont(i+1)-1) 
+         write(ulog,"(5i8)") NPartOrd(Icont(i):Icont(i+1)-1) 
       endif
    enddo
 endif
-write(nout,*) 
-write(nout,*) 
-call s_ctime(nout)
-write(nout,*) 
-write(nout,*) "Transient loop begins..."
-write(nout,*)
+write(ulog,*) 
+write(ulog,*) 
+call s_ctime
+write(ulog,*) 
+write(ulog,*) "Transient loop begins..."
+write(ulog,*)
 ! To initialize the post-processing file 
 if ((Domain%imemo_fr>0).OR.(Domain%memo_fr>zero)) then
    open(nres,file=nomefile(2),status="unknown",access="sequential"             &
@@ -563,13 +563,13 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
          allocate(Granular_flows_options%minimum_saturation_flag(              &
             Grid%ncd(1),Grid%ncd(2)),STAT=alloc_stat)
          if (alloc_stat/=0) then
-            write(nout,*) 'Allocation of ',                                    &
+            write(ulog,*) 'Allocation of ',                                    &
                'Granular_flows_options%minimum_saturation_flag ',              &
                'failed; the program stops here. '
             call diagnostic(arg1=4,arg2=1,arg3=nomsub)
             stop 
             else
-               write (nout,*) 'Allocation of ',                                &
+               write(ulog,*) 'Allocation of ',                                &
                   'Granular_flows_options%minimum_saturation_flag is',         &
                   ' successfully completed.'
          endif
@@ -580,13 +580,13 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
          allocate(Granular_flows_options%maximum_saturation_flag(              &
             Grid%ncd(1),Grid%ncd(2)),STAT=alloc_stat)
          if (alloc_stat/=0) then
-            write(nout,*) 'Allocation of ',                                    &
+            write(ulog,*) 'Allocation of ',                                    &
                'Granular_flows_options%maximum_saturation_flag ',              &
                'failed; the program stops here. '
             call diagnostic(arg1=4,arg2=1,arg3=nomsub)
             stop 
             else
-               write (nout,*) 'Allocation of ',                                &
+               write(ulog,*) 'Allocation of ',                                &
                   'Granular_flows_options%maximum_saturation_flag is',         &
                   ' successfully completed.'
          endif
@@ -597,13 +597,13 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
          allocate(Granular_flows_options%saturation_conditions(                &
             Grid%ncd(1),Grid%ncd(2)),STAT=alloc_stat)
          if (alloc_stat/=0) then
-            write(nout,*) 'Allocation of ',                                    &
+            write(ulog,*) 'Allocation of ',                                    &
                'Granular_flows_options%saturation_conditions failed; '         &
                ,'the program stops here. '
             call diagnostic(arg1=4,arg2=1,arg3=nomsub)
             stop 
             else
-               write (nout,*) 'Allocation of ',                                &
+               write(ulog,*) 'Allocation of ',                                 &
                   'Granular_flows_options%saturation_conditions is ',          &
                   'successfully completed.'
          endif
@@ -618,11 +618,11 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
          if ((restart.eqv..false.).or.(Domain%tipo=="bsph")) then
             allocate(GCBFPointers(NumCellmax,2),stat=ier)
             if (ier/=0) then
-               write(nout,'(1x,a,i2)')                                         &
+               write(ulog,'(1x,a,i2)')                                         &
                   "   Array GCBFPointers not allocated. Error code: ",ier
                call diagnostic(arg1=4,arg3=nomsub)
                else
-                  write(nout,'(1x,a)')                                         &
+                  write(ulog,'(1x,a)')                                         &
                      "   Array GCBFPointers successfully allocated"
             endif
          endif
@@ -636,35 +636,50 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
 ! Computation of the boundary contributions for the continuity equation (SA-SPH)
             call ComputeKernelTable
          endif
-! Allocation and initialization of the Z_fluid_max array
+! Allocation and initialization of the arrays: Z_fluid_max, Z_fluid_step
 ! Loop over the zones
          do i=1,NPartZone
             if (Partz(i)%IC_source_type==2) then
                if (.not.allocated(Z_fluid_max)) then
                   allocate(Z_fluid_max(Grid%ncd(1)*Grid%ncd(2)),STAT=alloc_stat)
                   if (alloc_stat/=0) then
-                     write(nout,*)                                             &
+                     write(ulog,*)                                             &
                      'Allocation of Z_fluid_max in Gest_Trans failed;',        &
                      ' the program terminates here.'
-                     stop ! Stop the main program
+                     stop
                      else
-                        write(nout,*)                                          &
+                        write(ulog,*)                                          &
                            'Allocation of Z_fluid_max in Gest_Trans ',         &
                            'successfully completed.'
                   endif
                   Z_fluid_max(:) = -999.d0
+               endif
+               if (.not.allocated(Z_fluid_step)) then
+                  allocate(Z_fluid_step(Grid%ncd(1)*Grid%ncd(2)),              &
+                     STAT=alloc_stat)
+                  if (alloc_stat/=0) then
+                     write(ulog,*)                                             &
+                     'Allocation of "Z_fluid_step" in the subroutine ',        &
+                     '"Gest_Trans" failed; the execution terminates here.'
+                     stop
+                     else
+                        write(ulog,*)                                          &
+                           'Allocation of "Z_fluid_step" in the ',             &
+                           'subroutine "Gest_Trans" is successfully completed.'
+                  endif
+                  Z_fluid_step(:) = -999.d0
                endif
                aux_integer = Partz(i)%ID_last_vertex -                         &
                              Partz(i)%ID_first_vertex + 1  
                if (.not.allocated(q_max)) then
                   allocate(q_max(aux_integer),STAT=alloc_stat)
                   if (alloc_stat/=0) then
-                     write(nout,*)                                             &
+                     write(ulog,*)                                             &
                      'Allocation of q_max in Gest_Trans failed;',              &
                      ' the program terminates here.'
                      stop ! Stop the main program
                      else
-                        write(nout,*)                                          &
+                        write(ulog,*)                                          &
                            'Allocation of q_max in Gest_Trans successfully ',  &
                            'completed.'
                   endif
@@ -677,12 +692,32 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
 ! Main loop
          call loop_irre_3D
          call start_and_stop(3,5)
-! Writing the h_max array and deallocation of the Z_fluid_max array
+! Writing the h_max array and deallocation of the arrays Z_fluid_max and 
+! Z_fluid_step
          if (allocated(Z_fluid_max)) then
-            call write_h_max      
-            if (allocated(Z_fluid_max)) deallocate(Z_fluid_max)
+            call write_h_max
+            deallocate(Z_fluid_max,STAT=alloc_stat)
+            if (alloc_stat/=0) then
+               write(uerr,*) 'Subroutine "Gest_Trans". Deallocation of the ',  &
+                  'array "Z_fluid_max" failed; the simulation terminates ',    &
+                  ' here.'
+               stop
+               else
+               write(ulog,*) 'Subroutine "Gest_Trans". Deallocation of the ',  &
+                  'array "Z_fluid_max" is successfully completed.'
+            endif
+            deallocate(Z_fluid_step,STAT=alloc_stat)
+            if (alloc_stat/=0) then
+               write(uerr,*) 'Subroutine "Gest_Trans". Deallocation of the ',  &
+                  'array "Z_fluid_step" failed; the simulation terminates ',   &
+                  ' here.'
+               stop
+               else
+                  write(ulog,*) 'Subroutine "Gest_Trans". Deallocation of ',   &
+                     'the array "Z_fluid_step" is successfully completed.'
+            endif
          endif
-   endif 
+   endif
    else
       call diagnostic(arg1=10,arg2=5,arg3=nomsub)
 endif

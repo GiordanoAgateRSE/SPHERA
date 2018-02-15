@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -25,7 +25,7 @@
 subroutine CalcPre
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
 use Static_allocation_module
 use Hybrid_allocation_module
 use Dynamic_allocation_module
@@ -96,34 +96,4 @@ endif
 !------------------------
 return
 end subroutine CalcPre
-
-! Draft subroutine
-!subroutine contrmach (k,celmax)
-!
-!use Static_allocation_module
-!use Hybrid_allocation_module
-!use Dynamic_allocation_module
-!
-!implicit none
-!
-!integer(4) :: k
-!
-!double precision    :: celmax,amaxnmach,amaxnmach2,amachnumb2
-!!double precision   :: vmod2,cel2,amachnumb
-!
-! amaxnmach  = 0.2d0
-! cel2       = celmax*celmax
-! amaxnmach2 = amaxnmach*amaxnmach
-!
-! controllo numero mach - scrive su nout
-! vmod2 = pg(k)%vel(1)*pg(k)%vel(1) + pg(k)%vel(3)*pg(k)%vel(3)
-! amachnumb2 = vmod2 / cel2
-!
-! if ( amachnumb2 > amaxnmach2 )then    ! -------------------------------
-!    amachnumb = dsqrt(amachnumb2)
-!!   pg(k)%vel(:)=(amaxnmach*celmax/dsqrt(vmod2))*pg(k)%vel(:) 
-! end if        ! -------------------------------
-!
-!return
-!end
 

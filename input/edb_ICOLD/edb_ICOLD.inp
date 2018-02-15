@@ -1,9 +1,11 @@
 8.0
 
 !-------------------------------------------------------------------------------
-! File name and copyright: ICOLD_earth-fill_dam_break.inp
-!    Copyright 2015-2016 (RSE SpA, authored by Andrea Amicarelli)
+! File name and copyright: edb_ICOLD.inp
+!    Copyright 2014-2018 (RSE SpA, authored by Andrea Amicarelli)
 ! File description: input file for SPHERA v.8.0 (RSE SpA).
+!   Erosional dam break on ICOLD (2013) complex topography. Reference: 
+!      Amicarelli et al. (2017, IJCFD).
 !
 ! This file is free software: you can redistribute it and/or modify
 ! it under the terms of the GNU General Public License as published by
@@ -18,7 +20,7 @@
 !-------------------------------------------------------------------------------
 
 ##### TITLE #####
-ICOLD_Erosional_Dam_Break_test79e
+edb_ICOLD
 ##### END TITLE #####
 
 ##### DOMAIN #####

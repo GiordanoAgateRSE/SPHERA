@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -28,7 +28,7 @@
 subroutine CalcVarLength
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
 use I_O_file_module
 use Static_allocation_module
 use Hybrid_allocation_module
@@ -50,7 +50,7 @@ double precision :: ragtemp(3)
 integer(4),dimension(:),allocatable :: bounded
 double precision,dimension(:),allocatable :: dShep_old
 character(len=lencard)  :: nomsub = "CalcVarLength"
-integer(4),external :: ParticleCellNumber, CellIndices, CellNumber
+integer(4),external :: ParticleCellNumber,CellIndices,CellNumber
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -94,7 +94,7 @@ endif
 !$omp private(normal_int_sat_top_abs)                                          &                 
 !$omp shared(nag,pg,Domain,Med,Icont,Npartord,NMAXPARTJ,rag,nPartIntorno)      &
 !$omp shared(Partintorno,PartKernel,ke_coef,kacl_coef,Doubleh,DoubleSquareh)   &
-!$omp shared(squareh,nomsub,ncord,eta,eta2,nout,nscr,ind_interfaces,DBSPH,pg_w)&
+!$omp shared(squareh,nomsub,ncord,eta,eta2,ulog,uerr,ind_interfaces,DBSPH,pg_w)&
 !$omp shared(Icont_w,Npartord_w,rag_fw,nPartIntorno_fw,Partintorno_fw)         &
 !$omp shared(kernel_fw,dShep_old,Granular_flows_options,NMedium)
 loop_nag: do npi=1,nag
@@ -159,10 +159,10 @@ loop_nag: do npi=1,nag
 ! Warning. A computational particle has reached the maximum number of   
 ! fluid particle neighbours allowed.                
                if (nPartIntorno(npi)>=NMAXPARTJ) then
-                  write (nscr,'(1x,a,i12,a,i12,a)')                            &
+                  write(uerr,'(1x,a,i12,a,i12,a)')                             &
                      ' The computational particle ',npi,' has reached ',       &
                      NMAXPARTJ,' fluid particle neighbours.'
-                  write (nscr,'(1x,a,3f25.10)') '        Coordinate: ',        &
+                  write(uerr,'(1x,a,3f25.10)') '        Coordinate: ',         &
                      pg(npi)%coord(:)
                   cycle
                endif
@@ -170,10 +170,10 @@ loop_nag: do npi=1,nag
 ! wall element neighbours allowed.
                if ((Domain%tipo=="bsph").and.(DBSPH%n_w>0)) then
                   if (nPartIntorno_fw(npi)>=NMAXPARTJ) then
-                     write (nscr,'(1x,a,i12,a,i12,a)')                         &
+                     write(uerr,'(1x,a,i12,a,i12,a)')                          &
                         ' The computational particle ',npi,' has reached ',    &
                         NMAXPARTJ,' wall element neighbours.'
-                     write (nscr,'(1x,a,3f15.10)') '        Coordinate: ',     &
+                     write(uerr,'(1x,a,3f15.10)') '        Coordinate: ',      &
                         pg(npi)%coord(:)
                      cycle
                   endif
@@ -194,9 +194,9 @@ loop_nag: do npi=1,nag
 ! Error. A computational particle has exceeded the maximum number of fluid  
 ! particle neighbours allowed. Simulation is killed.               
                if (nPartIntorno(npi)>NMAXPARTJ) then
-                  write (nscr,'(1x,a,i12,a)')   ' ERROR! The particle ',npi,   &
+                  write(uerr,'(1x,a,i12,a)')   ' ERROR! The particle ',npi,    &
                      ' has too many fluid particle neighbours.'
-                  write (nscr,'(1x,a,3f15.10)') '        Coordinate: ',        &
+                  write(uerr,'(1x,a,3f15.10)') '        Coordinate: ',         &
                      pg(npi)%coord(:)
                   call diagnostic(arg1=10,arg2=1,arg3=nomsub)
                endif
@@ -357,12 +357,12 @@ loop_nag: do npi=1,nag
                   if (rijtemp>doublesquareh) cycle
 ! Counter increases 
                   nPartIntorno_fw(npi) = nPartIntorno_fw(npi) + 1
-! Error. A computational particle has exceeded the maximum number of wall  
+! Error. A computational particle has exceeded the maximum number of wall 
 ! element neighbours allowed. Simulation is killed.               
                   if (nPartIntorno_fw(npi)>NMAXPARTJ) then
-                     write (nscr,'(1x,a,i12,a)')   ' ERROR! The particle ',npi,&
+                     write(uerr,'(1x,a,i12,a)')   ' ERROR! The particle ',npi, &
                         ' has too many wall element neighbours.'
-                     write (nscr,'(1x,a,3f15.10)') '        Coordinate: ',     &
+                     write(uerr,'(1x,a,3f15.10)') '        Coordinate: ',      &
                         pg(npi)%coord(:)
                      call diagnostic(arg1=10,arg2=9,arg3=nomsub)
                   endif                  
@@ -636,7 +636,7 @@ if (Granular_flows_options%ID_erosion_criterion>0) then
       endif
    endif
 !$omp parallel do default(none)                                                &
-!$omp shared(Grid,pg,ind_interfaces,nout,Granular_flows_options,simulation_time)&
+!$omp shared(Grid,pg,ind_interfaces,ulog,Granular_flows_options,simulation_time)&
 !$omp private(i_grid,j_grid)
    do i_grid=1,Grid%ncd(1)
       do j_grid=1,Grid%ncd(2)
@@ -737,7 +737,7 @@ if (Domain%tipo=="bsph") then
 !                     pg(npi)%Gamma = pg(npi)%sigma_same_fluid
 !               endif               
 !AA!!! test end                  
-               if (DBSPH%Gamma_limiter_flag.eqv..true.) pg(npi)%Gamma =         &
+               if (DBSPH%Gamma_limiter_flag.eqv..true.) pg(npi)%Gamma =        &
                   min(pg(npi)%Gamma,one)    
          endif
       endif

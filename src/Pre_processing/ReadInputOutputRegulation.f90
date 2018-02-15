@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -23,10 +23,10 @@
 ! Description:                        
 !-------------------------------------------------------------------------------
 
-subroutine ReadInputOutputRegulation(Med,ainp,comment,nrighe,ier,ninp,nout)
+subroutine ReadInputOutputRegulation(Med,ainp,comment,nrighe,ier,ninp,ulog)
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
 use Static_allocation_module                                      
 use Hybrid_allocation_module
 !------------------------
@@ -34,7 +34,7 @@ use Hybrid_allocation_module
 !------------------------
 implicit none
 type (TyMedium), dimension(NMedium) :: Med
-integer(4) :: nrighe,ier, ninp,nout
+integer(4) :: nrighe,ier, ninp,ulog
 character(1) :: comment
 character(100) :: ainp
 integer(4) :: iplot_fr,imemo_fr,irest_fr,icpoi_fr,ipllb_fr,ipllb_md,n,ioutopt
@@ -71,120 +71,120 @@ depth_dt_out = 0.0d0
 ! Statements
 !------------------------
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"OUTPUT REGULATION DATA",ninp,nout))  &
+if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"OUTPUT REGULATION DATA",ninp,ulog))  &
    return
 do while (TRIM(lcase(ainp))/="##### end output regulation #####")
    select case (TRIM(lcase(GetToken(ainp,1,ioerr))))
       case ("display")
          token = lcase(GetToken(ainp,2,ioerr))
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                             &
-            "DISPLAY FREQUENCY STEP/TIME",ninp,nout)) return
+            "DISPLAY FREQUENCY STEP/TIME",ninp,ulog)) return
          if (token(1:4)=="step") then 
             token = lcase(GetToken(ainp,3,ioerr))
             if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                          &
-               "DISPLAY FREQUENCY STEP value",ninp,nout)) return
+               "DISPLAY FREQUENCY STEP value",ninp,ulog)) return
             read(token,*,iostat=ioerr) iplot_fr
             if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                          &
-               "DISPLAY FREQUENCY STEP value",ninp,nout)) return
+               "DISPLAY FREQUENCY STEP value",ninp,ulog)) return
             elseif (token(1:4)=="time") then 
                token = lcase(GetToken(ainp,3,ioerr))
                if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                       &
-                  "DISPLAY FREQUENCY TIME value",ninp,nout)) return
+                  "DISPLAY FREQUENCY TIME value",ninp,ulog)) return
                read(token,*,iostat=ioerr)  plot_fr
                if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                       &
-                  "DISPLAY FREQUENCY TIME value",ninp,nout)) return
+                  "DISPLAY FREQUENCY TIME value",ninp,ulog)) return
          endif
       case ("results")
          token = lcase(GetToken(ainp,2,ioerr))
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                             &
-            "RESULTS SAVING FREQUENCY STEP/TIME",ninp,nout)) return
+            "RESULTS SAVING FREQUENCY STEP/TIME",ninp,ulog)) return
          if (token(1:4)=="step") then 
             token = lcase(GetToken(ainp,3,ioerr))
             if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                          &
-               "RESULTS SAVING FREQUENCY STEP value",ninp,nout)) return
+               "RESULTS SAVING FREQUENCY STEP value",ninp,ulog)) return
             read(token,*,iostat=ioerr) imemo_fr
             if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                          &
-               "RESULTS SAVING FREQUENCY STEP value",ninp,nout)) return
+               "RESULTS SAVING FREQUENCY STEP value",ninp,ulog)) return
             elseif (token(1:4)=="time") then 
                token = lcase(GetToken(ainp,3,ioerr))
                if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                       &
-                  "RESULTS SAVING FREQUENCY TIME value",ninp,nout)) return
+                  "RESULTS SAVING FREQUENCY TIME value",ninp,ulog)) return
                read(token,*,iostat=ioerr)  memo_fr
                if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                       &
-                  "RESULTS SAVING FREQUENCY TIME value",ninp,nout)) return
+                  "RESULTS SAVING FREQUENCY TIME value",ninp,ulog)) return
          endif
       case ("restart")
          token = lcase(GetToken(ainp,2,ioerr))
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                             &
-            "RESTART SAVING FREQUENCY STEP/TIME",ninp,nout)) return
+            "RESTART SAVING FREQUENCY STEP/TIME",ninp,ulog)) return
          if(token(1:4)=="step") then 
             token = lcase(GetToken(ainp,3,ioerr))
             if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                          &
-               "RESTART SAVING FREQUENCY STEP value",ninp,nout)) return
+               "RESTART SAVING FREQUENCY STEP value",ninp,ulog)) return
             read(token,*,iostat=ioerr) irest_fr
             if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                          &
-               "RESTART SAVING FREQUENCY STEP value",ninp,nout)) return
+               "RESTART SAVING FREQUENCY STEP value",ninp,ulog)) return
             elseif (token(1:4)=="time") then 
                token = lcase(GetToken(ainp,3,ioerr))
                if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                       &
-                  "RESTART SAVING FREQUENCY TIME value",ninp,nout)) return
+                  "RESTART SAVING FREQUENCY TIME value",ninp,ulog)) return
                read(token,*,iostat=ioerr)  rest_fr
                if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                       &
-                  "RESTART SAVING FREQUENCY TIME value",ninp,nout)) return
+                  "RESTART SAVING FREQUENCY TIME value",ninp,ulog)) return
          endif
       case ("control")
          token = lcase(GetToken(ainp,2,ioerr))
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                             &
-            "CONTROL POINTS SAVING FREQUENCY STEP/TIME",ninp,nout)) return
+            "CONTROL POINTS SAVING FREQUENCY STEP/TIME",ninp,ulog)) return
          if(token(1:4)=="step") then 
             token = lcase(GetToken(ainp,3,ioerr))
             if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                          &
-               "CONTROL POINTS SAVING FREQUENCY STEP value",ninp,nout))        &
+               "CONTROL POINTS SAVING FREQUENCY STEP value",ninp,ulog))        &
                return
             read(token,*,iostat=ioerr) icpoi_fr
             if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                          &
-               "CONTROL POINTS SAVING FREQUENCY STEP value",ninp,nout))        &
+               "CONTROL POINTS SAVING FREQUENCY STEP value",ninp,ulog))        &
                return
             elseif (token(1:4)=="time") then 
                token = lcase(GetToken(ainp,3,ioerr))
                if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                       &
-                  "CONTROL POINTS SAVING FREQUENCY TIME value",ninp,nout))     &
+                  "CONTROL POINTS SAVING FREQUENCY TIME value",ninp,ulog))     &
                   return
                read(token,*,iostat=ioerr)  cpoi_fr
                if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                       &
-                  "CONTROL POINTS SAVING FREQUENCY TIME value",ninp,nout))     &
+                  "CONTROL POINTS SAVING FREQUENCY TIME value",ninp,ulog))     &
                   return
          endif
       case ("level")
          do n=1,2
             token = lcase(GetToken(ainp,2*n,ioerr))
             if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"LEVEL OPTION",ninp,      &
-               nout)) return
+               ulog)) return
             if (token(1:4)=="step") then 
                token = lcase(GetToken(ainp,2*n+1,ioerr))
                if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                       &
-                  "LEVEL STEP FREQUENCY SAVING",ninp,nout)) return
+                  "LEVEL STEP FREQUENCY SAVING",ninp,ulog)) return
                read(token,*,iostat=ioerr) ipllb_fr
                if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                       &
-                  "LEVEL STEP FREQUENCY SAVING",ninp,nout)) return
+                  "LEVEL STEP FREQUENCY SAVING",ninp,ulog)) return
                elseif (token(1:4)=="time") then 
                   token = lcase(GetToken(ainp,2*n+1,ioerr))
                   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                    &
-                     "LEVEL TIME FREQUENCY SAVING",ninp,nout)) return
+                     "LEVEL TIME FREQUENCY SAVING",ninp,ulog)) return
                   read(token,*,iostat=ioerr)  pllb_fr
                   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                    &
-                     "LEVEL TIME FREQUENCY SAVING",ninp,nout)) return
+                     "LEVEL TIME FREQUENCY SAVING",ninp,ulog)) return
                   elseif (token(1:6)=="medium") then 
                      token = lcase(GetToken(ainp,2*n+1,ioerr))
                      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                 &
-                        "LEVEL MEDIUM INDEX",ninp,nout)) return
+                        "LEVEL MEDIUM INDEX",ninp,ulog)) return
                      read(token,*,iostat=ioerr) ipllb_md
                      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                 &
-                        "LEVEL MEDIUM INDEX",ninp,nout)) return
+                        "LEVEL MEDIUM INDEX",ninp,ulog)) return
                      if (ipllb_md==0) then
                         ioerr = 5
                         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,              &
-                           "LEVEL MEDIUM INDEX",ninp,nout)) return
+                           "LEVEL MEDIUM INDEX",ninp,ulog)) return
                      endif
                      else 
                         ier = 5
@@ -193,36 +193,36 @@ do while (TRIM(lcase(ainp))/="##### end output regulation #####")
          enddo
       case ("depth")
          token = lcase(GetToken(ainp,2,ioerr))
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DEPTH OPTION",ninp,nout))   &
+         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DEPTH OPTION",ninp,ulog))   &
             return
          if (token(1:4)=="dt_o") then 
             token = lcase(GetToken(ainp,2+1,ioerr))
             if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DEPTH DT_OUT SAVING",    &
-               ninp,nout)) return
+               ninp,ulog)) return
             read(token,*,iostat=ioerr) depth_dt_out
             if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DEPTH DT_OUT SAVING",    &
-               ninp,nout)) return
+               ninp,ulog)) return
          endif
       case ("print")
          token = lcase(GetToken(ainp,2,ioerr))
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                             &
-            "PRINT MODE AND FREQUENCY FULL/MINIMUM/NULL",ninp,nout)) return
+            "PRINT MODE AND FREQUENCY FULL/MINIMUM/NULL",ninp,ulog)) return
          if(token(1:4)=="full") then 
             token = lcase(GetToken(ainp,3,ioerr))
             if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                          &
-               "PRINT MINIMUM FREQUENCY step",ninp,nout)) return
+               "PRINT MINIMUM FREQUENCY step",ninp,ulog)) return
             read(token,*,iostat=ioerr)  ioutopt
             if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                          &
-               "PRINT MINIMUM FREQUENCY step",ninp,nout)) return
+               "PRINT MINIMUM FREQUENCY step",ninp,ulog)) return
             ioutopt =-1*abs(ioutopt)
             ioutpo2 = 1
             elseif (token(1:7)=="partial") then 
                token = lcase(GetToken(ainp,3,ioerr))
                if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                       &
-                  "PRINT MINIMUM FREQUENCY step",ninp,nout)) return
+                  "PRINT MINIMUM FREQUENCY step",ninp,ulog)) return
                read(token,*,iostat=ioerr)  ioutopt
                if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                       &
-                  "PRINT MINIMUM FREQUENCY step",ninp,nout)) return
+                  "PRINT MINIMUM FREQUENCY step",ninp,ulog)) return
                ioutpo2 = 2
                elseif (token(1:4)=="null") then 
                   ioutopt = 0
@@ -234,7 +234,7 @@ do while (TRIM(lcase(ainp))/="##### end output regulation #####")
    endselect
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"OUTPUT REGULATION DATA",ninp,     &
-      nout)) return
+      ulog)) return
 enddo
 if (ncord>0) then
    Domain%iplot_fr = iplot_fr
@@ -251,39 +251,39 @@ if (ncord>0) then
    Domain%depth_dt_out = depth_dt_out
    Domain%depth_it_out_last = 0.d0    
    Domain%ioutopt  = ioutopt
-   if (nout>0) then 
-      write(nout,"(1x,a,i12)")   "Displaying     step frequency : ",           &
+   if (ulog>0) then 
+      write(ulog,"(1x,a,i12)")   "Displaying     step frequency : ",           &
          Domain%iplot_fr
-      write(nout,"(1x,a,e12.4)") "Displaying     time frequency : ",           &
+      write(ulog,"(1x,a,e12.4)") "Displaying     time frequency : ",           &
          Domain%plot_fr
-      write(nout,"(1x,a,i12)")   "Results saving step frequency : ",           &
+      write(ulog,"(1x,a,i12)")   "Results saving step frequency : ",           &
          Domain%imemo_fr
-      write(nout,"(1x,a,e12.4)") "Results saving time frequency : ",           &
+      write(ulog,"(1x,a,e12.4)") "Results saving time frequency : ",           &
          Domain%memo_fr
-      write(nout,"(1x,a,i12)")   "Restart saving step frequency : ",           &
+      write(ulog,"(1x,a,i12)")   "Restart saving step frequency : ",           &
          Domain%irest_fr
-      write(nout,"(1x,a,e12.4)") "Restart saving time frequency : ",           &
+      write(ulog,"(1x,a,e12.4)") "Restart saving time frequency : ",           &
          Domain%rest_fr
-      write(nout,"(1x,a,i12)")   "Ctrl.Points    step frequency : ",           &
+      write(ulog,"(1x,a,i12)")   "Ctrl.Points    step frequency : ",           &
          Domain%icpoi_fr
-      write(nout,"(1x,a,e12.4)") "Ctrl.Points    time frequency : ",           &
+      write(ulog,"(1x,a,e12.4)") "Ctrl.Points    time frequency : ",           &
          Domain%cpoi_fr
-      write(nout,"(1x,a,i12)")   "Level Medium Index            : ",           &
+      write(ulog,"(1x,a,i12)")   "Level Medium Index            : ",           &
          Domain%ipllb_md
-      if (Domain%ipllb_md>0) write(nout,"(1x,a,e12.4)")                        &
+      if (Domain%ipllb_md>0) write(ulog,"(1x,a,e12.4)")                        &
                                  "Level Medium Density Limit    : ",           &
                                  med(Domain%ipllb_md)%den0 * half
-      write(nout,"(1x,a,i12)")   "Level          step frequency : ",           &
+      write(ulog,"(1x,a,i12)")   "Level          step frequency : ",           &
          Domain%ipllb_fr
-      write(nout,"(1x,a,e12.4)") "Level          time frequency : ",           &
+      write(ulog,"(1x,a,e12.4)") "Level          time frequency : ",           &
          Domain%pllb_fr
-      write(nout,"(1x,a,e12.4)") "Depth          dt_out(s)      : ",           &
+      write(ulog,"(1x,a,e12.4)") "Depth          dt_out(s)      : ",           &
          Domain%depth_dt_out
-      write(nout,"(1x,a,a)")     "Printing Option               : ",           &
+      write(ulog,"(1x,a,a)")     "Printing Option               : ",           &
          outopt(ioutpo2)
-      if (Domain%ioutopt>0) write(nout,"(1x,a,i12)")                           &
+      if (Domain%ioutopt>0) write(ulog,"(1x,a,i12)")                           &
          "Printing       step frequency : ",iabs(Domain%ioutopt)
-      write(nout,"(1x,a)") " "
+      write(ulog,"(1x,a)") " "
    endif
 endif
 !------------------------

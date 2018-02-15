@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -28,7 +28,7 @@
 subroutine write_h_max
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
 use Static_allocation_module
 use Hybrid_allocation_module
 use Dynamic_allocation_module
@@ -69,7 +69,7 @@ do i_zone=1,NPartZone
                        Partz(i_zone)%ID_first_vertex + 1
          allocate(h_max(aux_integer),STAT=alloc_stat)
          if (alloc_stat/=0) then
-            write(nout,*) 'Subroutine "write_h_max". ',                        &
+            write(ulog,*) 'Subroutine "write_h_max". ',                        &
                'Allocation of the array "h_max" failed; the simulation ',      &
                'stops here. '
             stop
@@ -103,7 +103,7 @@ close (ncpt)
 if (allocated(h_max)) then
    deallocate(h_max,STAT=dealloc_stat)
    if (dealloc_stat/=0) then
-      write(nout,*) 'Subroutine "write_h_max". ',                              &
+      write(ulog,*) 'Subroutine "write_h_max". ',                              &
          'Deallocation of the array "h_max" failed; the simulation stops here.'
       stop
    endif
@@ -111,7 +111,7 @@ endif
 if (allocated(q_max)) then
    deallocate(q_max,STAT=dealloc_stat)
    if (dealloc_stat/=0) then
-      write(nout,*) 'Subroutine "write_h_max". ',                              &
+      write(ulog,*) 'Subroutine "write_h_max". ',                              &
          'Deallocation of the array "q_max" failed; the simulation stops here.'
       stop
    endif

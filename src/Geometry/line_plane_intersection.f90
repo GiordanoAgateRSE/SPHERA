@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -27,14 +27,14 @@ subroutine line_plane_intersection(P1_line,P2_line,P1_plane3,P2_plane3,        &
                                    P3_plane3,test_point,intersection_pl)
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
 !------------------------
 ! Declarations
 !------------------------
 implicit none
 double precision,intent(IN) :: P1_line(3),P2_line(3),P1_plane3(3),P2_plane3(3)
 double precision,intent(IN) :: P3_plane3(3) 
-integer(4),intent(inout) :: test_point
+integer(4),intent(INOUT) :: test_point
 double precision,intent(INOUT) :: intersection_pl(3)
 double precision :: a1,b1,c1,d1,a2,b2,c2,d2,a3,b3,c3,d3
 double precision :: P3_plane1(3),P3_plane2(3),b_vec(3)

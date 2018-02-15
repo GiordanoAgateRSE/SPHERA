@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -32,7 +32,7 @@
 subroutine FindCloseBoundarySides2D(npi,Ncbs,Cloboside,LocXY)
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
 use I_O_file_module
 use Static_allocation_module
 use Hybrid_allocation_module
@@ -123,13 +123,13 @@ side_loop: do isi=1,NumBSides
 ! To check the maximum number allowed for closest boundaries
             if (Ncbs>MAXCLOSEBOUNDSIDES) then
 ! The particle "npi" has more than two boundary sides: to reduce dx and restart
-               write(nout,'(1x,a,i12,a)')   ' ERROR! The particle ',npi,       &
+               write(ulog,'(1x,a,i12,a)')   ' ERROR! The particle ',npi,       &
                   ' has more than two boundary sides: reduce dd and restart.'
-               write(nout,'(1x,a,3f15.10)') '        Coordinate: ',            &
+               write(ulog,'(1x,a,3f15.10)') '        Coordinate: ',            &
                   pg(npi)%coord(:)
-               write(nscr,'(1x,a,i12,a)')   ' ERROR! The particle ',npi,       &
+               write(uerr,'(1x,a,i12,a)')   ' ERROR! The particle ',npi,       &
                   ' has more than two boundary sides: reduce dd and restart.'
-               write(nscr,'(1x,a,3f15.10)') '        Coordinate: ',            &
+               write(uerr,'(1x,a,3f15.10)') '        Coordinate: ',            &
                   pg(npi)%coord(:)
                call diagnostic(arg1=8,arg2=8,arg3=nomsub)
             endif

@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -27,7 +27,7 @@ subroutine DBSPH_BC_shear_viscosity_term(i_0,i_a,npartint,                     &
    DBSPH_wall_she_vis_term)
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
 use Hybrid_allocation_module
 use Dynamic_allocation_module
 !------------------------
@@ -35,7 +35,7 @@ use Dynamic_allocation_module
 !------------------------
 implicit none
 integer(4),intent(in) :: i_0,i_a,npartint
-double precision,intent(inout) :: DBSPH_wall_she_vis_term(3)
+double precision,intent(INOUT) :: DBSPH_wall_she_vis_term(3)
 !------------------------
 ! Explicit interfaces
 !------------------------

@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -23,17 +23,17 @@
 ! Description: Reading control sections (not valid for the flow rate)                       
 !-------------------------------------------------------------------------------
 subroutine ReadInputControlSections(NumberEntities,Control_Sections,ainp,      &
-                                    comment,nrighe,ier,ninp,nout)
+                                    comment,nrighe,ier,ninp,ulog)
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
 use Static_allocation_module
 use Hybrid_allocation_module
 !------------------------
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: nrighe,ier,ninp,nout,npts
+integer(4) :: nrighe,ier,ninp,ulog,npts
 integer(4),dimension(20) :: NumberEntities
 type (TySection),dimension(0:Nsections+1) :: Control_Sections
 character(1) :: comment
@@ -60,7 +60,7 @@ character(100),external :: lcase, GetToken
 ! Statements
 !------------------------
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-if (.NOT.ReadCheck (ioerr,ier,nrighe,ainp,"CONTROL SECTIONS DATA",ninp,nout))  &
+if (.NOT.ReadCheck (ioerr,ier,nrighe,ainp,"CONTROL SECTIONS DATA",ninp,ulog))  &
    return
 npts = npoints+npointsl
 do while (TRIM(lcase(ainp))/="##### end control sections #####")
@@ -83,7 +83,7 @@ do while (TRIM(lcase(ainp))/="##### end control sections #####")
       endselect
    endif
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                                   &
-      "CONTROL SECTION "//label//" - CONSTANT COORD. DEFINITION",ninp,nout))   &
+      "CONTROL SECTION "//label//" - CONSTANT COORD. DEFINITION",ninp,ulog))   &
       return
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
    token = lcase(GetToken(ainp,1,ioerr))
@@ -106,7 +106,7 @@ do while (TRIM(lcase(ainp))/="##### end control sections #####")
       endselect
    endif
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                                   &
-      "CONTROL SECTION "//label//" - FIRST LIMIT DEFINITION",ninp,nout)) return
+      "CONTROL SECTION "//label//" - FIRST LIMIT DEFINITION",ninp,ulog)) return
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
    token = lcase(GetToken(ainp,1,ioerr))
    if (ioerr==0) then
@@ -128,7 +128,7 @@ do while (TRIM(lcase(ainp))/="##### end control sections #####")
       endselect
    endif
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                                   &
-      "CONTROL SECTION "//label//" - SECOND LIMIT DEFINITION",ninp,nout))      &
+      "CONTROL SECTION "//label//" - SECOND LIMIT DEFINITION",ninp,ulog))      &
       return
 ! Colour code: "ptcl"
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
@@ -144,7 +144,7 @@ do while (TRIM(lcase(ainp))/="##### end control sections #####")
       endselect
    endif
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                                   &
-      "CONTROL SECTION "//label//" - COLOR INDEX",ninp,nout)) return
+      "CONTROL SECTION "//label//" - COLOR INDEX",ninp,ulog)) return
 ! To estimate the number of points to be generated 
    Ndiv = NumberSectionPoints (values, CoordLabel(icord))
    NumberEntities(13) = NumberEntities(13) + Ndiv
@@ -171,28 +171,28 @@ do while (TRIM(lcase(ainp))/="##### end control sections #####")
       Control_Sections(NumberEntities(12))%ColorCode = icolor
       call CreateSectionPoints(vp,values,CoordLabel(icord),NumberEntities(12))
       npts = npts + Ndiv
-      if (nout>0) then
-         write (nout,"(1x,a,i3,1x,a)") "Control section   ",                   &
+      if (ulog>0) then
+         write(ulog,"(1x,a,i3,1x,a)") "Control section   ",                   &
             NumberEntities(12),                                                &
             "("//Control_Sections(NumberEntities(12))%label//")"
-         write (nout,"(1x,a,1x,a,f12.4)") "Constant Coordinate   ",            &
+         write(ulog,"(1x,a,1x,a,f12.4)") "Constant Coordinate   ",            &
             Control_Sections(NumberEntities(12))%Tipo//"=",                    &
             Control_Sections(NumberEntities(12))%Constant(icord)
-         write (nout,"(1x,a,2f12.4)")                                          &
+         write(ulog,"(1x,a,2f12.4)")                                          &
             CoordLabel(icor2)//" Coordinate Limits  ",                         &
             Control_Sections(NumberEntities(12))%XYZRange(icor2,:)
-         write (nout,"(1x,a,2f12.4)")                                          &
+         write(ulog,"(1x,a,2f12.4)")                                          &
             CoordLabel(icor3)//" Coordinate Limits  ",                         &
             Control_Sections(NumberEntities(12))%XYZRange(icor3,:) 
-         write (nout,"(1x,a,i12)") "First Point:      ",                       &
+         write(ulog,"(1x,a,i12)") "First Point:      ",                       &
             Control_Sections(NumberEntities(12))%icont(1)
-         write (nout,"(1x,a,i12)") "Last  Point:      ",                       &
+         write(ulog,"(1x,a,i12)") "Last  Point:      ",                       &
             Control_Sections(NumberEntities(12))%icont(2)
       endif
    endif
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
    if (.NOT.ReadCheck (ioerr,ier,nrighe,ainp,"CONTROL SECTIONS DATA",ninp,     &
-      nout)) return
+      ulog)) return
 enddo
 !------------------------
 ! Deallocations

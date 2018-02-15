@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -32,7 +32,7 @@
 logical function IsParticleInternal3D(mib,PX,IsopraS)
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
 use Static_allocation_module
 use Hybrid_allocation_module
 use Dynamic_allocation_module
@@ -69,7 +69,7 @@ interface
       double precision,intent(in) :: point(2),point_pol_1(2),point_pol_2(2)
       double precision,intent(in) :: point_pol_3(2),point_pol_4(2)
       double precision,intent(in) :: point_pol_5(2),point_pol_6(2)
-      integer(4),intent(inout) :: test
+      integer(4),intent(INOUT) :: test
       double precision :: dis1,dis2
       double precision :: normal(2)
    end subroutine point_inout_convex_non_degenerate_polygon
@@ -78,7 +78,7 @@ interface
       implicit none
       double precision,intent(in) :: point(2),point_pol_1(2),point_pol_2(2)
       double precision,intent(in) :: point_pol_3(2),point_pol_4(2)
-      integer(4),intent(inout) :: test
+      integer(4),intent(INOUT) :: test
    end subroutine point_inout_quadrilateral
    subroutine point_inout_pentagon(point,point_pol_1,point_pol_2,              &
                                    point_pol_3,point_pol_4,point_pol_5,test)
@@ -86,7 +86,7 @@ interface
       double precision,intent(in) :: point(2),point_pol_1(2),point_pol_2(2)
       double precision,intent(in) :: point_pol_3(2),point_pol_4(2)
       double precision,intent(in) :: point_pol_5(2)
-      integer(4),intent(inout) :: test
+      integer(4),intent(INOUT) :: test
    end subroutine point_inout_pentagon
    subroutine point_inout_hexagon(point,point_pol_1,point_pol_2,               &
                                   point_pol_3,point_pol_4,point_pol_5,         &
@@ -95,7 +95,7 @@ interface
       double precision,intent(in) :: point(2),point_pol_1(2),point_pol_2(2)
       double precision,intent(in) :: point_pol_3(2),point_pol_4(2)
       double precision,intent(in) :: point_pol_5(2),point_pol_6(2)
-      integer(4),intent(inout) :: test
+      integer(4),intent(INOUT) :: test
    end subroutine point_inout_hexagon
 end interface
 !------------------------
@@ -187,7 +187,7 @@ do kf=Tratto(mib)%iniface,(Tratto(mib)%iniface+Tratto(mib)%numvertices-1)
                                      BoundaryFace(nf)%Node(5)%LX(1:2),         &
                                      BoundaryFace(nf)%Node(6)%LX(1:2),test)
          case default
-            write(nscr,*) "Run-time error at IsParticleInternal3D. The number",&
+            write(uerr,*) "Run-time error at IsParticleInternal3D. The number",&
                " of face vertices (nnodes) must be 3, 4, 5 or 6. SPHERA stops. "   
             stop                                      
       endselect

@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -22,17 +22,17 @@
 ! Program unit: ReadInputDrawOptions                       
 ! Description:                        
 !-------------------------------------------------------------------------------
-subroutine ReadInputDrawOptions(ainp,comment,nrighe,ier,ninp,nout)
+subroutine ReadInputDrawOptions(ainp,comment,nrighe,ier,ninp,ulog)
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
 use Static_allocation_module                            
 use Hybrid_allocation_module
 !------------------------
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: nrighe,ier, ninp,nout
+integer(4) :: nrighe,ier, ninp,ulog
 character(1) :: comment
 character(100) :: ainp
 character(4) :: steptime
@@ -53,7 +53,7 @@ logical,external :: ReadCheck
 ! Statements
 !------------------------
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DRAW OPTIONS DATA",ninp,nout)) return
+if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DRAW OPTIONS DATA",ninp,ulog)) return
 do while (TRIM(lcase(ainp))/="##### end draw options #####")
    select case(lcase(GetToken(ainp,1,ioerr)))
       case("vtkconverter")
@@ -62,13 +62,13 @@ do while (TRIM(lcase(ainp))/="##### end draw options #####")
             case("any")
                token = lcase(GetToken(ainp,(3),ioerr))
                read (token,*,iostat=ioerr) freq_time
-               if ((ncord>0).and.(nout>0)) write(nout,"(1x,a,1pe12.4,a)")      &
+               if ((ncord>0).and.(ulog>0)) write(ulog,"(1x,a,1pe12.4,a)")      &
                   "VTKConversion any :",freq_time," seconds."
                val_time  = zero  
             case("at")
                token = lcase(GetToken(ainp,(3),ioerr))
                read (token,*,iostat=ioerr) freq_time
-               if ((ncord>0).and.(nout>0)) write(nout,"(1x,a,1pe12.4,a)")      &
+               if ((ncord>0).and.(ulog>0)) write(ulog,"(1x,a,1pe12.4,a)")      &
                   "VTKConversion at :",freq_time," second."
                   val_time  = freq_time
                   freq_time = -freq_time
@@ -78,34 +78,34 @@ do while (TRIM(lcase(ainp))/="##### end draw options #####")
                if (steptime=='time') then
                   freq_time = Domain%memo_fr
                   val_time  = zero  
-                  if ((ncord>0).and.(nout>0)) write(nout,"(1x,a,1pe12.4,a)")   &
+                  if ((ncord>0).and.(ulog>0)) write(ulog,"(1x,a,1pe12.4,a)")   &
                      "VTKConversion every :",freq_time," second."
                   elseif (steptime=='step') then
                      freq_time = zero
                      val_time  = const_m_9999
-                     if ((ncord>0).and.(nout>0)) write(nout,"(1x,a)")          &
+                     if ((ncord>0).and.(ulog>0)) write(ulog,"(1x,a)")          &
                         "VTKConversion all steps."
                      else
                         freq_time = Domain%memo_fr
                         val_time  = zero 
-                        if ((ncord>0).and.(nout>0)) write(nout,                &
+                        if ((ncord>0).and.(ulog>0)) write(ulog,                &
                            "(1x,a,1pe12.4,a)") "VTKConversion every :",        &
                            freq_time," second."
                endif
             case default
                freq_time = Domain%memo_fr
                val_time = zero
-               if ((ncord)>0.and.(nout>0)) write(nout,"(1x,a,1pe12.4,a)")      &
+               if ((ncord)>0.and.(ulog>0)) write(ulog,"(1x,a,1pe12.4,a)")      &
                   "VTKConversion every :",freq_time," second."
          endselect
-         if ((ncord>0).and.(nout>0)) write(nout,"(1x,a)") " "
+         if ((ncord>0).and.(ulog>0)) write(ulog,"(1x,a)") " "
          vtkconv = .TRUE.
       case default
          ier = 4
          return
    endselect
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DRAW OPTIONS DATA",ninp,nout))    &
+   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DRAW OPTIONS DATA",ninp,ulog))    &
       return
 enddo
 !------------------------

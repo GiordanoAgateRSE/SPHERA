@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -26,7 +26,7 @@
 subroutine RHS_body_dynamics(dtvel)
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
 use Static_allocation_module
 use Hybrid_allocation_module
 use Dynamic_allocation_module
@@ -72,7 +72,7 @@ interface
       double precision,intent(in) :: point(2),point_pol_1(2),point_pol_2(2)
       double precision,intent(in) :: point_pol_3(2),point_pol_4(2)
       double precision,intent(in) :: point_pol_5(2),point_pol_6(2)
-      integer(4),intent(inout) :: test
+      integer(4),intent(INOUT) :: test
       double precision :: dis1,dis2
       double precision :: normal(2)
    end subroutine point_inout_convex_non_degenerate_polygon
@@ -209,12 +209,12 @@ do npi=1,n_body_part
                         on_going_time_step,'_',npi,'_',npj,".txt"
                      open(60,file=file_name_test,status="unknown",             &
                         form="formatted")
-                     write (60,                                                &
+                     write(60,                                                &
               '((10x,a),4(11x,a),(2x,a),(9x,a),(6x,a),(4x,a),(9x,a),3(11x,a))')&
                        " time"," npi"," npj"," nbi"," nbj"," imp_vel(m/s)",    &
                        " r_per"," k_masses"," Gamma_boun"," r_par",            &
                        " n_x"," n_y"," n_z"
-                     write (60,'((g14.7,1x),4(i14,1x),8(g14.7,1x))')           &
+                     write(60,'((g14.7,1x),4(i14,1x),8(g14.7,1x))')           &
                         simulation_time,npi,npj,bp_arr(npi)%body,              &
                         bp_arr(npj)%body,impact_vel(aux2,bp_arr(npj)%body),    &
                         r_per,k_masses,Gamma_boun(r_per,Domain%h),r_par,       &

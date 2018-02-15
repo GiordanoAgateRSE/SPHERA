@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -35,7 +35,7 @@
 subroutine Shields(npi)
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
 use I_O_file_module
 use Static_allocation_module
 use Hybrid_allocation_module
@@ -348,26 +348,24 @@ iter_ustar: do while ((flagz0).and.                                            &
    contatore = contatore + 1
    if (contatore>Granular_flows_options%n_max_iterations) then
       inquire(file=nomefileerr,EXIST=err_flag)
-      if (.not.err_flag) open(unit=uniterr,file=nomefileerr,form='formatted',  &
+      if (.not.err_flag) open(unit=ueroerr,file=nomefileerr,form='formatted',  &
          status='unknown')
-      write (nout,*) ' WARNING! Superato il numero massimo di iterazioni per', &
+      write(ulog,*) ' WARNING! Superato il numero massimo di iterazioni per',  &
          ' il calcolo di Ustar. ' 
-
-
-      write (nscr,*) ' WARNING! Superato il numero massimo di iterazioni per', &
+      write(uerr,*) ' WARNING! Superato il numero massimo di iterazioni per',  &
          ' il calcolo di Ustar. ' 
-      write (uniterr,*) '   ' 
-      write (uniterr,*) ' WARNING! Superato il numero massimo di iterazioni ', &
+      write(ueroerr,*) '   ' 
+      write(ueroerr,*) ' WARNING! Superato il numero massimo di iterazioni ',  &
          ' per il calcolo di Ustar. ' 
-      write (uniterr,*) '  Provare a ridurre il valore di Ks e rilanciare ',   &
+      write(ueroerr,*) '  Provare a ridurre il valore di Ks e rilanciare ',    &
          '(for Shields 2D or Mohr erosion criterion). ' 
-      write (uniterr,*) '  simulation_time = ',simulation_time,'  Velocity',   &
+      write(ueroerr,*) '  simulation_time = ',simulation_time,'  Velocity',    &
          Velocity
-      write (uniterr,*) '  Ustar',Ustar,'  Ustarold',Ustarold
-      write (uniterr,'(a,i6,a,3f10.7,a,e10.3)') '  npi = ',npi,                &
+      write(ueroerr,*) '  Ustar',Ustar,'  Ustarold',Ustarold
+      write(ueroerr,'(a,i6,a,3f10.7,a,e10.3)') '  npi = ',npi,                 &
          '      pg(npi)%coord = ',pg(npi)%coord(1),pg(npi)%coord(2),           &
          pg(npi)%coord(3)," residual = ",DifRel
-      write (uniterr,*) '  DistZmin',DistZmin,'  Z0',Z0
+      write(ueroerr,*) '  DistZmin',DistZmin,'  Z0',Z0
 ! Rough boundary regime
       Z0 = 0.033d0 * Ks
       flagz0 = .false.
@@ -397,20 +395,20 @@ iter_ustar: do while ((flagz0).and.                                            &
             else
                flagz0 = .false.
                inquire (file=nomefileerr,EXIST=err_flag)
-               if (.not. err_flag) open(unit=uniterr,file=nomefileerr,         &
+               if (.not. err_flag) open(unit=ueroerr,file=nomefileerr,         &
                   form='formatted',status='unknown')
-               write (nout,*) ' WARNING! Z0>rijtempmin per il calcolo di Ustar.' 
-               write (nscr,*) ' WARNING! Z0>rijtempmin per il calcolo di Ustar.' 
-               write (uniterr,*) '   ' 
-               write (uniterr,*) ' WARNING! Z0>rijtempmin per il calcolo di ', &
+               write(ulog,*) ' WARNING! Z0>rijtempmin per il calcolo di Ustar.' 
+               write(uerr,*) ' WARNING! Z0>rijtempmin per il calcolo di Ustar.' 
+               write(ueroerr,*) '   ' 
+               write(ueroerr,*) ' WARNING! Z0>rijtempmin per il calcolo di ',  &
                   ' Ustar. ' 
-               write (uniterr,*) '  simulation_time = ',simulation_time,       &
+               write(ueroerr,*) '  simulation_time = ',simulation_time,        &
                   '  Velocity',Velocity
-               write (uniterr,*) '  Ustar',Ustar,'  Ustarold',Ustarold
-               write (uniterr,'(a,i6,a,3f10.7)') '  npi = ',npi,               &
+               write(ueroerr,*) '  Ustar',Ustar,'  Ustarold',Ustarold
+               write(ueroerr,'(a,i6,a,3f10.7)') '  npi = ',npi,                &
                   '      pg(npi)%coord = ',pg(npi)%coord(1),pg(npi)%coord(2),  &
                   pg(npi)%coord(3)
-               write (uniterr,*) '  DistZmin',DistZmin,'  Z0',Z0
+               write(ueroerr,*) '  DistZmin',DistZmin,'  Z0',Z0
          end if
    endif
 enddo iter_ustar 

@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -25,7 +25,7 @@
 subroutine CreaGrid
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
 use I_O_file_module
 use Static_allocation_module
 use Hybrid_allocation_module
@@ -70,19 +70,19 @@ if (ncord==2) Grid%ncd(2) = 1
 ! To assess the maximum number of cells covering the grid 
 ! domain (a parallelepiped)
 Grid%nmax = Grid%ncd(1) * Grid%ncd(2) * Grid%ncd(3)
-write (nout,'(1x,a)') " "
-write (nout,'(1x,a,3i8)') " Number of grid cells in x, y, z directions : ",    &
+write(ulog,'(1x,a)') " "
+write(ulog,'(1x,a,3i8)') " Number of grid cells in x, y, z directions : ",     &
    Grid%ncd(1),Grid%ncd(2),Grid%ncd(3)
-write (nout,'(1x,a,i10)') " Number of total grid cells : ",Grid%nmax
-write (nout,'(1x,a)') " "
+write(ulog,'(1x,a,i10)') " Number of total grid cells : ",Grid%nmax
+write(ulog,'(1x,a)') " "
 ! Allocation of a 2D matrix to detect free surface (erosion criterion)
 allocate(ind_interfaces(Grid%ncd(1),Grid%ncd(2),6),stat=alloc_stat)
 if (alloc_stat/=0) then
-   write (nout,'(1x,a,i2)')                                                    &
+   write(ulog,'(1x,a,i2)')                                                     &
       "    Array ind_interfaces not allocated. Error code: ",alloc_stat
    call diagnostic(arg1=4,arg3=nomsub)
    else
-      write (nout,'(1x,a)') "    Array ind_interfaces successfully allocated "
+      write(ulog,'(1x,a)') "    Array ind_interfaces successfully allocated "
 endif
 !------------------------
 ! Deallocations

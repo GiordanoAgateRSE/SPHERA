@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -27,7 +27,7 @@
 subroutine MohrC 
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
 use I_O_file_module
 use Static_allocation_module
 use Hybrid_allocation_module
@@ -60,7 +60,7 @@ integer(4),external :: ParticleCellNumber, CellIndices, CellNumber
 !$omp private(npartint,npj,k,numcell,nnlocal,m,intpl_id,peloloc,pl_imed)       &
 !$omp private(interf_liq,intliq_id,interf_sol,intsol_id,secinv,PartLiq_pres)   &
 !$omp private(preidro,pretot,preeff,coeff1,coeff2,mu,mumax,Velocity2)          &
-!$omp shared(ind_interfaces,nomsub,nout,nscr,nag,pg,Med,Domain,Grid,Icont)     &
+!$omp shared(ind_interfaces,nomsub,ulog,uerr,nag,pg,Med,Domain,Grid,Icont)     &
 !$omp shared(npartord,nPartIntorno,PartIntorno,NMAXPARTJ,diffusione,esplosione)&
 !$omp shared(on_going_time_step)
 do npi = 1,nag

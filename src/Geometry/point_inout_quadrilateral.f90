@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -29,14 +29,14 @@ subroutine point_inout_quadrilateral(point,point_pol_1,point_pol_2,point_pol_3,&
                                      point_pol_4,test)
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
 !------------------------
 ! Declarations
 !------------------------
 implicit none
 double precision,intent(in) :: point(2),point_pol_1(2),point_pol_2(2)
 double precision,intent(in) :: point_pol_3(2),point_pol_4(2)
-integer(4),intent(inout) :: test
+integer(4),intent(INOUT) :: test
 integer(4) :: test1,test2
 !------------------------
 ! Explicit interfaces
@@ -54,7 +54,7 @@ interface
       double precision,intent(in) :: point(2),point_pol_1(2),point_pol_2(2)
       double precision,intent(in) :: point_pol_3(2),point_pol_4(2)
       double precision,intent(in) :: point_pol_5(2),point_pol_6(2)
-      integer(4),intent(inout) :: test
+      integer(4),intent(INOUT) :: test
       double precision :: dis1,dis2
       double precision :: normal(2)
    end subroutine point_inout_convex_non_degenerate_polygon

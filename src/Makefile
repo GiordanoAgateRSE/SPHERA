@@ -12,11 +12,11 @@ COMPILATION_FLAGS = -O1
 # Suggested values for COMPILER
 #    gfortran
 #    ifort
-COMPILER = ifort
+COMPILER = gfortran
 # Suggested values for OMP_FLAG
 #    -fopenmp (gfortran omp)
 #    -qopenmp (ifort omp; formerly -openmp) 
-OMP_FLAG = -qopenmp
+OMP_FLAG = -fopenmp
 EXE_DIR = ../$(EXECUTION)/
 SOURCES = \
 ./Modules/Static_allocation_module.f90 \

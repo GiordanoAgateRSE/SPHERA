@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -24,17 +24,17 @@
 !              input file.                       
 !-------------------------------------------------------------------------------
 subroutine ReadInputMedium(NumberEntities,Med,ainp,comment,nrighe,ier,ninp,    &
-                           nout,nscr)
+                           ulog,uerr)
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
 use Static_allocation_module
 use Hybrid_allocation_module
 !------------------------
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: nrighe,ier,ninp,nout,nscr
+integer(4) :: nrighe,ier,ninp,ulog,uerr
 integer(4),dimension(20) :: NumberEntities
 type (TyMedium),dimension(NMedium) :: Med
 character(1) :: comment
@@ -62,13 +62,13 @@ logical,external :: ReadCheck
 ! Statements
 !------------------------
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"MEDIUM DATA",ninp,nout)) return
+if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"MEDIUM DATA",ninp,ulog)) return
 do while (TRIM(lcase(ainp))/="##### end medium #####")
    read(ainp,*,iostat=ioerr) tipo
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"MEDIUM TYPE",ninp,nout)) return
+   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"MEDIUM TYPE",ninp,ulog)) return
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
    read(ainp,*,iostat=ioerr) index
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"MEDIUM INDEX",ninp,nout)) return
+   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"MEDIUM INDEX",ninp,ulog)) return
    NumberEntities(2) = max(NumberEntities(2),index)
    den0 = zero
    eps = zero
@@ -100,158 +100,158 @@ do while (TRIM(lcase(ainp))/="##### end medium #####")
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read(ainp,*,iostat=ioerr) den0,eps
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                             &
-            "WATER DENSITY & COMPRIMIBILITY",ninp,nout)) return
+            "WATER DENSITY & COMPRIMIBILITY",ninp,ulog)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read(ainp,*,iostat=ioerr) alfaMon, betaMon
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"ALPHA e BETA MONAGHAN",ninp,&
-            nout)) return
+            ulog)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read(ainp,*,iostat=ioerr) codif, Settling
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DIFFUSION COEFF",ninp,nout))&
+         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DIFFUSION COEFF",ninp,ulog))&
             return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read(ainp,*,iostat=ioerr) gamma, InitialIntEn
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"EXPLOSION COEFF",ninp,nout))&
+         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"EXPLOSION COEFF",ninp,ulog))&
             return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read(ainp,*,iostat=ioerr) visc
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DYNAMIC VISCOSITY",ninp,    &
-            nout)) return            
+            ulog)) return            
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read(ainp,*,iostat=ioerr) Rough
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"ROUGH COEFFICIENT",ninp,nout&
+         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"ROUGH COEFFICIENT",ninp,ulog&
             )) return
       case ("liquid  ")
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read(ainp,*,iostat=ioerr) den0,eps
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                             &
-            "WATER DENSITY & COMPRIMIBILITY",ninp,nout)) return
+            "WATER DENSITY & COMPRIMIBILITY",ninp,ulog)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read(ainp,*,iostat=ioerr) alfaMon, betaMon
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"ALPHA e BETA MONAGHAN",     &
-            ninp,nout)) return
+            ninp,ulog)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read(ainp,*,iostat=ioerr) codif,Settling
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DIFFUSION COEFF",ninp,      &
-            nout)) return
+            ulog)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read(ainp,*,iostat=ioerr) gamma,InitialIntEn
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"EXPLOSION COEFF",ninp,      &
-            nout)) return
+            ulog)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read(ainp,*,iostat=ioerr) visc
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DYNAMIC VISCOSITY",ninp,    & 
-            nout)) return            
+            ulog)) return            
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read(ainp,*,iostat=ioerr) Rough
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"ROUGH COEFFICIENT",ninp,    &
-            nout)) return
+            ulog)) return
 ! Newtonian fluids with imposed dynamic turbulent viscosity (mixing-length 
 ! scheme, depending on dx, see "Smagorinsky") 
       case ("smagorin")
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read(ainp,*,iostat=ioerr) den0,eps
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                             &
-            "WATER DENSITY & COMPRIMIBILITY",ninp,nout)) return
+            "WATER DENSITY & COMPRIMIBILITY",ninp,ulog)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read(ainp,*,iostat=ioerr) alfaMon, betaMon
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"ALPHA e BETA MONAGHAN",     &
-            ninp,nout)) return
+            ninp,ulog)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read(ainp,*,iostat=ioerr) codif, Settling
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DIFFUSION COEFF",ninp,      &
-            nout)) return
+            ulog)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read(ainp,*,iostat=ioerr) gamma,InitialIntEn
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"EXPLOSION COEFF",ninp,      &
-            nout)) return
+            ulog)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read(ainp,*,iostat=ioerr) visc
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DYNAMIC VISCOSITY",ninp,    &
-            nout)) return            
+            ulog)) return            
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read(ainp,*,iostat=ioerr) Cs
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"SMAGORINSKY CONST",ninp,    &
-            nout)) return
+            ulog)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read(ainp,*,iostat=ioerr) Rough
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"ROUGH COEFFICIENT",ninp,    &
-            nout)) return   
+            ulog)) return   
 ! Non-Newtoniani fluids with apparent viscosity (Chen formula)
       case ("general ")
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read(ainp,*,iostat=ioerr) den0,eps
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                             &
-            "WATER DENSITY & COMPRIMIBILITY",ninp,nout)) return
+            "WATER DENSITY & COMPRIMIBILITY",ninp,ulog)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read(ainp,*,iostat=ioerr) alfaMon, betaMon
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"ALPHA e BETA MONAGHAN",     &
-            ninp,nout)) return
+            ninp,ulog)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read(ainp,*,iostat=ioerr) codif,Settling
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DIFFUSION COEFF",ninp,      &
-            nout)) return
+            ulog)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read(ainp,*,iostat=ioerr) gamma,InitialIntEn
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"EXPLOSION COEFF",ninp,      &
-            nout)) return
+            ulog)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read(ainp,*,iostat=ioerr) cons,viscmx
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"CONSISTENCY & VISCO MAX",   &
-            ninp,nout)) return            
+            ninp,ulog)) return            
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read(ainp,*,iostat=ioerr) taucri, cuin
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"TAUCRI & CUIN",ninp,nout)   &
+         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"TAUCRI & CUIN",ninp,ulog)   &
             ) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read(ainp,*,iostat=ioerr) Rough
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"ROUGH COEFFICIENT",ninp,    &
-            nout)) return
+            ulog)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read(ainp,*,iostat=ioerr) nitersol
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"N° ITERATION SOLID",ninp,   &
-            nout)) return
+            ulog)) return
          visc = viscmx
 ! Non-Newtonian fluids with apparent viscosity 
       case ("granular")
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read(ainp,*,iostat=ioerr) den0,eps
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                             &
-            "WATER DENSITY & COMPRIMIBILITY",ninp,nout)) return
+            "WATER DENSITY & COMPRIMIBILITY",ninp,ulog)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read(ainp,*,iostat=ioerr) alfaMon, betaMon
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"ALPHA e BETA MONAGHAN",     &
-            ninp,nout)) return
+            ninp,ulog)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read(ainp,*,iostat=ioerr) codif,Settling
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DIFFUSION COEFF",ninp,      &
-            nout)) return
+            ulog)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read(ainp,*,iostat=ioerr) gamma,InitialIntEn
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"EXPLOSION COEFF",ninp,      &
-            nout)) return
+            ulog)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read(ainp,*,iostat=ioerr) phi,saturated_medium_flag
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"PHI, SATURATED_MEDIUM_FLAG",&
-            ninp,nout)) return
+            ninp,ulog)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read(ainp,*,iostat=ioerr) coes,viscmx,visc,limiting_viscosity
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                             &
-            "COHESION, VISCO MAX, VISCO & LIMITING VISCOSITY",ninp,nout)) return            
+            "COHESION, VISCO MAX, VISCO & LIMITING VISCOSITY",ninp,ulog)) return            
          if (Granular_flows_options%ID_erosion_criterion==1) then
             call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
             read(ainp,*,iostat=ioerr) porosity,d50,d_90
             if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                          &
-               "POROSITY, d50 and D_90",ninp,nout)) return
+               "POROSITY, d50 and D_90",ninp,ulog)) return
             else
                call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
                read(ainp,*,iostat=ioerr) Rough,d50
                if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                       &
-                  "ROUGH COEFFICIENT, d50",ninp,nout)) return
+                  "ROUGH COEFFICIENT, d50",ninp,ulog)) return
                call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
                read(ainp,*,iostat=ioerr) nitersol
                if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                       &
-                  "N° ITERATION SOLID",ninp,nout)) return
+                  "N° ITERATION SOLID",ninp,ulog)) return
          endif
       case default
    endselect
@@ -283,56 +283,56 @@ do while (TRIM(lcase(ainp))/="##### end medium #####")
       Med(index)%SettlingCoef = Settling
       Med(index)%gamma = gamma
       Med(index)%InitialIntEn = InitialIntEn
-      if (nout>0) then
-         write(nout,"(1x,a,i3,1x,a)")  "Medium:.....................",         &
+      if (ulog>0) then
+         write(ulog,"(1x,a,i3,1x,a)")  "Medium:.....................",         &
             Med(index)%index,"("//Med(index)%tipo//")"
-         write(nout,"(1x,a,1p,e12.4)") "Density:....................",         &
+         write(ulog,"(1x,a,1p,e12.4)") "Density:....................",         &
             Med(index)%den0
-         write(nout,"(1x,a,1p,e12.4)") "Comprimibility:.............",         &
+         write(ulog,"(1x,a,1p,e12.4)") "Comprimibility:.............",         &
             Med(index)%eps
-         write(nout,"(1x,a,1p,e12.4)") "Celerity:...................",         &
+         write(ulog,"(1x,a,1p,e12.4)") "Celerity:...................",         &
             Med(index)%celerita
-         write(nout,"(1x,a,1p,e12.4)") "Alpha Monaghan Coeff.:......",         &
+         write(ulog,"(1x,a,1p,e12.4)") "Alpha Monaghan Coeff.:......",         &
             Med(index)%alfaMon 
-         write(nout,"(1x,a,1p,e12.4)") "Beta Monaghan Coeff.:.......",         &
+         write(ulog,"(1x,a,1p,e12.4)") "Beta Monaghan Coeff.:.......",         &
             Med(index)%betaMon
-         write(nout,"(1x,a,1p,e12.4)") "Dynamic Viscosity:..........",         &
+         write(ulog,"(1x,a,1p,e12.4)") "Dynamic Viscosity:..........",         &
             Med(index)%visc
-         write(nout,"(1x,a,1p,e12.4)") "Max. Dynamic Viscosity:.....",         &
+         write(ulog,"(1x,a,1p,e12.4)") "Max. Dynamic Viscosity:.....",         &
             Med(index)%mumx
-         write(nout,"(1x,a,1p,e12.4)") "Tau Critical:...............",         &
+         write(ulog,"(1x,a,1p,e12.4)") "Tau Critical:...............",         &
             Med(index)%taucri
-         write(nout,"(1x,a,1p,e12.4)") "Index curve:................",         &
+         write(ulog,"(1x,a,1p,e12.4)") "Index curve:................",         &
             Med(index)%cuin
-         write(nout,"(1x,a,1p,e12.4)") "Friction Angle:.............",         &
+         write(ulog,"(1x,a,1p,e12.4)") "Friction Angle:.............",         &
             Med(index)%phi
-         write(nout,"(1x,a,1p,l12)")   "Saturated medium flag:......",         &
+         write(ulog,"(1x,a,1p,l12)")   "Saturated medium flag:......",         &
             Med(index)%saturated_medium_flag
-         write(nout,"(1x,a,1p,e12.4)") "Cohesion:...................",         &
+         write(ulog,"(1x,a,1p,e12.4)") "Cohesion:...................",         &
             Med(index)%coes
-         write(nout,"(1x,a,1p,e12.4)") "Limiting viscosity:.........",         &
+         write(ulog,"(1x,a,1p,e12.4)") "Limiting viscosity:.........",         &
             Med(index)%limiting_viscosity
-         write(nout,"(1x,a,1p,e12.4)") "Consistency:................",         &
+         write(ulog,"(1x,a,1p,e12.4)") "Consistency:................",         &
             Med(index)%cons
-         write(nout,"(1x,a,1p,e12.4)") "Smagorinsky Constant:.......",         &
+         write(ulog,"(1x,a,1p,e12.4)") "Smagorinsky Constant:.......",         &
             Med(index)%Cs
-         write(nout,"(1x,a,1p,e12.4)") "Roughness Coeff.:...........",         &
+         write(ulog,"(1x,a,1p,e12.4)") "Roughness Coeff.:...........",         &
             Med(index)%RoughCoef
-         write(nout,"(1x,a,1p,e12.4)") "d50:........................",         &
+         write(ulog,"(1x,a,1p,e12.4)") "d50:........................",         &
             Med(index)%d50
-         write(nout,"(1x,a,1p,e12.4)") "d90:........................",         &
+         write(ulog,"(1x,a,1p,e12.4)") "d90:........................",         &
             Med(index)%d_90
-         write(nout,"(1x,a,1p,e12.4)") "Volume fraction (solid):....",         &
+         write(ulog,"(1x,a,1p,e12.4)") "Volume fraction (solid):....",         &
             Med(index)%gran_vol_frac_max
-         write(nout,"(1x,a,1p,e12.4)") "Diffusion Coeff.:...........",         &
+         write(ulog,"(1x,a,1p,e12.4)") "Diffusion Coeff.:...........",         &
             Med(index)%codif       
-         write(nout,"(1x,a,1p,e12.4)") "Settling Velocity Coeff.:...",         & 
+         write(ulog,"(1x,a,1p,e12.4)") "Settling Velocity Coeff.:...",         & 
             Med(index)%SettlingCoef       
-         write(nout,"(1x,a,1p,e12.4)") "Explosion Gamma Coeff.:.....",         &
+         write(ulog,"(1x,a,1p,e12.4)") "Explosion Gamma Coeff.:.....",         &
             Med(index)%Gamma       
-         write(nout,"(1x,a,1p,e12.4)") "Initial Internal Energy.:...",         &
+         write(ulog,"(1x,a,1p,e12.4)") "Initial Internal Energy.:...",         &
             Med(index)%InitialIntEn       
-         write(nout,"(1x,a)")  " "
+         write(ulog,"(1x,a)")  " "
       endif
       Med(index)%visc = visc / den0
       Med(index)%numx = viscmx / den0
@@ -340,7 +340,7 @@ do while (TRIM(lcase(ainp))/="##### end medium #####")
       Med(index)%phi = Med(index)%phi * PIGRECO / 180.  
    endif
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"MEDIUM DATA",ninp,nout)) return
+   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"MEDIUM DATA",ninp,ulog)) return
 enddo
 !------------------------
 ! Deallocations

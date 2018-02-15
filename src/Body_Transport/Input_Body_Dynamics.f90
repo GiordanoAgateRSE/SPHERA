@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -25,7 +25,7 @@
 subroutine Input_Body_Dynamics
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
 use Static_allocation_module
 use Hybrid_allocation_module
 use Dynamic_allocation_module
@@ -49,7 +49,7 @@ interface
       implicit none
       double precision,intent(in) :: teta_R
       double precision,intent(in) :: n_R(3)
-      double precision,intent(inout) :: vector(3)
+      double precision,intent(INOUT) :: vector(3)
    end subroutine vector_rotation_Rodrigues
 end interface
 !------------------------
@@ -104,12 +104,12 @@ end do
 if (.not.allocated(bp_arr)) then
    allocate(bp_arr(n_body_part),STAT=alloc_stat)
    if (alloc_stat/=0) then
-      write(nout,*)                                                            &
+      write(ulog,*)                                                            &
          'Allocation of bp_arr in Input_Body_Dynamics failed;',                &
          ' the program terminates here.'
       stop ! Stop the main program
       else
-         write (nout,*)                                                        &
+         write(ulog,*)                                                        &
             "Allocation of bp_arr in Input_Body_Dynamics successfully completed"
    endif
 endif
@@ -295,12 +295,12 @@ enddo
 if (.not.allocated(surf_body_part)) then
    allocate(surf_body_part(n_surf_body_part),STAT=alloc_stat)
    if (alloc_stat/=0) then
-      write(nout,*)                                                            &
+      write(ulog,*)                                                            &
          'Allocation of surf_body_part in Input_Body_Dynamics failed;',        &
          ' the program terminates here.'
       stop ! Stop the main program
       else
-         write (nout,*)                                                        &
+         write(ulog,*)                                                        &
             'Allocation of surf_body_part in Input_Body_Dynamics ',            &
             ' successfully completed.'
    endif

@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -26,7 +26,7 @@
 subroutine body_to_smoothing_pres(sompW_vec,AppUnity_vec)
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
 use Static_allocation_module
 use Hybrid_allocation_module
 use Dynamic_allocation_module
@@ -34,7 +34,7 @@ use Dynamic_allocation_module
 ! Declarations
 !------------------------
 implicit none
-double precision,dimension(nag),intent(inout) :: sompW_vec,AppUnity_vec
+double precision,dimension(nag),intent(INOUT) :: sompW_vec,AppUnity_vec
 integer(4) :: npi,j,npartint,npj
 double precision :: W_vol,dis
 double precision, external :: w

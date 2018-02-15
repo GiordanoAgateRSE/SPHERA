@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -42,7 +42,7 @@
 subroutine GridCellBoundaryFacesIntersections3D(NumCellmax)
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
 use Static_allocation_module
 use Hybrid_allocation_module
 use Dynamic_allocation_module
@@ -81,7 +81,7 @@ flpointer = 0
 ! Loop over all the cells of the grid
 !$omp parallel do default(none)                                                &
 !$omp shared(Grid,GCBFPointers,NumFacce,BFaceList,Tratto,BoundaryFace)         &
-!$omp shared(flpointer,GCBFVector_aux,nomsub,Domain,nout)                      &
+!$omp shared(flpointer,GCBFVector_aux,nomsub,Domain,ulog)                      &
 !$omp private(nc,irestocell,i,i0,j,j0,k,k0,CellXYZ,nv,ii,jj,kk,CellNodeXYZ,kf) &
 !$omp private(nf,nodes,Found,sd,Signcount,no,XYZnod,CellNodeZita,deltaXYZ)     &
 !$omp private(i_flpointer,flpointer_cell,GCBFVector_cell)
@@ -183,7 +183,7 @@ do nc=1,Grid%nmax
             if (Found) then        
                flpointer_cell = flpointer_cell + 1
                if (flpointer_cell>Domain%MAXCLOSEBOUNDFACES) then
-                  write(nout,'(1x,a)')                                         &
+                  write(ulog,'(1x,a)')                                         &
 " Too many faces crossing a given cell. Please increase the parameter MAXCLOSEBOUNDFACES. "
                   call diagnostic(arg1=4,arg3=nomsub)
                endif
@@ -209,10 +209,10 @@ GCBFVecDim = flpointer
 ! Allocating "GCBFVector" 
 allocate(GCBFVector(GCBFVecDim),stat=ier)    
 if (ier/=0) then
-   write(nout,'(1x,a,i2)') "   Array GCBFVector not allocated. Error code: ",ier
+   write(ulog,'(1x,a,i2)') "   Array GCBFVector not allocated. Error code: ",ier
    call diagnostic(arg1=4,arg3=nomsub)
    else
-      write(nout,'(1x,a)') "   Array GCBFVector successfully allocated "
+      write(ulog,'(1x,a)') "   Array GCBFVector successfully allocated "
 endif
 ! Loop over the reference array "GCBFVector"
 !$omp parallel do default(none)                                                &

@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -23,10 +23,11 @@
 ! Description: Ordering the numerical elements on the background positioning 
 !              grid.       
 !-------------------------------------------------------------------------------
-subroutine OrdGrid1(nout)
+subroutine OrdGrid1
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
+use I_O_file_module
 use Static_allocation_module
 use Hybrid_allocation_module
 use Dynamic_allocation_module
@@ -34,7 +35,6 @@ use Dynamic_allocation_module
 ! Declarations
 !------------------------
 implicit none
-integer(4),intent(IN) :: nout
 integer(4) :: npi,ncel,i
 integer(4),dimension(Grid%nmax) :: numpartincelgiaaposto
 integer(4),external :: ParticleCellNumber
@@ -67,7 +67,7 @@ do while ((nag>0).AND.(npi<nag))
       npi = npi - 1
       elseif ((ncel<=0).or.(ncel>Grid%nmax)) then
 ! The particle is out of grid and is removed from the particle array
-         write(nout,'(a,i7,a,i7,3x,3e15.8,a,i7)') "ORDGRID1 particle #",npi,   &
+         write(ulog,'(a,i7,a,i7,3x,3e15.8,a,i7)') "ORDGRID1 particle #",npi,   &
             "   cell:",ncel,pg(npi)%coord(:),                                  &
             "  Total number of particles is = ",nag-1
          EpOrdGrid(pg(npi)%imed) = EpOrdGrid(pg(npi)%imed) + 1

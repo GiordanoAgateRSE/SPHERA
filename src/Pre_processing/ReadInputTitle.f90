@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -22,16 +22,16 @@
 ! Program unit: ReadInputTitle                             
 ! Description:                        
 !-------------------------------------------------------------------------------
-subroutine ReadInputTitle(ainp,comment,nrighe,ier,ninp,nout)
+subroutine ReadInputTitle(ainp,comment,nrighe,ier,ninp,ulog)
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
 use Static_allocation_module                            
 !------------------------
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: nrighe,ier,ninp,nout
+integer(4) :: nrighe,ier,ninp,ulog
 character(1) :: comment
 character(100) :: ainp
 integer(4) :: n,ioerr
@@ -50,18 +50,18 @@ logical,external :: ReadCheck
 ! Statements
 !------------------------
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"TITLE DATA",ninp,nout)) return 
+if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"TITLE DATA",ninp,ulog)) return 
 n = 0
 do while (TRIM(lcase(ainp))/="##### end title #####" )
    n = n + 1
    if (n<=maxtit) then
       title(n) = ainp
-      if ((ncord>0).AND.(nout>0)) write(nout,"(1x,a)") title(n)
+      if ((ncord>0).AND.(ulog>0)) write(ulog,"(1x,a)") title(n)
    endif
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"TITLE DATA",ninp,nout)) return 
+   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"TITLE DATA",ninp,ulog)) return 
 enddo
-if ((ncord>0).AND.(nout>0)) write(nout,"(1x,a)") " "
+if ((ncord>0).AND.(ulog>0)) write(ulog,"(1x,a)") " "
 !------------------------
 ! Deallocations
 !------------------------

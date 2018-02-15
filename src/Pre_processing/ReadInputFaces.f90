@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -23,10 +23,10 @@
 ! Description:                        
 !-------------------------------------------------------------------------------
 subroutine ReadInputFaces(NumberEntities,ainp,comment,nrighe,ier,prtopt,ninp,  &
-                          nout)
+                          ulog)
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
 use Static_allocation_module
 use Hybrid_allocation_module
 use Dynamic_allocation_module
@@ -34,7 +34,7 @@ use Dynamic_allocation_module
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: nrighe,ier,ninp,nout
+integer(4) :: nrighe,ier,ninp,ulog
 logical(4) :: prtopt
 integer(4),dimension(20) :: NumberEntities
 character(1) :: comment
@@ -60,12 +60,12 @@ character(100),external :: lcase, GetToken
 if (restart) then
    do while (TRIM(lcase(ainp))/="##### end faces #####")
       call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"FACES DATA",ninp,nout)) return
+      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"FACES DATA",ninp,ulog)) return
    enddo
    return
 endif
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"FACES DATA",ninp,nout)) return
+if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"FACES DATA",ninp,ulog)) return
 do while (TRIM(lcase(ainp))/="##### end faces #####")
    select case (TRIM(Domain%tipo))
       case ("semi","bsph") 
@@ -73,7 +73,7 @@ do while (TRIM(lcase(ainp))/="##### end faces #####")
 ! ivalues(4) is the 4-th vertex (null in case of triangles)
          read(ainp,*,iostat=ioerr) i,ivalues,stretch  
          write(label,"(i8)") i
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"FACE n."//label,ninp,nout)) &
+         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"FACE n."//label,ninp,ulog)) &
             return
          NumberEntities(11) = max(i,NumberEntities(11))
 ! To count quadrilaterals to be splitted in triangles (if required)
@@ -84,9 +84,9 @@ do while (TRIM(lcase(ainp))/="##### end faces #####")
                   ivalues(1:MAXFACENODES)
                BoundaryFace(i)%stretch = stretch
                else
-                  if (nout>0) then
-                     write(nout,*) "Face definition: ",trim(ainp)
-                     write(nout,*) "Face already defined: ",i,                 &
+                  if (ulog>0) then
+                     write(ulog,*) "Face definition: ",trim(ainp)
+                     write(ulog,*) "Face already defined: ",i,                 &
                         BoundaryFace(i)%Node(1:MAXFACENODES)%name
                   endif
                   ier = 104
@@ -94,20 +94,20 @@ do while (TRIM(lcase(ainp))/="##### end faces #####")
             endif
          endif
       case default
-         if (nout>0) then
-            write(nout,*) "Unknown Domain Type: ",Domain%tipo
+         if (ulog>0) then
+            write(ulog,*) "Unknown Domain Type: ",Domain%tipo
          endif
          ier = 2
          return
    endselect
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"FACES DATA",ninp,nout)) return
+   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"FACES DATA",ninp,ulog)) return
 enddo
-if ((ncord>0).AND.(nout>0).AND.(prtopt)) then
-   write(nout,*)
-   write(nout,"(1x,a)") "List of faces:"
+if ((ncord>0).AND.(ulog>0).AND.(prtopt)) then
+   write(ulog,*)
+   write(ulog,"(1x,a)") "List of faces:"
    do n=1,NumberEntities(11)
-      write(nout,"(i10,' - ',6i10,' - ',i8)") n,BoundaryFace(n)%Node(1)%name,  &
+      write(ulog,"(i10,' - ',6i10,' - ',i8)") n,BoundaryFace(n)%Node(1)%name,  &
          BoundaryFace(n)%Node(2)%name,BoundaryFace(n)%Node(3)%name,            &
          BoundaryFace(n)%Node(4)%name,BoundaryFace(n)%Node(5)%name,            &
          BoundaryFace(n)%Node(6)%name,BoundaryFace(n)%stretch

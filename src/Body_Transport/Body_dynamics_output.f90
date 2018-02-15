@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -95,8 +95,8 @@ write(nomefilectl_Body_dynamics,"(a,a,i8.8,a)") nomecaso(1:len_trim(nomecaso)),&
    '_Body_dynamics_',on_going_time_step,".txt"
 open(ncpt,file=nomefilectl_Body_dynamics,status="unknown",form="formatted")
 if (on_going_time_step==1) then
-   write (ncpt,*) "Body dynamics values "
-   write (ncpt,                                                                &
+   write(ncpt,*) "Body dynamics values "
+   write(ncpt,                                                                &
  '(5(7x,a),3(5x,a),3(9x,a),3(6x,a),(a),3(1x,a),3(8x,a),(9x,a),2(7x,a),(1x,a))')&
       " Time(s)"," Body_ID"," x_CM(m)"," y_CM(m)"," z_CM(m)"," u_CM(m/s)",     &
       " v_CM(m/s)"," w_CM(m/s)"," Fx(N)"," Fy(N)"," Fz(N)"," n_R_IO_x",        &
@@ -113,7 +113,7 @@ do nbi=1,n_bodies
    call vector_rotation_axis_angle(body_arr(nbi)%rel_pos_part1_t0(:),          &
       bp_arr(aux_integer+1)%rel_pos(:),n_R_IO(:),teta_R_IO)
    aux_integer = aux_integer + body_arr(nbi)%npart
-   write (ncpt,'(g14.7,1x,i14,1x,23(g14.7,1x))') simulation_time,nbi,          &
+   write(ncpt,'(g14.7,1x,i14,1x,23(g14.7,1x))') simulation_time,nbi,          &
       body_arr(nbi)%x_CM(:),body_arr(nbi)%u_CM(:),body_arr(nbi)%Force(:),      &
       n_R_IO(:),teta_R_IO,body_arr(nbi)%omega(:),body_arr(nbi)%Moment(:),      &
       body_arr(nbi)%pmax,pmax_R(nbi),pmax_L(nbi),body_arr(nbi)%p_max_limiter
@@ -124,8 +124,8 @@ write(nomefilectl_Body_particles,"(a,a,i8.8,a)")                               &
    nomecaso(1:len_trim(nomecaso)),'_Body_particles_',on_going_time_step,".txt"
 open(ncpt,file=nomefilectl_Body_particles,status="unknown",form="formatted")
 if (on_going_time_step==1) then
-   write (ncpt,*) " Body particle parameters"
-   write (ncpt,'((7x,a),(3x,a),(7x,a),3(10x,a),3(8x,a),(6x,a),4(1x,a))')       &
+   write(ncpt,*) " Body particle parameters"
+   write(ncpt,'((7x,a),(3x,a),(7x,a),3(10x,a),3(8x,a),(6x,a),4(1x,a))')       &
       " Time(s)"," particle_ID"," body_ID"," x(m)"," y(m)"," z(m)"," u(m/s)",  &
       " v(m/s)"," w(m/s)"," p(N/m^2)"," impact_vel_body1(m/s)",                &
       " impact_vel_body2(m/s)"," impact_vel_body3(m/s)"," impact_vel_body4(m/s)"
@@ -133,7 +133,7 @@ endif
 flush(ncpt)
 do nsi=1,n_surf_body_part
    npi=surf_body_part(nsi)
-   write (ncpt,'(g14.7,1x,2(i14,1x),11(g14.7,1x))') simulation_time,npi,       &
+   write(ncpt,'(g14.7,1x,2(i14,1x),11(g14.7,1x))') simulation_time,npi,       &
       bp_arr(npi)%body,bp_arr(npi)%pos(:),bp_arr(npi)%vel(:),                  &
       bp_arr(npi)%pres,impact_vel(nsi,1),impact_vel(nsi,2),impact_vel(nsi,3),  &
       impact_vel(nsi,4)

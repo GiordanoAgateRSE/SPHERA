@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -25,7 +25,7 @@
 subroutine SetParticles(Nt,Nz,mate,Xmin,npps,NumParticles,IsopraS)
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
 use Static_allocation_module
 use I_O_file_module
 use Hybrid_allocation_module
@@ -38,7 +38,7 @@ implicit none
 integer(4),intent(in) :: Nt,Nz,mate
 integer(4),intent(in) :: npps(SPACEDIM)
 double precision,intent(in) :: Xmin(SPACEDIM)
-integer(4),intent(inout) :: NumParticles,IsopraS
+integer(4),intent(INOUT) :: NumParticles,IsopraS
 logical :: particellainterna
 integer(4) :: i,j,k,iaux,test,Nz_aux,nag_aux,pg_size
 double precision :: aux1,aux2,aux3,rnd,tstop
@@ -118,7 +118,7 @@ do i=1,(npps(1)-iaux)
 ! Check the storage for the reached number of fluid particles
             pg_size = size(pg)
             if (nag_aux>pg_size) then
-               write(nscr,*) "If you are using a reservoir generated from ",   &
+               write(uerr,*) "If you are using a reservoir generated from ",   &
                   "topography, you may need to increase the input parameter ", &
                   "COEFNMAXPARTI. The dimension of the 1D array pg is ",pg_size
                call diagnostic(arg1=10,arg2=4,arg3=nomsub)

@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -25,7 +25,7 @@
 subroutine GeneratePart(IC_loop)
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
 use I_O_file_module
 use Static_allocation_module
 use Hybrid_allocation_module
@@ -64,7 +64,7 @@ interface
       double precision,intent(in) :: point(2),point_pol_1(2),point_pol_2(2)
       double precision,intent(in) :: point_pol_3(2),point_pol_4(2)
       double precision,intent(in) :: point_pol_5(2),point_pol_6(2)
-      integer(4),intent(inout) :: test
+      integer(4),intent(INOUT) :: test
       double precision :: dis1,dis2
       double precision :: normal(2)
    end subroutine point_inout_convex_non_degenerate_polygon
@@ -156,7 +156,7 @@ second_cycle: do Nz=1,NPartZone
 ! fictitious vertex n.1
             allocate(z_aux(Partz(Nz)%npoints+1),STAT=alloc_stat)
             if (alloc_stat/=0) then
-               write(nout,*) 'Allocation of the auxiliary array z_aux ',       &
+               write(ulog,*) 'Allocation of the auxiliary array z_aux ',       &
                  'failed; the program stops here (subroutine GeneratePart). '
                stop
             endif
@@ -171,7 +171,7 @@ second_cycle: do Nz=1,NPartZone
          if (.not.allocated(pg_aux)) then
             allocate(pg_aux(nag_aux),STAT=alloc_stat)
             if (alloc_stat/=0) then
-               write(nout,*) 'Allocation of the auxiliary array pg_aux',       &
+               write(ulog,*) 'Allocation of the auxiliary array pg_aux',       &
                  'failed; the program stops here (subroutine GeneratePart). '
                stop
             endif
@@ -412,11 +412,11 @@ if (allocated(pg_aux)) then
    PARTICLEBUFFER = NumParticles * Domain%COEFNMAXPARTI
    allocate(pg(PARTICLEBUFFER),stat=ier)
    if (ier/=0) then
-      write (nout,'(1x,a,i2)')                                                 &
+      write(ulog,'(1x,a,i2)')                                                 &
          "    Array PG not allocated. Error code: ",ier
       call diagnostic(arg1=4,arg3=nomsub)
       else
-         write (nout,'(1x,a)') "    Array PG successfully allocated "
+         write(ulog,'(1x,a)') "    Array PG successfully allocated "
          pg(:) = PgZero
    endif
 ! Loop over the auxiliary particle array
@@ -429,14 +429,14 @@ if (allocated(pg_aux)) then
 ! Deallocation of the auxiliary array z_aux
    deallocate(z_aux,STAT=alloc_stat)
    if (alloc_stat/=0) then
-      write(nout,*) 'Deallocation of the auxiliary array z_aux ',              &
+      write(ulog,*) 'Deallocation of the auxiliary array z_aux ',              &
          'failed; the program stops here (subroutine GeneratePart). '
       stop
    endif
 ! Deallocation of the auxiliary array pg_aux
    deallocate(pg_aux,STAT=alloc_stat)
    if (alloc_stat/=0) then
-      write(nout,*) 'Deallocation of the auxiliary array pg_aux ',             &
+      write(ulog,*) 'Deallocation of the auxiliary array pg_aux ',             &
          'failed; the program stops here (subroutine GeneratePart). '
       stop
    endif

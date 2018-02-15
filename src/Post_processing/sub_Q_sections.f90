@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -26,7 +26,7 @@
 subroutine sub_Q_sections
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
 use I_O_file_module
 use Static_allocation_module
 use Hybrid_allocation_module
@@ -57,7 +57,7 @@ interface
       double precision,intent(in) :: point(2),point_pol_1(2),point_pol_2(2)
       double precision,intent(in) :: point_pol_3(2),point_pol_4(2)
       double precision,intent(in) :: point_pol_5(2),point_pol_6(2)
-      integer(4),intent(inout) :: test
+      integer(4),intent(INOUT) :: test
       double precision :: dis1,dis2
       double precision :: normal(2)
    end subroutine point_inout_convex_non_degenerate_polygon
@@ -79,8 +79,8 @@ write(nomefile_Q_sections,"(a,a,i8.8,a)") nomecaso(1:len_trim(nomecaso)),      &
 open(ncpt,file=nomefile_Q_sections,status="unknown",form="formatted")
 if (.not.(allocated(Q_sections%section(1)%flow_rate))) then
 ! First step in any case (standard or restart execution)
-   write (ncpt,*) "Flow rate values(m^3/s) "
-   write (ncpt,'((7x,a),(4x,a),(5x,a),(6x,a),(5x,a),(3x,a),(5x,a),6(5x,a))')   &
+   write(ncpt,*) "Flow rate values(m^3/s) "
+   write(ncpt,'((7x,a),(4x,a),(5x,a),(6x,a),(5x,a),(3x,a),(5x,a),6(5x,a))')    &
       " Time(s)"," ID_section","fluid_type"," Q(m^3/s)"," Area(m^2)",          &
       " n_particles"," dt_out(s)"," norm_x(m)"," norm_y(m)"," norm_z(m)",      &
       " x1_sec(m)"," y1_sec(m)"," z1_sec(m)"

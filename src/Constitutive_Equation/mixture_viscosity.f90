@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -27,7 +27,7 @@
 subroutine mixture_viscosity
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
 use Static_allocation_module 
 use Hybrid_allocation_module
 use Dynamic_allocation_module
@@ -68,7 +68,7 @@ gamma_fluid = Med(Granular_flows_options%ID_main_fluid)%den0 * GI
 !------------------------
 !$omp parallel do default(none) shared(nag,Med,pg)                             &
 !$omp shared(Granular_flows_options,ind_interfaces,simulation_time)            &
-!$omp shared(eps_fluid_blt,gamma_fluid,mu_main_fluid,nout)                     &
+!$omp shared(eps_fluid_blt,gamma_fluid,mu_main_fluid,ulog)                     &
 !$omp private(npi,i_cell,i_aux,i_grid,j_grid,k_grid,p_fluid_blt_top)           &
 !$omp private(z_blt_top_fluid,alfa_TBT,alfa_WT,z_soil_bottom,z_inf_sat)        &
 !$omp private(z_sat_top)
@@ -167,7 +167,7 @@ do npi=1,nag
                endif
             endif
          case default 
-            write(nout,*) 'The saturation scheme chosen in the input file is ',&
+            write(ulog,*) 'The saturation scheme chosen in the input file is ',&
                'wrong. The program terminates here. '
             stop
       endselect

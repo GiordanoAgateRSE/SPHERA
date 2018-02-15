@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -31,7 +31,7 @@
 subroutine LocalNormalCoordinates(PX,csi,nf)
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
 use Static_allocation_module
 use Hybrid_allocation_module
 use Dynamic_allocation_module
@@ -41,7 +41,7 @@ use Dynamic_allocation_module
 implicit none
 integer(4),intent(in) :: nf
 double precision,intent(in) :: PX(SPACEDIM)
-double precision,intent(inout) :: csi(SPACEDIM)
+double precision,intent(INOUT) :: csi(SPACEDIM)
 integer(4) :: i,j,k,nodes,fkod
 double precision :: AA,BB,CC,DueArea,UsuDueArea,xj,yj,xk,yk
 integer(4),dimension(3) :: iseg = (/ 2,3,1 /)

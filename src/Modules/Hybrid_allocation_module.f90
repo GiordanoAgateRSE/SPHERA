@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -588,7 +588,7 @@ type TyCtlLine
 end type TyCtlLine
 
 ! Monitoring section for flow rate (ID depends on the input order)
-type tyQ_section_array                                             
+type tyQ_section_array
    integer(4)       :: n_vertices ! Number of vertices describing a monitoring
                                   ! section for the flow rate (3 or 4)
    double precision :: area ! Area 
@@ -614,7 +614,40 @@ type TyQ_section
    double precision :: dt_out ! Writing time step for section flow rates
 ! type section to monitor flow rates
    type(tyQ_section_array),dimension(:),allocatable :: section           
-end type  
+end type
+
+! Substation array (ref. input file template)
+type type_substation
+   integer(4) :: n_vertices
+! Substation type
+   integer(4) :: type_ID
+! Number of DEM vertices within the substation surface
+   integer(4) :: n_DEM_vertices
+   double precision :: area
+! Sum (over time) of the filtered values of POS (useful to estimate EOS)
+   double precision :: POS_fsum
+! Maximum substation fluid/mixture depth
+   double precision :: Ymax
+! Expected Outage Time
+   double precision :: EOT
+! Substation value (euros)
+   double precision :: Val
+! List of DEM vertices associated with the substation
+   integer(4),dimension(:),allocatable :: DEMvert
+! Vertices of the polygon which describes the substation
+   double precision :: vert(6,3)
+end type
+
+! Monitoring the electrical substations (ref. input file template)
+type type_substations
+   integer(4)       :: n_sub
+! Last time step of substation result writing (auxiliary variable)
+   integer(4)       :: it_out_last
+! Writing time step for substations
+   double precision :: dt_out
+! type for the substation array
+   type(type_substation),dimension(:),allocatable :: sub          
+end type
 
 ! Derived type for bed-load transport layer 
 type TyGranular_flows_options
@@ -683,6 +716,7 @@ type TyGranular_flows_options
                                                                  ! flag 
                                                                  ! (presence of 
                                                                  ! the free 
+
                                                                  ! surface along
 
 
@@ -787,12 +821,13 @@ type DBSPH_der_type
 end type 
 
 ! Derived type declarations
-type(TyGlobal)                 :: Domain
-type(TyGriglia)                :: Grid
-type(TyParticle)               :: PgZero
-type(Tytime_stage)             :: ts_pgZero
-type(TyQ_section)              :: Q_sections
-type(TyGranular_flows_options) :: Granular_flows_options
-type(DBSPH_der_type)           :: DBSPH
+type(TyGlobal)                   :: Domain
+type(TyGriglia)                  :: Grid
+type(TyParticle)                 :: PgZero
+type(Tytime_stage)               :: ts_pgZero
+type(TyQ_section)                :: Q_sections
+type(type_substations)           :: substations
+type(TyGranular_flows_options)   :: Granular_flows_options
+type(DBSPH_der_type)             :: DBSPH
 
 end module Hybrid_allocation_module

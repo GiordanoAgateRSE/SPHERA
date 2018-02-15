@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -24,10 +24,10 @@
 !              (semi-analytic approach; Di Monaco et al., 2011, EACFM).                      
 !-------------------------------------------------------------------------------
 subroutine ReadInputBoundaries(NumberEntities,Partz,Tratto,BoundaryVertex,ainp,&
-   comment,nrighe,ier,ninp,nout)
+   comment,nrighe,ier,ninp,ulog)
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
 use Static_allocation_module
 use Hybrid_allocation_module
 !------------------------
@@ -35,7 +35,7 @@ use Hybrid_allocation_module
 !------------------------
 implicit none
 logical :: DBSPH_fictitious_reservoir_flag,laminar_no_slip_check
-integer(4) :: nrighe,ier,ninp,nout
+integer(4) :: nrighe,ier,ninp,ulog
 integer(4),dimension(20) :: NumberEntities
 integer(4),dimension(NumBVertices) :: BoundaryVertex
 character(1) :: comment
@@ -80,29 +80,29 @@ valp = zero
 if (restart) then
    do while (TRIM(lcase(ainp))/="##### end boundaries #####")
       call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"BOUNDARIES DATA",ninp,nout))   &
+      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"BOUNDARIES DATA",ninp,ulog))   &
          return
    enddo
    return
 endif
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"BOUNDARIES DATA",ninp,nout)) return
+if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"BOUNDARIES DATA",ninp,ulog)) return
 ! Reading input data
 do while (TRIM(lcase(ainp))/="##### end boundaries #####")
    label = ainp(1:8)
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"BOUNDARIES INDEX",ninp,nout))     &
+   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"BOUNDARIES INDEX",ninp,ulog))     &
       return
    token = GetToken(ainp,1,ioerr)
    read(token,*,iostat=ioerr) indexi
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"BOUNDARY INDEX",ninp,nout)) return
+   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"BOUNDARY INDEX",ninp,ulog)) return
    indexf = indexi
    token = GetToken(ainp,2,ioerr)
    if (token/="") read(token,*,iostat=ioerr) indexf
    NumberEntities(8) = max(indexf,NumberEntities(8))
 ! Boundary type
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"BOUNDARY TYPE",ninp,nout)) return
+   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"BOUNDARY TYPE",ninp,ulog)) return
    tipo = lcase(ainp(1:4))
    numv = 0
    ipointer = 0
@@ -142,7 +142,7 @@ do while (TRIM(lcase(ainp))/="##### end boundaries #####")
          token_color(5:6) = token(1:2) 
          read(token_color,'(Z6)',iostat=ioerr) icolor
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"FIXED: RRGGBB COLOR",ninp,  &
-            nout)) return
+            ulog)) return
 ! Boundary condition "fixe"
       case("fixe")    
          NumberEntities(3) = NumberEntities(3) + 1
@@ -150,7 +150,7 @@ do while (TRIM(lcase(ainp))/="##### end boundaries #####")
          if (ioerr==0) read(ainp,*,iostat=ioerr) shear,laminar_no_slip_check
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                             &
             "FIXED: SHEAR STRESS COEFFICIENT, LAMINAR NO-SLIP CHECK",ninp,     &
-            nout)) return
+            ulog)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          token = GetToken(ainp,1,ioerr)
          token_color(1:2) = token(5:6)
@@ -158,60 +158,60 @@ do while (TRIM(lcase(ainp))/="##### end boundaries #####")
          token_color(5:6) = token(1:2) 
          read(token_color,'(Z6)',iostat=ioerr) icolor
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"FIXED: RRGGBB COLOR",ninp,  &
-            nout)) return
+            ulog)) return
 ! Boundary condition "sour"
       case("sour")    
          NumberEntities(3) = NumberEntities(3) + 1
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          if (ioerr==0) read(ainp,*,iostat=ioerr) Medium
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"SOURCE: MEDIUM INDEX",ninp, &
-            nout)) return
+            ulog)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"SOURCE: FLOW RATE, TRAMPA ",&
-            ninp,nout)) return
+            ninp,ulog)) return
          token = GetToken(ainp,1,ioerr)
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"SOURCE: FLOW RATE",ninp,    &
-            nout)) return
+            ulog)) return
          read(token,*,iostat=ioerr) flowrate
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"SOURCE: FLOW RATE",ninp,    &
-            nout)) return
+            ulog)) return
          token = GetToken(ainp,2,ioerr)
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"SOURCE: TRAMPA",ninp,nout)) &
+         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"SOURCE: TRAMPA",ninp,ulog)) &
             return
          read(token,*,iostat=ioerr) trampa
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"SOURCE: TRAMPA",ninp,nout)) &
+         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"SOURCE: TRAMPA",ninp,ulog)) &
             return
          if (trampa/=0) then
-            write(nout,*) ' '
-            write(nout,*)                                                      &
+            write(ulog,*) ' '
+            write(ulog,*)                                                      &
 'TRAMPA in SOURCE boundary is not available. TRAMPA is setted to zero; check the VELOCITY boundary.'
-            write(nout,*) ' '
-            write(nout,*) ' '
-            write(nout,*)                                                      &
+            write(ulog,*) ' '
+            write(ulog,*) ' '
+            write(ulog,*)                                                      &
 'TRAMPA in SOURCE boundary is not available. TRAMPA is setted to zero;  check the VELOCITY boundary.'
-            write(nout,*) ' '
+            write(ulog,*) ' '
             trampa = zero
          endif
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          pressu = GetToken(ainp,1,ioerr)
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"SOURCE PRESSURE TYPE",ninp, &
-            nout)) return
+            ulog)) return
          if (pressu=="pa") then  
             token = GetToken(ainp,2,ioerr)
             if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"SOURCE PRESSURE VALUES", &
-               ninp,nout)) return
+               ninp,ulog)) return
             read(token,*,iostat=ioerr) valp
             if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"SOURCE PRESSURE VALUES", &
-               ninp,nout)) return
+               ninp,ulog)) return
             elseif (pressu=="qp") then
                token = GetToken(ainp,2,ioerr)
                if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"SOURCE PIEZO LINE",   &
-                  ninp,nout)) return
+                  ninp,ulog)) return
                read(token,*,iostat=ioerr) valp
                if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"SOURCE PIEZO LINE",   &
-                  ninp,nout)) return
+                  ninp,ulog)) return
                else
-                  if (nout>0) write(nout,*) "Unknown option: ",trim(ainp),     &
+                  if (ulog>0) write(ulog,*) "Unknown option: ",trim(ainp),     &
                      " in source boundary."
                   stop
          endif
@@ -222,7 +222,7 @@ do while (TRIM(lcase(ainp))/="##### end boundaries #####")
          token_color(5:6) = token(1:2) 
          read(token_color,'(Z6)',iostat=ioerr) icolor
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"FIXED: RRGGBB COLOR",ninp&
-            ,nout)) return
+            ,ulog)) return
          move   = "std"
 ! Boundary condition "velo"
       case("velo")    
@@ -230,7 +230,7 @@ do while (TRIM(lcase(ainp))/="##### end boundaries #####")
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          if (ioerr==0) read(ainp,*,iostat=ioerr) velocity,trampa
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                             &
-            "VELO: NORMAL VELOCITY, TRAMPA",ninp,nout)) return
+            "VELO: NORMAL VELOCITY, TRAMPA",ninp,ulog)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          token = GetToken(ainp,1,ioerr)
          token_color(1:2) = token(5:6)
@@ -238,7 +238,7 @@ do while (TRIM(lcase(ainp))/="##### end boundaries #####")
          token_color(5:6) = token(1:2) 
          read(token_color,'(Z6)',iostat=ioerr) icolor
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"FIXED: RRGGBB COLOR",ninp,  &
-            nout)) return
+            ulog)) return
          move = "std"
          pressu = "pa"
          valp = zero
@@ -248,7 +248,7 @@ do while (TRIM(lcase(ainp))/="##### end boundaries #####")
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          if (ioerr==0) read(ainp,*,iostat=ioerr) flowrate,trampa
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"VELO: FLOW RATE, TRAMPA",   &
-            ninp,nout)) return
+            ninp,ulog)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          token = GetToken(ainp,1,ioerr)
          token_color(1:2) = token(5:6)
@@ -256,7 +256,7 @@ do while (TRIM(lcase(ainp))/="##### end boundaries #####")
          token_color(5:6) = token(1:2) 
          read(token_color,'(Z6)',iostat=ioerr) icolor
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"FIXED: RRGGBB COLOR",ninp,  &
-            nout)) return
+            ulog)) return
          move = "std"
          pressu = "pa"
          valp = zero
@@ -265,47 +265,47 @@ do while (TRIM(lcase(ainp))/="##### end boundaries #####")
          NumberEntities(3) = NumberEntities(3) + 1
          call ReadInputParticlesData(NumberEntities,Medium,icolor,bends,move,  &
             slip,npointv,valuev,values3,pressu,valp,ainp,comment,nrighe,ier,   &
-            ninp,nout)
+            ninp,ulog)
          if (ier/=0) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          if (ioerr==0) read(ainp,*,iostat=ioerr) IC_source_type,Car_top_zone,  &
             DBSPH_fictitious_reservoir_flag
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                             &
             "IC_source_type, Car_top_zone, DBSPH_fictitious_reservoir_flag",   &
-            ninp,nout)) return
+            ninp,ulog)) return
          if (IC_source_type==2) then
             call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
             if (ioerr==0) read(ainp,*,iostat=ioerr) dx_CartTopog,H_res
             if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"dx_CartTopog,H_res",ninp,&
-               nout)) return
+               ulog)) return
             call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
             if (ioerr==0) read(ainp,*,iostat=ioerr)                            &
                ID_first_vertex,ID_last_vertex
             if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                          &
-               "ID_first_vertex,ID_last_vertex",ninp,nout)) return
+               "ID_first_vertex,ID_last_vertex",ninp,ulog)) return
             call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
             if (ioerr==0) read(ainp,*,iostat=ioerr) plan_reservoir_points
             if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                          &
-               "plan_reservoir_points",ninp,nout)) return
+               "plan_reservoir_points",ninp,ulog)) return
             do i2=1,plan_reservoir_points
                call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
                if (ioerr==0) read(ainp,*,iostat=ioerr) plan_reservoir_pos(i2,1)&
                   ,plan_reservoir_pos(i2,2)
                if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                       &
-                  "plan_reservoir_vertices",ninp,nout)) return
+                  "plan_reservoir_vertices",ninp,ulog)) return
             enddo
             call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
             if (ioerr==0) read(ainp,*,iostat=ioerr) dam_zone_ID,               &
                dam_zone_n_vertices
             if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                          &
-               "dam_zone_ID and dam_zone_vertices",ninp,nout)) return
+               "dam_zone_ID and dam_zone_vertices",ninp,ulog)) return
             if (dam_zone_ID>0) then
                do i2=1,dam_zone_n_vertices
                   call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
                   if (ioerr==0) read(ainp,*,iostat=ioerr)                      &
                      dam_zone_vertices(i2,1),dam_zone_vertices(i2,2)
                   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"dam zone vertices",&
-                     ninp,nout)) return
+                     ninp,ulog)) return
                enddo
             endif
          endif
@@ -313,7 +313,7 @@ do while (TRIM(lcase(ainp))/="##### end boundaries #####")
       case("tapi") 
 ! It returns an error if the number of vertices is not 2 (3D)
          if ((numv/=2).and.(NumberEntities(1)==3)) then 
-            write(nout,'(a,i15)')                                              &
+            write(ulog,'(a,i15)')                                              &
                "TAPIS boundary type: 2 vertices are requested:",numv
             ier = 103
             return
@@ -321,15 +321,15 @@ do while (TRIM(lcase(ainp))/="##### end boundaries #####")
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          if (ioerr==0) read(ainp,*,iostat=ioerr) shear
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                             &
-            "TAPIS: SHEAR STRESS COEFFICIENT",ninp,nout)) return
+            "TAPIS: SHEAR STRESS COEFFICIENT",ninp,ulog)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"TAPIS: VELOCITY COMPONENTS",&
-            ninp,nout)) return
+            ninp,ulog)) return
          do n=1,NumberEntities(1)
             icord = icoordp(n,NumberEntities(1)-1)
             token = GetToken(ainp,n,ioerr)
             if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                          &
-               xyzlabel(icord)//" VELOCITY COMPONENT (TAPIS)",ninp,nout)) return
+               xyzlabel(icord)//" VELOCITY COMPONENT (TAPIS)",ninp,ulog)) return
             read(token,*,iostat=ioerr) values1(icord)
          enddo
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
@@ -339,7 +339,7 @@ do while (TRIM(lcase(ainp))/="##### end boundaries #####")
          token_color(5:6) = token(1:2) 
          read(token_color,'(Z6)',iostat=ioerr) icolor
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"TAPIS: RRGGBB COLOR",ninp,  &
-            nout)) return
+            ulog)) return
 ! Boundary condition "pool" (only in 3D)
       case("pool")
          if (NumberEntities(1)==3) then      
@@ -347,19 +347,19 @@ do while (TRIM(lcase(ainp))/="##### end boundaries #####")
             call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
             pool_plane = GetToken(ainp,1,ioerr)
             if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"POOL: X/Y/Z/ PLANE LABEL"&
-               ,ninp,nout)) return
+               ,ninp,ulog)) return
             token = GetToken(ainp,2,ioerr)
             if (ioerr==0) read(token,*,iostat=ioerr) pool_value
             if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"POOL: PLANE VALUE",ninp, &
-               nout)) return
+               ulog)) return
             call ReadInputParticlesData(NumberEntities,Medium,icolor,bends,    &
                                         move,slip,npointv,valuev,values3,      &
                                         pressu,valp,ainp,comment,nrighe,ier,   &
-                                        ninp,nout)
+                                        ninp,ulog)
             if (ier/=0) return  
          endif 
       case default
-         write(nout,*) "Unrecognised BOUNDARY type: ",tipo
+         write(ulog,*) "Unrecognised BOUNDARY type: ",tipo
          ier = 101
          return
    end  select
@@ -419,45 +419,45 @@ do while (TRIM(lcase(ainp))/="##### end boundaries #####")
          Tratto(index)%trampa = trampa
          Tratto(index)%zone = Izona
          Tratto(index)%ColorCode = icolor
-         if ((nout>0).and.(index==indexi)) then
-            if (index>1) write(nout,*)
-            if (indexf==indexi) write(nout,"(1x,a,i5,1x,a)")                   &
+         if ((ulog>0).and.(index==indexi)) then
+            if (index>1) write(ulog,*)
+            if (indexf==indexi) write(ulog,"(1x,a,i5,1x,a)")                   &
                "Boundary        : ",indexi
-            if (indexf/=indexi) write(nout,"(1x,a,i5,1x,a,i5)")                &
+            if (indexf/=indexi) write(ulog,"(1x,a,i5,1x,a,i5)")                &
                "Boundary        : ",indexi,"   to",indexf
-            write(nout,"(1x,a,2x,a)") "Type            : ",Tratto(index)%tipo 
+            write(ulog,"(1x,a,2x,a)") "Type            : ",Tratto(index)%tipo 
             if (tipo=="fixe") then
-               write(nout,"(1x,a,1pe12.4)") "Shear coeff.    : ",              &
+               write(ulog,"(1x,a,1pe12.4)") "Shear coeff.    : ",              &
                   Tratto(index)%ShearCoeff
-               write(nout,"(1x,a,l12)")     "Laminar no-slip check: ",         &
+               write(ulog,"(1x,a,l12)")     "Laminar no-slip check: ",         &
                   Tratto(index)%laminar_no_slip_check
                elseif (tipo=="peri") then
-                  write(nout,"(1x,a,i3,1x,a)") "Medium Index    : ",           &
+                  write(ulog,"(1x,a,i3,1x,a)") "Medium Index    : ",           &
                      Tratto(index)%Medium
                   elseif (tipo=="pool") then
-                     write(nout,"(1x,a,i3,1x,a)") "Medium Index    : ",        &
+                     write(ulog,"(1x,a,i3,1x,a)") "Medium Index    : ",        &
                         Tratto(index)%Medium
                      elseif (tipo=="tapi") then
-                        write(nout,"(1x,a,1pe12.4)") "Shear coeff.    : ",     &
+                        write(ulog,"(1x,a,1pe12.4)") "Shear coeff.    : ",     &
                            Tratto(index)%ShearCoeff
                         do n=1,ncord
                            icord = icoordp(n,ncord-1)
-                           write(nout,"(1x,a,a,1pe12.4)") xyzlabel(icord),     &
+                           write(ulog,"(1x,a,a,1pe12.4)") xyzlabel(icord),     &
                               " Velocity      : ",Tratto(index)%velocity(n)
                         enddo
             endif
             if (ncord==2) then
-               write(nout,"(1x,a)") "Vertices List"
-               write(nout,"(1x,10i5)")                                         &
+               write(ulog,"(1x,a)") "Vertices List"
+               write(ulog,"(1x,10i5)")                                         &
 BoundaryVertex(Tratto(index)%inivertex:Tratto(index)%inivertex+Tratto(index)%numvertices-1)
-               write(nout,"(1x,a,z6)") "Color           : ",Tratto(index)%colorCode
+               write(ulog,"(1x,a,z6)") "Color           : ",Tratto(index)%colorCode
             endif
          endif
          select case(tipo)
             case("fixe")
                if (ncord==3) then
                   Tratto(index)%ColorCode = icolor
-                  if ((nout>0).and.(index==indexi)) write(nout,                &
+                  if ((ulog>0).and.(index==indexi)) write(ulog,                &
                      "(1x,a,z8)") "Color           : ",                        &
                      Tratto(index)%colorCode
                   Tratto(index)%ColorCode = icolor
@@ -465,13 +465,13 @@ BoundaryVertex(Tratto(index)%inivertex:Tratto(index)%inivertex+Tratto(index)%num
             case("tapi")
                if (ncord==3) then 
                   Tratto(index)%ColorCode = icolor
-                  if (nout>0.and.index==indexi) write(nout,"(1x,a,z8)")        &
+                  if (ulog>0.and.index==indexi) write(ulog,"(1x,a,z8)")        &
                      "Color           : ",Tratto(index)%colorCode
                   Tratto(index)%ColorCode = icolor
                   else 
                      numv = Tratto(index)%numvertices
                      if (numv/=2) then 
-                        if (nout>0) write(nout,'(a,i15)')                      &
+                        if (ulog>0) write(ulog,'(a,i15)')                      &
                            "TAPIS boundary type: 2 vertices are requested:",   &
                            numv
                         ier = 103
@@ -485,30 +485,30 @@ BoundaryVertex(Tratto(index)%inivertex:Tratto(index)%inivertex+Tratto(index)%num
 BoundaryVertex(Tratto(index)%inivertex+Tratto(index)%numvertices-1)
 ! Error if the first and the last vertices are different 
                   if (i/=i1) then 
-                     if (nout>0) write(nout,'(a,2i15)')                        &
+                     if (ulog>0) write(ulog,'(a,2i15)')                        &
 "PERIMETER boundary type: first and last vertices are different: ",i,i1
                      ier = 102
                      return
                   endif
-                  if (nout>0) then
-                     write(nout,"(1x,a,i3,1x,a)")                              &
+                  if (ulog>0) then
+                     write(ulog,"(1x,a,i3,1x,a)")                              &
                         "Zone            : ",Izona,Partz(Izona)%label
-                     write(nout,"(1x,a,i3)") "Medium Index    : ",             &
+                     write(ulog,"(1x,a,i3)") "Medium Index    : ",             &
                         Partz(Izona)%Medium
-                     write(nout,"(1x,a,Z6.6)") "Color           : ",           &
+                     write(ulog,"(1x,a,Z6.6)") "Color           : ",           &
                         Partz(Izona)%icol
-                     write(nout,"(1x,a,2x,a)") "Bends           : ",           &
+                     write(ulog,"(1x,a,2x,a)") "Bends           : ",           &
                         Partz(Izona)%bend
-                     write(nout,"(1x,a,2x,a)") "Movement Type   : ",           &
+                     write(ulog,"(1x,a,2x,a)") "Movement Type   : ",           &
                         Partz(Izona)%move
-                     write(nout,"(1x,a,2x,a)") "Boundary Cond.  : ",           &
+                     write(ulog,"(1x,a,2x,a)") "Boundary Cond.  : ",           &
                         Partz(Izona)%slip
                      if (Partz(Izona)%move=="law") then
-                        write(nout,"(1x,a,i3)")                                & 
+                        write(ulog,"(1x,a,i3)")                                & 
                            "Velocity Table - Number of Points: ",              &
                            Partz(Izona)%npointv
                         do i=1,Partz(Izona)%npointv
-                           write(nout,"(a,i3,1p,4(2x,a,e12.4))") " Point",i,   &
+                           write(ulog,"(a,i3,1p,4(2x,a,e12.4))") " Point",i,   &
                               (xyzlabel(icoordp(n,ncord-1)),                   &
                               Partz(Izona)%vlaw(icoordp(n,ncord-1),i),n=0,     &
                               ncord)
@@ -516,49 +516,49 @@ BoundaryVertex(Tratto(index)%inivertex+Tratto(index)%numvertices-1)
                      endif
                      do n=1,ncord
                         icord = icoordp(n,ncord-1)
-                        write(nout,"(1x,a,a,1pe12.4)") xyzlabel(icord),        &
+                        write(ulog,"(1x,a,a,1pe12.4)") xyzlabel(icord),        &
                            " velocity       : ",Partz(Izona)%vel(icord) 
                      enddo
-                     write(nout,"(1x,a,1pe12.4)") "Time Rampa      : ",        &
+                     write(ulog,"(1x,a,1pe12.4)") "Time Rampa      : ",        &
                         Partz(Izona)%trampa
-                     write(nout,"(1x,a,2x,a)")    "Pressure Type   : ",        &
+                     write(ulog,"(1x,a,2x,a)")    "Pressure Type   : ",        &
                         Partz(Izona)%pressure
-                     write(nout,"(1x,a,1pe12.4)") "Pressure Value  : ",        &
+                     write(ulog,"(1x,a,1pe12.4)") "Pressure Value  : ",        &
                         Partz(Izona)%valp
                   endif       
                   else
                      Tratto(index)%ColorCode = icolor
-                     if ((nout>0).and.(index==indexi)) write(nout,"(1x,a,z8)") &
+                     if ((ulog>0).and.(index==indexi)) write(ulog,"(1x,a,z8)") &
                         "Color           : ",Tratto(index)%colorCode
                endif
-               write(nout,"(1x,a,i12)") "IC_source_type  : ",                  &
+               write(ulog,"(1x,a,i12)") "IC_source_type  : ",                  &
                   Partz(Izona)%IC_source_type
-               write(nout,"(1x,a,i12)") "Car_top_zone    : ",                  &
+               write(ulog,"(1x,a,i12)") "Car_top_zone    : ",                  &
                   Partz(Izona)%Car_top_zone
-               write(nout,"(1x,a,l12)") "DBSPH_fictitious_reservoir_flag : ",  &
+               write(ulog,"(1x,a,l12)") "DBSPH_fictitious_reservoir_flag : ",  &
                   Partz(Izona)%DBSPH_fictitious_reservoir_flag
                if (IC_source_type==2) then
-                  write(nout,"(1x,a,1pe12.4)")    "dx_CartTopog    : ",        &
+                  write(ulog,"(1x,a,1pe12.4)")    "dx_CartTopog    : ",        &
                      Partz(Izona)%dx_CartTopog
-                  write(nout,"(1x,a,1pe12.4)") "H_res           : ",           &
+                  write(ulog,"(1x,a,1pe12.4)") "H_res           : ",           &
                      Partz(Izona)%H_res  
-                  write(nout,"(1x,a,i12)") "ID_first_vertex : ",               &
+                  write(ulog,"(1x,a,i12)") "ID_first_vertex : ",               &
                      Partz(Izona)%ID_first_vertex
-                  write(nout,"(1x,a,i12)") "ID_last_vertex  : ",               &
+                  write(ulog,"(1x,a,i12)") "ID_last_vertex  : ",               &
                      Partz(Izona)%ID_last_vertex
-                  write(nout,"(1x,a,i12)") "plan_reservoir_points: ",          &
+                  write(ulog,"(1x,a,i12)") "plan_reservoir_points: ",          &
                      Partz(Izona)%plan_reservoir_points
                   do i_point=1,plan_reservoir_points
-                     write(nout,"(1x,a,3(1pe12.4))") "plan_reservoir_pos   : " &
+                     write(ulog,"(1x,a,3(1pe12.4))") "plan_reservoir_pos   : " &
                         ,Partz(Izona)%plan_reservoir_pos(i_point,:)                  
                   enddo
-                  write(nout,"(1x,a,i12)") "dam_zone_ID          : ",          &
+                  write(ulog,"(1x,a,i12)") "dam_zone_ID          : ",          &
                      Partz(Izona)%dam_zone_ID
-                  write(nout,"(1x,a,i12)") "dam_zone_n_vertices  : ",          &
+                  write(ulog,"(1x,a,i12)") "dam_zone_n_vertices  : ",          &
                      Partz(Izona)%dam_zone_n_vertices  
                   if (dam_zone_ID>0) then
                      do i_point=1,dam_zone_n_vertices
-                        write(nout,"(1x,a,3(1pe12.4))")                        &
+                        write(ulog,"(1x,a,3(1pe12.4))")                        &
                            "dam_zone_vertices    : ",                          &
                            Partz(Izona)%dam_zone_vertices(i_point,:)                  
                      enddo
@@ -566,7 +566,7 @@ BoundaryVertex(Tratto(index)%inivertex+Tratto(index)%numvertices-1)
                endif
             case("pool")
                Tratto(index)%ColorCode = icolor
-               if ((nout>0).and.(index==indexi)) write(nout,"(1x,a,z8)")       &
+               if ((ulog>0).and.(index==indexi)) write(ulog,"(1x,a,z8)")       &
                   "Color           : ",Tratto(index)%colorCode
          endselect
       enddo MULTI_INDEX_LOOP

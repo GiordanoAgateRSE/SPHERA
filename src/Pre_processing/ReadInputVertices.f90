@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -23,10 +23,10 @@
 ! Description:                        
 !-------------------------------------------------------------------------------
 subroutine ReadInputVertices(NumberEntities,Vertice,ainp,comment,nrighe,ier,   &
-                             prtopt,ninp,nout)
+                             prtopt,ninp,ulog)
 !------------------------
 ! Modules
-!------------------------ 
+!------------------------
 use Static_allocation_module                              
 use Hybrid_allocation_module
 !------------------------
@@ -34,7 +34,7 @@ use Hybrid_allocation_module
 !------------------------
 implicit none
 logical(4) :: prtopt
-integer(4) :: nrighe,ier,ninp,nout
+integer(4) :: nrighe,ier,ninp,ulog
 integer(4),dimension(20) :: NumberEntities
 double precision,dimension(1:SPACEDIM,NumVertici) :: Vertice
 character(1) :: comment
@@ -60,15 +60,15 @@ character(100),external :: lcase, GetToken
 if (restart) then
    do while (TRIM(lcase(ainp))/="##### end vertices #####")
       call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
-      if (.NOT.ReadCheck (ioerr,ier,nrighe,ainp,"VERTICES DATA",ninp,nout))    &
+      if (.NOT.ReadCheck (ioerr,ier,nrighe,ainp,"VERTICES DATA",ninp,ulog))    &
          return
    enddo
   return
 endif
 call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
-if (.NOT.ReadCheck (ioerr,ier,nrighe,ainp,"VERTICES DATA",ninp,nout)) return
-if ((ncord>0).and.(nout>0).and.(prtopt)) then
-   write(nout,"(1x,a)") "List of vertices:"
+if (.NOT.ReadCheck (ioerr,ier,nrighe,ainp,"VERTICES DATA",ninp,ulog)) return
+if ((ncord>0).and.(ulog>0).and.(prtopt)) then
+   write(ulog,"(1x,a)") "List of vertices:"
 endif
 do while (TRIM(lcase(ainp))/="##### end vertices #####")
    select case (TRIM(Domain%tipo))
@@ -76,7 +76,7 @@ do while (TRIM(lcase(ainp))/="##### end vertices #####")
          read (ainp,*,iostat=ioerr) i, values1(1:NumberEntities(1))
          write(label,"(i8)") i
          if (.NOT.ReadCheck (ioerr,ier,nrighe,ainp,"VERTEX n."//label,ninp,    &
-            nout)) return
+            ulog)) return
          NumberEntities(7) = max(i,NumberEntities(7))
          if (ncord>0) then
             do n=1,NumberEntities(1)
@@ -91,28 +91,28 @@ do while (TRIM(lcase(ainp))/="##### end vertices #####")
             enddo
          endif
       case default
-         if (nout>0) then
-            write(nout,*) "Unknown Domain Type: ",Domain%tipo
+         if (ulog>0) then
+            write(ulog,*) "Unknown Domain Type: ",Domain%tipo
          endif
          ier = 2
          return
    endselect
-   if ((ncord>0).and.(nout>0).and.(prtopt)) then
-      write(nout,"(i6,1p,3(2x,a,e12.4))") i,(xyzlabel(icoordp(n,ncord-1)),     &
+   if ((ncord>0).and.(ulog>0).and.(prtopt)) then
+      write(ulog,"(i6,1p,3(2x,a,e12.4))") i,(xyzlabel(icoordp(n,ncord-1)),     &
          Vertice(icoordp(n,ncord-1),i),n=1,ncord)
    endif
    call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
-   if (.NOT.ReadCheck (ioerr,ier,nrighe,ainp,"VERTICES DATA",ninp,nout)) return
+   if (.NOT.ReadCheck (ioerr,ier,nrighe,ainp,"VERTICES DATA",ninp,ulog)) return
 enddo
-if ((ncord>0).and.(nout>0)) then
+if ((ncord>0).and.(ulog>0)) then
    do n=1,NumberEntities(1)
       icord = icoordp(n,ncord-1)
-      write(nout,"(1x,a,a,1p,e12.4)") xyzlabel(icord)," coordinate min. ",     &
+      write(ulog,"(1x,a,a,1p,e12.4)") xyzlabel(icord)," coordinate min. ",     &
          Domain%coord(icord,1)
-      write(nout,"(1x,a,a,1p,e12.4)") xyzlabel(icord)," coordinate max. ",     &
+      write(ulog,"(1x,a,a,1p,e12.4)") xyzlabel(icord)," coordinate max. ",     &
          Domain%coord(icord,2)
    enddo
-   write(nout,"(1x,a)") " "
+   write(ulog,"(1x,a)") " "
 endif
 !------------------------
 ! Deallocations

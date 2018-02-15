@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2017 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -164,6 +164,9 @@ integer(4),               dimension(:,:,:),allocatable :: ind_interfaces
 ! Only in 3D: the 2D array of the maximum values of the fluid particle height
 ! (at the nodes of the positioning grid columns) 
 real(kind=kind(1.d0)),    dimension(:),    allocatable :: Z_fluid_max
+! Only in 3D: the 2D array of the time step values of the fluid particle height
+! (at the nodes of the positioning grid columns) 
+real(kind=kind(1.d0)),    dimension(:),    allocatable :: Z_fluid_step
 ! Only in 3D: the 2D array of the maximum values of the specific flow rate (at 
 ! the nodes of the topographic grid columns)
 real(kind=kind(1.d0)),    dimension(:),    allocatable :: q_max
