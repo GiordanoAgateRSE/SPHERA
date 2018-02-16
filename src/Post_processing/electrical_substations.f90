@@ -132,9 +132,6 @@ if (.not.allocated(EOS)) then
       write(uerr,*) 'Allocation of "EOS" failed in the subroutine ',           &
          '"electrical_substations". The execution terminates here.'
       stop
-      else
-         write(ulog,*) 'Allocation of "EOS" in the subroutine ',               &
-            '"electrical_substations" is successfully completed.'
    endif
 endif
 if (.not.allocated(POSsub)) then
@@ -143,9 +140,6 @@ if (.not.allocated(POSsub)) then
       write(uerr,*) 'Allocation of "POSsub" failed in the subroutine ',        &
          '"electrical_substations". The execution terminates here.'
       stop
-      else
-         write(ulog,*) 'Allocation of "POSsub" in the subroutine ',            &
-            '"electrical_substations" is successfully completed.'
    endif
 endif
 if (.not.allocated(Ysub)) then
@@ -154,9 +148,6 @@ if (.not.allocated(Ysub)) then
       write(uerr,*) 'Allocation of "Ysub" failed in the subroutine ',          &
          '"electrical_substations". The execution terminates here.'
       stop
-      else
-         write(ulog,*) 'Allocation of "Ysub" in the subroutine ',              &
-            '"electrical_substations" is successfully completed.'
    endif
 endif
 if (.not.allocated(Dsub)) then
@@ -165,9 +156,6 @@ if (.not.allocated(Dsub)) then
       write(uerr,*) 'Allocation of "Dsub" failed in the subroutine ',          &
          '"electrical_substations". The execution terminates here.'
       stop
-      else
-         write(ulog,*) 'Allocation of "Dsub" in the subroutine ',              &
-            '"electrical_substations" is successfully completed.'
    endif
 endif
 if (.not.allocated(Vul)) then
@@ -176,9 +164,6 @@ if (.not.allocated(Vul)) then
       write(uerr,*) 'Allocation of "Vul" failed in the subroutine ',           &
          '"electrical_substations". The execution terminates here.'
       stop
-      else
-         write(ulog,*) 'Allocation of "Vul" in the subroutine ',               &
-            '"electrical_substations" is successfully completed.'
    endif
 endif
 !------------------------
@@ -429,9 +414,6 @@ if(allocated(aux_array)) then
       write(uerr,*) 'Deallocation of "aux_array" in the subroutine ',          &
          '"electrical_substations" failed; the execution terminates here. '
       stop
-      else
-         write(ulog,'(1x,a)') 'Deallocation of "aux_array" in the ',          &
-            'electrical_subroutine "substations" is successfully completed. '
    endif
 endif
 if (allocated(EOS)) then
@@ -440,9 +422,6 @@ if (allocated(EOS)) then
       write(uerr,*) 'Deallocation of "EOS" failed in the subroutine ',         &
          '"electrical_substations". The execution terminates here.'
       stop
-      else
-         write(ulog,*) 'Deallocation of "EOS" in the subroutine ',             &
-            '"electrical_substations" is successfully completed.'
    endif
 endif
 if (allocated(POSsub)) then
@@ -451,9 +430,6 @@ if (allocated(POSsub)) then
       write(uerr,*) 'Deallocation of "POSsub" failed in the subroutine ',      &
          '"electrical_substations". The execution terminates here.'
       stop
-      else
-         write(ulog,*) 'Deallocation of "POSsub" in the subroutine ',          &
-            '"electrical_substations" is successfully completed.'
    endif
 endif
 if (allocated(Ysub)) then
@@ -462,9 +438,6 @@ if (allocated(Ysub)) then
       write(uerr,*) 'Deallocation of "Ysub" failed in the subroutine ',        &
          '"electrical_substations". The execution terminates here.'
       stop
-      else
-         write(ulog,*) 'Deallocation of "Ysub" in the subroutine ',            &
-            '"electrical_substations" is successfully completed.'
    endif
 endif
 if (allocated(Dsub)) then
@@ -473,9 +446,6 @@ if (allocated(Dsub)) then
       write(uerr,*) 'Deallocation of "Dsub" failed in the subroutine ',        &
          '"electrical_substations". The execution terminates here.'
       stop
-      else
-         write(ulog,*) 'Deallocation of "Dsub" in the subroutine ',            &
-            '"electrical_substations" is successfully completed.'
    endif
 endif
 if (allocated(Vul)) then
@@ -484,9 +454,6 @@ if (allocated(Vul)) then
       write(uerr,*) 'Deallocation of "Vul" failed in the subroutine ',         &
          '"electrical_substations". The execution terminates here.'
       stop
-      else
-         write(ulog,*) 'Deallocation of "Vul" in the subroutine ',             &
-            '"electrical_substations" is successfully completed.'
    endif
 endif
 return

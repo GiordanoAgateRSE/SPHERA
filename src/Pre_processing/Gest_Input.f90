@@ -570,9 +570,10 @@ if (ncord==2) then
          (BoundarySide(isi)%tipo=="crit").or.                                  &
          (BoundarySide(isi)%tipo=="open")) then  
          NumOpenSides = NumOpenSides + 1
-         if (NumOpenSides>MAXOPENSIDES) call                                   &
-            diagnostic(arg1=10,arg2=6,arg3=nomsub)
-            OpenSide(NumOpenSides) = isi
+         if (NumOpenSides>MAXOPENSIDES) then
+            call diagnostic(arg1=10,arg2=6,arg3=nomsub)
+         endif
+         OpenSide(NumOpenSides) = isi
       endif
    enddo
 ! To assess and save the faces with condition "open" (3D)

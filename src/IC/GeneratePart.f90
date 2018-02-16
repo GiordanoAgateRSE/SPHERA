@@ -337,8 +337,9 @@ if ((Tratto(BoundaryFace(i_face)%stretch)%zone==Partz(Nz)%dam_zone_ID).and.    &
                         if ((test_z==0).and.(test_dam==0)) then
                            NumParticles = NumParticles + 1 
 ! Check the storage for the reached number of fluid particles
-                           if (NumParticles>nag_aux) call diagnostic           &
-                              (arg1=10,arg2=4,arg3=nomsub)  
+                           if (NumParticles>nag_aux) then
+                              call diagnostic(arg1=10,arg2=4,arg3=nomsub)
+                           endif  
                         endif
                      enddo
                   enddo
