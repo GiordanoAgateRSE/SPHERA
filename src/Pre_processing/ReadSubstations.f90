@@ -41,7 +41,7 @@ double precision :: dt_out,area
 character(1) :: comment
 character(100) :: ainp,lcase
 double precision :: vec_aux_4(3)
-double precision :: vertex(6,3)
+double precision :: vertex(6,2)
 logical,external :: ReadCheck
 !------------------------
 ! Explicit interfaces
@@ -106,27 +106,27 @@ do while (TRIM(lcase(ainp))/="##### end substations #####")
       if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"type_ID,n_vertices",ninp,ulog))&
          return
       call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-      read (ainp,*,iostat=ioerr) vertex(1,1),vertex(1,2),vertex(1,3)
+      read (ainp,*,iostat=ioerr) vertex(1,1),vertex(1,2)
       if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"vertex_1",ninp,ulog)) return
       call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-      read (ainp,*,iostat=ioerr) vertex(2,1),vertex(2,2),vertex(2,3)
+      read (ainp,*,iostat=ioerr) vertex(2,1),vertex(2,2)
       if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"vertex_2",ninp,ulog)) return
       call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-      read (ainp,*,iostat=ioerr) vertex(3,1),vertex(3,2),vertex(3,3)
+      read (ainp,*,iostat=ioerr) vertex(3,1),vertex(3,2)
       if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"vertex_3",ninp,ulog)) return
       if (n_vertices>3) then
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         read (ainp,*,iostat=ioerr) vertex(4,1),vertex(4,2),vertex(4,3)
+         read (ainp,*,iostat=ioerr) vertex(4,1),vertex(4,2)
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"vertex_4",ninp,ulog)) return           
       endif
       if (n_vertices>4) then
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         read (ainp,*,iostat=ioerr) vertex(5,1),vertex(5,2),vertex(5,3)
+         read (ainp,*,iostat=ioerr) vertex(5,1),vertex(5,2)
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"vertex_5",ninp,ulog)) return           
       endif
       if (n_vertices>5) then
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         read (ainp,*,iostat=ioerr) vertex(6,1),vertex(6,2),vertex(6,3)
+         read (ainp,*,iostat=ioerr) vertex(6,1),vertex(6,2)
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"vertex_6",ninp,ulog)) return           
       endif
 ! Assignation to the substation variables
@@ -136,27 +136,29 @@ do while (TRIM(lcase(ainp))/="##### end substations #####")
 ! Writing on the log file
       if (ncord>0) then
          if (ulog>0) then
+            write(ulog,"(1x,a,i12)")       "substation_ID:..............",     &
+               substation_ID
             write(ulog,"(1x,a,i12)")       "type_ID:....................",     &
                type_ID
             write(ulog,"(1x,a,i12)")       "n_vertices:.................",     &
                n_vertices
-            write(ulog,"(1x,a,1p,3e12.4)") "vertex(1,1:3):..............",     &
-               vertex(1,1),vertex(1,2),vertex(1,3)
-            write(ulog,"(1x,a,1p,3e12.4)") "vertex(2,1:3):..............",     &
-               vertex(2,1),vertex(2,2),vertex(2,3)
-            write(ulog,"(1x,a,1p,3e12.4)") "vertex(3,1:3):..............",     &
-               vertex(3,1),vertex(3,2),vertex(3,3)
+            write(ulog,"(1x,a,1p,3e12.4)") "vertex(1,1:2):..............",     &
+               vertex(1,1),vertex(1,2)
+            write(ulog,"(1x,a,1p,3e12.4)") "vertex(2,1:2):..............",     &
+               vertex(2,1),vertex(2,2)
+            write(ulog,"(1x,a,1p,3e12.4)") "vertex(3,1:2):..............",     &
+               vertex(3,1),vertex(3,2)
             if (n_vertices>3) then
-               write(ulog,"(1x,a,1p,3e12.4)") "vertex(4,1:3):..............",  &
-                  vertex(4,1),vertex(4,2),vertex(4,3)
+               write(ulog,"(1x,a,1p,3e12.4)") "vertex(4,1:2):..............",  &
+                  vertex(4,1),vertex(4,2)
             endif
             if (n_vertices>4) then
-               write(ulog,"(1x,a,1p,3e12.4)") "vertex(5,1:3):..............",  &
-                  vertex(5,1),vertex(5,2),vertex(5,3)     
+               write(ulog,"(1x,a,1p,3e12.4)") "vertex(5,1:2):..............",  &
+                  vertex(5,1),vertex(5,2)
             endif
             if (n_vertices>5) then
-               write(ulog,"(1x,a,1p,3e12.4)") "vertex(6,1:3):..............",  &
-                  vertex(6,1),vertex(6,2),vertex(6,3)
+               write(ulog,"(1x,a,1p,3e12.4)") "vertex(6,1:2):..............",  &
+                  vertex(6,1),vertex(6,2)
             endif
             write(ulog,"(1x,a)")  " "
          endif

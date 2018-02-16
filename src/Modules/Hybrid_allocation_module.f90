@@ -635,7 +635,7 @@ type type_substation
 ! List of DEM vertices associated with the substation
    integer(4),dimension(:),allocatable :: DEMvert
 ! Vertices of the polygon which describes the substation
-   double precision :: vert(6,3)
+   double precision :: vert(6,2)
 end type
 
 ! Monitoring the electrical substations (ref. input file template)

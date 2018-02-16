@@ -45,7 +45,7 @@ integer(4) :: test,i_zone,i_vertex,i_sub,i_aux,GridColumn,aux_integer,DEM_points
 integer(4) :: alloc_stat
 double precision :: Y_step
 character(255) :: nomefile_substations
-double precision :: pos(3),aux_vec(3)
+double precision :: aux_vec(3)
 ! Expected Outage Status
 logical,dimension(:),allocatable :: EOS
 ! Probability of an outage start
@@ -56,6 +56,7 @@ double precision,dimension(:),allocatable :: Ysub
 double precision,dimension(:),allocatable :: Dsub
 ! Substation vulnerability
 double precision,dimension(:),allocatable :: Vul
+double precision :: pos(6,3)
 integer(4),dimension(:,:),allocatable :: aux_array
 integer(4),external :: ParticleCellNumber
 !------------------------
@@ -230,34 +231,34 @@ if (on_going_time_step==1) then
 !$omp shared(Partz,i_zone,Vertice,substations,uerr,aux_array)                  &
 !$omp private(i_vertex,pos,i_sub,test)
          do i_vertex=Partz(i_zone)%ID_first_vertex,Partz(i_zone)%ID_last_vertex
-            pos(1) = Vertice(1,i_vertex)
-            pos(2) = Vertice(2,i_vertex)
+            pos(1,1) = Vertice(1,i_vertex)
+            pos(1,2) = Vertice(2,i_vertex)
 ! Loop over the substations
             do i_sub=1,substations%n_sub
               select case (substations%sub(i_sub)%n_vertices)
                   case(3)
-                     call point_inout_convex_non_degenerate_polygon(pos(1:2),3,&
-                             substations%sub(i_sub)%vert(1,1:2),               &
+                     call point_inout_convex_non_degenerate_polygon(pos(1,1:2),&
+                             3,substations%sub(i_sub)%vert(1,1:2),             &
                              substations%sub(i_sub)%vert(2,1:2),               &
                              substations%sub(i_sub)%vert(3,1:2),               &
                              substations%sub(i_sub)%vert(4,1:2),               &
                              substations%sub(i_sub)%vert(4,1:2),               &
                              substations%sub(i_sub)%vert(4,1:2),test)
                   case(4)
-                     call point_inout_quadrilateral(pos(1:2),                  &
+                     call point_inout_quadrilateral(pos(1,1:2),                &
                              substations%sub(i_sub)%vert(1,1:2),               &
                              substations%sub(i_sub)%vert(2,1:2),               &
                              substations%sub(i_sub)%vert(3,1:2),               &
                              substations%sub(i_sub)%vert(4,1:2),test)
                   case(5)
-                     call point_inout_pentagon(pos(1:2),                       &
+                     call point_inout_pentagon(pos(1,1:2),                     &
                              substations%sub(i_sub)%vert(1,1:2),               &
                              substations%sub(i_sub)%vert(2,1:2),               &
                              substations%sub(i_sub)%vert(3,1:2),               &
                              substations%sub(i_sub)%vert(4,1:2),               &
                              substations%sub(i_sub)%vert(5,1:2),test)
                   case(6)
-                     call point_inout_hexagon(pos(1:2),                        &
+                     call point_inout_hexagon(pos(1,1:2),                      &
                              substations%sub(i_sub)%vert(1,1:2),               &
                              substations%sub(i_sub)%vert(2,1:2),               &
                              substations%sub(i_sub)%vert(3,1:2),               &
@@ -286,7 +287,7 @@ if (on_going_time_step==1) then
 ! Loop over the substations
 !$omp parallel do default(none)                                                &
 !$omp shared(substations,aux_array,uerr,ulog)                                  &
-!$omp private(i_sub,aux_vec,alloc_stat)
+!$omp private(i_sub,aux_vec,alloc_stat,pos)
    do i_sub=1,substations%n_sub
 ! Allocation and assignment for the array of the substation DEM vertices
       if (.not.allocated(substations%sub(i_sub)%DEMvert)) then
@@ -306,33 +307,21 @@ allocate(substations%sub(i_sub)%DEMvert(substations%sub(i_sub)%n_DEM_vertices) &
       substations%sub(i_sub)%DEMvert(1:substations%sub(i_sub)%n_DEM_vertices) =&
          aux_array(i_sub,1:substations%sub(i_sub)%n_DEM_vertices)
 ! Substation area: start.
+      pos(1:6,1:2) = substations%sub(i_sub)%vert(1:6,1:2)
+      pos(1:6,3) = 0.d0
       select case (substations%sub(i_sub)%n_vertices)
          case(3)
-            call area_triangle(substations%sub(i_sub)%vert(1,1:3),             &
-                               substations%sub(i_sub)%vert(2,1:3),             &
-                               substations%sub(i_sub)%vert(3,1:3),             &
+            call area_triangle(pos(1,1:3),pos(2,1:3),pos(3,1:3),               &
                                substations%sub(i_sub)%area,aux_vec)
          case(4)
-            call area_quadrilateral(substations%sub(i_sub)%vert(1,1:3),        &
-                                    substations%sub(i_sub)%vert(2,1:3),        &
-                                    substations%sub(i_sub)%vert(3,1:3),        &
-                                    substations%sub(i_sub)%vert(4,1:3),        &
-                                    substations%sub(i_sub)%area)
+            call area_quadrilateral(pos(1,1:3),pos(2,1:3),pos(3,1:3),          &
+                                    pos(4,1:3),substations%sub(i_sub)%area)
          case(5)
-            call area_pentagon(substations%sub(i_sub)%vert(1,1:3),             &
-                               substations%sub(i_sub)%vert(2,1:3),             &
-                               substations%sub(i_sub)%vert(3,1:3),             &
-                               substations%sub(i_sub)%vert(4,1:3),             &
-                               substations%sub(i_sub)%vert(5,1:3),             &
-                               substations%sub(i_sub)%area)
+            call area_pentagon(pos(1,1:3),pos(2,1:3),pos(3,1:3),pos(4,1:3),    &
+                               pos(5,1:3),substations%sub(i_sub)%area)
          case(6)
-            call area_hexagon(substations%sub(i_sub)%vert(1,1:3),              &
-                              substations%sub(i_sub)%vert(2,1:3),              &
-                              substations%sub(i_sub)%vert(3,1:3),              &
-                              substations%sub(i_sub)%vert(4,1:3),              &
-                              substations%sub(i_sub)%vert(5,1:3),              &
-                              substations%sub(i_sub)%vert(6,1:3),              &
-                              substations%sub(i_sub)%area)
+            call area_hexagon(pos(1,1:3),pos(2,1:3),pos(3,1:3),pos(4,1:3),     &
+                              pos(5,1:3),pos(6,1:3),substations%sub(i_sub)%area)
          case default
                   write(uerr,*) 'Error in defining the areas of the ',         &
                      'electrical substations (subroutine ',                    &
@@ -367,10 +356,10 @@ allocate(substations%sub(i_sub)%DEMvert(substations%sub(i_sub)%n_DEM_vertices) &
 ! substation polygon: start.
 ! Loop over the DEM points of the substation
          do i_aux=1,substations%sub(i_sub)%n_DEM_vertices
-            pos(1) = Vertice(1,substations%sub(i_sub)%DEMvert(i_aux))
-            pos(2) = Vertice(2,substations%sub(i_sub)%DEMvert(i_aux))
-            pos(3) = Grid%extr(3,1) + 0.0000001d0
-            GridColumn = ParticleCellNumber(pos)
+            pos(1,1) = Vertice(1,substations%sub(i_sub)%DEMvert(i_aux))
+            pos(1,2) = Vertice(2,substations%sub(i_sub)%DEMvert(i_aux))
+            pos(1,3) = Grid%extr(3,1) + 0.0000001d0
+            GridColumn = ParticleCellNumber(pos(1,1:3))
             Y_step = max((Z_fluid_step(GridColumn) -                           &
                          Vertice(3,substations%sub(i_sub)%DEMvert(i_aux))),0.d0)
             Ysub(i_sub) = Ysub(i_sub) + Y_step
