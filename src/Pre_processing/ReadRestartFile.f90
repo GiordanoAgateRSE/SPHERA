@@ -248,7 +248,7 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
                   "Granular_flows_options%maximum_saturation_flag in ",        &
                   "ReadRestartFile is successfully completed."
          endif
-      endif      
+      endif
 ! Restart positions are based on the step number
       it_start = 0 
       if (save_istart>0) then
@@ -378,7 +378,7 @@ body_arr(i)%body_kinematics(1:body_arr(i)%n_records,1:7)
                         read(nsav,iostat=ioerr) q_max(1:size(q_max))
                         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"q_max",nsav&
                            ,ulog)) return
-                     endif   
+                     endif
                      if (allocated(substations%sub)) then
                         read(nsav,iostat=ioerr)                                &
                            substations%sub(1:substations%n_sub)%POS_fsum

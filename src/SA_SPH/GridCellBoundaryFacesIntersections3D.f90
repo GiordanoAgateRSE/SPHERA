@@ -183,7 +183,7 @@ do nc=1,Grid%nmax
             if (Found) then        
                flpointer_cell = flpointer_cell + 1
                if (flpointer_cell>Domain%MAXCLOSEBOUNDFACES) then
-                  write(ulog,'(1x,a)')                                         &
+                  write(uerr,'(1x,a)')                                         &
 " Too many faces crossing a given cell. Please increase the parameter MAXCLOSEBOUNDFACES. "
                   call diagnostic(arg1=4,arg3=nomsub)
                endif

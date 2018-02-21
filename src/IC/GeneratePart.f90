@@ -122,7 +122,7 @@ first_cycle: do Nz=1,NPartZone
 ! To search for the minimum and maximum coordinates of the current subzone 
 ! in 3D
          else
-         call FindFrame(Xmin,Xmax,Nt)
+            call FindFrame(Xmin,Xmax,Nt)
       endif
 ! To evaluate the minimum and maximum coordinates of the zone checking for 
 ! all the subzones
@@ -339,7 +339,7 @@ if ((Tratto(BoundaryFace(i_face)%stretch)%zone==Partz(Nz)%dam_zone_ID).and.    &
 ! Check the storage for the reached number of fluid particles
                            if (NumParticles>nag_aux) then
                               call diagnostic(arg1=10,arg2=4,arg3=nomsub)
-                           endif  
+                           endif
                         endif
                      enddo
                   enddo

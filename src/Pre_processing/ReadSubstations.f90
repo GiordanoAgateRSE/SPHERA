@@ -71,7 +71,7 @@ do while (TRIM(lcase(ainp))/="##### end substations #####")
       write(ulog,"(1x,a)")  " "
    endif
 ! Allocation of the array of the substations
-   if (.not.allocated(substations%sub)) then
+   if ((n_sub>0).and.(.not.allocated(substations%sub))) then
       allocate(substations%sub(n_sub),STAT=alloc_stat)
       if (alloc_stat/=0) then
          write(uerr,*) 'Allocation of "substations%sub" in the ',              &
@@ -82,18 +82,16 @@ do while (TRIM(lcase(ainp))/="##### end substations #####")
             write(ulog,*) 'Allocation of "substations%sub" in the subroutine ',&
                '"ReadSubstations" is successfully completed.'
       endif
-! Initializations: start.
-      substations%n_sub = n_sub
-      substations%dt_out = dt_out
-      substations%it_out_last = 0
       substations%sub(:)%area = 0.d0
       substations%sub(:)%POS_fsum = 0.d0
       substations%sub(:)%Ymax = -1.d9
       substations%sub(:)%EOT = 0.d0
       substations%sub(:)%Val = 0.d0
       substations%sub(:)%n_DEM_vertices = 0
-! Initializations: end.
    endif
+   substations%n_sub = n_sub
+   substations%dt_out = dt_out
+   substations%it_out_last = 0
 ! Loop over the substations
    do i=1,n_sub
 ! Reading the substation variables
