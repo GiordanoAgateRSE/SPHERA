@@ -81,7 +81,7 @@ flpointer = 0
 ! Loop over all the cells of the grid
 !$omp parallel do default(none)                                                &
 !$omp shared(Grid,GCBFPointers,NumFacce,BFaceList,Tratto,BoundaryFace)         &
-!$omp shared(flpointer,GCBFVector_aux,nomsub,Domain,ulog)                      &
+!$omp shared(flpointer,GCBFVector_aux,nomsub,Domain,ulog,uerr)                 &
 !$omp private(nc,irestocell,i,i0,j,j0,k,k0,CellXYZ,nv,ii,jj,kk,CellNodeXYZ,kf) &
 !$omp private(nf,nodes,Found,sd,Signcount,no,XYZnod,CellNodeZita,deltaXYZ)     &
 !$omp private(i_flpointer,flpointer_cell,GCBFVector_cell)

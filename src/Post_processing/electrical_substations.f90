@@ -379,12 +379,12 @@ allocate(substations%sub(i_sub)%DEMvert(substations%sub(i_sub)%n_DEM_vertices) &
          if (substations%sub(i_sub)%Ymax>10.d0) then
             Vul(i_sub) = 0.15d0
             elseif (substations%sub(i_sub)%Ymax>0.d0) then
-               Vul(i_sub) = 0.01d0 * (-0.0001d0 * substations%sub(i_sub)%Ymax  &
-                            ** 6 + 0.0019d0 * substations%sub(i_sub)%Ymax ** 5 &
-                            + 0.0008d0 * substations%sub(i_sub)%Ymax ** 4 -    &
-                            0.1191d0 * substations%sub(i_sub)%Ymax ** 3 +      &
-                            0.3907d0 * substations%sub(i_sub)%Ymax ** 2 +      &
-                            1.7024d0 * substations%sub(i_sub)%Ymax)                  
+               Vul(i_sub) = -1.22877d-6 * substations%sub(i_sub)%Ymax ** 6 +   &
+                            1.92478d-5 * substations%sub(i_sub)%Ymax ** 5 +    &
+                            8.4216d-6 * substations%sub(i_sub)%Ymax ** 4       &
+                            -0.00119121d0 * substations%sub(i_sub)%Ymax ** 3 + &
+                            0.00390726d0 * substations%sub(i_sub)%Ymax ** 2 +  &
+                            0.0170243d0 * substations%sub(i_sub)%Ymax
                else
                   Vul(i_sub) = 0.d0
          endif
