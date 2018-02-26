@@ -52,9 +52,9 @@ Icont = 0
 !------------------------
 ! Statements
 !------------------------
-! Fluid particles: start
+! Fluid particles: start.
 ! 1st loop: to find the particle cell and to count the number of particles
-! in every cell 
+! in every cell.
 npi = 0
 do while ((nag>0).AND.(npi<nag))
    npi = npi + 1
@@ -99,7 +99,7 @@ do npi=1,nag
     NPartOrd (Icont(ncel) + numpartincelgiaaposto(ncel)) = npi
     numpartincelgiaaposto(ncel) = numpartincelgiaaposto(ncel) + 1
 enddo
-! Fluid particles: end
+! Fluid particles: end.
 ! Semi-particles/wall elements (DB-SPH): start
 if ((DBSPH%n_w>0).and.((on_going_time_step == it_start).or.                    &
    (Domain%body_part_reorder==1))) then

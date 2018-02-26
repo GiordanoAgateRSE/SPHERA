@@ -181,7 +181,7 @@ Vul(:) = 0.d0
 !------------------------
 open(unit_substations,file=nomefile_substations,status="unknown",              &
      form="formatted")
-if (on_going_time_step==1) then
+if (.not.allocated(substations%sub(1)%DEMvert)) then
 ! First time step in any case (both with/without restart)
 ! .txt file creation and headings
    write(unit_substations,*) "Electrical substations "
