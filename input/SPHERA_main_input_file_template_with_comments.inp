@@ -363,9 +363,9 @@ phi saturated_medium_flag           ! phi(internal friction angle in degrees,
                                     ! saturated medium),.false.(dry medium). 
 cohesion viscosity_max tuned_viscosity limiting_viscosity
                                     ! cohesion (draft parameter); viscosity_max 
-                                    ! (threshold for the mixture viscosity to 
-                                    ! held particles fixed in the 
-                                    ! elastic-plastic strain regime); 
+                                    ! (threshold for the dynamic mixture 
+                                    ! viscosity to held particles fixed in 
+                                    ! the elastic-plastic strain regime); 
                                     ! tuned_viscosity (tuned dynamic viscosity -
                                     ! only for Manenti et al., 2012)
                                     ! limiting dynamic viscosity 
