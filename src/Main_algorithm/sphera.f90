@@ -1,13 +1,13 @@
 !-------------------------------------------------------------------------------
-! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
+! SPHERA v.9.0.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
 ! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
 !
-! This file is part of SPHERA v.8.0.
-! SPHERA v.8.0 is free software: you can redistribute it and/or modify
+! This file is part of SPHERA v.9.0.0
+! SPHERA v.9.0.0 is free software: you can redistribute it and/or modify
 ! it under the terms of the GNU General Public License as published by
 ! the Free Software Foundation, either version 3 of the License, or
 ! (at your option) any later version.
@@ -248,6 +248,7 @@ write(ulog,1000)
 1x,'Daria Gatti, Giordano Agate, Stefano Falappi, Barbara Flamini,          '/ &
 1x,'Roberto Guandalini, David Zuccalà).                                     '/ &
 1x,'Main numerical developments of SPHERA:                                  '/ &
+1x,'Amicarelli et al. (2017,IJCFD),                                         '/ &
 1x,'Amicarelli et al. (2015,CAF), Amicarelli et al. (2013,IJNME),           '/ &
 1x,'Manenti et al. (2012,JHE), Di Monaco et al. (2011,EACFM).               '/ & 
 1x,'Email contact: andrea.amicarelli@rse-web.it                             '/ &
