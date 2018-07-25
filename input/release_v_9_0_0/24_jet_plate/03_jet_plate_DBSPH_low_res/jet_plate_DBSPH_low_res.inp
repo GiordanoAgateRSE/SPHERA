@@ -1,0 +1,138 @@
+9.0.0
+
+!-------------------------------------------------------------------------------
+! File name and copyright: jet_plate_DBSPH_low_res.inp
+!    Copyright 2015 (RSE SpA, authored by Andrea Amicarelli)
+! File description: input file for SPHERA v.9.0.0 (RSE SpA).
+!    Reference: Amicarelli et al. 2013 (IJNME).
+!
+! This file is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! This file is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with this file. If not, see <http://www.gnu.org/licenses/>.
+!-------------------------------------------------------------------------------
+
+##### TITLE #####
+jet_plate_DBSPH_low_res
+##### END TITLE #####
+
+##### DOMAIN #####
+2 bsph
+0.001 1.3
+##### END DOMAIN #####
+
+##### VERTICES #####
+! plate
+1 -0.105 0.000
+2 0.105 0.000
+! inlet
+3 -0.014 0.120
+4 0.014 0.120          
+##### END VERTICES #####
+ 
+##### LINES #####
+1 1 2
+2 4 3     
+##### END LINES #####
+
+##### BOUNDARIES #####
+plate
+1
+fixed
+0. .false.
+111111
+!
+inlet
+2
+source
+1
+0.54908 0.
+pa 0.
+222222
+##### END BOUNDARIES #####
+
+##### DBSPH #####
+1. .false. 0.5 0 .true.
+.true. .true.
+0 1
+-0.105 0.105 -999999. 999999. -999999. 999999.  
+1 .false.
+2 0. 0. 0.
+0. 0. 0. 0. 0. 0. 0.
+6. 0. 0. 0. 0. 0. 0.
+1 0 4
+0. 0. 0.120 0. 0. 1. 0. 0. -19.61 0.028
+##### END DBSPH #####
+
+##### BED LOAD TRANSPORT #####
+0 1
+1 0. 0.
+##### end BED LOAD TRANSPORT #####
+
+##### medium #####
+liquid
+1
+1000. 4.0e+6
+1. 0.
+0. 0.
+0. 0. 0.
+.001
+0.
+##### end medium #####
+
+##### BODY DYNAMICS #####
+0 2. -1. -1. -1. .true. .true. .true.
+##### end BODY DYNAMICS #####
+
+##### RUN PARAMETERS #####
+0.1 10000000
+0.025 0.05 0 1 0. .false. 
+0.2 0.2 A
+1.1 2. 0          
+100000 9 10 450                  
+0                    
+##### end RUN PARAMETERS #####
+
+##### general physical properties #####
+0. 0. 0.
+0.
+##### end general physical properties #####
+
+##### output regulation #####
+results time 1.
+restart time 1.
+print partial 500
+control time 0.001
+level time 0.1 medium 1
+depth dt_out 900.
+##### end output regulation #####
+
+##### draw options #####
+vtkconverter any 0.002
+##### end draw options #####
+
+##### control points #####
+!
+##### end control points #####
+
+##### control lines #####
+!
+##### end control lines #####
+
+##### control sections #####
+!
+##### end control sections #####
+
+##### section flow rate #####
+0 1. 1
+##### end section flow rate #####
+
+##### substations #####
+0 0.
+##### end substations #####

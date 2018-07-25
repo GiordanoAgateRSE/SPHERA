@@ -1,12 +1,13 @@
-version.subversion   ! 
-                     ! SPHERA main input file: template and comments
+version.subversion.subsubversion   ! 
+                                   ! SPHERA main input file: template and 
+                                   ! comments
 !------------------------------------------------------------------------------
-! SPHERA v.8.0 (Smoothed Particle Hydrodynamics research software; mesh-less
+! SPHERA v.9.0.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
 ! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
-! SPHERA authors and email contact are providedoin SPHERA documentation.
+! SPHERA authors and email contact are provided in SPHERA documentation.
 !
 ! This file is part of SPHERA.
 ! SPHERA is free software: you can redistribute it and/or modify
@@ -184,7 +185,8 @@ circum_dam_1_x circum_dam_1_y
                             ! quadrilateral (otherwise the subroutine call for 
                             ! point_inout_convex_non_degenerate_polygon must be 
                             ! replaced with other calls to subroutines such as 
-                            ! point_inout_quadrilateral).                     
+                            ! point_inout_quadrilateral). From a plan view, the 
+                            ! vertices are provided anticlockwise.                    
 circum_dam_last_x circum_dam_last_y
                             ! last point of the 2D figure above
 ! If (IC_reservoir_type==2): end
@@ -216,8 +218,9 @@ dx_f/dx_w MUSCL_boundary_flag k_w slip_ID Gamma_limiter_flag
 ! Gamma_limiter_flag: logical variable to activate or deactivate Gamma upper 
 ! limiter (.true.)
 negative_wall_p_allowed FS_allowed  ! negative_wall_p_allowed: pressure of wall 
-                                    ! elements can be negative; FS_allowed: free
-                                    ! surface detection can be avoided. 
+                                    ! elements can be negative (logical); 
+                                    ! FS_allowed: free surface detection can be 
+                                    ! avoided (logical). 
 n_monitor_points n_monitor_regions  ! n_monitor_points; n_monitor_regions=0,1(to
                                     ! estimate the Force along x-direction)
 ! if (n_monitor_points>0): start
@@ -534,8 +537,8 @@ nag_aux MAXCLOSEBOUNDFACES MAXNUMCONVEXEDGES GCBFVecDim
                                     ! number of fluid particles in the 
                                     ! domain, it is only related to the very 
                                     ! first allocation of the particle array, 
-                                    ! it is influent only in case of reservoir 
-                                    ! derived from topography); 
+                                    ! it is influential only in case of 
+                                    ! reservoir extruded from topography); 
                                     ! MAXCLOSEBOUNDFACES(max number of 
                                     ! neighbouring boundary face per fluid 
                                     ! particle); MAXNUMCONVEXEDGES(max number 
@@ -555,7 +558,7 @@ nag_aux MAXCLOSEBOUNDFACES MAXNUMCONVEXEDGES GCBFVecDim
                                     ! time).
 density_thresholds_flag             ! density_thresholds_flag=0(default, no 
                                     ! density limiters),1(density limiters for 
-                                    ! debug) - density limiters do not apply to 
+                                    ! debug)- Density limiters do not apply to 
                                     ! the mixture particles which are held 
                                     ! fixed (elasto-plastic strain rate 
                                     ! regime)

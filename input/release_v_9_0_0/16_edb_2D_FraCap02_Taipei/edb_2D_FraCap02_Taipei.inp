@@ -1,0 +1,178 @@
+9.0.0
+
+!-------------------------------------------------------------------------------
+! File name and copyright: edb_2D_FraCap02_Taipei.inp
+!    Copyright 2014-2018 (RSE SpA, authored by Andrea Amicarelli)
+! File description: input file for SPHERA v.9.0.0 (RSE SpA).
+!   2D erosional dam break after the experiment of Fraccarollo & Capart (2002, 
+!      JFM, Taipei case). Reference: Amicarelli et al. (2017, IJCFD).
+!
+! This file is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! This file is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with this file. If not, see <http://www.gnu.org/licenses/>.
+!-------------------------------------------------------------------------------
+
+##### TITLE #####
+edb_2D_FraCap02_Taipei
+##### END TITLE #####
+
+##### DOMAIN #####
+2 semi
+0.005 1.3
+##### END DOMAIN #####
+
+##### VERTICES #####
+! Boundary
+1 -0.750 0.000
+2  0.750 0.000
+3 -0.750 0.200
+! Points to complete the granular bed
+4 -0.750 0.050
+5  0.750 0.050
+! Points to complete the water reservoir
+6  0.000 0.050 
+7 -0.750 0.150 
+8  0.000 0.150
+! Point for the down-flow vertical wall
+9 0.750 0.200
+##### END VERTICES #####
+ 
+##### LINES #####
+! Domain frontier
+1 3 1 2 9
+! Graular bed reservoir
+2 1 4 5 2 1
+! Water reservoir
+3 4 7 8 6 4
+##### END LINES #####
+
+##### BOUNDARIES #####
+Boundary
+1
+fixed
+1. .false.
+111111
+!
+Granular_bed
+2
+perimeter
+2
+uniform 009EA8
+std 0. 0. 0. 0.
+qp 0.05
+1 0 .false.
+!
+Water_reservoir
+3
+perimeter
+1
+uniform 009EA8
+std 0. 0. 0. 0.
+qp 0.15
+1 0 .false.
+##### END BOUNDARIES #####
+
+##### DBSPH #####
+1. .false. 0.5 2 .false.
+.false. .true.
+0 0
+0 .false.
+0 0 3
+##### END DBSPH #####
+
+##### BED LOAD TRANSPORT #####
+1 1
+1 0. 0.
+0. 1          
+0 0           
+1 0.0505 0.03 30
+-999999. 999999.
+-999999. 999999.
+-999999. 999999.
+0. 0.
+1               
+-999. 0.        
+##### end BED LOAD TRANSPORT #####
+
+##### medium #####
+liquid
+1
+1000. 1.0e5
+0.1 0.
+0. 0.
+0. 0. 0.
+0.001
+0.
+!
+granular
+2
+1048. 1.048e5
+0.1 0.
+0. 0.
+0. 0. 0.
+26. .true.
+0. 1.e4 0. 1.e5
+0.37 0.004 0.004    
+##### end medium #####
+
+##### BODY DYNAMICS #####
+0 2 -999. 999. -999. .false. .false. .true.
+##### end BODY DYNAMICS #####
+
+##### RUN PARAMETERS #####
+0.505 1000000000
+0.25 0.05 1 1 0. .false.
+0.25 0. A
+10. 4. 0
+100000 10 100 100000
+0
+##### end RUN PARAMETERS #####
+
+##### general physical properties #####
+0. -9.81
+0.
+##### end general physical properties #####
+
+##### restart #####
+!
+##### end restart #####
+
+##### output regulation #####
+results time 99999.
+restart time 0.00505
+print partial 100
+control time 99999.
+level time 99999. medium 1
+depth dt_out 999999.
+##### end output regulation #####
+
+##### draw options #####
+vtkconverter any 0.00505
+##### end draw options #####
+
+##### control points #####
+!
+##### end control points #####
+
+##### control lines #####
+!
+##### end control lines #####
+
+##### control sections #####
+!
+##### end control sections #####
+
+##### section flow rate #####
+!
+##### end section flow rate #####
+
+##### substations #####
+0 0.
+##### end substations #####

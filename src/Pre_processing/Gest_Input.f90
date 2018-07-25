@@ -117,7 +117,7 @@ NumBVertices = 1
 NPartZone = 1
 NMedium = 1
 NSections = 1
-NPoints = 1
+npoints = 1
 NLines = 1
 call ReadInput(NumberEntities,OnlyTriangle,InputErr,ainp)
 ! An error was detected in the input data. Execution fails.
@@ -172,9 +172,9 @@ if ((Domain%istart>0).or.(Domain%start>zero)) then
       ier = ier + 200
       call diagnostic(arg1=5,arg2=ier,arg3=msg_err)
    endif
-   NPoints = NumberEntities(4)
+   npoints = NumberEntities(4)
    NPointsl = NumberEntities(6)
-   NPointst = NumberEntities(4) + NumberEntities(6) + NumberEntities(13)
+   npointst = NumberEntities(4) + NumberEntities(6) + NumberEntities(13)
    NLines = NumberEntities(5)
    NSections = NumberEntities(12)
    NPointse = NumberEntities(13)
@@ -183,9 +183,9 @@ if ((Domain%istart>0).or.(Domain%start>zero)) then
       ncord = NumberEntities(1)
       NMedium = NumberEntities(2)
       NPartZone = NumberEntities(3)
-      NPoints = NumberEntities(4)
+      npoints = NumberEntities(4)
       NPointsl = NumberEntities(6)
-      NPointst = NumberEntities(4) + NumberEntities(6) + NumberEntities(13)
+      npointst = NumberEntities(4) + NumberEntities(6) + NumberEntities(13)
       NLines = NumberEntities(5)
       NumVertici = NumberEntities(7)
       NumTratti = NumberEntities(8)
@@ -214,7 +214,7 @@ if (ier/=0) then
 endif
 allocate(Partz(NPartZone),Med(NMedium),OpCount(NMedium),SpCount(NMedium),      &
    EpCount(NMedium),EpOrdGrid(NMedium),Control_Sections(0:NSections+1),        &
-   Control_Points(max(1,NPointst)),Control_Lines(max(1,NLines)),               &
+   Control_Points(max(1,npointst)),Control_Lines(max(1,NLines)),               &
    Section_Points(1),stat=ier)
 if (ier/=0) then
    write(ulog,'(1x,a,i2)')                                                     &

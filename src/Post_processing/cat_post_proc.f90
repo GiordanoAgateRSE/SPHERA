@@ -27,6 +27,9 @@ subroutine cat_post_proc
 !------------------------
 ! Modules
 !------------------------
+use Static_allocation_module
+use Hybrid_allocation_module
+use Dynamic_allocation_module
 !------------------------
 ! Declarations
 !------------------------
@@ -43,34 +46,64 @@ implicit none
 !------------------------
 ! Statements
 !------------------------
-call system("touch Body_dynamics.txt")
-call system("cat Body_dynamics.txt *Body_dynamics_* > Body-dynamics.txt")
-call system("rm -f *Body_dynamics*")
-call system("mv Body-dynamics.txt Body_dynamics.txt")
-call system("touch Body_particles.txt")
-call system("cat Body_particles.txt *Body_particles_* > Body-particles.txt")
-call system("rm -f *Body_particles*")
-call system("mv Body-particles.txt Body_particles.txt")
-call system("touch Q_sections.txt")
-call system("cat Q_sections.txt *Q_sections_* > Q-sections.txt")
-call system("rm -f *Q_sections*")
-call system("mv Q-sections.txt Q_sections.txt")
-call system("touch substations.txt")
-call system("cat substations.txt *substations_* > sub-stations.txt")
-call system("rm -f *substations*")
-call system("mv sub-stations.txt substations.txt")
-call system("touch monitoring_lines.txt")
-call system("cat monitoring_lines.txt *.cln > monitoring-lines.txt")
-call system("rm -f monitoring_lines.txt *.cln")
-call system("mv monitoring-lines.txt monitoring_lines.txt")
-call system("touch monitoring_points.txt")
-call system("cat monitoring_points.txt *.cpt > monitoring-points.txt")
-call system("rm -f monitoring_points.txt *.cpt")
-call system("mv monitoring-points.txt monitoring_points.txt")
-call system("touch blt_interfaces.txt")
-call system("cat blt_interfaces.txt *blt_interfaces_* > blt-interfaces.txt")
-call system("rm -f *blt_interfaces*")
-call system("mv blt-interfaces.txt blt_interfaces.txt")
+if (n_bodies>0) then
+   call system("touch Body_dynamics.txt draft_Body_dynamics_draft.txt")
+   call system("cat Body_dynamics.txt *Body_dynamics_* > Body-dynamics.txt")
+   call system("rm -f *Body_dynamics*")
+   call system("mv Body-dynamics.txt Body_dynamics.txt")
+   call system("touch Body_particles.txt draft_Body_particles_draft.txt")
+   call system("cat Body_particles.txt *Body_particles_* > Body-particles.txt")
+   call system("rm -f *Body_particles*")
+   call system("mv Body-particles.txt Body_particles.txt")
+endif
+if (Q_sections%n_sect>0) then
+   call system("touch Q_sections.txt draft_Q_sections_draft.txt")
+   call system("cat Q_sections.txt *Q_sections_* > Q-sections.txt")
+   call system("rm -f *Q_sections*")
+   call system("mv Q-sections.txt Q_sections.txt")
+endif
+if (substations%n_sub>0) then
+   call system("touch substations.txt draft_substations_draft.txt")
+   call system("cat substations.txt *substations_* > sub-stations.txt")
+   call system("rm -f *substations*")
+   call system("mv sub-stations.txt substations.txt")
+endif
+if (nlines>0) then
+    call system("touch monitoring_lines.txt draft.cln")
+    call system("cat monitoring_lines.txt *.cln > monitoring-lines.txt")
+    call system("rm -f monitoring_lines.txt *.cln")
+    call system("mv monitoring-lines.txt monitoring_lines.txt")
+endif
+if (npointst>0) then
+   call system("touch monitoring_points.txt draft.cpt")
+   call system("cat monitoring_points.txt *.cpt > monitoring-points.txt")
+   call system("rm -f monitoring_points.txt *.cpt")
+   call system("mv monitoring-points.txt monitoring_points.txt")
+endif
+if (Granular_flows_options%monitoring_lines>0) then
+   call system("touch blt_interfaces.txt draft_blt_interfaces_draft.txt")
+   call system("cat blt_interfaces.txt *blt_interfaces_* > blt-interfaces.txt")
+   call system("rm -f *blt_interfaces*")
+   call system("mv blt-interfaces.txt blt_interfaces.txt")
+endif
+if (DBSPH%n_w>0) then
+   if (DBSPH%n_monitor_points>0) then
+      call system("touch wall_IDs.txt draft_wall_IDs_draft.txt")
+      call system("cat wall_IDs.txt *wall_IDs_* > wall-IDs.txt")
+      call system("rm -f *wall_IDs_*")
+      call system("mv wall-IDs.txt wall_IDs.txt")
+   endif
+   if (DBSPH%n_monitor_regions>0) then
+      call system("touch wall_regions.txt draft_wall_regions_draft.txt")
+      call system("cat wall_regions.txt *wall_regions_* > wall-regions.txt")
+      call system("rm -f *wall_regions_*")
+      call system("mv wall-regions.txt wall_regions.txt")
+      call system("touch wall_Fx.txt draft_wall_Fx_draft.txt")
+      call system("cat wall_Fx.txt *wall_Fx_* > wall-Fx.txt")
+      call system("rm -f *wall_Fx_*")
+      call system("mv wall-Fx.txt wall_Fx.txt")
+   endif
+endif
 !------------------------
 ! Deallocations
 !------------------------

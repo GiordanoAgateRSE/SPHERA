@@ -35,7 +35,7 @@ use Hybrid_allocation_module
 implicit none
 integer(4) :: nrighe,ier,ninp,ulog
 integer(4),dimension(20) :: NumberEntities
-type (TyCtlPoint),dimension(NPointst) :: Control_Points
+type (TyCtlPoint),dimension(npointst) :: Control_Points
 character(1) :: comment
 character(100) :: ainp
 integer(4) :: n,i,icord,ioerr

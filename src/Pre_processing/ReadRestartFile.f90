@@ -71,14 +71,14 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
          "---------------------------------------------------------------"
       write(uerr,"(1x,a)")                                                     &
          ">> ERROR! The Restart version is not equal the current version."
-      write(uerr,"(1x,a)") ">>        The Run is stopped."
+      write(uerr,"(1x,a)") ">>        The run is stopped."
       write(uerr,'(a)')                                                        &
          "---------------------------------------------------------------"
       flush(uerr)
       stop
    endif
    read(nsav,iostat=ioerr) ncord,nag,NMedium,NPartZone,NumVertici,NumFacce,    &
-      NumTratti,NumBVertices,NumBSides,GCBFVecDim,Grid%nmax,NPointst,NPoints,  &
+      NumTratti,NumBVertices,NumBSides,GCBFVecDim,Grid%nmax,npointst,NPoints,  &
       NPointsl,NPointse,NLines,NSections,doubleh
    if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"ncord, nag, ...",nsav,ulog))    &
       return
@@ -86,7 +86,7 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
    write(ulog,"(1x,a,1p,i12)")   "GCBFVecDim (from restart file): ",GCBFVecDim
 ! Allocation of the array "GCBFVector"
    if ((Domain%tipo=="semi").and.(GCBFVecDim>0).and.                           &
-      (.not.allocated(GCBFVector))) then
+      (.not.allocated(GCBFVector)).and.(ncord==3)) then
       allocate(GCBFVector(GCBFVecDim),stat=ier)    
       if (ier/=0) then
          write(ulog,'(1x,2a)') "Allocation of GCBFVector in ",                 &
@@ -169,7 +169,7 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
          if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"BoundarySide",nsav,ulog)) &
             return
       endif
-      if (Domain%tipo=="semi") then
+      if ((Domain%tipo=="semi").and.(ncord==3)) then
          if (GCBFVecDim>0) then
             read(nsav,iostat=ioerr) GCBFVector(1:GCBFVecDim)
             if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"GCBFVector",nsav,ulog))&

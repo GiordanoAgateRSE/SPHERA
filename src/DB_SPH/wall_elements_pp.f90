@@ -152,7 +152,7 @@ endif
 ! (provided a region)
 if (DBSPH%n_monitor_regions==1) then
    write(nomefilectl_wall,"(a,a,i8.8,a)") nomecaso(1:len_trim(nomecaso)),      &
-      '_wall_region_',on_going_time_step,".txt"
+      '_wall_regions_',on_going_time_step,".txt"
    open(unit_dbsph_se_reg,file=nomefilectl_wall,status="unknown",              &
       form="formatted")
    write(unit_dbsph_se_reg,*) "Wall element values "

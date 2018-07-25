@@ -49,8 +49,8 @@ integer(4),external :: CellNumber
 !------------------------
 ! Statements
 !------------------------
-if (Npointst<1) return
-do i=1, Npointst
+if (npointst<1) return
+do i=1,npointst
    pglocal%coord(:) = control_points(i)%coord(:)
    pglocal%pres = zero
    pglocal%dens = zero

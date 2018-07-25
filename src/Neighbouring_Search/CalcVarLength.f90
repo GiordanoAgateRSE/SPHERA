@@ -365,7 +365,7 @@ loop_nag: do npi=1,nag
                      write(uerr,'(1x,a,3f15.10)') '        Coordinate: ',      &
                         pg(npi)%coord(:)
                      call diagnostic(arg1=10,arg2=9,arg3=nomsub)
-                  endif                  
+                  endif
                   npartint = (npi - 1) * NMAXPARTJ + nPartIntorno_fw(npi)
 ! Savings
                   PartIntorno_fw(npartint) = npj

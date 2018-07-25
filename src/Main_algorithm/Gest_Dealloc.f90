@@ -655,19 +655,19 @@ if (allocated(GCBFPointers)) then
 endif
 if(allocated(Q_sections%section)) then
    do i=1,Q_sections%n_sect
-   if(allocated(Q_sections%section(i)%flow_rate)) then
-      deallocate(Q_sections%section(i)%flow_rate,STAT=alloc_stat)
-      if (alloc_stat/=0) then
-         write(uerr,*) 'Deallocation of "Q_sections%section(',i,               &
-            ')%flow_rate" in the subroutine "Gest_Dealloc" failed; the ',      &
-            'execution stops here. '
-         stop
-         else
-            write(ulog,'(1x,a)') 'Deallocation of "Q_sections%section(',i,     &
-               ')%flow_rate" in the subroutine "Gest_Dealloc" is ',            &
-               'successfully completed.'
+      if(allocated(Q_sections%section(i)%flow_rate)) then
+         deallocate(Q_sections%section(i)%flow_rate,STAT=alloc_stat)
+         if (alloc_stat/=0) then
+            write(uerr,*) 'Deallocation of "Q_sections%section(',i,            &
+               ')%flow_rate" in the subroutine "Gest_Dealloc" failed; the ',   &
+               'execution stops here. '
+            stop
+            else
+               write(ulog,*) 'Deallocation of "Q_sections%section(',i,         &
+                  ')%flow_rate" in the subroutine "Gest_Dealloc" is ',         &
+                  'successfully completed.'
+         endif
       endif
-   endif
    enddo
    deallocate(Q_sections%section,STAT=alloc_stat)
    if (alloc_stat/=0) then
@@ -675,9 +675,8 @@ if(allocated(Q_sections%section)) then
          '"Gest_Dealloc" failed; the execution stops here. '
       stop       
       else
-         write(ulog,'(1x,a)') 'Deallocation of "Q_sections%section(',i,        &
-            ')%flow_rate" in the subroutine "Gest_Dealloc" is successfully ',  &
-            'completed.'
+         write(ulog,*) 'Deallocation of "Q_sections%section" in the ',         &
+            'subroutine "Gest_Dealloc" is successfully completed.'
    endif
 endif
 do i=1,substations%n_sub
