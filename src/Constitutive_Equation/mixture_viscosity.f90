@@ -19,10 +19,10 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: mixture_viscosity 
-! Description: To compute the frictional viscosity for the bed-load transport 
-!              layer, according to the formulation of Schaeffer (1987) and the 
-!              KTGF in the packing limit.       
+! Program unit: mixture_viscosity
+! Description: To compute the frictional viscosity and the mixture viscosity for
+!              dense granular flows (KTGF packing limit). 
+!              (Amicarelli et al., 2017, IJCFD)      
 !-------------------------------------------------------------------------------
 subroutine mixture_viscosity
 !------------------------
