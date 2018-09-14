@@ -149,7 +149,7 @@ do npi=1,n_body_part
 ! Only body particles at the body surface     
       if (bp_arr(npi)%area>0.d0) then  
 ! Computation of the ID of the surface body particles
-         aux2 = aux2+1
+         aux2 = aux2 + 1
 ! Fluid pressure forces
          f_pres(:) = bp_arr(npi)%pres * bp_arr(npi)%area * bp_arr(npi)%normal(:)
          body_arr(bp_arr(npi)%body)%Force(:) =                                 &

@@ -94,32 +94,36 @@ enddo
 call start_and_stop(3,17)
 ! Velocity and energy partial smoothing
 call start_and_stop(2,7)
-call velocity_smoothing
+if (Domain%TetaV>0.d0) then
+   call velocity_smoothing
 !$omp parallel do default(none)                                                &
 !$omp private(npi,ii,TetaV1)                                                   &
 !$omp shared(nag,Pg,Med,Domain,dt,indarrayFlu,Array_Flu,esplosione)
-do ii=1,indarrayFlu
-   npi = Array_Flu(ii)
-   if (esplosione) then
-      TetaV1 = Domain%TetaV * pg(npi)%Csound * dt / Domain%h
-      else
+   do ii=1,indarrayFlu
+      npi = Array_Flu(ii)
+      if (esplosione) then
+         TetaV1 = Domain%TetaV * pg(npi)%Csound * dt / Domain%h
+         else
 ! To update "TetaV", depending on dt.
-         TetaV1 = Domain%TetaV * Med(pg(npi)%imed)%Celerita * dt / Domain%h
-   endif
-   if (esplosione) pg(npi)%IntEn = pg(npi)%IntEn + TetaV1 * pg(npi)%Envar
-   if (pg(npi)%kodvel==0) then        
+            TetaV1 = Domain%TetaV * Med(pg(npi)%imed)%Celerita * dt / Domain%h
+      endif
+      if (esplosione) pg(npi)%IntEn = pg(npi)%IntEn + TetaV1 * pg(npi)%Envar
+      if (pg(npi)%kodvel==0) then        
 ! Particle is inside the domain and far from the boundaries.
 ! Velocity is partially smoothed.
-      pg(npi)%var(:) = pg(npi)%vel(:) + TetaV1 * pg(npi)%var(:)      
-      pg(npi)%vel(:) = pg(npi)%var(:)                                        
-      else  
+         pg(npi)%var(:) = pg(npi)%vel(:) + TetaV1 * pg(npi)%var(:)      
+         pg(npi)%vel(:) = pg(npi)%var(:)                                        
+         else
 ! The particle is close to a boundary of type: "source", "level" or 
 ! "normal velocity boundary" (kodvel = 1 or = 2). No partial smoothing for 
 ! velocity.
-         pg(npi)%var(:) = pg(npi)%vel(:) 
-   endif
-enddo
+            pg(npi)%var(:) = pg(npi)%vel(:) 
+      endif
+   enddo
 !$omp end parallel do
+   else
+      pg(npi)%var(:) = pg(npi)%vel(:)
+endif
 call start_and_stop(3,7)
 call start_and_stop(2,17)
 !$omp parallel do default(none)                                                &

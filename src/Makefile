@@ -1,5 +1,5 @@
 # Variables to be updated
-VERSION = 9_0_0
+VERSION = 9_0_0_AA
 # Suggested values for EXECUTION
 #    bin
 #    debug
@@ -12,11 +12,11 @@ COMPILATION_FLAGS = -O1
 # Suggested values for COMPILER
 #    gfortran
 #    ifort
-COMPILER = gfortran
+COMPILER = ifort
 # Suggested values for OMP_FLAG
 #    -fopenmp (gfortran omp)
 #    -qopenmp (ifort omp; formerly -openmp) 
-OMP_FLAG = -fopenmp
+OMP_FLAG = -qopenmp
 EXE_DIR = ../$(EXECUTION)/
 SOURCES = \
 ./Modules/Static_allocation_module.f90 \
