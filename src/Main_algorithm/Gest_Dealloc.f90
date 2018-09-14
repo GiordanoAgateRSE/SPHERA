@@ -627,8 +627,8 @@ if (allocated(BoundaryConvexEdge)) then
       check = .false.
       stop
       else
-      write(ulog,'(1x,a)')                                                     &
-         "   Array: BoundaryConvexEdge successfully deallocated "
+         write(ulog,'(1x,a)')                                                  &
+            "   Array: BoundaryConvexEdge successfully deallocated "
    endif
 endif
 if (allocated(GCBFVector)) then
