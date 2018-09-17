@@ -34,7 +34,7 @@ use I_O_file_module
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: npi,j,npartint,npj,k,npartint_bp,nbp
+integer(4) :: npi,j,npartint,npj,k
 double precision :: temp_dden,aux,dis,dis_min,x_min,x_max,y_min,y_max,z_min 
 double precision :: z_max,mod_normal,W_vol,sum_W_vol
 double precision :: dvar(3),aux_vec(3),aux_nor(3),aux_vec2(3)
@@ -54,11 +54,10 @@ double precision, external :: w
 ! Loop over the body particles 
 !$omp parallel do default(none)                                                &
 !$omp shared(n_body_part,bp_arr,nPartIntorno_bp_f,NMAXPARTJ,PartIntorno_bp_f)  &
-!$omp shared(KerDer_bp_f_cub_spl,rag_bp_f,pg,nPartIntorno_bp_bp)               &
-!$omp shared(PartIntorno_bp_bp,Domain,dx_dxbodies,ncord)                       &
+!$omp shared(KerDer_bp_f_cub_spl,rag_bp_f,pg,Domain,dx_dxbodies,ncord)         &
 !$omp private(npi,sum_W_vol,W_vol,j,npartint,npj,k,temp_dden,aux,dis,dis_min)  &
 !$omp private(x_min,x_max,y_min,y_max,z_min,z_max,mod_normal,dvar,aux_vec)     &
-!$omp private(aux_nor,aux_vec2,npartint_bp,nbp)
+!$omp private(aux_nor,aux_vec2)
 do npi=1,n_body_part
    bp_arr(npi)%vel_mir = 0.d0
    sum_W_vol = 0.d0
@@ -77,7 +76,7 @@ do npi=1,n_body_part
       z_max = max(bp_arr(npi)%pos(3),pg(npj)%coord(3))
       aux_nor = 0.d0
 ! Here the arrays nPartIntorno_bp_bp and PartIntorno_bp_bp cannot be used as 
-! they only refer to surface body particles 
+! they only refer to surface body particles
       do k=1,n_body_part
          if (bp_arr(k)%body==bp_arr(npi)%body) then
             aux=dot_product(rag_bp_f(:,npartint),bp_arr(k)%normal)
@@ -102,17 +101,17 @@ do npi=1,n_body_part
          endif
       enddo
 ! In case the normal is not yet defined, the normal vector is that of the body
-! particle (at the body surface), which is the closest to the fluid particle
+! particle (at the body surface), which is the closest to the fluid particle.
+! Here the arrays nPartIntorno_bp_bp and PartIntorno_bp_bp cannot be used as 
+! they only refer to surface body particles.
       mod_normal = dsqrt(dot_product(aux_nor,aux_nor))
       if (mod_normal==0.d0) then
          dis_min = 999999999.d0
-         do k=1,nPartIntorno_bp_bp(npi)
-            npartint_bp = (npi - 1) * NMAXPARTJ + k
-            nbp = PartIntorno_bp_bp(npartint_bp)
-            aux_vec(:) = bp_arr(nbp)%pos(:) - pg(npj)%coord(:) 
+         do k=1,n_body_part
+            aux_vec(:) = bp_arr(k)%pos(:) - pg(npj)%coord(:) 
             dis = dsqrt(dot_product(aux_vec,aux_vec))
             dis_min = min(dis_min,dis)
-            if (dis==dis_min) aux_nor(:) = bp_arr(nbp)%normal(:)
+            if (dis==dis_min) aux_nor(:) = bp_arr(k)%normal(:)
          enddo
       endif
 ! Relative velocity for the continuity equation     
