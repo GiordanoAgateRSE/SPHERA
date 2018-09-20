@@ -465,7 +465,7 @@ n_R_IO_elem_x n_R_IO_elem_y n_R_IO_elem_z teta_R_IO_elem
                                     ! cumulative with respect to the body 
                                     ! IC rotation. This rotation is relevant 
                                     ! only for IC and I/O purposes.
-face_xmin_flag face_xmax_flag face_ymin_flag face_ymax_flag face_zmin_flag face_zmax_flag
+face_zmin_flag face_zmax_flag face_ymin_flag face_ymax_flag face_xmin_flag face_xmax_flag
                                     ! (integer flags to activate the normal 
                                     ! vectors of surface body particles only 
                                     ! if face_..._flag=1; x/y/z_min/max 
