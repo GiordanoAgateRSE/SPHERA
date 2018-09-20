@@ -239,7 +239,8 @@ do contj=1,nPartIntorno(npi)
       pg(npi)%dEdT = pg(npi)%dEdT + half * (dervel(1) * (appopres(1) +         &
                      appodiss(1)) + dervel(2) * (appopres(2) + appodiss(2)) +  &
                      dervel(3) * (appopres(3) + appodiss(3)))
-enddo                     
+enddo
+pg(npi)%laminar_flag = 0
 if (pg(npi)%visc>0.d0) then
    absv_pres_grav_inner = dsqrt(dot_product(tpres,tpres)) + GI
    absv_Morris_inner = dsqrt(dot_product(rvw_sum,rvw_sum))
