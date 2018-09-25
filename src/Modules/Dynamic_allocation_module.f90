@@ -111,11 +111,11 @@ integer(4),               dimension(:),    allocatable :: PartIntorno_bp_f
 ! Kernel derivative neighbouring array (fluid neighbours), 
 ! KerDer_bp_f_cub_spl(n_body_particles*NMAXPARTJ), cubic spline;
 ! KerDer_bp_f_cub_spl = -|gradW_bp_f|/|r_bp_f|
-double precision,         dimension(:),    allocatable :: KerDer_bp_f_cub_spl 
+double precision,         dimension(:),    allocatable :: KerDer_bp_f_cub_spl
 ! Kernel derivative neighbouring array (fluid neighbours), 
 ! KerDer_bp_f_Gal(n_body_particles*NMAXPARTJ), Gallati's kernel;
 ! KerDer_bp_f_Gal = -|gradW_bp_f|/|r_bp_f|
-double precision,         dimension(:),    allocatable :: KerDer_bp_f_Gal 
+double precision,         dimension(:),    allocatable :: KerDer_bp_f_Gal
 ! relative distances from fluid particles: -r_bp_f; 
 ! rag_bp_f(3,NMAXPARTJ*n_body_particles)
 double precision,         dimension(:,:),  allocatable :: rag_bp_f  

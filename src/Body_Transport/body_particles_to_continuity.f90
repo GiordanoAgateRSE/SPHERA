@@ -55,6 +55,7 @@ double precision, external :: w
 !$omp parallel do default(none)                                                &
 !$omp shared(n_body_part,bp_arr,nPartIntorno_bp_f,NMAXPARTJ,PartIntorno_bp_f)  &
 !$omp shared(KerDer_bp_f_cub_spl,rag_bp_f,pg,Domain,dx_dxbodies,ncord)         &
+!$omp shared(FSI_free_slip_conditions)                                         &
 !$omp private(npi,sum_W_vol,W_vol,j,npartint,npj,k,temp_dden,aux,dis,dis_min)  &
 !$omp private(x_min,x_max,y_min,y_max,z_min,z_max,mod_normal,dvar,aux_vec)     &
 !$omp private(aux_nor,aux_vec2)
@@ -116,7 +117,13 @@ do npi=1,n_body_part
       endif
 ! Relative velocity for the continuity equation     
       aux_vec2(:) = bp_arr(npi)%vel(:) - pg(npj)%vel(:)
-      dvar(:) = aux_nor(:) * 2.d0 * dot_product(aux_vec2,aux_nor)
+      if (FSI_free_slip_conditions.eqv..true.) then
+! free-slip conditions
+         dvar(:) = aux_nor(:) * 2.d0 * dot_product(aux_vec2,aux_nor)
+         else
+! no-slip conditions
+            dvar(:) = 2.d0 * aux_vec2(:)
+      endif
       dis = dsqrt(dot_product(rag_bp_f(:,npartint),rag_bp_f(:,npartint)))
       W_vol = w(dis,Domain%h,Domain%coefke) * pg(npj)%mass / pg(npj)%dens
       bp_arr(npi)%vel_mir(:) = bp_arr(npi)%vel_mir(:) + (dvar(:) +             &

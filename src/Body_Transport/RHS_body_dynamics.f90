@@ -39,7 +39,7 @@ integer(4) :: npartint,i,j,npi,npj,Ncb,Nfzn,aux,nbi,npk,k,nbj,nbk
 integer(4) :: n_interactions,aux2,aux3,test,aux_locx_min,aux_locx_max,aux_int
 ! AA!!! test
 integer(4) :: aux_scal_test
-double precision :: c2,k_masses,r_per,r_par,temp_dden,temp_acc,alfa_boun
+double precision :: c2,k_masses,r_per,r_par,temp_dden,alfa_boun
 double precision :: aux_impact_vel,aux4,pres_mir,aux_scalar,aux_scalar_2
 double precision :: friction_limiter
 double precision :: f_pres(3),temp(3),r_par_vec(3),f_coll_bp_bp(3)          
@@ -110,17 +110,27 @@ interface_sliding_vel_max(:) = 0.d0
 !------------------------
 ! Updating pressure of the body particles
 call body_pressure_mirror
-! Contributions to fluid dynamics momentum (discretized semi-analytic approach: 
-! a mirror particle technique)
+! Contributions to fluid dynamics momentum equations (discretized semi-analytic 
+! approach: a mirror particle technique)
 do npi=1,n_body_part
    do j=1,nPartIntorno_bp_f(npi)
       npartint = (npi - 1) * NMAXPARTJ + j
       npj = PartIntorno_bp_f(npartint)
-      temp_acc = (pg(npj)%pres + bp_arr(npi)%pres) / (pg(npj)%dens *           &
-                 pg(npj)%dens)
+! contribution to the pressure gradient term
+      aux_scalar = (pg(npj)%pres + bp_arr(npi)%pres) / (pg(npj)%dens *         &
+                   pg(npj)%dens)
       pg(npj)%acc(:) = pg(npj)%acc(:) + ( - pg(npj)%mass / (dx_dxbodies **     &
-                       ncord) * temp_acc * ( - rag_bp_f(:,npartint)) *         &
-                       KerDer_bp_f_Gal(npartint))    
+                       ncord) * aux_scalar * ( - rag_bp_f(:,npartint)) *       &
+                       KerDer_bp_f_Gal(npartint))
+      if (FSI_free_slip_conditions.eqv..false.) then
+! body particle volume
+         aux_scalar = pg(npj)%mass / Med(pg(npj)%imed)%den0 / (dx_dxbodies **  &
+                      ncord)
+! contribution to the shear stress gradient term
+         pg(npj)%acc(:) = pg(npj)%acc(:) + 2.d0 * pg(npj)%visc *               &
+                          (bp_arr(npi)%vel(:) - pg(npj)%vel(:)) *              &
+                          KerDer_bp_f_cub_spl * aux_scalar
+      endif
    enddo
 enddo
 ! Loop over the transported bodies (gravity forces and Ic initialization)

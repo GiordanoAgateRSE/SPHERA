@@ -76,7 +76,6 @@ if (body_maximum_pressure_limiter.eqv..true.) then
    enddo
 endif
 ! Loop over body particles
-! Draft for omp parallelization with critical section 
 !$omp parallel do default(none)                                                &
 !$omp private(npi,Sum_W_vol,j,npartint,npj,aux_acc,pres_mir,dis,W_vol,aux)     &
 !$omp private(aux_scalar)                                                      &
@@ -121,7 +120,6 @@ do npi=1,n_body_part
       endif
    endif
 enddo
-! Draft for omp parallelization with critical section 
 !$omp end parallel do
 !------------------------
 ! Deallocations
