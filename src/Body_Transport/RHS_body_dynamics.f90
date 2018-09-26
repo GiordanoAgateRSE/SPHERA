@@ -127,7 +127,7 @@ do npi=1,n_body_part
          aux_scalar = pg(npj)%mass / Med(pg(npj)%imed)%den0 / (dx_dxbodies **  &
                       ncord)
 ! contribution to the shear stress gradient term
-         pg(npj)%acc(:) = pg(npj)%acc(:) + 2.d0 * pg(npj)%visc *               &
+         pg(npj)%acc(:) = pg(npj)%acc(:) - 2.d0 * pg(npj)%visc *               &
                           (bp_arr(npi)%vel(:) - pg(npj)%vel(:)) *              &
                           KerDer_bp_f_cub_spl * aux_scalar
       endif

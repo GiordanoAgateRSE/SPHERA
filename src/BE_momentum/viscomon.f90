@@ -54,7 +54,7 @@ double precision :: celtilde,rhotilde,amassj,vrij,TermMon
 vrij = - dervel(1) * rag(1,npartint) - dervel(2) * rag(2,npartint) - dervel(3) &
        * rag(3,npartint)
 ! AA504 removed part: Monaghan's term is always active even if particle are 
-! separating 
+! separating
 if (pg(npj)%vel_type/="std") then
    amassj   = pg(npi)%mass
    rhotilde = two * pg(npi)%dens

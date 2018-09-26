@@ -154,9 +154,9 @@ type TyParticle
    double precision :: dvdy 
    double precision :: visc ! Kinematic viscosity                          
    double precision :: mu ! Dynamic viscosity; equivalent mixture dynamic
-                          ! viscosity in case of bed-laod transport layer                             
+                          ! viscosity in case of bed-load transport layer                             
    double precision :: tstop ! Stop time                          
-   double precision :: mno                       
+   double precision :: mno        
    double precision :: ang                       
    double precision :: VolFra                         
    double precision :: rhoc                           
