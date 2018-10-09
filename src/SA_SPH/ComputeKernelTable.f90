@@ -20,14 +20,17 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: ComputeKernelTable                                   
-! Description: To pre-compute and store in kerneltab(0:ktrows,0:ktcols) the 
-!              following values:
-!                 kerneltab(0:ktrows, 0) = rob = rb/h
-!                 kerneltab(0:ktrows, 1) = Int W* ro2 dro       (from rob to 2)
-!                 kerneltab(0:ktrows, 2) = Int dW*/dro ro dro   (from rob to 2)
-!                 kerneltab(0:ktrows, 3) = Int dW*/dro ro^2 dro (from rob to 2)
-!                 kerneltab(0:ktrows, 4) = Int dW*/dro ro^3 dro (from rob to 2) 
-!              (Di Monaco et al., 2011, EACFM)                        
+! Description: To compute and save in kerneltab(0:ktrows,0:ktcols) the 
+!              following values (Di Monaco et al., 201, EACFM):
+!                 kerneltab(0:ktrows,0) = rob = r_0b/h = q_0b
+!                 kerneltab(0:ktrows,1) = Integral (W_norm * q**2 * dq) 
+!                                         (from q_0b to 2)
+!                 kerneltab(0:ktrows,2) = Integral (dW_norm/dq * q * dq) 
+!                                         (from q_0b to 2)
+!                 kerneltab(0:ktrows,3) = Integral (dW_norm/dq * q**2 * dq) 
+!                                         (from q_0b to 2)
+!                 kerneltab(0:ktrows,4) = Integral (dW/dq * q**3 * dq) 
+!                                         (from q_0b to 2)
 !-------------------------------------------------------------------------------
 subroutine ComputeKernelTable
 !------------------------

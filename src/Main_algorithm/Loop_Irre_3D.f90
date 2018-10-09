@@ -461,13 +461,13 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
             endif
 ! Partial smoothing for velocity: start 
             call start_and_stop(2,7)
-            if (Domain%TetaV>0.d0) then
-               call velocity_smoothing
+            if (Domain%TetaV>0.d0) call velocity_smoothing
 !$omp parallel do default(none) private(npi,ii,TetaV1)                         &
 !$omp shared(pg,Med,Domain,dt,indarrayFlu,Array_Flu,esplosione)
 ! Loop over all the active particles
-               do ii=1,indarrayFlu
-                  npi = Array_Flu(ii)
+            do ii=1,indarrayFlu
+               npi = Array_Flu(ii)
+               if (Domain%TetaV>0.d0) then
                   if (esplosione) then
                      TetaV1 = Domain%TetaV * pg(npi)%Csound * dt / Domain%h
                      else
@@ -485,12 +485,12 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
 ! The particle is close to a "source", "level" or "normal velocity boundary
 ! (kodvel = 1 or = 2): the final velocity is kept unmodified
                         pg(npi)%var(:) = pg(npi)%vel(:)                                         
-                  endif                                                             
-               enddo
+                  endif
+                  else
+                     pg(npi)%var(:) = pg(npi)%vel(:)
+               endif
+            enddo
 !$omp end parallel do
-               else
-                  pg(npi)%var(:) = pg(npi)%vel(:)
-            endif
             call start_and_stop(3,7)
 ! Partial smoothing for velocity: end
 ! Diffusion coefficient: start (input option not recommended)

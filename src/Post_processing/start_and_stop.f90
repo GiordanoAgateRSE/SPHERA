@@ -61,7 +61,7 @@ ishost = 0
 !------------------------
 ! Start detecting SPHERA executable file and the input file prefix.
 ! If this is not present, then the execution is stopped.
-select case(iset)
+select case (iset)
    case (0)
       tot_times = zero
       tot_call = 0

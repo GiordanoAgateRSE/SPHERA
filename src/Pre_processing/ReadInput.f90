@@ -96,7 +96,7 @@ SECTION_LOOP: do while (ioerr==0)
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"INPUT FILE SECTIONS",ninp,ulog))  &
       return
    if (ncord>0) write(ulog,"(//,1x,a,/)") lcase(ainp) 
-   select case(trim(lcase(trim(ainp))))
+   select case (trim(lcase(trim(ainp))))
       case("##### title #####")
          call ReadInputTitle(ainp,comment,nrighe,ier,ninp,ulog)
       case("##### restart #####")

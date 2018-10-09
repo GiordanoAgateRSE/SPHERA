@@ -94,13 +94,13 @@ enddo
 call start_and_stop(3,17)
 ! Velocity and energy partial smoothing
 call start_and_stop(2,7)
-if (Domain%TetaV>0.d0) then
-   call velocity_smoothing
+if (Domain%TetaV>0.d0) call velocity_smoothing
 !$omp parallel do default(none)                                                &
 !$omp private(npi,ii,TetaV1)                                                   &
 !$omp shared(nag,Pg,Med,Domain,dt,indarrayFlu,Array_Flu,esplosione)
-   do ii=1,indarrayFlu
-      npi = Array_Flu(ii)
+do ii=1,indarrayFlu
+   npi = Array_Flu(ii)
+   if (Domain%TetaV>0.d0) then
       if (esplosione) then
          TetaV1 = Domain%TetaV * pg(npi)%Csound * dt / Domain%h
          else
@@ -119,11 +119,11 @@ if (Domain%TetaV>0.d0) then
 ! velocity.
             pg(npi)%var(:) = pg(npi)%vel(:) 
       endif
-   enddo
+      else
+         pg(npi)%var(:) = pg(npi)%vel(:)
+   endif
+enddo
 !$omp end parallel do
-   else
-      pg(npi)%var(:) = pg(npi)%vel(:)
-endif
 call start_and_stop(3,7)
 call start_and_stop(2,17)
 !$omp parallel do default(none)                                                &

@@ -91,7 +91,7 @@ face_loop: do icbf = 1,Ncbf
             vb(SD) = BoundaryFace(iface)%velocity(SD)
             dvij(SD) = two * (vi(SD) - vb(SD))
             dvn = dvn + BoundaryFace(iface)%T(SD, 3) * dvij(SD)
-! Gravity local components 
+! Gravity local components
             Grav_Loc(SD) = zero                           
             do sdj=1,SPACEDIM
                Grav_Loc(SD) = Grav_Loc(SD) + BoundaryFace(iface)%T(sdj, SD) *  &
@@ -144,8 +144,8 @@ face_loop: do icbf = 1,Ncbf
          if (cinvisci>zero) then
             if ((pg(npi)%laminar_flag==1).or.                                  &
                 (Tratto(stretch)%laminar_no_slip_check.eqv..false.)) then
-               cinviscmult = two * cinvisci * IntdWrm1dV *                     &
-                             Tratto(stretch)%ShearCoeff
+! The factor 2 is already present in "dvij"
+               cinviscmult = cinvisci * IntdWrm1dV * Tratto(stretch)%ShearCoeff
                ViscoShear(:) = ViscoShear(:) + cinviscmult * dvij(:)
             endif
          endif
@@ -208,7 +208,7 @@ face_loop: do icbf = 1,Ncbf
                            nnlocal(:) 
                   endif
                endif
-               return                                                           
+               return                                                          
    endif
 enddo face_loop
 ! Adding boundary contributions to the momentum equation
@@ -219,7 +219,8 @@ enddo face_loop
 ! In case one needs to deactivate this term, it seems useless at this stage to 
 ! comment all the other lines involved as they are sparse and do not cause 
 ! relevant computational time.
-  tvisc(:) = tvisc(:) - ViscoShear(:)
+!AA!!! test (sighn changed according to the mathematical model)
+  tvisc(:) = tvisc(:) + ViscoShear(:)
 ! Contribution for specific internal energy
 if (esplosione) then
    pg(npi)%dEdT = - half * (tpres_save1 - ViscoMon_save1)

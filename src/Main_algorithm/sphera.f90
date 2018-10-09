@@ -246,7 +246,7 @@ write(ulog,1000)
 1x,'formerly CESI-Ricerca di Sistema; SPHERA has been authored for RSE SpA by:'/&
 1x,'Andrea Amicarelli, Antonio Di Monaco, Sauro Manenti, Elia Bon,          '/ &
 1x,'Daria Gatti, Giordano Agate, Stefano Falappi, Barbara Flamini,          '/ &
-1x,'Roberto Guandalini, David Zuccalà).                                     '/ &
+1x,'Roberto Guandalini, David Zuccalà, Qiao Cheng).                         '/ &
 1x,'Main numerical developments of SPHERA:                                  '/ &
 1x,'Amicarelli et al. (2017,IJCFD),                                         '/ &
 1x,'Amicarelli et al. (2015,CAF), Amicarelli et al. (2013,IJNME),           '/ &

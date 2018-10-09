@@ -87,7 +87,7 @@ enddo do_vertices_face1
 ! The only/first vertex (in 3D/2D) of the 1st face, not contributing to 
 ! test_face1, is finally found
 if (ncord==3) then
-   select case(test_face1)
+   select case (test_face1)
       case(5)
          ID_face1_iso = 1
       case(4)
@@ -98,7 +98,7 @@ if (ncord==3) then
          ID_face1_iso = 0
    endselect
    else
-      select case(test_face1)
+      select case (test_face1)
          case(13,20,25)
             ID_face1_iso = 1
          case(10,17)
@@ -112,7 +112,7 @@ endif
 ! The only/first vertex (in 3D/2D) of the 2nd face, not contributing to   
 ! test_face2, is finally found
 if (ncord==3) then
-   select case(test_face2)
+   select case (test_face2)
       case(5)
          ID_face2_iso = 1
       case(4)
@@ -123,7 +123,7 @@ if (ncord==3) then
          ID_face2_iso = 0
    endselect  
    else
-      select case(test_face2)
+      select case (test_face2)
          case(13,20,25)
             ID_face2_iso = 1
          case(10,17)

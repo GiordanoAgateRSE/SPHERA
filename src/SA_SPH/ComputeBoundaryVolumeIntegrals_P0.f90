@@ -20,7 +20,7 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: ComputeBoundaryVolumeIntegrals_P0                                   
-! Description: (Di Monaco et al., 2011, EACFM)                        
+! Description: (Di Monaco et al., 2011, EACFM)                   
 !-------------------------------------------------------------------------------
 subroutine ComputeBoundaryVolumeIntegrals_P0(icbf,Clobface,LocX,IntWdV,        &
    IntdWrm1dV,IntGWZrm1dV,IntGWdV,IntGWrRdV)
@@ -80,7 +80,7 @@ zpmin = eps * Domain%h
 LocPi(:) = LocX(:, icbf)                     
 if (LocPi(3)<zero) return
 if (LocPi(3)<zpmin) LocPi(3) = zpmin
-robpre = 2.1
+robpre = 2.1d0
 do ipk=1,BITrows
 ! Local components of the vector "PiPj"
    LocPiPj(:) = BoundIntegralTab(ipk,1:3)      
@@ -106,10 +106,10 @@ do ipk=1,BITrows
          enddo
          PiPxdist = dsqrt(PiPxdist)
 ! Normalised distance and related functions 
-         delta_alpha = BoundIntegralTab(ipk, 4)
+         delta_alpha = BoundIntegralTab(ipk,4)
          rob = PiPxdist / Domain%h
-         if (Abs(rob - robpre)>0.001) then
-            ivalue = zero
+         if (dabs(rob-robpre)>0.001d0) then
+            ivalue(:) = zero
             call InterpolateTable(rob,nicols,icol,ivalue)
             JW3ro2dA  = ivalue(1) * delta_alpha
             JdW3ro1dA = ivalue(2) * delta_alpha
@@ -117,7 +117,7 @@ do ipk=1,BITrows
             JdW3ro3dA = ivalue(4) * delta_alpha
             robpre = rob
          endif
-         RLoccos(:) = BoundIntegralTab(ipk, 5:7)
+         RLoccos(:) = BoundIntegralTab(ipk,5:7)
          RZ = RLoccos(3)
          RZ2 = RZ * RZ
 ! Boundary volume integrals  
@@ -128,7 +128,7 @@ do ipk=1,BITrows
             IntGWdV(SD) = IntGWdV(SD) + RLoccos(SD) * JdW3ro2dA
             do sdj=SD,SPACEDIM
                IntGWrRdV(SD,sdj) = IntGWrRdV(SD,sdj) + RLoccos(SD) *           &
-                  RLoccos(sdj) * JdW3ro3dA
+                                   RLoccos(sdj) * JdW3ro3dA
             enddo
          enddo
       endif
@@ -143,7 +143,7 @@ if (LocPi(3)==zpmin) then
    PXLoc(3) = zero
    call LocalNormalCoordinates (PXLoc, csi, iface)
    fkod = BoundaryFace(iface)%nodes - 2
-   if (IsPointInternal(fkod, csi)) then    
+   if (IsPointInternal(fkod,csi)) then    
 ! The particle projection belongs to the face
       IntWdV = half
       else                                    

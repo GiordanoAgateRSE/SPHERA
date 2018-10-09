@@ -131,7 +131,7 @@ do while (TRIM(lcase(ainp))/="##### end boundaries #####")
    dam_zone_n_vertices = 0
    plan_reservoir_pos = 0.d0 
    dam_zone_vertices = 0.d0
-   select case(tipo)
+   select case (tipo)
 ! Boundary condition "leve", "crit" or "open"
       case("leve","crit","open")    
          NumberEntities(3) = NumberEntities(3) + 1
@@ -453,7 +453,7 @@ BoundaryVertex(Tratto(index)%inivertex:Tratto(index)%inivertex+Tratto(index)%num
                write(ulog,"(1x,a,z6)") "Color           : ",Tratto(index)%colorCode
             endif
          endif
-         select case(tipo)
+         select case (tipo)
             case("fixe")
                if (ncord==3) then
                   Tratto(index)%ColorCode = icolor

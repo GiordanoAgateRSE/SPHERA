@@ -256,7 +256,7 @@ if (.not.allocated(substations%sub(1)%DEMvert)) then
                         '"electrical_substations"). The execution terminates ',&
                         'here. '
                      stop
-               end select
+               endselect
                if (test==1) then
                   substations%sub(i_sub)%n_DEM_vertices =                      &
                      substations%sub(i_sub)%n_DEM_vertices + 1
@@ -312,7 +312,7 @@ allocate(substations%sub(i_sub)%DEMvert(substations%sub(i_sub)%n_DEM_vertices) &
                      'electrical substations (subroutine ',                    &
                      '"electrical_substations"). The execution terminates here.'
                   stop
-      end select
+      endselect
 ! Substation area: end.
 ! Substation value
       select case (substations%sub(i_sub)%type_ID)
@@ -327,7 +327,7 @@ allocate(substations%sub(i_sub)%DEMvert(substations%sub(i_sub)%n_DEM_vertices) &
                'substations (subroutine "electrical_substations"). The ',      &
                'execution terminates here. '
                stop
-      end select
+      endselect
    enddo
 !$omp end parallel do
    else

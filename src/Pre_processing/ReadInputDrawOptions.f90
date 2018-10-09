@@ -55,10 +55,10 @@ logical,external :: ReadCheck
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DRAW OPTIONS DATA",ninp,ulog)) return
 do while (TRIM(lcase(ainp))/="##### end draw options #####")
-   select case(lcase(GetToken(ainp,1,ioerr)))
+   select case (lcase(GetToken(ainp,1,ioerr)))
       case("vtkconverter")
          token = lcase(GetToken(ainp,(2),ioerr))
-         select case(token)
+         select case (token)
             case("any")
                token = lcase(GetToken(ainp,(3),ioerr))
                read (token,*,iostat=ioerr) freq_time

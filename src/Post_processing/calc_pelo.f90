@@ -35,8 +35,7 @@ use Dynamic_allocation_module
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: i,j,ncel,npartcel,mm,jj  
-integer(4),dimension(1) :: minpos1,minpos2
+integer(4) :: i,j,ncel,npartcel,mm,jj,minpos1,minpos2
 double precision,dimension(3) :: ragtemp
 integer(4),dimension(:),allocatable :: PartCelnum
 double precision,dimension(:),allocatable :: PartCel
@@ -60,7 +59,9 @@ do i=1,nlines
 ! Loop over the line points
    do j=control_lines(i)%Icont(1)+1,control_lines(i)%Icont(2)
       ncel = control_points(j)%cella
+! Particle out of the numerical domain
       if (ncel==0) cycle
+! No particle in the cell
       if (Icont(ncel+1)<=Icont(ncel)) cycle
 ! Search for the two particles, which are the closest to the monitoring point 
 ! and in the same background cell: computation of their averaged position.
@@ -79,8 +80,8 @@ do i=1,nlines
       minpos1 = minloc(PartCel,1)
       PartCel(minpos1) = 9999.d0
       minpos2 = minloc(PartCel,1)
-      pelolib(1:3,i) = (pg(PartCelnum(minpos1(1)))%coord(1:3) +                &
-                       pg(PartCelnum(minpos2(1)))%coord(1:3)) * half +         &
+      pelolib(1:3,i) = (pg(PartCelnum(minpos1))%coord(1:3) +                   &
+                       pg(PartCelnum(minpos2))%coord(1:3)) * half +            &
                        Domain%dx / 2.d0
    enddo
 enddo

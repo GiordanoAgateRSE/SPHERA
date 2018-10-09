@@ -54,7 +54,7 @@ double precision,dimension(1:nicols) :: ivalue
 !------------------------
 deltaX = ktdelta
 xval0 = kerneltab(0,0)
-nr0 = Int((xval - xval0) / deltaX)
+nr0 = int((xval - xval0) / deltaX)
 !------------------------
 ! Statements
 !------------------------
@@ -74,7 +74,7 @@ if (nr0<=0) then
          do ic=1,nicols
             nc = icol(ic)
             ivalue(ic) = kerneltab(nr0,nc) + csi * (kerneltab(nr1,nc) -        &
-               kerneltab(nr0,nc))
+                         kerneltab(nr0,nc))
          enddo
 endif
 !------------------------
