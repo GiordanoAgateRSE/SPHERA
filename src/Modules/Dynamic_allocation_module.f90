@@ -39,15 +39,15 @@ type (TyCtlPoint),         dimension(:),   allocatable :: Section_Points
 type (TyParticle),         dimension(:),   allocatable :: Pg
 type (Tytime_stage),       dimension(:),   allocatable :: ts0_pg
 type(TyBoundaryConvexEdge),dimension(:),   allocatable :: BoundaryConvexEdge
-! Icont(grid%nmax+1) contains the number of the first particle in each cell and
-! the total number of particles.
-! The particle are here ordered according to the cell order. The element values
-! of this array monotonically increase. 
+! Icont(grid%nmax+1) contains the ID of the first particle in the cell. Here 
+! particles are ordered according to the ID of the associated cells. The total 
+! number of particles is the value of the last element of the array. The 
+! element values of this array monotonically increase. 
 ! NPartOrd(PARTICLEBUFFER) contains the particle IDs. The elements are ordered 
 ! as for Icont.
-integer(4),                dimension(:),   allocatable :: Icont,NPartOrd,GCBFVector
+integer(4),dimension(:),allocatable :: Icont,NPartOrd,GCBFVector
 ! Array of the wall elements (DB-SPH)
-type (TyParticle_w),       dimension(:),   allocatable :: Pg_w
+type (TyParticle_w),       dimension(:),   allocatable :: pg_w
 ! Arrays for ordering wall elements, according to the underliying mesh
 integer(4),                dimension(:),   allocatable :: Icont_w,NPartOrd_w
 ! Array of the transported rigid solid bodies
@@ -161,12 +161,16 @@ integer(4),               dimension(:),    allocatable :: Array_Flu
 !    the top of the fully saturated zone (under the hypothesis of stratified 
 !    flows).
 integer(4),               dimension(:,:,:),allocatable :: ind_interfaces
-! Only in 3D: the 2D array of the maximum values of the fluid particle height
-! (at the nodes of the positioning grid columns) 
-real(kind=kind(1.d0)),    dimension(:),    allocatable :: Z_fluid_max
+! Only in 3D: the 2D array of the maximum values of the fluid particle heights
+! (at the nodes of the positioning grid columns). The first element (second 
+! dimension) is the raw height, the second element (second dimension) is the 
+! filtered height.
+real(kind=kind(1.d0)),    dimension(:,:),    allocatable :: Z_fluid_max
 ! Only in 3D: the 2D array of the time step values of the fluid particle height
-! (at the nodes of the positioning grid columns) 
-real(kind=kind(1.d0)),    dimension(:),    allocatable :: Z_fluid_step
+! (at the nodes of the positioning grid columns). The first element (second 
+! dimension) is the raw height, the second element (second dimension) is the 
+! filtered height.
+real(kind=kind(1.d0)),    dimension(:,:),    allocatable :: Z_fluid_step
 ! Only in 3D: the 2D array of the maximum values of the specific flow rate (at 
 ! the nodes of the topographic grid columns)
 real(kind=kind(1.d0)),    dimension(:),    allocatable :: q_max

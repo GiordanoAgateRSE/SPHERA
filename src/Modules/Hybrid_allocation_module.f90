@@ -624,12 +624,18 @@ type type_substation
 ! Number of DEM vertices within the substation surface
    integer(4) :: n_DEM_vertices
    double precision :: area
-! Sum (over time) of the filtered values of POS (useful to estimate EOS)
-   double precision :: POS_fsum
-! Maximum substation fluid/mixture depth
-   double precision :: Ymax
-! Expected Outage Time
-   double precision :: EOT
+! Sum (over time) of the filtered values of POS (useful to estimate EOS); two 
+! values are available depending on the assessment method: one assumes that 
+! Ysub alternatively depends on two estimations of the water depth. The first 
+! is a raw estimation; the latter filters the atomization and the wave breaking 
+! effects.
+   double precision :: POS_fsum(2)
+! Maximum substation fluid/mixture depth; two values are available depending on 
+! the assessment method. 
+   double precision :: Ymax(2)
+! Expected Outage Time; two values are available depending on the assessment 
+! method.
+   double precision :: EOT(2)
 ! Substation value (euros)
    double precision :: Val
 ! List of DEM vertices associated with the substation

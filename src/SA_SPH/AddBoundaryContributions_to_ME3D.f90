@@ -219,7 +219,7 @@ enddo face_loop
 ! In case one needs to deactivate this term, it seems useless at this stage to 
 ! comment all the other lines involved as they are sparse and do not cause 
 ! relevant computational time.
-!AA!!! test (sighn changed according to the mathematical model)
+! For the sign of "ViscoShear" refer to the mathematical model
   tvisc(:) = tvisc(:) + ViscoShear(:)
 ! Contribution for specific internal energy
 if (esplosione) then

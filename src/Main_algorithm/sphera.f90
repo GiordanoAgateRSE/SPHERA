@@ -228,6 +228,7 @@ do n=1,narg
       nomefile(3) = trim(nomecaso)//".rst"
       nomefile(4) = trim(nomecaso)//".plb"
       nomefile(5) = trim(nomecaso)//".fro"
+      nomefile(6) = trim(nomecaso)//".zlft"
       nomefilekill = trim(nomecaso)//".kll"
       nomefileerr = trim(nomecaso)//".err"
       else
@@ -262,12 +263,13 @@ write(ulog,1000)
 call start_and_stop(0,0)
 write(ulog,*)
 write(ulog,*) " >> The following files have been assigned and checked:"
-write(ulog,*) "    Input  file      : ",trim(nomefile(0))
-write(ulog,*) "    Output file      : ",trim(nomefile(1))
-write(ulog,*) "    Result file      : ",trim(nomefile(2))
-write(ulog,*) "    Restart file     : ",trim(nomefile(3))
-write(ulog,*) "    Free surface file: ",trim(nomefile(4))
-write(ulog,*) "    Front file       : ",trim(nomefile(5))
+write(ulog,*) "    Input  file                       : ",trim(nomefile(0))
+write(ulog,*) "    Output file                       : ",trim(nomefile(1))
+write(ulog,*) "    Result file                       : ",trim(nomefile(2))
+write(ulog,*) "    Restart file                      : ",trim(nomefile(3))
+write(ulog,*) "    Free surface file                 : ",trim(nomefile(4))
+write(ulog,*) "    Front file                        : ",trim(nomefile(5))
+write(ulog,*) "    Lower fluid top height file       : ",trim(nomefile(6))
 write(ulog,*)
 ! Input 
 call start_and_stop(2,2)
@@ -311,6 +313,7 @@ write(ulog,*)
 if (ulog>0) close(ulog)
 if (nres>0) close(nres)
 if (nplb>0) close(nplb)
+if (uzlft>0) close(uzlft)
 if (nfro>0) close(nfro)
 if (ncpt>0) close(ncpt)
 stop

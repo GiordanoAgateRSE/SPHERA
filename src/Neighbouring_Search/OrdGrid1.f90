@@ -47,8 +47,8 @@ integer(4),external :: ParticleCellNumber
 !------------------------
 ! Initializations
 !------------------------
-numpartincelgiaaposto = 0
-Icont = 0
+numpartincelgiaaposto(:) = 0
+Icont(:) = 0
 !------------------------
 ! Statements
 !------------------------
@@ -96,15 +96,15 @@ enddo
 do npi=1,nag
     ncel = pg(npi)%cella
     if (ncel==0) cycle
-    NPartOrd (Icont(ncel) + numpartincelgiaaposto(ncel)) = npi
+    NPartOrd(Icont(ncel)+numpartincelgiaaposto(ncel)) = npi
     numpartincelgiaaposto(ncel) = numpartincelgiaaposto(ncel) + 1
 enddo
 ! Fluid particles: end.
 ! Semi-particles/wall elements (DB-SPH): start
 if ((DBSPH%n_w>0).and.((on_going_time_step == it_start).or.                    &
    (Domain%body_part_reorder==1))) then
-   Icont_w = 0
-   numpartincelgiaaposto = 0
+   Icont_w(:) = 0
+   numpartincelgiaaposto(:) = 0
 ! 1st loop: to find the particle cell and to count the number of particles
 ! in every cell 
    npi = 0
@@ -135,8 +135,8 @@ endif
 ! Semi-particles/wall elements (DB-SPH): end
 ! Body particles (Body Transport): start
 if (n_bodies>0) then
-   Icont_bp = 0
-   numpartincelgiaaposto = 0
+   Icont_bp(:) = 0
+   numpartincelgiaaposto(:) = 0
 ! 1st loop: to find the particle cell and to count the number of particles
 ! in every cell
    npi = 0

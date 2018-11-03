@@ -35,7 +35,7 @@ use Dynamic_allocation_module
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: npi,i_sect,test_intersection_point,test_inout,j
+integer(4) :: npi,i_sect,test_intersection_point,test_inout,j,alloc_stat
 character(255) :: nomefile_Q_sections
 double precision :: sign_dis_part_sect_old,sign_dis_part_sect
 double precision :: P_intersection(3),aux_vec_1(3),aux_vec_2(3)
@@ -65,7 +65,14 @@ end interface
 !------------------------
 ! Allocations
 !------------------------
-allocate(n_particles(Q_sections%n_sect))
+if (.not.allocated(n_particles)) then
+   allocate(n_particles(Q_sections%n_sect),STAT=alloc_stat)
+   if (alloc_stat/=0) then
+      write(ulog,*) 'Subroutine "sub_Q_sections". Allocation of the array ',   &
+         '"n_particles" failed; the simulation stops here.'
+      stop
+   endif
+endif
 !------------------------
 ! Initializations
 !------------------------
@@ -224,7 +231,14 @@ close(ncpt)
 !------------------------
 ! Deallocations
 !------------------------
-deallocate(n_particles)
+if (allocated(n_particles)) then
+   deallocate(n_particles,STAT=alloc_stat)
+   if (alloc_stat/=0) then
+      write(ulog,*) 'Subroutine "sub_Q_sections". Deallocation of the array ', &
+         '"n_particles" failed; the simulation stops here.'
+      stop
+   endif
+endif
 return
 end subroutine sub_Q_sections
 

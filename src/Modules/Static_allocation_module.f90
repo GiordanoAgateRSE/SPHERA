@@ -49,18 +49,18 @@ double precision,public,parameter :: KERNELCONST2D = 0.454728408833987d0
 double precision,public,parameter :: KERNELCONST3D = 1.0d0 / PIGRECO 
 double precision,public,parameter :: FI_INTERVAL = PIGRECO/2.0d0  
 double precision,public,parameter :: TETA_INTERVAL = PIGRECO + PIGRECO 
-double precision,public,parameter :: zero = 0.0d0  
-double precision,public,parameter :: one = 1.0d0  
-double precision,public,parameter :: two = 2.0d0  
-double precision,public,parameter :: four = 4.0d0 
+double precision,public,parameter :: zero = 0.d0  
+double precision,public,parameter :: one = 1.d0  
+double precision,public,parameter :: two = 2.d0  
+double precision,public,parameter :: four = 4.d0 
 double precision,public,parameter :: half = 0.5d0 
 double precision,public,parameter :: quarter = 0.25d0 
-double precision,public,parameter :: xyz_tolerance= 1.0d-4 ! tolerance for 
+double precision,public,parameter :: xyz_tolerance= 1.d-4 ! tolerance for 
                                                            !coordinate checking
-double precision,public,parameter :: const_m_9999 = -9999.0d0 
+double precision,public,parameter :: const_m_9999 = -9999.d0 
 double precision,public,parameter :: sqrttwo = 1.4142135623731d0 ! dsqrt(2.d0)
-double precision,public,parameter :: arrotondamento = 1.0d-5 ! tolerance
-double precision,public,parameter :: azzeramento = 1.0d8 ! tolerance
+double precision,public,parameter :: arrotondamento = 1.d-5 ! tolerance
+double precision,public,parameter :: azzeramento = 1.d8 ! tolerance
 double precision,public,parameter :: GI = 9.80665 ! gravitational constant
 double precision,public,parameter :: vKconst = 0.41 ! von Karman constant
 ! Global constants: end

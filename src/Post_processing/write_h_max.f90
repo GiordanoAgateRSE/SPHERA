@@ -20,10 +20,12 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: write_h_max                  
-! Description: To compute and write the 2D array of the maximum values of the
+! Description: To compute and write the 2D fields of the maximum values of the
 !              water depth, at the nodes of the Cartesian topography, provided
-!              as input data (only in 3D). Same task for the 2D field of the
-!              maximum (over time) specific flow rates.              
+!              as input data (only in 3D; two variants -hu, hf- based either on 
+!              the unfiltered -Zu- or filtered -Zf- free surface height). Same  
+!              task for the 2D field of the maximum (over time) specific flow 
+!              rates.              
 !-------------------------------------------------------------------------------
 subroutine write_h_max
 !------------------------
@@ -39,7 +41,7 @@ use I_O_file_module
 implicit none
 integer(4) :: i_zone,i_vertex,GridColumn,alloc_stat,dealloc_stat,aux_integer
 double precision :: pos(3)
-double precision,dimension(:),allocatable :: h_max 
+double precision,dimension(:,:),allocatable :: h_max 
 character(255) :: nomefile_h_max
 integer(4),external :: ParticleCellNumber
 !------------------------
@@ -54,12 +56,13 @@ integer(4),external :: ParticleCellNumber
 !------------------------
 ! Statements
 !------------------------
-! h_max .txt file: creation and heading 
+! h_max .txt files: creation and headings 
 write(nomefile_h_max,"(a,a)") nomecaso(1:len_trim(nomecaso)),"_h_max_q_max.txt"
 open(ncpt,file=nomefile_h_max,status="unknown",form="formatted")
 write(ncpt,*) "Maximum water depth (m) and specific flow rate (m^2/s)"
-write(ncpt,'(6(a))') "           x(m)","           y(m)","       h_max(m)",    &
-   " Z_fluid_max(m)","     z_topog(m)","   q_max(m^2/s)"
+write(ncpt,'(8(a))') "           x(m)","           y(m)","      hu_max(m)",    &
+   "      hf_max(m)","Zu_fluid_max(m)","Zf_fluid_max(m)","     z_topog(m)",    &
+   "   q_max(m^2/s)"
 flush(ncpt) 
 do i_zone=1,NPartZone
    if (Partz(i_zone)%IC_source_type==2) then
@@ -67,7 +70,7 @@ do i_zone=1,NPartZone
       if (.not.allocated(h_max)) then
          aux_integer = Partz(i_zone)%ID_last_vertex -                          &
                        Partz(i_zone)%ID_first_vertex + 1
-         allocate(h_max(aux_integer),STAT=alloc_stat)
+         allocate(h_max(aux_integer,2),STAT=alloc_stat)
          if (alloc_stat/=0) then
             write(ulog,*) 'Subroutine "write_h_max". ',                        &
                'Allocation of the array "h_max" failed; the simulation ',      &
@@ -76,7 +79,7 @@ do i_zone=1,NPartZone
          endif
       endif
 ! Initializing h_max
-      h_max = 0.d0
+      h_max(:,:) = 0.d0
 !$omp parallel do default(none)                                                &
 !$omp shared(Partz,Vertice,Grid,h_max,Z_fluid_max,ncpt,i_zone,q_max)           &
 !$omp private(i_vertex,GridColumn,pos)
@@ -85,16 +88,19 @@ do i_zone=1,NPartZone
          pos(2) = Vertice(2,i_vertex)
          pos(3) = Grid%extr(3,1) + 0.0000001d0
          GridColumn = ParticleCellNumber(pos)
-         h_max(i_vertex-Partz(i_zone)%ID_first_vertex+1) =                     &
-            max((Z_fluid_max(GridColumn) - Vertice(3,i_vertex)),0.d0)
+         h_max(i_vertex-Partz(i_zone)%ID_first_vertex+1,1) =                   &
+            max((Z_fluid_max(GridColumn,1) - Vertice(3,i_vertex)),0.d0)
+         h_max(i_vertex-Partz(i_zone)%ID_first_vertex+1,2) =                   &
+            max((Z_fluid_max(GridColumn,2) - Vertice(3,i_vertex)),0.d0)
 !$omp critical (omp_write_h_max)
-         write(ncpt,'(6(f14.4,1x))')Vertice(1,i_vertex),Vertice(2,i_vertex),   &
-            h_max(i_vertex-Partz(i_zone)%ID_first_vertex+1),                   &
-            Z_fluid_max(GridColumn),Vertice(3,i_vertex),                       &
-            q_max(i_vertex-Partz(i_zone)%ID_first_vertex+1)        
+         write(ncpt,'(8(f14.4,1x))')Vertice(1,i_vertex),Vertice(2,i_vertex),   &
+            h_max(i_vertex-Partz(i_zone)%ID_first_vertex+1,1),                 &
+            h_max(i_vertex-Partz(i_zone)%ID_first_vertex+1,2),                 &
+            Z_fluid_max(GridColumn,1),Z_fluid_max(GridColumn,2),               &
+            Vertice(3,i_vertex),q_max(i_vertex-Partz(i_zone)%ID_first_vertex+1)        
 !$omp end critical (omp_write_h_max)
       enddo
-!$omp end parallel do    
+!$omp end parallel do
       exit
    endif
 enddo

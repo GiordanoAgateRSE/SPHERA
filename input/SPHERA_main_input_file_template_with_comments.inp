@@ -126,7 +126,8 @@ fluid_ID                    !
 colour_pattern colour_ID    ! colour_pattern=uniform,bends; colour_ID=009EA8
 ! if (motion_type=std): start
 motion_type IC_velocity_x IC_velocity_y IC_velocity_z slip_condition
-                            ! motion_type=std; slip_condition=0.0
+                            ! motion_type=std (for computational particles); 
+                            ! slip_condition=0.0 (for computational particles)
 ! if (motion_type=std): end
 ! if (motion_type=law): start
 motion_type n_records       ! motion_type=law; n_records(number of records for 
@@ -599,7 +600,7 @@ control time dt_out_mon             ! dt_out_mon(writing time step for
 level time dt_out_FS medium fluid_ID
                                     ! dt_out_FS(writing time step for free 
                                     ! surface post-processing); fluid_ID 
-! if (IC_reservoir_type==2): start        
+! if (IC_reservoir_type==2): start
 depth dt_out dt_out_depth           ! dt_out_depth(writing time step for 2D 
                                     ! fields of water depth (h) and specific 
                                     ! flow rate components (q_x=u_m*h,q_y=v_m*h))

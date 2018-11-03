@@ -27,7 +27,10 @@
 !              Substation Beyond Outage (Dsub, time series update of its 
 !              expected scalar value), Substation Vulnerability (Vul). 
 !              Output depends on Ysub (spatial average of the fluid/mixture 
-!              depth at the DEM grid points, within the substation polygon).         
+!              depth at the DEM grid points, within the substation polygon). 
+!              Ysub alternatively depends on two estimations of the water 
+!              depth: the first (i_fil==1) is a raw estimation; the latter 
+!              (i_fil==2) filters the atomization and the wave breaking effects.
 !-------------------------------------------------------------------------------
 subroutine electrical_substations
 !------------------------
@@ -42,20 +45,20 @@ use Dynamic_allocation_module
 !------------------------
 implicit none
 integer(4) :: test,i_zone,i_vertex,i_sub,i_aux,GridColumn,aux_integer,DEM_points
-integer(4) :: alloc_stat
-double precision :: Y_step
+integer(4) :: alloc_stat,i_fil
+double precision :: Y_step,Y_filt_step
 character(255) :: nomefile_substations
 double precision :: aux_vec(3)
 ! Expected Outage Status
-logical,dimension(:),allocatable :: EOS
+logical,dimension(:,:),allocatable :: EOS
 ! Probability of an outage start
-double precision,dimension(:),allocatable :: POSsub
+double precision,dimension(:,:),allocatable :: POSsub
 ! Substation fluid/mixture depth
-double precision,dimension(:),allocatable :: Ysub
+double precision,dimension(:,:),allocatable :: Ysub
 ! Damage to the substation
-double precision,dimension(:),allocatable :: Dsub
+double precision,dimension(:,:),allocatable :: Dsub
 ! Substation vulnerability
-double precision,dimension(:),allocatable :: Vul
+double precision,dimension(:,:),allocatable :: Vul
 double precision :: pos(6,3)
 integer(4),dimension(:,:),allocatable :: aux_array
 integer(4),external :: ParticleCellNumber
@@ -127,7 +130,7 @@ end interface
 ! Allocations
 !------------------------
 if (.not.allocated(EOS)) then
-   allocate(EOS(substations%n_sub),STAT=alloc_stat)
+   allocate(EOS(substations%n_sub,2),STAT=alloc_stat)
    if (alloc_stat/=0) then
       write(uerr,*) 'Allocation of "EOS" failed in the subroutine ',           &
          '"electrical_substations". The execution terminates here.'
@@ -135,7 +138,7 @@ if (.not.allocated(EOS)) then
    endif
 endif
 if (.not.allocated(POSsub)) then
-   allocate(POSsub(substations%n_sub),STAT=alloc_stat)
+   allocate(POSsub(substations%n_sub,2),STAT=alloc_stat)
    if (alloc_stat/=0) then
       write(uerr,*) 'Allocation of "POSsub" failed in the subroutine ',        &
          '"electrical_substations". The execution terminates here.'
@@ -143,7 +146,7 @@ if (.not.allocated(POSsub)) then
    endif
 endif
 if (.not.allocated(Ysub)) then
-   allocate(Ysub(substations%n_sub),STAT=alloc_stat)
+   allocate(Ysub(substations%n_sub,2),STAT=alloc_stat)
    if (alloc_stat/=0) then
       write(uerr,*) 'Allocation of "Ysub" failed in the subroutine ',          &
          '"electrical_substations". The execution terminates here.'
@@ -151,7 +154,7 @@ if (.not.allocated(Ysub)) then
    endif
 endif
 if (.not.allocated(Dsub)) then
-   allocate(Dsub(substations%n_sub),STAT=alloc_stat)
+   allocate(Dsub(substations%n_sub,2),STAT=alloc_stat)
    if (alloc_stat/=0) then
       write(uerr,*) 'Allocation of "Dsub" failed in the subroutine ',          &
          '"electrical_substations". The execution terminates here.'
@@ -159,7 +162,7 @@ if (.not.allocated(Dsub)) then
    endif
 endif
 if (.not.allocated(Vul)) then
-   allocate(Vul(substations%n_sub),STAT=alloc_stat)
+   allocate(Vul(substations%n_sub,2),STAT=alloc_stat)
    if (alloc_stat/=0) then
       write(uerr,*) 'Allocation of "Vul" failed in the subroutine ',           &
          '"electrical_substations". The execution terminates here.'
@@ -171,11 +174,11 @@ endif
 !------------------------
 write(nomefile_substations,"(a,a,i8.8,a)") nomecaso(1:len_trim(nomecaso)),     &
    '_substations_',on_going_time_step,".txt"
-EOS(:) = .false.
-POSsub(:) = 0.d0
-Ysub(:) = 0.d0
-Dsub(:) = 0.d0
-Vul(:) = 0.d0
+EOS(:,:) = .false.
+POSsub(:,:) = 0.d0
+Ysub(:,:) = 0.d0
+Dsub(:,:) = 0.d0
+Vul(:,:) = 0.d0
 !------------------------
 ! Statements
 !------------------------
@@ -186,9 +189,9 @@ if (.not.allocated(substations%sub(1)%DEMvert)) then
 ! .txt file creation and headings
    write(unit_substations,*) "Electrical substations "
    write(unit_substations,                                                     &
-      '((7x,a),(1x,a),2(4x,a),(10x,a),(7x,a),2(11x,a),(8x,a),(11x,a),(3x,a))') &
-      " Time(s)"," ID_substation"," Val(euros)"," area(m**2)"," Y(m)",         &
-      " Ymax(m)"," POS"," EOS"," EOT(s)"," Vul"," Dsub(euros)"
+'((7x,a),(1x,a),(4x,a),(8x,a),(4x,a),(10x,a),(7x,a),2(11x,a),(8x,a),(11x,a),(3x,a))'&
+      ) " Time(s)"," ID_substation"," Val(euros)"," ID_fil"," area(m**2)",     &
+      " Y(m)"," Ymax(m)"," POS"," EOS"," EOT(s)"," Vul"," Dsub(euros)"
    flush(unit_substations)
 ! Association of the DEM points with the substations: start.
 ! Loop over the zones
@@ -335,7 +338,7 @@ allocate(substations%sub(i_sub)%DEMvert(substations%sub(i_sub)%n_DEM_vertices) &
 ! Loop over the substations
 !$omp parallel do default(none)                                                &
 !$omp shared(substations,Vertice,Grid,Z_fluid_step,EOS,Vul,Dsub,Ysub,POSsub)   &
-!$omp private(i_sub,i_aux,pos,GridColumn,Y_step)
+!$omp private(i_sub,i_aux,pos,GridColumn,Y_step,Y_filt_step,i_fil)
       do i_sub=1,substations%n_sub
 ! Spatial average of the fluid/mixture depth at the DEM grid points, within the 
 ! substation polygon: start.
@@ -345,63 +348,80 @@ allocate(substations%sub(i_sub)%DEMvert(substations%sub(i_sub)%n_DEM_vertices) &
             pos(1,2) = Vertice(2,substations%sub(i_sub)%DEMvert(i_aux))
             pos(1,3) = Grid%extr(3,1) + 0.0000001d0
             GridColumn = ParticleCellNumber(pos(1,1:3))
-            Y_step = max((Z_fluid_step(GridColumn) -                           &
+            Y_step = max((Z_fluid_step(GridColumn,1) -                         &
                          Vertice(3,substations%sub(i_sub)%DEMvert(i_aux))),0.d0)
-            Ysub(i_sub) = Ysub(i_sub) + Y_step
+            Y_filt_step = max((Z_fluid_step(GridColumn,2) -                    &
+               Vertice(3,substations%sub(i_sub)%DEMvert(i_aux))),0.d0)
+            Ysub(i_sub,1) = Ysub(i_sub,1) + Y_step
+            Ysub(i_sub,2) = Ysub(i_sub,2) + Y_filt_step
          enddo
          if (substations%sub(i_sub)%n_DEM_vertices>0) then
-            Ysub(i_sub) = Ysub(i_sub) / substations%sub(i_sub)%n_DEM_vertices
+            Ysub(i_sub,:) = Ysub(i_sub,:) /                                    &
+                            substations%sub(i_sub)%n_DEM_vertices
          endif
+         do i_fil=1,2
 ! Spatial average of the fluid/mixture depth at the DEM grid points, within the 
 ! substation polygon: end.
 ! Update of the maximum value of the substation fluid/mixture depth
-         substations%sub(i_sub)%Ymax = max(Ysub(i_sub),                        &
-                                       substations%sub(i_sub)%Ymax)
+            substations%sub(i_sub)%Ymax(i_fil) = max(Ysub(i_sub,i_fil),        &
+               substations%sub(i_sub)%Ymax(i_fil))
 ! Probability of an Outage Start: POS (time series update)
-         if (Ysub(i_sub)>=0.52d0) then
-            POSsub(i_sub) = 1.d0
-            elseif (Ysub(i_sub)>0.d0) then
-               POSsub(i_sub) = 1.92d0 * Ysub(i_sub)
-               else
-                  POSsub(i_sub) = 0.d0
-         endif
+            if (Ysub(i_sub,i_fil)>=0.52d0) then
+               POSsub(i_sub,i_fil) = 1.d0
+               elseif (Ysub(i_sub,i_fil)>0.d0) then
+                  POSsub(i_sub,i_fil) = 1.92d0 * Ysub(i_sub,i_fil)
+                  else
+                     POSsub(i_sub,i_fil) = 0.d0
+            endif
 ! Expected Outage Status (EOS, time series update); Expected Outage Time (EOT, 
 ! scalar written as a time series update). Simplifying hypothesis: physical 
 ! simulated time shorter than 11h.
-         substations%sub(i_sub)%POS_fsum = substations%sub(i_sub)%POS_fsum +   &
-                                           max(POSsub(i_sub) - 0.49d0,0.d0)
-         if (substations%sub(i_sub)%POS_fsum>1.d-9) then
-            EOS(i_sub) = .true.
-            substations%sub(i_sub)%EOT = substations%sub(i_sub)%EOT +          &
-                                         substations%dt_out
-         endif
+            substations%sub(i_sub)%POS_fsum(i_fil) =                           &
+               substations%sub(i_sub)%POS_fsum(i_fil) +                        &
+               max(POSsub(i_sub,i_fil) - 0.49d0,0.d0)
+            if (substations%sub(i_sub)%POS_fsum(i_fil)>1.d-9) then
+               EOS(i_sub,i_fil) = .true.
+               substations%sub(i_sub)%EOT(i_fil) =                             &
+                  substations%sub(i_sub)%EOT(i_fil) + substations%dt_out
+            endif
 ! Vulnerability (scalar written as a time series update)
-         if (substations%sub(i_sub)%Ymax>10.d0) then
-            Vul(i_sub) = 0.15d0
-            elseif (substations%sub(i_sub)%Ymax>0.d0) then
-               Vul(i_sub) = -1.22877d-6 * substations%sub(i_sub)%Ymax ** 6 +   &
-                            1.92478d-5 * substations%sub(i_sub)%Ymax ** 5 +    &
-                            8.4216d-6 * substations%sub(i_sub)%Ymax ** 4       &
-                            -0.00119121d0 * substations%sub(i_sub)%Ymax ** 3 + &
-                            0.00390726d0 * substations%sub(i_sub)%Ymax ** 2 +  &
-                            0.0170243d0 * substations%sub(i_sub)%Ymax
-               else
-                  Vul(i_sub) = 0.d0
-         endif
+            if (substations%sub(i_sub)%Ymax(i_fil)>10.d0) then
+               Vul(i_sub,i_fil) = 0.15d0
+               elseif (substations%sub(i_sub)%Ymax(i_fil)>0.d0) then
+                  Vul(i_sub,i_fil) = -1.22877d-6 *                             &
+                                     substations%sub(i_sub)%Ymax(i_fil) ** 6 + &
+                                     1.92478d-5 *                              &
+                                     substations%sub(i_sub)%Ymax(i_fil) ** 5 + &
+                                     8.4216d-6 *                               &
+                                     substations%sub(i_sub)%Ymax(i_fil) ** 4 - &
+                                     0.00119121d0 *                            &
+                                     substations%sub(i_sub)%Ymax(i_fil) ** 3 + &
+                                     0.00390726d0 *                            &
+                                     substations%sub(i_sub)%Ymax(i_fil) ** 2 + &
+                                     0.0170243d0 *                             &
+                                     substations%sub(i_sub)%Ymax(i_fil)
+                  else
+                     Vul(i_sub,i_fil) = 0.d0
+            endif
 ! Damage to the substation (scalar written as a time series update)
-         Dsub(i_sub) = Vul(i_sub) * substations%sub(i_sub)%Val
+            Dsub(i_sub,i_fil) = Vul(i_sub,i_fil) * substations%sub(i_sub)%Val
+         enddo
       enddo
 !$omp end parallel do
 ! Output writing
 ! Loop over the substations
       do i_sub=1,substations%n_sub
-         aux_integer = 0
-         if (EOS(i_sub).eqv..true.) aux_integer = 1
-         write(unit_substations,'(g15.5,i15,5(g15.5),i15,3(g15.5))')           &
-            simulation_time,i_sub,substations%sub(i_sub)%Val,                  &
-            substations%sub(i_sub)%area,Ysub(i_sub),                           &
-            substations%sub(i_sub)%Ymax,POSsub(i_sub),aux_integer,             &
-            substations%sub(i_sub)%EOT,Vul(i_sub),Dsub(i_sub)
+         do i_fil=1,2
+            aux_integer = 0
+            if (EOS(i_sub,i_fil).eqv..true.) aux_integer = 1
+            write(unit_substations,                                            &
+               '(g15.5,i15,g15.5,i15,4(g15.5),i15,3(g15.5))'),simulation_time, &
+               i_sub,substations%sub(i_sub)%Val,i_fil,                         &
+               substations%sub(i_sub)%area,Ysub(i_sub,i_fil),                  &
+               substations%sub(i_sub)%Ymax(i_fil),POSsub(i_sub,i_fil),         &
+               aux_integer,substations%sub(i_sub)%EOT(i_fil),Vul(i_sub,i_fil), &
+               Dsub(i_sub,i_fil)
+         enddo
       enddo
 endif
 close(unit_substations)

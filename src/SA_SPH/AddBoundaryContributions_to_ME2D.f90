@@ -209,7 +209,7 @@ do icbs=1,IntNcbs
                            nnlocal(2)
                   endif
                endif        
-               return             
+               return
                elseif (strtype=="sour") then
                   if (xpi>=zero.AND.xpi<=RifBoundarySide%length) then
                      if ((Domain%time_stage==1).or.(Domain%time_split==1)) then 
@@ -303,7 +303,6 @@ do icbs=1,IntNcbs
          do i=1,PLANEDIM
             TT(i) = TN * nnlocal(i)
          enddo
-! Shear viscosity force (with changed sign)
          if ((pg(npi)%laminar_flag==1).or.                                     &
             (Tratto(sidestr)%laminar_no_slip_check.eqv..false.)) then
             SVforce = SVcoeff * (cinvisci + cinvisci) * IntWd1s0
@@ -312,9 +311,7 @@ do icbs=1,IntNcbs
          endif
          do i=1,PLANEDIM
             ViscoMon(i) = ViscoMon(i) + TT(i)
-! explosion
             ViscoMon_save1 = ViscoMon_save1 + ViscoMon(i) * DvelN * nnlocal(i)
-! explosion
             ViscoShear(i) = ViscoShear(i) + Dvel(i) * SVforce
          enddo
       endif

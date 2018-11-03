@@ -135,12 +135,15 @@ if ((it_rest==it).or.(index(str,'inizio')/=0).or.(index(str,'fine')/=0)) then
    if (allocated(bp_arr)) write(nres) bp_arr(1:n_body_part)
    if (allocated(surf_body_part)) write(nres) surf_body_part(1:n_surf_body_part)
    if (allocated(Z_fluid_max)) write(nres)                                     &
-      Z_fluid_max(1:Grid%ncd(1)*Grid%ncd(2))
+      Z_fluid_max(1:Grid%ncd(1)*Grid%ncd(2),1:2)
    if (allocated(q_max)) write(nres) q_max(1:size(q_max))
    if (allocated(substations%sub)) then
-      write(nres) substations%sub(1:substations%n_sub)%POS_fsum
-      write(nres) substations%sub(1:substations%n_sub)%Ymax
-      write(nres) substations%sub(1:substations%n_sub)%EOT
+      write(nres) substations%sub(1:substations%n_sub)%POS_fsum(1),            &
+         substations%sub(1:substations%n_sub)%POS_fsum(2)
+      write(nres) substations%sub(1:substations%n_sub)%Ymax(1),                &
+         substations%sub(1:substations%n_sub)%Ymax(2)
+      write(nres) substations%sub(1:substations%n_sub)%EOT(1),                 &
+         substations%sub(1:substations%n_sub)%EOT(2)
    endif
    if (allocated(Granular_flows_options%minimum_saturation_flag)) write(nres)  &
       Granular_flows_options%minimum_saturation_flag(1:Grid%ncd(1),            &

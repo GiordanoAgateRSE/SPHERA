@@ -83,9 +83,12 @@ do while (TRIM(lcase(ainp))/="##### end substations #####")
                '"ReadSubstations" is successfully completed.'
       endif
       substations%sub(:)%area = 0.d0
-      substations%sub(:)%POS_fsum = 0.d0
-      substations%sub(:)%Ymax = -1.d9
-      substations%sub(:)%EOT = 0.d0
+      substations%sub(:)%POS_fsum(1) = 0.d0
+      substations%sub(:)%POS_fsum(2) = 0.d0
+      substations%sub(:)%Ymax(1) = -1.d9
+      substations%sub(:)%Ymax(2) = -1.d9
+      substations%sub(:)%EOT(1) = 0.d0
+      substations%sub(:)%EOT(2) = 0.d0
       substations%sub(:)%Val = 0.d0
       substations%sub(:)%n_DEM_vertices = 0
    endif

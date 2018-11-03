@@ -190,7 +190,7 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
          endif
       enddo
       if ((aux_integer>0).and.(.not.allocated(Z_fluid_max))) then
-         allocate(Z_fluid_max(Grid%ncd(1)*Grid%ncd(2)),STAT=alloc_stat)
+         allocate(Z_fluid_max(Grid%ncd(1)*Grid%ncd(2),2),STAT=alloc_stat)
          if (alloc_stat/=0) then
             write(ulog,*)                                                      &
             'Allocation of Z_fluid_max in ReadRestartFile failed;',            &
@@ -370,7 +370,7 @@ body_arr(i)%body_kinematics(1:body_arr(i)%n_records,1:7)
                      endif
                      if (allocated(Z_fluid_max)) then
                         read(nsav,iostat=ioerr)                                &
-                           Z_fluid_max(1:Grid%ncd(1)*Grid%ncd(2))
+                           Z_fluid_max(1:Grid%ncd(1)*Grid%ncd(2),1:2)
                         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,            &
                            "Z_fluid_max",nsav,ulog)) return
                      endif
@@ -381,15 +381,18 @@ body_arr(i)%body_kinematics(1:body_arr(i)%n_records,1:7)
                      endif
                      if (allocated(substations%sub)) then
                         read(nsav,iostat=ioerr)                                &
-                           substations%sub(1:substations%n_sub)%POS_fsum
+                           substations%sub(1:substations%n_sub)%POS_fsum(1),   &
+                           substations%sub(1:substations%n_sub)%POS_fsum(2)
                         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,            &
                            "POS_fsum_max",nsav,ulog)) return
                         read(nsav,iostat=ioerr)                                &
-                           substations%sub(1:substations%n_sub)%Ymax
+                           substations%sub(1:substations%n_sub)%Ymax(1),       &
+                           substations%sub(1:substations%n_sub)%Ymax(2)
                         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,            &
                            "Ymax",nsav,ulog)) return
                         read(nsav,iostat=ioerr)                                &
-                           substations%sub(1:substations%n_sub)%EOT
+                           substations%sub(1:substations%n_sub)%EOT(1),        &
+                           substations%sub(1:substations%n_sub)%EOT(2)
                         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,            &
                            "EOT",nsav,ulog)) return
                      endif
@@ -561,7 +564,7 @@ body_arr(i)%body_kinematics(1:body_arr(i)%n_records,1:7)
                         endif
                         if (allocated(Z_fluid_max)) then
                            read(nsav,iostat=ioerr) Z_fluid_max(1:Grid%ncd(1)*  &
-                              Grid%ncd(2))
+                              Grid%ncd(2),1:2)
                            if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,         &
                               "Z_fluid_max",nsav,ulog)) return
                         endif
@@ -572,15 +575,18 @@ body_arr(i)%body_kinematics(1:body_arr(i)%n_records,1:7)
                         endif
                         if (allocated(substations%sub)) then
                            read(nsav,iostat=ioerr)                             &
-                              substations%sub(1:substations%n_sub)%POS_fsum  
+                              substations%sub(1:substations%n_sub)%POS_fsum(1),&
+                              substations%sub(1:substations%n_sub)%POS_fsum(2) 
                            if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,         &
                               "POS_fsum_max",nsav,ulog)) return              
                            read(nsav,iostat=ioerr)                             &
-                              substations%sub(1:substations%n_sub)%Ymax      
+                              substations%sub(1:substations%n_sub)%Ymax(1),    &
+                              substations%sub(1:substations%n_sub)%Ymax(2)
                            if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,         &
-                              "Ymax",nsav,ulog)) return                      
+                              "Ymax",nsav,ulog)) return       
                            read(nsav,iostat=ioerr)                             &
-                              substations%sub(1:substations%n_sub)%EOT       
+                              substations%sub(1:substations%n_sub)%EOT(1),     &
+                              substations%sub(1:substations%n_sub)%EOT(2)     
                            if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,         &
                               "EOT",nsav,ulog)) return
                         endif

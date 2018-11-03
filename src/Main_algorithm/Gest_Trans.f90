@@ -415,8 +415,12 @@ if ((Domain%ipllb_fr>0).OR.(Domain%pllb_fr>zero)) then
    open(nplb,file=nomefile(4),status="unknown",access="sequential",            &
       form="formatted")
    write(nplb,"(a)") "time          free_surface_quota"
+   open(uzlft,file=nomefile(6),status="unknown",access="sequential",           &
+      form="formatted")
+   write(uzlft,"(a)") "time          lower_fluid_top_height"
    else
       nplb = - nplb
+      uzlft = - uzlft
 endif
 if ((Domain%imemo_fr>0).OR.(Domain%memo_fr>zero)) then
    open(nfro,file=nomefile(5),status="unknown",access="sequential"             &
@@ -641,7 +645,8 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
          do i=1,NPartZone
             if (Partz(i)%IC_source_type==2) then
                if (.not.allocated(Z_fluid_max)) then
-                  allocate(Z_fluid_max(Grid%ncd(1)*Grid%ncd(2)),STAT=alloc_stat)
+                  allocate(Z_fluid_max(Grid%ncd(1)*Grid%ncd(2),2),             &
+                     STAT=alloc_stat)
                   if (alloc_stat/=0) then
                      write(ulog,*)                                             &
                      'Allocation of Z_fluid_max in Gest_Trans failed;',        &
@@ -652,10 +657,10 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
                            'Allocation of Z_fluid_max in Gest_Trans ',         &
                            'successfully completed.'
                   endif
-                  Z_fluid_max(:) = -999.d0
+                  Z_fluid_max(:,:) = -999.d0
                endif
                if (.not.allocated(Z_fluid_step)) then
-                  allocate(Z_fluid_step(Grid%ncd(1)*Grid%ncd(2)),              &
+                  allocate(Z_fluid_step(Grid%ncd(1)*Grid%ncd(2),2),            &
                      STAT=alloc_stat)
                   if (alloc_stat/=0) then
                      write(ulog,*)                                             &
@@ -667,7 +672,7 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
                            'Allocation of "Z_fluid_step" in the ',             &
                            'subroutine "Gest_Trans" is successfully completed.'
                   endif
-                  Z_fluid_step(:) = -999.d0
+                  Z_fluid_step(:,:) = -999.d0
                endif
                aux_integer = Partz(i)%ID_last_vertex -                         &
                              Partz(i)%ID_first_vertex + 1  
@@ -721,7 +726,7 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
    else
       call diagnostic(arg1=10,arg2=5,arg3=nomsub)
 endif
-! To create vtk file
+! To create the ".pvd" file
 if (vtkconv) then
    prefix = nomecaso
    filevtk = "VTKConverter_"//prefix(1:len_trim(prefix))//".pvd"
@@ -738,7 +743,7 @@ if (vtkconv) then
       filename =                                                               &
 "VTKConverter_"//prefix(1:len_trim(prefix))//"_block_"//cargo(1:len_trim(cargo))//".vtu"
       stringa = '  <DataSet timestep="'
-      write(cargo,'(f15.6)')  Time_Block(i)
+      write(cargo,'(f15.6)') Time_Block(i)
       cargo = adjustl(trim(cargo))
       stringa =                                                                &
 stringa(1:len_trim(stringa))//cargo(1:len_trim(cargo))//'" group="" part="'
