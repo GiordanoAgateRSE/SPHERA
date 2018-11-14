@@ -20,7 +20,7 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: ReadBodyDynamics                    
-! Description: Reading input data for body trasnport in fluid flows (Amicarelli
+! Description: Reading input data for body transport in fluid flows (Amicarelli
 !              et al., 2015, CAF).                  
 !-------------------------------------------------------------------------------
 subroutine ReadBodyDynamics(ainp,comment,nrighe,ier,ninp,ulog)

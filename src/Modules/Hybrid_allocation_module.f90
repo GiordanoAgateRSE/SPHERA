@@ -121,7 +121,8 @@ type TyParticle
                                          ! particle and viceversa             
    integer(4)       :: blt_flag ! Bed-load transport flag: 0:generic position,
                                 ! 1:free surface; 2:top of bed-load transport
-                                ! zone, 3:fixed bed                      
+                                ! zone, 3:fixed bed; 4: bottom of the granular 
+                                ! material; 5: top of the saturated zone.                      
    integer(4)       :: ind_neigh_mob_for_granmob ! Index of the mobile 
                                                  ! ("flu"/mixture) particle,
                                                  ! which is the closest to
