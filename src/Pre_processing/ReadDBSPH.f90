@@ -190,7 +190,7 @@ do while (TRIM(lcase(ainp))/="##### end dbsph #####")
 "n_monitor_points................",n_monitor_points       
       if (n_monitor_points>0) then
          do i=1,n_monitor_points
-            write(ulog,"(1x,a,1p,e12.4)")                                      &
+            write(ulog,"(1x,a,1p,i12)")                                        &
 "ID_monitor......................",monitor_IDs(i)        
          enddo    
       endif
