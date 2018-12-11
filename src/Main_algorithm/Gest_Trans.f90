@@ -743,7 +743,7 @@ if (vtkconv) then
       filename =                                                               &
 "VTKConverter_"//prefix(1:len_trim(prefix))//"_block_"//cargo(1:len_trim(cargo))//".vtu"
       stringa = '  <DataSet timestep="'
-      write(cargo,'(f15.6)') Time_Block(i)
+      write(cargo,'(f15.9)') Time_Block(i)
       cargo = adjustl(trim(cargo))
       stringa =                                                                &
 stringa(1:len_trim(stringa))//cargo(1:len_trim(cargo))//'" group="" part="'
@@ -775,7 +775,7 @@ if ((Domain%tipo=="bsph").and.(DBSPH%n_w>0)) then
          filename =                                                            &
 "VTKConverter_"//prefix(1:len_trim(prefix))//"_block_wall_"//cargo(1:len_trim(cargo))//".vtu"
          stringa = '  <DataSet timestep="'
-         write(cargo,'(f15.6)')  Time_Block(i)
+         write(cargo,'(f15.9)')  Time_Block(i)
          cargo = adjustl(trim(cargo))
          stringa =                                                             &
 stringa(1:len_trim(stringa))//cargo(1:len_trim(cargo))//'" group="" part="'
@@ -808,7 +808,7 @@ if (n_bodies>0) then
          filename =                                                            &
 "VTKConverter_"//prefix(1:len_trim(prefix))//"_block_body-part_"//cargo(1:len_trim(cargo))//".vtu"
          stringa = '  <DataSet timestep="'
-         write(cargo,'(f15.6)')  Time_Block(i)
+         write(cargo,'(f15.9)')  Time_Block(i)
          cargo = adjustl(trim(cargo))
          stringa =                                                             &
 stringa(1:len_trim(stringa))//cargo(1:len_trim(cargo))//'" group="" part="'
@@ -839,7 +839,7 @@ stringa(1:len_trim(stringa))//cargo(1:len_trim(cargo))//'" file="'//filename(1:l
          filename =                                                            &
 "VTKConverter_"//prefix(1:len_trim(prefix))//"_block_body_"//cargo(1:len_trim(cargo))//".vtu"
          stringa = '  <DataSet timestep="'
-         write(cargo,'(f15.6)')  Time_Block(i)
+         write(cargo,'(f15.9)')  Time_Block(i)
          cargo = adjustl(trim(cargo))
          stringa =                                                             &
 stringa(1:len_trim(stringa))//cargo(1:len_trim(cargo))//'" group="" part="'

@@ -444,8 +444,8 @@ vel_CM_x vel_CM_y vel_CM_z          ! vel_CM(velocity of the centre of mass at
                                     ! t=0)
 omega_x omega_y omega_z             ! omega(angular velocity of the body at t=0)
 imposed_kinematics_flag n_records   ! imposed_kinematics_flag=0,1(kinematics is
-                                    ! imposed); n_records(number of records, 
-                                    ! which desrcibe the imposed kinematics)
+                                    ! imposed); n_records(number of records 
+                                    ! which describe the imposed kinematics)
 ! do i=1,n_records
 time_i velocity_x_i velocity_y_i velocity_z_i omega_x_i omega_y_i omega_z_i 
                                     ! i-th record for the imposed  
