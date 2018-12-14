@@ -87,11 +87,11 @@ if (index(str,'inizio')/=0) then
          GCBFPointers(1:Grid%nmax,1:2)
    endif
    flush(nres)
-   write(ulog,'(a,i10,a,f15.5)')                                               &
+   write(ulog,'(a)')                                                           &
 " ----------------------------------------------------------------------------"
-   write(ulog,'(a,i10,a,f15.5)') " Results and restart heading saved   step: ",&
-      it,"   time: ",simulation_time
-   write(ulog,'(a,i10,a,f15.5)')                                               &
+   write(ulog,'(a,i10,a,g15.6)') " Results and restart heading saved step: ",  &
+      it," time: ",simulation_time
+   write(ulog,'(a)')                                                           &
 " ----------------------------------------------------------------------------"
 endif
 if (Domain%irest_fr>0) then
@@ -155,9 +155,9 @@ if ((it_rest==it).or.(index(str,'inizio')/=0).or.(index(str,'fine')/=0)) then
    if (index(str,'inizio')==0) then
       write(ulog,'(a)')                                                        &
       " --------------------------------------------------------------------"
-      write(ulog,'(a,i10,a,g15.6)') " Results and restart saved   step: ",it,  &
-         "   time: ",simulation_time
-      write(ulog,'(a,i10,a,f15.5)')                                            &
+      write(ulog,'(a,i10,a,g15.6)') " Results and restart saved step: ",it,    &
+         " time: ",simulation_time
+      write(ulog,'(a)')                                                        &
       " --------------------------------------------------------------------"
    endif
    elseif (it_memo==it) then
@@ -172,8 +172,8 @@ if ((it_rest==it).or.(index(str,'inizio')/=0).or.(index(str,'fine')/=0)) then
       if (index(str,'inizio')==0) then
          write(ulog,'(a)')                                                     &
             " --------------------------------------------------------"
-         write(ulog,'(a,i10,a,g15.6)') " Results saved   step: ",it,"   time: "&
-            ,simulation_time
+         write(ulog,'(a,i10,a,g15.6)') " Results saved step: ",it," time: ",   &
+            simulation_time
          write(ulog,'(a)')                                                     &
             " --------------------------------------------------------"
       endif
