@@ -30,12 +30,13 @@ subroutine RHS_body_dynamics(dtvel)
 use Static_allocation_module
 use Hybrid_allocation_module
 use Dynamic_allocation_module
+use I_O_file_module
 !------------------------
 ! Declarations
 !------------------------
 implicit none
 double precision,intent(in) :: dtvel
-integer(4) :: npartint,i,j,npi,npj,Ncb,Nfzn,aux,nbi,npk,k,nbj,nbk
+integer(4) :: npartint,i,j,npi,npj,Ncb,Nfzn,aux,nbi,npk,k,nbj,nbk,alloc_stat
 integer(4) :: n_interactions,aux2,aux3,test,aux_locx_min,aux_locx_max,aux_int
 ! AA!!! test
 integer(4) :: aux_scal_test
@@ -82,15 +83,71 @@ end interface
 !------------------------
 if (ncord==2) aux = n_bodies+NumBSides
 if (ncord==3) aux = n_bodies+NumFacce
-allocate(Force(n_bodies,aux,3))
-allocate(Moment(n_bodies,aux,3))
-allocate(Force_mag_sum(n_bodies,aux))
-allocate(r_per_min(n_bodies,aux))
-allocate(aux_gravity(n_bodies,3))
-allocate(sum_normal_plane(n_bodies,3))
+if (.not.allocated(Force)) then
+   allocate(Force(n_bodies,aux,3),STAT=alloc_stat)
+   if (alloc_stat/=0) then
+      write(uerr,*) 'Allocation of "Force" failed in the program unit ',       &
+         '"RHS_body_dynamics"; the execution terminates here.'
+      stop
+   endif
+endif
+if (.not.allocated(Moment)) then
+   allocate(Moment(n_bodies,aux,3),STAT=alloc_stat)
+   if (alloc_stat/=0) then
+      write(uerr,*) 'Allocation of "Moment" failed in the program unit ',      &
+         '"RHS_body_dynamics"; the execution terminates here.'
+      stop
+   endif
+endif
+if (.not.allocated(Force_mag_sum)) then
+   allocate(Force_mag_sum(n_bodies,aux),STAT=alloc_stat)
+   if (alloc_stat/=0) then
+      write(uerr,*) 'Allocation of "Force_mag_sum" failed in the program ',    &
+         'unit "RHS_body_dynamics"; the execution terminates here.'
+      stop
+   endif
+endif
+if (.not.allocated(r_per_min)) then
+   allocate(r_per_min(n_bodies,aux),STAT=alloc_stat)
+   if (alloc_stat/=0) then
+      write(uerr,*) 'Allocation of "r_per_min" failed in the program unit ',   &
+         '"RHS_body_dynamics"; the execution terminates here.'
+      stop
+   endif
+endif
+if (.not.allocated(aux_gravity)) then
+   allocate(aux_gravity(n_bodies,3),STAT=alloc_stat)
+   if (alloc_stat/=0) then
+      write(uerr,*) 'Allocation of "aux_gravity" failed in the program unit ',   &
+         '"RHS_body_dynamics"; the execution terminates here.'
+      stop
+   endif
+endif
+if (.not.allocated(sum_normal_plane)) then
+   allocate(sum_normal_plane(n_bodies,3),STAT=alloc_stat)
+   if (alloc_stat/=0) then
+      write(uerr,*) 'Allocation of "sum_normal_plane" failed in the program ', &
+         'unit "RHS_body_dynamics"; the execution terminates here.'
+      stop
+   endif
+endif
 ! AA!!! test
-allocate(inter_front(n_bodies))
-allocate(interface_sliding_vel_max(n_bodies))
+if (.not.allocated(inter_front)) then
+   allocate(inter_front(n_bodies),STAT=alloc_stat)
+   if (alloc_stat/=0) then
+      write(uerr,*) 'Allocation of "inter_front" failed in the program ',      &
+         'unit "RHS_body_dynamics"; the execution terminates here.'
+      stop
+   endif
+endif
+if (.not.allocated(interface_sliding_vel_max)) then
+   allocate(interface_sliding_vel_max(n_bodies),STAT=alloc_stat)
+   if (alloc_stat/=0) then
+      write(uerr,*) 'Allocation of "interface_sliding_vel_max" failed in the', &
+         'program unit "RHS_body_dynamics"; the execution terminates here.'
+      stop
+   endif
+endif
 !------------------------
 ! Initializations
 !------------------------
@@ -116,17 +173,17 @@ do npi=1,n_body_part
    do j=1,nPartIntorno_bp_f(npi)
       npartint = (npi - 1) * NMAXPARTJ + j
       npj = PartIntorno_bp_f(npartint)
-! contribution to the pressure gradient term
+! Contribution to the pressure gradient term
       aux_scalar = (pg(npj)%pres + bp_arr(npi)%pres) / (pg(npj)%dens *         &
                    pg(npj)%dens)
       pg(npj)%acc(:) = pg(npj)%acc(:) + ( - pg(npj)%mass / (dx_dxbodies **     &
                        ncord) * aux_scalar * ( - rag_bp_f(:,npartint)) *       &
                        KerDer_bp_f_Gal(npartint))
       if (FSI_free_slip_conditions.eqv..false.) then
-! body particle volume
+! Body particle volume
          aux_scalar = pg(npj)%mass / Med(pg(npj)%imed)%den0 / (dx_dxbodies **  &
                       ncord)
-! contribution to the shear stress gradient term
+! Contribution to the shear stress gradient term
          pg(npj)%acc(:) = pg(npj)%acc(:) - 2.d0 * pg(npj)%visc *               &
                           (bp_arr(npi)%vel(:) - pg(npj)%vel(:)) *              &
                           KerDer_bp_f_cub_spl * aux_scalar
@@ -175,7 +232,7 @@ do npi=1,n_body_part
             r_per = abs(rag_bp_bp(1,npartint) * bp_arr(npj)%normal(1) +        &
                     rag_bp_bp(2,npartint) * bp_arr(npj)%normal(2) +            &
                     rag_bp_bp(3,npartint) * bp_arr(npj)%normal(3))
-! (note: rag=-r) 
+! rag=-r 
             r_par_vec(:) = - rag_bp_bp(:,npartint) - r_per *                   &
                            bp_arr(npj)%normal(:)  
             r_par = dsqrt(r_par_vec(1) * r_par_vec(1) + r_par_vec(2) *         &
@@ -592,7 +649,7 @@ do nbi=1,n_bodies
 ! To update the resultant force with gravity + normal reaction force under 
 ! sliding
       body_arr(nbi)%Force(:) = body_arr(nbi)%Force(:) + aux_gravity(nbi,:)
-!impact velocity
+! Impact velocity
       n_interactions = 0
       do j=1,aux
          if (nbi==j) cycle
@@ -625,15 +682,72 @@ enddo
 !------------------------
 ! Deallocations
 !------------------------
-deallocate(Force)
-deallocate(Moment)
-deallocate(Force_mag_sum)
-deallocate(r_per_min)
-deallocate(aux_gravity)
-deallocate(sum_normal_plane)
+if(allocated(Force)) then
+   deallocate(Force,STAT=alloc_stat)
+   if (alloc_stat/=0) then
+      write(uerr,*) 'Deallocation of "Force" in the program unit  ',           &
+         '"RHS_body_dynamics" failed; the execution terminates here. '
+      stop
+   endif
+endif
+if(allocated(Moment)) then
+   deallocate(Moment,STAT=alloc_stat)
+   if (alloc_stat/=0) then
+      write(uerr,*) 'Deallocation of "Moment" in the program unit  ',          &
+         '"RHS_body_dynamics" failed; the execution terminates here. '
+      stop
+   endif
+endif
+if(allocated(Force_mag_sum)) then
+   deallocate(Force_mag_sum,STAT=alloc_stat)
+   if (alloc_stat/=0) then
+      write(uerr,*) 'Deallocation of "Force_mag_sum" in the program unit  ',   &
+         '"RHS_body_dynamics" failed; the execution terminates here. '
+      stop
+   endif
+endif
+if(allocated(r_per_min)) then
+   deallocate(r_per_min,STAT=alloc_stat)
+   if (alloc_stat/=0) then
+      write(uerr,*) 'Deallocation of "r_per_min" in the program unit  ',       &
+         '"RHS_body_dynamics.f90" failed; the execution terminates here. '
+      stop
+   endif
+endif
+if(allocated(aux_gravity)) then
+   deallocate(aux_gravity,STAT=alloc_stat)
+   if (alloc_stat/=0) then
+      write(uerr,*) 'Deallocation of "aux_gravity" in the program unit  ',     &
+         '"RHS_body_dynamics" failed; the execution terminates here. '
+      stop
+   endif
+endif
+if(allocated(sum_normal_plane)) then
+   deallocate(sum_normal_plane,STAT=alloc_stat)
+   if (alloc_stat/=0) then
+      write(uerr,*) 'Deallocation of "sum_normal_plane" in the program unit  ',&
+         '"RHS_body_dynamics" failed; the execution terminates here. '
+      stop
+   endif
+endif
 ! AA!!! test
-deallocate(inter_front)
-deallocate(interface_sliding_vel_max)
+if(allocated(inter_front)) then
+   deallocate(inter_front,STAT=alloc_stat)
+   if (alloc_stat/=0) then
+      write(uerr,*) 'Deallocation of "inter_front" in the program unit  ',     &
+         '"RHS_body_dynamics" failed; the execution terminates here. '
+      stop
+   endif
+endif
+if(allocated(interface_sliding_vel_max)) then
+   deallocate(interface_sliding_vel_max,STAT=alloc_stat)
+   if (alloc_stat/=0) then
+      write(uerr,*) 'Deallocation of "interface_sliding_vel_max" in the ',     &
+         'program unit "RHS_body_dynamics" failed; the execution terminates ', &
+         'here. '
+      stop
+   endif
+endif
 return
 end subroutine RHS_body_dynamics
 

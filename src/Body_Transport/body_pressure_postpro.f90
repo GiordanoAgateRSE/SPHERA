@@ -65,24 +65,26 @@ do npi=1,n_body_part
    if (mod_normal>0.d0) then
       Sum_W_vol = 0.d0
 ! Loop over the body particles at the surface of the same body
+! Here the arrays nPartIntorno_bp_bp and PartIntorno_bp_bp cannot be used as 
+! they only refer to neighbouring (surface) body particles
       do npj=1,n_body_part
          mod_normal = dsqrt(dot_product(bp_arr(npj)%normal,bp_arr(npj)%normal))
-         if ((bp_arr(npi)%body==bp_arr(npj)%body).and.(mod_normal>0.)) then
+         if ((bp_arr(npi)%body==bp_arr(npj)%body).and.(mod_normal>0.d0)) then
             dis_vec(:) = bp_arr(npj)%pos(:) - bp_arr(npi)%pos(:) 
             dis = dsqrt(dot_product(dis_vec,dis_vec))
             W_vol = w(dis,Domain%h,Domain%coefke) * bp_arr(npj)%mass
             aux_pres(npi) = aux_pres(npi) + bp_arr(npj)%pres * W_vol
             Sum_W_vol = Sum_W_vol + W_vol 
          endif
-      end do
-      if (Sum_W_vol>0.000001) aux_pres(npi) = aux_pres(npi) / Sum_W_vol
+      enddo
+      if (Sum_W_vol>1.d-18) aux_pres(npi) = aux_pres(npi) / Sum_W_vol
    endif
 enddo
 !$omp end parallel do
 ! Loop over the body particles: update of pressure values 
 !$omp parallel do default(none) private(npi) shared(bp_arr,aux_pres,n_body_part)
 do npi=1,n_body_part
-   if (aux_pres(npi).ne.0.) bp_arr(npi)%pres = aux_pres(npi)
+   if (aux_pres(npi)/=0.d0) bp_arr(npi)%pres = aux_pres(npi)
 enddo
 !$omp end parallel do
 !------------------------

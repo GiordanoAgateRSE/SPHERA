@@ -68,7 +68,7 @@ do npi=1,n_body_part
       npj = PartIntorno_bp_f(npartint)
 ! Continuity equation
 ! Normal for u_SA
-      dis_min = 999999999.d0
+      dis_min = 1.d9
       x_min = min(bp_arr(npi)%pos(1),pg(npj)%coord(1))
       x_max = max(bp_arr(npi)%pos(1),pg(npj)%coord(1))
       y_min = min(bp_arr(npi)%pos(2),pg(npj)%coord(2))
@@ -76,12 +76,16 @@ do npi=1,n_body_part
       z_min = min(bp_arr(npi)%pos(3),pg(npj)%coord(3))
       z_max = max(bp_arr(npi)%pos(3),pg(npj)%coord(3))
       aux_nor = 0.d0
-! Here the arrays nPartIntorno_bp_bp and PartIntorno_bp_bp cannot be used as 
-! they only refer to surface body particles
+! Here the array PartIntorno_bp_bp cannot be used as it only refers to 
+! neighbouring body particles of other bodies
+! Here the array PartIntorno_bp_f cannot be used as it refers to the 
+! fluid neighbours of a body particles, not to the solid neighbours of a fluid 
+! particle.
       do k=1,n_body_part
          if (bp_arr(k)%body==bp_arr(npi)%body) then
             aux=dot_product(rag_bp_f(:,npartint),bp_arr(k)%normal)
             if (aux>0.d0) then
+! The fluid particle "npj" and the solid particle "k" can "see" each other
                if (npi==k) then
                   aux_nor(:) = bp_arr(k)%normal(:)
                   exit
@@ -92,22 +96,28 @@ do npi=1,n_body_part
                          (bp_arr(k)%pos(2)<=y_max).and.                        &
                          (bp_arr(k)%pos(3)>=z_min).and.                        &
                          (bp_arr(k)%pos(3)<=z_max)) then
+! The solid particle "k" lies "between" the fluid particle "npj" and the solid 
+! particle "npi"
                         call distance_point_line_3D                            &
                            (bp_arr(k)%pos,bp_arr(npi)%pos,pg(npj)%coord,dis)
-                        dis_min =min(dis_min,dis)
+                        dis_min=min(dis_min,dis)
                         if (dis==dis_min) aux_nor(:) = bp_arr(k)%normal(:)
                      endif
                endif
             endif
          endif
       enddo
-! In case the normal is not yet defined, the normal vector is that of the body
-! particle (at the body surface), which is the closest to the fluid particle.
-! Here the arrays nPartIntorno_bp_bp and PartIntorno_bp_bp cannot be used as 
-! they only refer to surface body particles.
       mod_normal = dsqrt(dot_product(aux_nor,aux_nor))
       if (mod_normal==0.d0) then
-         dis_min = 999999999.d0
+! In case the normal is not yet defined, the normal vector is that of the body
+! particle (at the body surface), which is the closest to the fluid particle.
+! This possible case might waste computational time.
+         dis_min = 1.d9
+! Here the array PartIntorno_bp_bp cannot be used as it only refers to 
+! neighbouring body particles of other bodies
+! Here the array PartIntorno_bp_f cannot be used as it refers to the 
+! fluid neighbours of a body particles, not to the solid neighbours of a fluid 
+! particle.
          do k=1,n_body_part
             aux_vec(:) = bp_arr(k)%pos(:) - pg(npj)%coord(:) 
             dis = dsqrt(dot_product(aux_vec,aux_vec))
