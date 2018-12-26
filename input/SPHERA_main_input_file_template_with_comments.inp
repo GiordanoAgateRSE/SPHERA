@@ -193,6 +193,9 @@ circum_dam_last_x circum_dam_last_y
 ! If (IC_reservoir_type==2): end
 ! If (Boundary_type=="perimeter"): end
 ! If (Boundary_type=="open"): start
+! In case particles go out the numerical domain without passing through an open 
+! section, the simulation slows down (beyond possible errors associated with 
+! the particles above).
 RGBColor
 ! If (Boundary_type=="open"): end
 ! If (Boundary_type=="source"): start

@@ -54,7 +54,7 @@ allocate(teta(n_bodies,3))
 !------------------------
 ! Loop over bodies (body dynamics)
 !$omp parallel do default(none)                                                &
-!$omp private(i,vec_temp,vec2_temp,vec3_temp,domega_dt,aux_umax)               &
+!$omp private(i,vec_temp,vec2_temp,vec3_temp,domega_dt)                        &
 !$omp shared(n_bodies,body_arr,dt,ncord,teta,dtvel,simulation_time)
 do i=1,n_bodies
 ! Staggered parameters (velocity and angular velocity)
@@ -119,9 +119,9 @@ do i=1,n_bodies
    body_arr(i)%umax = zero
 enddo
 !$omp end parallel do
-! Loop over body particles (static kinematics)
+! Loop over body particles (kinematics)
 !$omp parallel do default(none)                                                &
-!$omp private(npi,vec_temp,mod_normal,vec2_temp,aux_vel)                       &
+!$omp private(npi,vec_temp,mod_normal,vec2_temp,aux_vel,aux_umax)              &
 !$omp shared(n_body_part,body_arr,bp_arr,dt,ncord,teta,dtvel)
 do npi=1,n_body_part
 ! Staggered parameters
@@ -145,14 +145,14 @@ do npi=1,n_body_part
       bp_arr(npi)%rel_pos(2) = zero
       bp_arr(npi)%normal(2) = zero
    endif
+! Updating max velocity within every body
+   aux_umax = dsqrt(dot_product(bp_arr(npi)%vel,bp_arr(npi)%vel))
+!$omp critical (body_maximum_velocity)
+   body_arr(bp_arr(npi)%body)%umax = max(body_arr(bp_arr(npi)%body)%umax,      &
+      aux_umax)
+!$omp end critical (body_maximum_velocity)
 enddo
 !$omp end parallel do
-! Updating max velocity within every body
-do npi=1,n_body_part
-   aux_umax = dsqrt(dot_product(bp_arr(npi)%vel,bp_arr(npi)%vel))        
-   body_arr(bp_arr(npi)%body)%umax = max(body_arr(bp_arr(npi)%body)%umax,      &
-      aux_umax)   
-enddo
 ! Interesting part for RK1, not for Leapfrog: start
 ! Loop over body particles (kinematics)
 !  do npi=1,n_body_part

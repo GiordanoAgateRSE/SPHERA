@@ -66,7 +66,8 @@ do while ((nag>0).AND.(npi<nag))
       nag = nag - 1
       npi = npi - 1
       elseif ((ncel<=0).or.(ncel>Grid%nmax)) then
-! The particle is out of grid and is removed from the particle array
+! The particle is out of grid without passing any open section and is removed 
+! from the particle array
          write(ulog,'(a,i7,a,i7,3x,3e15.8,a,i7)') "ORDGRID1 particle #",npi,   &
             "   cell:",ncel,pg(npi)%coord(:),                                  &
             "  Total number of particles is = ",nag-1

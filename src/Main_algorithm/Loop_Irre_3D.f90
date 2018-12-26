@@ -408,7 +408,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
             Domain%MAXCLOSEBOUNDFACES," to ",Ncbf_Max
          call diagnostic(arg1=9,arg2=3,arg3=nomsub)
       endif
-! Time integration for body dynamics
+! Balance equations RHS for body dynamics
       if (n_bodies>0) then
          call start_and_stop(3,6)
          call start_and_stop(2,19)
