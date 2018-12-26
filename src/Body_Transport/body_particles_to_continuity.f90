@@ -35,9 +35,9 @@ use I_O_file_module
 !------------------------
 implicit none
 integer(4) :: npi,j,npartint,npj,k
-double precision :: temp_dden,aux,dis,dis_min,x_min,x_max,y_min,y_max,z_min 
-double precision :: z_max,mod_normal,W_vol,sum_W_vol
-double precision :: dvar(3),aux_vec(3),aux_nor(3),aux_vec2(3)
+double precision :: temp_dden,aux,dis,dis_min,mod_normal,W_vol,sum_W_vol
+double precision :: dis_fb_sb,dis_s0_sb,dis_fb_s0
+double precision :: dvar(3),aux_vec(3),aux_nor(3)
 double precision, external :: w  
 !------------------------
 ! Explicit interfaces
@@ -57,8 +57,7 @@ double precision, external :: w
 !$omp shared(KerDer_bp_f_cub_spl,rag_bp_f,pg,Domain,dx_dxbodies,ncord)         &
 !$omp shared(FSI_free_slip_conditions)                                         &
 !$omp private(npi,sum_W_vol,W_vol,j,npartint,npj,k,temp_dden,aux,dis,dis_min)  &
-!$omp private(x_min,x_max,y_min,y_max,z_min,z_max,mod_normal,dvar,aux_vec)     &
-!$omp private(aux_nor,aux_vec2)
+!$omp private(mod_normal,dvar,aux_vec,aux_nor,dis_s0_sb,dis_fb_s0,dis_fb_sb)
 do npi=1,n_body_part
    bp_arr(npi)%vel_mir = 0.d0
    sum_W_vol = 0.d0
@@ -69,13 +68,7 @@ do npi=1,n_body_part
 ! Continuity equation
 ! Normal for u_SA
       dis_min = 1.d9
-      x_min = min(bp_arr(npi)%pos(1),pg(npj)%coord(1))
-      x_max = max(bp_arr(npi)%pos(1),pg(npj)%coord(1))
-      y_min = min(bp_arr(npi)%pos(2),pg(npj)%coord(2))
-      y_max = max(bp_arr(npi)%pos(2),pg(npj)%coord(2))
-      z_min = min(bp_arr(npi)%pos(3),pg(npj)%coord(3))
-      z_max = max(bp_arr(npi)%pos(3),pg(npj)%coord(3))
-      aux_nor = 0.d0
+      aux_nor(:) = 0.d0
 ! Here the array PartIntorno_bp_bp cannot be used as it only refers to 
 ! neighbouring body particles of other bodies
 ! Here the array PartIntorno_bp_f cannot be used as it refers to the 
@@ -90,14 +83,17 @@ do npi=1,n_body_part
                   aux_nor(:) = bp_arr(k)%normal(:)
                   exit
                   else
-                     if ((bp_arr(k)%pos(1)>=x_min).and.                        &
-                         (bp_arr(k)%pos(1)<=x_max).and.                        &
-                         (bp_arr(k)%pos(2)>=y_min).and.                        &
-                         (bp_arr(k)%pos(2)<=y_max).and.                        &
-                         (bp_arr(k)%pos(3)>=z_min).and.                        &
-                         (bp_arr(k)%pos(3)<=z_max)) then
-! The solid particle "k" lies "between" the fluid particle "npj" and the solid 
-! particle "npi"
+                     aux_vec(:) = bp_arr(npi)%pos(:) - pg(npj)%coord(:) 
+                     dis_fb_s0 = dsqrt(dot_product(aux_vec,aux_vec))
+                     aux_vec(:) = bp_arr(npi)%pos(:) - bp_arr(k)%pos(:)
+                     dis_s0_sb = dsqrt(dot_product(aux_vec,aux_vec))
+                     aux_vec(:) = bp_arr(k)%pos(:) - pg(npj)%coord(:) 
+                     dis_fb_sb = dsqrt(dot_product(aux_vec,aux_vec))
+                     if ((dis_s0_sb<=dis_fb_s0).and.(dis_fb_sb<=dis_fb_s0)) then
+! The candidate solid particle "k" (or "sb") lies "between" the fluid particle 
+! "npj" (or "fb") and the solid particle "npi" (or "s0"). The candidate lies 
+! within the intersection of two equal spheres of radius dis_fb_s0 and centres 
+! x_fb and x_s0.
                         call distance_point_line_3D                            &
                            (bp_arr(k)%pos,bp_arr(npi)%pos,pg(npj)%coord,dis)
                         dis_min=min(dis_min,dis)
@@ -111,7 +107,10 @@ do npi=1,n_body_part
       if (mod_normal==0.d0) then
 ! In case the normal is not yet defined, the normal vector is that of the body
 ! particle (at the body surface), which is the closest to the fluid particle.
-! This possible case might waste computational time.
+! This very rare case is not intended to consume computational time.
+      write(ulog,*) 'Detected a very rare case during the search for the ',    &
+         'fluid-body interaction normals. These very rare cases are not ',     &
+         'intended to consume computational time.'
          dis_min = 1.d9
 ! Here the array PartIntorno_bp_bp cannot be used as it only refers to 
 ! neighbouring body particles of other bodies
@@ -126,13 +125,13 @@ do npi=1,n_body_part
          enddo
       endif
 ! Relative velocity for the continuity equation     
-      aux_vec2(:) = bp_arr(npi)%vel(:) - pg(npj)%vel(:)
+      aux_vec(:) = bp_arr(npi)%vel(:) - pg(npj)%vel(:)
       if (FSI_free_slip_conditions.eqv..true.) then
 ! free-slip conditions
-         dvar(:) = aux_nor(:) * 2.d0 * dot_product(aux_vec2,aux_nor)
+         dvar(:) = aux_nor(:) * 2.d0 * dot_product(aux_vec,aux_nor)
          else
 ! no-slip conditions
-            dvar(:) = 2.d0 * aux_vec2(:)
+            dvar(:) = 2.d0 * aux_vec(:)
       endif
       dis = dsqrt(dot_product(rag_bp_f(:,npartint),rag_bp_f(:,npartint)))
       W_vol = w(dis,Domain%h,Domain%coefke) * pg(npj)%mass / pg(npj)%dens
