@@ -68,13 +68,20 @@ do npi=1,n_body_part
 ! Here the arrays nPartIntorno_bp_bp and PartIntorno_bp_bp cannot be used as 
 ! they only refer to neighbouring (surface) body particles
       do npj=1,n_body_part
-         mod_normal = dsqrt(dot_product(bp_arr(npj)%normal,bp_arr(npj)%normal))
-         if ((bp_arr(npi)%body==bp_arr(npj)%body).and.(mod_normal>0.d0)) then
-            dis_vec(:) = bp_arr(npj)%pos(:) - bp_arr(npi)%pos(:) 
-            dis = dsqrt(dot_product(dis_vec,dis_vec))
-            W_vol = w(dis,Domain%h,Domain%coefke) * bp_arr(npj)%mass
-            aux_pres(npi) = aux_pres(npi) + bp_arr(npj)%pres * W_vol
-            Sum_W_vol = Sum_W_vol + W_vol 
+         dis_vec(:) = bp_arr(npj)%pos(:) - bp_arr(npi)%pos(:) 
+         dis = dsqrt(dot_product(dis_vec,dis_vec))
+         if (dis<=2.d0*Domain%h) then
+! The neighbouring body particle lies within the kernel support of the 
+! computational body particle
+            mod_normal =                                                       &
+               dsqrt(dot_product(bp_arr(npj)%normal,bp_arr(npj)%normal))
+            if ((bp_arr(npi)%body==bp_arr(npj)%body).and.(mod_normal>0.d0)) then
+! The neighbouring body particle is a surface body particle and belongs to the 
+! same body of the computational body particle
+               W_vol = w(dis,Domain%h,Domain%coefke) * bp_arr(npj)%mass
+               aux_pres(npi) = aux_pres(npi) + bp_arr(npj)%pres * W_vol
+               Sum_W_vol = Sum_W_vol + W_vol 
+            endif
          endif
       enddo
       if (Sum_W_vol>1.d-18) aux_pres(npi) = aux_pres(npi) / Sum_W_vol

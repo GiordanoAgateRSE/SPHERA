@@ -55,7 +55,7 @@ double precision, external :: w
 !$omp parallel do default(none)                                                &
 !$omp shared(n_body_part,bp_arr,nPartIntorno_bp_f,NMAXPARTJ,PartIntorno_bp_f)  &
 !$omp shared(KerDer_bp_f_cub_spl,rag_bp_f,pg,Domain,dx_dxbodies,ncord)         &
-!$omp shared(FSI_free_slip_conditions)                                         &
+!$omp shared(FSI_free_slip_conditions,ulog)                                    &
 !$omp private(npi,sum_W_vol,W_vol,j,npartint,npj,k,temp_dden,aux,dis,dis_min)  &
 !$omp private(mod_normal,dvar,aux_vec,aux_nor,dis_s0_sb,dis_fb_s0,dis_fb_sb)
 do npi=1,n_body_part
@@ -71,47 +71,51 @@ do npi=1,n_body_part
       aux_nor(:) = 0.d0
 ! Here the array PartIntorno_bp_bp cannot be used as it only refers to 
 ! neighbouring body particles of other bodies
-! Here the array PartIntorno_bp_f cannot be used as it refers to the 
+! Here the array PartIntorno_bp_f cannot be used as usually as it refers to the 
 ! fluid neighbours of a body particles, not to the solid neighbours of a fluid 
 ! particle.
       do k=1,n_body_part
-         if (bp_arr(k)%body==bp_arr(npi)%body) then
-            aux=dot_product(rag_bp_f(:,npartint),bp_arr(k)%normal)
-            if (aux>0.d0) then
+         aux_vec(:) = bp_arr(k)%pos(:) - pg(npj)%coord(:) 
+         dis_fb_sb = dsqrt(dot_product(aux_vec,aux_vec))
+         if (dis_fb_sb<=2.d0*Domain%h) then
+! The candidate solid particle "k" (or "sb") lies within the kernel support of 
+! the fluid particle "npj" (or "fb")
+            if (bp_arr(k)%body==bp_arr(npi)%body) then
+               aux=dot_product(rag_bp_f(:,npartint),bp_arr(k)%normal)
+               if (aux>1.d-12) then
 ! The fluid particle "npj" and the solid particle "k" can "see" each other
-               if (npi==k) then
-                  aux_nor(:) = bp_arr(k)%normal(:)
-                  exit
-                  else
-                     aux_vec(:) = bp_arr(npi)%pos(:) - pg(npj)%coord(:) 
-                     dis_fb_s0 = dsqrt(dot_product(aux_vec,aux_vec))
-                     aux_vec(:) = bp_arr(npi)%pos(:) - bp_arr(k)%pos(:)
-                     dis_s0_sb = dsqrt(dot_product(aux_vec,aux_vec))
-                     aux_vec(:) = bp_arr(k)%pos(:) - pg(npj)%coord(:) 
-                     dis_fb_sb = dsqrt(dot_product(aux_vec,aux_vec))
-                     if ((dis_s0_sb<=dis_fb_s0).and.(dis_fb_sb<=dis_fb_s0)) then
+                  if (npi==k) then
+                     aux_nor(:) = bp_arr(k)%normal(:)
+                     exit
+                     else
+                        aux_vec(:) = bp_arr(npi)%pos(:) - bp_arr(k)%pos(:)
+                        dis_s0_sb = dsqrt(dot_product(aux_vec,aux_vec))
+                        aux_vec(:) = bp_arr(npi)%pos(:) - pg(npj)%coord(:) 
+                        dis_fb_s0 = dsqrt(dot_product(aux_vec,aux_vec))
+                        if ((dis_s0_sb<=dis_fb_s0).and.(dis_fb_sb<=dis_fb_s0)) &
+                           then
 ! The candidate solid particle "k" (or "sb") lies "between" the fluid particle 
 ! "npj" (or "fb") and the solid particle "npi" (or "s0"). The candidate lies 
 ! within the intersection of two equal spheres of radius dis_fb_s0 and centres 
 ! x_fb and x_s0.
-                        call distance_point_line_3D                            &
-                           (bp_arr(k)%pos,bp_arr(npi)%pos,pg(npj)%coord,dis)
-                        dis_min=min(dis_min,dis)
-                        if (dis==dis_min) aux_nor(:) = bp_arr(k)%normal(:)
-                     endif
+                           call distance_point_line_3D                         &
+                              (bp_arr(k)%pos,bp_arr(npi)%pos,pg(npj)%coord,dis)
+                           dis_min=min(dis_min,dis)
+                           if (dis==dis_min) aux_nor(:) = bp_arr(k)%normal(:)
+                        endif
+                  endif
                endif
             endif
          endif
       enddo
       mod_normal = dsqrt(dot_product(aux_nor,aux_nor))
-      if (mod_normal==0.d0) then
+      if (mod_normal<9.99d-1) then
 ! In case the normal is not yet defined, the normal vector is that of the body
 ! particle (at the body surface), which is the closest to the fluid particle.
 ! This very rare case is not intended to consume computational time.
-      write(ulog,*) 'Detected a very rare case during the search for the ',    &
-         'fluid-body interaction normals. These very rare cases are not ',     &
-         'intended to consume computational time.'
-         dis_min = 1.d9
+         write(ulog,*) 'Detected a very rare case during the search for the ', &
+            'fluid-body interaction normals. These very rare cases are not ',  &
+            'intended to consume computational time.'
 ! Here the array PartIntorno_bp_bp cannot be used as it only refers to 
 ! neighbouring body particles of other bodies
 ! Here the array PartIntorno_bp_f cannot be used as it refers to the 
