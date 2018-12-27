@@ -55,7 +55,8 @@ double precision, external :: w
 !$omp parallel do default(none)                                                &
 !$omp shared(n_body_part,bp_arr,nPartIntorno_bp_f,NMAXPARTJ,PartIntorno_bp_f)  &
 !$omp shared(KerDer_bp_f_cub_spl,rag_bp_f,pg,Domain,dx_dxbodies,ncord)         &
-!$omp shared(FSI_free_slip_conditions,ulog)                                    &
+!$omp shared(FSI_free_slip_conditions,ulog,on_going_time_step,n_surf_body_part)&
+!$omp shared(surf_body_part)                                                   &
 !$omp private(npi,sum_W_vol,W_vol,j,npartint,npj,k,temp_dden,aux,dis,dis_min)  &
 !$omp private(mod_normal,dvar,aux_vec,aux_nor,dis_s0_sb,dis_fb_s0,dis_fb_sb)
 do npi=1,n_body_part
@@ -78,8 +79,8 @@ do npi=1,n_body_part
          aux_vec(:) = bp_arr(k)%pos(:) - pg(npj)%coord(:) 
          dis_fb_sb = dsqrt(dot_product(aux_vec,aux_vec))
          if (dis_fb_sb<=2.d0*Domain%h) then
-! The candidate solid particle "k" (or "sb") lies within the kernel support of 
-! the fluid particle "npj" (or "fb")
+! The candidate solid particle "k" (or "sb") has a non-null normal and lies 
+! within the kernel support of the fluid particle "npj" (or "fb")
             if (bp_arr(k)%body==bp_arr(npi)%body) then
                aux=dot_product(rag_bp_f(:,npartint),bp_arr(k)%normal)
                if (aux>1.d-12) then
@@ -110,19 +111,24 @@ do npi=1,n_body_part
       enddo
       mod_normal = dsqrt(dot_product(aux_nor,aux_nor))
       if (mod_normal<9.99d-1) then
-! In case the normal is not yet defined, the normal vector is that of the body
-! particle (at the body surface), which is the closest to the fluid particle.
-! This very rare case is not intended to consume computational time.
-         write(ulog,*) 'Detected a very rare case during the search for the ', &
-            'fluid-body interaction normals. These very rare cases are not ',  &
-            'intended to consume computational time.'
+! In case the normal is not yet defined, there is a fluid-solid mass 
+! penetration. The normal vector is taken from the neighbouring surface body 
+! particle, which is the closest to the neighbouring fluid particle.
+         write(ulog,'(3a)') 'The search for the fluid-body interaction ',      &
+            'normals detects a fluid-solid mass penetration (in case of ',     &
+            'no-slip conditions there is no detection).'
+         write(ulog,'(a,i10,a,i10,a,i10,a,i10,a)')                             &
+            'Computational body particle: ',npi,                               &
+            ' . Neighbouring fluid particle: ',npj,                            &
+            ' . Neighbouring body particle: ',k,                               &
+            ' . Current time step: ',on_going_time_step,' .'
 ! Here the array PartIntorno_bp_bp cannot be used as it only refers to 
 ! neighbouring body particles of other bodies
 ! Here the array PartIntorno_bp_f cannot be used as it refers to the 
 ! fluid neighbours of a body particles, not to the solid neighbours of a fluid 
 ! particle.
-         do k=1,n_body_part
-            aux_vec(:) = bp_arr(k)%pos(:) - pg(npj)%coord(:) 
+         do k=1,n_surf_body_part
+            aux_vec(:) = bp_arr(surf_body_part(k))%pos(:) - pg(npj)%coord(:) 
             dis = dsqrt(dot_product(aux_vec,aux_vec))
             dis_min = min(dis_min,dis)
             if (dis==dis_min) aux_nor(:) = bp_arr(k)%normal(:)
