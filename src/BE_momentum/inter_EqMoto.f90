@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.9.0.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2019 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -113,7 +113,7 @@ do contj=1,nPartIntorno(npi)
 ! Square distance is preferred to improve accuracy 
       rijtemp = ragtemp(1) * ragtemp(1) + ragtemp(2) * ragtemp(2) + ragtemp(3) &
                 *ragtemp(3)
-      if (rijtemp>doublesquareh) cycle
+      if (rijtemp>square_doubleh) cycle
 ! Saving inter-particle distance 
       rijtemp2 = rijtemp
       rijtemp = dsqrt(rijtemp)

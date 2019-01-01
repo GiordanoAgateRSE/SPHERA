@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.9.0.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2019 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -96,8 +96,10 @@ do ii=1,indarrayFlu
             AppUnity = AppUnity + AppUnity_vec(npi)
          endif
          if (Domain%tipo=="bsph") then
+! DB-SPH contributions to pressure smoothing
             pg(npi)%vpres = sompW / AppUnity
-            else          
+            else
+! SA-SPH contributions to pressure smoothing
                Ncbf = BoundaryDataPointer(1,npi)
                ibdt = BoundaryDataPointer(3,npi)
                if (Ncbf>0) then
@@ -130,7 +132,8 @@ enddo
 !$omp shared(pg,Med,Domain,dt,indarrayFlu,Array_Flu,esplosione)
 do ii=1,indarrayFlu
    npi = Array_Flu(ii)
-! Excluding particles close to the face with conditions "flow", "velo" and "sour"
+! Excluding particles close to the face with conditions "flow", "velo" and 
+! "sour"
    if (pg(npi)%koddens==0) then 
 ! Computing TetaP depending on the time step
       if (esplosione) then

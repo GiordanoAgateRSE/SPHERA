@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.9.0.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2019 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -78,6 +78,10 @@ do npi=1,n_body_part
             if ((bp_arr(npi)%body==bp_arr(npj)%body).and.(mod_normal>0.d0)) then
 ! The neighbouring body particle is a surface body particle and belongs to the 
 ! same body of the computational body particle
+! Here mass replaces volume because particle density is uniform within the same 
+! body and mass is estimated exaclty as ICs (whilst body particle volume is 
+! approximately assumed uniform -no discretization errors- all over the domain 
+! when computing the particle volume by means of dx and dx/dx_s).
                W_vol = w(dis,Domain%h,Domain%coefke) * bp_arr(npj)%mass
                aux_pres(npi) = aux_pres(npi) + bp_arr(npj)%pres * W_vol
                Sum_W_vol = Sum_W_vol + W_vol 

@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.9.0.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2019 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -93,7 +93,7 @@ endif
 !$omp private(dbsph_inoutlet_threshold,normal_int_mixture_top_abs)             &
 !$omp private(normal_int_sat_top_abs)                                          &                 
 !$omp shared(nag,pg,Domain,Med,Icont,Npartord,NMAXPARTJ,rag,nPartIntorno)      &
-!$omp shared(Partintorno,PartKernel,ke_coef,kacl_coef,Doubleh,DoubleSquareh)   &
+!$omp shared(Partintorno,PartKernel,ke_coef,kacl_coef,Doubleh,square_doubleh)  &
 !$omp shared(squareh,nomsub,ncord,eta,eta2,ulog,uerr,ind_interfaces,DBSPH,pg_w)&
 !$omp shared(Icont_w,Npartord_w,rag_fw,nPartIntorno_fw,Partintorno_fw)         &
 !$omp shared(kernel_fw,dShep_old,Granular_flows_options,NMedium)
@@ -186,7 +186,7 @@ loop_nag: do npi=1,nag
                rijtemp = ragtemp(1)*ragtemp(1) + ragtemp(2)*ragtemp(2) +       &
                          ragtemp(3)*ragtemp(3)
 ! Check if the second particle is a neighbour of the first one 
-               if (rijtemp>doublesquareh) cycle
+               if (rijtemp>square_doubleh) cycle
 ! Increase of the number of neighburs  
                nPartIntorno(npi) = nPartIntorno(npi) + 1
 ! Increase an array pointer 
@@ -354,7 +354,7 @@ loop_nag: do npi=1,nag
                   rijtemp = ragtemp(1) * ragtemp(1) + ragtemp(2) * ragtemp(2) +&
                             ragtemp(3)*ragtemp(3)
 ! Distance check
-                  if (rijtemp>doublesquareh) cycle
+                  if (rijtemp>square_doubleh) cycle
 ! Counter increases 
                   nPartIntorno_fw(npi) = nPartIntorno_fw(npi) + 1
 ! Error. A computational particle has exceeded the maximum number of wall 
@@ -807,7 +807,7 @@ if (n_bodies>0) then
 !$omp private(jrang,krang,bp_f,npj,npartint,ncelj,ragtemp,rijtemp,rijtemp2)    &
 !$omp private(rij_su_h,rij_su_h_quad,denom,index_rij_su_h,gradmod,bp)          &
 !$omp private(gradmodwacl,i,aux2)                                              &
-!$omp shared(NMAXPARTJ,ke_coef,kacl_coef,DoubleSquareh,squareh,ncord,Domain)   &
+!$omp shared(NMAXPARTJ,ke_coef,kacl_coef,square_doubleh,squareh,ncord,Domain)  &
 !$omp shared(Icont_bp,NPartOrd_bp,bp_arr,nPartIntorno_bp_bp,PartIntorno_bp_bp) &
 !$omp shared(rag_bp_bp,n_body_part,Icont,n_bodies,nPartIntorno_bp_f)           &
 !$omp shared(PartIntorno_bp_f,rag_bp_f,KerDer_bp_f_cub_spl,KerDer_bp_f_Gal)    &
@@ -842,7 +842,7 @@ if (n_bodies>0) then
                   rijtemp = ragtemp(1) * ragtemp(1) + ragtemp(2) * ragtemp(2)  &
                             + ragtemp(3) * ragtemp(3)
 ! Distance check
-                  if (rijtemp>doublesquareh) cycle
+                  if (rijtemp>square_doubleh) cycle
 ! neighbouring lists 
                   nPartIntorno_bp_f(npi) = nPartIntorno_bp_f(npi) + 1
                   npartint = (npi - 1) * NMAXPARTJ + nPartIntorno_bp_f(npi)
@@ -884,7 +884,7 @@ if (n_bodies>0) then
                      rijtemp = ragtemp(1) * ragtemp(1) + ragtemp(2) *          &
                                ragtemp(2) + ragtemp(3) * ragtemp(3)
 ! Distance check
-                     if (rijtemp>doublesquareh) cycle
+                     if (rijtemp>square_doubleh) cycle
 ! Neighbouring lists 
                      nPartIntorno_bp_bp(aux2) = nPartIntorno_bp_bp(aux2) + 1
                      npartint = (aux2 - 1) * NMAXPARTJ +                       &

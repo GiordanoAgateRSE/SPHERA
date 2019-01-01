@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.9.0.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2019 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -69,7 +69,7 @@ den_wpp = zero
 ! Loop over the wall elements
 !$omp parallel do default(none)                                                &
 !$omp shared(DBSPH,pg_w,ncord,Icont_w,NPartOrd_w,pres_wpp,Domain,den_wpp)      &
-!$omp shared(doublesquareh,squareh)                                            &
+!$omp shared(square_doubleh,squareh)                                            &
 !$omp private(npi,irestocell,igridi,jgridi,jgrid1,jgrid2,kgridi,jrang,irang)   &
 !$omp private(krang,ncelj,ww,npj,rijtemp,ragtemp,rijtemp2,rij_su_h)            &
 !$omp private(rij_su_h_quad,index_rij_su_h,wu)
@@ -97,7 +97,7 @@ do npi = 1,DBSPH%n_w
               rijtemp = ragtemp(1) * ragtemp(1) + ragtemp(2) * ragtemp(2) +    &
                         ragtemp(3) * ragtemp(3)
 ! Distance check
-              if (rijtemp > doublesquareh) cycle
+              if (rijtemp > square_doubleh) cycle
               rijtemp2 = rijtemp
               rij_su_h = dsqrt(rijtemp) / Domain%h
               rij_su_h_quad = rijtemp2 / squareh

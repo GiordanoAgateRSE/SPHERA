@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.9.0.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2019 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -148,7 +148,7 @@ double precision :: eta ! 0.001 * Domain%h
 double precision :: eta2 ! 0.01 * Domain%h * Domain%h
 double precision :: doubleh ! 2.*Domain%h
 double precision :: squareh ! Domain%h*Domain%h
-double precision :: doublesquareh ! doubleh * doubleh
+double precision :: square_doubleh ! doubleh * doubleh
 double precision :: cubich ! Domain%h*Domain%h*Domain%h
 double precision :: unosuh ! 1./Domain%h
 double precision :: unosusquareh ! 1./(Domain%h*Domain%h)

@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.9.0.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2018 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2019 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -105,7 +105,7 @@ side_loop: do isi=1,NumBSides
       if (((xpmin<xp).AND.(xp<xpmax)).AND.((ypmin<yp).AND.(yp<ypmax))) then
          if (xp<zero) then
             xpq = xp * xp
-            ypmx = dsqrt(doublesquareh - xpq)
+            ypmx = dsqrt(square_doubleh - xpq)
             ypmn = -ypmx 
 ! The particle falls on the segment 
             elseif (xp<=sidel) then
@@ -113,7 +113,7 @@ side_loop: do isi=1,NumBSides
                ypmn = ypmin 
                elseif (xp<xpmax) then
                   Lmxpq = (sidel - xp) * (sidel - xp)
-                  ypmx = dsqrt(doublesquareh - Lmxpq)
+                  ypmx = dsqrt(square_doubleh - Lmxpq)
                   ypmn = -ypmx 
          endif
 ! The boundary must be considered for the current particle as a close boundary
