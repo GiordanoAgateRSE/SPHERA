@@ -50,9 +50,9 @@ character(4) :: strtype
 !------------------------
 ! Statements
 !------------------------
-ncbf = BoundaryDataPointer(1,npi)
+Ncbf = BoundaryDataPointer(1,npi)
 ibdt = BoundaryDataPointer(3,npi)
-if (Ncbf>0) then  
+if (Ncbf>0) then
    do icbf=1,Ncbf
       ibdp = ibdt + icbf - 1
       LocX(1:SPACEDIM) = BoundaryDataTab(ibdp)%LocXYZ(1:SPACEDIM)

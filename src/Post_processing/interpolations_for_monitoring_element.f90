@@ -34,9 +34,9 @@ use Dynamic_allocation_module
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: nceli,ncel,npar,igridi,kgridi,jgridi,irang,krang,jrang,fw,sb
-integer(4) :: mm,npj,irestocell
-double precision :: rijlocal,uni, pesoj,plocal,rho
+integer(4) :: nceli,ncel,igridi,kgridi,jgridi,irang,krang,jrang,fw,sb
+integer(4) :: mm,npj,irestocell,ID_closest_fb,number_SASPH_neighbours
+double precision :: rijlocal,uni, pesoj,plocal,rho,dis_closest_fb
 double precision,dimension(3) :: raglocal,vel
 type (TyCtlPoint) :: pglocal
 integer(4),external :: CellIndices,CellNumber
@@ -57,7 +57,14 @@ uni = zero
 plocal = zero
 rho = zero
 vel(:) = zero
-npar = 0
+! Distance between the monitoring element and the possible closest fluid  
+! particle (within the kernel support of the monitoring element)
+dis_closest_fb = 2.d0 * Domain%h
+! ID of the possible closest fluid particle
+ID_closest_fb = 0
+! Number of the neighbouring SA-SPH frontiers of the possible fluid particle 
+! which is the closest to the monitoring element  
+number_SASPH_neighbours = 0
 !------------------------
 ! Statements
 !------------------------
@@ -67,6 +74,7 @@ do jrang = jgridi-1,jgridi+1
       do krang = kgridi-1,kgridi+1
          ncel = CellNumber (irang,jrang,krang)
          if (ncel==0) cycle
+! Contributions from fluid particles
          if (Icont(ncel+1)>Icont(ncel)) then
 ! Loop over the cell particles
             do mm=Icont(ncel),Icont(ncel+1)-1  
@@ -75,18 +83,22 @@ do jrang = jgridi-1,jgridi+1
                raglocal(:) = pglocal%coord(:) - pg(npj)%coord(:)
                rijlocal = dot_product(raglocal,raglocal)
                if (rijlocal>square_doubleh) cycle
-               npar = npar + 1
                rijlocal = dsqrt(rijlocal) 
                pesoj = pg(npj)%mass * w(rijlocal,Domain%h,Domain%coefke) /     &
                        pg(npj)%dens
                uni = uni + pesoj
-! Local pressure
+! Update of the monitoring element pressure
                plocal  = plocal  + pg(npj)%pres * pesoj        
-! Local density (mono-phase SPH approximation)
+! Update of the monitoring element density (mono-phase SPH approximation)
                rho = rho + pg(npj)%dens * pesoj
                vel(:) = vel(:) + pg(npj)%vel(:) * pesoj
+! Update the information on the possible closest fluid particle (within the 
+! kernel support of the monitoring element)
+               dis_closest_fb = min(dis_closest_fb,rijlocal)
+               if (dis_closest_fb==rijlocal) ID_closest_fb = npj
             enddo
          endif
+! Contributions from wall elements
          if ((Domain%tipo=="bsph").and.(DBSPH%n_w>0).and.                      &
             (Icont_w(ncel+1)>Icont_w(ncel))) then
 ! Loop over the neighbouring wall particles in the cell
@@ -97,7 +109,6 @@ do jrang = jgridi-1,jgridi+1
                rijlocal = dot_product(raglocal,raglocal)
 ! The wall element lies within the "kernel support" of the monitoring element
                if (rijlocal>square_doubleh) cycle
-               npar = npar + 1
                rijlocal = dsqrt(rijlocal)
                pesoj = pg_w(npj)%mass * w(rijlocal,Domain%h,Domain%coefke) /   &
                        pg_w(npj)%dens
@@ -107,7 +118,7 @@ do jrang = jgridi-1,jgridi+1
                vel(:) = vel(:) + pg_w(npj)%vel(:) * pesoj        
             enddo
          endif
-! To revise this part and then try it
+! Contributions from body particles
          if ((n_bodies>0).and.(Icont_bp(ncel+1)>Icont_bp(ncel))) then
 ! Loop over the neighbouring solid particles in the cell
             do sb=Icont_bp(ncel),Icont_bp(ncel+1)-1
@@ -117,7 +128,6 @@ do jrang = jgridi-1,jgridi+1
                rijlocal = dot_product(raglocal,raglocal)
                if (rijlocal>square_doubleh) cycle
 ! The body particle lies within the "kernel support" of the monitoring element
-               npar = npar + 1
                rijlocal = dsqrt(rijlocal)
 ! "Inner" and surface body particles are both useful
                pesoj = w(rijlocal,Domain%h,Domain%coefke) *                    &
@@ -132,10 +142,34 @@ do jrang = jgridi-1,jgridi+1
    enddo
 enddo
 pglocal%uni = uni
-if ((npar>0).and.(uni>=1.d-1)) then
-   pglocal%pres = plocal/uni
-   pglocal%dens = rho/uni
-   pglocal%vel(:) = vel(:)/uni
+if (uni>=1.d-1) then
+! In case the dicrete Shepard coefficient is smaller than 0.1 the monitor 
+! element assumes null pressure, velocity and density.
+   if (ID_closest_fb>0) then
+      if (ncord==3) then
+         number_SASPH_neighbours = BoundaryDataPointer(1,ID_closest_fb)
+         elseif (ncord==2) then
+            number_SASPH_neighbours = BoundaryDataPointer(2,ID_closest_fb)
+      endif
+   endif
+   if ((ID_closest_fb>0).and.(number_SASPH_neighbours>0)) then
+! If the possible closest fluid particle has neighbouring SA-SPH frontiers, 
+! then interpolations are replaced by this particle value (if the monitoring 
+! element has neighbouring SA-SPH frontiers, then one cannot neglect the SA-SPH 
+! contributions; as they are cumbersome to estimate for a monitoring element, 
+! which is not a particle, it seems smarter to refer to the closest fluid 
+! particle as the particle values are already representative of their kernel 
+! support).
+      pglocal%pres = pg(ID_closest_fb)%pres
+      pglocal%dens = pg(ID_closest_fb)%dens
+      pglocal%vel(:) = pg(ID_closest_fb)%vel(:)
+      else
+! SPH interpolations at the position of the monitoring element from the values 
+! of the nieghbounring fluid particles, wall elements and body particles.
+         pglocal%pres = plocal/uni
+         pglocal%dens = rho/uni
+         pglocal%vel(:) = vel(:)/uni
+   endif
 endif
 !------------------------
 ! Deallocations

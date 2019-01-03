@@ -84,13 +84,13 @@ do i=(ic-1),(ic+1)
    do j=(jc-1),(jc+1)
       do k=(kc-1),(kc+1)
 ! To find the cell ID of the adjacent cell
-         nc = CellNumber(i, j, k)
+         nc = CellNumber(i,j,k)
          if (nc==0) cycle
 ! To load the number of boundary faces cutting the cell and the initial and 
 ! final pointers
          nfpercell = GCBFPointers(nc,1)
          if (nfpercell>0) then
-            flpini = GCBFPointers(nc, 2)
+            flpini = GCBFPointers(nc,2)
             flpfin = flpini + nfpercell - 1
 ! Loop over the cutting faces
             do flp=flpini,flpfin

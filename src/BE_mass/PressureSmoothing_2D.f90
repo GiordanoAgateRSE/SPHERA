@@ -89,7 +89,7 @@ do ii=1,indarrayFlu
 ! Excluding particles close to the face with conditions "flow", "velo" and "sour"
    if (pg(npi)%koddens==0) then 
       Nsp = nPartIntorno(npi)
-      if (Nsp > 0) then
+      if (Nsp>0) then
          Appunity = zero
          mati = pg(npi)%imed
          ro0i = Med(mati)%den0
@@ -117,7 +117,7 @@ do ii=1,indarrayFlu
                VIntWdV_OSP = zero
                press_so = pi
                press_osb = pi
-                Ncbs = BoundaryDataPointer(1,npi)
+               Ncbs = BoundaryDataPointer(1,npi)
                IntNcbs = BoundaryDataPointer(2,npi)
                ibdt = BoundaryDataPointer(3,npi)
                do icbs=1,IntNcbs
@@ -149,7 +149,7 @@ do ii=1,indarrayFlu
                               (partz(izonelocal)%pressure=="pl")) then
                               press_so = ro0i * Domain%grav(3) *               &
                                  (Pg(npi)%coord(3) - partz(izonelocal)%valp)
-                        end if
+                        endif
                         else if (strtype=="crit") then
                            VIntWdV_OSP = VIntWdV_OSP + IntWdV
 ! Implicitly press_osp = pi
@@ -165,9 +165,9 @@ do ii=1,indarrayFlu
                                     (pg(npi)%coord(3) - partz(izonelocal)%valp)
                                  else
                                     press_osb = pi
-                              end if
-                  end if
-               end do
+                              endif
+                  endif
+               enddo
                if (esplosione) then
                   TetaP1 = Domain%TetaP * pg(npi)%Csound * dt / Domain%h
                   else
