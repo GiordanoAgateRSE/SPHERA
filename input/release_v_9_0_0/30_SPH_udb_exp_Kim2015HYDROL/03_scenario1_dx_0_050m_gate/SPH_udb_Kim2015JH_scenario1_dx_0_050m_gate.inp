@@ -401,11 +401,6 @@ liquid
 0.
 ##### end general physical properties #####
 
-##### restart #####
-time 320.
-udb_flood_Kim2015JH.res
-##### end restart #####
-
 ##### output regulation #####
 results time 601.
 restart time 2.5
