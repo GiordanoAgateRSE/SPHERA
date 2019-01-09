@@ -167,8 +167,7 @@ interface_sliding_vel_max(:) = 0.d0
 !------------------------
 ! Updating pressure of the body particles
 call body_pressure_mirror
-! Contributions to fluid dynamics momentum equations (discretized semi-analytic 
-! approach: a mirror particle technique)
+! Contributions to fluid dynamics momentum equations
 do npi=1,n_body_part
    do j=1,nPartIntorno_bp_f(npi)
       npartint = (npi - 1) * NMAXPARTJ + j
@@ -186,7 +185,7 @@ do npi=1,n_body_part
 ! Contribution to the shear stress gradient term
          pg(npj)%acc(:) = pg(npj)%acc(:) - 2.d0 * pg(npj)%visc *               &
                           (bp_arr(npi)%vel(:) - pg(npj)%vel(:)) *              &
-                          KerDer_bp_f_cub_spl * aux_scalar
+                          KerDer_bp_f_cub_spl(npartint) * aux_scalar
       endif
    enddo
 enddo
