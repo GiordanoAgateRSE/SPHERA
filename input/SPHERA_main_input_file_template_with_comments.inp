@@ -595,7 +595,8 @@ restart_file                        ! restart_file(restart file name -with
 ! possible fourth) of each line are keywords.
 results time dt_out                 ! dt_out(writing time step for the water 
                                     ! front: output file ".fro")
-restart time dt_restart             ! dt_restart(restart time frequency)
+restart time dt_restart             ! dt_restart(restart time frequency; 
+                                    ! default value: 2 * "vtkconverter any")
 print partial log_file_frequency    ! log_file_frequency (log file writing time 
                                     ! step in terms of time step number) 
 control time dt_out_mon             ! dt_out_mon(writing time step for 
