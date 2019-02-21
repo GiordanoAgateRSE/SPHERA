@@ -42,7 +42,9 @@ dx h/dx r     ! The third parameter ("r") is optional and provides a white noise
 ! frontiers
 ! In absence of a declared origin, the first vertex is fictitious,  
 ! and does not belong to any boundary (only useful for Paraview) 
-1 Vertex_x Vertex_y Vertex_z              ! (first vertex data) 
+1 Vertex_x Vertex_y Vertex_z              ! (first vertex data starting from 
+!                                         ! the possible topography from which 
+!                                         ! reservoirs are extruded) 
 ! ...                                     ! (other vertices; no gaps on vertex 
                                           ! IDs)
 Last_vertex_ID Vertex_x Vertex_y Vertex_z ! (last vertex data)

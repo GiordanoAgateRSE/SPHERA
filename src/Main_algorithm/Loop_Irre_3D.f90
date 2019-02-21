@@ -856,14 +856,14 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
    call CalcVarp
    if (Domain%icpoi_fr>0) then 
       if ((mod(it,Domain%icpoi_fr)==0).and.npointst>0) then
-         call memo_ctl
+         call Memo_Ctl
       endif
       if (n_bodies>0) then
          if (mod(it,Domain%icpoi_fr)==0)  call Body_dynamics_output      
       endif
       elseif (Domain%cpoi_fr>zero) then
          if ((mod(simulation_time,Domain%cpoi_fr)<=dtvel).and.npointst>0) then
-            call memo_ctl
+            call Memo_Ctl
          endif
          if (n_bodies>0) then
             if (mod(simulation_time,Domain%cpoi_fr)<=dtvel) then
@@ -887,7 +887,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
          call calc_pelo
       endif
       elseif (Domain%pllb_fr>zero) then
-         if ((mod(simulation_time,Domain%pllb_fr) <= dtvel).and.nlines>0) then
+         if ((mod(simulation_time,Domain%pllb_fr)<=dtvel).and.nlines>0) then
             call calc_pelo
          endif
    endif

@@ -74,7 +74,7 @@ pesodt = zero
 dt_alfa_Mon = .false.
 ioerr = 0
 nrighe = 0
-Npoints = NumberEntities(4)
+npoints = NumberEntities(4)
 NumberEntities = 0
 ! Check the compatibility of the input file with the program version 
 current_version = .TRUE.

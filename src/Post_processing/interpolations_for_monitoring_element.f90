@@ -99,24 +99,25 @@ do jrang = jgridi-1,jgridi+1
             enddo
          endif
 ! Contributions from wall elements
-         if ((Domain%tipo=="bsph").and.(DBSPH%n_w>0).and.                      &
-            (Icont_w(ncel+1)>Icont_w(ncel))) then
+         if ((Domain%tipo=="bsph").and.(DBSPH%n_w>0)) then
+            if (Icont_w(ncel+1)>Icont_w(ncel)) then
 ! Loop over the neighbouring wall particles in the cell
-            do fw=Icont_w(ncel),Icont_w(ncel+1)-1
-               npj = NPartOrd_w(fw)
+               do fw=Icont_w(ncel),Icont_w(ncel+1)-1
+                  npj = NPartOrd_w(fw)
 ! Relative positions and distances
-               raglocal(:) = pglocal%coord(:) - pg_w(npj)%coord(:)
-               rijlocal = dot_product(raglocal,raglocal)
+                  raglocal(:) = pglocal%coord(:) - pg_w(npj)%coord(:)
+                  rijlocal = dot_product(raglocal,raglocal)
 ! The wall element lies within the "kernel support" of the monitoring element
-               if (rijlocal>square_doubleh) cycle
-               rijlocal = dsqrt(rijlocal)
-               pesoj = pg_w(npj)%mass * w(rijlocal,Domain%h,Domain%coefke) /   &
-                       pg_w(npj)%dens
-               uni = uni + pesoj
-               plocal = plocal  + pg_w(npj)%pres * pesoj
-               rho = rho + pg_w(npj)%dens * pesoj                  
-               vel(:) = vel(:) + pg_w(npj)%vel(:) * pesoj        
-            enddo
+                  if (rijlocal>square_doubleh) cycle
+                  rijlocal = dsqrt(rijlocal)
+                  pesoj = pg_w(npj)%mass * w(rijlocal,Domain%h,Domain%coefke) /&
+                          pg_w(npj)%dens
+                  uni = uni + pesoj
+                  plocal = plocal  + pg_w(npj)%pres * pesoj
+                  rho = rho + pg_w(npj)%dens * pesoj                  
+                  vel(:) = vel(:) + pg_w(npj)%vel(:) * pesoj        
+               enddo
+            endif
          endif
 ! Contributions from body particles
          if ((n_bodies>0).and.(Icont_bp(ncel+1)>Icont_bp(ncel))) then

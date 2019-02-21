@@ -62,7 +62,7 @@ do i=1,npointst
    ii = ceiling(xp / Grid%dcd(1))
    jj = ceiling(yp / Grid%dcd(2))
    kk = ceiling(zp / Grid%dcd(3)) 
-   pointcellnumber = CellNumber(ii, jj, kk)
+   pointcellnumber = CellNumber(ii,jj,kk)
    pglocal%cella = pointcellnumber
    call interpolations_for_monitoring_element(pglocal)
    control_points(i)%pres = pglocal%pres

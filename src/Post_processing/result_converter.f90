@@ -41,9 +41,9 @@ integer(4) :: npi,i,j,k,k1,k2,numcells,numpoints
 double precision :: curtime
 integer(4),dimension(24) :: iappo
 integer(4),dimension(:),allocatable :: finger
-character(len=256) :: stringa,header_string
+character(len=10) :: cargo
 character(len=120) :: filevtk,prefix
-character(len=10)  :: cargo
+character(len=256) :: stringa,header_string
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -53,7 +53,7 @@ character(len=10)  :: cargo
 !------------------------
 ! Initializations
 !------------------------
-! .. check for time sampling is active
+! the check for time sampling is active
 curtime = simulation_time  
 !------------------------
 ! Statements
@@ -62,14 +62,14 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
 ! To concatenate the ".txt" output files and remove the original ones
 call cat_post_proc
 ! Rounding current physical time for Paraview .vtu files
-   curtime = simulation_time - MOD(simulation_time,abs(freq_time))  
-   if (nag>0) then
-      block = block + 1
-      nblocchi = nblocchi + 1
-      if (nblocchi>maxnumblock) then
-         write(uerr,'(a)')                                                     &
-' Warning! nblocchi>maxnumblock in subroutine result_converter.'
-         write(uerr,'(a)')                                                     &
+curtime = simulation_time - MOD(simulation_time,abs(freq_time))  
+if (nag>0) then
+   block = block + 1
+   nblocchi = nblocchi + 1
+   if (nblocchi>maxnumblock) then
+      write(uerr,'(a)')                                                     &
+         ' Warning! nblocchi>maxnumblock in subroutine result_converter.'
+      write(uerr,'(a)')                                                     &
          '    Increase maxnumblock or decrease output frequency for vtu files.'
       nblocchi = maxnumblock
    endif
@@ -1150,8 +1150,8 @@ call cat_post_proc
       flush(unitvtk)
       close (unitvtk)
       deallocate(finger)
-   endif  
-endif 
+   endif
+endif
 ! Updating the last output time for .vtu files 
 if (freq_time>zero) then
    val_time = val_time + abs(freq_time)

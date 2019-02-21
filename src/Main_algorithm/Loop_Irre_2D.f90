@@ -834,14 +834,14 @@ done_flag = .false.
    call CalcVarp
    if (Domain%icpoi_fr>0) then 
       if ((mod(it,Domain%icpoi_fr)==0).AND.(npointst>0)) then
-         call memo_ctl
+         call Memo_Ctl
       endif   
       if (n_bodies>0) then
          if (mod(it,Domain%icpoi_fr)==0)  call Body_dynamics_output      
       endif
       elseif (Domain%cpoi_fr>zero) then
          if ((mod(simulation_time,Domain%cpoi_fr)<=dtvel).AND.(npointst>0)) then
-            call memo_ctl
+            call Memo_Ctl
          endif   
          if (n_bodies>0) then
             if (mod(simulation_time,Domain%cpoi_fr)<=dtvel) then

@@ -48,7 +48,7 @@ character(255) :: nomefilectl
 !------------------------
 ! Statements
 !------------------------
-if (Npoints>0) then
+if (npoints>0) then
    write(nomefilectl,"(a,a,i8.8,a)") nomecaso(1:len_trim(nomecaso)),'_',       &
       on_going_time_step,".cpt"
    open(ncpt,file=nomefilectl,status="unknown",form="formatted")
@@ -57,7 +57,7 @@ if (Npoints>0) then
       "X Coord","Y Coord","Z Coord","X Velocity","Y Velocity","Z Velocity",    &
       " Pressure","Density "
   flush(ncpt)
-  do i=1,Npoints
+  do i=1,npoints
      if (control_points(i)%cella==0) then
         write(ncpt,'(a,i10,a,3g14.7)') "control point ",i,                    &
            " is outside. Coord=",Control_Points(i)%coord(:)
@@ -68,10 +68,10 @@ if (Npoints>0) then
               Control_Points(i)%dens
      endif
   enddo
-  close (ncpt)
+  close(ncpt)
 endif
 ! Printing monitoring line data
-if (Nlines>0) then
+if (nlines>0) then
    write(nomefilectl,"(a,a,i8.8,a)") nomecaso(1:len_trim(nomecaso)),'_',       &
       on_going_time_step,".cln"
    open(ncpt,file=nomefilectl,status="unknown",form="formatted")
@@ -79,7 +79,7 @@ if (Nlines>0) then
    write(ncpt,'(5(11x,a),3(9x,a),(10x,a),(5x,a))') "t(s)","step","x(m)",      &
       "y(m)","z(m)","u(m/s)","v(m/s)","w(m/s)","p(Pa)","rho(kg/m3)"
   flush(ncpt)
-  do i=1,Nlines
+  do i=1,nlines
      write(ncpt,*) "line #", i,"    Label ",Control_Lines(i)%label
      do j=Control_Lines(i)%icont(1),Control_Lines(i)%icont(2)
         if (control_points(j)%cella==0) then
