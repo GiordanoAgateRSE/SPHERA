@@ -58,11 +58,11 @@ Last_vertex_ID Vertex_x Vertex_y Vertex_z ! (last vertex data)
 ! the parallelepiped domain as a "perimeter" and the "fictitious reservoirs".
 ! In case of SA-SPH boundary treatment scheme, the code requires the 
 ! lines of the boundaries
-1 line_1_vertex_1 ... line_1_vertex last line_1_Boundary_ID
-                                           ! first line data
+! Add the token "&" or ">" at the end of a line for continuation lines
+1 line_1_vertex_1 ... line_1_vertex_last   ! first line data
 ...                                        ! other records (no gaps on line 
                                            ! IDs)
-line_last_ID line_last_vertex_1 ... line_last_vertex_last line_last_Boundary_ID
+line_last_ID line_last_vertex_1 ... line_last_vertex_last
 ##### END LINES #####
 ! If (D==2D): end
 ! If (D==3D): start
@@ -73,6 +73,8 @@ line_last_ID line_last_vertex_1 ... line_last_vertex_last line_last_Boundary_ID
 ! the parallelepiped domain as a "perimeter" and the "fictitious reservoirs".
 ! In case of SA-SPH boundary treatment scheme, the code requires the 
 ! the actual boundary faces.
+! In case a fluid reservoir needs to be partitioned, then each partition needs 
+! a dedicated "perimeter" item.
 ! Vertex list clockwise (normal vector exiting the frontier/domain; 
 ! view from the semi-space of the normal vector): not the best convention.
 ! The last 1/2/3 vertex IDs are 0 in case of pentagonal/quadrilateral/triangular
@@ -203,7 +205,7 @@ RGBColor
 ! If (Boundary_type=="source"): start
 fluid_ID
 flowrate 0.                 ! flowrate(inlet velocity * inlet area); 0.
-pa IC_pressure              !
+pa IC_pressure              ! "pa" is a keyword
 RGBColor 
 ! If (Boundary_type=="source"): end
 
@@ -233,7 +235,11 @@ n_monitor_points n_monitor_regions  ! n_monitor_points; n_monitor_regions=0,1(to
 ID_wall_element_monitor_1 ... ID_wall_element_monitor_n
 ! if (n_monitor_points>0): end
 ! if (n_monitor_regions>0): start
-xmin,xmax,ymin,xmax,zmin,zmax       ! (monitoring region vertices) 
+xmin_1,xmax_1,ymin_1,xmax_1,zmin_1,zmax_1
+                                    ! (vertices of monitoring region "1") 
+...
+xmin_last,xmax_last,ymin_last,xmax_last,zmin_last,zmax_last 
+                                    ! (vertices of the last monitoring region)
 ! if (n_monitor_regions>0): end
 surface_mesh_files flag_in-built_monitors ! surface_mesh_files: number of files 
                                           ! of the DBSPH surface meshes;
