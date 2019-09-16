@@ -1,5 +1,5 @@
 # Variables to be updated
-VERSION = 9_0_0_AA
+VERSION = 9_0_0
 # Suggested values for EXECUTION
 #    bin
 #    debug

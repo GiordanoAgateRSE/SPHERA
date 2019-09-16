@@ -38,8 +38,8 @@ integer(4),dimension(20) :: NumberEntities
 integer(4),dimension(NumBVertices) :: BoundaryVertex
 type (TyBoundaryStretch),dimension(NumTratti) :: Tratto
 character(1) :: comment
-character(100) :: ainp
-integer(4),parameter :: MAXLINENODES = 20
+character(200) :: ainp
+integer(4),parameter :: MAXLINENODES = 820
 integer(4) :: n,i,ioerr,i1,index,numv,numv_line,ipointer
 character(5) :: txt
 character(100) :: token
