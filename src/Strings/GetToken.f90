@@ -36,7 +36,7 @@ integer(4) :: itok,ioerr
 character(*) :: ainp
 logical :: blank
 integer(4) :: n,number_token
-integer(4),dimension(2,80) :: index_token
+integer(4),dimension(2,820) :: index_token
 !------------------------
 ! Explicit interfaces
 !------------------------
