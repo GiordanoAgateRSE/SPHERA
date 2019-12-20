@@ -52,8 +52,8 @@ integer(4) :: jgridi,kgridi,iappo,contatore,ind_neigh,ind_ref_interface
 double precision :: interf_liq,interf_sol,partLiq_pres,Ks,Ustar
 double precision :: Ustarold,Z0,Velocity,Velocity2,Taub,Restar,RestarC
 double precision :: Tetacr,Taubcror,Taubcr,phi,beta,gamma,Kbeta,Kgamma
-double precision :: nu_ustar,deltanu,DistZmin,pretot,DifRel,aux_scal
-double precision :: rel_dis(3),vel_rij(3),vel_s(3),aux_vec(3),aux_vec_2(3)
+double precision :: nu_ustar,deltanu,DistZmin,pretot,DifRel
+double precision :: vel_s(3),aux_vec(3)
 character(len=lencard)  :: nomsub = "Shields"
 integer(4),external :: ParticleCellNumber,CellIndices,CellNumber
 !------------------------

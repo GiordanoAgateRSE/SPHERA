@@ -64,20 +64,20 @@ if (gravmod>zero) then
    else
       coshor = zero
       senhor = zero
-end if
+endif
 pl_quote = max_negative_number
 pl_id = 0
 ! To search for free level conditions, if present ("pl" type).
 do npi=1,nag
    Nz = pg(npi)%izona
-   if (partz(Nz)%pressure/="pl") cycle 
+   if (partz(Nz)%pressure/="pl") cycle
    if (pl_id==0) then
       pl_id = int(partz(Nz)%valp)
-      else if (pl_id/=int(partz(Nz)%valp)) then
+      elseif (pl_id/=int(partz(Nz)%valp)) then
          call diagnostic(arg1=10,arg2=8,arg3=nomsub)
-   end if
+   endif
    pl_quote = max(pl_quote,pg(npi)%coord(3))
-end do 
+enddo 
 particle_loop: do npi=1,nag
 ! Initial conditions for pressure (from input file)
    Nz = pg(npi)%izona
@@ -85,7 +85,7 @@ particle_loop: do npi=1,nag
       pg(npi)%pres = partz(Nz)%valp + Domain%prif
       pg(npi)%dens = med(pg(npi)%imed)%den0
       cycle particle_loop
-   end if   
+   endif   
 ! To detect the cell number of the current particle
    ncelcorr = ParticleCellNumber(pg(npi)%coord)
    iappo = CellIndices(ncelcorr,igridi,jgridi,kgridi)
@@ -137,7 +137,7 @@ particle_loop: do npi=1,nag
    if (abs(ZQuotaMediumCorr-ZQuotaColonna)<xyz_tolerance) foundcell = .false.
 ! To set the reference pressure quote depending on the condition type
    if (partz(Nz)%pressure=="qp") ZQuotaColonna = partz(Nz)%valp
-   if (partz(Nz)%pressure=="pl") ZQuotaColonna = pl_quote
+   if (partz(Nz)%pressure=="pl") ZQuotaColonna = pl_quote + Domain%dx / 2.d0
 ! An upper medium interface cell has been found
    if (foundcell) then
 ! The average quote of the medium interface in the cell is calculated

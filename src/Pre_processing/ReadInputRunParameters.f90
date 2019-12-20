@@ -42,7 +42,7 @@ integer(4) :: MAXNUMCONVEXEDGES,GCBFVecDim_loc,density_thresholds,nag_aux
 character(1) :: Psurf
 character(100) :: token
 logical,external :: ReadCheck
-character(100),external :: lcase, GetToken
+character(100),external :: lcase,GetToken
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -58,7 +58,7 @@ character(100),external :: lcase, GetToken
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"RUN PARAMETERS DATA",ninp,ulog))     &
    return
-do while (TRIM(lcase(ainp))/="##### end run parameters #####")
+do while (trim(lcase(ainp))/="##### end run parameters #####")
    read (ainp,*,iostat=ioerr) tmax
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"MAX. TRANSIENT TIME & ITERATIONS",&
       ninp,ulog)) return
@@ -82,7 +82,7 @@ do while (TRIM(lcase(ainp))/="##### end run parameters #####")
    token = GetToken(ainp,3,ioerr)
    if (ioerr==0) then
       read (token,*,iostat=ioerr) Psurf
-      Psurf = lcase(Psurf)
+      Psurf = trim(lcase(Psurf))
       if ((Psurf/='o').and.(Psurf/='s').and.(Psurf/='a')) then
          write(uerr,"(1x,a)")                                                  &
             "Error setting run parameters. SMOOTHING Pressure Surface not set."

@@ -60,7 +60,7 @@ character(8) :: label
 character(100) :: token
 logical,external :: ReadCheck
 integer(4),external :: ptcolorrgb
-character(100), external :: lcase, GetToken
+character(100), external :: lcase,GetToken
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -78,7 +78,7 @@ valp = zero
 !------------------------
 ! In case of restart, input data are not read
 if (restart) then
-   do while (TRIM(lcase(ainp))/="##### end boundaries #####")
+   do while (trim(lcase(ainp))/="##### end boundaries #####")
       call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
       if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"BOUNDARIES DATA",ninp,ulog))   &
          return
@@ -88,7 +88,7 @@ endif
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"BOUNDARIES DATA",ninp,ulog)) return
 ! Reading input data
-do while (TRIM(lcase(ainp))/="##### end boundaries #####")
+do while (trim(lcase(ainp))/="##### end boundaries #####")
    label = ainp(1:8)
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"BOUNDARIES INDEX",ninp,ulog))     &
@@ -103,7 +103,7 @@ do while (TRIM(lcase(ainp))/="##### end boundaries #####")
 ! Boundary type
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"BOUNDARY TYPE",ninp,ulog)) return
-   tipo = lcase(ainp(1:4))
+   tipo = trim(lcase(ainp(1:4)))
    numv = 0
    ipointer = 0
    move = "   "
@@ -193,7 +193,7 @@ do while (TRIM(lcase(ainp))/="##### end boundaries #####")
             trampa = zero
          endif
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         pressu = GetToken(ainp,1,ioerr)
+         pressu = trim(GetToken(ainp,1,ioerr))
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"SOURCE PRESSURE TYPE",ninp, &
             ulog)) return
          if (pressu=="pa") then  
@@ -225,7 +225,7 @@ do while (TRIM(lcase(ainp))/="##### end boundaries #####")
             ,ulog)) return
          move   = "std"
 ! Boundary condition "velo"
-      case("velo")    
+      case("velo")
          NumberEntities(3) = NumberEntities(3) + 1
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          if (ioerr==0) read(ainp,*,iostat=ioerr) velocity,trampa
@@ -345,7 +345,7 @@ do while (TRIM(lcase(ainp))/="##### end boundaries #####")
          if (NumberEntities(1)==3) then      
             NumberEntities(3) = NumberEntities(3) + 1
             call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-            pool_plane = GetToken(ainp,1,ioerr)
+            pool_plane = trim(GetToken(ainp,1,ioerr))
             if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"POOL: X/Y/Z/ PLANE LABEL"&
                ,ninp,ulog)) return
             token = GetToken(ainp,2,ioerr)

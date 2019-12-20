@@ -24,7 +24,7 @@
 !              input file.                       
 !-------------------------------------------------------------------------------
 subroutine ReadInputMedium(NumberEntities,Med,ainp,comment,nrighe,ier,ninp,    &
-                           ulog,uerr)
+                           ulog)
 !------------------------
 ! Modules
 !------------------------
@@ -34,7 +34,7 @@ use Hybrid_allocation_module
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: nrighe,ier,ninp,ulog,uerr
+integer(4) :: nrighe,ier,ninp,ulog
 integer(4),dimension(20) :: NumberEntities
 type (TyMedium),dimension(NMedium) :: Med
 character(1) :: comment
@@ -46,7 +46,6 @@ double precision :: cons,codif,Settling,coes,Rough,d50,Gamma,InitialIntEn,d_90
 double precision :: limiting_viscosity
 double precision :: porosity
 character(8) :: tipo
-character(100) :: token
 character(100),external :: GetToken,lcase
 logical,external :: ReadCheck
 !------------------------
@@ -63,7 +62,7 @@ logical,external :: ReadCheck
 !------------------------
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"MEDIUM DATA",ninp,ulog)) return
-do while (TRIM(lcase(ainp))/="##### end medium #####")
+do while (trim(lcase(ainp))/="##### end medium #####")
    read(ainp,*,iostat=ioerr) tipo
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"MEDIUM TYPE",ninp,ulog)) return
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
@@ -93,7 +92,7 @@ do while (TRIM(lcase(ainp))/="##### end medium #####")
    nitersol = 0
    porosity = 0.d0
    d_90 = 0.d0
-   tipo = lcase(tipo)
+   tipo = trim(lcase(tipo))
    select case (tipo)
 ! Imposed dynamic viscosity for gases (explosion)
       case ("gas     ")

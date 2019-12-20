@@ -312,9 +312,9 @@ if (.not.restart) then
 ! allocated depending on the value "nag". 
          if (nag<100) then
 ! Initial domain empty (inlet section)
-            PARTICLEBUFFER = INIPARTICLEBUFFER * Domain%COEFNMAXPARTI
+            PARTICLEBUFFER = int(INIPARTICLEBUFFER * Domain%COEFNMAXPARTI) + 1
             else
-               PARTICLEBUFFER = nag * Domain%COEFNMAXPARTI
+               PARTICLEBUFFER = int(nag * Domain%COEFNMAXPARTI) + 1
          endif
          if (((Domain%tipo=="semi").or.(Domain%tipo=="bsph"))) then
             allocate(pg(PARTICLEBUFFER),stat=ier)
@@ -363,9 +363,9 @@ if (.not.restart) then
       endif
       if (nag<100) then
 ! Initial domain is empty (inlet section)
-         PARTICLEBUFFER = INIPARTICLEBUFFER * Domain%COEFNMAXPARTI
+         PARTICLEBUFFER = int(INIPARTICLEBUFFER * Domain%COEFNMAXPARTI) + 1
          else
-            PARTICLEBUFFER = nag * Domain%COEFNMAXPARTI
+            PARTICLEBUFFER = int(nag * Domain%COEFNMAXPARTI) + 1
       endif
       if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
          allocate(pg(PARTICLEBUFFER),stat=ier)  

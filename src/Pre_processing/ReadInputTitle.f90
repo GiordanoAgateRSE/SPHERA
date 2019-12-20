@@ -52,7 +52,7 @@ logical,external :: ReadCheck
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"TITLE DATA",ninp,ulog)) return 
 n = 0
-do while (TRIM(lcase(ainp))/="##### end title #####" )
+do while (trim(lcase(ainp))/="##### end title #####" )
    n = n + 1
    if (n<=maxtit) then
       title(n) = ainp

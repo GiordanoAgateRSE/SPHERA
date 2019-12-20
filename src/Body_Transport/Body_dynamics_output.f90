@@ -34,8 +34,8 @@ use Dynamic_allocation_module
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: nbi,npi,j,nsi,aux_integer
-double precision :: aux,teta_R_IO
+integer(4) :: nbi,npi,nsi,aux_integer
+double precision :: teta_R_IO
 double precision :: n_R_IO(3)
 ! 2 auxiliary parameters: pmax_R (x>0) and pmax_L (x<0), involving boundaries 
 ! pointing towards positive z

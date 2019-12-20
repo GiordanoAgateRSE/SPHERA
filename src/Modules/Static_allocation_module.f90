@@ -110,7 +110,7 @@ double precision,public,parameter :: VFmn = 0.1d0 ! Minimum volume fraction
 double precision,public,parameter :: VFmx = 0.9d0 ! Maximum volume fraction
 ! Global variables for the diffusion model: end
 integer(4),parameter :: MAXTIT = 10
-integer(4),public,parameter :: lencard= 200
+integer(4),public,parameter :: lencard = 200
 integer(4),public, parameter :: MAXPOINTSZONE = 20 ! Maximum number of points 
                                                    ! for the definition of a
                                                    ! "GENERIC" area

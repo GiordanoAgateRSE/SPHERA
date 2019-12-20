@@ -39,11 +39,9 @@ logical :: done_flag
 integer(4) :: Ncbf,i,npi,it,it_print,it_memo,it_rest,ir,ii,num_out,Ncbf_Max
 integer(4) :: OpCountot,SpCountot,EpCountot,EpOrdGridtot,ncel,aux,igridi
 integer(4) :: jgridi,kgridi,machine_Julian_day,machine_hour,machine_minute
-integer(4) :: machine_second,alloc_stat
-real :: time_aux_2
-double precision :: pretot,BCtorodivV,dt_previous_step,TetaV1,xmax,ymax,zmax
+integer(4) :: machine_second
+double precision :: BCtorodivV,dt_previous_step,TetaV1,xmax,ymax,zmax
 double precision :: appo1,appo2,appo3,dtvel
-real :: time_aux(2)
 double precision,dimension(1:SPACEDIM) :: tpres,tdiss,tvisc,BoundReaction
 character(len=lencard) :: nomsub = "Loop_Irre_3D"
 integer(4),external :: ParticleCellNumber,CellIndices,CellNumber

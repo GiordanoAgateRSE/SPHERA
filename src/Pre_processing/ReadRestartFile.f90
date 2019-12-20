@@ -57,7 +57,7 @@ aux_integer = 0
 ! Statements
 !------------------------
 ! Restart heading 
-if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
+if (trim(lcase(option))==trim(lcase("heading"))) then
    rewind(nsav)
    write(ulog,'(a)')    "-------------------"
    write(ulog,"(1x,a)") ">> Restart heading."
@@ -66,7 +66,7 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
    if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"versionerest,nrecords",nsav,    &
       ulog)) return
 ! Check the program version
-   if (TRIM(lcase(version))/=TRIM(lcase(versionerest))) then
+   if (trim(lcase(version))/=trim(lcase(versionerest))) then
       write(uerr,'(a)')                                                        &
          "---------------------------------------------------------------"
       write(uerr,"(1x,a)")                                                     &
@@ -96,7 +96,7 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
             "ReadRestartFile successully completed. "
       endif
    endif
-   elseif (TRIM(lcase(option))=="reading") then
+   elseif (trim(lcase(option))=="reading") then
       write(ulog,'(a)')                                                        &
          "---------------------------------------------------------------------"
       write(ulog,"(1x,a)")                                                     &

@@ -73,8 +73,8 @@ depth_dt_out = 0.0d0
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"OUTPUT REGULATION DATA",ninp,ulog))  &
    return
-do while (TRIM(lcase(ainp))/="##### end output regulation #####")
-   select case (TRIM(lcase(GetToken(ainp,1,ioerr))))
+do while (trim(lcase(ainp))/="##### end output regulation #####")
+   select case (trim(lcase(GetToken(ainp,1,ioerr))))
       case ("display")
          token = lcase(GetToken(ainp,2,ioerr))
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                             &

@@ -58,7 +58,7 @@ logical,external :: ReadCheck
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"BED LOAD TRANSPORT DATA",ninp,ulog)) &
    return
-do while (TRIM(lcase(ainp)) /= "##### end bed load transport #####")
+do while (trim(lcase(ainp)) /= "##### end bed load transport #####")
 ! Reading input parameters (first part)
    read(ainp,*,iostat=ioerr) ID_erosion_criterion,ID_main_fluid
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"BED-LOAD TRANSPORT INPUT LINE 1", &

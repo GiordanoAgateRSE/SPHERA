@@ -102,8 +102,7 @@ SECTION_LOOP: do while (ioerr==0)
       case("##### restart #####")
          call ReadInputRestart(ainp,comment,nrighe,ier,ninp,ulog)
       case("##### domain #####")
-         call ReadInputDomain(NumberEntities,ainp,comment,nrighe,ier,ninp,     &
-            ulog,uerr)
+         call ReadInputDomain(NumberEntities,ainp,comment,nrighe,ier,ninp,ulog)
       case("##### vertices #####")
          call ReadInputVertices(NumberEntities,Vertice, ainp,comment,nrighe,   &
             ier,.TRUE.,ninp,ulog)
@@ -120,7 +119,7 @@ SECTION_LOOP: do while (ioerr==0)
          call ReadBedLoadTransport(ainp,comment,nrighe,ier,ninp,ulog,uerr)
       case("##### medium #####")
          call ReadInputMedium(NumberEntities,Med,ainp,comment,nrighe,ier,ninp, &
-            ulog,uerr)
+            ulog)
       case("##### body dynamics #####")
          call ReadBodyDynamics(ainp,comment,nrighe,ier,ninp,ulog)
 ! Lower case letters are required

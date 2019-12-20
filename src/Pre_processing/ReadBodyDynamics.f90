@@ -59,7 +59,7 @@ logical,external :: ReadCheck
 call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
 if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"BODY DYNAMICS DATA",ninp,ulog))      &
    return
-do while (TRIM(lcase(ainp)) /= "##### end body dynamics #####")
+do while (trim(lcase(ainp)) /= "##### end body dynamics #####")
 ! Reading the number of bodies and the ratio between fluid and body particle 
 ! size
    read(ainp,*,iostat=ioerr) n_bodies,dx_dxbodies,friction_angle,              &

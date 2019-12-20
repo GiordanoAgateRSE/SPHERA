@@ -110,7 +110,8 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph"))  then
          endif
    endif
 endif
-NMAXPARTJ = Domain%COEFNMAXPARTJ * (Domain%h * four / Domain%dx) ** ncord
+NMAXPARTJ = int(Domain%COEFNMAXPARTJ * (Domain%h * four / Domain%dx) **        &
+            ncord) + 1
 write(ulog,'(2a,i15)') "     Maximum number of neighbouring particles: ",      &
    "NMAXPARTJ = ",NMAXPARTJ
 allocate(Array_Flu(1:PARTICLEBUFFER),stat=ier)
@@ -431,7 +432,7 @@ if ((Domain%imemo_fr>0).OR.(Domain%memo_fr>zero)) then
 endif
 ! To create vtk file to design the boundaries of the domain
 if (vtkconv) then
-   prefix = nomecaso
+   prefix = nomecaso(1:len(prefix))
    filevtk = "VTKConverter_"//prefix(1:len_trim(prefix))//"_domain.vtk"
    open(unit=unitvtk,file=filevtk,form='formatted',access='sequential',        &
       status='unknown')
@@ -728,7 +729,7 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
 endif
 ! To create the ".pvd" file
 if (vtkconv) then
-   prefix = nomecaso
+   prefix = nomecaso(1:len(prefix))
    filevtk = "VTKConverter_"//prefix(1:len_trim(prefix))//".pvd"
    open(unit=unitvtk,file=filevtk,form='formatted',access='sequential',        &
       status='unknown')

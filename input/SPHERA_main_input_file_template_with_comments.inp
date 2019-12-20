@@ -41,7 +41,10 @@ dx h/dx r     ! The third parameter ("r") is optional and provides a white noise
 ! The SA-SPH boundary treatment scheme requires the vertices of the wall 
 ! frontiers
 ! In absence of a declared origin, the first vertex is fictitious,  
-! and does not belong to any boundary (only useful for Paraview) 
+! and does not belong to any boundary (only useful for Paraview)
+! At least one SA-SPH frontier is requested to define the edges of the 
+! numerical domain. This frontier is possibly fictitious and does not interact 
+! with the SPH particles.
 1 Vertex_x Vertex_y Vertex_z              ! (first vertex data starting from 
 !                                         ! the possible topography from which 
 !                                         ! reservoirs are extruded) 
@@ -144,12 +147,17 @@ time_n_records u_n_records v_n_records w_n_records n_records
                             ! velocity, record_ID)                            
 ! if (motion_type=law): end
 IC_pressure_type IC_pressure_value
-                            ! IC_pressure_type=pa(uniform pressure),qp
-                            ! (hydrostatic conditions),pl(hydrostatic pressure 
-                            ! based on the maximum level of an assigned fluid;
-                            ! IC_pressure_value=(uniform pressure value for pa),
-                            ! (free surface height for qp), (equivalent free 
-                            ! surface level of the on-going fluid for pl)
+                            ! IC_pressure_type=pa(homogeneous conditions),qp 
+                            ! (hydrostatic conditions with equivalent free 
+                            ! surface level as input),pl(hydrostatic conditions 
+                            ! with equivalent free surface level equal to the  
+                            ! particle maximum height of a subset of 
+                            ! boundaries);
+                            ! IC_pressure_value=(IC_pressure_type=pa: uniform 
+                            ! pressure value),(IC_pressure_type=qp: equivalent 
+                            ! free surface level), (IC_pressure_type=pl: ID 
+                            ! indicating a subset of boundaries; only one 
+                            ! subset is allowed; real treated as an integer)
 IC_reservoir_type Car_top_zone DBSPH_fictitious_reservoir_flag
                             ! IC_reservoir_type=1(vertices and faces),2(from 
                             ! Cartesian topography); Car_top_zone = boundary ID 
@@ -399,7 +407,7 @@ max_step_still                      ! max_step_still(number of time steps during
 ##### BODY DYNAMICS #####
 ! Input parameters for the scheme on body transport in fluid flows
 ! Bodies with imposed kinematics are listed after all the bodies with computed 
-! kinematics
+! kinematics. Body particles cannot exit the numerical domain.
 n_bodies dx/dx_body friction_angle time_max_no_gravity_force time_max_no_body_frontier_impingements body_minimum_pressure_limiter body_maximum_pressure_limiter FSI_free_slip_conditions
                                     ! n_bodies(number of transported solid 
                                     ! bodies); dx/dx_body(ratio between fluid 

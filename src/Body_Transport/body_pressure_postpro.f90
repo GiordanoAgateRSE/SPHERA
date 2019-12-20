@@ -33,8 +33,8 @@ use Dynamic_allocation_module
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: npi,j,npartint,npj
-double precision :: Sum_W_vol,W_vol,dis,mod_normal,aux
+integer(4) :: npi,npj
+double precision :: Sum_W_vol,W_vol,dis,mod_normal
 double precision :: dis_vec(3)
 integer,dimension(:),allocatable :: wet
 double precision,dimension(:),allocatable :: aux_pres

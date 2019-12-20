@@ -64,7 +64,7 @@ n_kinematics_records(:) = 0
 !------------------------
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DBSPH DATA",ninp,ulog)) return
-do while (TRIM(lcase(ainp))/="##### end dbsph #####")
+do while (trim(lcase(ainp))/="##### end dbsph #####")
 ! Reading the ratio between the fluid and the semi-particle sizes (dx/dx_w)
    read(ainp,*,iostat=ioerr) dx_dxw,MUSCL_boundary_flag,k_w,slip_ID,           &
       Gamma_limiter_flag

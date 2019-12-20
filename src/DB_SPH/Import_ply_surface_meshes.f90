@@ -42,7 +42,7 @@ use I_O_diagnostic_module
 !------------------------
 implicit none
 integer(4) :: file_stat,n_vertices,old_size_vert,old_size_face,new_size_vert
-integer(4) :: new_size_face,dealloc_stat,alloc_stat,n_faces,face_vert_num,i,j,k
+integer(4) :: new_size_face,dealloc_stat,alloc_stat,n_faces,face_vert_num,j,k
 integer(4) :: surface_mesh_file_ID
 integer(4) :: aux_face_vert(6)
 character(100) :: file_name,aux_char_1,aux_char_2

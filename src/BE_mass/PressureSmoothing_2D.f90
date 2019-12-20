@@ -140,15 +140,14 @@ do ii=1,indarrayFlu
                      VIntWdV_FT = VIntWdV_FT + IntWdV
                      sompW = sompW + ro0i * (massforce(1) * IntDpWdV(1) +      &
                              massforce(2) * IntDpWdV(2))
-                     else if (strtype=="sour") then
+                     elseif (strtype=="sour") then
                         VIntWdV_SO = VIntWdV_SO + IntWdV
                         izonelocal = pg(npi)%izona
                         if (partz(izonelocal)%pressure=="pa") then
                            press_so = partz(izonelocal)%valp
-                           else if ((partz(izonelocal)%pressure=="qp").or.     &
-                              (partz(izonelocal)%pressure=="pl")) then
+                           elseif (partz(izonelocal)%pressure=="qp") then
                               press_so = ro0i * Domain%grav(3) *               &
-                                 (Pg(npi)%coord(3) - partz(izonelocal)%valp)
+                                 (pg(npi)%coord(3) - partz(izonelocal)%valp)
                         endif
                         else if (strtype=="crit") then
                            VIntWdV_OSP = VIntWdV_OSP + IntWdV

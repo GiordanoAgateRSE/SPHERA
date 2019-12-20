@@ -75,7 +75,7 @@ if (nag>0) then
    endif
    blocchi(nblocchi) = block
    Time_Block(nblocchi) = curtime
-   prefix = nomecaso
+   prefix = nomecaso(1:len(prefix))
    write(cargo,'(i8)') block
    cargo = adjustl(cargo)
    filevtk =                                                                   &

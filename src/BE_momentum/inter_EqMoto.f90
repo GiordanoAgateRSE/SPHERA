@@ -42,7 +42,7 @@ integer(4) :: npj,contj,npartint,index_rij_su_h
 double precision :: rhoi,rhoj,amassj,pi,pj,alpha,veln,velti,veltj,deltan,pre   
 double precision :: coeff,secinv,nupa,nu,modderveln,moddervelt,moddervel
 double precision :: dvtdn,denorm,rij_su_h,ke_coef,kacl_coef,rij_su_h_quad
-double precision :: vol_Shep,Ww_Shep,rijtemp,rijtemp2
+double precision :: rijtemp,rijtemp2
 double precision :: gradmod,gradmodwacl,wu,denom,absv_pres_grav_inner
 double precision :: absv_Morris_inner,Morris_inner_weigth,kernel_der
 double precision :: dervel(3),dervelmorr(3),appopres(3),appodiss(3),rvw(3)
@@ -52,11 +52,10 @@ double precision :: DBSPH_wall_she_vis_term(3),t_visc_semi_part(3)
 ! Explicit interfaces
 !------------------------
 interface
-   subroutine viscomorris(npi,npj,npartint,mass_comput_part,dens_comput_part,  &
-   kin_visc_comput_part,mass_neighbour,dens_neighbour,kin_visc_neighbour,      &
-   kernel_der,vel_type,rel_dis,dervel,rvw)
+   subroutine viscomorris(mass_comput_part,dens_comput_part,                   &
+      kin_visc_comput_part,mass_neighbour,dens_neighbour,kin_visc_neighbour,   &
+      kernel_der,vel_type,rel_dis,dervel,rvw)
    implicit none
-   integer(4),intent(in) :: npi,npj,npartint
    double precision,intent(in) :: mass_comput_part,dens_comput_part
    double precision,intent(in) :: kin_visc_comput_part,mass_neighbour
    double precision,intent(in) :: dens_neighbour,kin_visc_neighbour,kernel_der
@@ -228,7 +227,7 @@ do contj=1,nPartIntorno(npi)
 ! To add Monaghan term (artificial viscosity)
    tdiss(:) = tdiss(:) + appodiss(:)
 ! To compute Morris term (interaction with neighbouring fluid particle)
-   call viscomorris(npi,npj,npartint,pg(npi)%mass,pg(npi)%dens,pg(npi)%visc,   &
+   call viscomorris(pg(npi)%mass,pg(npi)%dens,pg(npi)%visc,                    &
       pg(npj)%mass,pg(npj)%dens,pg(npj)%visc,PartKernel(2,npartint),           &
       pg(npj)%vel_type,rag(1:3,npartint),dervel,rvw)
 ! To add  Morris term (interaction with neighbouring fluid particle)   
@@ -277,10 +276,9 @@ if (DBSPH%n_w>0) then
 ! To compute Morris term (interaction with neighbouring semi-particle)
          kernel_der = kernel_fw(2,npartint)/(dot_product(rag_fw(:,npartint),   &
                       rag_fw(:,npartint)) + eta2)
-         call viscomorris(npi,npj,npartint,pg(npi)%mass,pg(npi)%dens,          &
-            pg(npi)%visc,pg_w(npj)%mass,pg_w(npj)%dens,                        &
-            pg_w(npj)%kin_visc_semi_part,kernel_der,"std",                     &
-            rag_fw(1:3,npartint),dervel,rvw_semi_part)
+         call viscomorris(pg(npi)%mass,pg(npi)%dens,pg(npi)%visc,              &
+            pg_w(npj)%mass,pg_w(npj)%dens,pg_w(npj)%kin_visc_semi_part,        &
+            kernel_der,"std",rag_fw(1:3,npartint),dervel,rvw_semi_part)
          t_visc_semi_part(:) = t_visc_semi_part(:) + rvw_semi_part(:)
       endif
    enddo

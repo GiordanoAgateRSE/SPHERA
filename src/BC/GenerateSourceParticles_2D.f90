@@ -37,7 +37,7 @@ use I_O_diagnostic_module
 !------------------------
 implicit none
 integer(4) :: nt,sd,ip,inttimeratio,isi,i_source
-double precision :: Time,SourceTime,TimeFrac,DisplFrac,rnd
+double precision :: Time,SourceTime,TimeFrac,DisplFrac
 character(len=lencard) :: nomsub="GenerateSourceParticles_2D"
 integer(4),external :: ParticleCellNumber
 !------------------------

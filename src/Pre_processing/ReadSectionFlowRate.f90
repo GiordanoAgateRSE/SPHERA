@@ -58,7 +58,7 @@ logical,external :: ReadCheck
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"Section_flow_rate DATA",ninp,ulog))  &
    return
-do while (TRIM(lcase(ainp))/="##### end section flow rate #####")
+do while (trim(lcase(ainp))/="##### end section flow rate #####")
 ! Reading the number of monitoring sections for the flow rate and their writing 
 ! time step
    read (ainp,*,iostat=ioerr) n_sect,dt_out,n_fluid_types

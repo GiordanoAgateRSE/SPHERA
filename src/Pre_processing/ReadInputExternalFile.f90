@@ -41,7 +41,7 @@ character(100) :: ainp
 logical :: OnlyTriangle
 integer(4) :: ioerr
 logical,external :: ReadCheck
-character(100),external :: lcase, GetToken
+character(100),external :: lcase,GetToken
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -57,7 +57,7 @@ character(100),external :: lcase, GetToken
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"GEOMETRY FILE",ninp,ulog)) return
 OnlyTriangle = .TRUE.
-do while (TRIM(lcase(ainp))/="##### end geometry file #####")
+do while (trim(lcase(ainp))/="##### end geometry file #####")
    open(ninp2,file=trim(ainp),form="formatted",status="old",iostat=ioerr)
    if (ulog>0) then
       if (ioerr==0) then
@@ -71,7 +71,7 @@ do while (TRIM(lcase(ainp))/="##### end geometry file #####")
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp2)
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"GEOMETRY FILE",ninp2,ulog)) return
    SECTION_LOOP: do while (ioerr==0)
-      select case (TRIM(lcase(trim(ainp))))
+      select case (trim(lcase(trim(ainp))))
          case ("##### vertices #####")
             call ReadInputVertices (NumberEntities,Vertice,ainp,comment,       &
                                     nrighe,ier,.FALSE.,ninp2,ulog)

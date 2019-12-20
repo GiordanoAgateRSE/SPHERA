@@ -40,10 +40,9 @@ implicit none
 integer(4),intent(in) :: npi,npj
 double precision,intent(in) :: DistZmin
 integer(4) :: i_cell,i_aux,i_grid,j_grid,k_grid,n_roots,test_root1,test_root2
-integer(4) :: case_test,inpj_grid,jnpj_grid
+integer(4) :: case_test
 double precision :: k_v,k_Beta0,U_inf,Re,DELTA_Seminara,aux_var,a,b,c,root1
 double precision :: root2,Uf,z_aux,alfa
-double precision :: U_inf_vec(2),Uf_vec(2)
 double precision :: s_uni_vec(3),n2_uni_vec(3),vel_n(3)
 integer(4), external :: CellIndices,ParticleCellNumber
 !------------------------

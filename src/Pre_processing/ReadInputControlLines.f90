@@ -62,7 +62,7 @@ call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"CONTROL LINES DATA",ninp,ulog))      &
    return
 npts = npoints
-do while (TRIM(lcase(ainp))/="##### end control lines #####")
+do while (trim(lcase(ainp))/="##### end control lines #####")
    values1 = zero
    values2 = zero
    values3 = zero

@@ -36,7 +36,7 @@ use I_O_file_module
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: npi,i_cell,i_aux,i_grid,j_grid,k_grid,alloc_stat
+integer(4) :: npi,i_cell,i_aux,i_grid,j_grid,k_grid
 double precision :: mu_main_fluid,eps_fluid_blt,p_fluid_blt_top,gamma_fluid
 ! "alfa_TBT" means “Topographic angle at the Bed-load transport layer Top” 
 ! between the local interface normal (computed on the mixture particle, 

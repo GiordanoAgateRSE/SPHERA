@@ -46,11 +46,10 @@ double precision,parameter :: eps = 0.001d0
 integer(4),intent(in) :: mib
 double precision,intent(in) :: PX(SPACEDIM)
 integer(4),intent(in) :: IsopraS
-integer(4) :: kf,nf,i,j,sd,nnodes,norig,Nints,IntSotto,IntSopra,fkod
+integer(4) :: kf,nf,i,j,sd,nnodes,norig,Nints,IntSotto,IntSopra
 integer(4) :: test
 double precision :: tpar
 double precision :: P1(SPACEDIM),Pint(SPACEDIM),LPint(SPACEDIM)
-double precision :: csi(3)
 double precision,dimension(Tratto(mib)%numvertices) :: XYInts
 logical,external :: IsPointInternal
 !------------------------

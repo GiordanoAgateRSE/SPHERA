@@ -41,9 +41,8 @@ use I_O_diagnostic_module
 !------------------------
 implicit none
 integer(4) :: igridi,kgridi,jgridi,irang,krang,jrang,ncelj,jgrid1,jgrid2,i
-integer(4) :: npi,npj,npartint,index_rij_su_h,irestocell,ww
-double precision :: rij_su_h,ke_coef,rij_su_h_quad,rijtemp,rijtemp2,wu,denom
-double precision :: gradmod,Fx
+integer(4) :: npi,npj,index_rij_su_h,irestocell,ww
+double precision :: rij_su_h,ke_coef,rij_su_h_quad,rijtemp,rijtemp2,wu,Fx
 double precision :: ragtemp(3)
 double precision, dimension(:), allocatable :: pres_wpp,den_wpp
 character(255)   :: nomefilectl_wall

@@ -56,7 +56,7 @@ logical,external :: ReadCheck
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"GENERAL PHYSICAL PROPERTIES DATA",   &
    ninp,ulog)) return
-do while (TRIM(lcase(ainp))/="##### end general physical properties #####")
+do while (trim(lcase(ainp))/="##### end general physical properties #####")
    read (ainp,*,iostat=ioerr) values1(1:NumberEntities(1))
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"GRAVITAL ACCELERATION VECTOR",ninp&
       ,ulog)) return

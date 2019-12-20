@@ -43,7 +43,7 @@ integer(4) :: n,i,ioerr,stretch
 integer(4) :: ivalues(MAXFACENODES)
 character(8) :: label
 logical,external :: ReadCheck
-character(100),external :: lcase, GetToken
+character(100),external :: lcase,GetToken
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -58,7 +58,7 @@ character(100),external :: lcase, GetToken
 !------------------------
 ! In case of restart, input data are not read
 if (restart) then
-   do while (TRIM(lcase(ainp))/="##### end faces #####")
+   do while (trim(lcase(ainp))/="##### end faces #####")
       call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
       if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"FACES DATA",ninp,ulog)) return
    enddo
@@ -66,7 +66,7 @@ if (restart) then
 endif
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"FACES DATA",ninp,ulog)) return
-do while (TRIM(lcase(ainp))/="##### end faces #####")
+do while (trim(lcase(ainp))/="##### end faces #####")
    select case (TRIM(Domain%tipo))
       case ("semi","bsph") 
          ivalues = 0

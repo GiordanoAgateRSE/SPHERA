@@ -58,7 +58,7 @@ character(100),external :: lcase, GetToken
 !------------------------
 ! In case of restart, input data are not read
 if (restart) then
-   do while (TRIM(lcase(ainp))/="##### end vertices #####")
+   do while (trim(lcase(ainp))/="##### end vertices #####")
       call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
       if (.NOT.ReadCheck (ioerr,ier,nrighe,ainp,"VERTICES DATA",ninp,ulog))    &
          return
@@ -70,7 +70,7 @@ if (.NOT.ReadCheck (ioerr,ier,nrighe,ainp,"VERTICES DATA",ninp,ulog)) return
 if ((ncord>0).and.(ulog>0).and.(prtopt)) then
    write(ulog,"(1x,a)") "List of vertices:"
 endif
-do while (TRIM(lcase(ainp))/="##### end vertices #####")
+do while (trim(lcase(ainp))/="##### end vertices #####")
    select case (TRIM(Domain%tipo))
       case ("semi","bsph") 
          read (ainp,*,iostat=ioerr) i, values1(1:NumberEntities(1))

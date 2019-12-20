@@ -37,7 +37,6 @@ use I_O_diagnostic_module
 implicit none
 integer(4) :: ii,npi
 double precision :: appo1,appo2,appo3
-character(len=lencard) :: nomsub = "time_integration"
 !------------------------
 ! Explicit interfaces
 !------------------------

@@ -38,7 +38,7 @@ use I_O_diagnostic_module
 !------------------------
 implicit none
 integer(4) :: npi,npj,npartint,contj
-double precision :: volume,Ww_Shep
+double precision :: volume
 !------------------------
 ! Explicit interfaces
 !------------------------

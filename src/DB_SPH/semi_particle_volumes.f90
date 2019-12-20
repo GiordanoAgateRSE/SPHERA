@@ -38,7 +38,7 @@ implicit none
 logical :: aux_false_hyp 
 integer(4) :: j,i,ID_P_0_iso,ID_P_b_iso,dealloc_stat,aux_adjacent_faces
 integer(4) :: n_adj_faces_max
-double precision :: aux_scalar,aux_scalar_2,k_parameter,alfa,alfa_sum
+double precision :: aux_scalar,aux_scalar_2,alfa,alfa_sum
 double precision,dimension(3) :: aux_vec
 double precision,dimension(4,3) :: aux_face1,aux_face2
 !------------------------
@@ -70,9 +70,9 @@ endif
 ! Loop over the DBSPH surface elements
 !$omp parallel do default(none)                                                &
 !$omp shared(DBSPH,pg_w,ncord,Domain,Med,pg,ulog,n_adj_faces_max)              &
-!$omp private(aux_scalar,i,j,k_parameter,alfa,alfa_sum,aux_adjacent_faces)     &
-!$omp private(aux_face1,aux_face2,aux_false_hyp,aux_scalar_2,aux_vec)          &
-!$omp private(ID_P_b_iso,ID_P_0_iso)
+!$omp private(aux_scalar,i,j,alfa,alfa_sum,aux_adjacent_faces,aux_face1)       &
+!$omp private(aux_face2,aux_false_hyp,aux_scalar_2,aux_vec,ID_P_b_iso)         &
+!$omp private(ID_P_0_iso)
 do i=1,DBSPH%n_w
    alfa_sum = 0.d0
    aux_adjacent_faces = 0

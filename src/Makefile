@@ -1,21 +1,25 @@
+# 6 compilation procedures have to be tested (without warnings):
+#    gfortran_debug_omp, gfortran_debug, gfortran_bin, ifort_debug_omp, 
+#    ifort_debug, ifort_bin 
 # Variables to be updated
 VERSION = 9_0_0
 # Suggested values for EXECUTION
 #    bin
 #    debug
+#    debug_omp
 EXECUTION = bin
 # Suggested values for COMPILATION_FLAGS
-#   -O1 (bin)
-#   -g -O0 -fbacktrace -C (gfortran debug),
-#   -g -O0 -traceback -C -check bounds -check noarg_temp_created -debug all (ifort debug)
+#   -O1 (ifort_bin and gfortran_bin)
+#   -g -O0 -fbacktrace -C -Wall -fbounds-check (gfortran debug and gfortran_debug_omp),
+#   -g -O0 -traceback -C -check bounds -check noarg_temp_created -debug all -fpe0 (ifort_debug and ifort_debug_omp)
 COMPILATION_FLAGS = -O1
 # Suggested values for COMPILER
 #    gfortran
 #    ifort
 COMPILER = ifort
 # Suggested values for OMP_FLAG
-#    -fopenmp (gfortran omp)
-#    -qopenmp (ifort omp; formerly -openmp) 
+#    -fopenmp (gfortran_bin and gfortran_debug_omp)
+#    -qopenmp (ifort_bin and ifort_debug_omp) 
 OMP_FLAG = -qopenmp
 EXE_DIR = ../$(EXECUTION)/
 SOURCES = \

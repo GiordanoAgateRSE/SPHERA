@@ -36,16 +36,16 @@ use I_O_file_module
 !------------------------
 implicit none
 double precision,intent(in) :: dtvel
-integer(4) :: npartint,i,j,npi,npj,Ncb,Nfzn,aux,nbi,npk,k,nbj,nbk,alloc_stat
-integer(4) :: n_interactions,aux2,aux3,test,aux_locx_min,aux_locx_max,aux_int
+integer(4) :: npartint,i,j,npi,npj,aux,nbi,npk,k,nbk,alloc_stat
+integer(4) :: n_interactions,aux2,aux3,test,aux_int
 ! AA!!! test
 integer(4) :: aux_scal_test
-double precision :: c2,k_masses,r_per,r_par,temp_dden,alfa_boun
-double precision :: aux_impact_vel,aux4,pres_mir,aux_scalar,aux_scalar_2
-double precision :: friction_limiter
+double precision :: k_masses,r_per,r_par,alfa_boun
+double precision :: aux_impact_vel,aux4,aux_scalar,aux_scalar_2
+double precision :: friction_limiter,aux_locx_min,aux_locx_max
 double precision :: f_pres(3),temp(3),r_par_vec(3),f_coll_bp_bp(3)          
-double precision :: f_coll_bp_boun(3),dvar(3),pos_aux(3),normal_plane(3)
-double precision :: u_rel(3),x_rel(3),aux_acc(3),aux_vec(3),aux_vec2(3)
+double precision :: f_coll_bp_boun(3),pos_aux(3),normal_plane(3)
+double precision :: u_rel(3),x_rel(3),aux_vec(3),aux_vec2(3)
 double precision :: loc_pos(3),aux_locx_vert(3),sliding_friction_dir(3)
 double precision :: sliding_friction(3)
 ! AA!!! test
