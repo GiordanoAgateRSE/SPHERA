@@ -131,7 +131,7 @@ if ((on_going_time_step==it_start).and.(Domain%tipo=="bsph")) then
    IC_removal_flag = .true.
    call start_and_stop(3,9)
 endif
-if ((on_going_time_step==it_start).and.(n_bodies>0)) then
+if (n_bodies>0) then
    call start_and_stop(2,19)
    call initial_fluid_removal_in_solid_bodies
    IC_removal_flag = .true.

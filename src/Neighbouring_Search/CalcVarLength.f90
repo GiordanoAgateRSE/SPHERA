@@ -907,4 +907,3 @@ endif
 !------------------------
 return
 end subroutine CalcVarLength
-
