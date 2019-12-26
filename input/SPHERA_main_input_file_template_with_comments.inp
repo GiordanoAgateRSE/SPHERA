@@ -39,7 +39,7 @@ version.subversion.subsubversion   !
 
 ##### TITLE #####
 !-------------------------------------------------------------------------------
-![?] <title>:  title (of the test case, string)
+![?] <title>:  title of the test case (string)
 !-------------------------------------------------------------------------------
 ![*] <title>
 !-------------------------------------------------------------------------------
@@ -51,15 +51,18 @@ ___
 
 ##### DOMAIN #####
 !-------------------------------------------------------------------------------
-!# Input parameters for spatial resolution and boundary treatment scheme
-!# <D>: spatial dimensionality)=2(2D),3(3D)
-!# <BC_string>: boundary treatment scheme
-!  =semi (SA-SPH)
-!  =bsph (DB-SPH)
-!# <dx>: characteristic lenght of the SPH fluid/mixture particles
-!# <h/dx>: ratio between the characteristic lenght of the kernel support and dx
-!# <random_distribution>: optional letter
-!  =r (white noise to the IC -Initial Conditions- particle positions)
+![?] Input parameters for spatial resolution and boundary treatment scheme
+![?] <D>: spatial dimensionality
+!    =2 (2D)
+!    =3 (3D)
+![?] <BC_string>: boundary treatment scheme
+!    =semi (SA-SPH)
+!    =bsph (DB-SPH)
+![?] <dx>: characteristic lenght of the SPH fluid/mixture particles
+![?] <h/dx>: ratio between the characteristic lenght of the kernel support and 
+!    dx
+![?] <random_distribution>: optional letter
+!    =r (white noise to the IC -Initial Conditions- particle positions)
 !-------------------------------------------------------------------------------
 ![*] <D> <BC_string>
 ![*] <dx> <h/dx> <random_distribution>
@@ -94,7 +97,7 @@ ___ ___ ___
 ![*] <Last_vertex_ID> <Vertex_x> <Vertex_y> <Vertex_z>
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
- 1  ___ ___ ___
+1  ___ ___ ___
 ...
 ___ ___ ___ ___
 !>>>****************************************************************************
@@ -102,7 +105,7 @@ ___ ___ ___ ___
 ##### END VERTICES #####
 
 !-------------------------------------------------------------------------------
-!::: If (2D): start
+![?] if (2D) then
 !-------------------------------------------------------------------------------
 ##### LINES #####
 ![?] 2D input parameters for the boundary lines of the fluid domain
@@ -123,7 +126,7 @@ ___ ___ ___ ___
 ![*] <line_last_ID> <line_last_vertex_1> ... <line_last_vertex_last>
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
- 1  ___ ... ___
+1   ___ ... ___
 ...
 ___ ___ ... ___
 !>>>****************************************************************************
@@ -173,7 +176,7 @@ ___ ___ ... ___
      <face_last_Boundary_ID>
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
- 1  ___ ... ___ ___
+1   ___ ... ___ ___
 ...
 ___ ___ ... ___ ___
 !>>>****************************************************************************
@@ -271,7 +274,7 @@ ___ ___ ___ ___ ___
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
 ___ ___
-___ ___ ___ ___  1 
+___ ___ ___ ___ 1 
 ...
 ___ ___ ___ ___ ___
 !>>>****************************************************************************
@@ -283,9 +286,10 @@ ___ ___ ___ ___ ___
 !    =pl (hydrostatic conditions with equivalent free surface level equal to 
 !         the particle maximum height of a subset of boundaries)
 ![?] <IC_pressure_value>: uniform pressure value (IC_pressure_type=pa), 
-!    equivalent free surface level (IC_pressure_type=qp), ID indicating a 
-!    subset of boundaries (IC_pressure_type=pl; only one subset is allowed; 
-!    real input datum then treated as an integer)
+!    equivalent free surface level (IC_pressure_type=qp; it is influential only 
+!    if there is no other medium along the vertical above the current medium), 
+!    ID indicating a subset of boundaries (IC_pressure_type=pl; only one subset 
+!    is allowed; real input datum then treated as an integer)
 !-------------------------------------------------------------------------------
 ![*] <IC_pressure_type> <IC_pressure_value>
 !-------------------------------------------------------------------------------
@@ -809,7 +813,7 @@ ___ ___ ___ ___ ___ ___ ___ ___
 ![?] <n_elem>: number of elements of the body)
 ![?] <pos_CM>: position of the centre of mass (Initial Conditions)
 ![?] <Ic_flag>
-!    =0
+!    =0 (mass moment of inertia is computed)
 !    =1 (mass moment of inertia is imposed)
 !-------------------------------------------------------------------------------
 ![*] <ID_first_body> <n_elem>
@@ -818,7 +822,7 @@ ___ ___ ___ ___ ___ ___ ___ ___
 ![*] <Ic_flag>
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
-___ ___
+1   ___
 ___
 ___ ___ ___
 ___
@@ -847,7 +851,7 @@ ___ ___ ___
 ![?] <vel_CM>: velocity of the centre of mass at "t=0"
 ![?] <omega>: angular velocity of the body at "t=0"
 ![?] <imposed_kinematics_flag>
-!    =0
+!    =0 (no imposed kinematics; dynamics is computed)
 !    =1 (kinematics is imposed)
 ![?] <n_records>: number of records which describe the imposed kinematics
 !-------------------------------------------------------------------------------
@@ -904,7 +908,7 @@ ___ ___ ___ ___ ___ ___ ___
 ![*] <xmin> <xmax> <ymin> <ymax> <zmin> <zmax>
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
- 1
+1
 ___ ___ ___
 ___ ___ ___
 ___ ___ ___ ___
@@ -1210,7 +1214,7 @@ ___
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
 ___ ___ ___
- 1
+1
 ___
 ___ ___ ___
 ___ ___ ___
@@ -1270,7 +1274,7 @@ ___ ___ ___
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
 ___ ___
- 1
+1
 ___ ___
 ___ ___ ___
 ...

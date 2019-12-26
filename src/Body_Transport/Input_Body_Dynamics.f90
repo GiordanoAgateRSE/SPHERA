@@ -268,7 +268,7 @@ do nbi=1,n_bodies
          enddo
       enddo
    enddo
-end do
+enddo
 ! Cancel useless particles
 allocate(aux_bp_arr(n_body_part))
 do i=1,n_body_part
@@ -335,4 +335,3 @@ enddo
 deallocate(aux_mass)
 return
 end subroutine Input_Body_Dynamics
-

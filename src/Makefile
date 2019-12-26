@@ -7,20 +7,20 @@ VERSION = 9_0_0
 #    bin
 #    debug
 #    debug_omp
-EXECUTION = bin
+EXECUTION = debug_omp
 # Suggested values for COMPILATION_FLAGS
 #   -O1 (ifort_bin and gfortran_bin)
 #   -g -O0 -fbacktrace -C -Wall -fbounds-check (gfortran debug and gfortran_debug_omp),
 #   -g -O0 -traceback -C -check bounds -check noarg_temp_created -debug all -fpe0 (ifort_debug and ifort_debug_omp)
-COMPILATION_FLAGS = -O1
+COMPILATION_FLAGS = -g -O0 -fbacktrace -C -Wall -fbounds-check
 # Suggested values for COMPILER
 #    gfortran
 #    ifort
-COMPILER = ifort
+COMPILER = gfortran
 # Suggested values for OMP_FLAG
 #    -fopenmp (gfortran_bin and gfortran_debug_omp)
 #    -qopenmp (ifort_bin and ifort_debug_omp) 
-OMP_FLAG = -qopenmp
+OMP_FLAG = -fopenmp
 EXE_DIR = ../$(EXECUTION)/
 SOURCES = \
 ./Modules/Static_allocation_module.f90 \
@@ -58,7 +58,7 @@ OBJECTS = $(patsubst %.f90,%.o,$(SOURCES))
 #    Correct sequence to compile+link:
 #       make touch
 #       make
-all: compile link remove 
+all: touch compile link remove 
 #    "compiling" cannot be launched together with "touching" as ".o" files
 #    would not be available yet
 compile: $(SOURCES)

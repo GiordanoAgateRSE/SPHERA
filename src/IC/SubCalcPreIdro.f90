@@ -112,14 +112,14 @@ particle_loop: do npi=1,nag
 ! The interface cell is set
             if (.not.foundcell) then
                idpel = numcell
-               foundcell = .TRUE.
+               foundcell = .true.
                nnsave = nnlocal
-            end if
+            endif
 ! The minimum level in the interface cell for the medium different from the 
 ! current one is set
             if (numcell==idpel) then
                ZQuotaSecondMedium = min(ZQuotaSecondMedium,pg(nnlocal)%coord(3))
-            end if
+            endif
 ! To increase in any case the reference level of the column 
             ZQuotaColonna = max(ZQuotaColonna,pg(nnlocal)%coord(3))
             else
@@ -129,7 +129,7 @@ particle_loop: do npi=1,nag
 ! cells)
                ZQuotaMediumCorr = max(ZQuotaMediumCorr,pg(nnlocal)%coord(3))
                ZQuotaColonna    = max(ZQuotaColonna,pg(nnlocal)%coord(3))
-         end if
+         endif
       enddo
    enddo
 ! To check if the current particles is inside the intermediate cell, but it is 
@@ -149,7 +149,7 @@ particle_loop: do npi=1,nag
       affond2 = (ZQuotaMediumCorr - pg(npi)%coord(3)) * coshor +               &
                 pg(npi)%coord(1) * senhor 
       if (Domain%tipo=="bsph") then  
-! To check this line 
+! To check this line
          pg(npi)%pres = 0.d0 * (affond1 * med(pg(npi)%imed)%den0 * gravmod) *  &
                        (1.d0 - pg(npi)%coord(1) / 0.5925d0)
          else
@@ -167,7 +167,7 @@ particle_loop: do npi=1,nag
             else
                pg(npi)%pres = (affond1 * med(pg(npi)%imed)%den0 * gravmod) +   &
                               Domain%prif
-         end if
+         endif
    endif
 ! Density
    pg(npi)%dens = (one + (pg(npi)%pres - Domain%prif) / med(pg(npi)%imed)%eps)*&

@@ -27,13 +27,13 @@
 !                 highest index (the only zone where both particle number 
 !                 reduction and increase are allowed), then the outgoing 
 !                 particle (npi) is replaced by the last particle (nag) in the 
-!                 particle array pg, and the total number of particle becomes 
+!                 particle array pg, and the total number of particles becomes 
 !                 nag=nag-1; simultaneously, the index of the last particle of 
 !                 the zone is changed (Partz(maxzone)%limit(2)).   
 !              b) Otherwise, simply pg(npi)%cella = 0 (particle out of the 
 !                 domain boundaries).
 !-------------------------------------------------------------------------------
-subroutine CancelOutgoneParticles_3D  
+subroutine CancelOutgoneParticles_3D 
 !------------------------
 ! Modules
 !------------------------
@@ -169,4 +169,3 @@ enddo
 !------------------------
 return
 end subroutine CancelOutgoneParticles_3D
-

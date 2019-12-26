@@ -35,7 +35,7 @@ use I_O_diagnostic_module
 ! Declarations
 !------------------------
 implicit none
-logical :: done_flag
+logical :: done_flag,IC_removal_flag
 integer(4) :: Ncbs,IntNcbs,i,ii,num_out,npi,it,it_print,it_memo,it_rest,ir
 integer(4) :: OpCountot,SpCountot,EpCountot,EpOrdGridtot,ncel,aux,igridi
 integer(4) :: jgridi,kgridi,machine_Julian_day,machine_hour,machine_minute
@@ -97,6 +97,7 @@ enddo
 call PreSourceParticles_2D
 ! Initializing the time stage for time integration
 if (Domain%time_split==0) Domain%time_stage = 1
+IC_removal_flag = .false.
 !------------------------
 ! Statements
 !------------------------
@@ -119,6 +120,17 @@ if ((on_going_time_step==it_start).and.(Domain%tipo=="bsph")) then
       endif
    enddo
 !$omp end parallel do
+   IC_removal_flag = .true.
+   call start_and_stop(3,9)
+endif
+if ((on_going_time_step==it_start).and.(n_bodies>0)) then
+   call start_and_stop(2,19)
+   call initial_fluid_removal_in_solid_bodies
+   IC_removal_flag = .true.
+   call start_and_stop(3,19)
+endif
+if (IC_removal_flag.eqv..true.) then
+   call start_and_stop(2,9)
    call OrdGrid1
 ! Variable to count the particles, which are not "sol"
    indarrayFlu = 0
