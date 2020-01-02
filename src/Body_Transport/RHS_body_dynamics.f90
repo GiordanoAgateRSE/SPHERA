@@ -38,23 +38,39 @@ implicit none
 double precision,intent(in) :: dtvel
 integer(4) :: npartint,i,j,npi,npj,aux,nbi,npk,k,nbk,alloc_stat
 integer(4) :: n_interactions,aux2,aux3,test,aux_int
-! AA!!! test
 integer(4) :: aux_scal_test
 double precision :: k_masses,r_per,r_par,alfa_boun
 double precision :: aux_impact_vel,aux4,aux_scalar,aux_scalar_2
 double precision :: friction_limiter,aux_locx_min,aux_locx_max
-double precision :: f_pres(3),temp(3),r_par_vec(3),f_coll_bp_bp(3)          
+double precision :: f_pres(3),r_par_vec(3),f_coll_bp_bp(3)          
 double precision :: f_coll_bp_boun(3),pos_aux(3),normal_plane(3)
-double precision :: u_rel(3),x_rel(3),aux_vec(3),aux_vec2(3)
+double precision :: u_rel(3),x_rel(3),aux_vec(3),aux_vec_2(3),rel_pos(3)
 double precision :: loc_pos(3),aux_locx_vert(3),sliding_friction_dir(3)
 double precision :: sliding_friction(3)
-! AA!!! test
 double precision :: aux_mat(3,3)
+! "inter_front": Number of neighbouring frontiers for a given body. It is 
+! approximated by the maximum number of neighbouring frontiers of a single body 
+! particle belonging to the body.
 integer(4),dimension(:),allocatable :: inter_front
+! Array of the number of "body particle - frontier" interactions for a given 
+! body
+integer(4),dimension(:),allocatable :: bp_bound_interactions
 double precision,dimension(:),allocatable :: interface_sliding_vel_max
-double precision,dimension(:,:),allocatable :: Force_mag_sum,r_per_min
-double precision,dimension(:,:),allocatable :: aux_gravity,sum_normal_plane
-double precision,dimension(:,:,:),allocatable :: Force,Moment
+! Array of the hydrodynamic forces
+double precision,dimension(:,:),allocatable :: Force_bod_flu
+! "alfa_denom": denominator of the normalizing parameter alfa for body-body and 
+! body-bundary interactions
+double precision,dimension(:,:),allocatable :: alfa_denom
+double precision,dimension(:,:),allocatable :: r_per_min
+double precision,dimension(:,:),allocatable :: aux_gravity
+! Average of the normal vectors of the neighbouring boundaries of a given body
+double precision,dimension(:,:),allocatable :: mean_bound_normal
+! Average of the positions of the neighbouring boundaries of a given body
+double precision,dimension(:,:),allocatable :: mean_bound_pos
+! Array of the body-body and body-boundary forces
+double precision,dimension(:,:,:),allocatable :: Force_bod_sol
+! Array of the body-body and body-boundary torques
+double precision,dimension(:,:,:),allocatable :: Moment_bod_sol
 character(255) :: file_name_test
 double precision, external :: Gamma_boun
 !------------------------
@@ -78,32 +94,67 @@ interface
       double precision :: normal(2)
    end subroutine point_inout_convex_non_degenerate_polygon
 end interface
+interface
+   subroutine body_boundary_for_sliding_friction_normal_reaction(i_bp,         &
+      bp_bound_interactions,normal_plane,bp_pos,interface_sliding_vel_max,     &
+      mean_bound_normal,mean_bound_pos,aux_gravity)
+      implicit none
+      integer(4),intent(in) :: i_bp
+      integer(4),intent(inout) :: bp_bound_interactions
+      double precision,intent(in) :: normal_plane(3)
+      double precision,intent(in) :: bp_pos(3)
+      double precision,intent(inout) :: interface_sliding_vel_max
+      double precision,intent(inout) :: mean_bound_normal(3)
+      double precision,intent(inout) :: mean_bound_pos(3)
+      double precision,intent(out) :: aux_gravity(3)
+      double precision :: aux_scalar
+      double precision :: aux_vec(3)
+   end subroutine
+end interface
+interface
+   subroutine Vector_Product(uu,VV,ww,SPACEDIM)
+      implicit none
+      integer(4),intent(in) :: SPACEDIM
+      double precision,intent(in),dimension(SPACEDIM) :: uu,VV
+      double precision,intent(inout),dimension(SPACEDIM) :: ww
+      integer(4) :: i,j,k
+      integer(4),dimension(3) :: iseg=(/2,3,1/)
+   end subroutine
+end interface
 !------------------------
 ! Allocations
 !------------------------
 if (ncord==2) aux = n_bodies+NumBSides
 if (ncord==3) aux = n_bodies+NumFacce
-if (.not.allocated(Force)) then
-   allocate(Force(n_bodies,aux,3),STAT=alloc_stat)
+if (.not.allocated(Force_bod_flu)) then
+   allocate(Force_bod_flu(n_bodies,3),STAT=alloc_stat)
    if (alloc_stat/=0) then
-      write(uerr,*) 'Allocation of "Force" failed in the program unit ',       &
-         '"RHS_body_dynamics"; the execution terminates here.'
-      stop
-   endif
-endif
-if (.not.allocated(Moment)) then
-   allocate(Moment(n_bodies,aux,3),STAT=alloc_stat)
-   if (alloc_stat/=0) then
-      write(uerr,*) 'Allocation of "Moment" failed in the program unit ',      &
-         '"RHS_body_dynamics"; the execution terminates here.'
-      stop
-   endif
-endif
-if (.not.allocated(Force_mag_sum)) then
-   allocate(Force_mag_sum(n_bodies,aux),STAT=alloc_stat)
-   if (alloc_stat/=0) then
-      write(uerr,*) 'Allocation of "Force_mag_sum" failed in the program ',    &
+      write(uerr,*) 'Allocation of "Force_bod_flu" failed in the program ',    &
          'unit "RHS_body_dynamics"; the execution terminates here.'
+      stop
+   endif
+endif
+if (.not.allocated(Force_bod_sol)) then
+   allocate(Force_bod_sol(n_bodies,aux,3),STAT=alloc_stat)
+   if (alloc_stat/=0) then
+      write(uerr,*) 'Allocation of "Force_bod_sol" failed in the program ',    &
+         'unit "RHS_body_dynamics"; the execution terminates here.'
+      stop
+   endif
+endif
+if (.not.allocated(Moment_bod_sol)) then
+   allocate(Moment_bod_sol(n_bodies,aux,3),STAT=alloc_stat)
+   if (alloc_stat/=0) then
+      write(uerr,*) 'Allocation of "Moment_bod_sol" failed in the program ',   &
+         'unit "RHS_body_dynamics"; the execution terminates here.'
+      stop
+   endif
+endif
+if (.not.allocated(alfa_denom)) then
+   allocate(alfa_denom(n_bodies,aux),STAT=alloc_stat)
+   if (alloc_stat/=0) then
+      write(uerr,*) 'Allocation of "alfa_denom" failed in the program unit ',  &
+         '"RHS_body_dynamics"; the execution terminates here.'
       stop
    endif
 endif
@@ -118,25 +169,40 @@ endif
 if (.not.allocated(aux_gravity)) then
    allocate(aux_gravity(n_bodies,3),STAT=alloc_stat)
    if (alloc_stat/=0) then
-      write(uerr,*) 'Allocation of "aux_gravity" failed in the program unit ',   &
+      write(uerr,*) 'Allocation of "aux_gravity" failed in the program unit ', &
          '"RHS_body_dynamics"; the execution terminates here.'
       stop
    endif
 endif
-if (.not.allocated(sum_normal_plane)) then
-   allocate(sum_normal_plane(n_bodies,3),STAT=alloc_stat)
+if (.not.allocated(mean_bound_normal)) then
+   allocate(mean_bound_normal(n_bodies,3),STAT=alloc_stat)
    if (alloc_stat/=0) then
-      write(uerr,*) 'Allocation of "sum_normal_plane" failed in the program ', &
+      write(uerr,*) 'Allocation of "mean_bound_normal" failed in the program ',&
          'unit "RHS_body_dynamics"; the execution terminates here.'
       stop
    endif
 endif
-! AA!!! test
+if (.not.allocated(mean_bound_pos)) then
+   allocate(mean_bound_pos(n_bodies,3),STAT=alloc_stat)
+   if (alloc_stat/=0) then
+      write(uerr,*) 'Allocation of "mean_bound_pos" failed in the program ',   &
+         'unit "RHS_body_dynamics"; the execution terminates here.'
+      stop
+   endif
+endif
 if (.not.allocated(inter_front)) then
    allocate(inter_front(n_bodies),STAT=alloc_stat)
    if (alloc_stat/=0) then
       write(uerr,*) 'Allocation of "inter_front" failed in the program ',      &
          'unit "RHS_body_dynamics"; the execution terminates here.'
+      stop
+   endif
+endif
+if (.not.allocated(bp_bound_interactions)) then
+   allocate(bp_bound_interactions(n_bodies),STAT=alloc_stat)
+   if (alloc_stat/=0) then
+      write(uerr,*) 'Allocation of "bp_bound_interactions" failed in the ',    &
+         'program nit "RHS_body_dynamics"; the execution terminates here.'
       stop
    endif
 endif
@@ -151,16 +217,17 @@ endif
 !------------------------
 ! Initializations
 !------------------------
-Force = 0.d0
-Moment = 0.d0
-Force_mag_sum = 0.d0
-r_per_min = 1000000.d0
+Force_bod_flu = 0.d0
+Force_bod_sol = 0.d0
+Moment_bod_sol = 0.d0
+alfa_denom = 0.d0
+r_per_min = 1.d6
 aux2 = 0
-! AA!!! test start
 inter_front(:) = 0
+bp_bound_interactions(:) = 0
 aux_scal_test = 0
-! AA!!! test end
-sum_normal_plane(:,:) = 0.d0
+mean_bound_normal(:,:) = 0.d0
+mean_bound_pos(:,:) = 0.d0
 interface_sliding_vel_max(:) = 0.d0
 !------------------------
 ! Statements
@@ -220,9 +287,9 @@ do npi=1,n_body_part
          f_pres(:) = bp_arr(npi)%pres * bp_arr(npi)%area * bp_arr(npi)%normal(:)
          body_arr(bp_arr(npi)%body)%Force(:) =                                 &
             body_arr(bp_arr(npi)%body)%Force(:) + f_pres(:)
-         call Vector_Product(bp_arr(npi)%rel_pos(:),f_pres(:),temp(:),3)
+         call Vector_Product(bp_arr(npi)%rel_pos(:),f_pres(:),aux_vec(:),3)
          body_arr(bp_arr(npi)%body)%Moment(:) =                                &
-            body_arr(bp_arr(npi)%body)%Moment(:) + temp(:)
+            body_arr(bp_arr(npi)%body)%Moment(:) + aux_vec(:)
 ! Loop over the neighbouring body particles, belonging to other bodies 
 ! (inter-body impacts, partial contributions) 
          do j=1,nPartIntorno_bp_bp(aux2)
@@ -231,7 +298,7 @@ do npi=1,n_body_part
             r_per = abs(rag_bp_bp(1,npartint) * bp_arr(npj)%normal(1) +        &
                     rag_bp_bp(2,npartint) * bp_arr(npj)%normal(2) +            &
                     rag_bp_bp(3,npartint) * bp_arr(npj)%normal(3))
-! rag=-r 
+! rag=-r
             r_par_vec(:) = - rag_bp_bp(:,npartint) - r_per *                   &
                            bp_arr(npj)%normal(:)  
             r_par = dsqrt(r_par_vec(1) * r_par_vec(1) + r_par_vec(2) *         &
@@ -288,8 +355,9 @@ do npi=1,n_body_part
                         bp_arr(npj)%normal(3)
                      close(60)
                   endif
-                  Force(bp_arr(npi)%body,bp_arr(npj)%body,:) =                 &
-                    Force(bp_arr(npi)%body,bp_arr(npj)%body,:) + f_coll_bp_bp(:)
+                  Force_bod_sol(bp_arr(npi)%body,bp_arr(npj)%body,:) =         &
+                    Force_bod_sol(bp_arr(npi)%body,bp_arr(npj)%body,:) +       &
+                    f_coll_bp_bp(:)
 ! Body-body interactions: in the absence of neighburing fluid particles (dry 
 ! stage), sliding friction force depends on the interaction interface angle 
 ! (instead of the friction angle) and the normal reaction force under 
@@ -297,17 +365,19 @@ do npi=1,n_body_part
                   if (body_arr(bp_arr(npi)%body)%pmax<1.d-5) then
                      aux_gravity(bp_arr(npi)%body,:) = 0.d0
                   endif
-                  call Vector_Product(bp_arr(npi)%rel_pos,f_coll_bp_bp,temp,3)
-                  Moment(bp_arr(npi)%body,bp_arr(npj)%body,:) =                &
-                     Moment(bp_arr(npi)%body,bp_arr(npj)%body,:) + temp(:)
-                  Force_mag_sum(bp_arr(npi)%body,bp_arr(npj)%body) =           &
-                     Force_mag_sum(bp_arr(npi)%body,bp_arr(npj)%body) +        &
+                  call Vector_Product(bp_arr(npi)%rel_pos,f_coll_bp_bp,        &
+                     aux_vec,3)
+                  Moment_bod_sol(bp_arr(npi)%body,bp_arr(npj)%body,:) =        &
+                     Moment_bod_sol(bp_arr(npi)%body,bp_arr(npj)%body,:) +     &
+                     aux_vec(:)
+                  alfa_denom(bp_arr(npi)%body,bp_arr(npj)%body) =              &
+                     alfa_denom(bp_arr(npi)%body,bp_arr(npj)%body) +           &
                      (1.d0 / r_per) * k_masses * Gamma_boun(r_per,Domain%h) *  &
                      (1.d0 - r_par / (Domain%dx / dx_dxbodies))
                   r_per_min(bp_arr(npi)%body,bp_arr(npj)%body) =               &
                      min(r_per,r_per_min(bp_arr(npi)%body,bp_arr(npj)%body)) 
                endif
-            endif                      
+            endif
          enddo
 ! Loop over boundaries (body-boundary impacts, partial contributions) (3D case) 
          if (simulation_time>time_max_no_body_frontier_impingements) then
@@ -315,8 +385,8 @@ do npi=1,n_body_part
             do j=1,NumFacce
             if ((Tratto(BoundaryFace(j)%stretch)%tipo=="fixe") .or.            &
                (Tratto(BoundaryFace(j)%stretch)%tipo == "tapi")) then
-               aux_vec2(:) = bp_arr(npi)%pos(:) - BoundaryFace(j)%Node(1)%GX(:)
-               aux4 = dot_product(BoundaryFace(j)%T(:,3),aux_vec2)
+               aux_vec(:) = bp_arr(npi)%pos(:) - BoundaryFace(j)%Node(1)%GX(:)
+               aux4 = dot_product(BoundaryFace(j)%T(:,3),aux_vec)
                if (aux4>=0.d0) then
                   call dis_point_plane(bp_arr(npi)%pos,                        &
                      BoundaryFace(j)%Node(1)%GX,BoundaryFace(j)%Node(2)%GX,    &
@@ -352,48 +422,29 @@ do npi=1,n_body_part
                            (impact_vel(aux2,n_bodies+j) ** 2) / r_per) *       &
                            k_masses * Gamma_boun(r_per,Domain%h)               &
                            * normal_plane(:)
-                        Force(bp_arr(npi)%body,n_bodies+j,:) =                 &
-                           Force(bp_arr(npi)%body,n_bodies+j,:) +              &
+                        Force_bod_sol(bp_arr(npi)%body,n_bodies+j,:) =         &
+                           Force_bod_sol(bp_arr(npi)%body,n_bodies+j,:) +      &
                            f_coll_bp_boun(:)
-! Body-frontier interactions. In the absence of neighburing fluid particles
-! (dry stage), sliding friction force and explicit normal reaction force under 
-! sliding.
-                        if (body_arr(bp_arr(npi)%body)%pmax<1.d-5) then
-                           if ((friction_angle>(0.d0-1.d-9)).and.              &
-                              (simulation_time>time_max_no_body_gravity_force))&
-                              then
-! Sum of the normal vectors of the neighbouring frontiers
-                              sum_normal_plane(bp_arr(npi)%body,:) =           &
-                                 sum_normal_plane(bp_arr(npi)%body,:) +        & 
-                                 normal_plane(:)
-! To update the maximum tangential velocity
-                              aux_vec(:) = dot_product(bp_arr(npi)%vel,        &
-                                           normal_plane) * normal_plane(:)
-                              aux_vec(:) = bp_arr(npi)%vel(:) - aux_vec(:)
-                              aux_scalar = dsqrt(dot_product(aux_vec,aux_vec))
-                              interface_sliding_vel_max(bp_arr(npi)%body) = max&
-                                 (interface_sliding_vel_max(bp_arr(npi)%body), &
-                                 aux_scalar)
-                              else
-! Contribution of the normal reaction force under sliding and of the sliding 
-! friction force depending on the local slope angle (instead of the friction 
-! angle)
-                                 aux_gravity(bp_arr(npi)%body,:) = 0.d0
-                           endif
-                        endif
+                        call body_boundary_for_sliding_friction_normal_reaction&
+                           (npi,bp_bound_interactions(bp_arr(npi)%body),       &
+                           normal_plane(:),bp_arr(npi)%pos(:),                 &
+                           interface_sliding_vel_max(bp_arr(npi)%body),        &
+                           mean_bound_normal(bp_arr(npi)%body,:),              &
+                           mean_bound_pos(bp_arr(npi)%body,:),                 &
+                           aux_gravity(bp_arr(npi)%body,:))
                         call Vector_Product(bp_arr(npi)%rel_pos,               &
-                           f_coll_bp_boun,temp,3)
-                        Moment(bp_arr(npi)%body,n_bodies+j,:) =                &
-                           Moment(bp_arr(npi)%body,n_bodies+j,:) + temp(:)
-                        Force_mag_sum(bp_arr(npi)%body,n_bodies+j) =           &
-                           Force_mag_sum(bp_arr(npi)%body,n_bodies+j) +        &
+                           f_coll_bp_boun,aux_vec,3)
+                        Moment_bod_sol(bp_arr(npi)%body,n_bodies+j,:) =        &
+                           Moment_bod_sol(bp_arr(npi)%body,n_bodies+j,:) +     &
+                           aux_vec(:)
+                        alfa_denom(bp_arr(npi)%body,n_bodies+j) =              &
+                           alfa_denom(bp_arr(npi)%body,n_bodies+j) +           &
                            (1.d0 / r_per) * k_masses *                         &
                            Gamma_boun(r_per,Domain%h) 
                         r_per_min(bp_arr(npi)%body,n_bodies+j) =               &
                            min(r_per,r_per_min(bp_arr(npi)%body,n_bodies+j))
                         if (Gamma_boun(r_per,Domain%h)<=0.d0)                  &
                            impact_vel(aux2,n_bodies+j) = 0.d0
-! AA!!! test
                         aux_scal_test = aux_scal_test + 1
                         endif
                      endif
@@ -401,19 +452,17 @@ do npi=1,n_body_part
                endif
             enddo 
          endif
-! AA!!! test start
          inter_front(bp_arr(npi)%body) = max(inter_front(bp_arr(npi)%body),    &
                                          aux_scal_test)
          aux_scal_test = 0
-! AA!!! test end
 ! 2D case
          if (ncord==2) then
             do j=1,NumBSides
                if ((BoundarySide(j)%tipo=="fixe") .or.                         &
                   (BoundarySide(j)%tipo == "tapi")) then  
-                  aux_vec2(:) = bp_arr(npi)%pos(:) -                           &
+                  aux_vec(:) = bp_arr(npi)%pos(:) -                           &
                                 Vertice(1,BoundarySide(j)%Vertex(1))
-                  aux4 = dot_product(BoundarySide(j)%T(:,3),aux_vec2)
+                  aux4 = dot_product(BoundarySide(j)%T(:,3),aux_vec)
                   if (aux4>=0.d0) then
                      pos_aux(1) =  Vertice(1,BoundarySide(j)%Vertex(1))
                      pos_aux(2) = 0.d0
@@ -455,41 +504,23 @@ do npi=1,n_body_part
                            (impact_vel(aux2,n_bodies+j) ** 2) / r_per) *       &
                            k_masses * Gamma_boun(r_per,Domain%h)               &
                            * normal_plane(:)
-                        Force(bp_arr(npi)%body,n_bodies+j,:) =                 &
-                           Force(bp_arr(npi)%body,n_bodies+j,:) +              &
+                        Force_bod_sol(bp_arr(npi)%body,n_bodies+j,:) =         &
+                           Force_bod_sol(bp_arr(npi)%body,n_bodies+j,:) +      &
                            f_coll_bp_boun(:)
-! Body-frontier interactions. In the absence of neighburing fluid particles
-! (dry stage), sliding friction force and explicit normal reaction force under 
-! sliding.
-                        if (body_arr(bp_arr(npi)%body)%pmax<1.d-5) then
-                           if ((friction_angle>(0.d0-1.d-9)).and.              &
-                              (simulation_time>time_max_no_body_gravity_force))&
-                              then
-! Sum of the normal vectors of the neighbouring frontiers
-                              sum_normal_plane(bp_arr(npi)%body,:) =           &
-                                 sum_normal_plane(bp_arr(npi)%body,:) +        & 
-                                 normal_plane(:)
-! To update the maximum tangential velocity
-                              aux_vec(:) = dot_product(bp_arr(npi)%vel,        &
-                                           normal_plane) * normal_plane(:)
-                              aux_vec(:) = bp_arr(npi)%vel(:) - aux_vec(:)
-                              aux_scalar = dsqrt(dot_product(aux_vec,aux_vec))
-                              interface_sliding_vel_max(bp_arr(npi)%body) = max&
-                                 (interface_sliding_vel_max(bp_arr(npi)%body), &
-                                 aux_scalar)
-                              else
-! Contribution of the normal reaction force under sliding and of the sliding 
-! friction force depending on the local slope angle (instead of the friction 
-! angle)
-                                 aux_gravity(bp_arr(npi)%body,:) = 0.d0
-                           endif
-                        endif
+                        call body_boundary_for_sliding_friction_normal_reaction&
+                           (npi,bp_bound_interactions(bp_arr(npi)%body),       &
+                           normal_plane(:),bp_arr(npi)%pos(:),                 &
+                           interface_sliding_vel_max(bp_arr(npi)%body),        &
+                           mean_bound_normal(bp_arr(npi)%body,:),              &
+                           mean_bound_pos(bp_arr(npi)%body,:),                 &
+                           aux_gravity(bp_arr(npi)%body,:))
                         call Vector_Product(bp_arr(npi)%rel_pos,               &
-                           f_coll_bp_boun,temp,3)
-                        Moment(bp_arr(npi)%body,n_bodies+j,:) =                &
-                           Moment(bp_arr(npi)%body,n_bodies+j,:) + temp(:)
-                        Force_mag_sum(bp_arr(npi)%body,n_bodies+j) =           &
-                           Force_mag_sum(bp_arr(npi)%body,n_bodies+j) +        &
+                           f_coll_bp_boun,aux_vec,3)
+                        Moment_bod_sol(bp_arr(npi)%body,n_bodies+j,:) =        &
+                           Moment_bod_sol(bp_arr(npi)%body,n_bodies+j,:) +     &
+                           aux_vec(:)
+                        alfa_denom(bp_arr(npi)%body,n_bodies+j) =              &
+                           alfa_denom(bp_arr(npi)%body,n_bodies+j) +           &
                            (1.d0 / r_per) * k_masses *                         & 
                            Gamma_boun(r_per,Domain%h) 
                         r_per_min(bp_arr(npi)%body,n_bodies+j) =               &
@@ -542,30 +573,37 @@ do npi=1,n_body_part
    endif
 enddo     
 ! Loop over the transported bodies (global contributions from body-body and 
-! boundary-body impacts; computation of Ic and its inverse)
-! AA!!!test sub for inter_front
+! boundary-body interactions; computation of Ic and its inverse)
 !$omp parallel do default(none) private(i,j,k_masses,alfa_boun,aux_int)        &
 !$omp shared(n_bodies,body_arr,ncord,it_start,on_going_time_step,aux,r_per_min)&
-!$omp shared(Domain,Force_mag_sum,Force,Moment,inter_front)
+!$omp shared(Domain,alfa_denom,Force_bod_sol,Moment_bod_sol,inter_front)       &
+!$omp shared(Force_bod_flu)
 do i=1,n_bodies
    if (body_arr(i)%imposed_kinematics==0) then
-! Forces and torques/moments
+! Saving the hydrodynamic forces 
+      Force_bod_flu(i,:) = body_arr(i)%Force(:)
+! Finalizing the assessment of the body-solid forces 
       do j=1,aux
-         if (r_per_min(i,j)<1000000.d0) then
+         if (r_per_min(i,j)<1.d6) then
             if (j<=n_bodies) then
                k_masses = (body_arr(i)%mass * body_arr(j)%mass) /              & 
                           (body_arr(i)%mass + body_arr(j)%mass)
                else
                   k_masses = body_arr(i)%mass 
             endif
-            if (Force_mag_sum(i,j)>0.d0) then
+            if (alfa_denom(i,j)>0.d0) then
                alfa_boun = (Gamma_boun(r_per_min(i,j),Domain%h) /              &
-                           r_per_min(i,j) * k_masses) / Force_mag_sum(i,j)
+                           r_per_min(i,j) * k_masses) / alfa_denom(i,j)
+! The body-boundary forces are normalized by the number of neighbouring 
+! frontiers
                if (j>n_bodies) alfa_boun = alfa_boun / inter_front(i)
-               Force(i,j,:) = Force(i,j,:) * alfa_boun
-               body_arr(i)%Force(:) = body_arr(i)%Force(:) + Force(i,j,:)
-               Moment(i,j,:) = Moment(i,j,:) * alfa_boun
-               body_arr(i)%Moment(:) = body_arr(i)%Moment(:) + Moment(i,j,:)
+! Body-solid forces and torques/moments
+               Force_bod_sol(i,j,:) = Force_bod_sol(i,j,:) * alfa_boun
+               body_arr(i)%Force(:) = body_arr(i)%Force(:) +                   &
+                                      Force_bod_sol(i,j,:)
+               Moment_bod_sol(i,j,:) = Moment_bod_sol(i,j,:) * alfa_boun
+               body_arr(i)%Moment(:) = body_arr(i)%Moment(:) +                 &
+                                       Moment_bod_sol(i,j,:)
             endif
          endif
       enddo
@@ -583,40 +621,56 @@ do i=1,n_bodies
    endif
 enddo
 !$omp end parallel do     
-! Check body-body interactions and eventually zeroing impact velocities; 
-! adding gravity 
+! Finalizing body-body interactions and body-boundary interactions; possible
+! zeroing of the impact velocities; adding gravity. 
 !$omp parallel do default(none)                                                &
-!$omp shared(n_bodies,Moment,Force,body_arr,impact_vel,aux,Domain,aux_gravity) &
-!$omp shared(n_surf_body_part,surf_body_part,sum_normal_plane,friction_angle)  &
+!$omp shared(n_bodies,Moment_bod_sol,Force_bod_sol,body_arr,impact_vel,aux)    &
+!$omp shared(n_surf_body_part,surf_body_part,mean_bound_normal,friction_angle) &
 !$omp shared(inter_front,simulation_time,time_max_no_body_gravity_force)       &
-!$omp shared(interface_sliding_vel_max,dtvel)                                  &
-!$omp private(j,k,nbi,npk,nbk,n_interactions,aux2,aux_scalar,aux_vec)          &
+!$omp shared(interface_sliding_vel_max,dtvel,aux_gravity,Domain,Force_bod_flu) &
+!$omp shared(mean_bound_pos,bp_bound_interactions)                             &
+!$omp private(j,k,nbi,npk,nbk,n_interactions,aux2,aux_scalar,aux_vec,aux_vec_2)&
 !$omp private(sliding_friction_dir,aux_scalar_2,sliding_friction)              &
-!$omp private(friction_limiter)  
+!$omp private(friction_limiter,rel_pos)  
 do nbi=1,n_bodies
    if (body_arr(nbi)%imposed_kinematics==0) then
-      if ((friction_angle>(0.d0-1.d-9)).and.(inter_front(nbi)>0).and.          &
+      if ((friction_angle>-1.d-9).and.(inter_front(nbi)>0).and.                &
          (simulation_time>time_max_no_body_gravity_force)) then
 ! Overall normal representing the neighbouring frontiers
-         aux_scalar = dsqrt(dot_product(sum_normal_plane(nbi,:),               &
-                      sum_normal_plane(nbi,:)))
+         aux_scalar = dsqrt(dot_product(mean_bound_normal(nbi,:),              &
+                      mean_bound_normal(nbi,:)))
          if (aux_scalar>1.d-9) then
-            sum_normal_plane(nbi,:) = sum_normal_plane(nbi,:) / aux_scalar
+            mean_bound_normal(nbi,:) = mean_bound_normal(nbi,:) / aux_scalar
             else
-               sum_normal_plane(nbi,:) = 0.d0
+               mean_bound_normal(nbi,:) = 0.d0
          endif
+! Overall position representing the neighbouring frontiers
+         aux_scalar = dsqrt(dot_product(mean_bound_pos(nbi,:),                 &
+                      mean_bound_pos(nbi,:)))
+         mean_bound_pos(nbi,:) = mean_bound_pos(nbi,:) /                       &
+                                 bp_bound_interactions(nbi)
 ! Gravity component normal to the overall normal representing the neighbouring 
 ! frontiers
-         aux_vec(:) = dot_product(aux_gravity(nbi,:),sum_normal_plane(nbi,:))  &
-                      * sum_normal_plane(nbi,:)
-! Absolute value of the gravity component normal to the overall surface
+         aux_vec(:) = dot_product(aux_gravity(nbi,:),mean_bound_normal(nbi,:)) &
+                      * mean_bound_normal(nbi,:)
+         if (body_arr(nbi)%pmax<1.d-5) then
+! In case of dry body, normal boundary reaction under sliding is considered. 
+! Gravity force is replaced by the vector sum of the gravity force and the 
+! normal reaction.
+            aux_gravity(nbi,:) = aux_gravity(nbi,:) - aux_vec(:)
+         endif
+! Hydrodynamic force component normal to the overall normal representing the 
+! neighbouring frontiers
+         aux_vec_2(:) = dot_product(Force_bod_flu(nbi,:),                      &
+                        mean_bound_normal(nbi,:)) * mean_bound_normal(nbi,:)
+! Vector sum of the gravity (and normal reaction force) under sliding) and the 
+! hydrodynamic force, all aligned with the overall boundary normal.
+         aux_vec(:) = aux_vec(:) + aux_vec_2(:)
+! Absolute value of the normal force above
          aux_scalar = dsqrt(dot_product(aux_vec,aux_vec))
-! Gravity + normal reaction force under sliding (aligned with the overall normal
-! of the neighbouring frontiers)
-         aux_gravity(nbi,:) = aux_gravity(nbi,:) - aux_vec(:)
 ! Direction of the sliding friction force
-         aux_vec(:) = dot_product(body_arr(nbi)%u_CM,sum_normal_plane(nbi,:)) *&
-                      sum_normal_plane(nbi,:)
+         aux_vec(:) = dot_product(body_arr(nbi)%u_CM,mean_bound_normal(nbi,:)) &
+                      * mean_bound_normal(nbi,:)
          sliding_friction_dir(:) = body_arr(nbi)%u_CM(:) - aux_vec(:)
          aux_scalar_2 = dsqrt(dot_product(sliding_friction_dir,                &
                         sliding_friction_dir))
@@ -644,6 +698,10 @@ do nbi=1,n_bodies
          endif
 ! Contribution of the sliding friction force to the global force
          body_arr(nbi)%Force(:) = body_arr(nbi)%Force(:) + sliding_friction(:)
+! Contribution of the sliding friction to the global momentum
+         rel_pos(:) = mean_bound_pos(nbi,:) - body_arr(nbi)%x_CM(:)
+         call Vector_Product(rel_pos(:),sliding_friction(:),aux_vec(:),3)
+         body_arr(nbi)%Moment(:) = body_arr(nbi)%Moment(:) + aux_vec(:)
       endif
 ! To update the resultant force with gravity + normal reaction force under 
 ! sliding
@@ -652,9 +710,12 @@ do nbi=1,n_bodies
       n_interactions = 0
       do j=1,aux
          if (nbi==j) cycle
-         if ((Moment(nbi,j,1)==0.d0).and.(Force(nbi,j,1)==0.d0).and.           &
-             (Moment(nbi,j,2)==0.d0).and.(Force(nbi,j,2)==0.d0).and.           &
-             (Moment(nbi,j,3)==0.d0).and.(Force(nbi,j,3)==0.d0)) then
+         if ((Moment_bod_sol(nbi,j,1)==0.d0).and.                              &
+             (Force_bod_sol(nbi,j,1)==0.d0).and.                               &
+             (Moment_bod_sol(nbi,j,2)==0.d0).and.                              &
+             (Force_bod_sol(nbi,j,2)==0.d0).and.                               &
+             (Moment_bod_sol(nbi,j,3)==0.d0).and.                              &
+             (Force_bod_sol(nbi,j,3)==0.d0)) then
             if (j<=n_bodies) then
                k = 0
                nbk = 1
@@ -681,26 +742,34 @@ enddo
 !------------------------
 ! Deallocations
 !------------------------
-if(allocated(Force)) then
-   deallocate(Force,STAT=alloc_stat)
+if(allocated(Force_bod_flu)) then
+   deallocate(Force_bod_flu,STAT=alloc_stat)
    if (alloc_stat/=0) then
-      write(uerr,*) 'Deallocation of "Force" in the program unit  ',           &
+      write(uerr,*) 'Deallocation of "Force_bod_flu" in the program unit  ',   &
          '"RHS_body_dynamics" failed; the execution terminates here. '
       stop
    endif
 endif
-if(allocated(Moment)) then
-   deallocate(Moment,STAT=alloc_stat)
+if(allocated(Force_bod_sol)) then
+   deallocate(Force_bod_sol,STAT=alloc_stat)
    if (alloc_stat/=0) then
-      write(uerr,*) 'Deallocation of "Moment" in the program unit  ',          &
+      write(uerr,*) 'Deallocation of "Force_bod_sol" in the program unit  ',   &
          '"RHS_body_dynamics" failed; the execution terminates here. '
       stop
    endif
 endif
-if(allocated(Force_mag_sum)) then
-   deallocate(Force_mag_sum,STAT=alloc_stat)
+if(allocated(Moment_bod_sol)) then
+   deallocate(Moment_bod_sol,STAT=alloc_stat)
    if (alloc_stat/=0) then
-      write(uerr,*) 'Deallocation of "Force_mag_sum" in the program unit  ',   &
+      write(uerr,*) 'Deallocation of "Moment_bod_sol" in the program unit  ',  &
+         '"RHS_body_dynamics" failed; the execution terminates here. '
+      stop
+   endif
+endif
+if(allocated(alfa_denom)) then
+   deallocate(alfa_denom,STAT=alloc_stat)
+   if (alloc_stat/=0) then
+      write(uerr,*) 'Deallocation of "alfa_denom" in the program unit  ',      &
          '"RHS_body_dynamics" failed; the execution terminates here. '
       stop
    endif
@@ -721,20 +790,35 @@ if(allocated(aux_gravity)) then
       stop
    endif
 endif
-if(allocated(sum_normal_plane)) then
-   deallocate(sum_normal_plane,STAT=alloc_stat)
+if(allocated(mean_bound_normal)) then
+   deallocate(mean_bound_normal,STAT=alloc_stat)
    if (alloc_stat/=0) then
-      write(uerr,*) 'Deallocation of "sum_normal_plane" in the program unit  ',&
+      write(uerr,*) 'Deallocation of "mean_bound_normal" in the program unit ',&
          '"RHS_body_dynamics" failed; the execution terminates here. '
       stop
    endif
 endif
-! AA!!! test
+if(allocated(mean_bound_pos)) then
+   deallocate(mean_bound_pos,STAT=alloc_stat)
+   if (alloc_stat/=0) then
+      write(uerr,*) 'Deallocation of "mean_bound_pos" in the program unit ',   &
+         '"RHS_body_dynamics" failed; the execution terminates here. '
+      stop
+   endif
+endif
 if(allocated(inter_front)) then
    deallocate(inter_front,STAT=alloc_stat)
    if (alloc_stat/=0) then
       write(uerr,*) 'Deallocation of "inter_front" in the program unit  ',     &
          '"RHS_body_dynamics" failed; the execution terminates here. '
+      stop
+   endif
+endif
+if(allocated(bp_bound_interactions)) then
+   deallocate(bp_bound_interactions,STAT=alloc_stat)
+   if (alloc_stat/=0) then
+      write(uerr,*) 'Deallocation of "bp_bound_interactions" in the program ', &
+         'unit "RHS_body_dynamics" failed; the execution terminates here. '
       stop
    endif
 endif

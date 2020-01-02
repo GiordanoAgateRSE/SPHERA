@@ -521,7 +521,9 @@ end type TyBoundarySide
 ! Node
 type TyNode
    integer(4)       :: name
+! Position of the vertex in the global reference system 
    double precision :: GX(1:SPACEDIM)
+! Position of the vertex in the local reference system
    double precision :: LX(1:SPACEDIM)
 end type TyNode
 
