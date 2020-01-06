@@ -26,7 +26,7 @@
 !-------------------------------------------------------------------------------
 subroutine body_boundary_for_sliding_friction_normal_reaction(i_bp,            &
    bp_bound_interactions,normal_plane,bp_pos,interface_sliding_vel_max,        &
-   mean_bound_normal,mean_bound_pos,aux_gravity)
+   mean_bound_normal,sliding_app_point,sliding_dir,aux_gravity)
 !------------------------
 ! Modules
 !------------------------
@@ -46,7 +46,8 @@ double precision,intent(in) :: normal_plane(3)
 double precision,intent(in) :: bp_pos(3)
 double precision,intent(inout) :: interface_sliding_vel_max
 double precision,intent(inout) :: mean_bound_normal(3)
-double precision,intent(inout) :: mean_bound_pos(3)
+double precision,intent(inout) :: sliding_app_point(3)
+double precision,intent(inout) :: sliding_dir(3)
 double precision,intent(out) :: aux_gravity(3)
 double precision :: aux_scalar
 double precision :: aux_vec(3)
@@ -69,14 +70,18 @@ if ((friction_angle>-1.d-9).and.                                               &
 ! force under sliding.
 ! Sum of the normal vectors of the neighbouring frontiers: update
    mean_bound_normal(:) = mean_bound_normal(:) + normal_plane(:)
+! Sliding force application point
 ! Sum of the positions of the particles of the body each interaction: update
-   mean_bound_pos(:) = mean_bound_pos(:) + bp_pos(:)
+   sliding_app_point(:) = sliding_app_point(:) + bp_pos(:)
 ! Update of the number of "body particle - frontier" interactions for the 
 ! current body
    bp_bound_interactions = bp_bound_interactions + 1
-! To update the maximum tangential velocity
+! Interaction sliding velocity
    aux_vec(:) = dot_product(bp_arr(i_bp)%vel,normal_plane) * normal_plane(:)
    aux_vec(:) = bp_arr(i_bp)%vel(:) - aux_vec(:)
+! Update of the overall sliding direction
+   sliding_dir(:) = sliding_dir(:) + aux_vec(:)
+! Update of the maximum tangential velocity
    aux_scalar = dsqrt(dot_product(aux_vec,aux_vec))
    interface_sliding_vel_max = max(interface_sliding_vel_max,aux_scalar)
    elseif (body_arr(bp_arr(i_bp)%body)%pmax<1.d-5) then

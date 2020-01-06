@@ -45,7 +45,7 @@ double precision :: friction_limiter,aux_locx_min,aux_locx_max
 double precision :: f_pres(3),r_par_vec(3),f_coll_bp_bp(3)          
 double precision :: f_coll_bp_boun(3),pos_aux(3),normal_plane(3)
 double precision :: u_rel(3),x_rel(3),aux_vec(3),aux_vec_2(3),rel_pos(3)
-double precision :: loc_pos(3),aux_locx_vert(3),sliding_friction_dir(3)
+double precision :: loc_pos(3),aux_locx_vert(3)
 double precision :: sliding_friction(3)
 double precision :: aux_mat(3,3)
 ! "inter_front": Number of neighbouring frontiers for a given body. It is 
@@ -65,8 +65,15 @@ double precision,dimension(:,:),allocatable :: r_per_min
 double precision,dimension(:,:),allocatable :: aux_gravity
 ! Average of the normal vectors of the neighbouring boundaries of a given body
 double precision,dimension(:,:),allocatable :: mean_bound_normal
-! Average of the positions of the neighbouring boundaries of a given body
-double precision,dimension(:,:),allocatable :: mean_bound_pos
+! Sliding force application point for any body. It is computed as the average 
+! position of the body particles in the "body particle - frontier" interactions.
+! Each interaction has the same weight in the averaging process (every particle
+! might be considered more than once).
+double precision,dimension(:,:),allocatable :: sliding_app_point
+! Sliding direction. It is computed as the direction of the vector sum of the 
+! sliding velocity of the body particles in the sliding region (every particle 
+! might be considered more than once).
+double precision,dimension(:,:),allocatable :: sliding_dir
 ! Array of the body-body and body-boundary forces
 double precision,dimension(:,:,:),allocatable :: Force_bod_sol
 ! Array of the body-body and body-boundary torques
@@ -97,7 +104,7 @@ end interface
 interface
    subroutine body_boundary_for_sliding_friction_normal_reaction(i_bp,         &
       bp_bound_interactions,normal_plane,bp_pos,interface_sliding_vel_max,     &
-      mean_bound_normal,mean_bound_pos,aux_gravity)
+      mean_bound_normal,sliding_app_point,sliding_dir,aux_gravity)
       implicit none
       integer(4),intent(in) :: i_bp
       integer(4),intent(inout) :: bp_bound_interactions
@@ -105,7 +112,8 @@ interface
       double precision,intent(in) :: bp_pos(3)
       double precision,intent(inout) :: interface_sliding_vel_max
       double precision,intent(inout) :: mean_bound_normal(3)
-      double precision,intent(inout) :: mean_bound_pos(3)
+      double precision,intent(inout) :: sliding_app_point(3)
+      double precision,intent(inout) :: sliding_dir(3)
       double precision,intent(out) :: aux_gravity(3)
       double precision :: aux_scalar
       double precision :: aux_vec(3)
@@ -182,10 +190,18 @@ if (.not.allocated(mean_bound_normal)) then
       stop
    endif
 endif
-if (.not.allocated(mean_bound_pos)) then
-   allocate(mean_bound_pos(n_bodies,3),STAT=alloc_stat)
+if (.not.allocated(sliding_app_point)) then
+   allocate(sliding_app_point(n_bodies,3),STAT=alloc_stat)
    if (alloc_stat/=0) then
-      write(uerr,*) 'Allocation of "mean_bound_pos" failed in the program ',   &
+      write(uerr,*) 'Allocation of "sliding_app_point" failed in the program ',&
+         'unit "RHS_body_dynamics"; the execution terminates here.'
+      stop
+   endif
+endif
+if (.not.allocated(sliding_dir)) then
+   allocate(sliding_dir(n_bodies,3),STAT=alloc_stat)
+   if (alloc_stat/=0) then
+      write(uerr,*) 'Allocation of "sliding_dir" failed in the program ',      &
          'unit "RHS_body_dynamics"; the execution terminates here.'
       stop
    endif
@@ -227,7 +243,8 @@ inter_front(:) = 0
 bp_bound_interactions(:) = 0
 aux_scal_test = 0
 mean_bound_normal(:,:) = 0.d0
-mean_bound_pos(:,:) = 0.d0
+sliding_app_point(:,:) = 0.d0
+sliding_dir(:,:) = 0.d0
 interface_sliding_vel_max(:) = 0.d0
 !------------------------
 ! Statements
@@ -430,7 +447,8 @@ do npi=1,n_body_part
                            normal_plane(:),bp_arr(npi)%pos(:),                 &
                            interface_sliding_vel_max(bp_arr(npi)%body),        &
                            mean_bound_normal(bp_arr(npi)%body,:),              &
-                           mean_bound_pos(bp_arr(npi)%body,:),                 &
+                           sliding_app_point(bp_arr(npi)%body,:),              &
+                           sliding_dir(bp_arr(npi)%body,:),                    &
                            aux_gravity(bp_arr(npi)%body,:))
                         call Vector_Product(bp_arr(npi)%rel_pos,               &
                            f_coll_bp_boun,aux_vec,3)
@@ -512,7 +530,8 @@ do npi=1,n_body_part
                            normal_plane(:),bp_arr(npi)%pos(:),                 &
                            interface_sliding_vel_max(bp_arr(npi)%body),        &
                            mean_bound_normal(bp_arr(npi)%body,:),              &
-                           mean_bound_pos(bp_arr(npi)%body,:),                 &
+                           sliding_app_point(bp_arr(npi)%body,:),              &
+                           sliding_dir(bp_arr(npi)%body,:),                    &
                            aux_gravity(bp_arr(npi)%body,:))
                         call Vector_Product(bp_arr(npi)%rel_pos,               &
                            f_coll_bp_boun,aux_vec,3)
@@ -628,12 +647,12 @@ enddo
 !$omp shared(n_surf_body_part,surf_body_part,mean_bound_normal,friction_angle) &
 !$omp shared(inter_front,simulation_time,time_max_no_body_gravity_force)       &
 !$omp shared(interface_sliding_vel_max,dtvel,aux_gravity,Domain,Force_bod_flu) &
-!$omp shared(mean_bound_pos,bp_bound_interactions)                             &
+!$omp shared(sliding_app_point,sliding_dir,bp_bound_interactions)              &
 !$omp private(j,k,nbi,npk,nbk,n_interactions,aux2,aux_scalar,aux_vec,aux_vec_2)&
-!$omp private(sliding_friction_dir,aux_scalar_2,sliding_friction)              &
-!$omp private(friction_limiter,rel_pos)  
+!$omp private(aux_scalar_2,sliding_friction,friction_limiter,rel_pos)
 do nbi=1,n_bodies
    if (body_arr(nbi)%imposed_kinematics==0) then
+! Sliding friction, gravity and normal reaction: start
       if ((friction_angle>-1.d-9).and.(inter_front(nbi)>0).and.                &
          (simulation_time>time_max_no_body_gravity_force)) then
 ! Overall normal representing the neighbouring frontiers
@@ -644,19 +663,15 @@ do nbi=1,n_bodies
             else
                mean_bound_normal(nbi,:) = 0.d0
          endif
-! Overall position representing the neighbouring frontiers
-         aux_scalar = dsqrt(dot_product(mean_bound_pos(nbi,:),                 &
-                      mean_bound_pos(nbi,:)))
-         mean_bound_pos(nbi,:) = mean_bound_pos(nbi,:) /                       &
-                                 bp_bound_interactions(nbi)
+! Normal force for sliding friction: start
 ! Gravity component normal to the overall normal representing the neighbouring 
 ! frontiers
          aux_vec(:) = dot_product(aux_gravity(nbi,:),mean_bound_normal(nbi,:)) &
                       * mean_bound_normal(nbi,:)
          if (body_arr(nbi)%pmax<1.d-5) then
-! In case of dry body, normal boundary reaction under sliding is considered. 
-! Gravity force is replaced by the vector sum of the gravity force and the 
-! normal reaction.
+! In case of dry body, normal boundary reaction under sliding is here 
+! explicitly considered. Gravity force is replaced by the vector sum of the 
+! gravity force and the normal reaction.
             aux_gravity(nbi,:) = aux_gravity(nbi,:) - aux_vec(:)
          endif
 ! Hydrodynamic force component normal to the overall normal representing the 
@@ -668,25 +683,22 @@ do nbi=1,n_bodies
          aux_vec(:) = aux_vec(:) + aux_vec_2(:)
 ! Absolute value of the normal force above
          aux_scalar = dsqrt(dot_product(aux_vec,aux_vec))
-! Direction of the sliding friction force
-         aux_vec(:) = dot_product(body_arr(nbi)%u_CM,mean_bound_normal(nbi,:)) &
-                      * mean_bound_normal(nbi,:)
-         sliding_friction_dir(:) = body_arr(nbi)%u_CM(:) - aux_vec(:)
-         aux_scalar_2 = dsqrt(dot_product(sliding_friction_dir,                &
-                        sliding_friction_dir))
-         if (aux_scalar_2>1.d-9) then
-            sliding_friction_dir(:) = - sliding_friction_dir(:) / aux_scalar_2
+! Normal force for sliding friction: end
+! Sliding direction
+         aux_scalar = dsqrt(dot_product(sliding_dir(nbi,:),sliding_dir(nbi,:)))
+         if (aux_scalar>1.d-9) then
+            sliding_dir(nbi,:) = - sliding_dir(nbi,:) / aux_scalar
             else
-               sliding_friction_dir(:) = 0.d0
+               sliding_dir(nbi,:) = 0.d0
          endif
 ! Sliding friction force: first estimation
          sliding_friction(:) = aux_scalar * dtan(friction_angle) *             &
-                               sliding_friction_dir(:)
+                               sliding_dir(nbi,:)
 ! Limiter to the sliding friction force
          aux_scalar = dsqrt(dot_product(sliding_friction(:),                   &
                       sliding_friction(:)))
          if (dtvel>1.d-9) then
-            friction_limiter = interface_sliding_vel_max(nbi) / dtvel *        &
+            friction_limiter = 2.d0 * interface_sliding_vel_max(nbi) / dtvel * &
                                body_arr(nbi)%mass
             else
                friction_limiter = 0.d0
@@ -699,13 +711,16 @@ do nbi=1,n_bodies
 ! Contribution of the sliding friction force to the global force
          body_arr(nbi)%Force(:) = body_arr(nbi)%Force(:) + sliding_friction(:)
 ! Contribution of the sliding friction to the global momentum
-         rel_pos(:) = mean_bound_pos(nbi,:) - body_arr(nbi)%x_CM(:)
+         sliding_app_point(nbi,:) = sliding_app_point(nbi,:) /                 &
+                                    bp_bound_interactions(nbi)
+         rel_pos(:) = sliding_app_point(nbi,:) - body_arr(nbi)%x_CM(:)
          call Vector_Product(rel_pos(:),sliding_friction(:),aux_vec(:),3)
          body_arr(nbi)%Moment(:) = body_arr(nbi)%Moment(:) + aux_vec(:)
       endif
 ! To update the resultant force with gravity + normal reaction force under 
 ! sliding
       body_arr(nbi)%Force(:) = body_arr(nbi)%Force(:) + aux_gravity(nbi,:)
+! Sliding friction, gravity and normal reaction: end
 ! Impact velocity
       n_interactions = 0
       do j=1,aux
@@ -798,10 +813,18 @@ if(allocated(mean_bound_normal)) then
       stop
    endif
 endif
-if(allocated(mean_bound_pos)) then
-   deallocate(mean_bound_pos,STAT=alloc_stat)
+if(allocated(sliding_app_point)) then
+   deallocate(sliding_app_point,STAT=alloc_stat)
    if (alloc_stat/=0) then
-      write(uerr,*) 'Deallocation of "mean_bound_pos" in the program unit ',   &
+      write(uerr,*) 'Deallocation of "sliding_app_point" in the program unit ',&
+         '"RHS_body_dynamics" failed; the execution terminates here. '
+      stop
+   endif
+endif
+if(allocated(sliding_dir)) then
+   deallocate(sliding_dir,STAT=alloc_stat)
+   if (alloc_stat/=0) then
+      write(uerr,*) 'Deallocation of "sliding_dir" in the program unit ',      &
          '"RHS_body_dynamics" failed; the execution terminates here. '
       stop
    endif
