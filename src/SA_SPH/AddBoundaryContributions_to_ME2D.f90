@@ -161,17 +161,9 @@ do icbs=1,IntNcbs
          elseif (strtype=="velo") then     
             if ((Domain%time_stage==1).or.(Domain%time_split==1)) then 
                pg(npi)%kodvel = 2
-               if (simulation_time<Tratto(sidestr)%trampa) then
-                  pg(npi)%velass(1) = Tratto(sidestr)%NormVelocity*nnlocal(1) *&
-                     simulation_time / Tratto(sidestr)%trampa
-                  pg(npi)%velass(2) = zero           
-                  pg(npi)%velass(3) = Tratto(sidestr)%NormVelocity*nnlocal(2) *&
-                     simulation_time / Tratto(sidestr)%trampa
-                  else
-                     pg(npi)%velass(1) = Tratto(sidestr)%NormVelocity*nnlocal(1)
-                     pg(npi)%velass(2) = zero            
-                     pg(npi)%velass(3) = Tratto(sidestr)%NormVelocity*nnlocal(2)
-               endif
+               pg(npi)%velass(1) = Tratto(sidestr)%NormVelocity * nnlocal(1)
+               pg(npi)%velass(2) = zero            
+               pg(npi)%velass(3) = Tratto(sidestr)%NormVelocity * nnlocal(2)
             endif
             return             
             elseif (strtype=="flow") then     
@@ -195,40 +187,20 @@ do icbs=1,IntNcbs
                      else
                         Tratto(sidestr)%NormVelocity = zero
                   endif
-                  if (simulation_time<Tratto(sidestr)%trampa) then
-                     pg(npi)%velass(1) = Tratto(sidestr)%NormVelocity *        &
-                        nnlocal(1) * simulation_time / Tratto(sidestr)%trampa
-                     pg(npi)%velass(2) = zero           
-                     pg(npi)%velass(3) = Tratto(sidestr)%NormVelocity *        &
-                        nnlocal(2) * simulation_time / Tratto(sidestr)%trampa
-                     else
-                        pg(npi)%velass(1) = Tratto(sidestr)%NormVelocity *     &
-                           nnlocal(1)
-                        pg(npi)%velass(2) = zero            
-                        pg(npi)%velass(3) = Tratto(sidestr)%NormVelocity *     &
-                           nnlocal(2)
-                  endif
+                  pg(npi)%velass(1) = Tratto(sidestr)%NormVelocity * nnlocal(1)
+                  pg(npi)%velass(2) = zero            
+                  pg(npi)%velass(3) = Tratto(sidestr)%NormVelocity * nnlocal(2)
                endif        
                return
                elseif (strtype=="sour") then
                   if (xpi>=zero.AND.xpi<=RifBoundarySide%length) then
                      if ((Domain%time_stage==1).or.(Domain%time_split==1)) then 
                         pg(npi)%kodvel = 2
-                        if (simulation_time<Tratto(sidestr)%trampa) then
-                           pg(npi)%velass(1) = Tratto(sidestr)%NormVelocity *  &
-                                               nnlocal(1) * simulation_time /  &
-                                               Tratto(sidestr)%trampa
-                           pg(npi)%velass(2) = zero           
-                           pg(npi)%velass(3) = Tratto(sidestr)%NormVelocity *  &
-                                               nnlocal(2) * simulation_time /  &
-                                               Tratto(sidestr)%trampa
-                           else
-                              pg(npi)%velass(1) = Tratto(sidestr)%NormVelocity &
-                                 * nnlocal(1)
-                              pg(npi)%velass(2) = zero            
-                              pg(npi)%velass(3) = Tratto(sidestr)%NormVelocity &
-                                 * nnlocal(2)
-                        endif
+                        pg(npi)%velass(1) = Tratto(sidestr)%NormVelocity *     &
+                                            nnlocal(1)
+                        pg(npi)%velass(2) = zero            
+                        pg(npi)%velass(3) = Tratto(sidestr)%NormVelocity *     &
+                                            nnlocal(2)
                      endif
                      return
                   endif

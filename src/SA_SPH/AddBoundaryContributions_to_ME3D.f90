@@ -153,12 +153,7 @@ face_loop: do icbf = 1,Ncbf
       elseif (stretchtype=="velo") then 
          if ((Domain%time_stage==1).or.(Domain%time_split==1)) then 
             pg(npi)%kodvel = 2
-            if (simulation_time<Tratto(stretch)%trampa) then
-               pg(npi)%velass(:) = Tratto(stretch)%NormVelocity * nnlocal(:) * &
-                  simulation_time / Tratto(stretch)%trampa
-               else
-                  pg(npi)%velass(:) = Tratto(stretch)%NormVelocity * nnlocal(:) 
-            endif
+            pg(npi)%velass(:) = Tratto(stretch)%NormVelocity * nnlocal(:) 
          endif
          return
          elseif (stretchtype=="flow") then 
@@ -187,26 +182,14 @@ face_loop: do icbf = 1,Ncbf
                   else
                      Tratto(stretch)%NormVelocity = zero
                endif
-               if (simulation_time<Tratto(stretch)%trampa) then
-                  pg(npi)%velass(:) = Tratto(stretch)%NormVelocity *           &
-                     nnlocal(:) * simulation_time / Tratto(stretch)%trampa
-                  else
-                     pg(npi)%velass(:) = Tratto(stretch)%NormVelocity *        &
-                        nnlocal(:) 
-               endif
+               pg(npi)%velass(:) = Tratto(stretch)%NormVelocity * nnlocal(:) 
             endif
             return
 ! Inlet sections 
             elseif (stretchtype=="sour") then         
                if ((Domain%time_stage==1).or.(Domain%time_split==1)) then 
                   pg(npi)%kodvel = 2
-                  if (simulation_time<Tratto(stretch)%trampa) then
-                     pg(npi)%velass(:) = Tratto(stretch)%NormVelocity *        &
-                        nnlocal(:) * simulation_time / Tratto(stretch)%trampa
-                     else
-                        pg(npi)%velass(:) = Tratto(stretch)%NormVelocity *     &
-                           nnlocal(:) 
-                  endif
+                  pg(npi)%velass(:) = Tratto(stretch)%NormVelocity * nnlocal(:) 
                endif
                return                                                          
    endif

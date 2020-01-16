@@ -400,7 +400,6 @@ type TyZone
                                     ! Cartesian Topography 
    double precision :: H_res ! Height of the reservoir free surface
    double precision :: pool 
-   double precision :: trampa ! Time to reach the stationary inlet velocity
    double precision :: valp ! IC for pressure or free surface height
    integer(4)       :: Indix(2) 
    integer(4)       :: limit(2) ! Indices of the first and last particle 
@@ -440,7 +439,6 @@ type TyBoundaryStretch
    double precision :: NormVelocity ! Absolute value of the velocity component,
                                     ! which is normal to the face 
    double precision :: FlowRate ! Flow rate exiting the face 
-   double precision :: trampa 
    double precision :: ShearCoeff
    double precision :: velocity(1:SPACEDIM) ! Velocity for "TAPI" zones
    double precision :: PsiCoeff(1:SPACEDIM)
