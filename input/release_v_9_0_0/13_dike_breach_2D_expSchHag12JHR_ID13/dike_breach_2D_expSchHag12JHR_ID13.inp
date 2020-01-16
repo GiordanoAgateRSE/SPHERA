@@ -1,11 +1,11 @@
 9.0.0
 
 !-------------------------------------------------------------------------------
-! File name and copyright: dike_breach_2D_expSchHag12JHR_ID22.inp
+! File name and copyright: dike_breach_2D_expSchHag12JHR_ID13.inp
 !    Copyright 2016-2018 (RSE SpA, authored by Andrea Amicarelli)
 ! File description: input file for SPHERA v.9.0.0 (RSE SpA).
 !   Representation of the experimental 2D dike_breach of Schmocker and Hager 
-!   2012 (JHR), test case ID=22. Reference: Amicarelli & Agate (2017, RdS).
+!   2012 (JHR), test case ID=13. Reference: Amicarelli & Agate (2017, RdS).
 !
 ! This file is free software: you can redistribute it and/or modify
 ! it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 !-------------------------------------------------------------------------------
 
 ##### TITLE #####
-dike_breach_2D_expSchHag12JHR_ID22
+dike_breach_2D_expSchHag12JHR_ID13
 ##### END TITLE #####
 
 ##### DOMAIN #####
