@@ -678,16 +678,16 @@ do nbi=1,n_bodies
 ! neighbouring frontiers
          aux_vec_2(:) = dot_product(Force_bod_flu(nbi,:),                      &
                         mean_bound_normal(nbi,:)) * mean_bound_normal(nbi,:)
-! Vector sum of the gravity (and normal reaction force) under sliding) and the 
+! Vector sum of the gravity (and normal reaction force under sliding) and the 
 ! hydrodynamic force, all aligned with the overall boundary normal.
          aux_vec(:) = aux_vec(:) + aux_vec_2(:)
 ! Absolute value of the normal force above
          aux_scalar = dsqrt(dot_product(aux_vec,aux_vec))
 ! Normal force for sliding friction: end
 ! Sliding direction
-         aux_scalar = dsqrt(dot_product(sliding_dir(nbi,:),sliding_dir(nbi,:)))
-         if (aux_scalar>1.d-9) then
-            sliding_dir(nbi,:) = - sliding_dir(nbi,:) / aux_scalar
+         aux_scalar_2 = dsqrt(dot_product(sliding_dir(nbi,:),sliding_dir(nbi,:)))
+         if (aux_scalar_2>1.d-9) then
+            sliding_dir(nbi,:) = - sliding_dir(nbi,:) / aux_scalar_2
             else
                sliding_dir(nbi,:) = 0.d0
          endif
