@@ -481,7 +481,6 @@ if ((Taub>Taubcr).and.(on_going_time_step>Med(imed)%NIterSol)) then
          pg(npi)%var = zero
          pg(npi)%dens = med(imed)%den0 + (pretot / (Med(imed)%celerita *       &
                         Med(imed)%celerita))
-         if (diffusione) pg(npi)%dens = med(imed)%den0 
 ! Initializing some SPH parameters for fixed mixture particles.
          if (Granular_flows_options%ID_erosion_criterion==1) then
             pg(npi)%sigma_prime_m = 0.d0
@@ -494,4 +493,3 @@ endif
 !------------------------
 return
 end subroutine Shields
-

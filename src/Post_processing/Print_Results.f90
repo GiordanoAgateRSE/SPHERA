@@ -40,7 +40,7 @@ integer(4),intent(INOUT) :: it_print
 integer(4) :: npi,i,codice,dummy,OpCountot,SpCountot,minlocvelo,maxlocvelo,nbi
 integer(4) :: minlocvelx,maxlocvelx,minlocvely,maxlocvely,minlocvelz,maxlocvelz
 integer(4) :: minlocpres,maxlocpres,minlocdens,maxlocdens,minlocvisc,maxlocvisc
-integer(4) :: minloccodi,maxloccodi,minlocInEn,maxlocInEn,blt_laminar_flag_count
+integer(4) :: minlocInEn,maxlocInEn,blt_laminar_flag_count
 integer(4) :: minlocvelo_w,maxlocvelo_w,minlocpres_w,maxlocpres_w
 integer(4) :: minlocvelo_bp,maxlocvelo_bp,minlocpres_bp,maxlocpres_bp
 integer(4) :: minlocvelo_body,maxlocvelo_body,minlocomega_body,maxlocomega_body
@@ -49,7 +49,7 @@ integer(4) :: minlocu_star,maxlocu_star,laminar_flag_count,mixture_count
 integer(4) :: machine_Julian_day,machine_hour,machine_minute,machine_second
 integer(4) :: minlocacc_bp,maxlocacc_bp
 double precision :: minvelx,maxvelx,minvely,maxvely,minvelz,maxvelz,minpres
-double precision :: maxpres,mindens,maxdens,minvisc,maxvisc,mincodi,maxcodi
+double precision :: maxpres,mindens,maxdens,minvisc,maxvisc
 double precision :: minInEn,maxInEn,modvel,minvelo_w,maxvelo_w,minpres_w
 double precision :: maxpres_w,minvelo_bp,maxvelo_bp,minpres_bp,maxpres_bp
 double precision :: minvelo_body,maxvelo_body,minomega_body,maxomega_body
@@ -61,7 +61,6 @@ integer(4),dimension(1) :: pos
 character(len=42) :: fmt100="(a,i10,a,e18.9,a,e18.9,a,i  ,a,i  ,a,i  )"
 character(len=47) :: fmt101="(a,2(1x,f11.4,1x,a,1x,i8,1x,a,3(1x,f8.2,1x,a)))"
 character(len=47) :: fmt102="(a,2(1x,f11.1,1x,a,1x,i8,1x,a,3(1x,f8.2,1x,a)))"
-character(len=47) :: fmt103="(a,2(1x,f11.6,1x,a,1x,i8,1x,a,3(1x,f8.2,1x,a)))"
 character(len=47) :: fmt104="(a,2(1x,g11.4,1x,a,1x,i8,1x,a,3(1x,f8.2,1x,a)))"
 character(len=47) :: fmt105="(a,2(1x,e11.4,1x,a,1x,i8,1x,a,3(1x,f8.2,1x,a)))"
 character(len=12) :: stringa
@@ -202,15 +201,6 @@ if (nag>0) then
    minlocvisc = pos(1)
    pos = maxloc(pg(1:nag)%visc,mask=pg(1:nag)%cella/=0)
    maxlocvisc = pos(1)
-! Diffusion coefficient
-   if (diffusione) then
-      mincodi = minval(pg(1:nag)%coefdif,mask=pg(1:nag)%cella/=0)
-      maxcodi = maxval(pg(1:nag)%coefdif,mask=pg(1:nag)%cella/=0)
-      pos = minloc(pg(1:nag)%coefdif,mask=pg(1:nag)%cella/=0)
-      minloccodi = pos(1)
-      pos = maxloc(pg(1:nag)%coefdif,mask=pg(1:nag)%cella/=0)
-      maxloccodi = pos(1)
-   endif
 ! Explosion coefficient
    if (esplosione) then
       minInEn = minval(pg(1:nag)%IntEn,mask=pg(1:nag)%cella/=0)
@@ -449,13 +439,6 @@ if (nag>0) then
       pg(minlocvisc)%coord(3),"||",maxvisc,"|",maxlocvisc,"|",                 &
       pg(maxlocvisc)%coord(1),"|",pg(maxlocvisc)%coord(2),"|",                 &
       pg(maxlocvisc)%coord(3),"|"
-   if (diffusione) then
-      write(ulog,fmt103)  "Coef. diff.                  |",mincodi,"|",        &
-      minloccodi,"|",pg(minloccodi)%coord(1),"|",pg(minloccodi)%coord(2),"|",  &
-      pg(minloccodi)%coord(3),"||",maxcodi,"|",maxloccodi,"|",                 &
-      pg(maxloccodi)%coord(1),"|",pg(maxloccodi)%coord(2),"|",                 &
-      pg(maxloccodi)%coord(3),"|"
-   endif
    if ((Domain%tipo=="bsph").and.(DBSPH%n_w>0)) then
       write(ulog,fmt101)  "Wall velocity |u_a_|(m/s)   |",minvelo_w,"|",       &
          minlocvelo_w,"|",pg_w(minlocvelo_w)%coord(1),"|",                     &

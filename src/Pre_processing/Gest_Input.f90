@@ -65,7 +65,6 @@ Domain%file = " "
 Domain%NormFix = .FALSE.         
 Domain%Slip = .FALSE.
 OnlyTriangle = .FALSE.
-diffusione = .FALSE.
 esplosione = .FALSE.
 restart = .FALSE.
 simulation_time = zero
@@ -237,7 +236,6 @@ if (.not.restart) then
       call diagnostic(arg1=5,arg2=InputErr,arg3=msg_err)
    endif
    do i=1,NMedium
-      if (Med(i)%codif/=zero) diffusione = .TRUE.
       if (Med(i)%Gamma/=zero) esplosione = .TRUE.
    enddo
    close(ninp)
@@ -486,9 +484,6 @@ if (.not.restart) then
          call diagnostic(arg1=5,arg2=ier,arg3=msg_err)
       endif
       close(nsav)
-      do i=1,NMedium
-         if (Med(i)%codif/=zero) diffusione = .TRUE.
-      enddo
 ! To save current time for "result_converter"
       val_time = simulation_time
       close(ninp)

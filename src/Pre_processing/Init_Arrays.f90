@@ -67,7 +67,6 @@ do i=1,size(Med)
    Med(i)%RoughCoef = zero
    Med(i)%d50 = zero
    Med(i)%SettlingCoef = zero
-   Med(i)%Codif = zero
    Med(i)%Gamma = zero
    Med(i)%InitialIntEn = zero
 enddo

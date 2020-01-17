@@ -61,7 +61,7 @@ integer(4),external :: ParticleCellNumber, CellIndices, CellNumber
 !$omp private(interf_liq,intliq_id,interf_sol,intsol_id,secinv,PartLiq_pres)   &
 !$omp private(preidro,pretot,preeff,coeff1,coeff2,mu,mumax,Velocity2)          &
 !$omp shared(ind_interfaces,nomsub,ulog,uerr,nag,pg,Med,Domain,Grid,Icont)     &
-!$omp shared(npartord,nPartIntorno,PartIntorno,NMAXPARTJ,diffusione,esplosione)&
+!$omp shared(npartord,nPartIntorno,PartIntorno,NMAXPARTJ,esplosione)           &
 !$omp shared(on_going_time_step)
 do npi = 1,nag
    if ((pg(npi)%cella==0).or.(pg(npi)%vel_type/="std")) cycle
@@ -198,10 +198,6 @@ do npi = 1,nag
             pg(npi)%state = "sol"
             pg(npi)%vel = zero
             pg(npi)%var = zero
-! Density consistent with hydrostatic pressure 
-            if (.not.diffusione) pg(npi)%dens = med(imed)%den0 + (pretot /     &
-                                                (Med(imed)%celerita *          &
-                                                Med(imed)%celerita))
          end if
          else if (flag==1) then
             pg(npi)%state = "flu"
@@ -211,10 +207,6 @@ do npi = 1,nag
             pg(npi)%state = "sol"
             pg(npi)%vel = zero
             pg(npi)%var = zero
-! Density consistent with hydrostatic pressure 
-            if (.not. diffusione) pg(npi)%dens = med(imed)%den0 + (pretot /    &
-                                                 (Med(imed)%celerita *         &
-                                                 Med(imed)%celerita))
          end if
    end if
 end do

@@ -36,8 +36,7 @@ use Dynamic_allocation_module
 !------------------------
 implicit none
 integer(4) :: npi,npj,contj,npartint
-double precision :: rhoi,rhoj,amassj,moddervel,det,moddia,modout,appo,factdiff 
-double precision :: rvw,dervol
+double precision :: rhoi,rhoj,amassj,moddervel,det,moddia,modout,appo
 double precision,dimension(3) :: pesogradj,dvar
 double precision,dimension(9) :: aij,dvdi
 !------------------------
@@ -54,15 +53,14 @@ double precision,dimension(9) :: aij,dvdi
 !------------------------
 !$omp parallel do default(none)                                                &
 !$omp shared(nag,pg,nPartIntorno,NMAXPARTJ,PartIntorno,PartKernel,rag)         &
-!$omp shared(diffusione,Granular_flows_options,pg_w,nPartIntorno_fw)           &
-!$omp shared(PartIntorno_fw,DBSPH,kernel_fw,rag_fw,Domain,ncord)               &
+!$omp shared(Granular_flows_options,pg_w,nPartIntorno_fw,PartIntorno_fw,DBSPH) &
+!$omp shared(kernel_fw,rag_fw,Domain,ncord)                                    &
 !$omp private(npi,dvar,aij,dvdi,contj,npartint,npj,rhoi,rhoj,modout,appo)      &
-!$omp private(amassj,moddervel,pesogradj,dervol,factdiff,rvw,det,moddia)
+!$omp private(amassj,moddervel,pesogradj,det,moddia)
 ! Loop over all the active particles
 do npi=1,nag
    if ((pg(npi)%vel_type/="std").or.(pg(npi)%cella==0)) cycle
    pg(npi)%dden  = zero
-   pg(npi)%diffu = zero
    dvar(:) = zero
    aij(:) = zero
    dvdi(:) = zero
@@ -101,11 +99,6 @@ do npi=1,nag
                    dvar(3) * rag(3,npartint))
       endif
       pg(npi)%dden = pg(npi)%dden - appo
-      if (diffusione) then
-         dervol = pg(npj)%VolFra - pg(npi)%VolFra
-         call diffumorris (npi,npj,npartint,dervol,factdiff,rvw)
-         pg(npi)%diffu = pg(npi)%diffu + factdiff * rvw
-      end if
 ! Velocity derivatives 
       if (pg(npj)%vel_type/="std") cycle
       if ((Granular_flows_options%ID_erosion_criterion==1).or.                 &

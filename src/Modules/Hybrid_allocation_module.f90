@@ -164,9 +164,7 @@ type TyParticle
    double precision :: rhow                          
    double precision :: tiroc                          
    double precision :: cden                           
-   double precision :: wden                           
-   double precision :: diffu                         
-   double precision :: coefdif ! Diffusion coefficient                        
+   double precision :: wden
    double precision :: IntEn ! Specific internal energy                         
    double precision :: Envar ! Partial smoothing contributions
                              ! for specific internal energy                          
@@ -228,7 +226,6 @@ type TyParticle
                                          ! criterion)
    double precision :: drho(3) ! Density gradient (SPH pseudo-consistent 
                                ! approximation over fluid particles)
-   double precision :: veldif(3) ! Velocity in diffusion model 
    double precision :: rijtempmin(3) ! Minimum distance between a SPH mixture
                                      ! particle and a SPH pure fluid particle
    double precision :: vstart(3) ! Initial velocity for fixed particles 
@@ -482,7 +479,6 @@ type TyMedium
                             ! distribution 
    double precision :: SettlingCoef ! Coefficient for the settling velocity 
                                     ! of the solid grains 
-   double precision :: codif ! Diffusion coefficient
    double precision :: Gamma ! Constant in Bachelor equation of state 
                              ! (explosions)
    double precision :: InitialIntEn ! Initial specific internal energy 

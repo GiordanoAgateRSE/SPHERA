@@ -40,8 +40,7 @@ integer(4) :: Ncbf,i,npi,it,it_print,it_memo,it_rest,ir,ii,num_out,Ncbf_Max
 integer(4) :: OpCountot,SpCountot,EpCountot,EpOrdGridtot,ncel,aux,igridi
 integer(4) :: jgridi,kgridi,machine_Julian_day,machine_hour,machine_minute
 integer(4) :: machine_second
-double precision :: BCtorodivV,dt_previous_step,TetaV1,xmax,ymax,zmax
-double precision :: appo1,appo2,appo3,dtvel
+double precision :: BCtorodivV,dt_previous_step,TetaV1,xmax,ymax,zmax,dtvel
 double precision,dimension(1:SPACEDIM) :: tpres,tdiss,tvisc,BoundReaction
 character(len=lencard) :: nomsub = "Loop_Irre_3D"
 integer(4),external :: ParticleCellNumber,CellIndices,CellNumber
@@ -503,34 +502,6 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
 !$omp end parallel do
             call start_and_stop(3,7)
 ! Partial smoothing for velocity: end
-! Diffusion coefficient: start (input option not recommended)
-            if (diffusione) then
-               call start_and_stop(2,15)
-!$omp parallel do default(none) private(npi,ii,appo1,appo2,appo3)              &
-!$omp shared(nag,pg,Med,indarrayFlu,Array_Flu)
-               do ii=1,indarrayFlu
-                  npi = Array_Flu(ii)
-                  if ((pg(npi)%VolFra==VFmx).and.                              &
-                     (pg(npi)%visc==Med(pg(npi)%imed)%mumx/pg(npi)%dens)) then
-                     pg(npi)%coefdif = zero
-                     else
-                        call inter_CoefDif(npi)
-                        if (pg(npi)%uni>zero) pg(npi)%veldif = pg(npi)%veldif  &
-                                                               / pg(npi)%uni 
-                        appo1 = (pg(npi)%veldif(1) - pg(npi)%var(1)) *         &
-                                (pg(npi)%veldif(1) - pg(npi)%var(1))
-                        appo2 = (pg(npi)%veldif(2) - pg(npi)%var(2)) *         &
-                                (pg(npi)%veldif(2) - pg(npi)%var(2))
-                        appo3 = (pg(npi)%veldif(3) - pg(npi)%var(3)) *         &
-                                (pg(npi)%veldif(3) - pg(npi)%var(3))
-                        pg(npi)%coefdif = pg(npi)%coefdif * dsqrt(appo1 + appo2&
-                                          + appo3)
-                  endif
-               enddo
-!$omp end parallel do
-               call start_and_stop(3,15)
-            endif
-! Diffusion coefficient: end
 ! Update the particle positions
             call start_and_stop(2,8)
 !$omp parallel do default(none) private(npi) shared(nag,pg,dt)
@@ -731,15 +702,6 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
 !$omp end parallel do
             call start_and_stop(3,12)
 ! Continuity equation: end
-            if (diffusione) then
-               call start_and_stop(2,16)
-               call aggdens
-               call start_and_stop(3,16)
-            endif
-! Equation of state 
-            call start_and_stop(2,13)
-            call calcpre 
-            call start_and_stop(3,13)
             if (n_bodies>0) then
                call start_and_stop(2,19)
                call body_pressure_mirror
@@ -763,35 +725,11 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
          call body_pressure_postpro
          call start_and_stop(3,19)
       endif
-      if (diffusione) then
-         call start_and_stop(2,16)
-!$omp parallel do default(none) private(npi,ii)                                &
-!$omp shared(nag,Pg,Med,indarrayFlu,Array_Flu)
-         do ii = 1,indarrayFlu
-            npi = Array_Flu(ii)
-            if (pg(npi)%koddens/=0) cycle
-            if (pg(npi)%imed==1) then
-               pg(npi)%dens = pg(npi)%pres / (Med(1)%celerita *                &
-                              Med(1)%celerita) + (Med(2)%den0 * VFmn +         &
-                              Med(1)%den0 * (one - VFmn))
-               elseif (pg(npi)%imed==2) then
-                  pg(npi)%dens = pg(npi)%pres / (Med(2)%celerita *             &
-                                 Med(2)%celerita) + (Med(2)%den0 * VFmx +      &
-                                 Med(1)%den0 * (one - VFmx))
-            endif
-            Pg(npi)%rhoc = pg(npi)%pres / (med(2)%celerita * med(2)%celerita) +&
-                           med(2)%den0
-            Pg(npi)%rhow = pg(npi)%pres / (med(1)%celerita * med(1)%celerita) +&
-                           med(1)%den0
-         enddo
-!$omp end parallel do
-         call start_and_stop(3,16)
-      endif
       call start_and_stop(2,20)
       if (Granular_flows_options%ID_erosion_criterion==1) call mixture_viscosity 
       call start_and_stop(3,20)
 ! Apparent viscosity (input option not recommended)  
-      if (diffusione.or.esplosione) then
+      if (esplosione) then
          if ((Domain%time_split==1).or.(Domain%time_stage==Domain%RKscheme))   &
             then
             call start_and_stop(2,15)

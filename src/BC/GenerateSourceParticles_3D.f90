@@ -103,14 +103,11 @@ if (inttimeratio>pinttimeratio) then
             if ((index(Med(mat)%tipo,"liquid")>0).or.(index(Med(mat)%tipo,     &
                "smagorin")>0)) then
                pg(nag)%state = "flu"
-               pg(nag)%VolFra = VFmn
                elseif ((index(Med(mat)%tipo,"granular")>0).or.                 &
                        (index(Med(mat)%tipo,"general")>0)) then
                   pg(nag)%state = "sol"
-                  pg(nag)%VolFra = VFmx
                   elseif (index(Med(mat)%tipo,"gas")>0) then
                      pg(nag)%state = "flu"
-                     pg(nag)%VolFra = VFmn
             endif
 ! Movement/kinematics index
             pg(nag)%vel_type = partz(izone)%move        

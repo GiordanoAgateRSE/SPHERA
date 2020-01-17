@@ -124,23 +124,11 @@ pg(npi)%slip = partz(Nz)%slip
 pg(npi)%cella = ParticleCellNumber(pg(npi)%coord)
 ! Particle color definition, as defined in the input file.
 call defcolpartzero (Nz,partz,pg(npi))
-! Modulo diffusione
-if (diffusione) then
-   if (pg(npi)%imed==1) then
-      pg(npi)%VolFra = VFmn
-   end if
-   if (pg(npi)%imed==2) then          
-      pg(npi)%VolFra = VFmx
-   end if
-   else
-      pg(npi)%VolFra = one
-end if
 if (esplosione) then
    pg(npi)%IntEn  = Med(pg(npi)%imed)%InitialIntEn
-end if
+endif
 !------------------------
 ! Deallocations
 !------------------------
 return
 end subroutine SetParticleParameters
-

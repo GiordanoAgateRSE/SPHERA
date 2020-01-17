@@ -105,10 +105,6 @@ integer(4),dimension(maxnumblock) :: blocchi ! Array to store the number of
 double precision,dimension(maxnumblock) :: Time_Block ! Array to store the
                                                       ! time of the blocks
 ! Global variables for output files to Paraview: end
-! Global variables for the diffusion model: start 
-double precision,public,parameter :: VFmn = 0.1d0 ! Minimum volume fraction 
-double precision,public,parameter :: VFmx = 0.9d0 ! Maximum volume fraction
-! Global variables for the diffusion model: end
 integer(4),parameter :: MAXTIT = 10
 integer(4),public,parameter :: lencard = 200
 integer(4),public, parameter :: MAXPOINTSZONE = 20 ! Maximum number of points 
@@ -121,7 +117,6 @@ logical :: err_flag ! Flag for error file existence in erosion model
 logical :: restart ! Flag if the run is a restart
 logical :: kill_flag ! Flag to kill the execution
 logical :: current_version   
-logical :: diffusione ! Flag to activate the diffusion model
 logical :: esplosione ! Flag to activate the explosion model
 logical :: body_minimum_pressure_limiter ! Flag to activate/deactivate a 
                                          ! pressure limiter on the body 
@@ -181,4 +176,3 @@ character(255) :: nomefileerr ! File name for error file in erosion model
 character(len=8) :: dt_opt = "original" 
 character(100),dimension(MAXTIT) :: title  
 end module
-

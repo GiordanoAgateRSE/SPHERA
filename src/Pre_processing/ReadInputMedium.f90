@@ -42,7 +42,7 @@ character(100) :: ainp
 logical :: saturated_medium_flag
 integer(4) :: index,nitersol,ioerr
 double precision :: den0,eps,alfaMon,betaMon,visc,viscmx,taucri,cuin,phi,Cs
-double precision :: cons,codif,Settling,coes,Rough,d50,Gamma,InitialIntEn,d_90
+double precision :: cons,Settling,coes,Rough,d50,Gamma,InitialIntEn,d_90
 double precision :: limiting_viscosity
 double precision :: porosity
 character(8) :: tipo
@@ -73,7 +73,6 @@ do while (trim(lcase(ainp))/="##### end medium #####")
    eps = zero
    alfaMon = zero
    betaMon = zero
-   codif = zero
    Settling = zero
    Gamma = zero
    InitialIntEn = zero
@@ -105,7 +104,7 @@ do while (trim(lcase(ainp))/="##### end medium #####")
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"ALPHA e BETA MONAGHAN",ninp,&
             ulog)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         read(ainp,*,iostat=ioerr) codif, Settling
+         read(ainp,*,iostat=ioerr) Settling
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DIFFUSION COEFF",ninp,ulog))&
             return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
@@ -130,7 +129,7 @@ do while (trim(lcase(ainp))/="##### end medium #####")
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"ALPHA e BETA MONAGHAN",     &
             ninp,ulog)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         read(ainp,*,iostat=ioerr) codif,Settling
+         read(ainp,*,iostat=ioerr) Settling
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DIFFUSION COEFF",ninp,      &
             ulog)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
@@ -157,7 +156,7 @@ do while (trim(lcase(ainp))/="##### end medium #####")
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"ALPHA e BETA MONAGHAN",     &
             ninp,ulog)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         read(ainp,*,iostat=ioerr) codif, Settling
+         read(ainp,*,iostat=ioerr) Settling
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DIFFUSION COEFF",ninp,      &
             ulog)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
@@ -187,7 +186,7 @@ do while (trim(lcase(ainp))/="##### end medium #####")
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"ALPHA e BETA MONAGHAN",     &
             ninp,ulog)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         read(ainp,*,iostat=ioerr) codif,Settling
+         read(ainp,*,iostat=ioerr) Settling
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DIFFUSION COEFF",ninp,      &
             ulog)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
@@ -222,7 +221,7 @@ do while (trim(lcase(ainp))/="##### end medium #####")
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"ALPHA e BETA MONAGHAN",     &
             ninp,ulog)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         read(ainp,*,iostat=ioerr) codif,Settling
+         read(ainp,*,iostat=ioerr) Settling
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DIFFUSION COEFF",ninp,      &
             ulog)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
@@ -278,7 +277,6 @@ do while (trim(lcase(ainp))/="##### end medium #####")
       Med(index)%d50 = d50
       Med(index)%gran_vol_frac_max = (1.d0 - porosity)
       Med(index)%d_90 = d_90
-      Med(index)%codif = codif
       Med(index)%SettlingCoef = Settling
       Med(index)%gamma = gamma
       Med(index)%InitialIntEn = InitialIntEn
@@ -323,8 +321,6 @@ do while (trim(lcase(ainp))/="##### end medium #####")
             Med(index)%d_90
          write(ulog,"(1x,a,1p,e12.4)") "Volume fraction (solid):....",         &
             Med(index)%gran_vol_frac_max
-         write(ulog,"(1x,a,1p,e12.4)") "Diffusion Coeff.:...........",         &
-            Med(index)%codif       
          write(ulog,"(1x,a,1p,e12.4)") "Settling Velocity Coeff.:...",         & 
             Med(index)%SettlingCoef       
          write(ulog,"(1x,a,1p,e12.4)") "Explosion Gamma Coeff.:.....",         &

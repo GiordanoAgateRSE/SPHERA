@@ -217,18 +217,6 @@ if (nag>0) then
       write(unitvtk,'(8x,16(1x,e12.5))') (pg(finger(k))%coord(3),k=k1,k2)
    enddo
    write(unitvtk,'(a)') '      </DataArray>' 
-! Volume Fraction
-   if (diffusione) then
-      write(unitvtk,'(a)')                                                     &
-'      <DataArray type="Float32" Name="Volume Fraction (mc/mc)" format="ascii" >'
-      do i=1,numpoints,16
-         k1 = i
-         k2 = k1 + 15
-         if (k2>numpoints) k2 = numpoints
-         write(unitvtk,'(8x,16(1x,e12.5))') (pg(finger(k))%VolFra,k=k1,k2)
-      enddo
-      write(unitvtk,'(a)') '      </DataArray>'
-   endif
 ! Specific internal energy
    if (esplosione) then
       write(unitvtk,'(a)')                                                     &
