@@ -476,9 +476,7 @@ type TyMedium
    double precision :: Cs ! Costant of Smagorinsky's model    
    double precision :: RoughCoef ! Roughness coefficient 
    double precision :: d50 ! 50-th percentile diameter of the granular size
-                            ! distribution 
-   double precision :: SettlingCoef ! Coefficient for the settling velocity 
-                                    ! of the solid grains 
+                           ! distribution
    double precision :: Gamma ! Constant in Bachelor equation of state 
                              ! (explosions)
    double precision :: InitialIntEn ! Initial specific internal energy 

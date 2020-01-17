@@ -722,18 +722,12 @@ ___ ___
 ![?] <Monaghan_alpha>: artificial viscosity
 ![?] <Monaghan_beta>: artificial viscosity (non-linear term)
 !    =0. (default)
-![?] <diffusion_coefficient>: obsolete and inactive variable
-!    =0. (recommended and non-influential value)
-![?] <settling_velocity_coefficient>: obsolete and inactive variable
-!    =0. (recommended and non-influential value)
 !-------------------------------------------------------------------------------
 ![*] <Monaghan_alpha> <Monaghan_beta>
-![*] !!!<settling_velocity_coefficient>
 ![*] 0. 0. 0.
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
 ___ ___
- 0.
  0.  0.  0.
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
