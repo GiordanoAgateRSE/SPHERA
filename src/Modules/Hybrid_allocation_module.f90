@@ -463,11 +463,7 @@ type TyMedium
                             ! (tuning parameter in Manenti et al., 2012, JHE)
    double precision :: mumx ! Maximum value for the dynamic viscosity 
                             ! to detect the elasto-plastic regime
-   double precision :: taucri ! Critical shear stress (erosion criterion)
-   double precision :: cuin ! Exponent of the Constitutive Equation 
-   double precision :: phi ! Internal friction angle   
-   double precision :: cons ! Consistency   
-   double precision :: Cs ! Costant of Smagorinsky's model    
+   double precision :: phi ! Internal friction angle
    double precision :: RoughCoef ! Roughness coefficient 
    double precision :: d50 ! 50-th percentile diameter of the granular size
                            ! distribution
@@ -476,8 +472,7 @@ type TyMedium
                                          ! particle (bed-load transport layer)
    double precision :: d_90 ! 90-th percentile diameter of the granular size
                             ! distribution 
-   character(8)     :: tipo ! Type: "liquid  ","general ", "granular", 
-                            ! "smagorin"
+   character(8)     :: tipo ! Type: "liquid  ","granular"
 end type TyMedium
 
 ! Boundary side

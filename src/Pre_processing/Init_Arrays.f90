@@ -59,11 +59,7 @@ do i=1,size(Med)
    Med(i)%coes = zero
    Med(i)%numx = zero
    Med(i)%mumx = zero
-   Med(i)%taucri = zero
-   Med(i)%cuin = zero
    Med(i)%phi = zero
-   Med(i)%cons = zero
-   Med(i)%Cs = zero
    Med(i)%RoughCoef = zero
    Med(i)%d50 = zero
 enddo

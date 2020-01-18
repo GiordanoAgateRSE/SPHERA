@@ -100,11 +100,9 @@ if (inttimeratio>pinttimeratio) then
             pg(nag)%imed = mat  
             pg(nag)%visc = Med(mat)%visc
             pg(nag)%mu = Med(mat)%visc * Med(Mat)%den0
-            if ((index(Med(mat)%tipo,"liquid")>0).or.(index(Med(mat)%tipo,     &
-               "smagorin")>0)) then
+            if (index(Med(mat)%tipo,"liquid")>0) then
                pg(nag)%state = "flu"
-               elseif ((index(Med(mat)%tipo,"granular")>0).or.                 &
-                       (index(Med(mat)%tipo,"general")>0)) then
+               elseif (index(Med(mat)%tipo,"granular")>0) then
                   pg(nag)%state = "sol"
             endif
 ! Movement/kinematics index

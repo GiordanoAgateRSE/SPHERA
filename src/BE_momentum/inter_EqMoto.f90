@@ -168,17 +168,11 @@ do contj=1,nPartIntorno(npi)
             nu = Med(pg(npi)%imed)%visc
             if (index(Med(pg(npi)%imed)%tipo,"liquid")>0) then
                nu = Med(pg(npi)%imed)%visc
-               elseif (index(Med(pg(npi)%imed)%tipo,"general")>0) then
-                  nupa = Med(pg(npi)%imed)%taucri / (secinv + 1.d-4) +         &
-                         Med(pg(npi)%imed)%visc * ((secinv + 1.d-4) **         &
-                         (Med(pg(npi)%imed)%cuin-one))
-                  nu = min(Med(pg(npi)%imed)%numx,nupa)
-                  elseif (index(Med(pg(npi)%imed)%tipo,"granular")>0) then
-                     pre = (max(zero,pg(npi)%pres)) / pg(npi)%dens
-                     coeff = sin (Med(pg(npi)%imed)%phi)
-                     nupa = (pre*coeff) / (secinv + 1.d-4) +                   &
-                            Med(pg(npi)%imed)%visc
-                     nu = min(nupa,Med(pg(npi)%imed)%numx)
+               elseif (index(Med(pg(npi)%imed)%tipo,"granular")>0) then
+                  pre = (max(zero,pg(npi)%pres)) / pg(npi)%dens
+                  coeff = sin (Med(pg(npi)%imed)%phi)
+                  nupa = (pre*coeff) / (secinv + 1.d-4) + Med(pg(npi)%imed)%visc
+                  nu = min(nupa,Med(pg(npi)%imed)%numx)
             endif
             dvtdn = (sin(pg(npj)%ang)) * (pg(npi)%dudy + pg(npi)%dvdx) +       &
                     (cos(pg(npj)%ang)) * (pg(npi)%dudx - pg(npi)%dvdy)

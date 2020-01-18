@@ -41,8 +41,8 @@ character(1) :: comment
 character(100) :: ainp
 logical :: saturated_medium_flag
 integer(4) :: index,nitersol,ioerr
-double precision :: den0,eps,alfaMon,betaMon,visc,viscmx,taucri,cuin,phi,Cs
-double precision :: cons,coes,Rough,d50,d_90
+double precision :: den0,eps,alfaMon,betaMon,visc,viscmx,phi
+double precision :: coes,Rough,d50,d_90
 double precision :: limiting_viscosity
 double precision :: porosity
 character(8) :: tipo
@@ -75,11 +75,7 @@ do while (trim(lcase(ainp))/="##### end medium #####")
    betaMon = zero
    visc = zero
    Rough = zero
-   Cs = zero
-   cons = zero
    viscmx = zero
-   taucri = zero
-   cuin = zero
    coes = zero
    limiting_viscosity = zero
    phi = zero
@@ -107,56 +103,6 @@ do while (trim(lcase(ainp))/="##### end medium #####")
          read(ainp,*,iostat=ioerr) Rough
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"ROUGH COEFFICIENT",ninp,    &
             ulog)) return
-! Newtonian fluids with imposed dynamic turbulent viscosity (mixing-length 
-! scheme, depending on dx, see "Smagorinsky") 
-      case ("smagorin")
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         read(ainp,*,iostat=ioerr) den0,eps
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                             &
-            "WATER DENSITY & COMPRIMIBILITY",ninp,ulog)) return
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         read(ainp,*,iostat=ioerr) alfaMon, betaMon
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"ALPHA e BETA MONAGHAN",     &
-            ninp,ulog)) return
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         read(ainp,*,iostat=ioerr) visc
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DYNAMIC VISCOSITY",ninp,    &
-            ulog)) return            
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         read(ainp,*,iostat=ioerr) Cs
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"SMAGORINSKY CONST",ninp,    &
-            ulog)) return
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         read(ainp,*,iostat=ioerr) Rough
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"ROUGH COEFFICIENT",ninp,    &
-            ulog)) return   
-! Non-Newtoniani fluids with apparent viscosity (Chen formula)
-      case ("general ")
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         read(ainp,*,iostat=ioerr) den0,eps
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                             &
-            "WATER DENSITY & COMPRIMIBILITY",ninp,ulog)) return
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         read(ainp,*,iostat=ioerr) alfaMon, betaMon
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"ALPHA e BETA MONAGHAN",     &
-            ninp,ulog)) return
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         read(ainp,*,iostat=ioerr) cons,viscmx
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"CONSISTENCY & VISCO MAX",   &
-            ninp,ulog)) return            
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         read(ainp,*,iostat=ioerr) taucri, cuin
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"TAUCRI & CUIN",ninp,ulog)   &
-            ) return
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         read(ainp,*,iostat=ioerr) Rough
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"ROUGH COEFFICIENT",ninp,    &
-            ulog)) return
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         read(ainp,*,iostat=ioerr) nitersol
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"N° ITERATION SOLID",ninp,   &
-            ulog)) return
-         visc = viscmx
 ! Non-Newtonian fluids with apparent viscosity 
       case ("granular")
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
@@ -204,14 +150,10 @@ do while (trim(lcase(ainp))/="##### end medium #####")
       Med(index)%betaMon = betaMon
       Med(index)%visc = visc
       Med(index)%mumx = viscmx
-      Med(index)%cons = cons
-      Med(index)%taucri = taucri
-      Med(index)%cuin = cuin
       Med(index)%phi = phi
       Med(index)%saturated_medium_flag = saturated_medium_flag
       Med(index)%coes = coes
       Med(index)%limiting_viscosity = limiting_viscosity
-      Med(index)%Cs = Cs
       Med(index)%RoughCoef = Rough
       Med(index)%d50 = d50
       Med(index)%gran_vol_frac_max = (1.d0 - porosity)
@@ -233,10 +175,6 @@ do while (trim(lcase(ainp))/="##### end medium #####")
             Med(index)%visc
          write(ulog,"(1x,a,1p,e12.4)") "Max. Dynamic Viscosity:.....",         &
             Med(index)%mumx
-         write(ulog,"(1x,a,1p,e12.4)") "Tau Critical:...............",         &
-            Med(index)%taucri
-         write(ulog,"(1x,a,1p,e12.4)") "Index curve:................",         &
-            Med(index)%cuin
          write(ulog,"(1x,a,1p,e12.4)") "Friction Angle:.............",         &
             Med(index)%phi
          write(ulog,"(1x,a,1p,l12)")   "Saturated medium flag:......",         &
@@ -245,10 +183,6 @@ do while (trim(lcase(ainp))/="##### end medium #####")
             Med(index)%coes
          write(ulog,"(1x,a,1p,e12.4)") "Limiting viscosity:.........",         &
             Med(index)%limiting_viscosity
-         write(ulog,"(1x,a,1p,e12.4)") "Consistency:................",         &
-            Med(index)%cons
-         write(ulog,"(1x,a,1p,e12.4)") "Smagorinsky Constant:.......",         &
-            Med(index)%Cs
          write(ulog,"(1x,a,1p,e12.4)") "Roughness Coeff.:...........",         &
             Med(index)%RoughCoef
          write(ulog,"(1x,a,1p,e12.4)") "d50:........................",         &
