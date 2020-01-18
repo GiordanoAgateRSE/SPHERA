@@ -41,7 +41,7 @@ double precision, parameter :: MinTotUnit = 0.95d0
 ! You may consider "complete" or = "incomplete"
 character(10), parameter :: SmoothingNormalisation = "complete  "          
 integer(4) :: npi,npj,nsp,icbf,Ncbf,ibdt,ibdp,ii,j,npartint
-double precision :: p0i,pi,sompW,pesoj,DiffP,TetaP1,Appunity,smoothpi,IntWdV
+double precision :: p0i,pi,sompW,pesoj,DiffP,TetaP1,Appunity,IntWdV
 double precision,dimension(:),allocatable :: sompW_vec,AppUnity_vec    
 !------------------------
 ! Explicit interfaces
@@ -128,23 +128,18 @@ do ii=1,indarrayFlu
 enddo
 !$omp end parallel do
 !$omp parallel do default(none)                                                &
-!$omp private(npi,ii,smoothpi,TetaP1)                                          &
-!$omp shared(pg,Med,Domain,dt,indarrayFlu,Array_Flu,esplosione)
+!$omp shared(pg,Med,Domain,dt,indarrayFlu,Array_Flu)                           &
+!$omp private(npi,ii,TetaP1)
 do ii=1,indarrayFlu
    npi = Array_Flu(ii)
 ! Excluding particles close to the face with conditions "flow", "velo" and 
 ! "sour"
    if (pg(npi)%koddens==0) then 
 ! Computing TetaP depending on the time step
-      if (esplosione) then
-         TetaP1 = Domain%TetaP * pg(npi)%Csound * dt / Domain%h
-         else
-             TetaP1 = Domain%TetaP * Med(pg(npi)%imed)%Celerita * dt / Domain%h
-      endif
-      smoothpi = pg(npi)%pres + TetaP1 * pg(npi)%vpres
-      pg(npi)%pres = smoothpi
-      pg(npi)%dens = Med(pg(npi)%imed)%den0 * (one + (smoothpi - Domain%Prif)  &
-                     / Med(pg(npi)%imed)%eps)
+      TetaP1 = Domain%TetaP * Med(pg(npi)%imed)%Celerita * dt / Domain%h
+      pg(npi)%pres = pg(npi)%pres + TetaP1 * pg(npi)%vpres
+      pg(npi)%dens = Med(pg(npi)%imed)%den0 * (one + (pg(npi)%pres -           &
+                     Domain%Prif) / Med(pg(npi)%imed)%eps)
    endif
 enddo
 !$omp end parallel do
@@ -157,4 +152,3 @@ if (n_bodies>0) then
 endif
 return
 end subroutine PressureSmoothing_3D
-

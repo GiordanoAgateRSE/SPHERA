@@ -217,18 +217,6 @@ if (nag>0) then
       write(unitvtk,'(8x,16(1x,e12.5))') (pg(finger(k))%coord(3),k=k1,k2)
    enddo
    write(unitvtk,'(a)') '      </DataArray>' 
-! Specific internal energy
-   if (esplosione) then
-      write(unitvtk,'(a)')                                                     &
-'      <DataArray type="Float32" Name="Internal Energy (J/kg)" format="ascii" >'
-      do i=1,numpoints,16
-         k1 = i
-         k2 = k1 + 15
-         if (k2>numpoints) k2 = numpoints
-         write(unitvtk,'(8x,16(1x,e12.5))') (pg(finger(k))%IntEn,k=k1,k2)
-      enddo
-      write(unitvtk,'(a)') '      </DataArray>'
-   endif
 ! Fluid ID
    write(unitvtk,'(a)')                                                        &
       '      <DataArray type="Float32" Name="Medium" format="ascii" >'
@@ -259,9 +247,6 @@ if (nag>0) then
                elseif ((pg(finger(k))%state=="sol").and.                       &
                   (index(Med(pg(finger(k))%imed)%tipo,"granular")>0) ) then
                   iappo(k-k1+1) = 3
-                  elseif ((pg(finger(k))%state=="flu").and.                    &
-                     (index(Med(pg(finger(k))%imed)%tipo,"gas")>0) ) then
-                     iappo(k-k1+1) = 4
          endif
       enddo
       write(unitvtk,'(8x,24(1x,i6))') (iappo(k),k = 1,j)

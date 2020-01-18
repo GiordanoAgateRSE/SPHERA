@@ -107,8 +107,7 @@ particle_loop: do npi=1,nag
          nnlocal = npartord(m)
 ! A particle of different medium is found, so the interface cell identifier 
 ! is set
-         if ((med(pg(npi)%imed)%index/=med(pg(nnlocal)%imed)%index).and.       &
-         (index(Med(pg(nnlocal)%imed)%tipo,"gas")==0)) then
+         if ((med(pg(npi)%imed)%index/=med(pg(nnlocal)%imed)%index)) then
 ! The interface cell is set
             if (.not.foundcell) then
                idpel = numcell

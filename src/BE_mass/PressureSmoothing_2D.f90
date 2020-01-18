@@ -41,7 +41,7 @@ integer(4) :: Ncbs,IntNcbs,npi,npj,mati,nsp,icbs,iside,sidestr,izonelocal
 integer(4) :: ibdt,ibdp,j,i,ii,npartint
 double precision :: ro0i,p0i,pi,sompW,pesoj,TetaP1,VIntWdV_FT,VIntWdV_SO      
 double precision :: VIntWdV_OSB,VIntWdV_OSP,press_so, press_osb, vin
-double precision :: Appunity,smoothpi,IntWdV,IntEnerg
+double precision :: Appunity,smoothpi,IntWdV
 integer(4),dimension(1:PLANEDIM) :: acix
 double precision,dimension(1:2) :: IntDpWdV
 double precision,dimension(1:PLANEDIM) :: IntLocXY,sss,nnn,massforce
@@ -74,16 +74,16 @@ if (n_bodies>0) then
    call body_to_smoothing_pres(sompW_vec,AppUnity_vec)
    call start_and_stop(3,19)
 endif
-!$omp parallel do default(none) &
-!$omp private(npi,ii,Appunity,TetaP1,Ncbs,IntNcbs,ibdt,icbs,ibdp,iside)        &
-!$omp private(sidestr,Nsp,mati,ro0i,p0i,pi,SompW,j,npartint,npj,pesoj,IntEnerg)&
-!$omp private(VIntWdV_FT,VIntWdV_SO,VIntWdV_OSB,VIntWdV_OSP,press_so,press_osb)&
-!$omp private(IntLocXY,strtype,sss,nnn,massforce,IntWdV,IntDpWdV,izonelocal)   &
-!$omp private(vin,smoothpi)                                                    &
+!$omp parallel do default(none)                                                &
 !$omp shared(nag,Pg,Med,Tratto,Partz,Domain,nPartIntorno,PartIntorno,NMAXPARTJ)&
 !$omp shared(PartKernel,kernel_fw,BoundarySide,BoundaryDataPointer)            &
-!$omp shared(BoundaryDataTab,acix,dt,indarrayFlu,Array_Flu,esplosione)         &
-!$omp shared(sompW_vec,n_bodies,AppUnity_vec) 
+!$omp shared(BoundaryDataTab,acix,dt,indarrayFlu,Array_Flu,sompW_vec,n_bodies) &
+!$omp shared(AppUnity_vec)                                                     &
+!$omp private(npi,ii,Appunity,TetaP1,Ncbs,IntNcbs,ibdt,icbs,ibdp,iside)        &
+!$omp private(sidestr,Nsp,mati,ro0i,p0i,pi,SompW,j,npartint,npj,pesoj,smoothpi)&
+!$omp private(VIntWdV_FT,VIntWdV_SO,VIntWdV_OSB,VIntWdV_OSP,press_so,press_osb)&
+!$omp private(IntLocXY,strtype,sss,nnn,massforce,IntWdV,IntDpWdV,izonelocal)   &
+!$omp private(vin)
 do ii=1,indarrayFlu
    npi = Array_Flu(ii)
 ! Excluding particles close to the face with conditions "flow", "velo" and "sour"
@@ -167,13 +167,9 @@ do ii=1,indarrayFlu
                               endif
                   endif
                enddo
-               if (esplosione) then
-                  TetaP1 = Domain%TetaP * pg(npi)%Csound * dt / Domain%h
-                  else
 ! Computing TetaP depending on the time step
-                     TetaP1 = Domain%TetaP * Med(pg(npi)%imed)%Celerita * dt / &
-                              Domain%h
-               endif
+               TetaP1 = Domain%TetaP * Med(pg(npi)%imed)%Celerita * dt /       &
+                        Domain%h
                AppUnity = AppUnity + VIntWdV_FT + VIntWdV_SO + VIntWdV_OSP +   &
                           VIntWdV_OSB
                select case (SmoothVersion)
@@ -200,24 +196,16 @@ enddo
 !$omp end parallel do
 ! The new density and pressure values are temporarily saved in PartDens and 
 ! PartPress. In the next cycle, these values are copied in row k.
-!$omp parallel do default(none) &
-!$omp private(npi,ii,IntEnerg) &
-!$omp shared(nag,Pg,Domain,Med,indarrayFlu,Array_Flu,esplosione)
+!$omp parallel do default(none)                                                &
+!$omp shared(nag,pg,Domain,Med,indarrayFlu,Array_Flu)                          &
+!$omp private(npi,ii)
 do ii=1,indarrayFlu
    npi = Array_Flu(ii)
 ! Excluding particles close to the face with conditions "flow", "velo" and "sour"
    if (pg(npi)%koddens==0) then 
       pg(npi)%pres = pg(npi)%vpres
-      if (esplosione) then
-         IntEnerg = pg(npi)%pres / ((Med(pg(npi)%imed)%gamma - one) *          &
-                    pg(npi)%Dens)
-         pg(npi)%IntEn = half * (pg(npi)%IntEn + IntEnerg)
-         pg(npi)%dens = pg(npi)%pres / ((Med(pg(npi)%imed)%gamma - one) *      &
-                        pg(npi)%IntEn)
-         else
-             pg(npi)%dens = Med(pg(npi)%imed)%den0 * (one + (pg(npi)%vpres -   &
-                            Domain%Prif) / Med(pg(npi)%imed)%eps)
-      endif
+      pg(npi)%dens = Med(pg(npi)%imed)%den0 * (one + (pg(npi)%vpres -          &
+                     Domain%Prif) / Med(pg(npi)%imed)%eps)
    endif
 enddo
 !$omp end parallel do
@@ -230,4 +218,3 @@ if (n_bodies>0) then
 endif
 return
 end subroutine PressureSmoothing_2D
-

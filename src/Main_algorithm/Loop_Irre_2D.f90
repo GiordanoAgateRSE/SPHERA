@@ -54,21 +54,6 @@ integer(4),external :: ParticleCellNumber,CellIndices,CellNumber
 ! Initializations
 !------------------------
 on_going_time_step = -999
-if (esplosione) then
-   do npi=1,nag
-      if (index(Med(pg(npi)%imed)%tipo,"gas")>0) then
-         pg(npi)%pres = (Med(pg(npi)%imed)%gamma - one) * pg(npi)%IntEn *      &
-                        pg(npi)%dens
-         pg(npi)%Csound = dsqrt(Med(pg(npi)%imed)%gamma *                      &
-                          (Med(pg(npi)%imed)%gamma - one) * pg(npi)%IntEn)
-         else
-            pg(npi)%Csound = Med(pg(npi)%imed)%Celerita
-            pg(npi)%IntEn = pg(npi)%pres / ((Med(pg(npi)%imed)%gamma - one) *  &
-                            pg(npi)%dens)
-      endif
-      pg(npi)%state = "flu"
-   enddo
-endif
 SpCount = 0
 OpCount = 0
 EpCount = 0
@@ -287,8 +272,7 @@ done_flag = .false.
       if ((Domain%time_split==0).and.(Domain%time_stage==1)) then               
 ! Erosion criterium + continuity equation RHS  
          call start_and_stop(2,12)
-         if ((Granular_flows_options%ID_erosion_criterion>0).and.              &
-            (.not.esplosione)) then
+         if (Granular_flows_options%ID_erosion_criterion>0) then
             select case (Granular_flows_options%ID_erosion_criterion)
                case(1)
 !$omp parallel do default(none) shared(pg,nag) private(npi,ncel)
@@ -422,7 +406,7 @@ done_flag = .false.
          call start_and_stop(3,19)
          call start_and_stop(2,6)         
       endif
-! Time integration scheme for momentum and energy equations
+! Time integration scheme for momentum
       if (Domain%time_split==0) then 
 ! Explicit RK schemes
          call start_and_stop(3,6)
@@ -451,14 +435,6 @@ done_flag = .false.
             enddo
 !$omp end parallel do
             call start_and_stop(3,6)
-! Energy equation: start
-            if (esplosione) then
-               do ii=1,indarrayFlu
-                  npi = Array_Flu(ii)
-                  pg(npi)%IntEn = pg(npi)%IntEn + dtvel * pg(npi)%dEdT
-               enddo
-            endif
-! Energy equation: end
 ! Time integration for body dynamics
             if (n_bodies>0) then
                call start_and_stop(2,19)
@@ -469,20 +445,14 @@ done_flag = .false.
             call start_and_stop(2,7)
             if (Domain%TetaV>0.d0) call velocity_smoothing
 !$omp parallel do default(none) private(npi,ii,TetaV1)                         &
-!$omp shared(nag,Pg,Med,Domain,dt,indarrayFlu,Array_Flu,esplosione,it)
+!$omp shared(nag,Pg,Med,Domain,dt,indarrayFlu,Array_Flu,it)
 ! Loop over all the active particles
             do ii=1,indarrayFlu
                npi = Array_Flu(ii)
                if (Domain%TetaV>0.d0) then
-                  if (esplosione) then
-                     TetaV1 = Domain%TetaV * pg(npi)%Csound * dt / Domain%h
-                     else
 ! TetaV depending on the time step
-                        TetaV1 = Domain%TetaV * Med(pg(npi)%imed)%Celerita *   &
-                                 dt / Domain%h
-                  endif
-                  if (esplosione) pg(npi)%IntEn = pg(npi)%IntEn + TetaV1 *     &
-                     pg(npi)%Envar
+                  TetaV1 = Domain%TetaV * Med(pg(npi)%imed)%Celerita * dt /    &
+                           Domain%h
                   if (pg(npi)%kodvel==0) then        
 ! The particle is inside the domain and far from boundaries
                      pg(npi)%var(:) = pg(npi)%vel(:) + TetaV1 * pg(npi)%var(:)      
@@ -544,8 +514,7 @@ done_flag = .false.
 ! Continuity equation 
 ! Erosion criterion + continuity equation RHS
       call start_and_stop(2,12)
-      if ((Granular_flows_options%ID_erosion_criterion>0).and.                 &
-         (.not.esplosione)) then 
+      if (Granular_flows_options%ID_erosion_criterion>0) then 
          if (Domain%time_split==1) then 
 ! Assessing particle status ("flu" or "sol") of the mixture particles
 ! Calling the proper subroutine for the erosion criterion 
@@ -717,15 +686,6 @@ done_flag = .false.
       call start_and_stop(2,20)
       if (Granular_flows_options%ID_erosion_criterion==1) call mixture_viscosity 
       call start_and_stop(3,20)
-! Apparent viscosity (input option not recommended) 
-      if (esplosione) then
-         if ((Domain%time_split==1).or.(Domain%time_stage==Domain%RKscheme))   &
-            then
-            call start_and_stop(2,15)
-            call viscapp
-            call start_and_stop(3,15)
-         endif
-      endif
       if (Domain%tipo=="semi") then
 ! Boundary Conditions: start
 ! BC: checks for the particles gone out of the domain throughout the opened 

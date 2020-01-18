@@ -65,7 +65,6 @@ Domain%file = " "
 Domain%NormFix = .FALSE.         
 Domain%Slip = .FALSE.
 OnlyTriangle = .FALSE.
-esplosione = .FALSE.
 restart = .FALSE.
 simulation_time = zero
 dt = zero
@@ -235,9 +234,6 @@ if (.not.restart) then
       InputErr = InputErr + 300
       call diagnostic(arg1=5,arg2=InputErr,arg3=msg_err)
    endif
-   do i=1,NMedium
-      if (Med(i)%Gamma/=zero) esplosione = .TRUE.
-   enddo
    close(ninp)
    nag = 0
    if (ncord==2)then
@@ -595,4 +591,3 @@ EpOrdGrid = 0
 !------------------------
 return
 end subroutine Gest_Input
-

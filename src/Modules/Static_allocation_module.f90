@@ -117,7 +117,6 @@ logical :: err_flag ! Flag for error file existence in erosion model
 logical :: restart ! Flag if the run is a restart
 logical :: kill_flag ! Flag to kill the execution
 logical :: current_version   
-logical :: esplosione ! Flag to activate the explosion model
 logical :: body_minimum_pressure_limiter ! Flag to activate/deactivate a 
                                          ! pressure limiter on the body 
                                          ! surfaces not to have pressure 

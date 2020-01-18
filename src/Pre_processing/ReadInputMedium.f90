@@ -42,7 +42,7 @@ character(100) :: ainp
 logical :: saturated_medium_flag
 integer(4) :: index,nitersol,ioerr
 double precision :: den0,eps,alfaMon,betaMon,visc,viscmx,taucri,cuin,phi,Cs
-double precision :: cons,coes,Rough,d50,Gamma,InitialIntEn,d_90
+double precision :: cons,coes,Rough,d50,d_90
 double precision :: limiting_viscosity
 double precision :: porosity
 character(8) :: tipo
@@ -73,8 +73,6 @@ do while (trim(lcase(ainp))/="##### end medium #####")
    eps = zero
    alfaMon = zero
    betaMon = zero
-   Gamma = zero
-   InitialIntEn = zero
    visc = zero
    Rough = zero
    Cs = zero
@@ -92,28 +90,6 @@ do while (trim(lcase(ainp))/="##### end medium #####")
    d_90 = 0.d0
    tipo = trim(lcase(tipo))
    select case (tipo)
-! Imposed dynamic viscosity for gases (explosion)
-      case ("gas     ")
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         read(ainp,*,iostat=ioerr) den0,eps
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                             &
-            "WATER DENSITY & COMPRIMIBILITY",ninp,ulog)) return
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         read(ainp,*,iostat=ioerr) alfaMon,betaMon
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"ALPHA e BETA MONAGHAN",ninp,&
-            ulog)) return
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         read(ainp,*,iostat=ioerr) gamma,InitialIntEn
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"EXPLOSION COEFF",ninp,ulog))&
-            return
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         read(ainp,*,iostat=ioerr) visc
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DYNAMIC VISCOSITY",ninp,    &
-            ulog)) return            
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         read(ainp,*,iostat=ioerr) Rough
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"ROUGH COEFFICIENT",ninp,ulog&
-            )) return
       case ("liquid  ")
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read(ainp,*,iostat=ioerr) den0,eps
@@ -123,10 +99,6 @@ do while (trim(lcase(ainp))/="##### end medium #####")
          read(ainp,*,iostat=ioerr) alfaMon,betaMon
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"ALPHA e BETA MONAGHAN",     &
             ninp,ulog)) return
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         read(ainp,*,iostat=ioerr) gamma,InitialIntEn
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"EXPLOSION COEFF",ninp,      &
-            ulog)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read(ainp,*,iostat=ioerr) visc
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DYNAMIC VISCOSITY",ninp,    & 
@@ -146,10 +118,6 @@ do while (trim(lcase(ainp))/="##### end medium #####")
          read(ainp,*,iostat=ioerr) alfaMon, betaMon
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"ALPHA e BETA MONAGHAN",     &
             ninp,ulog)) return
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         read(ainp,*,iostat=ioerr) gamma,InitialIntEn
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"EXPLOSION COEFF",ninp,      &
-            ulog)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read(ainp,*,iostat=ioerr) visc
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DYNAMIC VISCOSITY",ninp,    &
@@ -172,10 +140,6 @@ do while (trim(lcase(ainp))/="##### end medium #####")
          read(ainp,*,iostat=ioerr) alfaMon, betaMon
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"ALPHA e BETA MONAGHAN",     &
             ninp,ulog)) return
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         read(ainp,*,iostat=ioerr) gamma,InitialIntEn
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"EXPLOSION COEFF",ninp,      &
-            ulog)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read(ainp,*,iostat=ioerr) cons,viscmx
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"CONSISTENCY & VISCO MAX",   &
@@ -203,10 +167,6 @@ do while (trim(lcase(ainp))/="##### end medium #####")
          read(ainp,*,iostat=ioerr) alfaMon,betaMon
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"ALPHA e BETA MONAGHAN",     &
             ninp,ulog)) return
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         read(ainp,*,iostat=ioerr) gamma,InitialIntEn
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"EXPLOSION COEFF",ninp,      &
-            ulog)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read(ainp,*,iostat=ioerr) phi,saturated_medium_flag
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"PHI, SATURATED_MEDIUM_FLAG",&
@@ -256,8 +216,6 @@ do while (trim(lcase(ainp))/="##### end medium #####")
       Med(index)%d50 = d50
       Med(index)%gran_vol_frac_max = (1.d0 - porosity)
       Med(index)%d_90 = d_90
-      Med(index)%gamma = gamma
-      Med(index)%InitialIntEn = InitialIntEn
       if (ulog>0) then
          write(ulog,"(1x,a,i3,1x,a)")  "Medium:.....................",         &
             Med(index)%index,"("//Med(index)%tipo//")"
@@ -299,10 +257,6 @@ do while (trim(lcase(ainp))/="##### end medium #####")
             Med(index)%d_90
          write(ulog,"(1x,a,1p,e12.4)") "Volume fraction (solid):....",         &
             Med(index)%gran_vol_frac_max
-         write(ulog,"(1x,a,1p,e12.4)") "Explosion Gamma Coeff.:.....",         &
-            Med(index)%Gamma       
-         write(ulog,"(1x,a,1p,e12.4)") "Initial Internal Energy.:...",         &
-            Med(index)%InitialIntEn       
          write(ulog,"(1x,a)")  " "
       endif
       Med(index)%visc = visc / den0
@@ -318,4 +272,3 @@ enddo
 !------------------------
 return
 end subroutine ReadInputMedium
-

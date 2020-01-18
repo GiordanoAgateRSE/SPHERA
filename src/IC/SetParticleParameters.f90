@@ -107,8 +107,6 @@ if ((index(Med(Mate)%tipo,"liquid")>0).or.                                     &
    elseif ((index(Med(Mate)%tipo,"granular")>0).or.                           &
       (index(Med(Mate)%tipo,"general")>0)) then
       pg(npi)%state = "sol"
-      elseif (index(Med(Mate)%tipo,"gas")>0) then
-         pg(npi)%state = "flu" 
 endif
 if ((index(Med(Mate)%tipo,"granular")>0).or.                                   &
    (index(Med(Mate)%tipo,"general")>0)) then
@@ -124,9 +122,6 @@ pg(npi)%slip = partz(Nz)%slip
 pg(npi)%cella = ParticleCellNumber(pg(npi)%coord)
 ! Particle color definition, as defined in the input file.
 call defcolpartzero (Nz,partz,pg(npi))
-if (esplosione) then
-   pg(npi)%IntEn  = Med(pg(npi)%imed)%InitialIntEn
-endif
 !------------------------
 ! Deallocations
 !------------------------

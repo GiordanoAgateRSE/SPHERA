@@ -48,7 +48,7 @@ double precision :: GradNpsuro,IntWd1s0,IntWd1s2,IntWd3s0,DvelN,viscN
 double precision :: GravN,PressB,distpi,distpimin,pressib,pressibmin
 double precision :: QiiIntWdS,level,pressj,Qsi,Qsj,velix,veliz,veliq,hcrit
 double precision :: hcritmin,zbottom,FlowRate1,Lb,L,minquotanode,maxquotanode
-double precision :: SomQsiQsj,DiffQsiQsj,tpres_save1,ViscoMon_save1
+double precision :: SomQsiQsj,DiffQsiQsj
 integer(4),dimension(1:PLANEDIM) :: acix
 double precision,dimension(1:PLANEDIM) :: IntLocXY,RHS,RG,ss,nnlocal,gradbPsuro
 double precision,dimension(1:PLANEDIM) :: ViscoMon,ViscoShear,sidevel,TT,Dvel
@@ -76,8 +76,6 @@ cinvisci = pg(npi)%visc
 roi = pg(npi)%dens
 pressi = pg(npi)%pres
 distpimin = Domain%dx
-tpres_save1 = zero
-ViscoMon_save1 = zero
 RHS(1) = -tpres(1)
 RHS(2) = -tpres(3)
 ViscoMon(1) = zero
@@ -252,10 +250,6 @@ do icbs=1,IntNcbs
       RG(i) = RG(i) * IntWdV
    enddo
    do i=1,PLANEDIM
-! explosion
-      tpres_save1 = tpres_save1 - (nnlocal(i) * QiiIntWdS + RG(i)) * DvelN *   &
-         nnlocal(i)
-! explosion
       RHS(i) = RHS(i) - nnlocal(i) * QiiIntWdS + RG(i)
    enddo
 ! Volume viscosity force (with changed sign)
@@ -283,7 +277,6 @@ do icbs=1,IntNcbs
          endif
          do i=1,PLANEDIM
             ViscoMon(i) = ViscoMon(i) + TT(i)
-            ViscoMon_save1 = ViscoMon_save1 + ViscoMon(i) * DvelN * nnlocal(i)
             ViscoShear(i) = ViscoShear(i) + Dvel(i) * SVforce
          enddo
       endif
@@ -294,13 +287,8 @@ do i=1,PLANEDIM
    tdiss(acix(i)) = tdiss(acix(i)) - ViscoMon(i)
    tvisc(acix(i)) = tvisc(acix(i)) - ViscoShear(i)
 enddo
-! contribution for specific internal energy
-if (esplosione) then
-   pg(npi)%dEdT = - half * (tpres_save1 - ViscoMon_save1)
-endif
 !------------------------
 ! Deallocations
 !------------------------
 return
 end subroutine AddBoundaryContributions_to_ME2D
-

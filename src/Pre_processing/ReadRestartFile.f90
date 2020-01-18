@@ -422,8 +422,8 @@ body_arr(i)%body_kinematics(1:body_arr(i)%n_records,1:7)
                            pg(1:nag)%coord(2),pg(1:nag)%coord(3),              &
                            pg(1:nag)%vel(1),pg(1:nag)%vel(2),pg(1:nag)%vel(3), &
                            pg(1:nag)%pres,pg(1:nag)%dens,pg(1:nag)%mass,       &
-                           pg(1:nag)%visc,pg(1:nag)%IntEn,pg(1:nag)%VolFra,    &
-                           pg(1:nag)%imed,pg(1:nag)%icol
+                           pg(1:nag)%visc,pg(1:nag)%VolFra,pg(1:nag)%imed,     &
+                           pg(1:nag)%icol
                         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"pg",nsav,  &
                            ulog)) return
                         write(uerr,'(a)') " "
@@ -617,8 +617,8 @@ if (allocated(Granular_flows_options%minimum_saturation_flag)) then
                               pg(1:nag)%coord(2),pg(1:nag)%coord(3),           &
                               pg(1:nag)%vel(1),pg(1:nag)%vel(2),               &
                               pg(1:nag)%vel(3),pg(1:nag)%pres,pg(1:nag)%dens,  &
-                              pg(1:nag)%mass,pg(1:nag)%visc,pg(1:nag)%IntEn,   &
-                              pg(1:nag)%VolFra,pg(1:nag)%imed,pg(1:nag)%icol
+                              pg(1:nag)%mass,pg(1:nag)%visc,pg(1:nag)%VolFra,  &
+                              pg(1:nag)%imed,pg(1:nag)%icol
                            if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"pg",    &
                               nsav,ulog)) return
                            write(ulog,'(a)') 

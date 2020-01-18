@@ -70,7 +70,6 @@ end interface
 !------------------------
 ! Initializations
 !------------------------
-pg(npi)%dEdT = zero
 tpres(:) = zero
 tdiss(:) = zero
 tvisc(:) = zero
@@ -165,28 +164,26 @@ do contj=1,nPartIntorno(npi)
                    pg(npj)%zer(3))
             velti = (pg(npi)%vel(1) * pg(npj)%zer(3) - pg(npi)%vel(3) *        &
                     pg(npj)%zer(1))
-            secinv = abs(velti / (deltan + 0.0001d0))
+            secinv = abs(velti / (deltan + 1.d-4))
             nu = Med(pg(npi)%imed)%visc
             if (index(Med(pg(npi)%imed)%tipo,"liquid")>0) then
                nu = Med(pg(npi)%imed)%visc
-               elseif (index(Med(pg(npi)%imed)%tipo,"gas")>0) then
-                  nu = Med(pg(npi)%imed)%visc
-                  elseif (index(Med(pg(npi)%imed)%tipo,"general")>0) then
-                     nupa = Med(pg(npi)%imed)%taucri / (secinv + 0.0001d0) +   &
-                            Med(pg(npi)%imed)%visc * ((secinv + 0.0001d0) **   &
-                            (Med(pg(npi)%imed)%cuin-one))
-                     nu = min(Med(pg(npi)%imed)%numx,nupa)
-                     elseif (index(Med(pg(npi)%imed)%tipo,"granular")>0) then
-                        pre = (max(zero,pg(npi)%pres)) / pg(npi)%dens
-                        coeff = sin (Med(pg(npi)%imed)%phi)
-                        nupa = (pre*coeff) / (secinv + 0.0001d0) +             &
-                               Med(pg(npi)%imed)%visc
-                        nu = min(nupa,Med(pg(npi)%imed)%numx)
+               elseif (index(Med(pg(npi)%imed)%tipo,"general")>0) then
+                  nupa = Med(pg(npi)%imed)%taucri / (secinv + 1.d-4) +         &
+                         Med(pg(npi)%imed)%visc * ((secinv + 1.d-4) **         &
+                         (Med(pg(npi)%imed)%cuin-one))
+                  nu = min(Med(pg(npi)%imed)%numx,nupa)
+                  elseif (index(Med(pg(npi)%imed)%tipo,"granular")>0) then
+                     pre = (max(zero,pg(npi)%pres)) / pg(npi)%dens
+                     coeff = sin (Med(pg(npi)%imed)%phi)
+                     nupa = (pre*coeff) / (secinv + 1.d-4) +                   &
+                            Med(pg(npi)%imed)%visc
+                     nu = min(nupa,Med(pg(npi)%imed)%numx)
             endif
             dvtdn = (sin(pg(npj)%ang)) * (pg(npi)%dudy + pg(npi)%dvdx) +       &
                     (cos(pg(npj)%ang)) * (pg(npi)%dudx - pg(npi)%dvdy)
-            veltj = ( - two * (deltan / (denorm + 0.0001d0)) * nu /            &
-                    (pg(npi)%visc + 0.0001d0) + one) * velti + two * dvtdn     &
+            veltj = ( - two * (deltan / (denorm + 1.d-4)) * nu /               &
+                    (pg(npi)%visc + 1.d-4) + one) * velti + two * dvtdn        &
                     * deltan
             moddervelt = veltj - velti
             modderveln = - two * veln               
@@ -234,10 +231,6 @@ do contj=1,nPartIntorno(npi)
    tvisc(:) = tvisc(:) + rvw(:)
    rvw_sum(:) = rvw_sum(:) + rvw(:)
 ! Momentum equation: end
-   if (esplosione) &
-      pg(npi)%dEdT = pg(npi)%dEdT + half * (dervel(1) * (appopres(1) +         &
-                     appodiss(1)) + dervel(2) * (appopres(2) + appodiss(2)) +  &
-                     dervel(3) * (appopres(3) + appodiss(3)))
 enddo
 pg(npi)%laminar_flag = 0
 if (pg(npi)%visc>0.d0) then
@@ -295,4 +288,3 @@ endif
 !------------------------
 return
 end subroutine inter_EqMoto
-

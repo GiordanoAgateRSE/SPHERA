@@ -144,8 +144,6 @@ select case (ierr)
 '  305 - Ascii input '//stringa(1:la)//' fails at the record for level option'
          case (306); write(ulog,'(1x,a)')                                      &
 '  306 - Ascii input '//stringa(1:la)//' fails at the record for erosion Shields Mohr module'
-         case (308); write(ulog,'(1x,a)')                                      &
-'  308 - Ascii input '//stringa(1:la)//' fails at the record for esplosion module'
          case (309); write(ulog,'(1x,a)')                                      &
 '  309 - Ascii input '//stringa(1:la)//' fails at the record for multi fluid module'
          case (310); write(ulog,'(1x,a)')                                      &

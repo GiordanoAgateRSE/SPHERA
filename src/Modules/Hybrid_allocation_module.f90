@@ -165,10 +165,6 @@ type TyParticle
    double precision :: tiroc                          
    double precision :: cden                           
    double precision :: wden
-   double precision :: IntEn ! Specific internal energy                         
-   double precision :: Envar ! Partial smoothing contributions
-                             ! for specific internal energy                          
-   double precision :: dEdT ! Energy equation LHS                          
    double precision :: Csound ! Sound speed                        
    double precision :: DensShep ! Density times Shepard coefficient                      
    double precision :: rhoSPH_new ! SPH approximation of density at the  
@@ -252,8 +248,6 @@ end type TyParticle
 type Tytime_stage
    double precision :: ts_dden ! Stage continuity equation LHS 
    double precision :: ts_dens ! Stage density
-   double precision :: ts_IntEn ! Stage specific internal energy 
-   double precision :: ts_dEdT ! Stage energy equation LHS
    double precision :: ts_coord(3) ! Stage position 
    double precision :: ts_var(3) ! Stage partially smoothed velocity
    double precision :: ts_vel(3) ! Stage velocity
@@ -477,16 +471,13 @@ type TyMedium
    double precision :: RoughCoef ! Roughness coefficient 
    double precision :: d50 ! 50-th percentile diameter of the granular size
                            ! distribution
-   double precision :: Gamma ! Constant in Bachelor equation of state 
-                             ! (explosions)
-   double precision :: InitialIntEn ! Initial specific internal energy 
    double precision :: gran_vol_frac_max ! Maximum volume fraction of the solid
                                          ! phase within an SPH mixture 
                                          ! particle (bed-load transport layer)
    double precision :: d_90 ! 90-th percentile diameter of the granular size
                             ! distribution 
-   character(8)     :: tipo ! Type: "liquid  "(, "gas     ", 
-                            ! "general ", "granular", "smagorin")
+   character(8)     :: tipo ! Type: "liquid  ","general ", "granular", 
+                            ! "smagorin"
 end type TyMedium
 
 ! Boundary side

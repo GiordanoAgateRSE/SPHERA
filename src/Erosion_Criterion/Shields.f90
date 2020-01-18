@@ -191,12 +191,6 @@ if (Granular_flows_options%ID_erosion_criterion==1) then
       endif
    endif
 endif
-! In case of explosion, erosion criterion is not active.  
-if (esplosione) then
-   Velocity2 = pg(npi)%vel(1) * pg(npi)%vel(1) + pg(npi)%vel(2) *              &
-               pg(npi)%vel(2) + pg(npi)%vel(3) * pg(npi)%vel(3)
-   if (Velocity2>1.0e-3) return 
-end if
 ! Choice of the representative neighbour (priority to pure fluid neighbours)
 if (Granular_flows_options%ID_erosion_criterion==1) then
    if (pg(npi)%indneighliqsol.ne.0) then

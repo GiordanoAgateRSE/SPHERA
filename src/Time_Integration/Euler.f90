@@ -53,8 +53,8 @@ integer(4),external :: ParticleCellNumber
 !------------------------
 !$omp parallel do default(none)                                                &
 !$omp private(npi,ii)                                                          &
-!$omp shared(nag,Pg,Domain,dt,indarrayFlu,Array_Flu,ts0_pg,esplosione)
-! Time integration for momentum and energy equations
+!$omp shared(nag,Pg,Domain,dt,indarrayFlu,Array_Flu,ts0_pg)
+! Time integration for momentum equations
 do ii = 1,indarrayFlu
    npi = Array_Flu(ii)
 ! To save the results of the previous step for the time stage parameters "ts0" 
@@ -66,10 +66,6 @@ do ii = 1,indarrayFlu
       ts0_pg(npi)%ts_acc(:) = pg(npi)%acc(:)                        
       ts0_pg(npi)%ts_dden = pg(npi)%dden
       ts0_pg(npi)%ts_dens = pg(npi)%dens
-      if (esplosione) then
-         ts0_pg(npi)%ts_IntEn = pg(npi)%IntEn
-         ts0_pg(npi)%ts_dEdT = pg(npi)%dEdT
-      endif
    endif
 ! kodvel = 0: the particle is internal to the domain. 
    if (pg(npi)%kodvel==0) then 
@@ -86,28 +82,20 @@ do ii = 1,indarrayFlu
          elseif (pg(npi)%kodvel==2) then  
             pg(npi)%vel(:) = pg(npi)%velass(:)            
    endif
-   if (esplosione) then
-      pg(npi)%IntEn = pg(npi)%IntEn + dt * pg(npi)%dEdT
-   endif
 enddo
 !$omp end parallel do
 call start_and_stop(3,17)
-! Velocity and energy partial smoothing
+! Velocity partial smoothing
 call start_and_stop(2,7)
 if (Domain%TetaV>0.d0) call velocity_smoothing
 !$omp parallel do default(none)                                                &
 !$omp private(npi,ii,TetaV1)                                                   &
-!$omp shared(nag,Pg,Med,Domain,dt,indarrayFlu,Array_Flu,esplosione)
+!$omp shared(nag,Pg,Med,Domain,dt,indarrayFlu,Array_Flu)
 do ii=1,indarrayFlu
    npi = Array_Flu(ii)
    if (Domain%TetaV>0.d0) then
-      if (esplosione) then
-         TetaV1 = Domain%TetaV * pg(npi)%Csound * dt / Domain%h
-         else
 ! To update "TetaV", depending on dt.
-            TetaV1 = Domain%TetaV * Med(pg(npi)%imed)%Celerita * dt / Domain%h
-      endif
-      if (esplosione) pg(npi)%IntEn = pg(npi)%IntEn + TetaV1 * pg(npi)%Envar
+      TetaV1 = Domain%TetaV * Med(pg(npi)%imed)%Celerita * dt / Domain%h
       if (pg(npi)%kodvel==0) then        
 ! Particle is inside the domain and far from the boundaries.
 ! Velocity is partially smoothed.
@@ -290,4 +278,3 @@ endif
 !------------------------
 return
 end subroutine Euler
-

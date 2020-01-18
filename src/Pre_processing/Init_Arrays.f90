@@ -66,8 +66,6 @@ do i=1,size(Med)
    Med(i)%Cs = zero
    Med(i)%RoughCoef = zero
    Med(i)%d50 = zero
-   Med(i)%Gamma = zero
-   Med(i)%InitialIntEn = zero
 enddo
 do i=1,size(Partz)
    Partz(i)%label = "        "

@@ -106,8 +106,6 @@ if (inttimeratio>pinttimeratio) then
                elseif ((index(Med(mat)%tipo,"granular")>0).or.                 &
                        (index(Med(mat)%tipo,"general")>0)) then
                   pg(nag)%state = "sol"
-                  elseif (index(Med(mat)%tipo,"gas")>0) then
-                     pg(nag)%state = "flu"
             endif
 ! Movement/kinematics index
             pg(nag)%vel_type = partz(izone)%move        
@@ -139,4 +137,3 @@ endif
 !------------------------
 return
 end subroutine GenerateSourceParticles_3D
-

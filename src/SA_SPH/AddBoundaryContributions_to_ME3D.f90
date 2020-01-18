@@ -40,8 +40,8 @@ integer(4),intent(IN) :: npi,Ncbf
 double precision,intent(INOUT),dimension(1:SPACEDIM) :: tpres,tdiss,tvisc
 integer(4) :: sd,icbf,iface,ibdp,sdj,i,j,mati,stretch
 double precision :: IntdWrm1dV,cinvisci,Monvisc,cinviscmult,pressi,dvn
-double precision :: FlowRate1,Lb,L,minquotanode,maxquotanode,ViscoMon_save1
-double precision :: Qii,roi,celeri,alfaMon,Mmult,IntGWZrm1dV,tpres_save1
+double precision :: FlowRate1,Lb,L,minquotanode,maxquotanode
+double precision :: Qii,roi,celeri,alfaMon,Mmult,IntGWZrm1dV
 double precision,dimension(1:SPACEDIM) :: vb,vi,dvij,RHS,nnlocal,Grav_Loc 
 double precision,dimension(1:SPACEDIM) :: ViscoMon,ViscoShear,LocPi,Gpsurob_Loc
 double precision,dimension(1:SPACEDIM) :: Gpsurob_Glo
@@ -51,8 +51,6 @@ cinvisci = pg(npi)%visc
 roi = pg(npi)%dens
 pressi = pg(npi)%pres
 Qii = (pressi + pressi) / roi
-tpres_save1 = zero
-ViscoMon_save1 = zero
 vi(:) = pg(npi)%var(:)
 RHS(:) = zero
 ViscoMon(:) = zero
@@ -112,14 +110,7 @@ face_loop: do icbf = 1,Ncbf
             Gpsurob_Glo(i) = zero
             do j=1,SPACEDIM
                Gpsurob_Glo(i) = Gpsurob_Glo(i) + BoundaryFace(iface)%T(i,j) *  &
-                  Gpsurob_Loc(j)
-! Explosion
-               if (esplosione) then
-                  tpres_save1 = tpres_save1 - (nnlocal(i) *                    &
-                     BoundaryDataTab(ibdp)%IntGiWrRdV(i,j) + Gpsurob_Glo(i)) * &
-                     dvn * nnlocal(i)
-               endif
-! Explosion
+                                Gpsurob_Loc(j)
             enddo
             RHS(i) = RHS(i) + Gpsurob_Glo(i)
          enddo
@@ -135,11 +126,6 @@ face_loop: do icbf = 1,Ncbf
             Monvisc = alfaMon * celeri * Domain%h 
             Mmult = -Monvisc * dvn * IntGWZrm1dV
             ViscoMon(:) = ViscoMon(:) + Mmult * nnlocal(:)
-! Explosion
-            do i=1,SPACEDIM
-               ViscoMon_save1 = ViscoMon_save1 + ViscoMon(i) * dvn * nnlocal(i)
-            enddo
-! Explosion
          endif
          if (cinvisci>zero) then
             if ((pg(npi)%laminar_flag==1).or.                                  &
@@ -204,13 +190,8 @@ enddo face_loop
 ! relevant computational time.
 ! For the sign of "ViscoShear" refer to the mathematical model
   tvisc(:) = tvisc(:) + ViscoShear(:)
-! Contribution for specific internal energy
-if (esplosione) then
-   pg(npi)%dEdT = - half * (tpres_save1 - ViscoMon_save1)
-endif
 !------------------------
 ! Deallocations
 !------------------------
 return
 end subroutine AddBoundaryContributions_to_ME3D
-

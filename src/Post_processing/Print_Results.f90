@@ -40,7 +40,7 @@ integer(4),intent(INOUT) :: it_print
 integer(4) :: npi,i,codice,dummy,OpCountot,SpCountot,minlocvelo,maxlocvelo,nbi
 integer(4) :: minlocvelx,maxlocvelx,minlocvely,maxlocvely,minlocvelz,maxlocvelz
 integer(4) :: minlocpres,maxlocpres,minlocdens,maxlocdens,minlocvisc,maxlocvisc
-integer(4) :: minlocInEn,maxlocInEn,blt_laminar_flag_count
+integer(4) :: blt_laminar_flag_count
 integer(4) :: minlocvelo_w,maxlocvelo_w,minlocpres_w,maxlocpres_w
 integer(4) :: minlocvelo_bp,maxlocvelo_bp,minlocpres_bp,maxlocpres_bp
 integer(4) :: minlocvelo_body,maxlocvelo_body,minlocomega_body,maxlocomega_body
@@ -50,7 +50,7 @@ integer(4) :: machine_Julian_day,machine_hour,machine_minute,machine_second
 integer(4) :: minlocacc_bp,maxlocacc_bp
 double precision :: minvelx,maxvelx,minvely,maxvely,minvelz,maxvelz,minpres
 double precision :: maxpres,mindens,maxdens,minvisc,maxvisc
-double precision :: minInEn,maxInEn,modvel,minvelo_w,maxvelo_w,minpres_w
+double precision :: modvel,minvelo_w,maxvelo_w,minpres_w
 double precision :: maxpres_w,minvelo_bp,maxvelo_bp,minpres_bp,maxpres_bp
 double precision :: minvelo_body,maxvelo_body,minomega_body,maxomega_body
 double precision :: modomega,mintau_tauc,maxtau_tauc,mink_BetaGamma
@@ -61,7 +61,6 @@ integer(4),dimension(1) :: pos
 character(len=42) :: fmt100="(a,i10,a,e18.9,a,e18.9,a,i  ,a,i  ,a,i  )"
 character(len=47) :: fmt101="(a,2(1x,f11.4,1x,a,1x,i8,1x,a,3(1x,f8.2,1x,a)))"
 character(len=47) :: fmt102="(a,2(1x,f11.1,1x,a,1x,i8,1x,a,3(1x,f8.2,1x,a)))"
-character(len=47) :: fmt104="(a,2(1x,g11.4,1x,a,1x,i8,1x,a,3(1x,f8.2,1x,a)))"
 character(len=47) :: fmt105="(a,2(1x,e11.4,1x,a,1x,i8,1x,a,3(1x,f8.2,1x,a)))"
 character(len=12) :: stringa
 character(len=2) :: coppia
@@ -201,15 +200,6 @@ if (nag>0) then
    minlocvisc = pos(1)
    pos = maxloc(pg(1:nag)%visc,mask=pg(1:nag)%cella/=0)
    maxlocvisc = pos(1)
-! Explosion coefficient
-   if (esplosione) then
-      minInEn = minval(pg(1:nag)%IntEn,mask=pg(1:nag)%cella/=0)
-      maxInEn = maxval(pg(1:nag)%IntEn,mask=pg(1:nag)%cella/=0)
-      pos = minloc(pg(1:nag)%IntEn,mask=pg(1:nag)%cella/=0)
-      minlocInEn = pos(1)
-      pos = maxloc(pg(1:nag)%IntEn,mask=pg(1:nag)%cella/=0)
-      maxlocInEn = pos(1)
-   endif
 ! Wall parameter limits: start
    if ((Domain%tipo=="bsph").and.(DBSPH%n_w>0)) then
 ! Wall pressure 
@@ -401,39 +391,18 @@ if (nag>0) then
       pg(minlocvelz)%coord(3),"||",maxvelz,"|",maxlocvelz,"|",                 &
       pg(maxlocvelz)%coord(1),"|",pg(maxlocvelz)%coord(2),"|",                 &
       pg(maxlocvelz)%coord(3),"|"
-   if (esplosione) then
-      write(ulog,fmt104)                                                       &
-         "Pressure p(Pa)               |",minpres,"|",minlocpres,"|",          &
-         pg(minlocpres)%coord(1),"|",pg(minlocpres)%coord(2),"|",              &
-         pg(minlocpres)%coord(3),"||",maxpres,"|",maxlocpres,"|",              &
-         pg(maxlocpres)%coord(1),"|",pg(maxlocpres)%coord(2),"|",              &
-         pg(maxlocpres)%coord(3),"|"
-      write(ulog,fmt104)                                                       &
-         "Int.Energy                   |",minInEn,"|",minlocInEn,"|",          &
-         pg(minlocInEn)%coord(1),"|",pg(minlocInEn)%coord(2),"|",              &
-         pg(minlocInEn)%coord(3),"||",maxInEn,"|",maxlocInEn,"|",              &
-         pg(maxlocInEn)%coord(1),"|",pg(maxlocInEn)%coord(2),"|",              &
-         pg(maxlocInEn)%coord(3),"|"
-      write(ulog,fmt104)                                                       &
-         "Density rho(kg/m^3)          |",mindens,"|",minlocdens,"|",          &
-         pg(minlocdens)%coord(1),"|",pg(minlocdens)%coord(2),"|",              &
-         pg(minlocdens)%coord(3),"||",maxdens,"|",maxlocdens,"|",              &
-         pg(maxlocdens)%coord(1),"|",pg(maxlocdens)%coord(2),"|",              &
-         pg(maxlocdens)%coord(3),"|"
-      else
-         write(ulog,fmt102)                                                    &
-            "Pressure p(Pa)               |",minpres,"|",minlocpres,"|",       &
-            pg(minlocpres)%coord(1),"|",pg(minlocpres)%coord(2),"|",           &
-            pg(minlocpres)%coord(3),"||",maxpres,"|",maxlocpres,"|",           &
-            pg(maxlocpres)%coord(1),"|",pg(maxlocpres)%coord(2),"|",           &
-            pg(maxlocpres)%coord(3),"|"
-         write(ulog,fmt102)                                                    &
-            "Density rho(kg/m^3)          |",mindens,"|",minlocdens,"|",       &
-            pg(minlocdens)%coord(1),"|",pg(minlocdens)%coord(2),"|",           &
-            pg(minlocdens)%coord(3),"||",maxdens,"|",maxlocdens,"|",           &
-            pg(maxlocdens)%coord(1),"|",pg(maxlocdens)%coord(2),"|",           &
-            pg(maxlocdens)%coord(3),"|"
-   endif
+   write(ulog,fmt102)                                                          &
+      "Pressure p(Pa)               |",minpres,"|",minlocpres,"|",             &
+      pg(minlocpres)%coord(1),"|",pg(minlocpres)%coord(2),"|",                 &
+      pg(minlocpres)%coord(3),"||",maxpres,"|",maxlocpres,"|",                 &
+      pg(maxlocpres)%coord(1),"|",pg(maxlocpres)%coord(2),"|",                 &
+      pg(maxlocpres)%coord(3),"|"
+   write(ulog,fmt102)                                                          &
+      "Density rho(kg/m^3)          |",mindens,"|",minlocdens,"|",             &
+      pg(minlocdens)%coord(1),"|",pg(minlocdens)%coord(2),"|",                 &
+      pg(minlocdens)%coord(3),"||",maxdens,"|",maxlocdens,"|",                 &
+      pg(maxlocdens)%coord(1),"|",pg(maxlocdens)%coord(2),"|",                 &
+      pg(maxlocdens)%coord(3),"|"
    write(ulog,fmt105)  "Kinem. viscosity ni(m/s^2)   |",minvisc,"|",minlocvisc,&
       "|",pg(minlocvisc)%coord(1),"|",pg(minlocvisc)%coord(2),"|",             &
       pg(minlocvisc)%coord(3),"||",maxvisc,"|",maxlocvisc,"|",                 &
@@ -524,4 +493,3 @@ it_print = it
 !------------------------
 return
 end subroutine Print_Results
-
