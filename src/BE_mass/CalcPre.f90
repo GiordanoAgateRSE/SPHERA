@@ -3,9 +3,9 @@
 ! Computational Fluid Dynamics code).
 ! Copyright 2005-2019 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
-
+!
 ! SPHERA authors and email contact are provided on SPHERA documentation.
-
+!
 ! This file is part of SPHERA v.9.0.0
 ! SPHERA v.9.0.0 is free software: you can redistribute it and/or modify
 ! it under the terms of the GNU General Public License as published by
@@ -19,22 +19,22 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: time_integration                                          
-! Description: Explicit Runge-Kutta time integration schemes. 
+! Program unit: CalcPre 
+! Description:  Particle pressure estimation      
 !-------------------------------------------------------------------------------
-subroutine time_integration  
+subroutine CalcPre
 !------------------------
 ! Modules
 !------------------------
-use I_O_file_module
 use Static_allocation_module
 use Hybrid_allocation_module
 use Dynamic_allocation_module
-use I_O_diagnostic_module
 !------------------------
 ! Declarations
 !------------------------
 implicit none
+integer(4) :: npi
+double precision :: rhorif,c2
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -47,25 +47,25 @@ implicit none
 !------------------------
 ! Statements
 !------------------------
-! Explicit Runge-Kutta time integration schemes (Euler-RK1-, Heun-RK2)
-call start_and_stop(2,17)
-select case (Domain%RKscheme)
-   case (1) 
-      call Euler
-   case (2) 
-      if (Domain%time_stage==1) then
-         call Euler
-         else
-            call Heun
-      endif
-endselect
-call start_and_stop(3,17)
-! Equation of State 
-call start_and_stop(2,13)
-call CalcPre  
-call start_and_stop(3,13)
+if (on_going_time_step>0) then  
+! Loop over all the particles
+!$omp parallel do default(none)                                                & 
+!$omp shared(nag,pg,Domain,Med)                                                &
+!$omp private(npi,rhorif,c2)
+   do npi=1,nag
+! Skip the outgone particles and the particles with velocity type different 
+! from "std"
+      if ((pg(npi)%cella==0).or.(pg(npi)%vel_type/="std")) cycle
+! Update of the particle pressure 
+      rhorif = Med(pg(npi)%imed)%den0
+      c2 = Med(pg(npi)%imed)%eps / rhorif
+      if ((pg(npi)%dens-rhorif)/=0.d0) pg(npi)%pres = c2 * (pg(npi)%dens -     &
+         rhorif) + Domain%prif
+   enddo
+!$omp end parallel do
+endif
 !------------------------
 ! Deallocations
 !------------------------
 return
-end subroutine time_integration
+end subroutine CalcPre

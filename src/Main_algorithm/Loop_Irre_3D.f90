@@ -670,6 +670,10 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
             enddo
 !$omp end parallel do
             call start_and_stop(3,12)
+! Equation of state 
+            call start_and_stop(2,13)
+            call CalcPre 
+            call start_and_stop(3,13)
 ! Continuity equation: end
             if (n_bodies>0) then
                call start_and_stop(2,19)
