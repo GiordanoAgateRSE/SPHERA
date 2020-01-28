@@ -35,7 +35,7 @@ implicit none
 integer(4) :: nrighe,ier, ninp,ulog
 integer(4),dimension(20) :: NumberEntities
 character(1) :: comment
-character(100) :: ainp
+character(LEN=lencard) :: ainp
 integer(4) :: ioerr
 double precision :: dx, trunc
 character(100) :: token

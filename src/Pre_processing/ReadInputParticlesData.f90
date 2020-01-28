@@ -38,7 +38,7 @@ integer(4):: nrighe,ier,ninp,ulog,Medium,npointv,icolor
 integer(4),dimension(20) :: NumberEntities
 double precision :: valp
 character(1) :: comment
-character(100) :: ainp
+character(LEN=lencard) :: ainp
 character(1) :: bends,slip
 character(3) :: move
 character(2) :: pressu

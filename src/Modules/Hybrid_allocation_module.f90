@@ -88,7 +88,7 @@ type TyGlobal
    double precision :: coord(3,2) ! Coordinates of 2 vertices of a diagonal 
                                   ! of the parallelepiped domain                       
    character(4)     :: tipo
-   character(100)    :: file
+   character(LEN=lencard) :: file ! string for a file name
    character(1)     :: Psurf 
    character(1)     :: RandomPos ! IC particle distribution noise. "r": slight 
                                  ! white noise is added, otherwise nothing.  

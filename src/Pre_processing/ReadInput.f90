@@ -36,7 +36,7 @@ use Dynamic_allocation_module
 implicit none
 logical :: OnlyTriangle
 integer(4) :: ier
-character(100) :: ainp
+character(LEN=lencard) :: ainp
 integer(4),dimension(20)    :: NumberEntities
 logical :: restartOK
 integer(4) :: ioerr,nrighe,ioutpo2,iplot_fr,imemo_fr,irest_fr,icpoi_fr,ipllb_fr

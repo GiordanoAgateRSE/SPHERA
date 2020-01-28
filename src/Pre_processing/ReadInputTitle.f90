@@ -33,7 +33,7 @@ use Static_allocation_module
 implicit none
 integer(4) :: nrighe,ier,ninp,ulog
 character(1) :: comment
-character(100) :: ainp
+character(LEN=lencard) :: ainp
 integer(4) :: n,ioerr
 character(100),external :: lcase
 logical,external :: ReadCheck
@@ -67,4 +67,3 @@ if ((ncord>0).AND.(ulog>0)) write(ulog,"(1x,a)") " "
 !------------------------
 return
 end subroutine ReadInputTitle
-

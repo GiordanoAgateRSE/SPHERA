@@ -38,7 +38,7 @@ integer(4) :: nrighe,ier,ninp,ulog
 logical(4) :: prtopt
 integer(4),dimension(20) :: NumberEntities
 character(1) :: comment
-character(100) :: ainp
+character(LEN=lencard) :: ainp
 integer(4) :: n,i,ioerr,stretch
 integer(4) :: ivalues(MAXFACENODES)
 character(8) :: label

@@ -37,7 +37,7 @@ integer(4) :: nrighe,ier,ninp,ulog,npts
 integer(4),dimension(20) :: NumberEntities
 type (TySection),dimension(0:Nsections+1) :: Control_Sections
 character(1) :: comment
-character(100) :: ainp
+character(LEN=lencard) :: ainp
 integer(4) :: icord,icor2,icor3,icolor,ndiv,ioerr
 double precision,dimension(3) :: vp
 character(8) :: label

@@ -34,7 +34,7 @@ use Hybrid_allocation_module
 implicit none
 integer(4) :: nrighe,ier,ninp,ulog
 character(1) :: comment
-character(100) :: ainp
+character(LEN=lencard) :: ainp
 logical :: restartOK
 integer(4) :: ioerr
 character(100) :: token
@@ -111,4 +111,3 @@ enddo
 !------------------------
 return
 end subroutine ReadInputRestart
-

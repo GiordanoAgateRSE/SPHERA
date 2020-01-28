@@ -36,7 +36,7 @@ use I_O_diagnostic_module
 implicit none
 integer(4),intent(INOUT) :: nrighe,ier,ninp,ulog
 character(1),intent(INOUT) :: comment
-character(100),intent(INOUT) :: ainp
+character(LEN=lencard),intent(INOUT) :: ainp
 logical :: MUSCL_boundary_flag,in_built_monitors,Gamma_limiter_flag
 logical :: negative_wall_p_allowed,FS_allowed
 integer(4) :: ioerr,n_monitor_points,n_monitor_regions,i,alloc_stat   

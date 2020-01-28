@@ -172,6 +172,6 @@ character(255) :: nomefilekill ! Killer file name
 character(10) :: exetype ! Type of machine: "windows" or "linux"
 character(255) :: nomefileerr ! File name for error file in erosion model
 ! "original" or "euristic"
-character(len=8) :: dt_opt = "original" 
-character(100),dimension(MAXTIT) :: title  
+character(len=8) :: dt_opt = "original"
+character(LEN=lencard),dimension(MAXTIT) :: title
 end module

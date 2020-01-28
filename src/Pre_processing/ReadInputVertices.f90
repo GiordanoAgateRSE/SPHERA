@@ -38,7 +38,7 @@ integer(4) :: nrighe,ier,ninp,ulog
 integer(4),dimension(20) :: NumberEntities
 double precision,dimension(1:SPACEDIM,NumVertici) :: Vertice
 character(1) :: comment
-character(100) :: ainp
+character(LEN=lencard) :: ainp
 integer(4) :: n,i,icord,ioerr
 double precision,dimension(3) :: values1
 character(8) :: label

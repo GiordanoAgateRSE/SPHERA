@@ -36,7 +36,7 @@ implicit none
 type (TyMedium), dimension(NMedium) :: Med
 integer(4) :: nrighe,ier, ninp,ulog
 character(1) :: comment
-character(100) :: ainp
+character(LEN=lencard) :: ainp
 integer(4) :: iplot_fr,imemo_fr,irest_fr,icpoi_fr,ipllb_fr,ipllb_md,n,ioutopt
 integer(4) :: ioutpo2,ioerr
 double precision :: plot_fr,memo_fr,rest_fr,cpoi_fr,pllb_fr,depth_dt_out

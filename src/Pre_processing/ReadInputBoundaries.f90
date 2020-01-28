@@ -39,7 +39,7 @@ integer(4) :: nrighe,ier,ninp,ulog
 integer(4),dimension(20) :: NumberEntities
 integer(4),dimension(NumBVertices) :: BoundaryVertex
 character(1) :: comment
-character(100) :: ainp
+character(LEN=lencard) :: ainp
 type (TyZone),dimension(NPartZone) :: Partz
 type (TyBoundaryStretch),dimension(NumTratti) :: Tratto
 integer(4) :: n,index,numv,indexi,indexf,Izona,ipointer,Medium,icolor,icord    
@@ -556,4 +556,3 @@ enddo
 !------------------------
 return
 end subroutine ReadInputBoundaries
-

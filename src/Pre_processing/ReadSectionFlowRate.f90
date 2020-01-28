@@ -36,7 +36,7 @@ use Dynamic_allocation_module
 implicit none
 integer(4) :: nrighe,ier,alloc_stat
 character(1) :: comment
-character(100) :: ainp,lcase
+character(LEN=lencard) :: ainp,lcase
 integer(4) :: n_fluid_types,ioerr,i,n_sect,n_vertices,section_ID
 double precision :: dt_out,aux_dis,area
 double precision :: plane_normal(3),vec_aux_1(3),vec_aux_2(3),vec_aux_3(3)

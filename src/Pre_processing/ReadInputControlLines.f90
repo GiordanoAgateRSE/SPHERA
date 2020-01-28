@@ -38,7 +38,7 @@ integer(4),dimension(20) :: NumberEntities
 type (TyCtlPoint),dimension(npointst) :: Control_Points
 type (TyCtlLine),dimension(NLines) :: Control_Lines
 character(1) :: comment
-character(100) :: ainp
+character(LEN=lencard) :: ainp
 integer(4) :: n,i,ndiv,icord,ioerr,npts
 double precision :: vp
 double precision,dimension(3) :: values1,values2,values3

@@ -41,8 +41,8 @@ integer(4) :: npi,ier,i,n,isi,nfc,nt,nrecords,IC_loop,InputErr,alloc_stat
 integer(4) :: machine_Julian_day,machine_hour,machine_minute,machine_second
 integer(4),dimension(20) :: NumberEntities 
 double precision :: eps_f
-character(len=lencard) :: nomsub = "GEST_INPUT"
-character(len=lencard) :: ainp,msg_err
+character(LEN=lencard) :: nomsub = "GEST_INPUT"
+character(LEN=lencard) :: ainp,msg_err
 character(100), external :: lcase
 !------------------------
 ! Explicit interfaces

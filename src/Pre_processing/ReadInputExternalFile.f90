@@ -37,7 +37,7 @@ implicit none
 integer(4) :: nrighe,ier,ninp,ulog,ninp2
 integer(4),dimension(20) :: NumberEntities
 character(1) :: comment
-character(100) :: ainp
+character(LEN=lencard) :: ainp
 logical :: OnlyTriangle
 integer(4) :: ioerr
 logical,external :: ReadCheck
