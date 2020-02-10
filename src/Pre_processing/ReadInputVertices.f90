@@ -38,7 +38,7 @@ integer(4) :: nrighe,ier,ninp,ulog
 integer(4),dimension(20) :: NumberEntities
 double precision,dimension(1:SPACEDIM,NumVertici) :: Vertice
 character(1) :: comment
-character(100) :: ainp
+character(LEN=lencard) :: ainp
 integer(4) :: n,i,icord,ioerr
 double precision,dimension(3) :: values1
 character(8) :: label
@@ -58,7 +58,7 @@ character(100),external :: lcase, GetToken
 !------------------------
 ! In case of restart, input data are not read
 if (restart) then
-   do while (TRIM(lcase(ainp))/="##### end vertices #####")
+   do while (trim(lcase(ainp))/="##### end vertices #####")
       call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
       if (.NOT.ReadCheck (ioerr,ier,nrighe,ainp,"VERTICES DATA",ninp,ulog))    &
          return
@@ -70,7 +70,7 @@ if (.NOT.ReadCheck (ioerr,ier,nrighe,ainp,"VERTICES DATA",ninp,ulog)) return
 if ((ncord>0).and.(ulog>0).and.(prtopt)) then
    write(ulog,"(1x,a)") "List of vertices:"
 endif
-do while (TRIM(lcase(ainp))/="##### end vertices #####")
+do while (trim(lcase(ainp))/="##### end vertices #####")
    select case (TRIM(Domain%tipo))
       case ("semi","bsph") 
          read (ainp,*,iostat=ioerr) i, values1(1:NumberEntities(1))

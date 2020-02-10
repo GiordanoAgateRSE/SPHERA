@@ -34,12 +34,12 @@ use Hybrid_allocation_module
 implicit none
 integer(4) :: nrighe,ier,ninp,ulog
 character(1) :: comment
-character(100) :: ainp
+character(LEN=lencard) :: ainp
 logical :: restartOK
 integer(4) :: ioerr
 character(100) :: token
 logical,external :: ReadCheck
-character(100),external :: lcase, GetToken
+character(100),external :: lcase,GetToken
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -54,8 +54,8 @@ character(100),external :: lcase, GetToken
 !------------------------
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 if (.NOT.ReadCheck (ioerr,ier,nrighe,ainp,"RESTART DATA",ninp,ulog)) return
-do while (TRIM(lcase(ainp))/="##### end restart #####")
-   select case (TRIM(lcase(GetToken(ainp,1,ioerr))))
+do while (trim(lcase(ainp))/="##### end restart #####")
+   select case (trim(lcase(GetToken(ainp,1,ioerr))))
       case ("step")
          token = lcase(GetToken(ainp,2,ioerr))
          if (.NOT.ReadCheck (ioerr,ier,nrighe,ainp,"RESTART DATA STEP value",  &
@@ -111,4 +111,3 @@ enddo
 !------------------------
 return
 end subroutine ReadInputRestart
-

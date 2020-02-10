@@ -138,14 +138,6 @@ PgZero%rhow = zero
 PgZero%tiroc = zero
 PgZero%cden = zero
 PgZero%wden = zero
-PgZero%diffu = zero
-PgZero%coefdif = zero
-PgZero%veldif(1) = zero
-PgZero%veldif(2) = zero
-PgZero%veldif(3) = zero
-PgZero%IntEn = zero
-PgZero%Envar = zero
-PgZero%dEdT  = zero
 PgZero%Csound = zero
 ts_pgZero%ts_coord(1) = zero
 ts_pgZero%ts_coord(2) = zero
@@ -161,8 +153,6 @@ ts_pgZero%ts_dens = zero
 ts_pgZero%ts_var(1) = zero
 ts_pgZero%ts_var(2) = zero
 ts_pgZero%ts_var(3) = zero
-ts_pgZero%ts_IntEn = zero
-ts_pgZero%ts_dEdT = zero
 ! Max number of particles
 PARTICLEBUFFER = INIPARTICLEBUFFER
 ! Initializing the array of the cell indices 

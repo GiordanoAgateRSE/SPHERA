@@ -571,7 +571,7 @@ loop_nag: do npi=1,nag
          endif
       endif        
 ! To update the local position of the upper interface of the bed-load transport 
-! layer (liquid side)   
+! layer (liquid side)
       if ((index(Med(pg(npi)%imed)%tipo,"granular")>0).and.                    &
          (pg(npi)%indneighliqsol.ne.0)) then   
          if (ind_interfaces(igridi,jgridi,2)==0) then
@@ -907,4 +907,3 @@ endif
 !------------------------
 return
 end subroutine CalcVarLength
-

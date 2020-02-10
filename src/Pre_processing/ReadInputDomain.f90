@@ -22,8 +22,7 @@
 ! Program unit: ReadInputDomain                       
 ! Description:                        
 !-------------------------------------------------------------------------------
-subroutine ReadInputDomain(NumberEntities,ainp,comment,nrighe,ier,ninp,ulog,   &
-                           uerr)
+subroutine ReadInputDomain(NumberEntities,ainp,comment,nrighe,ier,ninp,ulog)
 !------------------------
 ! Modules
 !------------------------
@@ -33,15 +32,15 @@ use Hybrid_allocation_module
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: nrighe,ier, ninp,ulog,uerr
+integer(4) :: nrighe,ier, ninp,ulog
 integer(4),dimension(20) :: NumberEntities
 character(1) :: comment
-character(100) :: ainp
+character(LEN=lencard) :: ainp
 integer(4) :: ioerr
 double precision :: dx, trunc
 character(100) :: token
 logical,external :: ReadCheck
-character(100),external :: lcase, GetToken
+character(100),external :: lcase,GetToken
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -58,7 +57,7 @@ character(100),external :: lcase, GetToken
 ! for regular runs). restart=.false. during the first reading of the main input
 ! file, even for restarted simulations.
 if (restart) then
-   do while (TRIM(lcase(ainp))/="##### end domain #####")
+   do while (trim(lcase(ainp))/="##### end domain #####")
       call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
       if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DOMAIN DATA",ninp,ulog))       &
          return
@@ -67,7 +66,7 @@ if (restart) then
 endif
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DOMAIN DATA",ninp,ulog)) return
-do while (TRIM(lcase(ainp))/="##### end domain #####")
+do while (trim(lcase(ainp))/="##### end domain #####")
    token = lcase(GetToken(ainp,1,ioerr))
    read(token,*,iostat=ioerr) NumberEntities(1)
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DOMAIN COORDINATES NUMBER",ninp,  &

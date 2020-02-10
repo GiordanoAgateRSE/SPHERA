@@ -101,17 +101,12 @@ if (Granular_flows_options%ID_erosion_criterion==1) then
    pg(npi)%pres_fluid = 0.0d0
 endif
 ! Particle status, depending on the velocity components (fluid or solid).
-if ((index(Med(Mate)%tipo,"liquid")>0).or.                                     &
-   (index(Med(Mate)%tipo,"smagorin")>0)) then
-   pg(npi)%state = "flu" 
-   elseif ((index(Med(Mate)%tipo,"granular")>0).or.                           &
-      (index(Med(Mate)%tipo,"general")>0)) then
+if (index(Med(Mate)%tipo,"liquid")>0) then
+   pg(npi)%state = "flu"
+   elseif (index(Med(Mate)%tipo,"granular")>0) then
       pg(npi)%state = "sol"
-      elseif (index(Med(Mate)%tipo,"gas")>0) then
-         pg(npi)%state = "flu" 
 endif
-if ((index(Med(Mate)%tipo,"granular")>0).or.                                   &
-   (index(Med(Mate)%tipo,"general")>0)) then
+if (index(Med(Mate)%tipo,"granular")>0) then
    if ((pg(npi)%vel(1)/=zero).or.(pg(npi)%vel(2)/=zero).or.                    &
       (pg(npi)%vel(3)/=zero)) pg(npi)%state = "flu"     
 endif
@@ -124,23 +119,8 @@ pg(npi)%slip = partz(Nz)%slip
 pg(npi)%cella = ParticleCellNumber(pg(npi)%coord)
 ! Particle color definition, as defined in the input file.
 call defcolpartzero (Nz,partz,pg(npi))
-! Modulo diffusione
-if (diffusione) then
-   if (pg(npi)%imed==1) then
-      pg(npi)%VolFra = VFmn
-   end if
-   if (pg(npi)%imed==2) then          
-      pg(npi)%VolFra = VFmx
-   end if
-   else
-      pg(npi)%VolFra = one
-end if
-if (esplosione) then
-   pg(npi)%IntEn  = Med(pg(npi)%imed)%InitialIntEn
-end if
 !------------------------
 ! Deallocations
 !------------------------
 return
 end subroutine SetParticleParameters
-

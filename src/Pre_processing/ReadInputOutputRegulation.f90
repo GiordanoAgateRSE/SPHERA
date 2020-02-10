@@ -36,7 +36,7 @@ implicit none
 type (TyMedium), dimension(NMedium) :: Med
 integer(4) :: nrighe,ier, ninp,ulog
 character(1) :: comment
-character(100) :: ainp
+character(LEN=lencard) :: ainp
 integer(4) :: iplot_fr,imemo_fr,irest_fr,icpoi_fr,ipllb_fr,ipllb_md,n,ioutopt
 integer(4) :: ioutpo2,ioerr
 double precision :: plot_fr,memo_fr,rest_fr,cpoi_fr,pllb_fr,depth_dt_out
@@ -73,8 +73,8 @@ depth_dt_out = 0.0d0
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"OUTPUT REGULATION DATA",ninp,ulog))  &
    return
-do while (TRIM(lcase(ainp))/="##### end output regulation #####")
-   select case (TRIM(lcase(GetToken(ainp,1,ioerr))))
+do while (trim(lcase(ainp))/="##### end output regulation #####")
+   select case (trim(lcase(GetToken(ainp,1,ioerr))))
       case ("display")
          token = lcase(GetToken(ainp,2,ioerr))
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                             &

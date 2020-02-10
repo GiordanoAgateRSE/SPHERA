@@ -84,15 +84,11 @@ enddo
 !$omp end parallel do
 !$omp parallel do default(none)                                                &
 !$omp private(npi,ii,TetaP1)                                                   &
-!$omp shared(nag,Pg,Med,Domain,dt,indarrayFlu,Array_Flu,esplosione)
+!$omp shared(nag,Pg,Med,Domain,dt,indarrayFlu,Array_Flu)
 do ii = 1,indarrayFlu
    npi = Array_Flu(ii)
-   if (esplosione) then
-      TetaP1 = Domain%TetaP * pg(npi)%Csound * dt / Domain%h
-      else
 ! Computation of TetaP depending on the time step
-         TetaP1 = Domain%TetaP * Med(pg(npi)%imed)%Celerita * dt / Domain%h
-   endif
+   TetaP1 = Domain%TetaP * Med(pg(npi)%imed)%Celerita * dt / Domain%h
    pg(npi)%pres = pg(npi)%pres + TetaP1 * pg(npi)%vpres / pg(npi)%uni
 ! To update density depending on pressure
    pg(npi)%dens = Med(pg(npi)%imed)%den0 * (one + pg(npi)%pres /               &
@@ -104,4 +100,3 @@ enddo
 !------------------------
 return
 end subroutine inter_SmoothPres
-

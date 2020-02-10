@@ -60,4 +60,3 @@ Gamma_boun = dabs(Gamma_boun)
 !------------------------
 return
 end function Gamma_boun 
-

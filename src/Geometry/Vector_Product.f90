@@ -30,9 +30,9 @@ subroutine Vector_Product(uu,VV,ww,SPACEDIM)
 ! Declarations
 !------------------------
 implicit none
-integer(4),intent(IN) :: SPACEDIM
-double precision,intent(IN),dimension(SPACEDIM) :: uu,VV
-double precision,intent(INOUT),dimension(SPACEDIM) :: ww
+integer(4),intent(in) :: SPACEDIM
+double precision,intent(in),dimension(SPACEDIM) :: uu,VV
+double precision,intent(inout),dimension(SPACEDIM) :: ww
 integer(4) :: i,j,k
 integer(4),dimension(3) :: iseg=(/2,3,1/)
 !------------------------

@@ -57,7 +57,7 @@ aux_integer = 0
 ! Statements
 !------------------------
 ! Restart heading 
-if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
+if (trim(lcase(option))==trim(lcase("heading"))) then
    rewind(nsav)
    write(ulog,'(a)')    "-------------------"
    write(ulog,"(1x,a)") ">> Restart heading."
@@ -66,7 +66,7 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
    if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"versionerest,nrecords",nsav,    &
       ulog)) return
 ! Check the program version
-   if (TRIM(lcase(version))/=TRIM(lcase(versionerest))) then
+   if (trim(lcase(version))/=trim(lcase(versionerest))) then
       write(uerr,'(a)')                                                        &
          "---------------------------------------------------------------"
       write(uerr,"(1x,a)")                                                     &
@@ -96,7 +96,7 @@ if (TRIM(lcase(option))==TRIM(lcase("heading"))) then
             "ReadRestartFile successully completed. "
       endif
    endif
-   elseif (TRIM(lcase(option))=="reading") then
+   elseif (trim(lcase(option))=="reading") then
       write(ulog,'(a)')                                                        &
          "---------------------------------------------------------------------"
       write(ulog,"(1x,a)")                                                     &
@@ -422,8 +422,8 @@ body_arr(i)%body_kinematics(1:body_arr(i)%n_records,1:7)
                            pg(1:nag)%coord(2),pg(1:nag)%coord(3),              &
                            pg(1:nag)%vel(1),pg(1:nag)%vel(2),pg(1:nag)%vel(3), &
                            pg(1:nag)%pres,pg(1:nag)%dens,pg(1:nag)%mass,       &
-                           pg(1:nag)%visc,pg(1:nag)%IntEn,pg(1:nag)%VolFra,    &
-                           pg(1:nag)%imed,pg(1:nag)%icol
+                           pg(1:nag)%visc,pg(1:nag)%VolFra,pg(1:nag)%imed,     &
+                           pg(1:nag)%icol
                         if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"pg",nsav,  &
                            ulog)) return
                         write(uerr,'(a)') " "
@@ -617,8 +617,8 @@ if (allocated(Granular_flows_options%minimum_saturation_flag)) then
                               pg(1:nag)%coord(2),pg(1:nag)%coord(3),           &
                               pg(1:nag)%vel(1),pg(1:nag)%vel(2),               &
                               pg(1:nag)%vel(3),pg(1:nag)%pres,pg(1:nag)%dens,  &
-                              pg(1:nag)%mass,pg(1:nag)%visc,pg(1:nag)%IntEn,   &
-                              pg(1:nag)%VolFra,pg(1:nag)%imed,pg(1:nag)%icol
+                              pg(1:nag)%mass,pg(1:nag)%visc,pg(1:nag)%VolFra,  &
+                              pg(1:nag)%imed,pg(1:nag)%icol
                            if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"pg",    &
                               nsav,ulog)) return
                            write(ulog,'(a)') 

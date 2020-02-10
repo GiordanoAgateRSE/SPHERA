@@ -37,7 +37,7 @@ integer(4) :: nrighe,ier,ninp,ulog
 integer(4),dimension(20) :: NumberEntities
 type (TyCtlPoint),dimension(npointst) :: Control_Points
 character(1) :: comment
-character(100) :: ainp
+character(LEN=lencard) :: ainp
 integer(4) :: n,i,icord,ioerr
 double precision,dimension(3) :: values1
 logical,external :: ReadCheck
@@ -57,7 +57,7 @@ character(100),external :: lcase
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"CONTROL POINTS DATA",ninp,ulog))     &
    return
-do while (TRIM(lcase(ainp))/="##### end control points #####" )
+do while (trim(lcase(ainp))/="##### end control points #####" )
    NumberEntities(4) = NumberEntities(4) + 1
    read(ainp,*,iostat=ioerr) values1(1:ncord)
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"CONTROL POINT COORDINATES",ninp,  &

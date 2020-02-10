@@ -35,7 +35,7 @@ use I_O_file_module
 !------------------------
 implicit none
 integer(4) :: i,nbi,npi,j,k,nei,erased_part,alloc_stat,aux_integer
-double precision :: xmin,xmax,ymin,ymax,zmin,zmax,mod_normal,aux_umax
+double precision :: mod_normal,aux_umax
 integer(4) :: vec_temp(3)
 double precision :: vec2_temp(3)
 double precision, dimension(:), allocatable  ::  aux_mass
@@ -268,7 +268,7 @@ do nbi=1,n_bodies
          enddo
       enddo
    enddo
-end do
+enddo
 ! Cancel useless particles
 allocate(aux_bp_arr(n_body_part))
 do i=1,n_body_part
@@ -335,4 +335,3 @@ enddo
 deallocate(aux_mass)
 return
 end subroutine Input_Body_Dynamics
-

@@ -34,7 +34,7 @@ use Hybrid_allocation_module
 implicit none
 integer(4) :: nrighe,ier, ninp,ulog
 character(1) :: comment
-character(100) :: ainp
+character(LEN=lencard) :: ainp
 character(4) :: steptime
 integer(4) :: ioerr
 character(100) :: token
@@ -54,7 +54,7 @@ logical,external :: ReadCheck
 !------------------------
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DRAW OPTIONS DATA",ninp,ulog)) return
-do while (TRIM(lcase(ainp))/="##### end draw options #####")
+do while (trim(lcase(ainp))/="##### end draw options #####")
    select case (lcase(GetToken(ainp,1,ioerr)))
       case("vtkconverter")
          token = lcase(GetToken(ainp,(2),ioerr))

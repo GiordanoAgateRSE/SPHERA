@@ -43,7 +43,6 @@ double precision :: uCartL(3)
 ! Array to detect wall elements with fluid neighbours
 integer(4), dimension(:), allocatable :: neigh_w
 double precision,dimension(:), allocatable :: den
-character(len=lencard)  :: nomsub = "BC_wall_elements"
 !------------------------
 ! Explicit interfaces
 !------------------------

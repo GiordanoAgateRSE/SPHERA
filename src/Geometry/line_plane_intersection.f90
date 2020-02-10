@@ -37,7 +37,7 @@ double precision,intent(IN) :: P3_plane3(3)
 integer(4),intent(INOUT) :: test_point
 double precision,intent(INOUT) :: intersection_pl(3)
 double precision :: a1,b1,c1,d1,a2,b2,c2,d2,a3,b3,c3,d3
-double precision :: P3_plane1(3),P3_plane2(3),b_vec(3)
+double precision :: P3_plane1(3),P3_plane2(3)
 !------------------------
 ! Explicit interfaces
 !------------------------

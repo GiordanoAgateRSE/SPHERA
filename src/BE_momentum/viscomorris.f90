@@ -25,7 +25,7 @@
 ! "fluid particle - fluid particle" and "fluid particle - semi-particle" (DBSPH) 
 ! are considered.
 !-------------------------------------------------------------------------------
-subroutine viscomorris(npi,npj,npartint,mass_comput_part,dens_comput_part,     &
+subroutine viscomorris(mass_comput_part,dens_comput_part,                      &
 kin_visc_comput_part,mass_neighbour,dens_neighbour,kin_visc_neighbour,         &
 kernel_der,vel_type,rel_dis,dervel,rvw)
 !------------------------
@@ -38,7 +38,6 @@ use Dynamic_allocation_module
 ! Declarations
 !------------------------
 implicit none
-integer(4),intent(in) :: npi,npj,npartint
 double precision,intent(in) :: mass_comput_part,dens_comput_part
 double precision,intent(in) :: kin_visc_comput_part,mass_neighbour
 double precision,intent(in) :: dens_neighbour,kin_visc_neighbour,kernel_der

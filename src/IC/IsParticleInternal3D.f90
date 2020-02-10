@@ -22,12 +22,12 @@
 ! Program unit: IsParticleInternal3D
 ! Description: To check whether a particle is internal to a 3D volume 
 !              (domain/zone) or not. It checks if point Px() is internal to  
-!              the perimeter mib. It returns .true. (positive check) or .false. 
-!              . The perimeter can be both convex or concave. The input point is
-!              internal to the zone if the number of both "faces intercepted by 
-!              the vertical (passing for the input point) above the input point"
-!              and "faces intercepted by the vertical (passing for the input 
-!              point) below the input point" are odd.
+!              the perimeter "mib". It returns ".true." (positive check) or 
+!              ".false.". The perimeter can be both convex or concave. The 
+!              input point is internal to the zone if the number of both "faces 
+!              intercepted by the vertical (passing for the input point) above 
+!              the input point" and "faces intercepted by the vertical (passing 
+!              for the input point) below the input point" are odd.
 !-------------------------------------------------------------------------------
 logical function IsParticleInternal3D(mib,PX,IsopraS)
 !------------------------
@@ -46,11 +46,10 @@ double precision,parameter :: eps = 0.001d0
 integer(4),intent(in) :: mib
 double precision,intent(in) :: PX(SPACEDIM)
 integer(4),intent(in) :: IsopraS
-integer(4) :: kf,nf,i,j,sd,nnodes,norig,Nints,IntSotto,IntSopra,fkod
+integer(4) :: kf,nf,i,j,sd,nnodes,norig,Nints,IntSotto,IntSopra
 integer(4) :: test
 double precision :: tpar
 double precision :: P1(SPACEDIM),Pint(SPACEDIM),LPint(SPACEDIM)
-double precision :: csi(3)
 double precision,dimension(Tratto(mib)%numvertices) :: XYInts
 logical,external :: IsPointInternal
 !------------------------
@@ -219,4 +218,3 @@ endif
 !------------------------
 return
 end function IsParticleInternal3D
-

@@ -38,7 +38,7 @@ integer(4),dimension(20) :: NumberEntities
 type (TyCtlPoint),dimension(npointst) :: Control_Points
 type (TyCtlLine),dimension(NLines) :: Control_Lines
 character(1) :: comment
-character(100) :: ainp
+character(LEN=lencard) :: ainp
 integer(4) :: n,i,ndiv,icord,ioerr,npts
 double precision :: vp
 double precision,dimension(3) :: values1,values2,values3
@@ -62,7 +62,7 @@ call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"CONTROL LINES DATA",ninp,ulog))      &
    return
 npts = npoints
-do while (TRIM(lcase(ainp))/="##### end control lines #####")
+do while (trim(lcase(ainp))/="##### end control lines #####")
    values1 = zero
    values2 = zero
    values3 = zero

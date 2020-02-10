@@ -62,12 +62,8 @@ if (pg(npj)%vel_type/="std") then
    else
       amassj = pg(npj)%mass
       rhotilde = pg(npi)%dens + pg(npj)%dens
-      if (esplosione) then  
-         celtilde = pg(npi)%Csound + pg(npj)%Csound
-         else
-         celtilde = Med(pg(npi)%imed)%celerita + Med(pg(npj)%imed)%celerita
-      end if
-end if
+      celtilde = Med(pg(npi)%imed)%celerita + Med(pg(npj)%imed)%celerita
+endif
 TermMon = Med(pg(npi)%imed)%alfaMon * celtilde * Domain%h / rhotilde
 ! Volume viscosity term (compressible flows)
 ! can be neglected and may causes several problems when activated
@@ -80,4 +76,3 @@ rvwbeta(1:3) = zero
 !------------------------
 return
 end subroutine viscomon
-

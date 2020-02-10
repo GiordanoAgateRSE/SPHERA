@@ -52,8 +52,8 @@ integer(4) :: jgridi,kgridi,iappo,contatore,ind_neigh,ind_ref_interface
 double precision :: interf_liq,interf_sol,partLiq_pres,Ks,Ustar
 double precision :: Ustarold,Z0,Velocity,Velocity2,Taub,Restar,RestarC
 double precision :: Tetacr,Taubcror,Taubcr,phi,beta,gamma,Kbeta,Kgamma
-double precision :: nu_ustar,deltanu,DistZmin,pretot,DifRel,aux_scal
-double precision :: rel_dis(3),vel_rij(3),vel_s(3),aux_vec(3),aux_vec_2(3)
+double precision :: nu_ustar,deltanu,DistZmin,pretot,DifRel
+double precision :: vel_s(3),aux_vec(3)
 character(len=lencard)  :: nomsub = "Shields"
 integer(4),external :: ParticleCellNumber,CellIndices,CellNumber
 !------------------------
@@ -191,12 +191,6 @@ if (Granular_flows_options%ID_erosion_criterion==1) then
       endif
    endif
 endif
-! In case of explosion, erosion criterion is not active.  
-if (esplosione) then
-   Velocity2 = pg(npi)%vel(1) * pg(npi)%vel(1) + pg(npi)%vel(2) *              &
-               pg(npi)%vel(2) + pg(npi)%vel(3) * pg(npi)%vel(3)
-   if (Velocity2>1.0e-3) return 
-end if
 ! Choice of the representative neighbour (priority to pure fluid neighbours)
 if (Granular_flows_options%ID_erosion_criterion==1) then
    if (pg(npi)%indneighliqsol.ne.0) then
@@ -481,7 +475,6 @@ if ((Taub>Taubcr).and.(on_going_time_step>Med(imed)%NIterSol)) then
          pg(npi)%var = zero
          pg(npi)%dens = med(imed)%den0 + (pretot / (Med(imed)%celerita *       &
                         Med(imed)%celerita))
-         if (diffusione) pg(npi)%dens = med(imed)%den0 
 ! Initializing some SPH parameters for fixed mixture particles.
          if (Granular_flows_options%ID_erosion_criterion==1) then
             pg(npi)%sigma_prime_m = 0.d0
@@ -494,4 +487,3 @@ endif
 !------------------------
 return
 end subroutine Shields
-

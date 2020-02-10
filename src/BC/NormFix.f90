@@ -49,17 +49,17 @@ double precision,dimension(3) :: appo
 ! Statements
 !------------------------
 if (ncord==2) then
-!$omp parallel do default(none) private(npi,appo,unity) shared(nag,Pg)
+!$omp parallel do default(none) private(npi,appo,unity) shared(nag,pg)
    do npi=1,nag
       if ((pg(npi)%cella==0).or.(pg(npi)%vel_type=="std")) cycle
       call InterFix(npi,appo,unity)
-! Components of the generic normal  
+! Components of the generic normal
       pg(npi)%mno = dsqrt((appo(1)*appo(1)) + (appo(3)*appo(3)))
       pg(npi)%zer(1) = appo(1) / (pg(npi)%mno + 0.0001d0)
       pg(npi)%zer(2) = zero
       pg(npi)%zer(3) = appo(2) / (pg(npi)%mno + 0.0001d0)
-      pg(npi)%ang = (ATAN2(pg(npi)%zer(1),pg(npi)%zer(3)))
-      if ((abs(pg(npi)%zer(1))<0.5).AND.(abs(pg(npi)%zer(3))<0.5)) then
+      pg(npi)%ang = (atan2(pg(npi)%zer(1),pg(npi)%zer(3)))
+      if ((abs(pg(npi)%zer(1))<0.5).and.(abs(pg(npi)%zer(3))<0.5)) then
          pg(npi)%zer(1) = zero
          pg(npi)%zer(2) = zero
          pg(npi)%zer(3) = zero
@@ -69,14 +69,14 @@ if (ncord==2) then
    enddo
 !$omp end parallel do
    elseif (ncord==3) then
-!$omp parallel do default(none) private(npi,appo,unity) shared(nag,Pg)
-   do npi=1,nag
-      if ((pg(npi)%cella==0).or.(pg(npi)%vel_type=="std")) cycle
-      call InterFix(npi,appo,unity)
-      pg(npi)%mno = dsqrt((appo(1) * appo(1)) + (appo(2) * appo(2)) + (appo(3) &
-                    * appo(3)))
-      pg(npi)%zer(:) = appo(:) / (pg(npi)%mno + 0.0001d0)
-   enddo
+!$omp parallel do default(none) private(npi,appo,unity) shared(nag,pg)
+      do npi=1,nag
+         if ((pg(npi)%cella==0).or.(pg(npi)%vel_type=="std")) cycle
+         call InterFix(npi,appo,unity)
+         pg(npi)%mno = dsqrt((appo(1) * appo(1)) + (appo(2) * appo(2)) +       &
+                       (appo(3) * appo(3)))
+         pg(npi)%zer(:) = appo(:) / (pg(npi)%mno + 0.0001d0)
+      enddo
 !$omp end parallel do
 endif
 !------------------------
@@ -84,4 +84,3 @@ endif
 !------------------------
 return
 end subroutine NormFix
-

@@ -63,7 +63,7 @@ if (n_bodies>0) then
 endif
 !$omp parallel do default(none)                                                &
 !$omp shared(pg,Med,nPartIntorno,NMAXPARTJ,PartIntorno,PartKernel,indarrayFlu) &
-!$omp shared(Array_Flu,esplosione,Domain,n_bodies,dervel_mat,ncord)            &
+!$omp shared(Array_Flu,Domain,n_bodies,dervel_mat,ncord)                       &
 !$omp private(ii,npi,contj,npartint,npj,rhoi,rhoj,amassj,dervel,moddervel)     &
 !$omp private(pesoj)
 do ii=1,indarrayFlu
@@ -72,7 +72,6 @@ do ii=1,indarrayFlu
 ! The mixture particles, which are temporarily affected by the frictional 
 ! viscosity threshold are fixed.
    if (pg(npi)%mu==Med(pg(npi)%imed)%mumx) cycle
-   pg(npi)%Envar = zero
    do contj=1,nPartIntorno(npi)
       npartint = (npi - 1) * NMAXPARTJ + contj
       npj = PartIntorno(npartint)
@@ -89,9 +88,7 @@ do ii=1,indarrayFlu
       endif
       if (Med(pg(npj)%imed)%den0/=Med(pg(npi)%imed)%den0) cycle
       pesoj = amassj * PartKernel(4,npartint) / rhoj
-      pg(npi)%var(:) = pg(npi)%var(:) + dervel(:) * pesoj   
-      if (esplosione) pg(npi)%Envar = pg(npi)%Envar + (pg(npj)%IntEn -         &
-                                      pg(npi)%IntEn) * pesoj
+      pg(npi)%var(:) = pg(npi)%var(:) + dervel(:) * pesoj
    enddo
    if (n_bodies>0) then
       pg(npi)%var(:) = pg(npi)%var(:) + dervel_mat(npi,:)

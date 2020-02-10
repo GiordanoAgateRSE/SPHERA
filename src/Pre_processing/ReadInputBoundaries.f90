@@ -39,14 +39,14 @@ integer(4) :: nrighe,ier,ninp,ulog
 integer(4),dimension(20) :: NumberEntities
 integer(4),dimension(NumBVertices) :: BoundaryVertex
 character(1) :: comment
-character(100) :: ainp
+character(LEN=lencard) :: ainp
 type (TyZone),dimension(NPartZone) :: Partz
 type (TyBoundaryStretch),dimension(NumTratti) :: Tratto
 integer(4) :: n,index,numv,indexi,indexf,Izona,ipointer,Medium,icolor,icord    
 integer(4) :: ioerr,npointv,IC_source_type,Car_top_zone
 integer(4) :: plan_reservoir_points,i,i1,i2,i_point,ID_first_vertex
 integer(4) :: ID_last_vertex,dam_zone_ID,dam_zone_n_vertices
-double precision :: pool_value,shear,velocity,trampa,valp,flowrate,H_res
+double precision :: pool_value,shear,velocity,valp,flowrate,H_res
 double precision :: dx_CartTopog
 double precision,dimension(3) :: values1,values3
 double precision,dimension(0:3,maxpointsvlaw) :: valuev
@@ -60,7 +60,7 @@ character(8) :: label
 character(100) :: token
 logical,external :: ReadCheck
 integer(4),external :: ptcolorrgb
-character(100), external :: lcase, GetToken
+character(100), external :: lcase,GetToken
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -78,7 +78,7 @@ valp = zero
 !------------------------
 ! In case of restart, input data are not read
 if (restart) then
-   do while (TRIM(lcase(ainp))/="##### end boundaries #####")
+   do while (trim(lcase(ainp))/="##### end boundaries #####")
       call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
       if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"BOUNDARIES DATA",ninp,ulog))   &
          return
@@ -88,7 +88,7 @@ endif
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"BOUNDARIES DATA",ninp,ulog)) return
 ! Reading input data
-do while (TRIM(lcase(ainp))/="##### end boundaries #####")
+do while (trim(lcase(ainp))/="##### end boundaries #####")
    label = ainp(1:8)
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"BOUNDARIES INDEX",ninp,ulog))     &
@@ -103,7 +103,7 @@ do while (TRIM(lcase(ainp))/="##### end boundaries #####")
 ! Boundary type
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"BOUNDARY TYPE",ninp,ulog)) return
-   tipo = lcase(ainp(1:4))
+   tipo = trim(lcase(ainp(1:4)))
    numv = 0
    ipointer = 0
    move = "   "
@@ -116,7 +116,6 @@ do while (TRIM(lcase(ainp))/="##### end boundaries #####")
    shear = zero
    velocity = zero
    flowrate = zero
-   trampa = zero
    pressu = "  "
    valp = zero
    IC_source_type = 0
@@ -167,33 +166,16 @@ do while (TRIM(lcase(ainp))/="##### end boundaries #####")
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"SOURCE: MEDIUM INDEX",ninp, &
             ulog)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"SOURCE: FLOW RATE, TRAMPA ",&
-            ninp,ulog)) return
+         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"SOURCE: FLOW RATE ",ninp,   &
+            ulog)) return
          token = GetToken(ainp,1,ioerr)
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"SOURCE: FLOW RATE",ninp,    &
             ulog)) return
          read(token,*,iostat=ioerr) flowrate
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"SOURCE: FLOW RATE",ninp,    &
             ulog)) return
-         token = GetToken(ainp,2,ioerr)
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"SOURCE: TRAMPA",ninp,ulog)) &
-            return
-         read(token,*,iostat=ioerr) trampa
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"SOURCE: TRAMPA",ninp,ulog)) &
-            return
-         if (trampa/=0) then
-            write(ulog,*) ' '
-            write(ulog,*)                                                      &
-'TRAMPA in SOURCE boundary is not available. TRAMPA is setted to zero; check the VELOCITY boundary.'
-            write(ulog,*) ' '
-            write(ulog,*) ' '
-            write(ulog,*)                                                      &
-'TRAMPA in SOURCE boundary is not available. TRAMPA is setted to zero;  check the VELOCITY boundary.'
-            write(ulog,*) ' '
-            trampa = zero
-         endif
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         pressu = GetToken(ainp,1,ioerr)
+         pressu = trim(GetToken(ainp,1,ioerr))
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"SOURCE PRESSURE TYPE",ninp, &
             ulog)) return
          if (pressu=="pa") then  
@@ -225,12 +207,12 @@ do while (TRIM(lcase(ainp))/="##### end boundaries #####")
             ,ulog)) return
          move   = "std"
 ! Boundary condition "velo"
-      case("velo")    
+      case("velo")
          NumberEntities(3) = NumberEntities(3) + 1
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         if (ioerr==0) read(ainp,*,iostat=ioerr) velocity,trampa
+         if (ioerr==0) read(ainp,*,iostat=ioerr) velocity
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                             &
-            "VELO: NORMAL VELOCITY, TRAMPA",ninp,ulog)) return
+            "VELO: NORMAL VELOCITY",ninp,ulog)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          token = GetToken(ainp,1,ioerr)
          token_color(1:2) = token(5:6)
@@ -246,9 +228,9 @@ do while (TRIM(lcase(ainp))/="##### end boundaries #####")
       case("flow")    
          NumberEntities(3) = NumberEntities(3) + 1
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         if (ioerr==0) read(ainp,*,iostat=ioerr) flowrate,trampa
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"VELO: FLOW RATE, TRAMPA",   &
-            ninp,ulog)) return
+         if (ioerr==0) read(ainp,*,iostat=ioerr) flowrate
+         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"VELO: FLOW RATE",ninp,ulog) &
+            ) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          token = GetToken(ainp,1,ioerr)
          token_color(1:2) = token(5:6)
@@ -345,7 +327,7 @@ do while (TRIM(lcase(ainp))/="##### end boundaries #####")
          if (NumberEntities(1)==3) then      
             NumberEntities(3) = NumberEntities(3) + 1
             call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-            pool_plane = GetToken(ainp,1,ioerr)
+            pool_plane = trim(GetToken(ainp,1,ioerr))
             if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"POOL: X/Y/Z/ PLANE LABEL"&
                ,ninp,ulog)) return
             token = GetToken(ainp,2,ioerr)
@@ -394,7 +376,6 @@ do while (TRIM(lcase(ainp))/="##### end boundaries #####")
       endif
       Partz(Izona)%vel = zero
       Partz(Izona)%vel(icoordp(1:ncord,ncord-1)) = values3(1:ncord)
-      Partz(Izona)%trampa = trampa
       Partz(Izona)%pressure = pressu
       Partz(Izona)%valp = valp
       Partz(Izona)%Indix(1) = indexi
@@ -416,7 +397,6 @@ do while (TRIM(lcase(ainp))/="##### end boundaries #####")
          Tratto(index)%velocity = values1
          Tratto(index)%NormVelocity = velocity
          Tratto(index)%FlowRate = flowrate
-         Tratto(index)%trampa = trampa
          Tratto(index)%zone = Izona
          Tratto(index)%ColorCode = icolor
          if ((ulog>0).and.(index==indexi)) then
@@ -519,8 +499,6 @@ BoundaryVertex(Tratto(index)%inivertex+Tratto(index)%numvertices-1)
                         write(ulog,"(1x,a,a,1pe12.4)") xyzlabel(icord),        &
                            " velocity       : ",Partz(Izona)%vel(icord) 
                      enddo
-                     write(ulog,"(1x,a,1pe12.4)") "Time Rampa      : ",        &
-                        Partz(Izona)%trampa
                      write(ulog,"(1x,a,2x,a)")    "Pressure Type   : ",        &
                         Partz(Izona)%pressure
                      write(ulog,"(1x,a,1pe12.4)") "Pressure Value  : ",        &
@@ -578,4 +556,3 @@ enddo
 !------------------------
 return
 end subroutine ReadInputBoundaries
-

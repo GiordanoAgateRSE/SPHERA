@@ -194,7 +194,7 @@ do nc=1,Grid%nmax
       endif
    enddo
 !$omp critical (omp_GridCellBoundaryFacesIntersections3D)
-   do i_flpointer=1,flpointer_cell    
+   do i_flpointer=1,flpointer_cell
       flpointer = flpointer + 1
       GCBFVector_aux(flpointer) = GCBFVector_cell(i_flpointer)
       if (i_flpointer==1) GCBFPointers(nc,2) = flpointer

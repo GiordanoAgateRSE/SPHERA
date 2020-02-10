@@ -35,7 +35,7 @@ implicit none
 integer(4) :: nrighe,ier, ninp,ulog
 integer(4),dimension(20) :: NumberEntities
 character(1) :: comment
-character(100) :: ainp
+character(LEN=lencard) :: ainp
 integer(4) :: n,icord,ioerr
 double precision :: prif
 double precision,dimension(3) :: values1
@@ -56,7 +56,7 @@ logical,external :: ReadCheck
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"GENERAL PHYSICAL PROPERTIES DATA",   &
    ninp,ulog)) return
-do while (TRIM(lcase(ainp))/="##### end general physical properties #####")
+do while (trim(lcase(ainp))/="##### end general physical properties #####")
    read (ainp,*,iostat=ioerr) values1(1:NumberEntities(1))
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"GRAVITAL ACCELERATION VECTOR",ninp&
       ,ulog)) return
@@ -85,4 +85,3 @@ endif
 !------------------------
 return
 end subroutine ReadInputGeneralPhysical
-

@@ -59,17 +59,9 @@ do i=1,size(Med)
    Med(i)%coes = zero
    Med(i)%numx = zero
    Med(i)%mumx = zero
-   Med(i)%taucri = zero
-   Med(i)%cuin = zero
    Med(i)%phi = zero
-   Med(i)%cons = zero
-   Med(i)%Cs = zero
    Med(i)%RoughCoef = zero
    Med(i)%d50 = zero
-   Med(i)%SettlingCoef = zero
-   Med(i)%Codif = zero
-   Med(i)%Gamma = zero
-   Med(i)%InitialIntEn = zero
 enddo
 do i=1,size(Partz)
    Partz(i)%label = "        "
@@ -99,7 +91,6 @@ do i=1,size(Partz)
          Partz(i)%vlaw(j,n) = zero
       enddo
    enddo
-   Partz(i)%trampa = zero
    Partz(i)%valp = zero
 enddo
 do i=1,size(Control_Points)
@@ -203,7 +194,6 @@ do i=1,size(Tratto)
    Tratto(i)%medium = 0
    Tratto(i)%zone = 0
    Tratto(i)%NormVelocity = zero
-   Tratto(i)%trampa = zero
    Tratto(i)%ShearCoeff = zero
    do j=1,SPACEDIM
       Tratto(i)%velocity(j) = zero

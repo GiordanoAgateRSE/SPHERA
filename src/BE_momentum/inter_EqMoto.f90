@@ -42,7 +42,7 @@ integer(4) :: npj,contj,npartint,index_rij_su_h
 double precision :: rhoi,rhoj,amassj,pi,pj,alpha,veln,velti,veltj,deltan,pre   
 double precision :: coeff,secinv,nupa,nu,modderveln,moddervelt,moddervel
 double precision :: dvtdn,denorm,rij_su_h,ke_coef,kacl_coef,rij_su_h_quad
-double precision :: vol_Shep,Ww_Shep,rijtemp,rijtemp2
+double precision :: rijtemp,rijtemp2
 double precision :: gradmod,gradmodwacl,wu,denom,absv_pres_grav_inner
 double precision :: absv_Morris_inner,Morris_inner_weigth,kernel_der
 double precision :: dervel(3),dervelmorr(3),appopres(3),appodiss(3),rvw(3)
@@ -52,11 +52,10 @@ double precision :: DBSPH_wall_she_vis_term(3),t_visc_semi_part(3)
 ! Explicit interfaces
 !------------------------
 interface
-   subroutine viscomorris(npi,npj,npartint,mass_comput_part,dens_comput_part,  &
-   kin_visc_comput_part,mass_neighbour,dens_neighbour,kin_visc_neighbour,      &
-   kernel_der,vel_type,rel_dis,dervel,rvw)
+   subroutine viscomorris(mass_comput_part,dens_comput_part,                   &
+      kin_visc_comput_part,mass_neighbour,dens_neighbour,kin_visc_neighbour,   &
+      kernel_der,vel_type,rel_dis,dervel,rvw)
    implicit none
-   integer(4),intent(in) :: npi,npj,npartint
    double precision,intent(in) :: mass_comput_part,dens_comput_part
    double precision,intent(in) :: kin_visc_comput_part,mass_neighbour
    double precision,intent(in) :: dens_neighbour,kin_visc_neighbour,kernel_der
@@ -71,7 +70,6 @@ end interface
 !------------------------
 ! Initializations
 !------------------------
-pg(npi)%dEdT = zero
 tpres(:) = zero
 tdiss(:) = zero
 tvisc(:) = zero
@@ -166,28 +164,20 @@ do contj=1,nPartIntorno(npi)
                    pg(npj)%zer(3))
             velti = (pg(npi)%vel(1) * pg(npj)%zer(3) - pg(npi)%vel(3) *        &
                     pg(npj)%zer(1))
-            secinv = abs(velti / (deltan + 0.0001d0))
+            secinv = abs(velti / (deltan + 1.d-4))
             nu = Med(pg(npi)%imed)%visc
             if (index(Med(pg(npi)%imed)%tipo,"liquid")>0) then
                nu = Med(pg(npi)%imed)%visc
-               elseif (index(Med(pg(npi)%imed)%tipo,"gas")>0) then
-                  nu = Med(pg(npi)%imed)%visc
-                  elseif (index(Med(pg(npi)%imed)%tipo,"general")>0) then
-                     nupa = Med(pg(npi)%imed)%taucri / (secinv + 0.0001d0) +   &
-                            Med(pg(npi)%imed)%visc * ((secinv + 0.0001d0) **   &
-                            (Med(pg(npi)%imed)%cuin-one))
-                     nu = min(Med(pg(npi)%imed)%numx,nupa)
-                     elseif (index(Med(pg(npi)%imed)%tipo,"granular")>0) then
-                        pre = (max(zero,pg(npi)%pres)) / pg(npi)%dens
-                        coeff = sin (Med(pg(npi)%imed)%phi)
-                        nupa = (pre*coeff) / (secinv + 0.0001d0) +             &
-                               Med(pg(npi)%imed)%visc
-                        nu = min(nupa,Med(pg(npi)%imed)%numx)
+               elseif (index(Med(pg(npi)%imed)%tipo,"granular")>0) then
+                  pre = (max(zero,pg(npi)%pres)) / pg(npi)%dens
+                  coeff = sin (Med(pg(npi)%imed)%phi)
+                  nupa = (pre*coeff) / (secinv + 1.d-4) + Med(pg(npi)%imed)%visc
+                  nu = min(nupa,Med(pg(npi)%imed)%numx)
             endif
             dvtdn = (sin(pg(npj)%ang)) * (pg(npi)%dudy + pg(npi)%dvdx) +       &
                     (cos(pg(npj)%ang)) * (pg(npi)%dudx - pg(npi)%dvdy)
-            veltj = ( - two * (deltan / (denorm + 0.0001d0)) * nu /            &
-                    (pg(npi)%visc + 0.0001d0) + one) * velti + two * dvtdn     &
+            veltj = ( - two * (deltan / (denorm + 1.d-4)) * nu /               &
+                    (pg(npi)%visc + 1.d-4) + one) * velti + two * dvtdn        &
                     * deltan
             moddervelt = veltj - velti
             modderveln = - two * veln               
@@ -228,17 +218,13 @@ do contj=1,nPartIntorno(npi)
 ! To add Monaghan term (artificial viscosity)
    tdiss(:) = tdiss(:) + appodiss(:)
 ! To compute Morris term (interaction with neighbouring fluid particle)
-   call viscomorris(npi,npj,npartint,pg(npi)%mass,pg(npi)%dens,pg(npi)%visc,   &
+   call viscomorris(pg(npi)%mass,pg(npi)%dens,pg(npi)%visc,                    &
       pg(npj)%mass,pg(npj)%dens,pg(npj)%visc,PartKernel(2,npartint),           &
       pg(npj)%vel_type,rag(1:3,npartint),dervel,rvw)
 ! To add  Morris term (interaction with neighbouring fluid particle)   
    tvisc(:) = tvisc(:) + rvw(:)
    rvw_sum(:) = rvw_sum(:) + rvw(:)
 ! Momentum equation: end
-   if (esplosione) &
-      pg(npi)%dEdT = pg(npi)%dEdT + half * (dervel(1) * (appopres(1) +         &
-                     appodiss(1)) + dervel(2) * (appopres(2) + appodiss(2)) +  &
-                     dervel(3) * (appopres(3) + appodiss(3)))
 enddo
 pg(npi)%laminar_flag = 0
 if (pg(npi)%visc>0.d0) then
@@ -277,10 +263,9 @@ if (DBSPH%n_w>0) then
 ! To compute Morris term (interaction with neighbouring semi-particle)
          kernel_der = kernel_fw(2,npartint)/(dot_product(rag_fw(:,npartint),   &
                       rag_fw(:,npartint)) + eta2)
-         call viscomorris(npi,npj,npartint,pg(npi)%mass,pg(npi)%dens,          &
-            pg(npi)%visc,pg_w(npj)%mass,pg_w(npj)%dens,                        &
-            pg_w(npj)%kin_visc_semi_part,kernel_der,"std",                     &
-            rag_fw(1:3,npartint),dervel,rvw_semi_part)
+         call viscomorris(pg(npi)%mass,pg(npi)%dens,pg(npi)%visc,              &
+            pg_w(npj)%mass,pg_w(npj)%dens,pg_w(npj)%kin_visc_semi_part,        &
+            kernel_der,"std",rag_fw(1:3,npartint),dervel,rvw_semi_part)
          t_visc_semi_part(:) = t_visc_semi_part(:) + rvw_semi_part(:)
       endif
    enddo
@@ -297,4 +282,3 @@ endif
 !------------------------
 return
 end subroutine inter_EqMoto
-

@@ -38,13 +38,13 @@ integer(4),dimension(20) :: NumberEntities
 integer(4),dimension(NumBVertices) :: BoundaryVertex
 type (TyBoundaryStretch),dimension(NumTratti) :: Tratto
 character(1) :: comment
-character(200) :: ainp
+character(LEN=lencard) :: ainp
 integer(4),parameter :: MAXLINENODES = 820
 integer(4) :: n,i,ioerr,i1,index,numv,numv_line,ipointer
 character(5) :: txt
 character(100) :: token
 logical,external :: ReadCheck
-character(100),external :: lcase, GetToken
+character(100),external :: lcase,GetToken
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -59,8 +59,8 @@ character(100),external :: lcase, GetToken
 !------------------------
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"LINES DATA",ninp,ulog)) return
-do while (TRIM(lcase(ainp))/="##### end lines #####")
-   select case (TRIM(Domain%tipo))
+do while (trim(lcase(ainp))/="##### end lines #####")
+   select case (trim(Domain%tipo))
       case ("semi","bsph") 
 ! Reading the boundary vertices 
          numv = 0

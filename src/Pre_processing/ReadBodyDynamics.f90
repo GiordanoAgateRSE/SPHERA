@@ -42,7 +42,7 @@ double precision :: L_geom(3),x_CM(3),n_R_IO(3),u_CM(3),omega(3),x_rotC(3)
 double precision :: mass_deact(6)
 double precision :: Ic(3,3)
 character(1) :: comment
-character(100) :: ainp,lcase !,token,GetToken
+character(LEN=lencard) :: ainp,lcase !,token,GetToken
 logical,external :: ReadCheck
 !------------------------
 ! Explicit interfaces
@@ -59,7 +59,7 @@ logical,external :: ReadCheck
 call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
 if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"BODY DYNAMICS DATA",ninp,ulog))      &
    return
-do while (TRIM(lcase(ainp)) /= "##### end body dynamics #####")
+do while (trim(lcase(ainp)) /= "##### end body dynamics #####")
 ! Reading the number of bodies and the ratio between fluid and body particle 
 ! size
    read(ainp,*,iostat=ioerr) n_bodies,dx_dxbodies,friction_angle,              &

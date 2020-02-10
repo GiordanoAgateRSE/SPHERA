@@ -69,4 +69,3 @@ enddo
 !------------------------
 return
 end subroutine body_to_smoothing_pres
-

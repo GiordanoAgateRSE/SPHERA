@@ -35,15 +35,12 @@ use I_O_diagnostic_module
 ! Declarations
 !------------------------
 implicit none
-logical :: done_flag
+logical :: done_flag,IC_removal_flag
 integer(4) :: Ncbf,i,npi,it,it_print,it_memo,it_rest,ir,ii,num_out,Ncbf_Max
 integer(4) :: OpCountot,SpCountot,EpCountot,EpOrdGridtot,ncel,aux,igridi
 integer(4) :: jgridi,kgridi,machine_Julian_day,machine_hour,machine_minute
-integer(4) :: machine_second,alloc_stat
-real :: time_aux_2
-double precision :: pretot,BCtorodivV,dt_previous_step,TetaV1,xmax,ymax,zmax
-double precision :: appo1,appo2,appo3,dtvel
-real :: time_aux(2)
+integer(4) :: machine_second
+double precision :: BCtorodivV,dt_previous_step,TetaV1,xmax,ymax,zmax,dtvel
 double precision,dimension(1:SPACEDIM) :: tpres,tdiss,tvisc,BoundReaction
 character(len=lencard) :: nomsub = "Loop_Irre_3D"
 integer(4),external :: ParticleCellNumber,CellIndices,CellNumber
@@ -57,21 +54,6 @@ integer(4),external :: ParticleCellNumber,CellIndices,CellNumber
 ! Initializations
 !------------------------
 on_going_time_step = -999
-if (esplosione) then
-   do npi=1,nag
-      if (index(Med(pg(npi)%imed)%tipo,"gas")>0) then
-         pg(npi)%pres = (Med(pg(npi)%imed)%gamma - one) * pg(npi)%IntEn *      &
-                        pg(npi)%dens
-         pg(npi)%Csound = dsqrt(Med(pg(npi)%imed)%gamma *                      &
-                          (Med(pg(npi)%imed)%gamma - one) * pg(npi)%IntEn)
-         else
-            pg(npi)%Csound = Med(pg(npi)%imed)%Celerita
-            pg(npi)%IntEn = pg(npi)%pres / ((Med(pg(npi)%imed)%gamma - one) *  &
-                            pg(npi)%dens)
-      endif
-      pg(npi)%state = "flu"
-   enddo
-endif
 SpCount = 0
 OpCount = 0
 EpCount = 0
@@ -99,6 +81,7 @@ enddo
 call PreSourceParticles_3D
 ! Initializing the time stage for time integration
 if (Domain%time_split==0) Domain%time_stage = 1
+IC_removal_flag = .false.
 !------------------------
 ! Statements
 !------------------------
@@ -129,6 +112,17 @@ if ((on_going_time_step==it_start).and.(Domain%tipo=="bsph")) then
       endif
    enddo
 !$omp end parallel do
+   IC_removal_flag = .true.
+   call start_and_stop(3,9)
+endif
+if (n_bodies>0) then
+   call start_and_stop(2,19)
+   call initial_fluid_removal_in_solid_bodies
+   IC_removal_flag = .true.
+   call start_and_stop(3,19)
+endif
+if (IC_removal_flag.eqv..true.) then
+   call start_and_stop(2,9)
    call OrdGrid1
 ! Variable to count the particles, which are not "sol"
    indarrayFlu = 0
@@ -282,8 +276,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
       if ((Domain%time_split==0).and.(Domain%time_stage==1)) then               
 ! Erosion criterium + continuity equation RHS  
          call start_and_stop(2,12)
-         if ((Granular_flows_options%ID_erosion_criterion>0).and.              &
-            (.not.esplosione)) then
+         if (Granular_flows_options%ID_erosion_criterion>0) then
             select case (Granular_flows_options%ID_erosion_criterion)
                case(1)
 !$omp parallel do default(none) shared(pg,nag) private(npi,ncel)
@@ -416,7 +409,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
          call start_and_stop(3,19)
          call start_and_stop(2,6)
       endif
-! Time integration scheme for momentum and energy equations 
+! Time integration scheme for momentum equations 
       if (Domain%time_split==0) then   
 ! Explicit RK schemes
          call start_and_stop(3,6)
@@ -445,14 +438,6 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
             enddo
 !$omp end parallel do
             call start_and_stop(3,6)
-! Energy equation: start
-            if (esplosione) then
-               do ii = 1,indarrayFlu
-                 npi = Array_Flu(ii)
-                 pg(npi)%IntEn = pg(npi)%IntEn + dtvel * pg(npi)%dEdT
-               enddo
-            endif
-! Energy equation: end
 ! Time integration for body dynamics
             if (n_bodies>0) then
                call start_and_stop(2,19)
@@ -463,20 +448,14 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
             call start_and_stop(2,7)
             if (Domain%TetaV>0.d0) call velocity_smoothing
 !$omp parallel do default(none) private(npi,ii,TetaV1)                         &
-!$omp shared(pg,Med,Domain,dt,indarrayFlu,Array_Flu,esplosione)
+!$omp shared(pg,Med,Domain,dt,indarrayFlu,Array_Flu)
 ! Loop over all the active particles
             do ii=1,indarrayFlu
                npi = Array_Flu(ii)
                if (Domain%TetaV>0.d0) then
-                  if (esplosione) then
-                     TetaV1 = Domain%TetaV * pg(npi)%Csound * dt / Domain%h
-                     else
 ! TetaV depending on the time step
-                        TetaV1 = Domain%TetaV * Med(pg(npi)%imed)%Celerita *   &
-                                 dt / Domain%h
-                  endif
-                  if (esplosione) pg(npi)%IntEn = pg(npi)%IntEn + TetaV1 *     &
-                                                  pg(npi)%Envar
+                  TetaV1 = Domain%TetaV * Med(pg(npi)%imed)%Celerita * dt /    &
+                           Domain%h
                   if (pg(npi)%kodvel==0) then              
 ! The particle is inside the domain and far from boundaries
                      pg(npi)%var(:) = pg(npi)%vel(:) + TetaV1 * pg(npi)%var(:)     
@@ -493,34 +472,6 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
 !$omp end parallel do
             call start_and_stop(3,7)
 ! Partial smoothing for velocity: end
-! Diffusion coefficient: start (input option not recommended)
-            if (diffusione) then
-               call start_and_stop(2,15)
-!$omp parallel do default(none) private(npi,ii,appo1,appo2,appo3)              &
-!$omp shared(nag,pg,Med,indarrayFlu,Array_Flu)
-               do ii=1,indarrayFlu
-                  npi = Array_Flu(ii)
-                  if ((pg(npi)%VolFra==VFmx).and.                              &
-                     (pg(npi)%visc==Med(pg(npi)%imed)%mumx/pg(npi)%dens)) then
-                     pg(npi)%coefdif = zero
-                     else
-                        call inter_CoefDif(npi)
-                        if (pg(npi)%uni>zero) pg(npi)%veldif = pg(npi)%veldif  &
-                                                               / pg(npi)%uni 
-                        appo1 = (pg(npi)%veldif(1) - pg(npi)%var(1)) *         &
-                                (pg(npi)%veldif(1) - pg(npi)%var(1))
-                        appo2 = (pg(npi)%veldif(2) - pg(npi)%var(2)) *         &
-                                (pg(npi)%veldif(2) - pg(npi)%var(2))
-                        appo3 = (pg(npi)%veldif(3) - pg(npi)%var(3)) *         &
-                                (pg(npi)%veldif(3) - pg(npi)%var(3))
-                        pg(npi)%coefdif = pg(npi)%coefdif * dsqrt(appo1 + appo2&
-                                          + appo3)
-                  endif
-               enddo
-!$omp end parallel do
-               call start_and_stop(3,15)
-            endif
-! Diffusion coefficient: end
 ! Update the particle positions
             call start_and_stop(2,8)
 !$omp parallel do default(none) private(npi) shared(nag,pg,dt)
@@ -567,8 +518,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
 ! Erosion criterion + continuity equation RHS 
       call start_and_stop(2,12)
       Ncbf_Max = 0
-      if ((Granular_flows_options%ID_erosion_criterion>0).and.                 &
-         (.not.esplosione)) then  
+      if (Granular_flows_options%ID_erosion_criterion>0) then  
          if (Domain%time_split==1) then 
 ! Assessing particle status ("flu" or "sol") of the mixture particles
 ! Calling the proper subroutine for the erosion criterion 
@@ -720,16 +670,11 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
             enddo
 !$omp end parallel do
             call start_and_stop(3,12)
-! Continuity equation: end
-            if (diffusione) then
-               call start_and_stop(2,16)
-               call aggdens
-               call start_and_stop(3,16)
-            endif
 ! Equation of state 
             call start_and_stop(2,13)
-            call calcpre 
+            call CalcPre 
             call start_and_stop(3,13)
+! Continuity equation: end
             if (n_bodies>0) then
                call start_and_stop(2,19)
                call body_pressure_mirror
@@ -753,42 +698,9 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
          call body_pressure_postpro
          call start_and_stop(3,19)
       endif
-      if (diffusione) then
-         call start_and_stop(2,16)
-!$omp parallel do default(none) private(npi,ii)                                &
-!$omp shared(nag,Pg,Med,indarrayFlu,Array_Flu)
-         do ii = 1,indarrayFlu
-            npi = Array_Flu(ii)
-            if (pg(npi)%koddens/=0) cycle
-            if (pg(npi)%imed==1) then
-               pg(npi)%dens = pg(npi)%pres / (Med(1)%celerita *                &
-                              Med(1)%celerita) + (Med(2)%den0 * VFmn +         &
-                              Med(1)%den0 * (one - VFmn))
-               elseif (pg(npi)%imed==2) then
-                  pg(npi)%dens = pg(npi)%pres / (Med(2)%celerita *             &
-                                 Med(2)%celerita) + (Med(2)%den0 * VFmx +      &
-                                 Med(1)%den0 * (one - VFmx))
-            endif
-            Pg(npi)%rhoc = pg(npi)%pres / (med(2)%celerita * med(2)%celerita) +&
-                           med(2)%den0
-            Pg(npi)%rhow = pg(npi)%pres / (med(1)%celerita * med(1)%celerita) +&
-                           med(1)%den0
-         enddo
-!$omp end parallel do
-         call start_and_stop(3,16)
-      endif
       call start_and_stop(2,20)
       if (Granular_flows_options%ID_erosion_criterion==1) call mixture_viscosity 
       call start_and_stop(3,20)
-! Apparent viscosity (input option not recommended)  
-      if (diffusione.or.esplosione) then
-         if ((Domain%time_split==1).or.(Domain%time_stage==Domain%RKscheme))   &
-            then
-            call start_and_stop(2,15)
-            call viscapp 
-            call start_and_stop(3,15)
-         endif
-      endif
       if (Domain%tipo=="semi") then
 ! Boundary Conditions: start
 ! BC: checks for the particles gone out of the domain throughout the opened 
@@ -1024,4 +936,3 @@ if ((Domain%tipo=="bsph").and.(DBSPH%n_w>0)) deallocate(pg_w)
 !------------------------
 return
 end subroutine Loop_Irre_3D
-

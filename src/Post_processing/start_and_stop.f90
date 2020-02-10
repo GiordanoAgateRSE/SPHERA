@@ -33,7 +33,7 @@ use I_O_file_module
 !------------------------
 implicit none
 integer(4), intent(in) :: iset,itot
-integer :: HOSTNM,GETCWD,count_i,counts_per_second,count_maximum
+integer :: count_i,counts_per_second,count_maximum
 integer(4) :: i,hours,days,minutes,seconds,ishost,string_index,string_size
 integer(4), dimension(8) :: dat_array
 double precision :: time_increment
@@ -159,4 +159,3 @@ endselect
 !------------------------
 return
 end subroutine start_and_stop
-

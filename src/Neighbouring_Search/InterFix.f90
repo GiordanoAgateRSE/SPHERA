@@ -20,7 +20,7 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: InterFix              
-! Description:      
+! Description: 
 !-------------------------------------------------------------------------------
 subroutine InterFix(npi,appo,unity)
 !------------------------
@@ -33,11 +33,11 @@ use Dynamic_allocation_module
 ! Declarations
 !------------------------
 implicit none
-integer(4),parameter :: local_d = 500 ! Local maximum number of particles 
-                                      ! within the kernel support 
-integer(4),intent(IN) :: npi
-double precision,intent(INOUT) :: unity
-double precision,intent(INOUT),dimension(3) :: appo
+! Local maximum number of particles within the kernel support 
+integer(4),parameter :: local_d = 500
+integer(4),intent(in) :: npi
+double precision,intent(inout) :: unity
+double precision,intent(inout),dimension(3) :: appo
 integer(4) :: npj,contj,npartint   
 double precision :: rhoj,amassj,pesoj
 double precision,dimension(3) :: pesogradj
@@ -56,20 +56,19 @@ appo(:) = zero
 ! Statements
 !------------------------
 do contj=1,nPartIntorno(npi)
-   npartint = (npi - 1)* NMAXPARTJ + contj
+   npartint = (npi - 1) * NMAXPARTJ + contj
    npj = PartIntorno(npartint)
-   if ( pg(npj)%vel_type=="std") cycle    
+   if (pg(npj)%vel_type=="std") cycle    
    rhoj = pg(npj)%dens
    amassj = pg(npj)%mass
    pesoj = amassj * Partkernel(4,npartint) / rhoj
    pesogradj(1:3) = amassj * rag(1:3,npartint) * PartKernel(1,npartint) / rhoj
-   unity = unity + pesoj  
-   appo(:) = appo(:) + pesogradj(:)  
+   unity = unity + pesoj 
+   appo(:) = appo(:) + pesogradj(:)
 enddo
 appo(:) = -appo(:)
 !------------------------
 ! Deallocations
 !------------------------
 return
-end subroutine InterFix 
-
+end subroutine InterFix

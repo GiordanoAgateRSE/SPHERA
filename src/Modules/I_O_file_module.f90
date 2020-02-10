@@ -52,4 +52,3 @@ integer(4) :: unit_dbsph_se_reg = 60 ! DB-SPH post-processing
 integer(4) :: unit_substations = 61 ! Substation post-processing
 character(255), dimension(0:7) :: nomefile
 end module
-

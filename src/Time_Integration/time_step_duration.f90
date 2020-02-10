@@ -22,10 +22,9 @@
 ! Program unit: time_step_duration                                 
 ! Description: Computation of the time step duration (dt) according to 
 !              stability constraints (CFL condition, viscosity term stability 
-!              criterion, interface diffusion criterion -not recommended-). 
-!              Plus, a special treatment for Monaghan artificial viscosity term 
-!              and management of low-velocity SPH mixture particles for 
-!              bed-load transport phenomena.
+!              criterion). Plus, a special treatment for Monaghan artificial 
+!              viscosity term and management of low-velocity SPH mixture 
+!              particles for bed-load transport phenomena.
 !-------------------------------------------------------------------------------
 subroutine time_step_duration
 !------------------------
@@ -40,7 +39,7 @@ use Dynamic_allocation_module
 !------------------------
 implicit none
 integer(4) :: j,npi,ii
-double precision :: dtmin,dt_CFL,dt_dif,dt_vis,diffmax,U,celiq,visc_Mon_j
+double precision :: dtmin,dt_CFL,dt_vis,U,celiq,visc_Mon_j
 double precision :: dt_Mon_j,dt_Mon
 !------------------------
 ! Explicit interfaces
@@ -52,7 +51,6 @@ double precision :: dt_Mon_j,dt_Mon
 ! Initializations
 !------------------------
 dtmin = 1.d30                                              
-diffmax = zero
 dt_Mon = max_positive_number 
 !------------------------
 ! Statements
@@ -61,10 +59,9 @@ if (indarrayFlu==0) then
 ! In case there is no fluid (or mobile) particle
    dt = 0.d0
    else
-! Time step depends on 3 stability criteria:
+! Time step depends on 2 stability criteria:
 ! 1) CFL criterion: dt_CFL<=CFL*(2h/(c+U))
 ! 2) viscous term criterion: dt_vis<=vsc_coeff*(rho*h**2/(0.5*mu)) 
-! 3) interface diffusion criterion: dt_diff<=(h**2/2*teta)
       do ii=1,indarrayFlu
          npi = Array_Flu(ii)
          if ((Granular_flows_options%ID_erosion_criterion==1).and.             &
@@ -92,7 +89,6 @@ if (indarrayFlu==0) then
          if (celiq>=zero) pg(npi)%csound = dsqrt(celiq)
       enddo
       do j=1,NMedium
-         diffmax = max(diffmax,Med(j)%codif)
          if (dt_alfa_Mon.eqv..true.) then
             visc_Mon_j = Med(j)%alfaMon * Med(j)%celerita * Domain%h /         &
                Med(j)%den0
@@ -100,10 +96,6 @@ if (indarrayFlu==0) then
             dt_Mon = min(dt_Mon,dt_Mon_j)
          endif
       enddo
-      if (diffusione) then
-         dt_dif = half * squareh / (diffmax+1.d-9)
-         dtmin = min(dtmin,dt_dif)
-      endif
       if (dt_alfa_Mon.eqv..true.) dtmin = min(dtmin,dt_Mon)
       if (on_going_time_step==0) then
          dt = dtmin

@@ -88,7 +88,7 @@ type TyGlobal
    double precision :: coord(3,2) ! Coordinates of 2 vertices of a diagonal 
                                   ! of the parallelepiped domain                       
    character(4)     :: tipo
-   character(100)    :: file
+   character(LEN=lencard) :: file ! string for a file name
    character(1)     :: Psurf 
    character(1)     :: RandomPos ! IC particle distribution noise. "r": slight 
                                  ! white noise is added, otherwise nothing.  
@@ -157,20 +157,14 @@ type TyParticle
    double precision :: mu ! Dynamic viscosity; equivalent mixture dynamic
                           ! viscosity in case of bed-load transport layer                             
    double precision :: tstop ! Stop time                          
-   double precision :: mno        
+   double precision :: mno    
    double precision :: ang                       
    double precision :: VolFra                         
    double precision :: rhoc                           
    double precision :: rhow                          
    double precision :: tiroc                          
    double precision :: cden                           
-   double precision :: wden                           
-   double precision :: diffu                         
-   double precision :: coefdif ! Diffusion coefficient                        
-   double precision :: IntEn ! Specific internal energy                         
-   double precision :: Envar ! Partial smoothing contributions
-                             ! for specific internal energy                          
-   double precision :: dEdT ! Energy equation LHS                          
+   double precision :: wden
    double precision :: Csound ! Sound speed                        
    double precision :: DensShep ! Density times Shepard coefficient                      
    double precision :: rhoSPH_new ! SPH approximation of density at the  
@@ -228,7 +222,6 @@ type TyParticle
                                          ! criterion)
    double precision :: drho(3) ! Density gradient (SPH pseudo-consistent 
                                ! approximation over fluid particles)
-   double precision :: veldif(3) ! Velocity in diffusion model 
    double precision :: rijtempmin(3) ! Minimum distance between a SPH mixture
                                      ! particle and a SPH pure fluid particle
    double precision :: vstart(3) ! Initial velocity for fixed particles 
@@ -255,8 +248,6 @@ end type TyParticle
 type Tytime_stage
    double precision :: ts_dden ! Stage continuity equation LHS 
    double precision :: ts_dens ! Stage density
-   double precision :: ts_IntEn ! Stage specific internal energy 
-   double precision :: ts_dEdT ! Stage energy equation LHS
    double precision :: ts_coord(3) ! Stage position 
    double precision :: ts_var(3) ! Stage partially smoothed velocity
    double precision :: ts_vel(3) ! Stage velocity
@@ -400,7 +391,6 @@ type TyZone
                                     ! Cartesian Topography 
    double precision :: H_res ! Height of the reservoir free surface
    double precision :: pool 
-   double precision :: trampa ! Time to reach the stationary inlet velocity
    double precision :: valp ! IC for pressure or free surface height
    integer(4)       :: Indix(2) 
    integer(4)       :: limit(2) ! Indices of the first and last particle 
@@ -440,7 +430,6 @@ type TyBoundaryStretch
    double precision :: NormVelocity ! Absolute value of the velocity component,
                                     ! which is normal to the face 
    double precision :: FlowRate ! Flow rate exiting the face 
-   double precision :: trampa 
    double precision :: ShearCoeff
    double precision :: velocity(1:SPACEDIM) ! Velocity for "TAPI" zones
    double precision :: PsiCoeff(1:SPACEDIM)
@@ -474,27 +463,16 @@ type TyMedium
                             ! (tuning parameter in Manenti et al., 2012, JHE)
    double precision :: mumx ! Maximum value for the dynamic viscosity 
                             ! to detect the elasto-plastic regime
-   double precision :: taucri ! Critical shear stress (erosion criterion)
-   double precision :: cuin ! Exponent of the Constitutive Equation 
-   double precision :: phi ! Internal friction angle   
-   double precision :: cons ! Consistency   
-   double precision :: Cs ! Costant of Smagorinsky's model    
+   double precision :: phi ! Internal friction angle
    double precision :: RoughCoef ! Roughness coefficient 
    double precision :: d50 ! 50-th percentile diameter of the granular size
-                            ! distribution 
-   double precision :: SettlingCoef ! Coefficient for the settling velocity 
-                                    ! of the solid grains 
-   double precision :: codif ! Diffusion coefficient
-   double precision :: Gamma ! Constant in Bachelor equation of state 
-                             ! (explosions)
-   double precision :: InitialIntEn ! Initial specific internal energy 
+                           ! distribution
    double precision :: gran_vol_frac_max ! Maximum volume fraction of the solid
                                          ! phase within an SPH mixture 
                                          ! particle (bed-load transport layer)
    double precision :: d_90 ! 90-th percentile diameter of the granular size
                             ! distribution 
-   character(8)     :: tipo ! Type: "liquid  "(, "gas     ", 
-                            ! "general ", "granular", "smagorin")
+   character(8)     :: tipo ! Type: "liquid  ","granular"
 end type TyMedium
 
 ! Boundary side
@@ -521,7 +499,9 @@ end type TyBoundarySide
 ! Node
 type TyNode
    integer(4)       :: name
+! Position of the vertex in the global reference system 
    double precision :: GX(1:SPACEDIM)
+! Position of the vertex in the local reference system
    double precision :: LX(1:SPACEDIM)
 end type TyNode
 

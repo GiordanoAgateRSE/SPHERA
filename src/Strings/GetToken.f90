@@ -18,12 +18,11 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
-
 !-------------------------------------------------------------------------------
 ! Program unit: GetToken                                           
-! Description: 
+! Description: To extract the "itok"-th substring (without blank spaces) from 
+!              the input string "ainp" (with blank spaces)
 !-------------------------------------------------------------------------------
-
 character(100) function GetToken(ainp,itok,ioerr)
 !------------------------
 ! Modules
@@ -48,7 +47,7 @@ integer(4),dimension(2,820) :: index_token
 !------------------------
 number_token = 0
 index_token  = 0
-blank = .TRUE.
+blank = .true.
 !------------------------
 ! Statements
 !------------------------
@@ -61,15 +60,15 @@ do n=1,len_trim(ainp)
       elseif ((.not.blank).and.(ainp(n:n)/=" ")) then
          index_token(2,number_token) = n
          elseif (ainp(n:n)==" ") then 
-         blank = .TRUE.
+         blank = .true.
    endif
-end do
+enddo
 if (itok<=number_token) then
    ioerr = 0
    GetToken = ainp(index_token(1,itok):index_token(2,itok))
    else
-   ioerr = itok
-   GetToken = ""
+      ioerr = itok
+      GetToken = ""
 endif
 !------------------------
 ! Deallocations

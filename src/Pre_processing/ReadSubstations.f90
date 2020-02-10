@@ -37,10 +37,9 @@ use Dynamic_allocation_module
 implicit none
 integer(4) :: nrighe,ier,alloc_stat,ioerr,i,n_sub,n_vertices,substation_ID
 integer(4) :: type_ID
-double precision :: dt_out,area
+double precision :: dt_out
 character(1) :: comment
-character(100) :: ainp,lcase
-double precision :: vec_aux_4(3)
+character(LEN=lencard) :: ainp,lcase
 double precision :: vertex(6,2)
 logical,external :: ReadCheck
 !------------------------
@@ -57,7 +56,7 @@ logical,external :: ReadCheck
 !------------------------
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"Substations DATA",ninp,ulog)) return
-do while (TRIM(lcase(ainp))/="##### end substations #####")
+do while (trim(lcase(ainp))/="##### end substations #####")
 ! Reading the number of substations and their writing time step
    read (ainp,*,iostat=ioerr) n_sub,dt_out
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"Substations GENERAL INPUT",ninp,  &

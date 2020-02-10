@@ -38,7 +38,7 @@ integer(4):: nrighe,ier,ninp,ulog,Medium,npointv,icolor
 integer(4),dimension(20) :: NumberEntities
 double precision :: valp
 character(1) :: comment
-character(100) :: ainp
+character(LEN=lencard) :: ainp
 character(1) :: bends,slip
 character(3) :: move
 character(2) :: pressu
@@ -48,7 +48,7 @@ integer(4) :: ioerr,i,n,icord
 character(100) :: token
 character(6) :: token_color
 logical,external :: ReadCheck
-character(100),external :: lcase, GetToken
+character(100),external :: lcase,GetToken
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -67,7 +67,7 @@ if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"MEDIUM INDEX",ninp,ulog)) return
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 token = GetToken(ainp,1,ioerr)
 if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"COLOURING TYPE",ninp,ulog)) return
-bends = lcase(token(1:1))
+bends = trim(lcase(token(1:1)))
 token = GetToken(ainp,2,ioerr)
 ! Saving colours 
 token_color(1:2) = token(5:6)
@@ -76,7 +76,7 @@ token_color(5:6) = token(1:2)
 read(token_color,'(Z6)',iostat=ioerr) icolor
 if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"COLOUR",ninp,ulog)) return
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-move = GetToken(ainp,1,ioerr)
+move = trim(GetToken(ainp,1,ioerr))
 if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"INITIAL MOVE STATUS TYPE",ninp,ulog))&
    return
 values3(:) = zero
@@ -145,7 +145,7 @@ select case (lcase(move))
       stop
 endselect
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-pressu = GetToken(ainp,1,ioerr)
+pressu = trim(GetToken(ainp,1,ioerr))
 if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"INITIAL PRESSURE TYPE",ninp,ulog))   &
    return
 ! IC uniform pressure ("pa") is assigned 
@@ -164,7 +164,7 @@ if (pressu=="pa") then
          return
 ! IC hydrostatic pressure based on the maximum level ("pl") of
 ! an assigned fluid 
-         elseif (pressu=="pl") then      
+         elseif (pressu=="pl") then
             token = lcase(GetToken(ainp,2,ioerr))
             if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"FREE LEVEL LINE",ninp,   &
                ulog)) return

@@ -41,8 +41,8 @@ integer(4) :: npi,ier,i,n,isi,nfc,nt,nrecords,IC_loop,InputErr,alloc_stat
 integer(4) :: machine_Julian_day,machine_hour,machine_minute,machine_second
 integer(4),dimension(20) :: NumberEntities 
 double precision :: eps_f
-character(len=lencard) :: nomsub = "GEST_INPUT"
-character(len=lencard) :: ainp,msg_err
+character(LEN=lencard) :: nomsub = "GEST_INPUT"
+character(LEN=lencard) :: ainp,msg_err
 character(100), external :: lcase
 !------------------------
 ! Explicit interfaces
@@ -65,8 +65,6 @@ Domain%file = " "
 Domain%NormFix = .FALSE.         
 Domain%Slip = .FALSE.
 OnlyTriangle = .FALSE.
-diffusione = .FALSE.
-esplosione = .FALSE.
 restart = .FALSE.
 simulation_time = zero
 dt = zero
@@ -236,10 +234,6 @@ if (.not.restart) then
       InputErr = InputErr + 300
       call diagnostic(arg1=5,arg2=InputErr,arg3=msg_err)
    endif
-   do i=1,NMedium
-      if (Med(i)%codif/=zero) diffusione = .TRUE.
-      if (Med(i)%Gamma/=zero) esplosione = .TRUE.
-   enddo
    close(ninp)
    nag = 0
    if (ncord==2)then
@@ -312,9 +306,9 @@ if (.not.restart) then
 ! allocated depending on the value "nag". 
          if (nag<100) then
 ! Initial domain empty (inlet section)
-            PARTICLEBUFFER = INIPARTICLEBUFFER * Domain%COEFNMAXPARTI
+            PARTICLEBUFFER = int(INIPARTICLEBUFFER * Domain%COEFNMAXPARTI) + 1
             else
-               PARTICLEBUFFER = nag * Domain%COEFNMAXPARTI
+               PARTICLEBUFFER = int(nag * Domain%COEFNMAXPARTI) + 1
          endif
          if (((Domain%tipo=="semi").or.(Domain%tipo=="bsph"))) then
             allocate(pg(PARTICLEBUFFER),stat=ier)
@@ -363,9 +357,9 @@ if (.not.restart) then
       endif
       if (nag<100) then
 ! Initial domain is empty (inlet section)
-         PARTICLEBUFFER = INIPARTICLEBUFFER * Domain%COEFNMAXPARTI
+         PARTICLEBUFFER = int(INIPARTICLEBUFFER * Domain%COEFNMAXPARTI) + 1
          else
-            PARTICLEBUFFER = nag * Domain%COEFNMAXPARTI
+            PARTICLEBUFFER = int(nag * Domain%COEFNMAXPARTI) + 1
       endif
       if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
          allocate(pg(PARTICLEBUFFER),stat=ier)  
@@ -486,9 +480,6 @@ if (.not.restart) then
          call diagnostic(arg1=5,arg2=ier,arg3=msg_err)
       endif
       close(nsav)
-      do i=1,NMedium
-         if (Med(i)%codif/=zero) diffusione = .TRUE.
-      enddo
 ! To save current time for "result_converter"
       val_time = simulation_time
       close(ninp)
@@ -600,4 +591,3 @@ EpOrdGrid = 0
 !------------------------
 return
 end subroutine Gest_Input
-

@@ -61,19 +61,12 @@ integer(4),external :: ParticleCellNumber, CellIndices, CellNumber
 !$omp private(interf_liq,intliq_id,interf_sol,intsol_id,secinv,PartLiq_pres)   &
 !$omp private(preidro,pretot,preeff,coeff1,coeff2,mu,mumax,Velocity2)          &
 !$omp shared(ind_interfaces,nomsub,ulog,uerr,nag,pg,Med,Domain,Grid,Icont)     &
-!$omp shared(npartord,nPartIntorno,PartIntorno,NMAXPARTJ,diffusione,esplosione)&
-!$omp shared(on_going_time_step)
+!$omp shared(npartord,nPartIntorno,PartIntorno,NMAXPARTJ,on_going_time_step)
 do npi = 1,nag
    if ((pg(npi)%cella==0).or.(pg(npi)%vel_type/="std")) cycle
 ! Check motion status and viscosity computation 
    imed = pg(npi)%imed
    if (index(Med(imed)%tipo,"granular")<=0) cycle
-! In case of explosion, erosion criterion is not active. 
-   if (esplosione) then
-      Velocity2 = pg(npi)%vel(1) * pg(npi)%vel(1) + pg(npi)%vel(2) *           &
-                  pg(npi)%vel(2) + pg(npi)%vel(3) * pg(npi)%vel(3)
-      if (Velocity2>1.0e-3) cycle
-   end if
    ncelcorr = ParticleCellNumber(pg(npi)%coord)
    iappo = CellIndices(ncelcorr,igridi,jgridi,kgridi)
    intpl_id = ind_interfaces(igridi,jgridi,1)
@@ -198,10 +191,6 @@ do npi = 1,nag
             pg(npi)%state = "sol"
             pg(npi)%vel = zero
             pg(npi)%var = zero
-! Density consistent with hydrostatic pressure 
-            if (.not.diffusione) pg(npi)%dens = med(imed)%den0 + (pretot /     &
-                                                (Med(imed)%celerita *          &
-                                                Med(imed)%celerita))
          end if
          else if (flag==1) then
             pg(npi)%state = "flu"
@@ -211,10 +200,6 @@ do npi = 1,nag
             pg(npi)%state = "sol"
             pg(npi)%vel = zero
             pg(npi)%var = zero
-! Density consistent with hydrostatic pressure 
-            if (.not. diffusione) pg(npi)%dens = med(imed)%den0 + (pretot /    &
-                                                 (Med(imed)%celerita *         &
-                                                 Med(imed)%celerita))
          end if
    end if
 end do

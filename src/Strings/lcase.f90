@@ -18,10 +18,10 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
-
 !-------------------------------------------------------------------------------
 ! Program unit: lcase                                           
-! Description: 
+! Description: To convert upper case in lower case letters for a string whose 
+!              blank spaces are all located at the end of the string
 !-------------------------------------------------------------------------------
 character(100) function lcase(ainp)
 !------------------------

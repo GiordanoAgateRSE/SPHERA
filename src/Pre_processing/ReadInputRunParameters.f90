@@ -34,7 +34,7 @@ use Hybrid_allocation_module
 implicit none
 integer(4) :: nrighe,ier,ninp,ulog,uerr
 character(1) :: comment
-character(100) :: ainp
+character(LEN=lencard) :: ainp
 integer(4) :: itmax
 double precision :: tmax,CFL,TetaP,TetaV,COEFNMAXPARTJ,COEFNMAXPARTI,vsc_coeff
 integer(4) :: ioerr,time_split,RKscheme,body_part_reorder,MAXCLOSEBOUNDFACES
@@ -42,7 +42,7 @@ integer(4) :: MAXNUMCONVEXEDGES,GCBFVecDim_loc,density_thresholds,nag_aux
 character(1) :: Psurf
 character(100) :: token
 logical,external :: ReadCheck
-character(100),external :: lcase, GetToken
+character(100),external :: lcase,GetToken
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -58,7 +58,7 @@ character(100),external :: lcase, GetToken
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"RUN PARAMETERS DATA",ninp,ulog))     &
    return
-do while (TRIM(lcase(ainp))/="##### end run parameters #####")
+do while (trim(lcase(ainp))/="##### end run parameters #####")
    read (ainp,*,iostat=ioerr) tmax
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"MAX. TRANSIENT TIME & ITERATIONS",&
       ninp,ulog)) return
@@ -82,7 +82,7 @@ do while (TRIM(lcase(ainp))/="##### end run parameters #####")
    token = GetToken(ainp,3,ioerr)
    if (ioerr==0) then
       read (token,*,iostat=ioerr) Psurf
-      Psurf = lcase(Psurf)
+      Psurf = trim(lcase(Psurf))
       if ((Psurf/='o').and.(Psurf/='s').and.(Psurf/='a')) then
          write(uerr,"(1x,a)")                                                  &
             "Error setting run parameters. SMOOTHING Pressure Surface not set."

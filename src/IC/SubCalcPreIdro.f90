@@ -64,20 +64,20 @@ if (gravmod>zero) then
    else
       coshor = zero
       senhor = zero
-end if
+endif
 pl_quote = max_negative_number
 pl_id = 0
 ! To search for free level conditions, if present ("pl" type).
 do npi=1,nag
    Nz = pg(npi)%izona
-   if (partz(Nz)%pressure/="pl") cycle 
+   if (partz(Nz)%pressure/="pl") cycle
    if (pl_id==0) then
       pl_id = int(partz(Nz)%valp)
-      else if (pl_id/=int(partz(Nz)%valp)) then
+      elseif (pl_id/=int(partz(Nz)%valp)) then
          call diagnostic(arg1=10,arg2=8,arg3=nomsub)
-   end if
+   endif
    pl_quote = max(pl_quote,pg(npi)%coord(3))
-end do 
+enddo 
 particle_loop: do npi=1,nag
 ! Initial conditions for pressure (from input file)
    Nz = pg(npi)%izona
@@ -85,7 +85,7 @@ particle_loop: do npi=1,nag
       pg(npi)%pres = partz(Nz)%valp + Domain%prif
       pg(npi)%dens = med(pg(npi)%imed)%den0
       cycle particle_loop
-   end if   
+   endif   
 ! To detect the cell number of the current particle
    ncelcorr = ParticleCellNumber(pg(npi)%coord)
    iappo = CellIndices(ncelcorr,igridi,jgridi,kgridi)
@@ -107,19 +107,18 @@ particle_loop: do npi=1,nag
          nnlocal = npartord(m)
 ! A particle of different medium is found, so the interface cell identifier 
 ! is set
-         if ((med(pg(npi)%imed)%index/=med(pg(nnlocal)%imed)%index).and.       &
-         (index(Med(pg(nnlocal)%imed)%tipo,"gas")==0)) then
+         if ((med(pg(npi)%imed)%index/=med(pg(nnlocal)%imed)%index)) then
 ! The interface cell is set
             if (.not.foundcell) then
                idpel = numcell
-               foundcell = .TRUE.
+               foundcell = .true.
                nnsave = nnlocal
-            end if
+            endif
 ! The minimum level in the interface cell for the medium different from the 
 ! current one is set
             if (numcell==idpel) then
                ZQuotaSecondMedium = min(ZQuotaSecondMedium,pg(nnlocal)%coord(3))
-            end if
+            endif
 ! To increase in any case the reference level of the column 
             ZQuotaColonna = max(ZQuotaColonna,pg(nnlocal)%coord(3))
             else
@@ -129,7 +128,7 @@ particle_loop: do npi=1,nag
 ! cells)
                ZQuotaMediumCorr = max(ZQuotaMediumCorr,pg(nnlocal)%coord(3))
                ZQuotaColonna    = max(ZQuotaColonna,pg(nnlocal)%coord(3))
-         end if
+         endif
       enddo
    enddo
 ! To check if the current particles is inside the intermediate cell, but it is 
@@ -137,7 +136,7 @@ particle_loop: do npi=1,nag
    if (abs(ZQuotaMediumCorr-ZQuotaColonna)<xyz_tolerance) foundcell = .false.
 ! To set the reference pressure quote depending on the condition type
    if (partz(Nz)%pressure=="qp") ZQuotaColonna = partz(Nz)%valp
-   if (partz(Nz)%pressure=="pl") ZQuotaColonna = pl_quote
+   if (partz(Nz)%pressure=="pl") ZQuotaColonna = pl_quote + Domain%dx / 2.d0
 ! An upper medium interface cell has been found
    if (foundcell) then
 ! The average quote of the medium interface in the cell is calculated
@@ -149,7 +148,7 @@ particle_loop: do npi=1,nag
       affond2 = (ZQuotaMediumCorr - pg(npi)%coord(3)) * coshor +               &
                 pg(npi)%coord(1) * senhor 
       if (Domain%tipo=="bsph") then  
-! To check this line 
+! To check this line
          pg(npi)%pres = 0.d0 * (affond1 * med(pg(npi)%imed)%den0 * gravmod) *  &
                        (1.d0 - pg(npi)%coord(1) / 0.5925d0)
          else
@@ -167,36 +166,15 @@ particle_loop: do npi=1,nag
             else
                pg(npi)%pres = (affond1 * med(pg(npi)%imed)%den0 * gravmod) +   &
                               Domain%prif
-         end if
+         endif
    endif
 ! Density
    pg(npi)%dens = (one + (pg(npi)%pres - Domain%prif) / med(pg(npi)%imed)%eps)*&
                   med(pg(npi)%imed)%den0
    pg(npi)%dden = zero
-! Diffusion model
-   if (diffusione) then
-      if (pg(npi)%VolFra == VFmx) then
-         pg(npi)%pres = ((ZQuotaColonna - ZQuotaMediumCorr) * (med(2)%den0 *   &
-                        VFmn + med(1)%den0 * (one - VFmn)) + (ZQuotaMediumCorr &
-                        - pg(npi)%coord(3)) * (med(2)%den0 * VFmx + med(1)%den0&
-                        * (one - VFmx))) * gravmod 
-         pg(npi)%rhoc = (one + pg(npi)%pres / med(pg(npi)%imed)%eps) *         &
-                        med(pg(npi)%imed)%den0 
-         pg(npi)%rhow = (one + pg(npi)%pres / med(1)%eps) * med(1)%den0
-         pg(npi)%dens = VFmx * pg(npi)%rhoc + (one - VFmx) * pg(npi)%rhow
-         elseif (pg(npi)%VolFra==VFmn) then
-            pg(npi)%pres = ((ZQuotaColonna - pg(npi)%coord(3)) * (med(2)%den0 *&
-                           VFmn + med(1)%den0 * (one - VFmn))) * gravmod 
-            pg(npi)%rhoc = (one + pg(npi)%pres / med(2)%eps) * med(2)%den0 
-            pg(npi)%rhow = (one + pg(npi)%pres / med(pg(npi)%imed)%eps) *      &
-                           med(pg(npi)%imed)%den0
-            pg(npi)%dens = VFmn * pg(npi)%rhoc + (one - VFmn) * pg(npi)%rhow
-      endif
-   endif
 enddo particle_loop
 !------------------------
 ! Deallocations
 !------------------------
 return
 end subroutine subCalcPreIdro
-

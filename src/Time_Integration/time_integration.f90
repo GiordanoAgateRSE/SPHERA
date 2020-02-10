@@ -35,9 +35,6 @@ use I_O_diagnostic_module
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: ii,npi
-double precision :: appo1,appo2,appo3
-character(len=lencard) :: nomsub = "time_integration"
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -63,44 +60,12 @@ select case (Domain%RKscheme)
       endif
 endselect
 call start_and_stop(3,17)
-! Diffusion coefficient update
-if (diffusione) then
-   call start_and_stop(2,15)
-!$omp parallel do default(none)                                                &
-!$omp private(npi,ii,appo1,appo2,appo3)                                        &
-!$omp shared(nag,Pg,Med,indarrayFlu,Array_Flu)
-   do ii=1,indarrayFlu
-      npi = Array_Flu(ii)
-      if ((pg(npi)%VolFra==VFmx).and.                                          &
-         (pg(npi)%visc==Med(pg(npi)%imed)%mumx/pg(npi)%dens)) then
-         pg(npi)%coefdif = zero
-         else
-            call inter_CoefDif(npi)
-            if (pg(npi)%uni>zero) pg(npi)%veldif = pg(npi)%veldif / pg(npi)%uni
-            appo1 = (pg(npi)%veldif(1) - pg(npi)%var(1)) * (pg(npi)%veldif(1)  &
-               - pg(npi)%var(1))
-            appo2 = (pg(npi)%veldif(2) - pg(npi)%var(2)) * (pg(npi)%veldif(2)  &
-               - pg(npi)%var(2))
-            appo3 = (pg(npi)%veldif(3) - pg(npi)%var(3)) * (pg(npi)%veldif(3)  &
-               - pg(npi)%var(3))
-            pg(npi)%coefdif = pg(npi)%coefdif * dsqrt(appo1 + appo2 + appo3)
-      endif
-   enddo
-!$omp end parallel do
-   call start_and_stop(3,15)
-endif
-if (diffusione) then
-   call start_and_stop(2,16)
-   call aggdens
-   call start_and_stop(3,16)
-endif
 ! Equation of State 
 call start_and_stop(2,13)
-call calcpre  
+call CalcPre  
 call start_and_stop(3,13)
 !------------------------
 ! Deallocations
 !------------------------
 return
 end subroutine time_integration
-

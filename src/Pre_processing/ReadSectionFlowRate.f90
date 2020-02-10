@@ -36,7 +36,7 @@ use Dynamic_allocation_module
 implicit none
 integer(4) :: nrighe,ier,alloc_stat
 character(1) :: comment
-character(100) :: ainp,lcase
+character(LEN=lencard) :: ainp,lcase
 integer(4) :: n_fluid_types,ioerr,i,n_sect,n_vertices,section_ID
 double precision :: dt_out,aux_dis,area
 double precision :: plane_normal(3),vec_aux_1(3),vec_aux_2(3),vec_aux_3(3)
@@ -58,7 +58,7 @@ logical,external :: ReadCheck
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"Section_flow_rate DATA",ninp,ulog))  &
    return
-do while (TRIM(lcase(ainp))/="##### end section flow rate #####")
+do while (trim(lcase(ainp))/="##### end section flow rate #####")
 ! Reading the number of monitoring sections for the flow rate and their writing 
 ! time step
    read (ainp,*,iostat=ioerr) n_sect,dt_out,n_fluid_types

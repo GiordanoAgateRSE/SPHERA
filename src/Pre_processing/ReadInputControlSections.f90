@@ -37,7 +37,7 @@ integer(4) :: nrighe,ier,ninp,ulog,npts
 integer(4),dimension(20) :: NumberEntities
 type (TySection),dimension(0:Nsections+1) :: Control_Sections
 character(1) :: comment
-character(100) :: ainp
+character(LEN=lencard) :: ainp
 integer(4) :: icord,icor2,icor3,icolor,ndiv,ioerr
 double precision,dimension(3) :: vp
 character(8) :: label
@@ -46,7 +46,7 @@ character(1),dimension(3) :: CoordLabel = (/ "x", "y", "z" /)
 double precision,dimension(3,2) :: values
 logical,external :: ReadCheck
 integer(4),external :: NumberSectionPoints
-character(100),external :: lcase, GetToken
+character(100),external :: lcase,GetToken
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -63,7 +63,7 @@ call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 if (.NOT.ReadCheck (ioerr,ier,nrighe,ainp,"CONTROL SECTIONS DATA",ninp,ulog))  &
    return
 npts = npoints+npointsl
-do while (TRIM(lcase(ainp))/="##### end control sections #####")
+do while (trim(lcase(ainp))/="##### end control sections #####")
    NumberEntities(12) = NumberEntities(12) + 1
    label(1:8) = ainp(1:8)
    vp = zero

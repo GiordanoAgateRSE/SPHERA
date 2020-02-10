@@ -33,7 +33,7 @@ use Static_allocation_module
 implicit none
 integer(4) :: nrighe,ier,ninp,ulog
 character(1) :: comment
-character(100) :: ainp
+character(LEN=lencard) :: ainp
 integer(4) :: n,ioerr
 character(100),external :: lcase
 logical,external :: ReadCheck
@@ -52,7 +52,7 @@ logical,external :: ReadCheck
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"TITLE DATA",ninp,ulog)) return 
 n = 0
-do while (TRIM(lcase(ainp))/="##### end title #####" )
+do while (trim(lcase(ainp))/="##### end title #####" )
    n = n + 1
    if (n<=maxtit) then
       title(n) = ainp
@@ -67,4 +67,3 @@ if ((ncord>0).AND.(ulog>0)) write(ulog,"(1x,a)") " "
 !------------------------
 return
 end subroutine ReadInputTitle
-

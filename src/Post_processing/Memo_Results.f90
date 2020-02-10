@@ -34,10 +34,10 @@ use Dynamic_allocation_module
 ! Declarations
 !------------------------
 implicit none
-integer(4),intent(IN) :: it
-double precision,intent(IN) :: dtvel
-character(6),intent(IN) :: str
-integer(4),intent(INOUT) :: it_memo,it_rest
+integer(4),intent(in) :: it
+double precision,intent(in) :: dtvel
+character(6),intent(in) :: str
+integer(4),intent(inout) :: it_memo,it_rest
 integer(4) :: nrecords,restartcode,i
 !------------------------
 ! Explicit interfaces
@@ -166,8 +166,8 @@ if ((it_rest==it).or.(index(str,'inizio')/=0).or.(index(str,'fine')/=0)) then
       write(nres) it,simulation_time,dt,nag,ncord,restartcode
       write(nres) pg(1:nag)%coord(1),pg(1:nag)%coord(2),pg(1:nag)%coord(3),    &
          pg(1:nag)%vel(1),pg(1:nag)%vel(2),pg(1:nag)%vel(3),pg(1:nag)%pres,    &
-         pg(1:nag)%dens,pg(1:nag)%mass,pg(1:nag)%visc,pg(1:nag)%IntEn,         &
-         pg(1:nag)%VolFra,pg(1:nag)%imed,pg(1:nag)%icol
+         pg(1:nag)%dens,pg(1:nag)%mass,pg(1:nag)%visc,pg(1:nag)%VolFra,        &
+         pg(1:nag)%imed,pg(1:nag)%icol
       flush(nres)
       if (index(str,'inizio')==0) then
          write(ulog,'(a)')                                                     &
@@ -183,4 +183,3 @@ endif
 !------------------------
 return
 end subroutine Memo_Results
-

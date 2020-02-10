@@ -41,7 +41,7 @@ double precision :: dt_out,x_fixed,y_fixed,conv_crit_erosion,velocity_fixed_bed
 double precision :: x_min_dt,x_max_dt,y_min_dt,y_max_dt,time_minimum_saturation
 double precision :: z_min_dt,z_max_dt,t_q0,t_liq,time_maximum_saturation
 character(1) :: comment
-character(100) :: ainp,lcase
+character(LEN=lencard) :: ainp,lcase
 logical,external :: ReadCheck
 !------------------------
 ! Explicit interfaces
@@ -58,7 +58,7 @@ logical,external :: ReadCheck
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"BED LOAD TRANSPORT DATA",ninp,ulog)) &
    return
-do while (TRIM(lcase(ainp)) /= "##### end bed load transport #####")
+do while (trim(lcase(ainp)) /= "##### end bed load transport #####")
 ! Reading input parameters (first part)
    read(ainp,*,iostat=ioerr) ID_erosion_criterion,ID_main_fluid
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"BED-LOAD TRANSPORT INPUT LINE 1", &

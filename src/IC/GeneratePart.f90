@@ -38,7 +38,7 @@ implicit none
 integer(4),intent(IN) :: IC_loop
 integer(4) :: Nt,Nz,Mate,IsopraS,NumParticles,i,j,k,dimensioni,NumPartPrima    
 integer(4) :: aux_factor,i_vertex,j_vertex,test_xy,test_z,n_levels,nag_aux
-integer(4) :: i_face,j_node,npi,ier,test_face,test_dam,test_xy_2,alloc_stat
+integer(4) :: i_face,npi,ier,test_face,test_dam,test_xy_2,alloc_stat
 double precision :: distance_hor,z_min,aux_scal,rnd
 double precision :: aux_vec(3)
 integer(4),dimension(SPACEDIM) :: Npps
@@ -149,7 +149,7 @@ second_cycle: do Nz=1,NPartZone
 ! Update number of points/vertices of the zone
          Partz(Nz)%npoints = Partz(Nz)%ID_last_vertex -                        &
                              Partz(Nz)%ID_first_vertex + 1
-         aux_factor = anint(Partz(Nz)%dx_CartTopog / Domain%dx) 
+         aux_factor = nint(Partz(Nz)%dx_CartTopog / Domain%dx) 
 ! Allocation of the auxiliary array z_aux
          if (.not.allocated(z_aux)) then
 ! The number of points is increased due to the eventual presence of the 
@@ -410,7 +410,7 @@ if (allocated(pg_aux)) then
 ! Allocation of the fluid particle array in the presence of at least one  
 ! reservoir extruded from topography       
    NumParticles = NumParticles - 1
-   PARTICLEBUFFER = NumParticles * Domain%COEFNMAXPARTI
+   PARTICLEBUFFER = int(NumParticles * Domain%COEFNMAXPARTI) + 1
    allocate(pg(PARTICLEBUFFER),stat=ier)
    if (ier/=0) then
       write(ulog,'(1x,a,i2)')                                                 &

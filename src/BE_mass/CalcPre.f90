@@ -20,7 +20,7 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: CalcPre 
-! Description:  Particle pressure estimation.      
+! Description:  Particle pressure estimation      
 !-------------------------------------------------------------------------------
 subroutine CalcPre
 !------------------------
@@ -34,7 +34,7 @@ use Dynamic_allocation_module
 !------------------------
 implicit none
 integer(4) :: npi
-double precision :: rhorif,c2,crhorif,wrhorif,wc2,cc2 
+double precision :: rhorif,c2
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -47,53 +47,25 @@ double precision :: rhorif,c2,crhorif,wrhorif,wc2,cc2
 !------------------------
 ! Statements
 !------------------------
-if (diffusione) then
-!$omp parallel do default(none) private(npi,crhorif,wrhorif,wc2,cc2)           &
-!$omp shared(nag,Pg,Med)
+if (on_going_time_step>0) then  
+! Loop over all the particles
+!$omp parallel do default(none)                                                & 
+!$omp shared(nag,pg,Domain,Med)                                                &
+!$omp private(npi,rhorif,c2)
    do npi=1,nag
-      if (pg(npi)%koddens/=0) cycle
+! Skip the outgone particles and the particles with velocity type different 
+! from "std"
       if ((pg(npi)%cella==0).or.(pg(npi)%vel_type/="std")) cycle
-      crhorif = Med(2)%den0
-      wrhorif = Med(1)%den0
-      wc2 = Med(1)%celerita * Med(1)%celerita
-      cc2 = Med(2)%celerita * Med(2)%celerita
-      if (pg(npi)%imed==1)then
-         pg(npi)%pres = wc2 * (pg(npi)%dens - (crhorif * VFmn + wrhorif * (1 - &
-                        VFmn))) 
-         elseif (pg(npi)%imed==2) then
-         pg(npi)%pres = cc2 * (pg(npi)%dens - (crhorif * VFmx + wrhorif * (1 - &
-                        VFmx))) 
-      endif
+! Update of the particle pressure 
+      rhorif = Med(pg(npi)%imed)%den0
+      c2 = Med(pg(npi)%imed)%eps / rhorif
+      if ((pg(npi)%dens-rhorif)/=0.d0) pg(npi)%pres = c2 * (pg(npi)%dens -     &
+         rhorif) + Domain%prif
    enddo
 !$omp end parallel do
-   else
-! Is this useless?
-      if (on_going_time_step>0) then  
-!$omp parallel do default(none) private(npi,rhorif,c2)                         & 
-!$omp shared(nag,pg,Domain,Med,esplosione) 
-! Loop over all the particles
-         do npi=1,nag
-! It skips the outgone particles
-! It skips the particles with velocity type different from "standard"
-            if ((pg(npi)%cella==0).or.(pg(npi)%vel_type/="std")) cycle
-            if (esplosione) then
-! Modification for specific internal energy
-               pg(npi)%pres = (Med(pg(npi)%imed)%gamma - one) * pg(npi)%IntEn  &
-                              * pg(npi)%dens
-               else
-! It evaluats the new pressure particle value 
-                  rhorif = Med(pg(npi)%imed)%den0
-                  c2 = Med(pg(npi)%imed)%eps / rhorif
-                  if ((pg(npi)%dens-rhorif)/=0.d0) pg(npi)%pres = c2 *         &
-                     (pg(npi)%dens - rhorif) + Domain%prif
-            endif
-         enddo
-!$omp end parallel do
-      endif
 endif
 !------------------------
 ! Deallocations
 !------------------------
 return
 end subroutine CalcPre
-

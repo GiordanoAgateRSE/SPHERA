@@ -54,7 +54,7 @@ double precision,external :: w
 ! Rough approximation of the maximum admissible pressure value on each body
 if (body_maximum_pressure_limiter.eqv..true.) then
    rho_ref = maxval(Med(1:size(Med))%den0)
-   z_max = maxval(pg(1:size(pg))%coord(3),mask=pg(1:nag)%cella/=0)
+   z_max = maxval(pg(1:size(pg))%coord(3),mask=pg(1:size(pg))%cella/=0)
    c_ref = maxval(Med(1:size(Med))%celerita)
    abs_gravity_acc = dsqrt(dot_product(Domain%grav(:),Domain%grav(:)))
    abs_u_max = 0.d0
