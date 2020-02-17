@@ -1072,7 +1072,9 @@ ___
 !    =step
 ![?] <restart_time_value>: positive time value in seconds or step number, 
 !    according to "restart_mode"; "restart_time_value" has to be smaller than 
-!    the time value of the last restart output; default choice: "2*dt_out_PV"
+!    the time value of the last restart output; default choice: "2*dt_out_PV". 
+!    The following constraint "restart_time_value>=dt_out_PV" is highly 
+!    suggested because it permits easier post-processing. 
 ![?] <restart_file>: restart file name (with file extension)
 !-------------------------------------------------------------------------------
 ![*] <restart_mode> <restart_time_value>
