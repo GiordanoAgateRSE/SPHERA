@@ -39,7 +39,8 @@ integer(4) :: nrighe,ier,alloc_stat,ioerr,i,n_sub,n_vertices,substation_ID
 integer(4) :: type_ID
 double precision :: dt_out
 character(1) :: comment
-character(LEN=lencard) :: ainp,lcase
+character(100) :: lcase
+character(LEN=lencard) :: ainp
 double precision :: vertex(6,2)
 logical,external :: ReadCheck
 !------------------------

@@ -26,7 +26,7 @@ subroutine ReadBedLoadTransport(ainp,comment,nrighe,ier,ninp,ulog,uerr)
 !------------------------
 ! Modules
 !------------------------
-use Static_allocation_module                            
+use Static_allocation_module                        
 use Hybrid_allocation_module
 use Dynamic_allocation_module
 !------------------------
@@ -41,7 +41,8 @@ double precision :: dt_out,x_fixed,y_fixed,conv_crit_erosion,velocity_fixed_bed
 double precision :: x_min_dt,x_max_dt,y_min_dt,y_max_dt,time_minimum_saturation
 double precision :: z_min_dt,z_max_dt,t_q0,t_liq,time_maximum_saturation
 character(1) :: comment
-character(LEN=lencard) :: ainp,lcase
+character(100) :: lcase
+character(LEN=lencard) :: ainp
 logical,external :: ReadCheck
 !------------------------
 ! Explicit interfaces
@@ -172,7 +173,7 @@ do while (trim(lcase(ainp)) /= "##### end bed load transport #####")
       Granular_flows_options%z_min_dt = z_min_dt
       Granular_flows_options%z_max_dt = z_max_dt
       Granular_flows_options%t_q0 = t_q0
-      Granular_flows_options%t_liq = t_liq   
+      Granular_flows_options%t_liq = t_liq
 ! Allocation of the array of the monitoring lines
       if (allocated(Granular_flows_options%lines)) then
          else
@@ -224,4 +225,3 @@ enddo
 !------------------------
 return
 end subroutine ReadBedLoadTransport
-
