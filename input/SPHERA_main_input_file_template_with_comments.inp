@@ -732,15 +732,11 @@ ___ ___
 ![?] if (fluid_type==liquid) then                             
 ![?] <dynamic_viscosity>
 !    >0.
-![?] <roughness_coefficient>: obsolete and inactive variable
-!    =0. (recommended and non-influential value)
 !-------------------------------------------------------------------------------
 ![*] <dynamic_viscosity>
-![*] <roughness_coefficient>
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
 ___
- 0.
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
 ![?] endif (fluid_type==liquid)
@@ -776,7 +772,9 @@ ___ ___ ___
 ![?] endif ((fluid_type==granular).and.(erosion_criterion_ID==1))
 ![?] if ((fluid_type==granular).and.(erosion_criterion_ID>1)) then
 ![?] <max_step_still>: number of time steps during which mixture particles are 
-!    kept still)               
+!    kept still)
+![?] <roughness_coefficient>: roughness coefficient for the 2D erosion criterion
+!    (Manenti et al., 2012)            
 !-------------------------------------------------------------------------------
 ![*] <roughness_coefficient> <d_50>
 ![*] <max_step_still>

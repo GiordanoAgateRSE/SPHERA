@@ -98,10 +98,6 @@ do while (trim(lcase(ainp))/="##### end medium #####")
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read(ainp,*,iostat=ioerr) visc
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DYNAMIC VISCOSITY",ninp,    & 
-            ulog)) return            
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         read(ainp,*,iostat=ioerr) Rough
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"ROUGH COEFFICIENT",ninp,    &
             ulog)) return
 ! Non-Newtonian fluids with apparent viscosity 
       case ("granular")
