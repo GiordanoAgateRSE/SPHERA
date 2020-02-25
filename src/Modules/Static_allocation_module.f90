@@ -26,11 +26,11 @@ module Static_allocation_module
 ! Global constants for array sizes: start
 integer(4),public,parameter :: SPACEDIM = 3
 integer(4),public,parameter :: PLANEDIM = 2
-integer(4),public,parameter :: MAXCLOSEBOUNDSIDES = 2 
+integer(4),public,parameter :: MAXCLOSEBOUNDSIDES = 4 
 integer(4),public,parameter :: MAXOPENSIDES = 10
 integer(4),public,parameter :: MAXOPENFACES = 50
 integer(4),public,parameter :: MAXPARTLINE = 2000
-integer(4),public,parameter :: LIMCLOSEBOUNDSIDES = 2
+integer(4),public,parameter :: LIMCLOSEBOUNDSIDES = 4
 integer(4),public,parameter :: MAXFACENODES = 6
 integer(4),public,parameter :: NUMCOLS_BIT = 5
 integer(4),public,parameter :: NUMROWS_BIT = 22
