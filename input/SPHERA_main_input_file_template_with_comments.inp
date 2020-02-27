@@ -1192,10 +1192,6 @@ ___
 !-------------------------------------------------------------------------------
 ##### end control lines #####
 
-##### control sections #####
-![?] This section is not active
-##### end control sections #####
-
 ##### section flow rate #####
 !-------------------------------------------------------------------------------
 ![?] Input parameters on monitoring sections for the flow rate. These sections 

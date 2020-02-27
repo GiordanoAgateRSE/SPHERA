@@ -69,7 +69,7 @@ if (index(str,'inizio')/=0) then
    write(nres) version,nrecords
    write(nres) ncord,Nag,NMedium,NPartZone,NumVertici,NumFacce,NumTratti,      &   
       NumBVertices,NumBSides,GCBFVecDim,Grid%nmax,npointst,NPoints,NPointsl,   &
-      NPointse,NLines,NSections,doubleh
+      NPointse,NLines,doubleh
    write(nres) domain
    write(nres) Grid
    write(nres) Med(1:NMedium)

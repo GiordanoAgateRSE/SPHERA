@@ -34,8 +34,6 @@ type (TyBoundarySide),     dimension(:),   allocatable :: BoundarySide
 type (TyBoundaryFace),     dimension(:),   allocatable :: BoundaryFace
 type (TyCtlPoint),         dimension(:),   allocatable :: Control_Points
 type (TyCtlLine),          dimension(:),   allocatable :: Control_Lines
-type (TySection),          dimension(:),   allocatable :: Control_Sections
-type (TyCtlPoint),         dimension(:),   allocatable :: Section_Points
 type (TyParticle),         dimension(:),   allocatable :: Pg
 type (Tytime_stage),       dimension(:),   allocatable :: ts0_pg
 type(TyBoundaryConvexEdge),dimension(:),   allocatable :: BoundaryConvexEdge

@@ -37,7 +37,7 @@ implicit none
 logical :: OnlyTriangle
 integer(4) :: ier
 character(LEN=lencard) :: ainp
-integer(4),dimension(20)    :: NumberEntities
+integer(4),dimension(20) :: NumberEntities
 logical :: restartOK
 integer(4) :: ioerr,nrighe,ioutpo2,iplot_fr,imemo_fr,irest_fr,icpoi_fr,ipllb_fr
 integer(4) :: ipllb_md,ioutopt
@@ -141,9 +141,6 @@ SECTION_LOOP: do while (ioerr==0)
       case("##### control lines #####")
          call ReadInputControlLines(NumberEntities,Control_Points,             &
             Control_Lines,ainp,comment,nrighe,ier, ninp,ulog)
-      case("##### control sections #####")
-         call ReadInputControlSections(NumberEntities,Control_Sections,ainp,   &
-            comment,nrighe,ier,ninp,ulog)
       case("##### section flow rate #####")
          call ReadSectionFlowRate(ainp,comment,nrighe,ier)
       case("##### substations #####")

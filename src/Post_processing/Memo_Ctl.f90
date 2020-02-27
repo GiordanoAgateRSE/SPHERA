@@ -93,38 +93,10 @@ if (nlines>0) then
         endif
      enddo
   enddo
-  close (ncpt)
-endif
-! Printing monitoring section data (not for the flow rate)
-if (Nsections>0) then
-   write(nomefilectl,"(a,a,i8.8,a)") nomecaso(1:len_trim(nomecaso)),'_',       &
-      on_going_time_step,".csc"
-   open(ncpt,file=nomefilectl,status="unknown",form="formatted")
-   write(ncpt,*) "Control sections "
-   write(ncpt,'(1x,2(a,10x),3(a,8x),3(a,5x),a,7x,a)') " Time","Iter",          &
-      "X Coord","Y Coord","Z Coord","X Velocity","Y Velocity","Z Velocity",    &
-      " Pressure","Density "
-  flush(ncpt)
-  do i=1,Nsections
-     write(ncpt,*) "section #", i,"    Label ",Control_sections(i)%label,      &
-        "    Type ",Control_sections(i)%Tipo
-     do j=Control_sections(i)%icont(1),Control_sections(i)%icont(2)
-        if (control_points(j)%cella==0) then
-           write(ncpt,'(a,i10,a,3(g14.7))') "control point ",j,               &
-              " is outside. Coord=",Control_Points(j)%coord(:)
-           else
-              write(ncpt,'(g14.7,i14,8(1x,g14.7))') simulation_time,          &
-                 on_going_time_step,Control_Points(j)%coord(:),                &
-                 Control_Points(j)%vel(:),Control_Points(j)%pres,              &
-                 Control_Points(j)%dens
-        endif
-     enddo
-  enddo
-  close (ncpt)
+  close(ncpt)
 endif
 !------------------------
 ! Deallocations
 !------------------------
 return
 end subroutine Memo_Ctl
-

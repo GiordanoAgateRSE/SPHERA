@@ -79,7 +79,7 @@ if (trim(lcase(option))==trim(lcase("heading"))) then
    endif
    read(nsav,iostat=ioerr) ncord,nag,NMedium,NPartZone,NumVertici,NumFacce,    &
       NumTratti,NumBVertices,NumBSides,GCBFVecDim,Grid%nmax,npointst,NPoints,  &
-      NPointsl,NPointse,NLines,NSections,doubleh
+      NPointsl,NPointse,NLines,doubleh
    if (.NOT.ReadCheck(ioerr,ier,it_start,ainp,"ncord, nag, ...",nsav,ulog))    &
       return
 ! The parameter is read from the restart file and not from the input file

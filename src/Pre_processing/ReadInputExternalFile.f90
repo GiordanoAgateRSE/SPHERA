@@ -19,7 +19,7 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: ReadInputExternalFile                        
+! Program unit: ReadInputExternalFile                       
 ! Description:                        
 !-------------------------------------------------------------------------------
 subroutine ReadInputExternalFile(NumberEntities,ainp,comment,nrighe,ier,       &
@@ -101,4 +101,3 @@ enddo
 !------------------------
 return
 end subroutine ReadInputExternalFile
-

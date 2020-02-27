@@ -94,16 +94,15 @@ allocate(Vertice(SPACEDIM,1),BoundaryFace(1),Tratto(1),BoundaryVertex(1),      &
       write(ulog,'(1x,a)')                                                     &
 "    Arrays VERTICE, BoundaryFace, TRATTO, BOUNDARYVERTEX successfully allocated "
 endif
-allocate(Partz(1),Med(1),Control_Sections(0:1),Control_Points(1),              &
-   Control_Lines(1),stat=ier)
+allocate(Partz(1),Med(1),Control_Points(1),Control_Lines(1),stat=ier)
    if (ier/=0) then
       write(ulog,'(1x,a,i2)')                                                  &
-"    Arrays PARTZ, MED, Control_Sections, Control_Points, Control_Lines not allocated. Error code: "&
+"    Arrays PARTZ, MED, Control_Points, Control_Lines not allocated. Error code: "&
          ,ier
       call diagnostic(arg1=4,arg3=nomsub)
       else
          write(ulog,'(1x,a)')                                                  &
-"    Arrays PARTZ, MED, Control_Sections, Control_Points, Control_Lines successfully allocated "
+"    Arrays PARTZ, MED, Control_Points, Control_Lines successfully allocated "
 endif
 ! Input data reading
 ! To read for the first time the input file to get the parameters for 
@@ -114,7 +113,6 @@ NumTratti = 1
 NumBVertices = 1
 NPartZone = 1
 NMedium = 1
-NSections = 1
 npoints = 1
 NLines = 1
 call ReadInput(NumberEntities,OnlyTriangle,InputErr,ainp)
@@ -138,15 +136,15 @@ if (ier/=0) then
          write(ulog,'(1x,a)')                                                  &
 "    Arrays VERTICE, BoundaryFace, TRATTO, BOUNDARYVERTEX successfully deallocated "
 endif
-deallocate(Partz,Med,Control_Sections,Control_Points,Control_Lines,stat=ier)
+deallocate(Partz,Med,Control_Points,Control_Lines,stat=ier)
 if (ier/=0) then
    write(ulog,'(1x,a,i2)')                                                     &
-"    Arrays PARTZ, MED, Control_Sections, Control_Points, Control_Lines not deallocated. Error code: "&
+"    Arrays PARTZ, MED, Control_Points, Control_Lines not deallocated. Error code: "&
       ,ier
    call diagnostic(arg1=4,arg3=nomsub)
    else
       write(ulog,'(1x,a)')                                                     &
-"    Arrays PARTZ, MED, Control_Sections, Control_Points, Control_Lines successfully deallocated "
+"    Arrays PARTZ, MED, Control_Points, Control_Lines successfully deallocated "
 endif
 ! A restart procedure has been invoked: restart positioning 
 ! (step number / step time)
@@ -174,7 +172,6 @@ if ((Domain%istart>0).or.(Domain%start>zero)) then
    NPointsl = NumberEntities(6)
    npointst = NumberEntities(4) + NumberEntities(6) + NumberEntities(13)
    NLines = NumberEntities(5)
-   NSections = NumberEntities(12)
    NPointse = NumberEntities(13)
    else
 ! No restart: standard initialization
@@ -191,7 +188,6 @@ if ((Domain%istart>0).or.(Domain%start>zero)) then
       NumBSides = NumberEntities(10)
       NumFacce = NumberEntities(11)
       if (OnlyTriangle) NumFacce = NumFacce + NumberEntities(18)
-      NSections = NumberEntities(12)
       NPointse = NumberEntities(13)
       if (NumberEntities(19)==1) Domain%Slip = .TRUE.
       if (NumberEntities(20)==1) Domain%NormFix = .TRUE.
@@ -211,17 +207,16 @@ if (ier/=0) then
 "    Arrays VERTICE, BoundaryFace, TRATTO, BOUNDARYVERTEX, BOUNDARYSIDE successfully allocated "
 endif
 allocate(Partz(NPartZone),Med(NMedium),OpCount(NMedium),SpCount(NMedium),      &
-   EpCount(NMedium),EpOrdGrid(NMedium),Control_Sections(0:NSections+1),        &
-   Control_Points(max(1,npointst)),Control_Lines(max(1,NLines)),               &
-   Section_Points(1),stat=ier)
+   EpCount(NMedium),EpOrdGrid(NMedium),Control_Points(max(1,npointst)),        &
+   Control_Lines(max(1,NLines)),stat=ier)
 if (ier/=0) then
    write(ulog,'(1x,a,i2)')                                                     &
-"    Arrays PARTZ, MED, Control_Sections, Control_Points, Control_Lines, Section_Points not allocated. Error code: "&
+"    Arrays PARTZ, MED, Control_Points, Control_Lines, not allocated. Error code: "&
       ,ier
    call diagnostic(arg1=4,arg3=nomsub)
    else
       write(ulog,'(1x,a)')                                                     &
-"    Arrays PARTZ, MED, Control_Sections, Control_Points, Control_Lines, Section_Points successfully allocated "
+"    Arrays PARTZ, MED, Control_Points, Control_Lines, successfully allocated "
 endif
 rewind(ninp)
 ! Array initializations
@@ -251,8 +246,6 @@ if (.not.restart) then
 ! Particle volume
          Domain%PVolume = Domain%dx * Domain%dx * Domain%dx
    endif
-   Control_Sections(NSections+1)%XYZRange(1:3,1) = Domain%coord(1:3,1)
-   Control_Sections(NSections+1)%XYZRange(1:3,2) = Domain%coord(1:3,2)
 ! An irregular domain is considered 
    if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
       if (ncord==2) then

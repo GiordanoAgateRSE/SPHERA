@@ -550,17 +550,6 @@ type TyCtlPoint
    double precision :: vel(3) ! Interpolated velocity                          
 end type TyCtlPoint
 
-! Section
-type TySection
-   integer(4)       :: ColorCode
-   integer(4)       :: Icont(2) ! Pointer to the generated monitoring points
-   double precision :: Constant(1:SPACEDIM)          
-   double precision :: XYZRange(1:SPACEDIM,2)        
-   double precision :: TGLsection(1:SPACEDIM,1:SPACEDIM)  
-   character(8)     :: Label                          
-   character(2)     :: Tipo ! type: x,y,x,g
-end type TySection
-
 ! Control line
 type TyCtlLine
    integer(4)       :: icont(2) ! Pointers  to the initial and last monitoring  

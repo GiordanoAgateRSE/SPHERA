@@ -183,19 +183,6 @@ if (allocated(EpOrdGrid)) then
          write(ulog,'(1x,a)') "   Array: EpOrdGrid successfully deallocated "
    endif
 endif
-if (allocated(Control_Sections)) then
-   deallocate(Control_Sections,stat=alloc_stat)
-   if (alloc_stat/=0) then
-      write(uerr,'(1x,a,i2)')                                                  &
-         "   Array: CONTROL_SECTION not deallocated with error code: ",        &
-         alloc_stat
-      check = .false.
-      stop
-      else
-         write(ulog,'(1x,a)')                                                  &
-            "   Array: CONTROL_SECTION successfully deallocated"
-   endif
-endif
 if (allocated(Control_Points)) then
    deallocate(Control_Points,stat=alloc_stat)
    if (alloc_stat/=0) then
@@ -241,17 +228,6 @@ if (allocated(ts0_pg)) then
       else
          write(ulog,'(1x,a)') "   Array: ts0_pg successfully deallocated "
    endif
-endif
-if (allocated(Section_Points)) then
-   deallocate(Section_Points,stat=alloc_stat)
-   if (alloc_stat/=0) then
-      write(uerr,'(1x,a,i2)')                                                  &
-         "   Array: SECTION_POINTS not deallocated with error code: ",alloc_stat
-      check = .false.
-      stop
-      else
-      write(ulog,'(1x,a)') "   Array: SECTION_POINTS successfully deallocated "
-   end if
 endif
 if (allocated(NPartOrd)) then
    deallocate(NPartOrd,stat=alloc_stat)

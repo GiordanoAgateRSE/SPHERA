@@ -33,7 +33,7 @@ use Dynamic_allocation_module
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: i,j,n,i1
+integer(4) :: i,j,n
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -105,46 +105,6 @@ do i=1,size(Control_Points)
    Control_Points(i)%dens = zero
    Control_Points(i)%uni = zero
    Control_Points(i)%dist = zero
-enddo
-do i=1,size(Section_Points)
-   Section_Points(i)%cella = 0
-   Section_Points(i)%coord(1) = zero
-   Section_Points(i)%coord(2) = zero
-   Section_Points(i)%coord(3) = zero
-   Section_Points(i)%vel(1) = zero
-   Section_Points(i)%vel(2) = zero
-   Section_Points(i)%vel(3) = zero
-   Section_Points(i)%pres = zero
-   Section_Points(i)%dens = zero
-   Section_Points(i)%uni = zero
-   Section_Points(i)%dist = zero
-enddo
-Control_Sections(0)%Label = "Domain  "
-Control_Sections(1:NSections)%Label = "        "
-Control_Sections(NSections+1)%Label = "One more"
-do i1=1,size(Control_Sections)
-   i = i1 - 1
-   Control_Sections(i)%Tipo = "  "
-   Control_Sections(i)%Icont(1) = 0
-   Control_Sections(i)%Icont(2) = 0
-   Control_Sections(i)%ColorCode = 1
-   Control_Sections(i)%Constant(1) = zero
-   Control_Sections(i)%Constant(2) = zero
-   Control_Sections(i)%Constant(3) = zero
-   Control_Sections(i)%XYZRange(1,1) = zero
-   Control_Sections(i)%XYZRange(2,1) = zero
-   Control_Sections(i)%XYZRange(3,1) = zero
-   Control_Sections(i)%XYZRange(1,2) = zero
-   Control_Sections(i)%XYZRange(2,2) = zero
-   Control_Sections(i)%XYZRange(3,2) = zero
-   do j=1,SPACEDIM
-      do n=1,SPACEDIM
-         Control_Sections(i)%TGLsection(j,n) = zero
-      enddo
-   enddo
-   Control_Sections(i)%TGLsection(1,2) = one
-   Control_Sections(i)%TGLsection(2,1) =-one
-   Control_Sections(i)%TGLsection(3,3) = one
 enddo
 do i=1,size(Control_Lines)
    Control_Lines(i)%label = "Empty   "
@@ -271,4 +231,3 @@ Domain%Slip = .false.
 !------------------------
 return
 end subroutine Init_Arrays
-
