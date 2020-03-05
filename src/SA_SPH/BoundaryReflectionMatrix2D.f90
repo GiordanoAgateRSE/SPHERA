@@ -22,7 +22,7 @@
 ! Program unit: BoundaryReflectionMatrix2D                                
 ! Description: Generation of the generalized reflection matrix R, based on the 
 !              cosine matrix T and the parameters PsiS and PsiN.
-!              (Di Monaco et al., 2011, EACFM)                        
+!              (Di Monaco et al., 2011, EACFM)                      
 !-------------------------------------------------------------------------------
 subroutine BoundaryReflectionMatrix2D(T,R,PsiS,PsiN)
 !------------------------
@@ -57,4 +57,3 @@ R(3,3) = PsiS * T(3,1) * T(3,1) + PsiN * T(1,1) * T(1,1)
 !------------------------
 return
 end subroutine BoundaryReflectionMatrix2D
-

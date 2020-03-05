@@ -209,44 +209,22 @@ if (((DBSPH%n_w+DBSPH%n_inlet+DBSPH%n_outlet)>0).and.(Domain%tipo=="bsph")) &
       if (DBSPH%Gamma_limiter_flag.eqv..true.) then
 ! Gamma=1 for particles in the inner domain
          if (nPartIntorno_fw(npi)==0) pg(npi)%Gamma = one 
-      endif        
+      endif      
       pg(npi)%dden = pg(npi)%dden / pg(npi)%Gamma
 ! Boundary type is fixe or tapis or level(?)
       if (pg(npi)%koddens==0) then
-! SPH approxmation of density (alternative to the continuity equation)
-!AA!!! test start
-!         if (NMedium==1) then
-!            if (pg(npi)%FS==1) then
-!               pg(npi)%dens = pg(npi)%rhoSPH_new / pg(npi)%sigma
-!               
-!               else
-!                  pg(npi)%dens = pg(npi)%rhoSPH_new / pg(npi)%Gamma
-!            endif
-!            elseif (NMedium>1) then
-!               pg(npi)%dens = pg(npi)%rhoSPH_new / pg(npi)%sigma_same_fluid      
-!         endif
+! SPH approximation of density (alternative to the continuity equation)
          if (pg(npi)%FS==0) then
             pg(npi)%dens = pg(npi)%rhoSPH_new / pg(npi)%Gamma
             else
-!AA!!! test start  
                pg(npi)%dens = pg(npi)%rhoSPH_new / pg(npi)%sigma 
                if (pg(npi)%dens<(0.98d0*med(1)%den0)) pg(npi)%dens = 0.98d0 *  &
                                                                      med(1)%den0 
-!               if (NMedium==1) then
-!                  pg(npi)%dens = pg(npi)%rhoSPH_new / pg(npi)%sigma 
-!                  if (pg(npi)%dens<(0.98d0*med(1)%den0)) pg(npi)%dens = 0.98d0 &
-!                     * med(1)%den0
-!                  else
-!                     pg(npi)%dens = pg(npi)%rhoSPH_new /                       &
-!                                    pg(npi)%sigma_same_fluid
-!               endif
-!AA!!! test end
          endif
-!AA!!! test end         
-! Interesting test, according to Ferrand et al. (2013)
-! beta = exp(-30000.*(min((pg(npi)%sigma/pg(npi)%Gamma),1.)-1.)**2)
-! pg(npi)%dens =  pg(npi)%rhoSPH_new / (beta*pg(npi)%Gamma+(1.-beta)
-!    *pg(npi)%sigma)
+! Possible interesting test, according to Ferrand et al. (2013):
+! beta = exp(-30000.*(min((pg(npi)%sigma/pg(npi)%Gamma),1.)-1.)**2) ,
+! pg(npi)%dens =  pg(npi)%rhoSPH_new / (beta*pg(npi)%Gamma+(1.-beta) 
+! * pg(npi)%sigma)
          pg(npi)%densass = zero
          elseif (pg(npi)%koddens==2) then
             pg(npi)%dens = pg(npi)%densass  
