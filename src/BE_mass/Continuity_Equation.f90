@@ -101,8 +101,7 @@ do npi=1,nag
       pg(npi)%dden = pg(npi)%dden - appo
 ! Velocity derivatives 
       if (pg(npj)%vel_type/="std") cycle
-      if ((Granular_flows_options%ID_erosion_criterion==1).or.                 &
-         (Granular_flows_options%ID_erosion_criterion==3)) then
+      if (Granular_flows_options%ID_erosion_criterion==1) then
          if (ncord==3) then
 !du/dy
             dvdi(2) = dvdi(2) + pesogradj(2) * dvar(1)
@@ -133,7 +132,7 @@ do npi=1,nag
             aij(4) = aij(4) + (pg(npj)%coord(3) - pg(npi)%coord(3)) *          &
                      pesogradj(3)
          endif
-      endif 
+      endif
    enddo
 ! Boundary contributions (DB-SPH)
    if ((Domain%tipo=="bsph").and.(ncord==2)) then
@@ -150,8 +149,7 @@ do npi=1,nag
          pg(npi)%dden = pg(npi)%dden + appo
       enddo
    endif
-   if ((Granular_flows_options%ID_erosion_criterion==1).or.                    &
-      (Granular_flows_options%ID_erosion_criterion==3)) then
+   if (Granular_flows_options%ID_erosion_criterion==1) then
       if (ncord==3) then
          moddia = (dvdi(1) * dvdi(1) + dvdi(5) * dvdi(5) + dvdi(9) * dvdi(9))
          modout = ((dvdi(2) + dvdi(4)) * (dvdi(2) + dvdi(4)) + (dvdi(3) +      &
@@ -183,4 +181,3 @@ call start_and_stop(2,12)
 !------------------------
 return
 end subroutine Continuity_Equation
-

@@ -309,11 +309,6 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
                      call Shields(npi) 
                   enddo
 !$omp end parallel do 
-               case(3)
-! To compute the second invariant of the rate-strain tensor and density 
-! derivatives
-                  call Continuity_Equation
-                  call MohrC
                case default
             endselect
 ! Update auxiliary vector for counting particles, whose status is not "sol"
@@ -553,11 +548,6 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
                      call Shields(npi) 
                   enddo
 !$omp end parallel do 
-               case(3)
-! To compute the second invariant of the rate-strain tensor and density 
-! derivatives
-                  call Continuity_Equation
-                  call MohrC
                case default
             endselect
 ! Update auxiliary vector for counting particles, whose status is not "sol"

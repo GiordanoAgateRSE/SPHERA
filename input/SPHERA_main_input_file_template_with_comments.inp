@@ -598,7 +598,6 @@ ___ ___ ___ ___ ___ ___ ___ ___
 !    =0 (no bed-load transport)
 !    =1 (Shields-Seminara)
 !    =2 (Shields without blt-fixed bed interactions)
-!    =3 (Mohr-Coulomb, not recommended)
 ![?] <ID_main_fluid>: medium of the main fluid
 ![?] <saturation_scheme>
 !    =0 (dry soil)
