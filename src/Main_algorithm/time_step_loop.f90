@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.9.0.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2019 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2020 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -19,10 +19,10 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: Loop_Irre_3D         
-! Description: 3D main algorithm.                    
+! Program unit: time_step_loop         
+! Description: loop over the simulation time steps                    
 !-------------------------------------------------------------------------------
-subroutine Loop_Irre_3D
+subroutine time_step_loop
 !------------------------
 ! Modules
 !------------------------
@@ -36,13 +36,14 @@ use I_O_diagnostic_module
 !------------------------
 implicit none
 logical :: done_flag,IC_removal_flag
-integer(4) :: Ncbf,i,npi,it,it_print,it_memo,it_rest,ir,ii,num_out,Ncbf_Max
+integer(4) :: Ncbf,i,npi,it,it_print,it_memo,it_rest,ir,ii,num_out,Ncbf_Max,Ncbs
 integer(4) :: OpCountot,SpCountot,EpCountot,EpOrdGridtot,ncel,aux,igridi
 integer(4) :: jgridi,kgridi,machine_Julian_day,machine_hour,machine_minute
-integer(4) :: machine_second
+integer(4) :: machine_second,IntNcbs
 double precision :: BCtorodivV,dt_previous_step,TetaV1,xmax,ymax,zmax,dtvel
+double precision :: BCrodivV
 double precision,dimension(1:SPACEDIM) :: tpres,tdiss,tvisc,BoundReaction
-character(len=lencard) :: nomsub = "Loop_Irre_3D"
+character(len=lencard) :: nomsub = "time_step_loop"
 integer(4),external :: ParticleCellNumber,CellIndices,CellNumber
 !------------------------
 ! Explicit interfaces
@@ -60,6 +61,7 @@ EpCount = 0
 EpOrdGrid = 0
 num_out = 0
 SourceFace = 0
+SourceSide = 0
 it_eff = it_start
 it_print = it_start
 it_memo = it_start
@@ -78,7 +80,11 @@ do npi=1,nag
    endif
 enddo
 ! Introductory procedure for inlet conditions
-call PreSourceParticles_3D
+if (ncord==3) then
+   call PreSourceParticles_3D
+   else
+      call PreSourceParticles_2D
+endif
 ! Initializing the time stage for time integration
 if (Domain%time_split==0) Domain%time_stage = 1
 IC_removal_flag = .false.
@@ -98,7 +104,7 @@ if ((on_going_time_step==it_start).and.(Domain%tipo=="bsph")) then
 !$omp parallel do default(none) shared(nag,pg,OpCount,Partz) private(npi)
    do npi=1,nag
 ! Fictitious air reservoirs
-      if (Partz(pg(npi)%izona)%DBSPH_fictitious_reservoir_flag.eqv.(.true.))  &
+      if (Partz(pg(npi)%izona)%DBSPH_fictitious_reservoir_flag.eqv.(.true.))   &
          then   
          OpCount(pg(npi)%imed) = OpCount(pg(npi)%imed) + 1    
          pg(npi)%cella = -1
@@ -175,6 +181,7 @@ endif
 ! To evaluate the properties that must be attributed to the fixed particles
 if (Domain%NormFix) call NormFix
 if (uerr>0) write(uerr,"(a,1x,a)") " Running case:",trim(nomecas2)
+! To initialize the output files
 if (ulog>0) then
    it_print = it_eff
    call Print_Results(it_eff,it_print,'inizio')
@@ -190,6 +197,7 @@ endif
 ! To assess the initial time step
 if (it_start==0) call time_step_duration
 it = it_start
+! Computing the time elapsed before the actual simulation
 if (exetype=="linux") then
    if (Domain%tmax>0.d0) then
       call system("date +%j%H%M%S>date_pre_iterations.txt")
@@ -204,12 +212,14 @@ if (exetype=="linux") then
 endif
 ITERATION_LOOP: do while (it<=Domain%itmax)
    done_flag = .false.
+! Set the iteration counter
    it = it + 1
    on_going_time_step = it
    it_eff = it
 ! To store the old time step duration, to evaluate the new value of time step 
 ! duration and update the simulation time
    dt_previous_step = dt
+! Stability criteria
    if (nag>0) call time_step_duration
    simulation_time = simulation_time + dt
    if (uerr>0) write(uerr,"(a,i8,a,g13.6,a,g12.4,a,i8,a,i5)") " it= ",it,      &
@@ -342,8 +352,9 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
       call start_and_stop(2,6)
       Ncbf_Max = 0
 !$omp parallel do default(none)                                                &
-!$omp private(npi,ii,tpres,tdiss,tvisc,Ncbf,BoundReaction)                     &
-!$omp shared(pg,Domain,BoundaryDataPointer,Ncbf_Max,indarrayFlu,Array_Flu,Med)
+!$omp private(npi,ii,tpres,tdiss,tvisc,Ncbf,BoundReaction,Ncbs,IntNcbs)        &
+!$omp shared(pg,Domain,BoundaryDataPointer,Ncbf_Max,indarrayFlu,Array_Flu,Med) &
+!$omp shared(nag,it,Granular_flows_options,ncord)
 ! Loop over particles
       do ii = 1,indarrayFlu
          npi = Array_Flu(ii)
@@ -353,45 +364,65 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
             cycle
          endif
          call inter_EqMoto(npi,tpres,tdiss,tvisc)
-! Searching for the boundary faces, which are the nearest the npi-th current 
-! particle
+! Searching for the boundary faces/sides, which are the nearest the npi-th 
+! current particle
          if ((Domain%time_stage==1).or.(Domain%time_split==1)) then 
             pg(npi)%kodvel = 0
             pg(npi)%velass = zero
          endif
          if (Domain%tipo=="semi") then
-            Ncbf = BoundaryDataPointer(1,npi)
+            if (ncord==3) then
+               Ncbf = BoundaryDataPointer(1,npi)
+               else
+                  Ncbs = BoundaryDataPointer(1,npi)
+                  IntNcbs = BoundaryDataPointer(2,npi)
+            endif
             else
-               Ncbf = 0
+               if (ncord==3) then
+                  Ncbf = 0
+                  else
+                     Ncbs = 0
+                     IntNcbs = 0
+               endif
          endif
-         if ((Domain%tipo=="semi").and.(Ncbf>0)) then
+         if ((Domain%tipo=="semi").and.                                        &
+            ((Ncbf>0).or.((Ncbs>0).and.(IntNcbs>0)))) then
+            if (ncord==3) then
 !$omp critical (omp_Ncbf_Max)
                Ncbf_Max = max(Ncbf_Max,Ncbf)
 !$omp end critical (omp_Ncbf_Max)
                call AddBoundaryContributions_to_ME3D(npi,Ncbf,tpres,tdiss,tvisc)
-               if (pg(npi)%kodvel==0) then
-                  BoundReaction = zero
-                  call AddElasticBoundaryReaction_3D(npi,Ncbf,BoundReaction)
-                  pg(npi)%acc(:) = tpres(:) + tdiss(:) + tvisc(:) +            &
-                                   Domain%grav(:) + BoundReaction(:)
-                  else
-                     pg(npi)%acc(:) = zero
-               endif
                else
-                  if (Domain%tipo=="semi") then
-                     pg(npi)%acc(:) = tpres(:) + tdiss(:) + tvisc(:) +         &
-                                      Domain%grav(:)
-                     else
-                        if (Domain%tipo=="bsph") then
-                           pg(npi)%acc(:) = (tpres(:) + tdiss(:) + tvisc(:)) / &
-                                            pg(npi)%Gamma + Domain%grav(:)
-                        endif         
-                  endif
+                  call AddBoundaryContributions_to_ME2D(npi,IntNcbs,tpres,     &
+                     tdiss,tvisc)
+            endif
+            if (pg(npi)%kodvel==0) then
+               if (ncord==3) then
+                  call AddElasticBoundaryReaction_3D(npi,Ncbf,BoundReaction)
+                  else
+                     call AddElasticBoundaryReaction_2D(npi,IntNcbs,           &
+                        BoundReaction)
+               endif
+               pg(npi)%acc(:) = tpres(:) + tdiss(:) + tvisc(:) +               &
+                                Domain%grav(:) + BoundReaction(:)
+               else
+                  pg(npi)%acc(:) = zero
+            endif
+            else
+               if (Domain%tipo=="semi") then
+                  pg(npi)%acc(:) = tpres(:) + tdiss(:) + tvisc(:) +            &
+                                   Domain%grav(:)
+                  else
+                     if (Domain%tipo=="bsph") then
+                        pg(npi)%acc(:) = (tpres(:) + tdiss(:) + tvisc(:)) /    &
+                                         pg(npi)%Gamma + Domain%grav(:)
+                     endif         
+               endif
          endif
       enddo
 !$omp end parallel do
       if (Ncbf_Max>Domain%MAXCLOSEBOUNDFACES) then
-         write(ulog,"(a,i5,a,i5)")                                            &
+         write(ulog,"(a,i5,a,i5)")                                             &
             "Increase parameter MAXCLOSEBOUNDFACES from",                      &
             Domain%MAXCLOSEBOUNDFACES," to ",Ncbf_Max
          call diagnostic(arg1=9,arg2=3,arg3=nomsub)
@@ -485,11 +516,14 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
             enddo
 !$omp end parallel do
             call start_and_stop(3,8)
-! Check on the particles gone out of the domain throughout the opened faces
+! Check on the particles gone out of the domain throughout the opened 
+! faces/sides
             call start_and_stop(2,9)
             if (NumOpenFaces>0) call CancelOutgoneParticles_3D
+            if (NumOpenSides>0) call CancelOutgoneParticles_2D
 ! Adding new particles from the inlet sections
             if (SourceFace/=0) call GenerateSourceParticles_3D
+            if (SourceSide/=0) call GenerateSourceParticles_2D
 ! Particle reordering
             call OrdGrid1
             call start_and_stop(3,9)
@@ -594,25 +628,41 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
 !$omp end parallel do
       endif
       if (Domain%tipo=="semi") then
-!$omp parallel do default(none) private(npi,ii,BCtorodivV,Ncbf)                &
-!$omp shared(nag,pg,BoundaryDataPointer,Ncbf_Max,indarrayFlu,Array_Flu,it)
+!$omp parallel do default(none)                                                & 
+!$omp shared(nag,pg,BoundaryDataPointer,Ncbf_Max,indarrayFlu,Array_Flu,it)     &
+!$omp shared(ncord)                                                            &
+!$omp private(npi,ii,BCtorodivV,BCrodivV,Ncbf,Ncbs,IntNcbs)
 ! Loop over all the active particles
 ! Density update 
 ! Boundary contributions to the continuity equation (SA-SPH)
          do ii=1,indarrayFlu
             npi = Array_Flu(ii)
-! Seaching for the neighbouring faces of the particle "npi"
-            BCtorodivV = zero
-            Ncbf = BoundaryDataPointer(1,npi)
+! Seaching for the neighbouring faces/sides of the particle "npi"
+            if (ncord==3) then
+               BCtorodivV = zero
+               Ncbf = BoundaryDataPointer(1,npi)
 ! Detecting the faces with actual contributions
-            if (Ncbf>0) then
+               if (Ncbf>0) then
 !$omp critical (omp_Ncbf_Max_2)
-               Ncbf_Max = max(Ncbf_Max,Ncbf)
+                  Ncbf_Max = max(Ncbf_Max,Ncbf)
 !$omp end critical (omp_Ncbf_Max_2)
-               call AddBoundaryContribution_to_CE3D(npi,Ncbf,BCtorodivV)
+                  call AddBoundaryContribution_to_CE3D(npi,Ncbf,BCtorodivV)
+               endif
+               else
+                  BCrodivV = zero
+                  Ncbs = BoundaryDataPointer(1,npi)
+                  IntNcbs = BoundaryDataPointer(2,npi)
+! Detecting the sides with actual contributions
+                  if ((Ncbs>0).and.(IntNcbs>0)) then
+                     call AddBoundaryContribution_to_CE2D(npi,IntNcbs,BCrodivV)
+                  endif
             endif
             if (pg(npi)%koddens==0) then
-               pg(npi)%dden = pg(npi)%dden - BCtorodivV
+               if (ncord==3) then
+                  pg(npi)%dden = pg(npi)%dden - BCtorodivV
+                  else
+                     pg(npi)%dden = pg(npi)%dden - BCrodivV
+               endif
                elseif (pg(npi)%koddens==1) then
                   pg(npi)%dden = zero  
 ! Boundary type is velocity or source
@@ -623,7 +673,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
 !$omp end parallel do
       endif
       if (Ncbf_Max>Domain%MAXCLOSEBOUNDFACES) then
-         write(ulog,"(a,i5,a,i5)")                                            &
+         write(ulog,"(a,i5,a,i5)")                                             &
             "Increase parameter MAXCLOSEBOUNDFACES from "                      &
             ,Domain%MAXCLOSEBOUNDFACES," to ",Ncbf_Max
          call diagnostic(arg1=9,arg2=4,arg3=nomsub)
@@ -694,14 +744,15 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
       if (Domain%tipo=="semi") then
 ! Boundary Conditions: start
 ! BC: checks for the particles gone out of the domain throughout the opened 
-! faces
-
+! faces/sides
          if ((Domain%time_split==0).and.(Domain%time_stage==Domain%RKscheme))  &
             then
             call start_and_stop(2,9)
             if (NumOpenFaces>0) call CancelOutgoneParticles_3D
+            if (NumOpenSides>0) call CancelOutgoneParticles_2D
 ! Adding new particles at the inlet sections
             if (SourceFace/=0) call GenerateSourceParticles_3D
+            if (SourceSide/=0) call GenerateSourceParticles_2D
 ! Particle reordering on the background positioning grid
             call OrdGrid1
             call start_and_stop(3,9)
@@ -824,10 +875,18 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
          do npi=1,nag
             if ((pg(npi)%vel_type/="std").or.(pg(npi)%cella==0)) cycle
             xmax = max(xmax,pg(npi)%coord(1))
-            ymax = max(ymax,pg(npi)%coord(2))
-            zmax = max(zmax,pg(npi)%coord(3))
+            if (ncord==3) then
+               ymax = max(ymax,pg(npi)%coord(2))
+               zmax = max(zmax,pg(npi)%coord(3))
+               else
+                  ymax = max(ymax,pg(npi)%coord(3))
+            endif
          enddo
-         write(nfro,'(4g14.7)') simulation_time,xmax,ymax,zmax
+         if (ncord==3) then
+            write(nfro,'(4g14.7)') simulation_time,xmax,ymax,zmax
+            else
+               write(nfro,'(2g14.7,13x,a,g14.7)') simulation_time,xmax,'-',ymax
+         endif
       endif
       elseif (Domain%memo_fr>zero) then
          if (it>1.and.mod(simulation_time,Domain%memo_fr) <= dtvel) then
@@ -837,10 +896,19 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
             do npi=1,nag
                if (pg(npi)%vel_type/="std".or.pg(npi)%cella==0) cycle
                xmax = max(xmax,pg(npi)%coord(1))
-               ymax = max(ymax,pg(npi)%coord(2))
-               zmax = max(zmax,pg(npi)%coord(3))
+               if (ncord==3) then
+                  ymax = max(ymax,pg(npi)%coord(2))
+                  zmax = max(zmax,pg(npi)%coord(3))
+                  else
+                     ymax = max(ymax,pg(npi)%coord(3))
+               endif
             enddo
-            write(nfro,'(4g14.7)') simulation_time,xmax,ymax,zmax
+            if (ncord==3) then
+               write(nfro,'(4g14.7)') simulation_time,xmax,ymax,zmax
+               else
+                  write(nfro,'(2g14.7,13x,a,g14.7)') simulation_time,xmax,'-', &
+                     ymax
+            endif
          endif
    endif
 ! Paraview output and .txt file concatenation
@@ -866,63 +934,63 @@ if (vtkconv) then
 endif
 if (ulog>0) then
    write(ulog,*) " "
-   write(ulog,'(a)')                                                          &
+   write(ulog,'(a)')                                                           &
 "----------------------------------------------------------------------------------------"
    write(ulog,*) " "
    SpCountot = 0
    do i=1,NMedium
       SpCountot = SpCountot + SpCount(i)
-      write(ulog,'(a,i15,a,a)')                                               &
+      write(ulog,'(a,i15,a,a)')                                                &
          "Number of source particles        :  SpCount = ",SpCount(i),         &
          " medium ",Med(i)%tipo
    enddo
-   write(ulog,'(a,i15)') "Number of total source particles  :  SpCountot = ", &
+   write(ulog,'(a,i15)') "Number of total source particles  :  SpCountot = ",  &
       SpCountot
    write(ulog,*) " "
    OpCountot = 0
    do i=1,NMedium
       OpCountot = OpCountot + OpCount(i)
-      write(ulog,'(a,i15,a,a)')                                               &
+      write(ulog,'(a,i15,a,a)')                                                &
          "Number of outgone particles       :  OpCount = ",OpCount(i),         &
          " medium ",Med(i)%tipo
    enddo
-   write(ulog,'(a,i15)')                                                      &
+   write(ulog,'(a,i15)')                                                       &
       "Number of total outgone particles :  OpCountot = ",OpCountot
    write(ulog,*) " "
    EpCountot = 0
    do i=1,NMedium
       EpCountot = EpCountot + EpCount(i)
-      write(ulog,'(a,i15,a,a)')                                               &
+      write(ulog,'(a,i15,a,a)')                                                &
          "Number of escaped particles       :  EpCount = ",EpCount(i),         &
          " medium ",Med(i)%tipo
    enddo
-   write(ulog,'(a,i15)')                                                      &
+   write(ulog,'(a,i15)')                                                       &
       "Number of total escaped particles :  EpCountot = ",EpCountot
    write(ulog,*) " "
    EpOrdGridtot = 0
    do i=1,NMedium
       EpOrdGridtot = EpOrdGridtot + EpOrdGrid(i)
-      write(ulog,'(a,i15,a,a)')                                               &
+      write(ulog,'(a,i15,a,a)')                                                &
          "Number of escaped particles (OrdGrid1)       :  EpOrdGrid = ",       & 
          EpOrdGrid(i)," medium ",Med(i)%tipo
    enddo
-   write(ulog,'(a,i15)')                                                      &
+   write(ulog,'(a,i15)')                                                       &
       "Number of total escaped particles (OrdGrid1) :  EpOrdGridtot = ",       &
 
       EpOrdGridtot
    write(ulog,*) " "
    write(ulog,*) " "
    write(ulog,*) "Final number of particles:       NAG = ",nag
-   if (Domain%tipo=="bsph") write(ulog,*)                                     &
+   if (Domain%tipo=="bsph") write(ulog,*)                                      &
       "Final number of wall particles:       DBSPH%n_w = ",DBSPH%n_w
    write(ulog,*) " "
-   write(ulog,'(a)')                                                          &
+   write(ulog,'(a)')                                                           &
 "----------------------------------------------------------------------------------------"
    write(ulog,*) " "
 endif
-if ((Domain%tipo=="bsph").and.(DBSPH%n_w>0)) deallocate(pg_w)
 !------------------------
 ! Deallocations
 !------------------------
+if ((Domain%tipo=="bsph").and.(DBSPH%n_w>0)) deallocate(pg_w)
 return
-end subroutine Loop_Irre_3D
+end subroutine time_step_loop

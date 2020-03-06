@@ -616,7 +616,7 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
    endif
    if (ncord==2) then
       call start_and_stop(2,5)
-      call loop_irre_2D 
+      call time_step_loop 
       call start_and_stop(3,5)
       elseif (ncord==3) then
          NumCellmax = Grid%nmax
@@ -696,7 +696,7 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
          enddo  
          call start_and_stop(2,5)
 ! Main loop
-         call loop_irre_3D
+         call time_step_loop
          call start_and_stop(3,5)
 ! Writing the h_max array and deallocation of the arrays Z_fluid_max and 
 ! Z_fluid_step

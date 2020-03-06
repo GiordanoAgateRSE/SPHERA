@@ -42,8 +42,7 @@ $(wildcard ./IC/*.f90) \
 $(wildcard ./Interface_dispersion/*.f90) \
 ./Main_algorithm/Gest_Dealloc.f90 \
 ./Main_algorithm/Gest_Trans.f90 \
-./Main_algorithm/Loop_Irre_2D.f90 \
-./Main_algorithm/Loop_Irre_3D.f90 \
+./Main_algorithm/time_step_loop.f90 \
 $(wildcard ./Neighbouring_Search/*.f90) \
 $(wildcard ./Post_processing/*.f90) \
 $(wildcard ./Pre_processing/*.f90) \

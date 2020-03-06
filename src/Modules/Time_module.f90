@@ -55,7 +55,7 @@ data tot_routines(1) / "Initialization                          " /
 data tot_routines(2) / "Gest_Input                              " /
 data tot_routines(3) / "Gest_Trans                              " /
 data tot_routines(4) / "   Loop_ghost                           " /
-data tot_routines(5) / "   Loop_Irre_2D/3D                      " /
+data tot_routines(5) / "   time_step_loop                       " /
 data tot_routines(6) / "     Motion Equation & Update velocity  " /
 data tot_routines(7) / "     Velocity smoothing                 " /
 data tot_routines(8) / "     Update position                    " /

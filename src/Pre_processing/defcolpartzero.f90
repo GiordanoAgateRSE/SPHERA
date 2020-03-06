@@ -20,7 +20,7 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: defcolpartzero                   
-! Description: on the particle colours for visualization purposes.               
+! Description: on the particle colours for visualization purposes              
 !-------------------------------------------------------------------------------
 subroutine defcolpartzero(ir,partz,pg)
 !------------------------
