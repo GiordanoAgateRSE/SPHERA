@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.9.0.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2019 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2020 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -93,7 +93,7 @@ select case (iset)
 ! Detection of the current time
    case (1)
 ! End the execution by assessing the computational time &
-! and the phisical/elapsed time statistics.
+! and the physical/elapsed time statistics.
       call system_clock(count=count_i,count_rate=counts_per_second,            &
          count_max=count_maximum)
       tot_times(numb_subr,2) = dfloat(count_i) - tot_times(numb_subr,1)

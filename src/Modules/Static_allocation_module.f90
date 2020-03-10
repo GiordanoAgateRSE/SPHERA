@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.9.0.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2019 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2020 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
@@ -168,8 +168,11 @@ character(255) :: nomecaso, nomecas2
 character(1),dimension(0:3) :: xyzlabel = (/ "T", "X", "Y", "Z" /)  
 character(4),dimension(3) :: ncordlabel = (/ "    ", "(2D)", "(3D)" /)  
 character(255) :: LicenseFile ! File name for license 
-character(255) :: nomefilekill ! Killer file name 
-character(10) :: exetype ! Type of machine: "windows" or "linux"
+character(255) :: nomefilekill ! Killer file name
+! Operating System: "linux" (no other option is active). This string is 
+! useful for the real-time assessment of the final elapsed time. Any other 
+! string value deactvates the assessment above.
+character(10) :: exetype = "linux"
 character(255) :: nomefileerr ! File name for error file in erosion model
 ! "original" or "euristic"
 character(len=8) :: dt_opt = "original"

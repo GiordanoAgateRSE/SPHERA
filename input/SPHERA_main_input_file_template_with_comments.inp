@@ -216,6 +216,11 @@ ___ ___ ... ___ ___
 !    =source(inlet section)
 !    =open (only removal of the particles crossing the boundary)
 !    =tapis (not recommended)
+!    =leve (not recommended)
+!    =pool (not recommended)
+!    =flow (not recommended)
+!    =crit (not recommended)
+!    =velo (not recommended)
 !-------------------------------------------------------------------------------
 ![*] Boundary_name
 ![*] Boundary_ID
