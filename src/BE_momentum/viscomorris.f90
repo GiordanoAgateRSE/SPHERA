@@ -74,4 +74,3 @@ rvw(1:3) = factivis * (-dervel(1:3) * kernel_der * dot_product(rel_dis,rel_dis))
 !------------------------
 return
 end subroutine viscomorris
-

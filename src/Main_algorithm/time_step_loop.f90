@@ -729,7 +729,11 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
          if (Domain%Psurf=='s') then
             call inter_SmoothPres
             elseif (Domain%Psurf=='a') then
-               call PressureSmoothing_3D
+               if (ncord==3) then
+                  call PressureSmoothing_3D
+                  else
+                     call PressureSmoothing_2D
+               endif
          endif
          call start_and_stop(3,14)
       endif
