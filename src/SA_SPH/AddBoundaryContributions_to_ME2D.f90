@@ -72,7 +72,7 @@ if ((Domain%time_stage==1).or.(Domain%time_split==1)) then
 endif
 imed = pg(npi)%imed
 ro0 = Med(imed)%den0
-cinvisci = pg(npi)%visc
+cinvisci = pg(npi)%kin_visc
 roi = pg(npi)%dens
 pressi = pg(npi)%pres
 distpimin = Domain%dx
@@ -252,7 +252,7 @@ do icbs=1,IntNcbs
    do i=1,PLANEDIM
       RHS(i) = RHS(i) - nnlocal(i) * QiiIntWdS + RG(i)
    enddo
-! Volume viscosity force (with changed sign)
+! Volume viscosity force (with changed sign) and artificial viscosity term
    if (strtype=="fixe".OR.strtype=="tapi") then
       if (xpi>=zero.AND.xpi<=RifBoundarySide%length) then
          SVcoeff = Tratto(sidestr)%ShearCoeff
@@ -260,7 +260,6 @@ do icbs=1,IntNcbs
             Dvel(i) = two * (pg(npi)%var(acix(i)) - sidevel(i))
          enddo
          DvelN = Dvel(1) * nnlocal(1) + Dvel(2) * nnlocal(2)
-         viscN = 0.3333333d0 * cinvisci
          celeri = Med(imed)%celerita
          alfaMon = Med(imed)%alfaMon
          Monvisc = alfaMon * celeri * Domain%h
@@ -271,7 +270,7 @@ do icbs=1,IntNcbs
          enddo
          if ((pg(npi)%laminar_flag==1).or.                                     &
             (Tratto(sidestr)%laminar_no_slip_check.eqv..false.)) then
-            SVforce = SVcoeff * (cinvisci + cinvisci) * IntWd1s0
+            SVforce = 2.d0 * cinvisci * SVcoeff * IntWd1s0
             else
                SVforce = 0.d0
          endif

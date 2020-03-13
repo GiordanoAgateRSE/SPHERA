@@ -42,7 +42,7 @@ character(LEN=lencard) :: ainp
 logical :: saturated_medium_flag
 integer(4) :: index,nitersol,ioerr
 double precision :: den0,eps,alfaMon,betaMon,visc,viscmx,phi
-double precision :: coes,Rough,d50,d_90
+double precision :: Rough,d50,d_90
 double precision :: limiting_viscosity
 double precision :: porosity
 character(8) :: tipo
@@ -75,8 +75,7 @@ do while (trim(lcase(ainp))/="##### end medium #####")
    betaMon = zero
    visc = zero
    Rough = zero
-   viscmx = zero
-   coes = zero
+   viscmx = max_positive_number
    limiting_viscosity = zero
    phi = zero
    saturated_medium_flag = .false.
@@ -114,9 +113,10 @@ do while (trim(lcase(ainp))/="##### end medium #####")
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"PHI, SATURATED_MEDIUM_FLAG",&
             ninp,ulog)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         read(ainp,*,iostat=ioerr) coes,viscmx,visc,limiting_viscosity
+         read(ainp,*,iostat=ioerr) viscmx,visc,limiting_viscosity
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                             &
-            "COHESION, VISCO MAX, VISCO & LIMITING VISCOSITY",ninp,ulog)) return            
+            "THRESHOLD VISCOSITY, TUNING VISCOSITY & LIMITING VISCOSITY",ninp, &
+            ulog)) return            
          if (Granular_flows_options%ID_erosion_criterion==1) then
             call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
             read(ainp,*,iostat=ioerr) porosity,d50,d_90
@@ -144,11 +144,12 @@ do while (trim(lcase(ainp))/="##### end medium #####")
       Med(index)%celerita = dsqrt(eps/den0)
       Med(index)%alfaMon = alfaMon
       Med(index)%betaMon = betaMon
-      Med(index)%visc = visc
+! Temporarily, "Med(index)%kin_visc" is a dynamic viscosity
+      Med(index)%kin_visc = visc
+! Temporarily, "Med(index)%mumx" is a dynamic viscosity
       Med(index)%mumx = viscmx
       Med(index)%phi = phi
       Med(index)%saturated_medium_flag = saturated_medium_flag
-      Med(index)%coes = coes
       Med(index)%limiting_viscosity = limiting_viscosity
       Med(index)%RoughCoef = Rough
       Med(index)%d50 = d50
@@ -167,16 +168,15 @@ do while (trim(lcase(ainp))/="##### end medium #####")
             Med(index)%alfaMon 
          write(ulog,"(1x,a,1p,e12.4)") "Beta Monaghan Coeff.:.......",         &
             Med(index)%betaMon
+! Temporarily, "Med(index)%kin_visc" is a dynamic viscosity
          write(ulog,"(1x,a,1p,e12.4)") "Dynamic Viscosity:..........",         &
-            Med(index)%visc
+            Med(index)%kin_visc
          write(ulog,"(1x,a,1p,e12.4)") "Max. Dynamic Viscosity:.....",         &
             Med(index)%mumx
          write(ulog,"(1x,a,1p,e12.4)") "Friction Angle:.............",         &
             Med(index)%phi
          write(ulog,"(1x,a,1p,l12)")   "Saturated medium flag:......",         &
             Med(index)%saturated_medium_flag
-         write(ulog,"(1x,a,1p,e12.4)") "Cohesion:...................",         &
-            Med(index)%coes
          write(ulog,"(1x,a,1p,e12.4)") "Limiting viscosity:.........",         &
             Med(index)%limiting_viscosity
          write(ulog,"(1x,a,1p,e12.4)") "Roughness Coeff.:...........",         &
@@ -189,9 +189,9 @@ do while (trim(lcase(ainp))/="##### end medium #####")
             Med(index)%gran_vol_frac_max
          write(ulog,"(1x,a)")  " "
       endif
-      Med(index)%visc = visc / den0
+      Med(index)%kin_visc = visc / den0
       Med(index)%numx = viscmx / den0
-! From degrees to radians 
+! From degrees to radians
       Med(index)%phi = Med(index)%phi * PIGRECO / 180.  
    endif
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)

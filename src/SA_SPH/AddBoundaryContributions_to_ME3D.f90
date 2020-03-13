@@ -47,7 +47,7 @@ double precision,dimension(1:SPACEDIM) :: ViscoMon,ViscoShear,LocPi,Gpsurob_Loc
 double precision,dimension(1:SPACEDIM) :: Gpsurob_Glo
 character(4) :: stretchtype
 mati = pg(npi)%imed
-cinvisci = pg(npi)%visc
+cinvisci = pg(npi)%kin_visc
 roi = pg(npi)%dens
 pressi = pg(npi)%pres
 Qii = (pressi + pressi) / roi
@@ -183,12 +183,7 @@ enddo face_loop
 ! Adding boundary contributions to the momentum equation
   tpres(:) = tpres(:) - RHS(:)
   tdiss(:) = tdiss(:) - ViscoMon(:)
-! Important note: this 3D boundary term is under assessment and does not 
-! represent a default choice
-! In case one needs to deactivate this term, it seems useless at this stage to 
-! comment all the other lines involved as they are sparse and do not cause 
-! relevant computational time.
-! For the sign of "ViscoShear" refer to the mathematical model
+! For the sign of "ViscoShear", refer to the mathematical model
   tvisc(:) = tvisc(:) + ViscoShear(:)
 !------------------------
 ! Deallocations

@@ -97,7 +97,7 @@ if ((pg(npi)%Beta_slope>=Med(pg(npi)%imed)%Phi).or.                            &
             i_aux = CellIndices(i_cell,i_grid,j_grid,k_grid)
             U_inf = dsqrt(dot_product(pg(npj)%vel_old,pg(npj)%vel_old)) 
 ! Compute Re (flow around a sphere)
-            Re = U_inf*Med(pg(npi)%imed)%d50 / pg(npj)%visc 
+            Re = U_inf*Med(pg(npi)%imed)%d50 / pg(npj)%kin_visc 
 ! Compute the drag coefficient C_D (Morrison 2013)              
             if (Re<=100.0d0) then
                pg(npi)%C_D = 1.0d0

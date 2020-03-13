@@ -71,8 +71,8 @@ pg(npi)%tstop = tstop
 ! Material ID
 pg(npi)%imed = Mate
 ! Viscosities
-pg(npi)%visc = Med(Mate)%visc
-pg(npi)%mu   = Med(Mate)%visc * Med(Mate)%den0
+pg(npi)%kin_visc = Med(Mate)%kin_visc
+pg(npi)%mu = Med(Mate)%kin_visc * Med(Mate)%den0
 ! DB-SPH parameters
 if (Domain%tipo=="bsph") then
    pg(npi)%Gamma = one 
@@ -87,14 +87,14 @@ if (Domain%tipo=="bsph") then
    pg(npi)%DBSPH_outlet_ID = 0
 endif
 ! Mixture density for granular SPH particles (bed-load transport) 
-if (Granular_flows_options%ID_erosion_criterion==1) then
+if (Granular_flows_options%ID_erosion_criterion>0) then
    if (Med(pg(npi)%imed)%tipo=="granular") then
       pg(npi)%dens = Med(pg(npi)%imed)%den0_s 
 ! IC viscosity from pure fluid, as I cannot calculate the right one at this 
 ! stage.         
-      pg(npi)%mu = Med(Granular_flows_options%ID_main_fluid)%visc *            &
+      pg(npi)%mu = Med(Granular_flows_options%ID_main_fluid)%kin_visc *        &
                    Med(Granular_flows_options%ID_main_fluid)%den0
-      pg(npi)%visc = Med(Granular_flows_options%ID_main_fluid)%visc
+      pg(npi)%kin_visc = Med(Granular_flows_options%ID_main_fluid)%kin_visc
    endif
    call initialization_fixed_granular_particle(npi)
    pg(npi)%sigma_prime_m = 0.0d0
@@ -112,7 +112,7 @@ if (index(Med(Mate)%tipo,"granular")>0) then
 endif
 ! Motion index
 pg(npi)%vel_type = partz(Nz)%move        
-if (partz(Nz)%move/="std") pg(npi)%visc = zero
+if (partz(Nz)%move/="std") pg(npi)%kin_visc = zero
 ! Boundary slip condition
 pg(npi)%slip = partz(Nz)%slip  
 ! Grid cell 

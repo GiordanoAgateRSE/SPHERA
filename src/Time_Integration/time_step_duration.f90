@@ -50,8 +50,9 @@ double precision :: dt_Mon_j,dt_Mon
 !------------------------
 ! Initializations
 !------------------------
-dtmin = 1.d30                                              
-dt_Mon = max_positive_number 
+dtmin = max_positive_number                                  
+dt_Mon = max_positive_number
+dt_vis = max_positive_number
 !------------------------
 ! Statements
 !------------------------
@@ -61,11 +62,17 @@ if (indarrayFlu==0) then
    else
 ! Time step depends on 2 stability criteria:
 ! 1) CFL criterion: dt_CFL<=CFL*(2h/(c+U))
-! 2) viscous term criterion: dt_vis<=vsc_coeff*(rho*h**2/(0.5*mu)) 
+! 2) viscous term criterion: dt_vis<=vsc_coeff*(rho*h**2/(0.5*mu))
+! Loop over the media
+      do ii=1,NMedium
+         if (Med(ii)%kin_visc>1.d-24) dt_vis = Domain%vsc_coeff * squareh /    &
+                                               (half * Med(ii)%kin_visc)
+         dtmin = min(dtmin,dt_vis)
+      enddo
+! Loop over the particles
       do ii=1,indarrayFlu
          npi = Array_Flu(ii)
-         if ((Granular_flows_options%ID_erosion_criterion==1).and.             &
-            (Med(pg(npi)%imed)%tipo=="granular")) then
+         if (Med(pg(npi)%imed)%tipo=="granular") then
 ! Redundant and safety check
             if ((pg(npi)%state=="sol").or.(pg(npi)%mu==Med(pg(npi)%imed)%mumx))&
                cycle
@@ -77,13 +84,13 @@ if (indarrayFlu==0) then
                (pg(npi)%coord(3)>Granular_flows_options%z_max_dt)) then
                cycle
             endif
+            if (pg(npi)%mu>1.d-24) dt_vis = Domain%vsc_coeff * pg(npi)%dens *  &
+                                            squareh / (half * pg(npi)%mu)
          endif
          U = sqrt(pg(npi)%vel(1) ** 2 + pg(npi)%vel(2) ** 2 + pg(npi)%vel(3)   &
              ** 2)
          dt_CFL = Domain%CFL * 2.d0 * Domain%h / (Med(pg(npi)%imed)%celerita + &
                   U)
-         dt_vis = Domain%vsc_coeff * pg(npi)%dens * squareh / (half *          &
-                  pg(npi)%mu)
          dtmin = min(dtmin,dt_CFL,dt_vis)
          celiq = Med(pg(npi)%imed)%eps / pg(npi)%dens
          if (celiq>=zero) pg(npi)%csound = dsqrt(celiq)
@@ -114,4 +121,3 @@ endif
 !------------------------
 return
 end subroutine time_step_duration
-

@@ -194,11 +194,11 @@ if (nag>0) then
    pos = maxloc(pg(1:nag)%dens,mask=pg(1:nag)%cella/=0)
    maxlocdens = pos(1)
 ! Viscosity
-   minvisc = minval(pg(1:nag)%visc,mask=pg(1:nag)%cella/=0)
-   maxvisc = maxval(pg(1:nag)%visc,mask=pg(1:nag)%cella/=0)
-   pos = minloc(pg(1:nag)%visc,mask=pg(1:nag)%cella/=0)
+   minvisc = minval(pg(1:nag)%kin_visc,mask=pg(1:nag)%cella/=0)
+   maxvisc = maxval(pg(1:nag)%kin_visc,mask=pg(1:nag)%cella/=0)
+   pos = minloc(pg(1:nag)%kin_visc,mask=pg(1:nag)%cella/=0)
    minlocvisc = pos(1)
-   pos = maxloc(pg(1:nag)%visc,mask=pg(1:nag)%cella/=0)
+   pos = maxloc(pg(1:nag)%kin_visc,mask=pg(1:nag)%cella/=0)
    maxlocvisc = pos(1)
 ! Wall parameter limits: start
    if ((Domain%tipo=="bsph").and.(DBSPH%n_w>0)) then

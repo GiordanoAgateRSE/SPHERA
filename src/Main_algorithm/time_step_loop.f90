@@ -309,7 +309,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
                      aux = CellIndices(ncel,igridi,jgridi,kgridi)
                      if (pg(npi)%state=="sol") then
                         pg(npi)%mu = Med(pg(npi)%imed)%mumx
-                        pg(npi)%visc = pg(npi)%mu / pg(npi)%dens
+                        pg(npi)%kin_visc = pg(npi)%mu / pg(npi)%dens
                      endif
                   enddo
 !$omp end parallel do
@@ -572,7 +572,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
                      aux = CellIndices(ncel,igridi,jgridi,kgridi)
                      if (pg(npi)%state=="sol") then
                         pg(npi)%mu = Med(pg(npi)%imed)%mumx
-                        pg(npi)%visc = pg(npi)%mu / pg(npi)%dens
+                        pg(npi)%kin_visc = pg(npi)%mu / pg(npi)%dens
                      endif
                   enddo
 !$omp end parallel do

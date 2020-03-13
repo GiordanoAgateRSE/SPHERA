@@ -165,19 +165,19 @@ do contj=1,nPartIntorno(npi)
             velti = (pg(npi)%vel(1) * pg(npj)%zer(3) - pg(npi)%vel(3) *        &
                     pg(npj)%zer(1))
             secinv = abs(velti / (deltan + 1.d-4))
-            nu = Med(pg(npi)%imed)%visc
             if (index(Med(pg(npi)%imed)%tipo,"liquid")>0) then
-               nu = Med(pg(npi)%imed)%visc
+               nu = Med(pg(npi)%imed)%kin_visc
                elseif (index(Med(pg(npi)%imed)%tipo,"granular")>0) then
                   pre = (max(zero,pg(npi)%pres)) / pg(npi)%dens
                   coeff = sin (Med(pg(npi)%imed)%phi)
-                  nupa = (pre*coeff) / (secinv + 1.d-4) + Med(pg(npi)%imed)%visc
+                  nupa = (pre*coeff) / (secinv + 1.d-4) +                      &
+                         Med(pg(npi)%imed)%kin_visc
                   nu = min(nupa,Med(pg(npi)%imed)%numx)
             endif
             dvtdn = (sin(pg(npj)%ang)) * (pg(npi)%dudy + pg(npi)%dvdx) +       &
                     (cos(pg(npj)%ang)) * (pg(npi)%dudx - pg(npi)%dvdy)
             veltj = ( - two * (deltan / (denorm + 1.d-4)) * nu /               &
-                    (pg(npi)%visc + 1.d-4) + one) * velti + two * dvtdn        &
+                    (pg(npi)%kin_visc + 1.d-4) + one) * velti + two * dvtdn    &
                     * deltan
             moddervelt = veltj - velti
             modderveln = - two * veln               
@@ -189,7 +189,7 @@ do contj=1,nPartIntorno(npi)
                dervelmorr(:) = - pg(npi)%vel(:)
       endif
    endif
-! Momentum equation: start 
+! Momentum equation: start
    if (Granular_flows_options%ID_erosion_criterion/=1) then
       alpha = pi / (rhoi * rhoi) + pj / (rhoj * rhoj) 
       else
@@ -218,16 +218,18 @@ do contj=1,nPartIntorno(npi)
 ! To add Monaghan term (artificial viscosity)
    tdiss(:) = tdiss(:) + appodiss(:)
 ! To compute Morris term (interaction with neighbouring fluid particle)
-   call viscomorris(pg(npi)%mass,pg(npi)%dens,pg(npi)%visc,                    &
-      pg(npj)%mass,pg(npj)%dens,pg(npj)%visc,PartKernel(2,npartint),           &
-      pg(npj)%vel_type,rag(1:3,npartint),dervel,rvw)
+   if ((pg(npi)%kin_visc>1.d-12).and.(pg(npj)%kin_visc>1.d-12)) then
+      call viscomorris(pg(npi)%mass,pg(npi)%dens,pg(npi)%kin_visc,             &
+         pg(npj)%mass,pg(npj)%dens,pg(npj)%kin_visc,PartKernel(2,npartint),    &
+         pg(npj)%vel_type,rag(1:3,npartint),dervel,rvw)
 ! To add  Morris term (interaction with neighbouring fluid particle)   
-   tvisc(:) = tvisc(:) + rvw(:)
-   rvw_sum(:) = rvw_sum(:) + rvw(:)
+      tvisc(:) = tvisc(:) + rvw(:)
+      rvw_sum(:) = rvw_sum(:) + rvw(:)
+   endif
 ! Momentum equation: end
 enddo
 pg(npi)%laminar_flag = 0
-if (pg(npi)%visc>0.d0) then
+if (pg(npi)%kin_visc>0.d0) then
    absv_pres_grav_inner = dsqrt(dot_product(tpres,tpres)) + GI
    absv_Morris_inner = dsqrt(dot_product(rvw_sum,rvw_sum))
    if (absv_pres_grav_inner/=0.) Morris_inner_weigth = absv_Morris_inner /     &
@@ -260,13 +262,16 @@ if (DBSPH%n_w>0) then
       if ((pg(npi)%laminar_flag==1).or.(DBSPH%slip_ID==1)) then
          call DBSPH_BC_shear_viscosity_term(npi,npj,npartint,                  &
             DBSPH_wall_she_vis_term)
+         if ((pg(npi)%kin_visc>1.d-12).and.                                    &
+            (pg_w(npj)%kin_visc_semi_part>1.d-12)) then
 ! To compute Morris term (interaction with neighbouring semi-particle)
-         kernel_der = kernel_fw(2,npartint)/(dot_product(rag_fw(:,npartint),   &
-                      rag_fw(:,npartint)) + eta2)
-         call viscomorris(pg(npi)%mass,pg(npi)%dens,pg(npi)%visc,              &
-            pg_w(npj)%mass,pg_w(npj)%dens,pg_w(npj)%kin_visc_semi_part,        &
-            kernel_der,"std",rag_fw(1:3,npartint),dervel,rvw_semi_part)
-         t_visc_semi_part(:) = t_visc_semi_part(:) + rvw_semi_part(:)
+            kernel_der = kernel_fw(2,npartint)/(dot_product(rag_fw(:,npartint),&
+                         rag_fw(:,npartint)) + eta2)
+            call viscomorris(pg(npi)%mass,pg(npi)%dens,pg(npi)%kin_visc,       &
+               pg_w(npj)%mass,pg_w(npj)%dens,pg_w(npj)%kin_visc_semi_part,     &
+               kernel_der,"std",rag_fw(1:3,npartint),dervel,rvw_semi_part)
+            t_visc_semi_part(:) = t_visc_semi_part(:) + rvw_semi_part(:)
+         endif
       endif
    enddo
    if ((pg(npi)%laminar_flag==1).or.(DBSPH%slip_ID==1)) then

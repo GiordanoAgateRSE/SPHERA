@@ -749,18 +749,17 @@ ___
 ![?] <saturated_medium_flag>
 !    =.true. (fully saturated medium)
 !    =.false. (dry medium) 
-![?] <cohesion>: draft parameter
 ![?] <viscosity_max>: threshold for the dynamic mixture viscosity to held 
 !    particles fixed in the elastic-plastic strain regime
 ![?] <tuned_viscosity>: tuned dynamic viscosity (only for Manenti et al., 2012)
 ![?] <limiting_viscosity>: limiting dynamic viscosity (Manenti et al., 2018)
 !-------------------------------------------------------------------------------
 ![*] <phi> <saturated_medium_flag>
-![*] <cohesion> <viscosity_max> <tuned_viscosity> <limiting_viscosity>
+![*] <viscosity_max> <tuned_viscosity> <limiting_viscosity>
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
 ___ ___
-___ ___ ___ ___
+___ ___ ___
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
 ![?] endif (fluid_type==granular)

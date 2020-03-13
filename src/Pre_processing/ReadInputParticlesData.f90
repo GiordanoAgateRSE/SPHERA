@@ -93,14 +93,16 @@ select case (lcase(move))
       enddo
    case ("fix")
       npointv = 1
-      valuev  = zero  
+      valuev = zero
+! NumberEntities(1) is the spatial dimensionality (it is or it will be equal to 
+! the variable "ncord")
       do n=1,NumberEntities(1)
          token = GetToken(ainp,(n+1),ioerr)
          read(token,*,iostat=ioerr) values3(n)
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"INITIAL VELOCITY",ninp,ulog &
             )) return
       enddo
-! No-slip / free-slip 
+! No-slip / free-slip
       token = GetToken(ainp,(NumberEntities(1)+2),ioerr)
       if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"NO_SLIP/FREE_SLIP",ninp,ulog)) &
          return
@@ -186,4 +188,3 @@ endif
 !------------------------
 return
 end subroutine ReadInputParticlesData
-

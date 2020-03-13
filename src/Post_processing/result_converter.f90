@@ -204,7 +204,7 @@ if (nag>0) then
       k1 = i
       k2 = k1 + 15
       if (k2>numpoints) k2 = numpoints
-      write(unitvtk,'(8x,16(1x,e12.5))') (pg(finger(k))%visc,k=k1,k2)
+      write(unitvtk,'(8x,16(1x,e12.5))') (pg(finger(k))%kin_visc,k=k1,k2)
    enddo
    write(unitvtk,'(a)') '      </DataArray>'
 ! z-coordinate

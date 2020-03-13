@@ -152,11 +152,13 @@ type TyParticle
    double precision :: dudx  
    double precision :: dudy 
    double precision :: dvdx 
-   double precision :: dvdy 
-   double precision :: visc ! Kinematic viscosity                          
-   double precision :: mu ! Dynamic viscosity; equivalent mixture dynamic
-                          ! viscosity in case of bed-load transport layer                             
-   double precision :: tstop ! Stop time                          
+   double precision :: dvdy
+! (mixture or liquid) kinematic viscosity
+   double precision :: kin_visc
+! (mixture or liquid) dynamic viscosity
+   double precision :: mu
+! Stop time                            
+   double precision :: tstop                          
    double precision :: mno    
    double precision :: ang                       
    double precision :: VolFra                         
@@ -165,169 +167,216 @@ type TyParticle
    double precision :: tiroc                          
    double precision :: cden                           
    double precision :: wden
-   double precision :: Csound ! Sound speed                        
-   double precision :: DensShep ! Density times Shepard coefficient                      
-   double precision :: rhoSPH_new ! SPH approximation of density at the  
-                                  ! on-going time step 
-   double precision :: rhoSPH_old ! SPH approximation of density at the 
-                                  ! previous time step 
-   double precision :: dShep ! Lagrangian derivative of Shepard 
-                             ! coefficient 
-   double precision :: sigma ! Discrete Shepard coefficient
-   double precision :: sigma_same_fluid ! Discrete Shepard coefficient involving
-                                        ! neighbours of the same fluid   
-   double precision :: Gamma ! Integral Shepard coefficient
-   double precision :: Gamma_last_active ! Last value of Gamma before FS=3
-   double precision :: dens_init_err ! Initial difference between SPH 
-                                     ! approx. of density and its exact 
-                                     ! value. This is added in the interior
-                                     ! domain to each SPH density approx. 
-                                     ! to solve inlet problems.
-   double precision :: Beta_slope ! Main slope angle of the fixed bed 
-                                  ! (along the direction aligned with 
-                                  ! the mean flow; bed-load transport)
-   double precision :: Gamma_slope ! Transversal slope angle of the fixed bed
-                                   ! (along the direction transversal to the 
-                                   ! mean flow; bed-load transport)
-   double precision :: sigma_prime_m ! Mean of the effective normal stresses
-   double precision :: pres_fluid ! Pressure of the fluid phase (bed-load 
-                                  ! transport)
-   double precision :: u_star ! Friction velocity representative of the
-                              ! Surface Neutral Boundary Layer 
-   double precision :: C_L ! Lift coefficient for 3D erosion criterion
-   double precision :: C_D ! Drag coefficient for 3D erosion criterion
-   double precision :: tau_tauc ! Ratio (tau/tau_c) between bottom shear
-                                ! stress and critical shear stress (from
-                                ! erosion criterion)
-   double precision :: k_BetaGamma ! Ratio between 3D critical shear stress
-                                   ! (Shields-Seminara) and analogous 2D 
-                                   ! criterion (tauc/tauc,00) 
-   double precision :: normal_int(3) ! Normal of the interface between the
-                                     ! mobile particles and the fixed particles 
-                                     ! (bed-load transport in the presence of an
-                                     ! erosion criterion); the normal vector 
-                                     ! points intward the mobile domain
-   double precision :: normal_int_mixture_top(3) ! Normal of the interface 
-                                                 ! between the mixture and the 
-                                                 ! pure fluid (top of the 
-                                                 ! bed-load transport layer, 
-                                                 ! mixture side)
-   double precision :: normal_int_sat_top(3) ! Normal of the interface between 
-                                             ! the fully saturated mixture and 
-                                             ! the rest of the domain
-   double precision :: vel_old(3) ! Velocity vector before the erosion 
-                                  ! criterion (3D erosion criterion)
-   double precision :: normal_int_old(3) ! normal_int variable before the 
-                                         ! erosion criterion (3D erosion 
-                                         ! criterion)
-   double precision :: drho(3) ! Density gradient (SPH pseudo-consistent 
-                               ! approximation over fluid particles)
-   double precision :: rijtempmin(3) ! Minimum distance between a SPH mixture
-                                     ! particle and a SPH pure fluid particle
-   double precision :: vstart(3) ! Initial velocity for fixed particles 
-   double precision :: velmorr(3) ! Velocity to use for Morris scheme
-   double precision :: zer(3) 
-   double precision :: var(3) ! Partially smoothed velocity 
-   double precision :: acc(3) ! Acceleration
-   double precision :: coord(3) ! Position
-   double precision :: CoordOld(3) ! Position at the previous time step 
-   double precision :: sect_old_pos(3) ! Position at the
-                                       ! previous flow rate writing step   
-   double precision :: vel(3) ! Velocity
-   double precision :: velass(3) ! Imposed velocity 
-   double precision :: dvel(3,3) ! Velocity gradient (SPH pseudo-consistent
-                                 ! approximation over fluid particles)
-   character(1)     :: slip ! BC conditions for fixed particles (f=free slip;
-                            ! n=no slip; c=cont slip)
-
-   character(3)     :: vel_type ! Movement type
-   character(3)     :: state ! Particle "status" ("sol": fixed; "flu": mobile)
+! Sound speed
+   double precision :: Csound
+! Density times Shepard coefficient                         
+   double precision :: DensShep
+! SPH approximation of density at the current time step                     
+   double precision :: rhoSPH_new
+! SPH approximation of density at the previous time step 
+   double precision :: rhoSPH_old
+! Lagrangian derivative of Shepard coefficient 
+   double precision :: dShep
+! Discrete Shepard coefficient
+   double precision :: sigma
+! Discrete Shepard coefficient involving neighbours of the same fluid   
+   double precision :: sigma_same_fluid
+! Integral Shepard coefficient
+   double precision :: Gamma
+! Last value of Gamma before FS=3
+   double precision :: Gamma_last_active
+! Initial difference between SPH approx. of density and its exact value. This 
+! is added in the interior domain to each SPH density approx. to solve inlet 
+! problems.
+   double precision :: dens_init_err
+! Main slope angle of the fixed bed (along the direction aligned with the mean 
+! flow; bed-load transport)
+   double precision :: Beta_slope
+! Transversal slope angle of the fixed bed (along the direction transversal to 
+! the mean flow; bed-load transport)
+   double precision :: Gamma_slope
+! Mean of the effective normal stresses
+   double precision :: sigma_prime_m
+! Pressure of the fluid phase (bed-load transport)
+   double precision :: pres_fluid
+! Friction velocity representative of the Surface Neutral Boundary Layer 
+   double precision :: u_star
+! Lift coefficient for the 3D erosion criterion
+   double precision :: C_L
+! Drag coefficient for 3D erosion criterion
+   double precision :: C_D
+! Ratio (tau/tau_c) between bottom shear stress and critical shear stress 
+! (from erosion criterion)
+   double precision :: tau_tauc
+! Ratio between the 3D critical shear stress (Shields-Seminara) and the 
+! analogous 2D criterion value (tauc/tauc,00) 
+   double precision :: k_BetaGamma
+! Normal of the interface between the mobile particles and the fixed particles 
+! (bed-load transport in the presence of an erosion criterion); the normal 
+! points inward the mobile domain
+   double precision :: normal_int(3)
+! Normal of the interface between the mixture and the pure fluid (top of the 
+! bed-load transport layer, mixture side)
+   double precision :: normal_int_mixture_top(3)
+! Normal of the interface between the fully saturated mixture and the rest of 
+! the domain
+   double precision :: normal_int_sat_top(3)
+! Velocity vector before the 3D erosion criterion
+   double precision :: vel_old(3)
+! normal_int variable before the 3D erosion criterion
+   double precision :: normal_int_old(3)
+! Density gradient (SPH pseudo-consistent approximation over fluid particles)
+   double precision :: drho(3)
+! Minimum distance between a SPH mixture particle and a SPH liquid particle
+   double precision :: rijtempmin(3)
+! Initial velocity for fixed particles
+   double precision :: vstart(3)
+! Velocity to use for Morris scheme   
+   double precision :: velmorr(3)
+   double precision :: zer(3)
+! Partially smoothed velocity 
+   double precision :: var(3)
+! Acceleration 
+   double precision :: acc(3)
+! Position
+   double precision :: coord(3)
+! Position at the previous time step
+   double precision :: CoordOld(3)
+! Position at the previous flow rate writing step   
+   double precision :: sect_old_pos(3)
+! Velocity
+   double precision :: vel(3)
+! Imposed velocity
+   double precision :: velass(3)
+! Velocity gradient (SPH pseudo-consistent approximation over fluid particles) 
+   double precision :: dvel(3,3)
+! BC conditions for fixed particles (f=free slip; n=no slip; c=cont slip)
+   character(1)     :: slip
+! Movement type
+   character(3)     :: vel_type
+! Particle "status" ("sol": fixed; "flu": mobile)
+   character(3)     :: state
 end type TyParticle
 
 ! Particle intermediate (time stage) values (time integration scheme RK2)
 type Tytime_stage
-   double precision :: ts_dden ! Stage continuity equation LHS 
-   double precision :: ts_dens ! Stage density
-   double precision :: ts_coord(3) ! Stage position 
-   double precision :: ts_var(3) ! Stage partially smoothed velocity
-   double precision :: ts_vel(3) ! Stage velocity
-   double precision :: ts_acc(3) ! Stage acceleration
+! Stage continuity equation LHS
+   double precision :: ts_dden
+! Stage density 
+   double precision :: ts_dens
+! Stage position
+   double precision :: ts_coord(3)
+! Stage partially smoothed velocity 
+   double precision :: ts_var(3)
+! Stage velocity
+   double precision :: ts_vel(3)
+! Stage acceleration
+   double precision :: ts_acc(3)
 end type Tytime_stage
 
 ! Semi-particles and wall elements (DB-SPH)
 type TyParticle_w
-   integer(4)       :: cella ! Cell number 
-   integer(4)       :: adjacent_faces(3) ! Index of the adjacent_faces (3 
-                                         ! at maximum)
-   integer(4)       :: wet ! =1 for wet wall particle (distance from fluid 
-                           ! particle smaller than 1.3dx)
-   integer(4)       :: surface_mesh_file_ID ! ID of the surface mesh file
-   double precision :: dens ! Density
-   double precision :: pres ! Pressure
-   double precision :: weight ! Area(3D)/length(2D) of the wall element 
-   double precision :: mass ! Mass of the semi-particle
-   double precision :: k_d ! Depth coefficient
-   double precision :: volume ! Semi-particle volume (area in 2D)
-   double precision :: sigma ! Discrete Shepard coefficient of the wall elements
-                             ! depending on fluid particles (not on
-                             ! semi-particles)  
-   double precision :: kin_visc_semi_part ! Kinematic viscosity of the
-                                          ! semi-particle                             
-   double precision :: normal(3) ! Normal
-   double precision :: coord(3) ! Position
-   double precision :: vel(3) ! Velocity
-   double precision :: grad_vel_VSL_times_mu(3) ! Velocity gradient in VSL
-                                                ! (projected along the wall
-                                                ! element normal) times the
-                                                ! shear viscosity
+! Cell number
+   integer(4) :: cella
+! Index of the adjacent_faces (3 at maximum)
+   integer(4) :: adjacent_faces(3)
+! wet=1 for wet wall element (distance from fluid particle smaller than 1.3dx)
+   integer(4) :: wet
+! ID of the surface mesh file
+   integer(4) :: surface_mesh_file_ID
+! Density
+   double precision :: dens
+! Pressure
+   double precision :: pres
+! Area(3D)/length(2D) of the wall element
+   double precision :: weight
+! Mass of the semi-particle 
+   double precision :: mass
+! Depth coefficient
+   double precision :: k_d
+! Semi-particle volume (area in 2D)
+   double precision :: volume
+! Discrete Shepard coefficient of the wall elements depending on fluid 
+! particles (not on semi-particles) 
+   double precision :: sigma
+! Kinematic viscosity of the semi-particle
+   double precision :: kin_visc_semi_part                             
+! Normal
+   double precision :: normal(3)
+! Position
+   double precision :: coord(3)
+! Velocity
+   double precision :: vel(3)
+! Velocity gradient in VSL (projected along the wall element normal) times the
+! shear viscosity
+   double precision :: grad_vel_VSL_times_mu(3)
 end type TyParticle_w
 
 ! Body elements
 type body_element
-   integer(4)       :: npart ! Number of body particles
-   double precision :: teta_R_IO ! rotation angle for IC and I/O purposes
-   double precision :: L_geom(3) ! Element dimensions (Lx,Ly,Lz): a 
-                                 ! paralelepiped
-   double precision :: dx(3) ! Body particle spacing  
-   double precision :: x_CM(3) ! Position of the centre of mass
-   double precision :: n_R_IO(3) ! rotation axis for IC and I/O purposes
-   integer(4)       :: normal_act(6) ! Boolean value to activate 
-                                     ! normals if the element side 
-                                     ! is a body side
-   double precision :: mass_deact(6) ! (xmin,xmax,ymin,xmax,zmin,zmax) to 
-                                     ! deactivate particle masses
+! Number of body particles
+   integer(4) :: npart
+! rotation angle for IC and I/O purposes
+   double precision :: teta_R_IO
+! Element (parallelepiped) dimensions (Lx,Ly,Lz)
+   double precision :: L_geom(3)
+! Body particle spacing
+   double precision :: dx(3)
+! Position of the centre of mass
+   double precision :: x_CM(3)
+! rotation axis for IC and I/O purposes
+   double precision :: n_R_IO(3)
+! Boolean value to activate normals if the element side is a body side
+   integer(4) :: normal_act(6)
+! (xmin,xmax,ymin,xmax,zmin,zmax) to deactivate particle masses
+   double precision :: mass_deact(6)
 end type body_element
 
 ! Rigid solid body
 type body
-   integer(4)       :: npart ! Number of body particles 
-   integer(4)       :: Ic_imposed ! Flag to impose Ic in input
-   integer(4)       :: n_elem ! Number of body particles 
-   integer(4)       :: imposed_kinematics ! Flag for imposed kinematics   
-   integer(4)       :: n_records ! Number of records for imposed body 
-                                 ! kinematics   
-   double precision :: mass ! Mass
-   double precision :: umax ! Maximum among the absolute values of the  
-                            ! particle velocities
-   double precision :: pmax ! Maximum value of pressure
-   double precision :: teta_R_IO ! rotation angle for IC and I/O purposes
-   double precision :: p_max_limiter ! Maximum pressure value for the maximum 
-                                     ! pressure limiter
-   double precision :: x_CM(3) ! Position of the centre of mass
-   double precision :: alfa(3) ! Rotation angle of the body with respect to 
-                               ! the reference system
-   double precision :: x_rotC(3) ! Centre of rotation just to configure the
-                                 ! initial geometry
-   double precision :: u_CM(3) ! Velocity of the centre of mass
-   double precision :: omega(3) ! Angular velocity 
-   double precision :: Force(3) ! Force
-   double precision :: Moment(3) ! Moment / torque
-   double precision :: n_R_IO(3) ! rotation axis for IC and I/O purposes
-   double precision :: rel_pos_part1_t0(3) ! relative position of the first 
-                                           ! particle of the body at the 
-                                           ! beginning of the simulation
-   double precision :: Ic(3,3) ! Moment of inertia
-   double precision :: Ic_inv(3,3) ! Inverse of the moment of inertia
+! Number of body particles
+   integer(4) :: npart
+! Flag to impose Ic in input
+   integer(4) :: Ic_imposed
+! Number of body particles
+   integer(4) :: n_elem
+! Flag for imposed kinematics
+   integer(4) :: imposed_kinematics
+! Number of records for imposed body kinematics      
+   integer(4) :: n_records
+! Mass
+   double precision :: mass
+! Maximum among the absolute values of the particle velocities
+   double precision :: umax
+! Maximum value of pressure
+   double precision :: pmax
+! rotation angle for IC and I/O purposes
+   double precision :: teta_R_IO
+! Maximum pressure value for the maximum pressure limiter
+   double precision :: p_max_limiter
+! Position of the centre of mass
+   double precision :: x_CM(3)
+! Rotation angle of the body with respect to the reference system
+   double precision :: alfa(3)
+! Centre of rotation just to configure the initial geometry
+   double precision :: x_rotC(3)
+! Velocity of the centre of mass
+   double precision :: u_CM(3)
+! Angular velocity
+   double precision :: omega(3)
+! Force 
+   double precision :: Force(3)
+! Moment / torque
+   double precision :: Moment(3)
+! Rotation axis for IC and I/O purposes
+   double precision :: n_R_IO(3)
+! Relative position of the first particle of the body at the beginning of the 
+! simulation
+   double precision :: rel_pos_part1_t0(3)
+! Moment of inertia
+   double precision :: Ic(3,3)
+! Inverse of the moment of inertia
+   double precision :: Ic_inv(3,3)
 ! Array for the imposed body kinematics (n_records*7) 
    double precision,dimension(:,:),allocatable :: body_kinematics 
 ! Array of the elements of the body 
@@ -336,169 +385,191 @@ end type body
 
 ! Body particle
 type body_particle
-   integer(4)       :: body ! Body ID 
-   integer(4)       :: cell ! Cell ID 
-   double precision :: pres ! Pressure
-   double precision :: mass ! Mass 
-   double precision :: area ! Area (length in 2D) for surface body particles
-   double precision :: rel_pos(3) ! Relative position (with respect to the
-                                  ! body centre of mass)
-   double precision :: pos(3) ! Position (with respect to the origin of the
-                              ! reference system)
-   double precision :: vel(3) ! Velocity
-   double precision :: vel_mir(3) ! Velocity of mirror particles
-   double precision :: acc(3) ! Acceleration
-   double precision :: normal(3) ! Normal
+! Body ID
+   integer(4) :: body
+! Cell ID
+   integer(4) :: cell
+! Pressure
+   double precision :: pres
+! Mass
+   double precision :: mass
+! Area (length in 2D) for surface body particles
+   double precision :: area
+! Relative position (with respect to the body barycentre)
+   double precision :: rel_pos(3)
+! Position (with respect to the origin of the reference system)
+   double precision :: pos(3)
+! Velocity
+   double precision :: vel(3)
+! Velocity of mirror particles
+   double precision :: vel_mir(3)
+! Acceleration
+   double precision :: acc(3)
+! Normal
+   double precision :: normal(3)
 end type body_particle
 
 ! Zone
 type TyZone
-   logical          :: DBSPH_fictitious_reservoir_flag ! .true.(DB-SPH
-                                                       ! fictitious fluid
-                                                       ! particles to complete
-                                                       ! the kernel support at
-                                                       ! free surface in
-                                                       ! pre-processing)
-   integer(4)       :: ipool 
-   integer(4)       :: npoints ! number of topographic vertices used for 
-                               ! extrusion (only for a fluid zone extruded from 
-                               ! topography)
-   integer(4)       :: icol ! Particle colour or number of vertical strips
-   integer(4)       :: Medium ! Fluid ID
-   integer(4)       :: npointv ! Number of records at imposed kinematics 
-                               ! (only for fluid zones)  
-   integer(4)       :: IC_source_type ! IC fluid particle distribution from 
-                                      ! reservoir vertices and faces (1) or 
-                                      ! from Cartesian topography (2)
-   integer(4)       :: Car_top_zone ! Zone describing the Cartesian topography,
-                                    ! which contains the reservoir 
-                                    ! (0 if IC_source_type=1)
-   integer(4)       :: plan_reservoir_points ! Number of points describing the
-                                             ! reservoir, if(IC_source_type==2)
-   integer(4)       :: ID_first_vertex ! ID first vertex of topography 
-                                       ! (only for a fluid zone 
-                                       ! extruded from topography)
-   integer(4)       :: ID_last_vertex ! ID last vertex of topography
-                                      ! (only for a fluid zone 
-                                      ! extruded from topography)
-   integer(4)       :: dam_zone_ID ! ID of the dam zone, related to the
-                                   ! eventual reservoir (0 if no dam is 
-                                   ! present), if (IC_source_type==2) 
-   integer(4)       :: dam_zone_n_vertices ! Number of points describing the
-                                           ! horizontal projection of the dam
-                                           ! zone, if (dam_zone_ID>1) 
-   double precision :: dx_CartTopog ! Spatial resolution of the regular 
-                                    ! Cartesian Topography 
-   double precision :: H_res ! Height of the reservoir free surface
-   double precision :: pool 
-   double precision :: valp ! IC for pressure or free surface height
-   integer(4)       :: Indix(2) 
-   integer(4)       :: limit(2) ! Indices of the first and last particle 
-                                ! IDs in the zone 
-   double precision :: vel(3) ! Initial velocity 
-   double precision :: plan_reservoir_pos(4,2) ! Plane coordinates of the 
-                                               ! points (3 or 4), which 
-                                               ! describe the reservoir,
-                                               ! if (IC_source_type==2)
-   double precision :: dam_zone_vertices(4,2) ! Plane coordinates of the points
-                                              ! (3 or 4), which describe the 
-                                              ! dam zone, if (dam_zone_ID>1)
-   double precision :: coordMM(3,2) ! Coordinates of the vertices 
-   double precision :: vlaw(0:3,MAXPOINTSVLAW) ! Initial velocity
-   character(8)     :: label ! Name 
-   character(4)     :: tipo ! Type: "PERI", "SOUR", "OPEN"(, "FLOW", "VELO", 
-                            ! "CRIT", "LEVE", "TAPI", "POOL")
-   character(1)     :: shape ! Shape 
-   character(1)     :: bend ! Colour pattern: uniform or stripped 
-   character(2)     :: pressure ! Assigning IC constant pressure or 
-                                ! hydrostatic distribution 
-   character(3)     :: move ! Motion type: standard or fixed
-   character(1)     :: slip ! Boundary slip condition for fixed particles
-                            ! (f=free slip; n=no slip)
+! Flag to activate/deactivate DB-SPH fictitious fluid particles to complete the 
+! kernel support at free surface to impose initial conditions
+   logical :: DBSPH_fictitious_reservoir_flag
+   integer(4) :: ipool
+! Number of topographic vertices used for extrusion (only for a fluid zone 
+! extruded from topography)
+   integer(4) :: npoints
+! Particle colour or number of vertical strips
+   integer(4) :: icol
+! Fluid ID
+   integer(4) :: Medium
+! Number of records for kinematics imposed (only for fluid zones)  
+   integer(4) :: npointv
+! IC fluid particle distribution from reservoir vertices and faces 
+! (IC_source_type=1) or from Cartesian topography (IC_source_type=2)
+   integer(4) :: IC_source_type
+! Zone describing the Cartesian topography, which contains the reservoir 
+! (Car_top_zone=0 when IC_source_type=1)
+   integer(4) :: Car_top_zone
+! Number of points describing the reservoir if (IC_source_type==2)
+   integer(4) :: plan_reservoir_points
+! ID of the first vertex of topography (for a fluid zone extruded from 
+! topography)
+   integer(4) :: ID_first_vertex
+! ID of the last vertex of topography (for a fluid zone extruded from 
+! topography) 
+   integer(4) :: ID_last_vertex
+! ID of the dam zone, related to the eventual reservoir (dam_zone_ID=0 if no 
+! dam is present), if(IC_source_type==2) 
+   integer(4) :: dam_zone_ID
+! Number of points describing the horizontal projection of the dam zone, 
+! if (dam_zone_ID>1) 
+   integer(4) :: dam_zone_n_vertices
+! Spatial resolution of the regular Cartesian Topography 
+   double precision :: dx_CartTopog
+! Height of the reservoir free surface
+   double precision :: H_res
+   double precision :: pool
+! IC for pressure or free surface height 
+   double precision :: valp
+   integer(4) :: Indix(2)
+! Indices of the first and last particle IDs in the zone  
+   integer(4) :: limit(2)
+! Initial velocity
+   double precision :: vel(3)
+! Coordinates of the vertices
+   double precision :: coordMM(3,2)
+! Horizontal coordinates of the points (3 or 4), which describe the reservoir,
+! if (IC_source_type==2)
+   double precision :: plan_reservoir_pos(4,2)
+! Horizontal coordinates of the points (3 or 4), which describe the dam zone, 
+! if (dam_zone_ID>1)
+   double precision :: dam_zone_vertices(4,2)
+! Initial velocity
+   double precision :: vlaw(0:3,MAXPOINTSVLAW)
+   character(1) :: shape
+! Colour pattern: uniform or stripped 
+   character(1) :: bend
+! Boundary slip condition for fixed particles ("f": free-slip; "n": no-slip)
+   character(1) :: slip
+! Assigning IC constant pressure or hydrostatic distribution 
+   character(2) :: pressure
+! Motion type: standard or fixed
+   character(3) :: move
+! Type: "PERI", "SOUR", "OPEN"(, "FLOW", "VELO", "CRIT", "LEVE", "TAPI", "POOL") 
+   character(4) :: tipo
+! Name
+   character(8) :: label
 end type TyZone
 
 ! Boundary stretch
 type TyBoundaryStretch
-   logical          :: laminar_no_slip_check ! Input variable
-   integer(4)       :: ColorCode
-   integer(4)       :: numvertices
-   integer(4)       :: inivertex
-   integer(4)       :: iniside
-   integer(4)       :: iniface
-   integer(4)       :: medium
-   integer(4)       :: zone
-   double precision :: NormVelocity ! Absolute value of the velocity component,
-                                    ! which is normal to the face 
-   double precision :: FlowRate ! Flow rate exiting the face 
+   logical :: laminar_no_slip_check
+   integer(4) :: ColorCode
+   integer(4) :: numvertices
+   integer(4) :: inivertex
+   integer(4) :: iniside
+   integer(4) :: iniface
+   integer(4) :: medium
+   integer(4) :: zone
+! Absolute value of the velocity component which is normal to the face 
+   double precision :: NormVelocity
+! Flow rate exiting the face
+   double precision :: FlowRate 
    double precision :: ShearCoeff
-   double precision :: velocity(1:SPACEDIM) ! Velocity for "TAPI" zones
+! Velocity for "TAPI" zones
+   double precision :: velocity(1:SPACEDIM)
    double precision :: PsiCoeff(1:SPACEDIM)
    double precision :: FiCoeff(1:SPACEDIM)
-   character(4)     :: tipo ! type: "PERImeter", "SOURce", "OPEN"(, "FIXEd",
-                            ! "POOL", "TAPIs", "LEVEl", "FLOW", "VELOcity",
-                            ! "CRITic") 
+! Type: "PERI", "SOUR", "OPEN"(, "FLOW", "VELO", "CRIT", "LEVE", "TAPI", "POOL")
+   character(4) :: tipo
 end type TyBoundaryStretch
 
 ! Fluid
 type TyMedium
-   logical :: saturated_medium_flag ! saturated_medium_flag=.true.(fully 
-                                    ! saturated medium),.false.(dry medium)  
-   integer(4)       :: index ! Fluid ID 
-   integer(4)       :: NIterSol ! Number of iterations while the mixture is 
-                                ! completely still (beginning of simulation) 
-   double precision :: den0 ! IC density
-   double precision :: den0_s ! Solid phase reference density 
-                              ! (bed-load transport layer)
-   double precision :: eps ! Bulk modulus
-   double precision :: celerita ! Sound speed 
-   double precision :: alfaMon ! Monaghan's alfa parameter 
-                               ! (artificial viscosity)
-   double precision :: betaMon ! Monaghan's beta parameter 
-                               ! (artificial viscosity)
-   double precision :: visc ! Kinematic viscosity  
-   double precision :: coes ! Cohesion
-   double precision :: limiting_viscosity ! Dynamic viscosity threshold 
-                                          ! to save comput. time
-   double precision :: numx ! Maximum value for the kinematic viscosity 
-                            ! (tuning parameter in Manenti et al., 2012, JHE)
-   double precision :: mumx ! Maximum value for the dynamic viscosity 
-                            ! to detect the elasto-plastic regime
-   double precision :: phi ! Internal friction angle
-   double precision :: RoughCoef ! Roughness coefficient 
-   double precision :: d50 ! 50-th percentile diameter of the granular size
-                           ! distribution
-   double precision :: gran_vol_frac_max ! Maximum volume fraction of the solid
-                                         ! phase within an SPH mixture 
-                                         ! particle (bed-load transport layer)
-   double precision :: d_90 ! 90-th percentile diameter of the granular size
-                            ! distribution 
-   character(8)     :: tipo ! Type: "liquid  ","granular"
+! saturated_medium_flag=.true.(fully saturated medium),.false.(dry medium)
+   logical :: saturated_medium_flag
+! Fluid ID
+   integer(4) :: index
+! Number of iterations while the mixture is completely still (IC) 
+   integer(4) :: NIterSol
+! Fluid reference density
+   double precision :: den0
+! Solid phase reference density
+   double precision :: den0_s
+! Bulk modulus
+   double precision :: eps
+! Sound speed
+   double precision :: celerita
+! Monaghan's alfa parameter (artificial viscosity) 
+   double precision :: alfaMon
+! Monaghan's beta parameter (artificial viscosity)
+   double precision :: betaMon
+! Kinematic viscosity
+   double precision :: kin_visc
+   double precision :: limiting_viscosity
+! Maximum value for the kinematic viscosity (tuning parameter in Manenti et 
+! al., 2012, JHE)
+   double precision :: numx
+! Maximum value for the dynamic viscosity to detect the elasto-plastic regime
+   double precision :: mumx
+! Internal friction angle
+   double precision :: phi
+! Roughness coefficient for the erosion criteria
+   double precision :: RoughCoef
+! 50-th percentile diameter of the granular size distribution 
+   double precision :: d50
+! Maximum volume fraction of the solid phase within an SPH mixture particle
+   double precision :: gran_vol_frac_max
+! 90-th percentile diameter of the granular size distribution
+   double precision :: d_90
+! Type: "liquid  ","granular" 
+   character(8) :: tipo
 end type TyMedium
 
 ! Boundary side
 type TyBoundarySide
-   integer(4)       :: stretch
-   integer(4)       :: previous_side
-   integer(4)       :: vertex(1:SPACEDIM-1)
-   integer(4)       :: CloseParticles ! Number of neighbouring particles 
+   integer(4) :: stretch
+   integer(4) :: previous_side
+   integer(4) :: vertex(1:SPACEDIM-1)
+! Number of neighbouring particles
+   integer(4) :: CloseParticles 
    double precision :: length
-   double precision :: CloseParticles_maxQuota ! Maximum height among the  
-                                               ! neighbouring particles
+! Maximum height among the neighbouring particles
+   double precision :: CloseParticles_maxQuota
    double precision :: angle
-   double precision :: velocity(1:SPACEDIM) ! Velocity
-   double precision :: T(1:SPACEDIM,1:SPACEDIM)  ! Direction cosines of the
-                                                 ! local reference system of
-                                                 ! the boundary (the last one
-                                                 ! is the normal)   
-   double precision :: R(1:SPACEDIM, 1:SPACEDIM)      
-   double precision :: RN(1:SPACEDIM, 1:SPACEDIM)
-   character(4)     :: tipo ! type: "FIXEd", "PERImeter", "SOURce"(,"TAPIs",  
-                            ! "LEVEl", "FLOW", "VELOcity", "CRITic", "OPEN")
+   double precision :: velocity(1:SPACEDIM)
+! Direction cosines of the local reference system of the boundary (the last one
+! is the normal)   
+   double precision :: T(1:SPACEDIM,1:SPACEDIM)
+   double precision :: R(1:SPACEDIM,1:SPACEDIM)      
+   double precision :: RN(1:SPACEDIM,1:SPACEDIM)
+! Type: "PERI", "SOUR", "OPEN"(, "FLOW", "VELO", "CRIT", "LEVE", "TAPI", "POOL")
+   character(4) :: tipo
 end type TyBoundarySide
 
 ! Node
 type TyNode
-   integer(4)       :: name
+   integer(4) :: name
 ! Position of the vertex in the global reference system 
    double precision :: GX(1:SPACEDIM)
 ! Position of the vertex in the local reference system
@@ -507,20 +578,20 @@ end type TyNode
 
 ! Face
 type TyBoundaryFace
-   integer(4)       :: nodes
-   integer(4)       :: stretch
-   integer(4)       :: CloseParticles ! Number of neighbouring particles
+   integer(4) :: nodes
+   integer(4) :: stretch
+! Number of neighbouring particles
+   integer(4) :: CloseParticles
    double precision :: area
-   double precision :: CloseParticles_maxQuota ! Maximum height among the  
-                                               ! neighbouring particles
-   double precision :: T(1:SPACEDIM,1:SPACEDIM) ! Direction cosines of the 
-                                                ! local reference system of
-                                                ! the boundary (the last 
-                                                ! one is the normal)
+! Maximum height among the neighbouring particles
+   double precision :: CloseParticles_maxQuota
+! Direction cosines of the local reference system of the boundary (the last 
+! one is the normal)
+   double precision :: T(1:SPACEDIM,1:SPACEDIM)
    double precision :: RPsi(1:SPACEDIM,1:SPACEDIM)
    double precision :: RFi(1:SPACEDIM,1:SPACEDIM)
-   double precision :: velocity(1:SPACEDIM) ! Velocity
-   type(TyNode)     :: Node(1:MAXFACENODES)
+   double precision :: velocity(1:SPACEDIM)
+   type(TyNode) :: Node(1:MAXFACENODES)
 end type TyBoundaryFace
 
 ! Close boundary data table
@@ -692,10 +763,7 @@ type TyGranular_flows_options
                                                                  ! flag 
                                                                  ! (presence of 
                                                                  ! the free 
-
                                                                  ! surface along
-
-
                                                                  ! the vertical)
                                                                  ! at the time 
                                                                  ! of minimum 

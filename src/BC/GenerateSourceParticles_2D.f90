@@ -98,8 +98,8 @@ if (inttimeratio>pinttimeratio) then
             pg(nag)%izona = irz
             pg(nag)%mass = ParticleVolume * Med(Mat)%den0
             pg(nag)%imed = mat           
-            pg(nag)%visc = Med(mat)%visc
-            pg(nag)%mu = Med(mat)%visc * Med(Mat)%den0
+            pg(nag)%kin_visc = Med(mat)%kin_visc
+            pg(nag)%mu = Med(mat)%kin_visc * Med(Mat)%den0
             if (index(Med(mat)%tipo,"liquid")>0) then
                pg(nag)%state  = "flu"
                elseif (index(Med(mat)%tipo,"granular")>0) then
@@ -107,8 +107,8 @@ if (inttimeratio>pinttimeratio) then
             endif
 ! Movement/kinematics index
             pg(nag)%vel_type  = partz(irz)%move   
-            if (partz(irz)%move/="std") pg(nag)%visc=zero
-! Boundary conditions 
+            if (partz(irz)%move/="std") pg(nag)%kin_visc=zero
+! Boundary conditions
             pg(nag)%slip = partz(irz)%slip   
             pg(nag)%cella = ParticleCellNumber(pg(nag)%coord)
 ! Particle colour 

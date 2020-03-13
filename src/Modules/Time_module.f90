@@ -20,12 +20,14 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: Time_module            
-! Description: Module for time recording.                                           
+! Description: Module for time recording.                                 
 !-------------------------------------------------------------------------------
 module Time_module
 use Static_allocation_module
-integer(4),parameter :: redcard = 20 ! Reduced length of strings
-integer(4),parameter :: numb_subr = 21 ! Number of subroutine to count + 1
+! Reduced length of strings
+integer(4),parameter :: redcard = 20
+! Number of feature groups to count + 1
+integer(4),parameter :: numb_subr = 21
 integer(4) :: ifiout
 integer(4),dimension(numb_subr) :: tot_call
 double precision, dimension(numb_subr,2) :: tot_times
@@ -51,10 +53,8 @@ common /strings   / tot_routines,routine,date_exec,prefix,nomefile_sta,        &
                     nomefile_txt,nomefile_chk,nomefile_neu,case_data,case_hour,&
                     case_title,case_subtitle
 common /timetable / tot_times,tot_call
-data tot_routines(1) / "Initialization                          " /
 data tot_routines(2) / "Gest_Input                              " /
 data tot_routines(3) / "Gest_Trans                              " /
-data tot_routines(4) / "   Loop_ghost                           " /
 data tot_routines(5) / "   time_step_loop                       " /
 data tot_routines(6) / "     Motion Equation & Update velocity  " /
 data tot_routines(7) / "     Velocity smoothing                 " /
@@ -65,8 +65,6 @@ data tot_routines(11) / "     Boundary integrals                 " /
 data tot_routines(12) / "     Continuity equation                " /
 data tot_routines(13) / "     State equation                     " /
 data tot_routines(14) / "     Pressure smoothing                 " /
-data tot_routines(15) / "     Apparent viscosity                 " /
-data tot_routines(16) / "     Diffusion model                    " /
 data tot_routines(17) / "     RK time integration                " /
 data tot_routines(18) / "     Wall parameter update              " /
 data tot_routines(19) / "     Rigid body transport               " /

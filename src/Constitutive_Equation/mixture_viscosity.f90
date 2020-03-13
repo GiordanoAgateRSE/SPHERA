@@ -59,7 +59,7 @@ integer(4),external :: ParticleCellNumber,CellIndices
 !------------------------
 ! Initializations
 !------------------------
-mu_main_fluid = Med(Granular_flows_options%ID_main_fluid)%visc *               &
+mu_main_fluid = Med(Granular_flows_options%ID_main_fluid)%kin_visc *           &
                 Med(Granular_flows_options%ID_main_fluid)%den0
 ! Specific weight of the fluid phase
 gamma_fluid = Med(Granular_flows_options%ID_main_fluid)%den0 * GI
@@ -209,7 +209,7 @@ do npi=1,nag
             pg(npi)%mu = Med(pg(npi)%imed)%limiting_viscosity
       endif
 ! Kinematic viscosity is updated
-      pg(npi)%visc = pg(npi)%mu / pg(npi)%dens
+      pg(npi)%kin_visc = pg(npi)%mu / pg(npi)%dens
    endif
 enddo
 !$omp end parallel do

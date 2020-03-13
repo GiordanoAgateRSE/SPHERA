@@ -166,7 +166,7 @@ if ((it_rest==it).or.(index(str,'inizio')/=0).or.(index(str,'fine')/=0)) then
       write(nres) it,simulation_time,dt,nag,ncord,restartcode
       write(nres) pg(1:nag)%coord(1),pg(1:nag)%coord(2),pg(1:nag)%coord(3),    &
          pg(1:nag)%vel(1),pg(1:nag)%vel(2),pg(1:nag)%vel(3),pg(1:nag)%pres,    &
-         pg(1:nag)%dens,pg(1:nag)%mass,pg(1:nag)%visc,pg(1:nag)%VolFra,        &
+         pg(1:nag)%dens,pg(1:nag)%mass,pg(1:nag)%kin_visc,pg(1:nag)%VolFra,    &
          pg(1:nag)%imed,pg(1:nag)%icol
       flush(nres)
       if (index(str,'inizio')==0) then
