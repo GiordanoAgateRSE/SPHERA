@@ -20,7 +20,8 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: stoptime                                          
-! Description: Stopping time.
+! Description: Assessment of the final simulation time for each medium 
+!              depending on the motion type. 
 !-------------------------------------------------------------------------------
 subroutine stoptime(partzlocal,tstop)
 !------------------------

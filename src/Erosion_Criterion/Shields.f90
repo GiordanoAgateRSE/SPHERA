@@ -315,7 +315,7 @@ if (Granular_flows_options%ID_erosion_criterion>1) then
                  dot_product(pg(intliq_id)%vel_old,pg(npi)%normal_int) *       &
                  pg(npi)%normal_int(:)  
       Velocity = dsqrt(dot_product(vel_s,vel_s))
-endif             
+endif
 ! To compute the distance between the computational particle and the interacting 
 ! particle (the height difference does not work for inclined beds)
 if (Granular_flows_options%ID_erosion_criterion==1) then

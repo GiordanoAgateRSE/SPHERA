@@ -524,7 +524,7 @@ type TyMedium
    double precision :: alfaMon
 ! Monaghan's beta parameter (artificial viscosity)
    double precision :: betaMon
-! Kinematic viscosity
+! Kinematic viscosity (in case of granular media, kin_visc=mumx)
    double precision :: kin_visc
    double precision :: limiting_viscosity
 ! Maximum value for the kinematic viscosity (tuning parameter in Manenti et 

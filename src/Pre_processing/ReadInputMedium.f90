@@ -113,10 +113,9 @@ do while (trim(lcase(ainp))/="##### end medium #####")
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"PHI, SATURATED_MEDIUM_FLAG",&
             ninp,ulog)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         read(ainp,*,iostat=ioerr) viscmx,visc,limiting_viscosity
+         read(ainp,*,iostat=ioerr) viscmx,limiting_viscosity
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                             &
-            "THRESHOLD VISCOSITY, TUNING VISCOSITY & LIMITING VISCOSITY",ninp, &
-            ulog)) return            
+            "THRESHOLD VISCOSITY & LIMITING VISCOSITY",ninp,ulog)) return            
          if (Granular_flows_options%ID_erosion_criterion==1) then
             call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
             read(ainp,*,iostat=ioerr) porosity,d50,d_90
@@ -145,7 +144,13 @@ do while (trim(lcase(ainp))/="##### end medium #####")
       Med(index)%alfaMon = alfaMon
       Med(index)%betaMon = betaMon
 ! Temporarily, "Med(index)%kin_visc" is a dynamic viscosity
-      Med(index)%kin_visc = visc
+      if (tipo=="liquid  ") then
+         Med(index)%kin_visc = visc
+         else
+! Redundant statement, but useful to avoid a medium with null viscosity (e.g., 
+! assessment of the time step duration)
+            Med(index)%kin_visc = viscmx
+      endif
 ! Temporarily, "Med(index)%mumx" is a dynamic viscosity
       Med(index)%mumx = viscmx
       Med(index)%phi = phi
