@@ -32,4 +32,3 @@ interface
    end subroutine 
 end interface 
 end module I_O_diagnostic_module
-

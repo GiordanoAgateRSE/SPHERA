@@ -28,128 +28,167 @@
 module Hybrid_allocation_module
 use Static_allocation_module
 type TyGlobal
-   logical          :: NormFix
-   logical          :: Slip
-   integer(4)       :: iplot_fr ! Output frequency on log file                      
-   integer(4)       :: imemo_fr ! Saving frequency                      
-   integer(4)       :: irest_fr ! Restart file frequency                      
-   integer(4)       :: icpoi_fr ! Monitoring point output frequency 
-   integer(4)       :: ipllb_fr ! Output frequency for free surface                      
-   integer(4)       :: ipllb_md ! Reference fluid for free surface
-   integer(4)       :: istart ! Initial time step ID                         
-   integer(4)       :: ioutopt ! Printing code for log file                       
-   integer(4)       :: itmax ! Maximum step number   
-   integer(4)       :: body_part_reorder ! Flag for body particles reordering
-   integer(4)       :: nag_aux ! Rough and slight overestimation of the number 
-                               ! of fluid particles in the reservoir (auxiliary 
-                               ! parameter useful for extruded reservoir IC)           
-   integer(4)       :: MAXCLOSEBOUNDFACES ! Maximum number of neighbouring 
-                                          ! SA-SPH faces for a computational 
-                                          ! particle
-   integer(4)       :: MAXNUMCONVEXEDGES ! Maximum number of convex edges             
-   integer(4)       :: density_thresholds ! Density_thresholds flag (default=0;
-                                          ! =1 for very low bulk modulus  
-                                          ! -preliminary simulations-)            
-   integer(4)       :: time_split ! Flag for Leapfrog scheme                    
-   integer(4)       :: RKscheme ! RK scheme (1,2,3,4) (time_split=0)                      
-   integer(4)       :: time_stage ! Stage of RK schemes                                           
-   double precision :: tmax ! Maximum physical time                           
-   double precision :: dx ! dx: particle size                             
-   double precision :: trunc ! h/dx, h=dx*trunc                         
-   double precision :: PVolume ! dx^D, D: domain dimensionality                        
+   logical :: NormFix
+   logical :: Slip
+! Output frequency on log file
+   integer(4) :: iplot_fr
+! Saving frequency                      
+   integer(4) :: imemo_fr
+! Restart file frequency                      
+   integer(4) :: irest_fr
+! Monitoring point output frequency                      
+   integer(4) :: icpoi_fr
+! Output frequency for free surface 
+   integer(4) :: ipllb_fr
+! Reference fluid for free surface                      
+   integer(4) :: ipllb_md
+! Initial time step ID
+   integer(4) :: istart
+! Printing code for log file                        
+   integer(4) :: ioutopt
+! Maximum step number                       
+   integer(4) :: itmax
+! Flag for body particles reordering
+   integer(4) :: body_part_reorder
+! Rough and slight overestimation of the number of fluid particles in the 
+! reservoir (auxiliary parameter useful for extruded reservoir IC)           
+   integer(4) :: nag_aux
+! Maximum number of neighbouring SA-SPH faces for a computational particle
+   integer(4) :: MAXCLOSEBOUNDFACES
+! Maximum number of convex edges
+   integer(4) :: MAXNUMCONVEXEDGES
+! Density_thresholds flag (default=0; =1 for very low bulk modulus -preliminary 
+! simulations-)            
+   integer(4) :: density_thresholds
+! Flag for Leapfrog scheme
+   integer(4) :: time_split
+! RK scheme (1,2,3,4) (time_split=0)                    
+   integer(4) :: RKscheme
+! Stage of RK schemes                       
+   integer(4) :: time_stage
+! Maximum physical time                                           
+   double precision :: tmax
+! Particle size                           
+   double precision :: dx
+! h/dx, h=dx*trunc                          
+   double precision :: trunc
+! dx^D, D: domain dimensionality                       
+   double precision :: PVolume                        
    double precision :: coefke  
    double precision :: coefkacl  
-   double precision :: CFL ! CFL number
-   double precision :: vsc_coeff ! viscous stability condition coefficient, 
-                                 ! default value: 0.05
-   double precision :: prif ! Reference pressure                          
-   double precision :: plot_fr ! Output frequency for log file                       
-   double precision :: memo_fr ! Frequency for result saving 
-   double precision :: rest_fr ! Output frequency for restart files
-   double precision :: cpoi_fr ! Output frequency for monitoring points
-   double precision :: pllb_fr ! Output frequency for free surface                       
-   double precision :: depth_dt_out ! Output frequency for water depth                 
-   double precision :: depth_it_out_last ! Last time step when water depth 
-                                         ! was printed (auxiliary variable)             
-   double precision :: TetaP ! Partial smoothing parameter for pressure                         
-   double precision :: TetaV ! Partial smoothing parameter for velocity                         
-   double precision :: h ! Kernel support length scale                              
-   double precision :: start ! Simulation start time                         
-   double precision :: COEFNMAXPARTI ! Max number of fluid 
-                                     ! particles=nag*COEFNMAXPARTI                 
-   double precision :: COEFNMAXPARTJ ! maxb(maximum number of 
-                                     ! fluid neighbours) = COEFNMAXPARTJ * 
-                                     ! (4h/dx)^D  
-   double precision :: t0 ! Time at the beginning of the simulation 
-                          ! (origin: beginning of the year)                            
-   double precision :: t_pre_iter ! Time at the beginning of the iterations
-                                  ! (origin: beginning of the year)                 
-   double precision :: grav(3) ! Gravity                        
-   double precision :: coord(3,2) ! Coordinates of 2 vertices of a diagonal 
-                                  ! of the parallelepiped domain                       
-   character(4)     :: tipo
-   character(LEN=lencard) :: file ! string for a file name
-   character(1)     :: Psurf 
-   character(1)     :: RandomPos ! IC particle distribution noise. "r": slight 
-                                 ! white noise is added, otherwise nothing.  
+   double precision :: CFL
+! Viscous stability criterion coefficient, default value: 0.05
+   double precision :: vsc_coeff
+! Reference pressure
+   double precision :: prif
+! Output frequency for log file                       
+   double precision :: plot_fr
+! Frequency for result saving                       
+   double precision :: memo_fr
+! Output frequency for restart files 
+   double precision :: rest_fr
+! Output frequency for monitoring points
+   double precision :: cpoi_fr
+! Output frequency for free surface
+   double precision :: pllb_fr 
+! Output time step for water depth
+   double precision :: depth_dt_out
+! Last time step when water depth was printed (auxiliary variable)                         
+   double precision :: depth_it_out_last
+! Partial smoothing parameter for pressure
+   double precision :: TetaP
+! Partial smoothing parameter for velocity                         
+   double precision :: TetaV
+! Kernel support length scale                         
+   double precision :: h
+! Simulation start time                          
+   double precision :: start
+! Max number of fluid particles = nag * COEFNMAXPARTI                                  
+   double precision :: COEFNMAXPARTI
+! maxb(maximum number of fluid neighbours) = COEFNMAXPARTJ * (4h/dx)^D  
+   double precision :: COEFNMAXPARTJ
+! Time at the beginning of the simulation (origin: beginning of the year)                            
+   double precision :: t0
+! Time at the beginning of the iterations (origin: beginning of the year)
+   double precision :: t_pre_iter
+! Gravity acceleration
+   double precision :: grav(3)
+! Coordinates of 2 vertices of a diagonal of the parallelepiped domain                                            
+   double precision :: coord(3,2)
+   character(4) :: tipo
+   character(LEN=lencard) :: file
+   character(1) :: Psurf
+! IC particle distribution noise. "r": slight white noise is added, otherwise 
+! no noise.
+   character(1) :: RandomPos
 end type TyGlobal
 
 ! Background positioning grid 
 type TyGriglia
-   integer(4)       :: nmax ! Number of cells                           
-   integer(4)       :: ncd(3) ! Number of cells for each axis direction                         
-   double precision :: dcd(3) ! Grid resolutions                          
-   double precision :: extr(3,2) ! Coordinates of 2 vertices of a diagonal 
-                                 ! of the parallelepiped domain                      
+! Number of cells
+   integer(4) :: nmax
+! Number of cells for each axis direction                         
+   integer(4) :: ncd(3)
+! Grid resolutions                   
+   double precision :: dcd(3)
+! Coordinates of 2 vertices of a diagonal of the parallelepiped domain
+   double precision :: extr(3,2)
 end type TyGriglia
 
 ! Fluid particle 
 type TyParticle
-   integer(4)       :: DBSPH_inlet_ID ! ID of an inlet neighbouring DB-SPH 
-                                      ! surface element, if any (otherwise it is
-                                      ! null)                
-   integer(4)       :: DBSPH_outlet_ID ! ID of an outlet neighbouring DB-SPH  
-                                       ! surface element, if any (otherwise it
-                                       ! is null)               
-   integer(4)       :: indneighliqsol ! Neighbouring "liquid"/"granular" 
-                                      ! particle for
-                                      ! a computational "granular"/"liquid" 
-                                      ! particle (erosion criterion)                
-   integer(4)       :: ind_neigh_mix_bed ! Index of the mobile ("flu"/mixture) 
-                                         ! particle, which is the closest to a 
-                                         ! computational fixed ("sol"/bed) 
-                                         ! particle and viceversa             
-   integer(4)       :: blt_flag ! Bed-load transport flag: 0:generic position,
-                                ! 1:free surface; 2:top of bed-load transport
-                                ! zone, 3:fixed bed; 4: bottom of the granular 
-                                ! material; 5: top of the saturated zone.                      
-   integer(4)       :: ind_neigh_mob_for_granmob ! Index of the mobile 
-                                                 ! ("flu"/mixture) particle,
-                                                 ! which is the closest to
-                                                 ! the computational mobile
-                                                 ! granular ("sol"/bed) one     
-   integer(4)       :: kodvel ! Velocity code                         
-   integer(4)       :: koddens ! Density code                       
-   integer(4)       :: CloseBcOut                     
-   integer(4)       :: cella ! Cell number                          
-   integer(4)       :: izona                         
-   integer(4)       :: icol ! Colour 
-   integer(4)       :: imed ! Fluid ID                          
-   integer(4)       :: FS ! Free Surface (0,3: no free surface; 1,2: free 
-                          ! surface) (2,3: deactivated for Shep evolution) 
-   integer(4)       :: laminar_flag ! Laminar flag
+! ID of an inlet neighbouring DB-SPH surface element, if any (otherwise it is
+! null)                
+   integer(4) :: DBSPH_inlet_ID
+! ID of an outlet neighbouring DB-SPH surface element, if any (otherwise it is 
+! null)               
+   integer(4) :: DBSPH_outlet_ID
+! Neighbouring "liquid"/"granular" particle for a computational "granular" / 
+! "liquid" particle (erosion criterion)                
+   integer(4) :: indneighliqsol
+! Index of the mobile ("flu"/mixture) particle, which is the closest to a 
+! computational fixed ("sol"/bed) particle and viceversa          
+   integer(4) :: ind_neigh_mix_bed
+! Bed-load transport flag: =0: generic position; =1: free surface; =2: top of 
+! bed-load transport zone; =3: fixed bed; =4: bottom of the granular material; 
+! =5: top of the saturated zone.                         
+   integer(4) :: blt_flag
+! Index of the mobile ("flu"/mixture) particle, which is the closest to the 
+! computational mobile granular ("sol"/bed) one     
+   integer(4) :: ind_neigh_mob_for_granmob
+! Velocity code
+   integer(4) :: kodvel
+! Density code                    
+   integer(4) :: koddens                       
+   integer(4) :: CloseBcOut                     
+   integer(4) :: cella                          
+   integer(4) :: izona
+! Colour                         
+   integer(4) :: icol
+! Fluid ID 
+   integer(4) :: imed
+! Free Surface (0,3: no free surface; 1,2: free surface; 2,3: deactivated for 
+! "Shep" evolution)                           
+   integer(4) :: FS
+   integer(4) :: laminar_flag
    double precision :: densass                        
-   double precision :: mass ! Mass                          
-   double precision :: dens ! Density                          
-   double precision :: pres ! Pressure                           
-   double precision :: dden ! Continuity equation LHS                             
-   double precision :: uni ! Shepard coefficient (Shep: discrete or integral,
-                           ! it depends on the input data)                           
-   double precision :: vpres ! Pressure correction                          
-   double precision :: vden ! Density correction                           
-   double precision :: secinv ! Second invariant of the strain rate tensor 
-                              ! for incompressible fluids                        
-   double precision :: dudx  
+   double precision :: mass
+! Density                          
+   double precision :: dens
+! Pressure                          
+   double precision :: pres
+! Continuity equation LHS                           
+   double precision :: dden
+! Shepard coefficient ("Shep": discrete or integral, it depends on the input 
+! data)                                                        
+   double precision :: uni
+! Pressure correction
+   double precision :: vpres
+! Density correction                          
+   double precision :: vden
+! Second invariant of the strain rate tensor for incompressible fluids                         
+   double precision :: secinv        
+   double precision :: dudx
    double precision :: dudy 
    double precision :: dvdx 
    double precision :: dvdy
@@ -157,7 +196,7 @@ type TyParticle
    double precision :: kin_visc
 ! (mixture or liquid) dynamic viscosity
    double precision :: mu
-! Stop time                            
+! Stop time                 
    double precision :: tstop                          
    double precision :: mno    
    double precision :: ang                       
@@ -251,11 +290,11 @@ type TyParticle
 ! Velocity gradient (SPH pseudo-consistent approximation over fluid particles) 
    double precision :: dvel(3,3)
 ! BC conditions for fixed particles (f=free slip; n=no slip; c=cont slip)
-   character(1)     :: slip
+   character(1) :: slip
 ! Movement type
-   character(3)     :: vel_type
+   character(3) :: vel_type
 ! Particle "status" ("sol": fixed; "flu": mobile)
-   character(3)     :: state
+   character(3) :: state
 end type TyParticle
 
 ! Particle intermediate (time stage) values (time integration scheme RK2)
@@ -596,68 +635,78 @@ end type TyBoundaryFace
 
 ! Close boundary data table
 type TyBoundaryData
-   integer(4)       :: CloBoNum ! Number of neighbouring faces for a particle
-   double precision :: LocXYZ(1:SPACEDIM) ! Face normal vectors in the local 
-                                          ! reference system
-   double precision :: BoundaryIntegral(1:8) ! Table of integrals  
-   double precision :: IntGiWrRdV(1:SPACEDIM,1:SPACEDIM) ! Table of integrals 
+! Number of neighbouring faces for a particle
+   integer(4)       :: CloBoNum
+! Face normal vectors in the local reference system
+   double precision :: LocXYZ(1:SPACEDIM)
+! Table of integrals
+   double precision :: BoundaryIntegral(1:8)
+! Table of integrals
+   double precision :: IntGiWrRdV(1:SPACEDIM,1:SPACEDIM)
 end type TyBoundaryData
 
 type TyBoundaryConvexEdge
    double precision :: length                         
-   integer(4)       :: face(1:2)
+   integer(4) :: face(1:2)
    double precision :: component(1:SPACEDIM)         
-   type(TyNode)     :: Node(1:2)
+   type(TyNode) :: Node(1:2)
 end type TyBoundaryConvexEdge
 
 ! Control point
 type TyCtlPoint
-   integer(4)       :: cella                         
-   double precision :: pres ! Interpolated pressure 
-   double precision :: dens ! Interpolated density
-   double precision :: uni ! Interpolated Shepard coefficient
-   double precision :: dist 
-   double precision :: coord(3) ! Position
-   double precision :: vel(3) ! Interpolated velocity                          
+   integer(4) :: cella
+! Interpolated pressure                    
+   double precision :: pres
+! Interpolated density 
+   double precision :: dens
+! Interpolated Shepard coefficient
+   double precision :: uni
+   double precision :: dist
+! Position
+   double precision :: coord(3)
+! Interpolated velocity
+   double precision :: vel(3)
 end type TyCtlPoint
 
 ! Control line
 type TyCtlLine
-   integer(4)       :: icont(2) ! Pointers  to the initial and last monitoring  
-                                ! points of the discretized line
-   character(8)     :: label ! Name 
+! Pointers  to the initial and last monitoring points of the discretized line
+   integer(4) :: icont(2)
+   character(8) :: label
 end type TyCtlLine
 
 ! Monitoring section for flow rate (ID depends on the input order)
 type tyQ_section_array
-   integer(4)       :: n_vertices ! Number of vertices describing a monitoring
-                                  ! section for the flow rate (3 or 4)
-   double precision :: area ! Area 
-   double precision :: normal(3) ! Normal 
-   double precision :: vertex(4,3) ! Vertices (in case of 3 vertices, 
-                                   ! do not mind about the fourth point)
-   double precision :: vertex_loc(4,3) ! Vertices (local coordinates:
-                                       ! the origin is vertex1, the third local
-                                       ! axis is the normal)
-   double precision :: loc_axis(3,3) ! Local axis (axis 1: vertex2-vertex1, 
-                                     ! axis 2: vector product of local axis 1
-                                     ! and normal; axis 3: normal)
+! Number of vertices describing a monitoring section for the flow rate (3 or 4)
+   integer(4) :: n_vertices
+   double precision :: area
+   double precision :: normal(3)
+! Vertices (in case of 3 vertices, do not mind about the fourth point)
+   double precision :: vertex(4,3)
+! Vertices (local coordinates: the origin is vertex1, the third local axis is 
+! the normal)
+   double precision :: vertex_loc(4,3)
+! Local axis (axis 1: vertex2-vertex1, axis 2: vector product of local axis 1
+! and the normal; axis 3: normal)
+   double precision :: loc_axis(3,3)
 ! Section flow rate per fluid type and global: flow_rate(n_fluid_types+1)
    double precision,dimension(:),allocatable  :: flow_rate          
 end type
 
 ! Monitoring sections for flow rate 
 type TyQ_section
-   integer(4)       :: n_sect ! Number of monitoring sections for the flow rate 
-   integer(4)       :: n_fluid_types ! Number of fluid types (the first ID 
-                                     ! fluid types are selected)
-   integer(4)       :: it_out_last ! Auxiliary variable to print flow rates 
-   double precision :: dt_out ! Writing time step for section flow rates
-! type section to monitor flow rates
+! Number of monitoring sections for the flow rate
+   integer(4) :: n_sect
+! Number of fluid types (the first ID fluid types are selected)
+   integer(4) :: n_fluid_types
+! Auxiliary variable to print flow rates
+   integer(4) :: it_out_last
+! Writing time step for the monitoring sections
+   double precision :: dt_out
    type(tyQ_section_array),dimension(:),allocatable :: section           
 end type
 
-! Substation array (ref. input file template)
+! Substation array
 type type_substation
    integer(4) :: n_vertices
 ! Substation type
@@ -687,9 +736,9 @@ end type
 
 ! Monitoring the electrical substations (ref. input file template)
 type type_substations
-   integer(4)       :: n_sub
+   integer(4) :: n_sub
 ! Last time step of substation result writing (auxiliary variable)
-   integer(4)       :: it_out_last
+   integer(4) :: it_out_last
 ! Writing time step for substations
    double precision :: dt_out
 ! type for the substation array
@@ -698,153 +747,110 @@ end type
 
 ! Derived type for bed-load transport layer 
 type TyGranular_flows_options
-   integer(4)       :: ID_erosion_criterion ! Erosion criterion ID 
-                                            ! (1:Shields-Seminara,
-                                            ! 2:Shields,3:Mohr-Coulomb)
-   integer(4)       :: ID_main_fluid ! ID of the main flow 
-   integer(4)       :: monitoring_lines ! Number of monitoring lines aligned 
-                                        ! with x- or y-axis
-   integer(4)       :: it_out_last ! Auxiliary variable for post-processing
-   integer(4)       :: n_max_iterations ! Maximum number of iterations 
-                                        ! (iterative process, which estimates
-                                        ! u_star)
-   integer(4)       :: erosion_flag ! Erosion_flag: 0(activated far from 
-                                    ! fronts); 1(not activated), 
-                                    ! 2(activated everywhere)
-   integer(4)       :: deposition_at_frontiers ! Forced deposition at frontiers
-                                               ! (erosion criterion=2): yes(1)
-                                               ! or no(2) 
-   integer(4)       :: Gamma_slope_flag ! Flag to activate (or not) Gamma_slope       
-                                        ! (effects only when ID_erosion 
-                                        ! criterion=1) 
-   integer(4)       :: saturation_scheme ! saturation_scheme=0(dry soil),1(fully 
-                                         ! saturated soil),2(saturation zones 
-                                         ! depepending on 
-                                         ! time_minimum_saturation and
-                                         ! time_maximum_saturation),3(Lagrangian 
-                                         ! scheme for saturation conditions)
-   double precision :: time_minimum_saturation ! Time related to the minimum 
-                                               ! saturation of the granular 
-                                               ! material.
-   double precision :: time_maximum_saturation ! Time related to the maximum 
-                                               ! saturation of the granular 
-                                               ! material. So far, 
-                                               ! time_minimum_saturation 
-                                               ! has to be smaller than (or 
-                                               ! equal to) 
-                                               ! time_maximum_saturation.
-                                               ! When t<=t_min_sat, there is 
-                                               ! always phreatic zone below the 
-                                               ! free surface and dry soil 
-                                               ! elsewhere. When t>=t_max_sat, 
-                                               ! the saturation zones are 
-                                               ! freezed at t_max_sat.
-   double precision :: conv_crit_erosion ! Convergence criterion for erosion  
-   double precision :: velocity_fixed_bed ! (optional) velocity_fixed_bed:  
-                                          ! velocity threshold (input) to 
-                                          ! speed-up a simulation 
-   double precision :: dt_out ! Writing time step for the interface monitoring
-                              ! lines
-   double precision :: x_min_dt ! x_min to involve SPH mixture particles in dt
-                                ! estimation
-   double precision :: x_max_dt ! x_max to involve SPH mixture particles in dt 
-                                ! estimation
-   double precision :: y_min_dt ! y_min to involve SPH mixture particles in dt
-                                ! estimation
-   double precision :: y_max_dt ! y_max to involve SPH mixture particles in dt 
-                                ! estimation
-   double precision :: z_min_dt ! z_min to involve SPH mixture particles in dt 
-                                ! estimation
-   double precision :: z_max_dt ! z_max to involve SPH mixture particles in dt 
-                                ! estimation 
-   double precision :: t_q0 ! t_q0: quake start time 
-   double precision :: t_liq ! t_liq: liquefaction time
-   logical,dimension(:,:),allocatable :: minimum_saturation_flag ! Free surface 
-                                                                 ! flag 
-                                                                 ! (presence of 
-                                                                 ! the free 
-                                                                 ! surface along
-                                                                 ! the vertical)
-                                                                 ! at the time 
-                                                                 ! of minimum 
-                                                                 ! saturation of
-                                                                 ! the granular 
-                                                                 ! material
-   logical,dimension(:,:),allocatable :: maximum_saturation_flag ! Free surface 
-                                                                 ! flag 
-                                                                 ! (presence of 
-                                                                 ! the free 
-                                                                 ! surface along
-                                                                 ! the vertical)
-                                                                 ! at the time 
-                                                                 ! of maximum 
-                                                                 ! saturation of
-                                                                 ! the granular 
-                                                                 ! material
-   integer(4),dimension(:,:),allocatable :: saturation_conditions 
-! Saturation conditions: 1 (phreatic zone), 2 (infiltration zone), 3 (dry soil)
+! Erosion criterion ID
+   integer(4) :: ID_erosion_criterion
+   integer(4) :: ID_main_fluid
+! Number of monitoring lines aligned with x- or y-axis
+   integer(4) :: monitoring_lines
+! Auxiliary variable for post-processing
+   integer(4) :: it_out_last
+! Maximum number of iterations (iterative process, which estimates u_star)
+   integer(4) :: n_max_iterations
+! Erosion_flag: 0(activated far from fronts); 1(not activated), 2(activated 
+! everywhere)
+   integer(4) :: erosion_flag
+! Forced deposition at frontiers 
+   integer(4) :: deposition_at_frontiers
+! Flag to activate (or not) Gamma_slope
+   integer(4) :: Gamma_slope_flag
+   integer(4) :: saturation_scheme
+   double precision :: time_minimum_saturation
+   double precision :: time_maximum_saturation
+! Convergence criterion for erosion
+   double precision :: conv_crit_erosion
+! Velocity threshold (input)
+   double precision :: velocity_fixed_bed
+   double precision :: dt_out
+! x_min to involve SPH mixture particles in dt estimation
+   double precision :: x_min_dt
+   double precision :: x_max_dt
+   double precision :: y_min_dt
+   double precision :: y_max_dt
+   double precision :: z_min_dt
+   double precision :: z_max_dt
+! Quake start time
+   double precision :: t_q0
+! Liquefaction time
+   double precision :: t_liq
+! Free surface flag at the time of minimum saturation of the granular material
+   logical,dimension(:,:),allocatable :: minimum_saturation_flag
+   logical,dimension(:,:),allocatable :: maximum_saturation_flag
+   integer(4),dimension(:,:),allocatable :: saturation_conditions
 ! x and/or y coordinates defining the monitoring line/point   
    double precision,dimension(:,:),allocatable :: lines                  
 end type
 
 ! Face (DB-SPH)
-type face_der_type                                                                  
-   integer(4),dimension(4)       :: vert_list ! List of face/segment vertices 
-                                              ! (triangles in 3D)  
-   double precision              :: area ! Face area/length in 3D/2D
-   double precision,dimension(3) :: normal ! Face normal 
+type face_der_type
+! List of face/segment vertices (triangles in 3D)                                             
+   integer(4),dimension(4) :: vert_list  
+ ! Face area/length in 3D/2D
+   double precision :: area
+   double precision,dimension(3) :: normal 
 end type
 
 ! Vertex
 type vertex_der_type
-   double precision,dimension(3) :: pos ! Vertex position                                         
+! Position
+   double precision,dimension(3) :: pos                                         
 end type
 
 ! Surface mesh for DB-SPH boundaries
 type DBSPH_surf_mesh_der_type 
 ! ID of the surface mesh file
-   integer(4),allocatable,dimension(:)            :: surface_mesh_file_ID
+   integer(4),allocatable,dimension(:) :: surface_mesh_file_ID
 ! List of vertices of the surface mesh
    type(vertex_der_type),allocatable,dimension(:) :: vertices  
 ! List of faces (both 3D and 2D)
-   type(face_der_type),allocatable,dimension(:)   :: faces                    
+   type(face_der_type),allocatable,dimension(:) :: faces                    
 end type 
 
 ! Derived type for DB-SPH bundary treatment scheme
-type DBSPH_der_type 
-   logical           :: MUSCL_boundary_flag ! Flag to activate (or not) 
-                                            ! boundary terms for MUSCL 
-                                            ! reconstruction
-   logical           :: in_built_monitors ! Flag to activate (or not) 
-                                          ! in-built motion of control lines 
-   logical           :: Gamma_limiter_flag ! flag to activate or deactivate 
-                                           ! Gamma upper limiter (1.)
-   logical           :: negative_wall_p_allowed ! pressure of wall elements can 
-                                                ! be negative
-   logical           :: FS_allowed ! free surface detection can be avoided
-   integer(4)        :: n_w ! Number of surface elements
-   integer(4)        :: n_monitor_points ! Number of monitoring points
-   integer(4)        :: n_monitor_regions ! Number of monitoring regions 
-                                          ! (0 or 1) to estimate the Force
-                                          ! along x-direction
-   integer(4)        :: n_inlet ! Number of inlet sections (to impose DBSPH 
-                                ! inlet BC)
-   integer(4)        :: n_outlet ! Number of outlet sections (to impose 
-                                 ! DBSPH outlet BC)
-   integer(4)        :: ply_n_face_vert ! Number of vertices for each surface 
-                                        ! mesh face in the .ply input files 
-   integer(4)        :: surface_mesh_files ! number of files of the DBSPH 
-                                           ! surface meshes
-   integer(4)        :: slip_ID ! slip_ID (ID for slip conditions) = 0 
-                                ! (free-slip),1 (no-slip), 2 (run-time choice 
-                                ! depending on the inner shear viscosity terms 
-                                ! in SPH-NS balance equations)
-   double precision  :: dx_dxw ! Ratio between the fluid and the 
-                               ! semi-particle sizes
-   double precision  :: k_w ! Coefficient to compute semi-particle volumes
-                            ! (DB-SPH equations)
-   double precision  :: monitor_region(6) ! (xmin,xmax,ymin,xmax,zmin,zmax)
-                                          ! to detect the monitoring region
+type DBSPH_der_type
+! Flag to activate (or not) boundary terms for MUSCL reconstruction
+   logical :: MUSCL_boundary_flag
+! Flag to activate (or not) in-built motion of control lines 
+   logical :: in_built_monitors
+! Flag to activate or deactivate Gamma upper limiter (1.)
+   logical :: Gamma_limiter_flag
+! Pressure of wall elements can be negative
+   logical :: negative_wall_p_allowed
+! Free surface detection can be avoided
+   logical :: FS_allowed
+! Number of surface elements
+   integer(4) :: n_w
+! Number of monitoring points
+   integer(4) :: n_monitor_points
+! Number of monitoring regions (0 or 1) to estimate the Force along x-direction
+   integer(4) :: n_monitor_regions
+! Number of inlet sections (to impose DBSPH inlet BC)
+   integer(4) :: n_inlet
+! Number of outlet sections (to impose DBSPH outlet BC)
+   integer(4) :: n_outlet
+! Number of vertices for each surface mesh face in the ".ply" input files 
+   integer(4) :: ply_n_face_vert
+! Number of files of the DBSPH surface meshes
+   integer(4) :: surface_mesh_files
+! slip_ID (ID for slip conditions) = 0 (free-slip),1 (no-slip), 2 (run-time 
+! choice depending on the inner shear viscosity terms in SPH-NS balance 
+! equations)  
+   integer(4) :: slip_ID
+! Ratio between the fluid and the semi-particle sizes
+   double precision :: dx_dxw
+! Coefficient to compute semi-particle volumes (DB-SPH equations)
+   double precision :: k_w
+! (xmin,xmax,ymin,xmax,zmin,zmax) to detect the monitoring region
+   double precision :: monitor_region(6)
 ! IDs of the monitoring points
    integer(4),allocatable,dimension(:) :: monitor_IDs     
 ! Number of records for imposed kinematics (surface_mesh_files,n_records)     
@@ -865,13 +871,13 @@ type DBSPH_der_type
 end type 
 
 ! Derived type declarations
-type(TyGlobal)                   :: Domain
-type(TyGriglia)                  :: Grid
-type(TyParticle)                 :: PgZero
-type(Tytime_stage)               :: ts_pgZero
-type(TyQ_section)                :: Q_sections
-type(type_substations)           :: substations
-type(TyGranular_flows_options)   :: Granular_flows_options
-type(DBSPH_der_type)             :: DBSPH
+type(TyGlobal) :: Domain
+type(TyGriglia) :: Grid
+type(TyParticle) :: PgZero
+type(Tytime_stage) :: ts_pgZero
+type(TyQ_section) :: Q_sections
+type(type_substations) :: substations
+type(TyGranular_flows_options) :: Granular_flows_options
+type(DBSPH_der_type) :: DBSPH
 
 end module Hybrid_allocation_module

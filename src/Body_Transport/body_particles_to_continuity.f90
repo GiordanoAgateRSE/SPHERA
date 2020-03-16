@@ -38,7 +38,7 @@ integer(4) :: npi,j,npartint,npj,k
 double precision :: temp_dden,aux,dis,dis_min,mod_normal,W_vol,sum_W_vol
 double precision :: dis_fb_sb,dis_s0_sb,dis_fb_s0
 double precision :: dvar(3),aux_vec(3),aux_nor(3)
-double precision, external :: w  
+double precision,external :: w  
 !------------------------
 ! Explicit interfaces
 !------------------------

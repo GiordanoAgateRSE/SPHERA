@@ -23,7 +23,7 @@
 ! Description: Module to define global (and statically allocated) variables.                                          
 !-------------------------------------------------------------------------------
 module Static_allocation_module
-! Global constants for array sizes: start
+! Global constants: start
 integer(4),public,parameter :: SPACEDIM = 3
 integer(4),public,parameter :: PLANEDIM = 2
 integer(4),public,parameter :: MAXCLOSEBOUNDSIDES = 4 
@@ -43,8 +43,8 @@ integer(4),public,parameter :: TETA_STEPS = 4 * FI_STEPS
 integer(4),public,parameter :: menouno = - 1
 double precision,public,parameter :: max_positive_number = 3.4d+38
 double precision,public,parameter :: max_negative_number = -3.4d+38
-double precision,public,parameter :: PIGRECO = 3.14159265358979d0 ! PI GRECO
-! =10/(7*PIGRECO) 
+double precision,public,parameter :: PIGRECO = 3.14159265358979d0
+! 10/(7*PIGRECO) 
 double precision,public,parameter :: KERNELCONST2D = 0.454728408833987d0 
 double precision,public,parameter :: KERNELCONST3D = 1.0d0 / PIGRECO 
 double precision,public,parameter :: FI_INTERVAL = PIGRECO/2.0d0  
@@ -54,15 +54,17 @@ double precision,public,parameter :: one = 1.d0
 double precision,public,parameter :: two = 2.d0  
 double precision,public,parameter :: four = 4.d0 
 double precision,public,parameter :: half = 0.5d0 
-double precision,public,parameter :: quarter = 0.25d0 
-double precision,public,parameter :: xyz_tolerance= 1.d-4 ! tolerance for 
-                                                           !coordinate checking
+double precision,public,parameter :: quarter = 0.25d0
+! Tolerance for coordinate checking
+double precision,public,parameter :: xyz_tolerance= 1.d-4
 double precision,public,parameter :: const_m_9999 = -9999.d0 
-double precision,public,parameter :: sqrttwo = 1.4142135623731d0 ! dsqrt(2.d0)
-double precision,public,parameter :: arrotondamento = 1.d-5 ! tolerance
-double precision,public,parameter :: azzeramento = 1.d8 ! tolerance
-double precision,public,parameter :: GI = 9.80665 ! gravitational constant
-double precision,public,parameter :: vKconst = 0.41 ! von Karman constant
+double precision,public,parameter :: sqrttwo = 1.4142135623731d0
+double precision,public,parameter :: arrotondamento = 1.d-5
+double precision,public,parameter :: azzeramento = 1.d8
+! Gravitational constant
+double precision,public,parameter :: GI = 9.80665
+! von Karman constant
+double precision,public,parameter :: vKconst = 0.41
 ! Global constants: end
 ! Global variables: start 
 logical :: dt_alfa_Mon
@@ -95,85 +97,95 @@ double precision :: ktdelta
 double precision,dimension(0:ktrows,0:ktcols) :: kerneltab
 double precision,dimension(1:BITrows,1:BITcols) :: BoundIntegralTab
 ! Global variables to compute SA-SPH integrals: end
-! Global variables for output files to Paraview: start
-integer(4),public,parameter :: maxnumblock = 9999 ! Maximum number of blocks
-logical :: vtkconv ! Flag to activate the "vtkconverter"
-integer(4) :: nblocchi,block ! Number of current blocks 
-double precision :: freq_time, val_time ! Writing time step 
-integer(4),dimension(maxnumblock) :: blocchi ! Array to store the number of 
-                                             ! blocks
-double precision,dimension(maxnumblock) :: Time_Block ! Array to store the
-                                                      ! time of the blocks
+! Global variables for Paraview output files : start
+! Maximum number of blocks
+integer(4),public,parameter :: maxnumblock = 9999
+! Flag to activate the "vtkconverter"
+logical :: vtkconv
+! Number of current blocks
+integer(4) :: nblocchi,block
+! Writing time step
+double precision :: freq_time, val_time
+! Array to store the number of blocks
+integer(4),dimension(maxnumblock) :: blocchi
+! Array to store the time of the blocks
+double precision,dimension(maxnumblock) :: Time_Block
 ! Global variables for output files to Paraview: end
 integer(4),parameter :: MAXTIT = 10
 integer(4),public,parameter :: lencard = 200
-integer(4),public, parameter :: MAXPOINTSZONE = 20 ! Maximum number of points 
-                                                   ! for the definition of a
-                                                   ! "GENERIC" area
-integer(4),public, parameter :: MAXPOINTSVLAW  = 50 ! Maximum number of data 
-                                                    ! for the definition of 
-                                                    ! a velocity "LAW"
-logical :: err_flag ! Flag for error file existence in erosion model
-logical :: restart ! Flag if the run is a restart
-logical :: kill_flag ! Flag to kill the execution
-logical :: current_version   
-logical :: body_minimum_pressure_limiter ! Flag to activate/deactivate a 
-                                         ! pressure limiter on the body 
-                                         ! surfaces not to have pressure 
-                                         ! negative values
-logical :: body_maximum_pressure_limiter ! Flag to activate/deactivate a 
-                                         ! pressure limiter on the body 
-                                         ! surfaces not to have unphysical 
-                                         ! maximum pressure values
-logical :: FSI_free_slip_conditions ! slip conditions for FSI: .true. 
-                                    ! (free-slip), .false. (no-slip, Adami et 
-                                    ! al., 2012, JCP)
-integer(4) :: NMAXPARTJ ! Max number of neighbouring particles
-integer(4) :: MaxNcbs ! Max number of close boundary sides for the current 
-                      ! particle
-integer(4) :: MaxNcbf ! Max number of close boundary faces for the current 
-                      ! particle
-integer(4) :: n_body_part ! Total number of body particles
-integer(4) :: n_surf_body_part ! Total number of surface body particles 
-integer(4) :: n_bodies ! Total number of bodies
-integer(4) :: NumBEdges ! Number of convex edges
-double precision :: friction_angle ! Input variable 
-double precision :: eta ! 0.001 * Domain%h
-double precision :: eta2 ! 0.01 * Domain%h * Domain%h
-double precision :: doubleh ! 2.*Domain%h
-double precision :: squareh ! Domain%h*Domain%h
-double precision :: square_doubleh ! doubleh * doubleh
-double precision :: cubich ! Domain%h*Domain%h*Domain%h
-double precision :: unosuh ! 1./Domain%h
-double precision :: unosusquareh ! 1./(Domain%h*Domain%h)
-double precision :: dx_dxbodies ! Ratio between fluid particle and body
-                                ! particle size
-double precision :: time_max_no_body_gravity_force ! gravity force is   
-                                                   ! deactivated for body 
-                                                   ! dynamics until this time
-double precision :: time_max_no_body_frontier_impingements ! body-frontier 
-                                                           ! impingements 
-                                                           ! are deactivated 
-                                                           ! until this time
-! Indices of cells that must be considered around the current one 
-! in subrutine "CalcVarLength"
-integer(4),dimension(14,3) :: indicecelle 
-integer(4),dimension(0:3,2) :: icoordp ! Pointer for coordinate location 2D or 
-                                       ! 3D; = (/0,1,3,0,0,1,2,3/) initialized
-                                       ! in the main program for compatibility
-                                       ! with xlf90
+! Maximum number of points for the definition of a "GENERIC" area
+integer(4),public, parameter :: MAXPOINTSZONE = 20
+! Maximum number of data for the definition of a velocity "LAW"
+integer(4),public, parameter :: MAXPOINTSVLAW  = 50
+! Flag for error file existence in erosion model
+logical :: err_flag
+! Flag if the run is a restart
+logical :: restart
+! Flag to kill the execution
+logical :: kill_flag
+logical :: current_version
+! Flags to activate/deactivate pressure limiters on the body surfaces (input)
+logical :: body_minimum_pressure_limiter
+logical :: body_maximum_pressure_limiter
+! Slip conditions for FSI (input)
+logical :: FSI_free_slip_conditions
+! Max number of neighbouring particles
+integer(4) :: NMAXPARTJ
+! Max number of close boundary sides for the current particle
+integer(4) :: MaxNcbs
+! Max number of close boundary faces for the current particle
+integer(4) :: MaxNcbf
+! Total number of body particles
+integer(4) :: n_body_part
+! Total number of surface body particles
+integer(4) :: n_surf_body_part
+! Total number of bodies 
+integer(4) :: n_bodies
+! Number of convex edges
+integer(4) :: NumBEdges
+! Input variable
+double precision :: friction_angle
+! 0.001 * Domain%h 
+double precision :: eta
+! 0.01 * Domain%h * Domain%h
+double precision :: eta2
+! 2.*Domain%h
+double precision :: doubleh
+! Domain%h*Domain%h
+double precision :: squareh
+! doubleh * doubleh
+double precision :: square_doubleh
+! Domain%h*Domain%h*Domain%h 
+double precision :: cubich
+! 1./Domain%h
+double precision :: unosuh
+! 1./(Domain%h*Domain%h)
+double precision :: unosusquareh
+! Ratio between fluid particle and body particle size
+double precision :: dx_dxbodies
+! Numerical times for body dynamics (input)
+double precision :: time_max_no_body_gravity_force
+double precision :: time_max_no_body_frontier_impingements
+! Indices of cells that must be considered around the current one in the 
+! program unit "CalcVarLength"
+integer(4),dimension(14,3) :: indicecelle
+! Pointer for coordinate location 2D or 3D; = (/0,1,3,0,0,1,2,3/); initialized
+! in the main program for compatibility with xlf90 
+integer(4),dimension(0:3,2) :: icoordp
 character(len=8),parameter :: acode = "SPHERA  "
 character(len=8),parameter :: version = "9.0.0 "
 character(255) :: nomecaso, nomecas2
 character(1),dimension(0:3) :: xyzlabel = (/ "T", "X", "Y", "Z" /)  
 character(4),dimension(3) :: ncordlabel = (/ "    ", "(2D)", "(3D)" /)  
-character(255) :: LicenseFile ! File name for license 
-character(255) :: nomefilekill ! Killer file name
+character(255) :: LicenseFile
+! Killer file name
+character(255) :: nomefilekill
 ! Operating System: "linux" (no other option is active). This string is 
 ! useful for the real-time assessment of the final elapsed time. Any other 
 ! string value deactvates the assessment above.
 character(10) :: exetype = "linux"
-character(255) :: nomefileerr ! File name for error file in erosion model
+! File name for error file in erosion model
+character(255) :: nomefileerr
 ! "original" or "euristic"
 character(len=8) :: dt_opt = "original"
 character(LEN=lencard),dimension(MAXTIT) :: title
