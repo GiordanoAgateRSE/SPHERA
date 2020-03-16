@@ -65,9 +65,10 @@ if (indarrayFlu==0) then
 ! 2) viscous term criterion: dt_vis<=vsc_coeff*(rho*h**2/(0.5*mu))
 ! Loop over the media
       do ii=1,NMedium
-         if (Med(ii)%kin_visc>1.d-24) dt_vis = Domain%vsc_coeff * squareh /    &
-                                               (half * Med(ii)%kin_visc)
-         dtmin = min(dtmin,dt_vis)
+         if ((Med(ii)%tipo=="liquid  ").and.(Med(ii)%kin_visc>1.d-24)) then
+            dt_vis = Domain%vsc_coeff * squareh / (half * Med(ii)%kin_visc)
+            dtmin = min(dtmin,dt_vis)
+         endif
       enddo
 ! Loop over the particles
       do ii=1,indarrayFlu
