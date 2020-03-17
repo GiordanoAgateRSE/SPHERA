@@ -561,7 +561,7 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
 ! To estimate "DTmin" for boundary elastic reaction 
    call EvaluateBER_TimeStep
 ! In case of bed-load transport
-   if (Granular_flows_options%ID_erosion_criterion>0) then        
+   if (Granular_flows_options%KTGF_config>0) then        
 ! Allocation of the 2D array of the minimum saturation flag (bed-load transport)
       if (.not.allocated(                                                      &
          Granular_flows_options%minimum_saturation_flag))then

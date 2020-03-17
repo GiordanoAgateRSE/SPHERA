@@ -283,7 +283,8 @@ ___ ___ ___ ___ ___
 ![?] endif (motion_type=std)
 ![?] if (motion_type=law) then
 ![?] <motion_type>
-!    =law
+!    =law (imposed kinematics; this value is converted in "fix" during the 
+!       simulation)
 ![?] <n_records>: number of records for the imposed kinematics
 !-------------------------------------------------------------------------------
 ![*] <motion_type> <n_records>
@@ -599,10 +600,12 @@ ___ ___ ___ ___ ___ ___ ___ ___
 ##### BED LOAD TRANSPORT #####
 !-------------------------------------------------------------------------------
 ![?] Input parameters for bed-load transport ("blt") scheme
-![?] <ID_erosion_criterion>
-!    =0 (no bed-load transport)
-!    =1 (Shields-Seminara)
-!    =2 (Shields without blt-fixed bed interactions)
+![?] <KTGF_config> (Kinetic Theory of Granular Flow configuration)
+!    =0 (KTGF scheme deactivated)
+!    =1 (KTGF scheme activated with possible use of the 3D 2-interface 
+!       erosion criterion)
+!    =2 (KTGF scheme activated with possible use of the 2D 1-interface erosion 
+!       criterion)
 ![?] <ID_main_fluid>: medium of the main fluid
 ![?] <saturation_scheme>
 !    =0 (dry soil)
@@ -620,7 +623,7 @@ ___ ___ ___ ___ ___ ___ ___ ___
 !    elsewhere. When "t>=t_max_sat", the saturation zones are freezed at 
 !    "t=t_max_sat".
 !-------------------------------------------------------------------------------
-![*] <erosion_criterion_ID> <ID_main_fluid>
+![*] <KTGF_config> <ID_main_fluid>
 ![*] <saturation_scheme> <time_minimum_saturation> <time_maximum_saturation>
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
@@ -628,7 +631,7 @@ ___ ___
 ___ ___ ___
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
-![?] if (erosion_criterion_ID>0) then
+![?] if (KTGF_config>0) then
 ![?] <velocity_fixed_bed>: velocity threshold (e.g. equal to velocity scale 
 !    divided by 100) to detect the fixed bed
 ![?] <erosion_flag>
@@ -683,7 +686,7 @@ ___
 ___ ___
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
-![?] endif (erosion_criterion_ID>0
+![?] endif (KTGF_config>0)
 !-------------------------------------------------------------------------------
 ##### end BED LOAD TRANSPORT #####
 
@@ -695,7 +698,7 @@ ___ ___
 !-------------------------------------------------------------------------------
 ![?] <fluid_type>
 !    =liquid
-!    =granular (only if erosion_criterion_ID>0)
+!    =granular (only if KTGF_config>0)
 !-------------------------------------------------------------------------------
 ![*] <fluid_type>
 ![*] <fluid_ID>
@@ -762,7 +765,7 @@ ___ ___
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
 ![?] endif (fluid_type==granular)
-![?] if ((fluid_type==granular).and.(erosion_criterion_ID==1)) then
+![?] if ((fluid_type==granular).and.(KTGF_config==1)) then
 !-------------------------------------------------------------------------------
 ![*] <effective_porosity> <d_50> <d_90>
 !-------------------------------------------------------------------------------
@@ -770,8 +773,8 @@ ___ ___
 ___ ___ ___
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
-![?] endif ((fluid_type==granular).and.(erosion_criterion_ID==1))
-![?] if ((fluid_type==granular).and.(erosion_criterion_ID>1)) then
+![?] endif ((fluid_type==granular).and.(KTGF_config==1))
+![?] if ((fluid_type==granular).and.(KTGF_config>1)) then
 ![?] <max_step_still>: number of time steps during which mixture particles are 
 !    kept still)
 ![?] <roughness_coefficient>: roughness coefficient for the 2D erosion criterion
@@ -785,7 +788,7 @@ ___ ___
 ___
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
-![?] endif ((fluid_type==granular).and.(erosion_criterion_ID>1))
+![?] endif ((fluid_type==granular).and.(KTGF_config>1))
 !-------------------------------------------------------------------------------
 ![?] enddo NUMBER_OF_FLUIDS
 !-------------------------------------------------------------------------------

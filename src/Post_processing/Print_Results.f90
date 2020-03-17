@@ -126,12 +126,12 @@ if (nag>0) then
       maxomega_body = max_negative_number
    endif
    if ((Granular_flows_options%erosion_flag.ne.1).and.                         &
-      (Granular_flows_options%ID_erosion_criterion==1)) then
+      (Granular_flows_options%KTGF_config==1)) then
       mintau_tauc = max_positive_number
       maxtau_tauc = max_negative_number
       minu_star = max_positive_number
       maxu_star = max_negative_number
-      if (Granular_flows_options%ID_erosion_criterion==1) then    
+      if (Granular_flows_options%KTGF_config==1) then    
          mink_BetaGamma = max_positive_number
          maxk_BetaGamma = max_negative_number
       endif
@@ -302,7 +302,7 @@ if (nag>0) then
    endif
 ! Limits for supplementary bed-load transport parameters 
    if ((Granular_flows_options%erosion_flag.ne.1).and.                         &
-      (Granular_flows_options%ID_erosion_criterion==1)) then
+      (Granular_flows_options%KTGF_config==1)) then
 ! tau_tauc 
       mintau_tauc = minval(pg(1:nag)%tau_tauc,mask=pg(1:nag)%cella/=0)
       maxtau_tauc = maxval(pg(1:nag)%tau_tauc,mask=pg(1:nag)%cella/=0)
@@ -318,7 +318,7 @@ if (nag>0) then
       pos = maxloc(pg(1:nag)%u_star,mask=pg(1:nag)%cella/=0)
       maxlocu_star = pos(1) 
 ! k_BetaGamma 
-      if (Granular_flows_options%ID_erosion_criterion==1) then   
+      if (Granular_flows_options%KTGF_config==1) then   
          mink_BetaGamma = minval(pg(1:nag)%k_BetaGamma,mask=pg(1:nag)%cella/=0)
          maxk_BetaGamma = maxval(pg(1:nag)%k_BetaGamma,mask=pg(1:nag)%cella/=0)
          pos = minloc(pg(1:nag)%k_BetaGamma,mask=pg(1:nag)%cella/=0)
@@ -452,7 +452,7 @@ if (nag>0) then
          body_arr(maxlocomega_body)%x_CM(3),"|"
    endif
    if ((Granular_flows_options%erosion_flag.ne.1).and.                         &
-      (Granular_flows_options%ID_erosion_criterion==1)) then
+      (Granular_flows_options%KTGF_config==1)) then
       write(ulog,fmt101)  "Shear stress ratio tau/tauc |",mintau_tauc,"|",     &
          minloctau_tauc,"|",pg(minloctau_tauc)%coord(1),"|",                   &
          pg(minloctau_tauc)%coord(2),"|",pg(minloctau_tauc)%coord(3),"||",     &
@@ -463,7 +463,7 @@ if (nag>0) then
          pg(minlocu_star)%coord(2),"|",pg(minlocu_star)%coord(3),"||",         &
          maxu_star,"|",maxlocu_star,"|",pg(maxlocu_star)%coord(1),"|",         &
          pg(maxlocu_star)%coord(2),"|",pg(maxlocu_star)%coord(3),"|"  
-      if (Granular_flows_options%ID_erosion_criterion==1) then       
+      if (Granular_flows_options%KTGF_config==1) then       
          write(ulog,fmt101)  "3D eros.coeff. (k_BetaGamma)|",mink_BetaGamma,   &
             "|",minlock_BetaGamma,"|",pg(minlock_BetaGamma)%coord(1),"|",      &
             pg(minlock_BetaGamma)%coord(2),"|",pg(minlock_BetaGamma)%coord(3), &

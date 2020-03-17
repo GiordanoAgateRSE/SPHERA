@@ -415,7 +415,7 @@ allocate(substations%sub(i_sub)%DEMvert(substations%sub(i_sub)%n_DEM_vertices) &
             aux_integer = 0
             if (EOS(i_sub,i_fil).eqv..true.) aux_integer = 1
             write(unit_substations,                                            &
-               '(g15.5,i15,g15.5,i15,4(g15.5),i15,3(g15.5))'),simulation_time, &
+               '(g15.5,i15,g15.5,i15,4(g15.5),i15,3(g15.5))') simulation_time, &
                i_sub,substations%sub(i_sub)%Val,i_fil,                         &
                substations%sub(i_sub)%area,Ysub(i_sub,i_fil),                  &
                substations%sub(i_sub)%Ymax(i_fil),POSsub(i_sub,i_fil),         &

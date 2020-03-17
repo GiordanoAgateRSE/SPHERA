@@ -129,7 +129,7 @@ loop_nag: do npi=1,nag
          endif      
       enddo
    endif
-   if (Granular_flows_options%ID_erosion_criterion>0) then
+   if (Granular_flows_options%KTGF_config>0) then
       pg(npi)%normal_int(:) = 0.d0
       pg(npi)%normal_int_mixture_top(:) = 0.d0
       pg(npi)%normal_int_sat_top(:) = 0.d0
@@ -254,7 +254,7 @@ loop_nag: do npi=1,nag
                   endif
                endif
 ! In case of bed-load transport with/without any erosion criterion
-               if (Granular_flows_options%ID_erosion_criterion>0) then
+               if (Granular_flows_options%KTGF_config>0) then
 ! Searching for the nearest fluid/mixture SPH particle 
                   if (Med(pg(npi)%imed)%tipo/=Med(pg(npj)%imed)%tipo) then
                      if ((rijtemp<pg(npi)%rijtempmin(1)).or.                   &
@@ -414,7 +414,7 @@ loop_nag: do npi=1,nag
          enddo loop_krang      
       enddo loop_irang       
    enddo loop_jrang   
-   if (Granular_flows_options%ID_erosion_criterion>0) then
+   if (Granular_flows_options%KTGF_config>0) then
 ! Free surface detection along the grid column
       if (index(Med(pg(npi)%imed)%tipo,"liquid")>0) then
 !$omp critical (free_surface_detection)
@@ -489,7 +489,7 @@ loop_nag: do npi=1,nag
       endif                                     
    endif
 ! In case of bed-load transport with an erosion criterion
-   if ((Granular_flows_options%ID_erosion_criterion>0).and.                    &
+   if ((Granular_flows_options%KTGF_config>0).and.                             &
       (Granular_flows_options%erosion_flag/=1)) then
 ! Normalization of the interface normal between the granular mixture and the 
 ! fixed bed (bed-load transport)
@@ -502,7 +502,7 @@ loop_nag: do npi=1,nag
       endif    
    endif
 ! In case of bed-load transport
-   if (Granular_flows_options%ID_erosion_criterion>0) then
+   if (Granular_flows_options%KTGF_config>0) then
       if (index(Med(pg(npi)%imed)%tipo,"granular")>0) then 
 ! Normalization of the mixture top interface normal 
          normal_int_mixture_top_abs = dsqrt(dot_product(                       &
@@ -576,7 +576,7 @@ loop_nag: do npi=1,nag
 enddo loop_nag
 !$omp end parallel do
 ! In case of bed-load transport 
-if (Granular_flows_options%ID_erosion_criterion>0) then
+if (Granular_flows_options%KTGF_config>0) then
 ! To compute the interface flags
    do npi=1,nag
       nceli = ParticleCellNumber(pg(npi)%coord)

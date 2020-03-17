@@ -21,7 +21,8 @@
 !-------------------------------------------------------------------------------
 ! Program unit: stoptime                                          
 ! Description: Assessment of the final simulation time for each medium 
-!              depending on the motion type. 
+!              depending on the motion type. The input motion type "law" is 
+!              also converted in "fix". 
 !-------------------------------------------------------------------------------
 subroutine stoptime(partzlocal,tstop)
 !------------------------

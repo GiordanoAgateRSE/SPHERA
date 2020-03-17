@@ -286,8 +286,8 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
       if ((Domain%time_split==0).and.(Domain%time_stage==1)) then               
 ! Erosion criterium + continuity equation RHS  
          call start_and_stop(2,12)
-         if (Granular_flows_options%ID_erosion_criterion>0) then
-            select case (Granular_flows_options%ID_erosion_criterion)
+         if (Granular_flows_options%KTGF_config>0) then
+            select case (Granular_flows_options%KTGF_config)
                case(1)
 !$omp parallel do default(none) shared(pg,nag) private(npi,ncel)
                   do npi=1,nag
@@ -547,11 +547,11 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
 ! Erosion criterion + continuity equation RHS 
       call start_and_stop(2,12)
       Ncbf_Max = 0
-      if (Granular_flows_options%ID_erosion_criterion>0) then  
+      if (Granular_flows_options%KTGF_config>0) then  
          if (Domain%time_split==1) then 
 ! Assessing particle status ("flu" or "sol") of the mixture particles
 ! Calling the proper subroutine for the erosion criterion 
-            select case (Granular_flows_options%ID_erosion_criterion)
+            select case (Granular_flows_options%KTGF_config)
                case(1)
 !$omp parallel do default(none) shared(pg,nag) private(npi,ncel)
                   do npi=1,nag
@@ -743,7 +743,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
          call start_and_stop(3,19)
       endif
       call start_and_stop(2,20)
-      if (Granular_flows_options%ID_erosion_criterion==1) call mixture_viscosity 
+      if (Granular_flows_options%KTGF_config==1) call mixture_viscosity 
       call start_and_stop(3,20)
       if (Domain%tipo=="semi") then
 ! Boundary Conditions: start

@@ -747,8 +747,8 @@ end type
 
 ! Derived type for bed-load transport layer 
 type TyGranular_flows_options
-! Erosion criterion ID
-   integer(4) :: ID_erosion_criterion
+! Dense granular flow configuration
+   integer(4) :: KTGF_config
    integer(4) :: ID_main_fluid
 ! Number of monitoring lines aligned with x- or y-axis
    integer(4) :: monitoring_lines

@@ -190,13 +190,13 @@ do contj=1,nPartIntorno(npi)
       endif
    endif
 ! Momentum equation: start
-   if (Granular_flows_options%ID_erosion_criterion/=1) then
+   if (Granular_flows_options%KTGF_config/=1) then
       alpha = pi / (rhoi * rhoi) + pj / (rhoj * rhoj) 
       else
          alpha = (pi + pj) / rhoi 
    endif
    if (Domain%tipo=="semi") then
-      if (Granular_flows_options%ID_erosion_criterion/=1) then
+      if (Granular_flows_options%KTGF_config/=1) then
          appopres(:) = ( - amassj * alpha * rag(:,npartint) *                  &
                        PartKernel(3,npartint) )
          else

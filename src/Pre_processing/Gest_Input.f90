@@ -276,7 +276,7 @@ if (.not.restart) then
             call FindBoundaryConvexEdges3D
       endif
       nagpg = 0
-      if (Granular_flows_options%ID_erosion_criterion>0) then
+      if (Granular_flows_options%KTGF_config>0) then
          do i=1,NMedium
             if (index(Med(i)%tipo,"granular")>0) then
                Med(i)%den0_s = Med(i)%den0

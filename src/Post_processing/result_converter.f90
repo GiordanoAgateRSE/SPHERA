@@ -375,7 +375,7 @@ if (nag>0) then
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
    endif
-   if (Granular_flows_options%ID_erosion_criterion>=1) then
+   if (Granular_flows_options%KTGF_config>=1) then
 ! sigma_prime_m
       write(unitvtk,'(a)') '      <DataArray type="Float32" Name="sigma_prime_m (Pa)" format="ascii" >'
       do i=1,numpoints,16
@@ -497,7 +497,7 @@ if (nag>0) then
                pg(finger(k))%normal_int(2),pg(finger(k))%normal_int(3),k=k1,k2)
          enddo
          write(unitvtk,'(a)') '      </DataArray>'    
-         if (Granular_flows_options%ID_erosion_criterion==1) then  
+         if (Granular_flows_options%KTGF_config==1) then  
             if (ncord==3) then    
 ! C_D
                write(unitvtk,'(a)')                                            &

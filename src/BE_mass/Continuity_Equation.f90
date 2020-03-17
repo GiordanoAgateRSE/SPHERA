@@ -89,7 +89,7 @@ do npi=1,nag
 ! Continuity equation
       pesogradj(1:3) = amassj * rag(1:3,npartint) * PartKernel(1,npartint) /   &
                        rhoj
-      if (Granular_flows_options%ID_erosion_criterion.ne.1) then
+      if (Granular_flows_options%KTGF_config.ne.1) then
          appo = amassj * PartKernel(1,npartint) *                              &
                 (dvar(1)*rag(1,npartint) + dvar(2)*rag(2,npartint) +           &
                 dvar(3)*rag(3,npartint))
@@ -101,7 +101,7 @@ do npi=1,nag
       pg(npi)%dden = pg(npi)%dden - appo
 ! Velocity derivatives 
       if (pg(npj)%vel_type/="std") cycle
-      if (Granular_flows_options%ID_erosion_criterion==1) then
+      if (Granular_flows_options%KTGF_config==1) then
          if (ncord==3) then
 !du/dy
             dvdi(2) = dvdi(2) + pesogradj(2) * dvar(1)
@@ -149,7 +149,7 @@ do npi=1,nag
          pg(npi)%dden = pg(npi)%dden + appo
       enddo
    endif
-   if (Granular_flows_options%ID_erosion_criterion==1) then
+   if (Granular_flows_options%KTGF_config==1) then
       if (ncord==3) then
          moddia = (dvdi(1) * dvdi(1) + dvdi(5) * dvdi(5) + dvdi(9) * dvdi(9))
          modout = ((dvdi(2) + dvdi(4)) * (dvdi(2) + dvdi(4)) + (dvdi(3) +      &

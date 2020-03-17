@@ -217,7 +217,7 @@ if (trim(lcase(option))==trim(lcase("heading"))) then
          endif
       endif
 ! Allocation of the 2D array of the minimum saturation flag (bed-load transport)
-      if ((Granular_flows_options%ID_erosion_criterion>0).and.                 &
+      if ((Granular_flows_options%KTGF_config>0).and.                          &
          (.not.allocated(Granular_flows_options%minimum_saturation_flag))) then
          allocate(Granular_flows_options%minimum_saturation_flag(Grid%ncd(1),  &
             Grid%ncd(2)),STAT=alloc_stat)
@@ -234,7 +234,7 @@ if (trim(lcase(option))==trim(lcase("heading"))) then
          endif
       endif
 ! Allocation of the 2D array of the maximum saturation flag (bed-load transport)
-      if ((Granular_flows_options%ID_erosion_criterion>0).and.                 &
+      if ((Granular_flows_options%KTGF_config>0).and.                          &
          (.not.allocated(Granular_flows_options%maximum_saturation_flag))) then
          allocate(Granular_flows_options%maximum_saturation_flag(Grid%ncd(1),  &
             Grid%ncd(2)),STAT=alloc_stat)

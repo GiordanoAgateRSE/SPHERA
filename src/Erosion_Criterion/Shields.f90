@@ -108,7 +108,7 @@ if (Granular_flows_options%erosion_flag==1) then
                   Med(imed)%celerita))  
    return
 endif
-if (Granular_flows_options%ID_erosion_criterion==1) then
+if (Granular_flows_options%KTGF_config==1) then
 ! SPH granular particles below the fixed bed (more than 2h) are fixed 
 ! (this involves Beta_max=45°)
    bed_slope_test = .true.
@@ -192,7 +192,7 @@ if (Granular_flows_options%ID_erosion_criterion==1) then
    endif
 endif
 ! Choice of the representative neighbour (priority to pure fluid neighbours)
-if (Granular_flows_options%ID_erosion_criterion==1) then
+if (Granular_flows_options%KTGF_config==1) then
    if (pg(npi)%indneighliqsol.ne.0) then
       ind_neigh = pg(npi)%indneighliqsol
       elseif (pg(npi)%state=="sol") then
@@ -209,7 +209,7 @@ if (ind_neigh==0) then
    pg(npi)%vel = zero
    pg(npi)%var = zero
 ! Deposition or no erosion for particles with no neighbours 
-   if (Granular_flows_options%ID_erosion_criterion==1) then
+   if (Granular_flows_options%KTGF_config==1) then
       pg(npi)%sigma_prime_m = 0.d0
       pg(npi)%pres_fluid = 0.d0
       indpeloloc = ind_interfaces(igridi,jgridi,3)
@@ -219,7 +219,7 @@ if (ind_neigh==0) then
    if (indpeloloc/=0) then
       intsol_id = ind_ref_interface
       if (intsol_id==0) intsol_id = npi
-      if (Granular_flows_options%ID_erosion_criterion==1) then
+      if (Granular_flows_options%KTGF_config==1) then
          Velocity2 = pg(indpeloloc)%vel_old(1) * pg(indpeloloc)%vel_old(1) +   &
                      pg(indpeloloc)%vel_old(2) * pg(indpeloloc)%vel_old(2) +   &
                      pg(indpeloloc)%vel_old(3) * pg(indpeloloc)%vel_old(3)
@@ -244,7 +244,7 @@ if (ind_neigh==0) then
    return 
 end if
 ! Pure fluid - bed load transport layer interface 
-if (Granular_flows_options%ID_erosion_criterion==1) then
+if (Granular_flows_options%KTGF_config==1) then
    intliq_id = ind_neigh
    intsol_id = npi
    else
@@ -262,7 +262,7 @@ endif
 interf_liq = pg(intliq_id)%coord(3)
 interf_sol = pg(intsol_id)%coord(3)
 ! To compute "pretot" with kinetic term (depeding on the relative velocity) 
-if (Granular_flows_options%ID_erosion_criterion==1) then      
+if (Granular_flows_options%KTGF_config==1) then      
    Velocity2 = dot_product(pg(intliq_id)%vel_old,pg(intliq_id)%vel_old)
    Velocity = dsqrt(Velocity2)
    PartLiq_pres = (interf_liq - interf_sol) * med(pg(intliq_id)%imed)%den0 *   &
@@ -285,7 +285,7 @@ if (Velocity2==zero) then
    pg(npi)%var = zero
    pg(npi)%dens = med(imed)%den0 + (pretot / (Med(imed)%celerita *             &
                   Med(imed)%celerita))
-   if (Granular_flows_options%ID_erosion_criterion==1) then
+   if (Granular_flows_options%KTGF_config==1) then
       pg(npi)%sigma_prime_m = 0.d0
       pg(npi)%pres_fluid = 0.d0
    endif
@@ -293,12 +293,12 @@ if (Velocity2==zero) then
 end if
 ! To compute roughness (k): c_4=k/d_50 (from input, Shields 2D) or c_4=3 
 ! (Shields 3D)
-if (Granular_flows_options%ID_erosion_criterion==1) then
+if (Granular_flows_options%KTGF_config==1) then
    Ks = 3.d0 * med(imed)%d_90
    else
       Ks = med(imed)%RoughCoef * med(imed)%d50
 endif
-if (Granular_flows_options%ID_erosion_criterion>1) then     
+if (Granular_flows_options%KTGF_config>1) then     
    Velocity = dsqrt(Velocity2)
    else
       if (Granular_flows_options%erosion_flag==2) then
@@ -318,7 +318,7 @@ if (Granular_flows_options%ID_erosion_criterion>1) then
 endif
 ! To compute the distance between the computational particle and the interacting 
 ! particle (the height difference does not work for inclined beds)
-if (Granular_flows_options%ID_erosion_criterion==1) then
+if (Granular_flows_options%KTGF_config==1) then
    if (pg(npi)%indneighliqsol.ne.0) then
       DistZmin = pg(npi)%rijtempmin(1)
       elseif (pg(npi)%state=="sol") then
@@ -421,7 +421,7 @@ end if
 ! To compute Shields critical parameter for flat beds 
 Taubcror = Tetacr * GI * med(imed)%d50 * (Med(pg(intsol_id)%imed)%den0_s -     &
            Med(pg(intliq_id)%imed)%den0)
-if (Granular_flows_options%ID_erosion_criterion==1) then
+if (Granular_flows_options%KTGF_config==1) then
    pg(npi)%u_star = Ustar
    call compute_k_BetaGamma(npi,intliq_id,DistZmin)
    Taubcr = Taubcror * pg(npi)%k_BetaGamma
@@ -476,7 +476,7 @@ if ((Taub>Taubcr).and.(on_going_time_step>Med(imed)%NIterSol)) then
          pg(npi)%dens = med(imed)%den0 + (pretot / (Med(imed)%celerita *       &
                         Med(imed)%celerita))
 ! Initializing some SPH parameters for fixed mixture particles.
-         if (Granular_flows_options%ID_erosion_criterion==1) then
+         if (Granular_flows_options%KTGF_config==1) then
             pg(npi)%sigma_prime_m = 0.d0
             pg(npi)%pres_fluid = 0.d0
          endif

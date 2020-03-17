@@ -116,7 +116,7 @@ do while (trim(lcase(ainp))/="##### end medium #####")
          read(ainp,*,iostat=ioerr) viscmx,limiting_viscosity
          if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                             &
             "THRESHOLD VISCOSITY & LIMITING VISCOSITY",ninp,ulog)) return            
-         if (Granular_flows_options%ID_erosion_criterion==1) then
+         if (Granular_flows_options%KTGF_config==1) then
             call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
             read(ainp,*,iostat=ioerr) porosity,d50,d_90
             if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                          &

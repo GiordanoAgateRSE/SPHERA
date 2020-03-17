@@ -87,7 +87,7 @@ if (Domain%tipo=="bsph") then
    pg(npi)%DBSPH_outlet_ID = 0
 endif
 ! Mixture density for granular SPH particles (bed-load transport) 
-if (Granular_flows_options%ID_erosion_criterion>0) then
+if (Granular_flows_options%KTGF_config>0) then
    if (Med(pg(npi)%imed)%tipo=="granular") then
       pg(npi)%dens = Med(pg(npi)%imed)%den0_s 
 ! IC viscosity from pure fluid, as I cannot calculate the right one at this 

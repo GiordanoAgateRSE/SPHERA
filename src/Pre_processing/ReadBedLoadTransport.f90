@@ -33,7 +33,7 @@ use Dynamic_allocation_module
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: nrighe,ier,ninp,ulog,uerr,ioerr,ID_erosion_criterion,alloc_stat
+integer(4) :: nrighe,ier,ninp,ulog,uerr,ioerr,KTGF_config,alloc_stat
 integer(4) :: ID_main_fluid,monitoring_lines,i,line_ID
 integer(4) :: n_max_iterations,erosion_flag
 integer(4) :: deposition_at_frontiers,Gamma_slope_flag,saturation_scheme
@@ -61,7 +61,7 @@ if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"BED LOAD TRANSPORT DATA",ninp,ulog)) &
    return
 do while (trim(lcase(ainp)) /= "##### end bed load transport #####")
 ! Reading input parameters (first part)
-   read(ainp,*,iostat=ioerr) ID_erosion_criterion,ID_main_fluid
+   read(ainp,*,iostat=ioerr) KTGF_config,ID_main_fluid
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"BED-LOAD TRANSPORT INPUT LINE 1", &
       ninp,ulog)) return
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
@@ -69,7 +69,7 @@ do while (trim(lcase(ainp)) /= "##### end bed load transport #####")
       time_maximum_saturation
    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"BED-LOAD TRANSPORT INPUT LINE 2", &
       ninp,ulog)) return
-   if (ID_erosion_criterion>0) then
+   if (KTGF_config>0) then
       call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
       read(ainp,*,iostat=ioerr) velocity_fixed_bed,erosion_flag
       if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                                &
@@ -101,21 +101,18 @@ do while (trim(lcase(ainp)) /= "##### end bed load transport #####")
    endif
 ! Writing input parameters (first part)
    if ((ncord>0).and.(ulog > 0)) then
-      select case (ID_erosion_criterion)
+      select case (KTGF_config)
       case (0)
-         write(ulog,"(1x,a,1p,i12,a)") "ID_erosion_criterion:.........",       &
-            ID_erosion_criterion," no-bed load transport."
+         write(ulog,"(1x,a,1p,i12,a)") "KTGF_config:...................",      &
+            KTGF_config," KTGF scheme deactivated."
       case (1)
-         write(ulog,"(1x,a,1p,i12,a)") "ID_erosion_criterion:.........",       &
-            ID_erosion_criterion," Shields-Seminara."
+         write(ulog,"(1x,a,1p,i12,a)") "KTGF_config:...................",      &
+            KTGF_config," KTGF scheme with possible 3D erosion criterion."
       case (2)
-         write(ulog,"(1x,a,1p,i12,a)") "ID_erosion_criterion:.........",       &
-            ID_erosion_criterion," Shields."
-      case (3)
-         write(ulog,"(1x,a,1p,i12,a)") "ID_erosion_criterion:.........",       &
-            ID_erosion_criterion," Mohr-Coulomb."
+         write(ulog,"(1x,a,1p,i12,a)") "KTGF_config:...................",      &
+            KTGF_config," KTGF scheme with possible 2D erosion criterion."
       endselect
-      if (ID_erosion_criterion>0) then      
+      if (KTGF_config>0) then      
          write(ulog,"(1x,a,1p,i12)") "ID_main_fluid:................",         &
             ID_main_fluid
          write(ulog,"(1x,a,1p,i12)") "saturation_scheme:............",         &
@@ -147,13 +144,13 @@ do while (trim(lcase(ainp)) /= "##### end bed load transport #####")
          write(ulog,"(1x,a,1p,g12.5)") "z_min_dt:.....................",z_min_dt
          write(ulog,"(1x,a,1p,g12.5)") "z_max_dt:.....................",z_max_dt
          write(ulog,"(1x,a,1p,g12.5)") "t_q0:.........................",t_q0
-         write(ulog,"(1x,a,1p,g12.5)") "t_liq:.........................",t_liq               
+         write(ulog,"(1x,a,1p,g12.5)") "t_liq:........................",t_liq               
          write(ulog,"(1x,a)")  " "
       endif
    endif
 ! Assignment to the body parameters (first part)
-   Granular_flows_options%ID_erosion_criterion = ID_erosion_criterion
-   if (ID_erosion_criterion>0) then      
+   Granular_flows_options%KTGF_config = KTGF_config
+   if (KTGF_config>0) then      
       Granular_flows_options%ID_main_fluid = ID_main_fluid
       Granular_flows_options%saturation_scheme = saturation_scheme
       Granular_flows_options%time_minimum_saturation = time_minimum_saturation
