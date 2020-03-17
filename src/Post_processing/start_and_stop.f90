@@ -92,8 +92,8 @@ select case (iset)
       write(ulog,'(a,a)') " >>> Case identifier :",TRIM(nomecaso)
 ! Detection of the current time
    case (1)
-! End the execution by assessing the computational time &
-! and the physical/elapsed time statistics.
+! End the execution by assessing the computational time and the 
+! physical/elapsed time statistics.
       call system_clock(count=count_i,count_rate=counts_per_second,            &
          count_max=count_maximum)
       tot_times(numb_subr,2) = dfloat(count_i) - tot_times(numb_subr,1)
