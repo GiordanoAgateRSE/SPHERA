@@ -195,7 +195,6 @@ do while (trim(lcase(ainp))/="##### end medium #####")
          write(ulog,"(1x,a)")  " "
       endif
       Med(index)%kin_visc = visc / den0
-      Med(index)%numx = viscmx / den0
 ! From degrees to radians
       Med(index)%phi = Med(index)%phi * PIGRECO / 180.  
    endif

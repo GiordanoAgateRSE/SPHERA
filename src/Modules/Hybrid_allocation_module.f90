@@ -566,9 +566,6 @@ type TyMedium
 ! Kinematic viscosity (in case of granular media, kin_visc=mumx)
    double precision :: kin_visc
    double precision :: limiting_viscosity
-! Maximum value for the kinematic viscosity (tuning parameter in Manenti et 
-! al., 2012, JHE)
-   double precision :: numx
 ! Maximum value for the dynamic viscosity to detect the elasto-plastic regime
    double precision :: mumx
 ! Internal friction angle

@@ -34,16 +34,15 @@ use Hybrid_allocation_module
 ! Declarations
 !------------------------
 implicit none
-integer(4):: nrighe,ier,ninp,ulog,Medium,npointv,icolor
-integer(4),dimension(20) :: NumberEntities
-double precision :: valp
-character(1) :: comment
-character(LEN=lencard) :: ainp
-character(1) :: bends,slip
-character(3) :: move
-character(2) :: pressu
-double precision,dimension(3) :: values3
-double precision,dimension(0:3,maxpointsvlaw) :: valuev
+integer(4),intent(inout) :: Medium,icolor,npointv,nrighe,ier,ninp,ulog
+double precision,intent(inout) :: valp
+integer(4),dimension(20),intent(inout) :: NumberEntities
+double precision,dimension(3),intent(inout) :: values3
+double precision,dimension(0:3,maxpointsvlaw),intent(inout) :: valuev
+character(1),intent(inout) :: bends,slip,comment
+character(2),intent(inout) :: pressu
+character(3),intent(inout) :: move
+character(LEN=lencard),intent(inout) :: ainp
 integer(4) :: ioerr,i,n,icord
 character(100) :: token
 character(6) :: token_color

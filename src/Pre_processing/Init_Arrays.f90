@@ -56,7 +56,6 @@ do i=1,size(Med)
    Med(i)%alfaMon = zero
    Med(i)%betaMon = zero
    Med(i)%kin_visc = zero
-   Med(i)%numx = zero
    Med(i)%mumx = zero
    Med(i)%phi = zero
    Med(i)%RoughCoef = zero

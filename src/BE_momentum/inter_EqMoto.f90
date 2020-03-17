@@ -42,7 +42,7 @@ integer(4) :: npj,contj,npartint,index_rij_su_h
 double precision :: rhoi,rhoj,amassj,pi,pj,alpha,veln,velti,veltj,deltan,pre   
 double precision :: coeff,secinv,nupa,nu,modderveln,moddervelt,moddervel
 double precision :: dvtdn,denorm,rij_su_h,ke_coef,kacl_coef,rij_su_h_quad
-double precision :: rijtemp,rijtemp2
+double precision :: rijtemp,rijtemp2,numx
 double precision :: gradmod,gradmodwacl,wu,denom,absv_pres_grav_inner
 double precision :: absv_Morris_inner,Morris_inner_weigth,kernel_der
 double precision :: dervel(3),dervelmorr(3),appopres(3),appodiss(3),rvw(3)
@@ -172,7 +172,8 @@ do contj=1,nPartIntorno(npi)
                   coeff = sin (Med(pg(npi)%imed)%phi)
                   nupa = (pre*coeff) / (secinv + 1.d-4) +                      &
                          Med(pg(npi)%imed)%kin_visc
-                  nu = min(nupa,Med(pg(npi)%imed)%numx)
+                  numx = Med(pg(npi)%imed)%mumx / Med(pg(npi)%imed)%den0
+                  nu = min(nupa,numx)
             endif
             dvtdn = (sin(pg(npj)%ang)) * (pg(npi)%dudy + pg(npi)%dvdx) +       &
                     (cos(pg(npj)%ang)) * (pg(npi)%dudx - pg(npi)%dvdy)

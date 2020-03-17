@@ -2,7 +2,7 @@
 #    gfortran_debug_omp, gfortran_debug, gfortran_bin, ifort_debug_omp, 
 #    ifort_debug, ifort_bin 
 # Variables to be updated
-VERSION = 9_0_0
+VERSION = 9_0_0_AA
 # Suggested values for EXECUTION
 #    bin
 #    debug
