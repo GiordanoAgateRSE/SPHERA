@@ -521,9 +521,8 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
             call start_and_stop(2,9)
             if (NumOpenFaces>0) call CancelOutgoneParticles_3D
             if (NumOpenSides>0) call CancelOutgoneParticles_2D
-! Adding new particles from the inlet sections
-            if (SourceFace/=0) call GenerateSourceParticles_3D
-            if (SourceSide/=0) call GenerateSourceParticles_2D
+! Adding new particles from the inlet section
+            if ((SourceFace/=0).or.(SourceSide/=0)) call GenerateSourceParticles
 ! Particle reordering
             call OrdGrid1
             call start_and_stop(3,9)
@@ -754,9 +753,8 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
             call start_and_stop(2,9)
             if (NumOpenFaces>0) call CancelOutgoneParticles_3D
             if (NumOpenSides>0) call CancelOutgoneParticles_2D
-! Adding new particles at the inlet sections
-            if (SourceFace/=0) call GenerateSourceParticles_3D
-            if (SourceSide/=0) call GenerateSourceParticles_2D
+! Adding new particles at the inlet section
+            if ((SourceFace/=0).or.(SourceSide/=0)) call GenerateSourceParticles
 ! Particle reordering on the background positioning grid
             call OrdGrid1
             call start_and_stop(3,9)

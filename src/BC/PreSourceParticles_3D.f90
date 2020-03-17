@@ -86,7 +86,7 @@ do isi=1,NumFacce
                 BoundaryFace(SourceFace)%Node(nodes)%GX(sd)) ** 2
          LenS = LenS + (BoundaryFace(SourceFace)%Node(3)%GX(sd) -              &
                 BoundaryFace(SourceFace)%Node(nodes)%GX(sd)) ** 2
-      end do
+      enddo
       LenR = dsqrt(LenR)
       LenS = dsqrt(LenS)
       NumPartR = Int(LenR / deltapart + 0.01d0)
@@ -112,9 +112,9 @@ do isi=1,NumFacce
                        BoundaryFace(SourceFace)%Node(2)%GX(sd) * csi
                PartLine(i_source,ip,sd) = P(sd) * (one - etalocal) + Q(sd) *   &
                                           etalocal
-            end do
-         end do
-      end do
+            enddo
+         enddo
+      enddo
       NumPartFace(i_source) = ip
       ParticleVolume = Domain%PVolume
       RowPeriod = ParticleVolume * NumPartFace(i_source) / Tratto(nt)%FlowRate 
@@ -129,4 +129,3 @@ enddo
 !------------------------
 return
 end subroutine PreSourceParticles_3D
-

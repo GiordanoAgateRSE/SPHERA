@@ -472,7 +472,7 @@ if (nag>0) then
             "|",pg(maxlock_BetaGamma)%coord(3),"|"
       endif
    endif
-   if (.not.((Domain%tipo=="bsph").and.(DBSPH%slip_ID<2))) then   
+   if (.not.((Domain%tipo=="bsph").and.(DBSPH%slip_ID<2))) then  
       write(ulog,'(a,g12.3,a)') "The ",laminar_flag_perc,                      &
 "% of fluid particles needs the shear viscous term in the momentum equation. "
       if (mixture_count>0) then

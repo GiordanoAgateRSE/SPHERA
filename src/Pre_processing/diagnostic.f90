@@ -168,8 +168,6 @@ select case (ierr)
       select case (dato)
          case (1); write(ulog,'(1x,2a)')                                       &
 ' 1 - Number of particles nag > PARTICLEBUFFER (a).  Routine ->',stringa(1:la)
-         case (2); write(ulog,'(1x,2a)')                                       &
-' 2 - Number of particles nag > PARTICLEBUFFER (b).  Routine ->',stringa(1:la)
       endselect
    case (7); write(ulog,'(1x,2a)')                                             &
       'Number of cels in grid: NumCellmax < Grid%nmax.  Routine ->',           &

@@ -176,8 +176,7 @@ character(len=8),parameter :: acode = "SPHERA  "
 character(len=8),parameter :: version = "9.0.0 "
 character(255) :: nomecaso, nomecas2
 character(1),dimension(0:3) :: xyzlabel = (/ "T", "X", "Y", "Z" /)  
-character(4),dimension(3) :: ncordlabel = (/ "    ", "(2D)", "(3D)" /)  
-character(255) :: LicenseFile
+character(4),dimension(3) :: ncordlabel = (/ "    ", "(2D)", "(3D)" /)
 ! Killer file name
 character(255) :: nomefilekill
 ! Operating System: "linux" (no other option is active). This string is 

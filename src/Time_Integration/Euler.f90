@@ -167,11 +167,11 @@ if (((DBSPH%n_w+DBSPH%n_inlet+DBSPH%n_outlet)>0).and.(Domain%tipo=="bsph")) &
       if (ncord==2) then 
          if (NumOpenSides>0) call CancelOutgoneParticles_2D
 ! Adds new particles at the inlet sections
-         if (SourceSide /= 0) call GenerateSourceParticles_2D 
+         if (SourceSide/=0) call GenerateSourceParticles
          else
             if (NumOpenFaces>0) call CancelOutgoneParticles_3D
 ! Adds new particles at the inlet sections
-            if (SourceFace/=0) call GenerateSourceParticles_3D 
+            if (SourceFace/=0) call GenerateSourceParticles 
       endif
 ! Particle reordering on the backround positioning grid 
       call OrdGrid1

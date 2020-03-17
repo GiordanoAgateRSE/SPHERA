@@ -236,7 +236,7 @@ if (pg(npi)%kin_visc>0.d0) then
                                                        absv_pres_grav_inner *  &
                                                        100.d0
 ! Taking into account the condition (absv_pres_grav_inner==0.d0) is only due to 
-! graphical reasons. 
+! graphical reasons.
    if ((Morris_inner_weigth>5.d0).or.(absv_pres_grav_inner==0.d0)) then
       pg(npi)%laminar_flag = 1
       else
