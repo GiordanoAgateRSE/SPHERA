@@ -9,7 +9,7 @@ VERSION = 9_0_0_AA
 #    debug_omp
 EXECUTION = debug_omp
 # Suggested values for COMPILATION_FLAGS
-#   -O1 (ifort_bin and gfortran_bin)
+#   -O2 (ifort_bin and gfortran_bin)
 #   -g -O0 -fbacktrace -C -Wall -fbounds-check (gfortran debug and gfortran_debug_omp),
 #   -g -O0 -traceback -C -check bounds -check noarg_temp_created -debug all -fpe0 (ifort_debug and ifort_debug_omp)
 COMPILATION_FLAGS = -g -O0 -fbacktrace -C -Wall -fbounds-check
