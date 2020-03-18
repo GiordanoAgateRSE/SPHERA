@@ -2,7 +2,7 @@
 #    gfortran_debug_omp, gfortran_debug, gfortran_bin, ifort_debug_omp, 
 #    ifort_debug, ifort_bin 
 # Variables to be updated
-VERSION = 9_0_0_AA
+VERSION = 9_0_0
 # Suggested values for EXECUTION
 #    bin
 #    debug
@@ -12,11 +12,11 @@ EXECUTION = debug_omp
 #   "gfortran_debug" and "gfortran_debug_omp"
 #      -g -O0 -fbacktrace -C -Wall -fbounds-check
 #   "gfortran_bin" 
-#      -O2 -msse3
+#      -O2
 #   "ifort_debug" and "ifort_debug_omp"
 #      -g -O0 -traceback -C -check bounds -check noarg_temp_created -debug all -fpe0
 #   "ifort_bin"
-#      -O2 -ipo -axSSSE3
+#      -O2
 COMPILATION_FLAGS = -g -O0 -fbacktrace -C -Wall -fbounds-check
 # Suggested values for COMPILER
 #    gfortran

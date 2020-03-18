@@ -67,9 +67,9 @@ if (nag>0) then
    block = block + 1
    nblocchi = nblocchi + 1
    if (nblocchi>maxnumblock) then
-      write(uerr,'(a)')                                                     &
+      write(uerr,'(a)')                                                        &
          ' Warning! nblocchi>maxnumblock in subroutine result_converter.'
-      write(uerr,'(a)')                                                     &
+      write(uerr,'(a)')                                                        &
          '    Increase maxnumblock or decrease output frequency for vtu files.'
       nblocchi = maxnumblock
    endif
@@ -121,7 +121,7 @@ if (nag>0) then
       k1 = i
       k2 = k1 + 5
       if (k2>numpoints) k2 = numpoints
-      write(stringa,'(6(3(e12.5,1x)))')                                       &
+      write(stringa,'(6(3(ES12.4E3,1x)))')                                     &
          (pg(finger(k))%coord(1),pg(finger(k))%coord(2),pg(finger(k))%coord(3),k=k1,k2)
       stringa = adjustl(trim(stringa))
       write(unitvtk,'(8x,a)') stringa(1:len_trim(stringa))
@@ -163,7 +163,7 @@ if (nag>0) then
       k1 = i
       k2 = k1 + 5
       if (k2>numpoints) k2 = numpoints
-      write(unitvtk,'(8x,6(3(1x,e12.5)))') (pg(finger(k))%vel(1),              &
+      write(unitvtk,'(8x,6(3(1x,ES12.4E3)))') (pg(finger(k))%vel(1),           &
          pg(finger(k))%vel(2),pg(finger(k))%vel(3),k=k1,k2)
    enddo
    write(unitvtk,'(a)') '      </DataArray>'
@@ -174,7 +174,7 @@ if (nag>0) then
       k1 = i
       k2 = k1 + 15
       if (k2>numpoints) k2 = numpoints
-      write(unitvtk,'(8x,16(1x,e12.5))') (pg(finger(k))%pres,k=k1,k2)
+      write(unitvtk,'(8x,16(1x,ES12.4E3))') (pg(finger(k))%pres,k=k1,k2)
    enddo
    write(unitvtk,'(a)') '      </DataArray>'
 ! Density
@@ -184,7 +184,7 @@ if (nag>0) then
       k1 = i
       k2 = k1 + 15
       if (k2>numpoints) k2 = numpoints
-      write(unitvtk,'(8x,16(1x,e12.5))') (pg(finger(k))%dens,k=k1,k2)
+      write(unitvtk,'(8x,16(1x,ES12.4E3))') (pg(finger(k))%dens,k=k1,k2)
    enddo
    write(unitvtk,'(a)') '      </DataArray>'
 ! Mass
@@ -194,7 +194,7 @@ if (nag>0) then
       k1 = i
       k2 = k1 + 15
       if (k2>numpoints) k2 = numpoints
-      write(unitvtk,'(8x,16(1x,e12.5))') (pg(finger(k))%mass,k=k1,k2)
+      write(unitvtk,'(8x,16(1x,ES12.4E3))') (pg(finger(k))%mass,k=k1,k2)
    enddo
    write(unitvtk,'(a)') '      </DataArray>'
 ! Viscosity
@@ -204,7 +204,7 @@ if (nag>0) then
       k1 = i
       k2 = k1 + 15
       if (k2>numpoints) k2 = numpoints
-      write(unitvtk,'(8x,16(1x,e12.5))') (pg(finger(k))%kin_visc,k=k1,k2)
+      write(unitvtk,'(8x,16(1x,ES12.4E3))') (pg(finger(k))%kin_visc,k=k1,k2)
    enddo
    write(unitvtk,'(a)') '      </DataArray>'
 ! z-coordinate
@@ -214,7 +214,7 @@ if (nag>0) then
       k1 = i
       k2 = k1 + 15
       if (k2>numpoints) k2 = numpoints
-      write(unitvtk,'(8x,16(1x,e12.5))') (pg(finger(k))%coord(3),k=k1,k2)
+      write(unitvtk,'(8x,16(1x,ES12.4E3))') (pg(finger(k))%coord(3),k=k1,k2)
    enddo
    write(unitvtk,'(a)') '      </DataArray>' 
 ! Fluid ID
@@ -270,7 +270,7 @@ if (nag>0) then
          k1 = i
          k2 = k1 + 15
          if (k2>numpoints) k2 = numpoints
-         write(unitvtk,'(8x,16(1x,e12.5))') (pg(finger(k))%uni,k=k1,k2)
+         write(unitvtk,'(8x,16(1x,ES12.4E3))') (pg(finger(k))%uni,k=k1,k2)
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
 ! Discrete Shepard coefficient
@@ -280,7 +280,7 @@ if (nag>0) then
          k1 = i
          k2 = k1 + 15
          if (k2>numpoints) k2 = numpoints
-         write(unitvtk,'(8x,16(1x,e12.5))') (pg(finger(k))%sigma,k=k1,k2)
+         write(unitvtk,'(8x,16(1x,ES12.4E3))') (pg(finger(k))%sigma,k=k1,k2)
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
 ! Discrete Shepard coefficient in the same fluid
@@ -291,7 +291,7 @@ if (nag>0) then
             k1 = i
             k2 = k1 + 15
             if (k2>numpoints) k2 = numpoints
-            write(unitvtk,'(8x,16(1x,e12.5))') (pg(finger(k))%sigma_same_fluid,&
+            write(unitvtk,'(8x,16(1x,ES12.4E3))') (pg(finger(k))%sigma_same_fluid,&
                k=k1,k2)
          enddo
          write(unitvtk,'(a)') '      </DataArray>'
@@ -303,7 +303,7 @@ if (nag>0) then
          k1 = i
          k2 = k1 + 15
          if (k2>numpoints) k2 = numpoints
-         write(unitvtk,'(8x,16(1x,e12.5))') (pg(finger(k))%Gamma,k=k1,k2)
+         write(unitvtk,'(8x,16(1x,ES12.4E3))') (pg(finger(k))%Gamma,k=k1,k2)
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
 ! Free surface flag
@@ -323,7 +323,7 @@ if (nag>0) then
          k1 = i
          k2 = k1 + 5
          if (k2>numpoints) k2 = numpoints
-         write(unitvtk,'(8x,6(3(1x,e12.5)))') (pg(finger(k))%drho(1),          &
+         write(unitvtk,'(8x,6(3(1x,ES12.4E3)))') (pg(finger(k))%drho(1),       &
             pg(finger(k))%drho(2),pg(finger(k))%drho(3),k=k1,k2)
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
@@ -334,7 +334,7 @@ if (nag>0) then
          k1 = i
          k2 = k1 + 5
          if (k2>numpoints) k2 = numpoints
-         write(unitvtk,'(8x,6(3(1x,e12.5)))') (pg(finger(k))%dvel(1,1),        &
+         write(unitvtk,'(8x,6(3(1x,ES12.4E3)))') (pg(finger(k))%dvel(1,1),     &
             pg(finger(k))%dvel(1,2),pg(finger(k))%dvel(1,3),k=k1,k2)
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
@@ -346,7 +346,7 @@ if (nag>0) then
             k1 = i
             k2 = k1 + 5
             if (k2>numpoints) k2 = numpoints
-            write(unitvtk,'(8x,6(3(1x,e12.5)))') (pg(finger(k))%dvel(2,1),     &
+            write(unitvtk,'(8x,6(3(1x,ES12.4E3)))') (pg(finger(k))%dvel(2,1),  &
                pg(finger(k))%dvel(2,2),pg(finger(k))%dvel(2,3),k=k1,k2)
          enddo
          write(unitvtk,'(a)') '      </DataArray>'
@@ -358,7 +358,7 @@ if (nag>0) then
          k1 = i
          k2 = k1 + 5
          if (k2>numpoints) k2 = numpoints
-         write(unitvtk,'(8x,6(3(1x,e12.5)))') (pg(finger(k))%dvel(3,1),        &
+         write(unitvtk,'(8x,6(3(1x,ES12.4E3)))') (pg(finger(k))%dvel(3,1),     &
             pg(finger(k))%dvel(3,2),pg(finger(k))%dvel(3,3),k=k1,k2)
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
@@ -382,7 +382,7 @@ if (nag>0) then
          k1 = i
          k2 = k1 + 15
          if (k2>numpoints) k2 = numpoints
-         write(unitvtk,'(8x,16(1x,e12.5))')                                    &
+         write(unitvtk,'(8x,16(1x,ES12.4E3))')                                 &
             (pg(finger(k))%sigma_prime_m,k=k1,k2)
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
@@ -392,7 +392,7 @@ if (nag>0) then
          k1 = i
          k2 = k1 + 15
          if (k2>numpoints) k2 = numpoints
-         write(unitvtk,'(8x,16(1x,e12.5))')                                    &
+         write(unitvtk,'(8x,16(1x,ES12.4E3))')                                 &
             (pg(finger(k))%pres_fluid,k=k1,k2)
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
@@ -403,7 +403,7 @@ if (nag>0) then
          k1 = i
          k2 = k1 + 15
          if (k2>numpoints) k2 = numpoints
-         write(unitvtk,'(8x,16(1x,e12.5))') (pg(finger(k))%secinv,k=k1,k2)
+         write(unitvtk,'(8x,16(1x,ES12.4E3))') (pg(finger(k))%secinv,k=k1,k2)
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
 ! blt_flag
@@ -429,7 +429,7 @@ if (nag>0) then
             if (pg(finger(k))%blt_flag/=2)                                     &
                pg(finger(k))%normal_int_mixture_top(:) = 0.d0
          enddo
-         write(unitvtk,'(8x,6(3(1x,e12.5)))') (                                &
+         write(unitvtk,'(8x,6(3(1x,ES12.4E3)))') (                             &
             pg(finger(k))%normal_int_mixture_top(1),                           &
             pg(finger(k))%normal_int_mixture_top(2),                           &
             pg(finger(k))%normal_int_mixture_top(3),k=k1,k2)
@@ -448,7 +448,7 @@ if (nag>0) then
             if (pg(finger(k))%blt_flag/=5)                                     &
                pg(finger(k))%normal_int_sat_top(:) = 0.d0
          enddo
-         write(unitvtk,'(8x,6(3(1x,e12.5)))') (                                &
+         write(unitvtk,'(8x,6(3(1x,ES12.4E3)))') (                             &
             pg(finger(k))%normal_int_sat_top(1),                               &
             pg(finger(k))%normal_int_sat_top(2),                               &
             pg(finger(k))%normal_int_sat_top(3),k=k1,k2)
@@ -462,7 +462,7 @@ if (nag>0) then
             k1 = i
             k2 = k1 + 15
             if (k2>numpoints) k2 = numpoints
-            write(unitvtk,'(8x,16(1x,e12.5))')                                 &
+            write(unitvtk,'(8x,16(1x,ES12.4E3))')                              &
                (pg(finger(k))%Beta_slope,k=k1,k2)
          enddo
          write(unitvtk,'(a)') '      </DataArray>' 
@@ -473,7 +473,7 @@ if (nag>0) then
             k1 = i
             k2 = k1 + 15
             if (k2>numpoints) k2 = numpoints
-            write(unitvtk,'(8x,16(1x,e12.5))') (pg(finger(k))%tau_tauc,k=k1,k2)
+            write(unitvtk,'(8x,16(1x,ES12.4E3))') (pg(finger(k))%tau_tauc,k=k1,k2)
          enddo
          write(unitvtk,'(a)') '      </DataArray>'
 ! u_star
@@ -483,7 +483,7 @@ if (nag>0) then
             k1 = i
             k2 = k1 + 15
             if (k2>numpoints) k2 = numpoints
-            write(unitvtk,'(8x,16(1x,e12.5))') (pg(finger(k))%u_star,k=k1,k2)
+            write(unitvtk,'(8x,16(1x,ES12.4E3))') (pg(finger(k))%u_star,k=k1,k2)
          enddo
          write(unitvtk,'(a)') '      </DataArray>'
 ! normal_int
@@ -493,8 +493,9 @@ if (nag>0) then
             k1 = i
             k2 = k1 + 5
             if (k2>numpoints) k2 = numpoints
-            write(unitvtk,'(8x,6(3(1x,e12.5)))') (pg(finger(k))%normal_int(1), &
-               pg(finger(k))%normal_int(2),pg(finger(k))%normal_int(3),k=k1,k2)
+            write(unitvtk,'(8x,6(3(1x,ES12.4E3)))')                            &
+               (pg(finger(k))%normal_int(1),pg(finger(k))%normal_int(2),       &
+               pg(finger(k))%normal_int(3),k=k1,k2)
          enddo
          write(unitvtk,'(a)') '      </DataArray>'    
          if (Granular_flows_options%KTGF_config==1) then  
@@ -506,7 +507,7 @@ if (nag>0) then
                   k1 = i
                   k2 = k1 + 15
                   if (k2>numpoints) k2 = numpoints
-                  write(unitvtk,'(8x,16(1x,e12.5))') (pg(finger(k))%C_D,k=k1,k2)
+                  write(unitvtk,'(8x,16(1x,ES12.4E3))') (pg(finger(k))%C_D,k=k1,k2)
                enddo
                write(unitvtk,'(a)') '      </DataArray>' 
 ! C_L
@@ -516,7 +517,7 @@ if (nag>0) then
                   k1 = i
                   k2 = k1 + 15
                   if (k2>numpoints) k2 = numpoints
-                  write(unitvtk,'(8x,16(1x,e12.5))') (pg(finger(k))%C_L,k=k1,k2)
+                  write(unitvtk,'(8x,16(1x,ES12.4E3))') (pg(finger(k))%C_L,k=k1,k2)
                enddo
                write(unitvtk,'(a)') '      </DataArray>'
 ! Gamma
@@ -526,7 +527,7 @@ if (nag>0) then
                   k1 = i
                   k2 = k1 + 15
                   if (k2>numpoints) k2 = numpoints
-                  write(unitvtk,'(8x,16(1x,e12.5))')                           &
+                  write(unitvtk,'(8x,16(1x,ES12.4E3))')                        &
                      (pg(finger(k))%Gamma_slope,k=k1,k2)
                enddo
                write(unitvtk,'(a)') '      </DataArray>' 
@@ -538,7 +539,7 @@ if (nag>0) then
                k1 = i
                k2 = k1 + 15
                if (k2>numpoints) k2 = numpoints
-               write(unitvtk,'(8x,16(1x,e12.5))')                              &
+               write(unitvtk,'(8x,16(1x,ES12.4E3))')                           &
                  (pg(finger(k))%k_BetaGamma,k=k1,k2)
             enddo
             write(unitvtk,'(a)') '      </DataArray>'  
@@ -604,7 +605,7 @@ if (nag>0) then
          k1 = i
          k2 = k1 + 5
          if (k2>numpoints) k2 = numpoints
-         write(stringa,'(6(3(e12.5,1x)))') (pg_w(finger(k))%coord(1),          &
+         write(stringa,'(6(3(ES12.4E3,1x)))') (pg_w(finger(k))%coord(1),       &
          pg_w(finger(k))%coord(2),pg_w(finger(k))%coord(3),k=k1,k2)
          stringa = adjustl(trim(stringa))
          write(unitvtk,'(8x,a)') stringa(1:len_trim(stringa))
@@ -647,7 +648,7 @@ if (nag>0) then
          k1 = i
          k2 = k1 + 5
          if (k2>numpoints) k2 = numpoints
-         write(unitvtk,'(8x,6(3(1x,e12.5)))') (pg_w(finger(k))%vel(1),         &
+         write(unitvtk,'(8x,6(3(1x,ES12.4E3)))') (pg_w(finger(k))%vel(1),      &
             pg_w(finger(k))%vel(2),pg_w(finger(k))%vel(3),k=k1,k2)
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
@@ -658,7 +659,7 @@ if (nag>0) then
          k1 = i
          k2 = k1 + 5
          if (k2>numpoints) k2 = numpoints
-         write(unitvtk,'(8x,6(3(1x,e12.5)))') (pg_w(finger(k))%normal(1),      &
+         write(unitvtk,'(8x,6(3(1x,ES12.4E3)))') (pg_w(finger(k))%normal(1),   &
             pg_w(finger(k))%normal(2),pg_w(finger(k))%normal(3),k=k1,k2)
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
@@ -671,7 +672,7 @@ if (nag>0) then
             k1 = i
             k2 = k1 + 5
             if (k2>numpoints) k2 = numpoints
-            write(unitvtk,'(8x,6(3(1x,e12.5)))') (                             &
+            write(unitvtk,'(8x,6(3(1x,ES12.4E3)))') (                          &
                pg_w(finger(k))%grad_vel_VSL_times_mu(1),                       &
                pg_w(finger(k))%grad_vel_VSL_times_mu(2),                       &
                pg_w(finger(k))%grad_vel_VSL_times_mu(3),k=k1,k2)
@@ -685,7 +686,7 @@ if (nag>0) then
          k1 = i
          k2 = k1 + 15
          if (k2>numpoints) k2 = numpoints
-         write(unitvtk,'(8x,16(1x,e12.5))') (pg_w(finger(k))%pres,k=k1,k2)
+         write(unitvtk,'(8x,16(1x,ES12.4E3))') (pg_w(finger(k))%pres,k=k1,k2)
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
 ! Weight
@@ -700,7 +701,7 @@ if (nag>0) then
          k1 = i
          k2 = k1 + 15
          if (k2>numpoints) k2 = numpoints
-         write(unitvtk,'(8x,16(1x,e12.5))') (pg_w(finger(k))%weight,k=k1,k2)
+         write(unitvtk,'(8x,16(1x,ES12.4E3))') (pg_w(finger(k))%weight,k=k1,k2)
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
 ! Semi-particle mass 
@@ -710,7 +711,7 @@ if (nag>0) then
          k1 = i
          k2 = k1 + 15
          if (k2>numpoints) k2 = numpoints
-         write(unitvtk,'(8x,16(1x,e12.5))') (pg_w(finger(k))%mass,k=k1,k2)
+         write(unitvtk,'(8x,16(1x,ES12.4E3))') (pg_w(finger(k))%mass,k=k1,k2)
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
 ! Semi-particle k_d 
@@ -720,7 +721,7 @@ if (nag>0) then
          k1 = i
          k2 = k1 + 15
          if (k2>numpoints) k2 = numpoints
-         write(unitvtk,'(8x,16(1x,e12.5))') (pg_w(finger(k))%k_d,k=k1,k2)
+         write(unitvtk,'(8x,16(1x,ES12.4E3))') (pg_w(finger(k))%k_d,k=k1,k2)
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
 ! Semi-particle volume      
@@ -730,7 +731,7 @@ if (nag>0) then
          k1 = i
          k2 = k1 + 15
          if (k2>numpoints) k2 = numpoints
-         write(unitvtk,'(8x,16(1x,e12.5))') (pg_w(finger(k))%volume,k=k1,k2)
+         write(unitvtk,'(8x,16(1x,ES12.4E3))') (pg_w(finger(k))%volume,k=k1,k2)
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
 ! Semi-particle kinematic viscosity
@@ -741,7 +742,7 @@ if (nag>0) then
             k1 = i
             k2 = k1 + 15
             if (k2>numpoints) k2 = numpoints
-            write(unitvtk,'(8x,16(1x,e12.5))')                                 &
+            write(unitvtk,'(8x,16(1x,ES12.4E3))')                              &
                (pg_w(finger(k))%kin_visc_semi_part,k=k1,k2)
          enddo      
          write(unitvtk,'(a)') '      </DataArray>'    
@@ -819,7 +820,7 @@ if (nag>0) then
          k1 = i
          k2 = k1 + 5
          if (k2>numpoints) k2 = numpoints
-         write(stringa,'(6(3(e12.5,1x)))') (bp_arr(finger(k))%pos(1),          &
+         write(stringa,'(6(3(ES12.4E3,1x)))') (bp_arr(finger(k))%pos(1),       &
             bp_arr(finger(k))%pos(2),bp_arr(finger(k))%pos(3),k=k1,k2)
          stringa = adjustl(trim(stringa))
          write(unitvtk,'(8x,a)') stringa(1:len_trim(stringa))
@@ -862,7 +863,7 @@ if (nag>0) then
          k1 = i
          k2 = k1 + 5
          if (k2>numpoints) k2 = numpoints
-         write(unitvtk,'(8x,6(3(1x,e12.5)))') (bp_arr(finger(k))%vel(1),       &
+         write(unitvtk,'(8x,6(3(1x,ES12.4E3)))') (bp_arr(finger(k))%vel(1),    &
             bp_arr(finger(k))%vel(2),bp_arr(finger(k))%vel(3),k=k1,k2)
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
@@ -873,7 +874,7 @@ if (nag>0) then
          k1 = i
          k2 = k1 + 5
          if (k2>numpoints) k2 = numpoints
-         write(unitvtk,'(8x,6(3(1x,e12.5)))') (bp_arr(finger(k))%normal(1),    &
+         write(unitvtk,'(8x,6(3(1x,ES12.4E3)))') (bp_arr(finger(k))%normal(1), &
                                                bp_arr(finger(k))%normal(2),    &
                                                bp_arr(finger(k))%normal(3),    &
                                                k=k1,k2)
@@ -886,7 +887,7 @@ if (nag>0) then
          k1 = i
          k2 = k1 + 15
          if (k2>numpoints) k2 = numpoints
-         write(unitvtk,'(8x,16(1x,e12.5))') (bp_arr(finger(k))%pres,k=k1,k2)
+         write(unitvtk,'(8x,16(1x,ES12.4E3))') (bp_arr(finger(k))%pres,k=k1,k2)
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
 ! Mass 
@@ -896,7 +897,7 @@ if (nag>0) then
          k1 = i
          k2 = k1 + 15
          if (k2>numpoints) k2 = numpoints
-         write(unitvtk,'(8x,16(1x,e12.5))') (bp_arr(finger(k))%mass,k=k1,k2)
+         write(unitvtk,'(8x,16(1x,ES12.4E3))') (bp_arr(finger(k))%mass,k=k1,k2)
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
 ! Area 
@@ -906,7 +907,7 @@ if (nag>0) then
          k1 = i
          k2 = k1 + 15
          if (k2>numpoints) k2 = numpoints
-         write(unitvtk,'(8x,16(1x,e12.5))') (bp_arr(finger(k))%area,k=k1,k2)
+         write(unitvtk,'(8x,16(1x,ES12.4E3))') (bp_arr(finger(k))%area,k=k1,k2)
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
 ! Particle ID 
@@ -988,7 +989,7 @@ if (nag>0) then
          k1 = i
          k2 = k1 + 5
          if (k2>numpoints) k2 = numpoints
-         write(stringa,'(6(3(e12.5,1x)))') (body_arr(finger(k))%x_CM(1),       &
+         write(stringa,'(6(3(ES12.4E3,1x)))') (body_arr(finger(k))%x_CM(1),    &
                                              body_arr(finger(k))%x_CM(2),      &
                                              body_arr(finger(k))%x_CM(3),      &
                                              k=k1,k2)
@@ -1032,7 +1033,7 @@ if (nag>0) then
          k1 = i
          k2 = k1 + 5
          if (k2>numpoints) k2 = numpoints
-         write(unitvtk,'(8x,6(3(1x,e12.5)))') (body_arr(finger(k))%u_CM(1),    &
+         write(unitvtk,'(8x,6(3(1x,ES12.4E3)))') (body_arr(finger(k))%u_CM(1), &
                                                body_arr(finger(k))%u_CM(2),    &
                                                body_arr(finger(k))%u_CM(3),    &
                                                k=k1,k2)
@@ -1045,7 +1046,7 @@ if (nag>0) then
          k1 = i
          k2 = k1 + 5
          if (k2>numpoints) k2 = numpoints
-         write(unitvtk,'(8x,6(3(1x,e12.5)))') (body_arr(finger(k))%omega(1),   &
+         write(unitvtk,'(8x,6(3(1x,ES12.4E3)))') (body_arr(finger(k))%omega(1),&
                                                body_arr(finger(k))%omega(2),   &
                                                body_arr(finger(k))%omega(3),   &
                                                k=k1,k2)
@@ -1059,7 +1060,7 @@ if (nag>0) then
          k1 = i
          k2 = k1 + 5
          if (k2>numpoints) k2 = numpoints
-         write(unitvtk,'(8x,6(3(1x,e12.5)))') (body_arr(finger(k))%Ic(1,1),    &
+         write(unitvtk,'(8x,6(3(1x,ES12.4E3)))') (body_arr(finger(k))%Ic(1,1), &
                                                body_arr(finger(k))%Ic(1,2),    &
                                                body_arr(finger(k))%Ic(1,3),    &
                                                k=k1,k2)
@@ -1072,7 +1073,7 @@ if (nag>0) then
          k1 = i
          k2 = k1 + 5
          if (k2>numpoints) k2 = numpoints
-         write(unitvtk,'(8x,6(3(1x,e12.5)))') (body_arr(finger(k))%Ic(2,1),    &
+         write(unitvtk,'(8x,6(3(1x,ES12.4E3)))') (body_arr(finger(k))%Ic(2,1), &
                                                body_arr(finger(k))%Ic(2,2),    &
                                                body_arr(finger(k))%Ic(2,3),    &
                                                k=k1,k2)
@@ -1085,7 +1086,7 @@ if (nag>0) then
          k1 = i
          k2 = k1 + 5
          if (k2>numpoints) k2 = numpoints
-         write(unitvtk,'(8x,6(3(1x,e12.5)))') (body_arr(finger(k))%Ic(3,1),    &
+         write(unitvtk,'(8x,6(3(1x,ES12.4E3)))') (body_arr(finger(k))%Ic(3,1), &
                                                body_arr(finger(k))%Ic(3,2),    &
                                                body_arr(finger(k))%Ic(3,3),    &
                                                k=k1,k2)
@@ -1098,7 +1099,7 @@ if (nag>0) then
          k1 = i
          k2 = k1 + 15
          if (k2>numpoints) k2 = numpoints
-         write(unitvtk,'(8x,16(1x,e12.5))') (body_arr(finger(k))%mass,k=k1,k2)
+         write(unitvtk,'(8x,16(1x,ES12.4E3))') (body_arr(finger(k))%mass,k=k1,k2)
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
 ! Body ID
@@ -1136,4 +1137,3 @@ endif
 !------------------------
 return
 end subroutine result_converter
-
