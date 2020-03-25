@@ -180,7 +180,7 @@ loop_nag: do npi=1,nag
                endif
                if (Icont(ncelj+1)<=Icont(ncelj)) cycle
                npj = NPartOrd(mm)
-! Relative distance 
+! Relative distance
                ragtemp(1:3) = pg(npi)%coord(1:3) - pg(npj)%coord(1:3)
 ! Square of the relative distance (to improve accuracy later on)
                rijtemp = ragtemp(1)*ragtemp(1) + ragtemp(2)*ragtemp(2) +       &
@@ -497,7 +497,7 @@ loop_nag: do npi=1,nag
          normal_int_abs = dsqrt(dot_product(pg(npi)%normal_int,                &
                           pg(npi)%normal_int)) 
          if (normal_int_abs>zero) then
-            pg(npi)%normal_int(:) = pg(npi)%normal_int(:)/normal_int_abs
+            pg(npi)%normal_int(:) = pg(npi)%normal_int(:) / normal_int_abs
          endif
       endif    
    endif

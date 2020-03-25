@@ -100,8 +100,10 @@ if ((on_going_time_step==-2).and.(Domain%tipo=="bsph")) on_going_time_step =   &
 call start_and_stop(3,10)
 ! Removing fictitious reservoirs used for DB-SPH initialization
 if ((on_going_time_step==it_start).and.(Domain%tipo=="bsph")) then
-   call start_and_stop(2,9) 
-!$omp parallel do default(none) shared(nag,pg,OpCount,Partz) private(npi)
+   call start_and_stop(2,9)
+!$omp parallel do default(none)                                                &
+!$omp shared(nag,pg,OpCount,Partz)                                             &
+!$omp private(npi)
    do npi=1,nag
 ! Fictitious air reservoirs
       if (Partz(pg(npi)%izona)%DBSPH_fictitious_reservoir_flag.eqv.(.true.))   &
@@ -212,7 +214,7 @@ if (exetype=="linux") then
 endif
 ITERATION_LOOP: do while (it<=Domain%itmax)
    done_flag = .false.
-! Set the iteration counter
+! Set the time step ID
    it = it + 1
    on_going_time_step = it
    it_eff = it
@@ -267,7 +269,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
                         pg(npi)%vel(:) = Partz(ir)%vel(:)
                   endif
                enddo
-! Fixed value of velocity (npointv = 1)
+! Fixed value of velocity (npointv=1)
                elseif (Partz(ir)%npointv==1) then
 ! As an alternative, one may loop over particles 
                   do npi=Partz(ir)%limit(1),Partz(ir)%limit(2)
@@ -287,40 +289,38 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
 ! Erosion criterium + continuity equation RHS  
          call start_and_stop(2,12)
          if (Granular_flows_options%KTGF_config>0) then
-            select case (Granular_flows_options%KTGF_config)
-               case(1)
-!$omp parallel do default(none) shared(pg,nag) private(npi,ncel)
-                  do npi=1,nag
-                     pg(npi)%vel_old(:) = pg(npi)%vel(:)
-                     pg(npi)%normal_int_old(:) = pg(npi)%normal_int(:)
-                     call initialization_fixed_granular_particle(npi)             
-                  enddo
+            if (Granular_flows_options%KTGF_config==1) then
+!$omp parallel do default(none)                                                &
+!$omp shared(pg,nag)                                                           &
+!$omp private(npi,ncel)
+               do npi=1,nag
+                  pg(npi)%vel_old(:) = pg(npi)%vel(:)
+                  pg(npi)%normal_int_old(:) = pg(npi)%normal_int(:)
+                  call initialization_fixed_granular_particle(npi)             
+               enddo
 !$omp end parallel do 
-!$omp parallel do default(none) shared(pg,nag) private(npi) 
-                  do npi=1,nag
-                     call Shields(npi) 
-                  enddo
+            endif
+!$omp parallel do default(none)                                                &
+!$omp shared(pg,nag)                                                           &
+!$omp private(npi) 
+            do npi=1,nag
+               call Shields(npi) 
+            enddo
 !$omp end parallel do
+            if (Granular_flows_options%KTGF_config==1) then
 ! Initializing viscosity for fixed particles
-!$omp parallel do default(none) shared(pg,nag,Granular_flows_options,Med)      &
+!$omp parallel do default(none)                                                &
+!$omp shared(pg,nag,Granular_flows_options,Med)                                &
 !$omp private(npi,ncel,aux,igridi,jgridi,kgridi)
-                  do npi=1,nag
-                     ncel = ParticleCellNumber(pg(npi)%coord)
-                     aux = CellIndices(ncel,igridi,jgridi,kgridi)
-                     if (pg(npi)%state=="sol") then
-                        pg(npi)%mu = Med(pg(npi)%imed)%mumx
-                        pg(npi)%kin_visc = pg(npi)%mu / pg(npi)%dens
-                     endif
-                  enddo
-!$omp end parallel do
-               case(2)
-!$omp parallel do default(none) shared(pg,nag) private(npi)
-                  do npi=1,nag
-                     call Shields(npi) 
-                  enddo
-!$omp end parallel do 
-               case default
-            endselect
+               do npi=1,nag
+                  ncel = ParticleCellNumber(pg(npi)%coord)
+                  aux = CellIndices(ncel,igridi,jgridi,kgridi)
+                  if (pg(npi)%state=="sol") then
+                     pg(npi)%mu = Med(pg(npi)%imed)%mumx
+                     pg(npi)%kin_visc = pg(npi)%mu / pg(npi)%dens
+                  endif
+               enddo
+            endif
 ! Update auxiliary vector for counting particles, whose status is not "sol"
             indarrayFlu = 0
             do npi=1,nag
@@ -352,14 +352,14 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
       call start_and_stop(2,6)
       Ncbf_Max = 0
 !$omp parallel do default(none)                                                &
-!$omp private(npi,ii,tpres,tdiss,tvisc,Ncbf,BoundReaction,Ncbs,IntNcbs)        &
 !$omp shared(pg,Domain,BoundaryDataPointer,Ncbf_Max,indarrayFlu,Array_Flu,Med) &
-!$omp shared(nag,it,Granular_flows_options,ncord)
+!$omp shared(nag,it,Granular_flows_options,ncord)                              &
+!$omp private(npi,ii,tpres,tdiss,tvisc,Ncbf,BoundReaction,Ncbs,IntNcbs)
 ! Loop over particles
       do ii = 1,indarrayFlu
          npi = Array_Flu(ii)
 ! The mixture particles in the elastic-plastic strain regime are held fixed.
-         if (pg(npi)%mu==Med(pg(npi)%imed)%mumx) then
+         if (pg(npi)%mu>(Med(pg(npi)%imed)%mumx-1.d-12)) then
             pg(npi)%acc(:) = zero
             cycle
          endif
@@ -442,8 +442,8 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
 ! dt computation 
             dtvel = half * (dt + dt_previous_step) 
 !$omp parallel do default(none)                                                &
-!$omp private(npi,ii)                                                          &
-!$omp shared(pg,dtvel,indarrayFlu,Array_Flu)
+!$omp shared(pg,dtvel,indarrayFlu,Array_Flu)                                   &
+!$omp private(npi,ii)
             do ii=1,indarrayFlu
                npi = Array_Flu(ii)
 ! kodvel = 0: the particle is internal to the domain. 
@@ -470,13 +470,14 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
             endif
 ! Partial smoothing for velocity: start 
             call start_and_stop(2,7)
-            if (Domain%TetaV>0.d0) call velocity_smoothing
-!$omp parallel do default(none) private(npi,ii,TetaV1)                         &
-!$omp shared(pg,Med,Domain,dt,indarrayFlu,Array_Flu)
+            if (Domain%TetaV>1.d-9) call velocity_smoothing
+!$omp parallel do default(none)                                                &
+!$omp shared(pg,Med,Domain,dt,indarrayFlu,Array_Flu)                           &
+!$omp private(npi,ii,TetaV1)
 ! Loop over all the active particles
             do ii=1,indarrayFlu
                npi = Array_Flu(ii)
-               if (Domain%TetaV>0.d0) then
+               if (Domain%TetaV>1.d-9) then
 ! TetaV depending on the time step
                   TetaV1 = Domain%TetaV * Med(pg(npi)%imed)%Celerita * dt /    &
                            Domain%h
@@ -498,7 +499,9 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
 ! Partial smoothing for velocity: end
 ! Update the particle positions
             call start_and_stop(2,8)
-!$omp parallel do default(none) private(npi) shared(nag,pg,dt)
+!$omp parallel do default(none)                                                &
+!$omp shared(nag,pg,dt)                                                        &
+!$omp private(npi)
 ! Loop over the active particles
             do npi=1,nag
                if (pg(npi)%cella==0) cycle
@@ -547,44 +550,43 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
       if (Granular_flows_options%KTGF_config>0) then  
          if (Domain%time_split==1) then 
 ! Assessing particle status ("flu" or "sol") of the mixture particles
-! Calling the proper subroutine for the erosion criterion 
-            select case (Granular_flows_options%KTGF_config)
-               case(1)
-!$omp parallel do default(none) shared(pg,nag) private(npi,ncel)
-                  do npi=1,nag
-                     pg(npi)%vel_old(:) = pg(npi)%vel(:)
-                     pg(npi)%normal_int_old(:) = pg(npi)%normal_int(:)        
-                     call initialization_fixed_granular_particle(npi)             
-                  enddo
-!$omp end parallel do
-!$omp parallel do default(none) shared(pg,nag) private(npi)
-                  do npi=1,nag
-                     call Shields(npi) 
-                  enddo
+! Calling the proper subroutine for the erosion criterion
+            if (Granular_flows_options%KTGF_config==1) then
+!$omp parallel do default(none)                                                &
+!$omp shared(pg,nag)                                                           &
+!$omp private(npi,ncel)
+               do npi=1,nag
+                  pg(npi)%vel_old(:) = pg(npi)%vel(:)
+                  pg(npi)%normal_int_old(:) = pg(npi)%normal_int(:)
+                  call initialization_fixed_granular_particle(npi)             
+               enddo
 !$omp end parallel do 
-!$omp parallel do default(none) shared(pg,nag,Granular_flows_options,Med)      &
+            endif
+!$omp parallel do default(none)                                                &
+!$omp shared(pg,nag)                                                           &
+!$omp private(npi) 
+            do npi=1,nag
+               call Shields(npi) 
+            enddo
+!$omp end parallel do
+            if (Granular_flows_options%KTGF_config==1) then
+! Initializing viscosity for fixed particles
+!$omp parallel do default(none)                                                &
+!$omp shared(pg,nag,Granular_flows_options,Med)                                &
 !$omp private(npi,ncel,aux,igridi,jgridi,kgridi)
-                  do npi=1,nag
-                     ncel = ParticleCellNumber(pg(npi)%coord)
-                     aux = CellIndices(ncel,igridi,jgridi,kgridi)
-                     if (pg(npi)%state=="sol") then
-                        pg(npi)%mu = Med(pg(npi)%imed)%mumx
-                        pg(npi)%kin_visc = pg(npi)%mu / pg(npi)%dens
-                     endif
-                  enddo
-!$omp end parallel do
-               case(2)
-!$omp parallel do default(none) shared(pg,nag) private(npi)
-                  do npi=1,nag
-                     call Shields(npi) 
-                  enddo
-!$omp end parallel do 
-               case default
-            endselect
+               do npi=1,nag
+                  ncel = ParticleCellNumber(pg(npi)%coord)
+                  aux = CellIndices(ncel,igridi,jgridi,kgridi)
+                  if (pg(npi)%state=="sol") then
+                     pg(npi)%mu = Med(pg(npi)%imed)%mumx
+                     pg(npi)%kin_visc = pg(npi)%mu / pg(npi)%dens
+                  endif
+               enddo
+            endif
 ! Update auxiliary vector for counting particles, whose status is not "sol"
             indarrayFlu = 0
             do npi=1,nag
-               if (pg(npi)%cella==0.or.pg(npi)%vel_type/="std") cycle
+               if ((pg(npi)%cella==0).or.(pg(npi)%vel_type/="std")) cycle
                if (pg(npi)%state=="flu") then
                   indarrayFlu = indarrayFlu + 1
 ! Check the boundary sizes and possible resizing
@@ -617,7 +619,9 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
             endif
       endif 
       if ((Domain%time_stage==1).or.(Domain%time_split==1)) then 
-!$omp parallel do default(none) private(npi) shared(nag,pg)
+!$omp parallel do default(none)                                                &
+!$omp shared(nag,pg)                                                           &
+!$omp private(npi)
          do npi=1,nag
             pg(npi)%koddens = 0
             pg(npi)%densass = pg(npi)%dens
@@ -682,12 +686,14 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
          call start_and_stop(3,12)
          elseif (Domain%time_split==1) then 
 ! Leapfrog scheme
-!$omp parallel do default(none) private(npi,ii)                                &
-!$omp shared(pg,dt,indarrayFlu,Array_Flu,Domain,Med)
+!$omp parallel do default(none)                                                &
+!$omp shared(pg,dt,indarrayFlu,Array_Flu,Domain,Med)                           &
+!$omp private(npi,ii)
             do ii=1,indarrayFlu
                npi = Array_Flu(ii)
                if (pg(npi)%cella==0.or.pg(npi)%vel_type/="std") cycle
-               if (Domain%tipo=="bsph") pg(npi)%dden=pg(npi)%dden/pg(npi)%uni
+               if (Domain%tipo=="bsph") pg(npi)%dden = pg(npi)%dden /          &
+                                                       pg(npi)%uni
 ! Boundary type is "fixe" or "tapis" or "level"
                if (pg(npi)%koddens==0) then
                   if (Domain%tipo=="semi") pg(npi)%dens = pg(npi)%dens + dt *  &
@@ -709,7 +715,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
             call start_and_stop(3,12)
 ! Equation of state 
             call start_and_stop(2,13)
-            call CalcPre 
+            call CalcPre
             call start_and_stop(3,13)
 ! Continuity equation: end
             if (n_bodies>0) then
@@ -782,10 +788,10 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
       call start_and_stop(3,18)
 ! Update of the time stage
       if ((Domain%RKscheme>1).and.(Domain%time_split==0)) then
-         Domain%time_stage = MODULO(Domain%time_stage,Domain%RKscheme)
+         Domain%time_stage = modulo(Domain%time_stage,Domain%RKscheme)
          Domain%time_stage = Domain%time_stage + 1
             else
-               done_flag = .true.         
+               done_flag = .true.
       endif
    enddo
 ! Post-processing
@@ -828,7 +834,9 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
             dtvel)) then
             if ((DBSPH%n_monitor_points>0).or.(DBSPH%n_monitor_regions==1))    &
                call wall_elements_pp
-!$omp parallel do default(none) shared(DBSPH,pg_w) private(npi)
+!$omp parallel do default(none)                                                &
+!$omp shared(DBSPH,pg_w)                                                       &
+!$omp private(npi)
             do npi=1,DBSPH%n_w
                pg_w(npi)%wet = 0 
             enddo    
@@ -869,9 +877,9 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
 ! Post-processing for the water front
    if (Domain%imemo_fr>0) then
       if (mod(it,Domain%imemo_fr)==0) then
-         xmax = -1.0d30
-         ymax = -1.0d30
-         zmax = -1.0d30
+         xmax = -1.d30
+         ymax = -1.d30
+         zmax = -1.d30
          do npi=1,nag
             if ((pg(npi)%vel_type/="std").or.(pg(npi)%cella==0)) cycle
             xmax = max(xmax,pg(npi)%coord(1))
@@ -889,10 +897,10 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
          endif
       endif
       elseif (Domain%memo_fr>zero) then
-         if (it>1.and.mod(simulation_time,Domain%memo_fr) <= dtvel) then
-            xmax = - 1.0d30
-            ymax = - 1.0d30
-            zmax = - 1.0d30
+         if (it>1.and.mod(simulation_time,Domain%memo_fr)<=dtvel) then
+            xmax = - 1.d30
+            ymax = - 1.d30
+            zmax = - 1.d30
             do npi=1,nag
                if (pg(npi)%vel_type/="std".or.pg(npi)%cella==0) cycle
                xmax = max(xmax,pg(npi)%coord(1))
