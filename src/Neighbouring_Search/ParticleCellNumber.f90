@@ -65,5 +65,4 @@ ParticleCellNumber = CellNumber(i, j, k)
 ! Deallocations
 !------------------------
 return
-end Function ParticleCellNumber
-
+end function ParticleCellNumber

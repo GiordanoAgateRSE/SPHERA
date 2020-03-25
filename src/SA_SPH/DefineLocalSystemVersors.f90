@@ -106,8 +106,8 @@ do n=1,(nnodes-1)
       LocX = zero
       do j=1,SPACEDIM
          LocX = LocX + BoundaryFace(Nf)%T(j,i) *                               &
-            (BoundaryFace(Nf)%Node(n)%GX(j) -                                  &
-            BoundaryFace(Nf)%Node(refnode)%GX(j))
+               (BoundaryFace(Nf)%Node(n)%GX(j) -                               &
+               BoundaryFace(Nf)%Node(refnode)%GX(j))
       enddo
       BoundaryFace(nf)%Node(n)%LX(i) = LocX
    enddo
@@ -120,4 +120,3 @@ enddo
 !------------------------
 return
 end subroutine DefineLocalSystemVersors
-

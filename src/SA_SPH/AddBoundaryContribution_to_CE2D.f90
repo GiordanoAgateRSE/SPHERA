@@ -21,9 +21,9 @@
 !-------------------------------------------------------------------------------
 ! Program unit: AddBoundaryContribution_to_CE2D                                
 ! Description: To compute boundary terms for the 2D continuity equation 
-!              (rodivV). Equation refers to particle npi. It performs implicit 
-!              computation of gradPsuro. 
-!              (Di Monaco et al., 2011, EACFM)                        
+!              (rodivV) of a generic "npi" SPH particle. It performs implicit 
+!              computation of "gradPsuro".
+!              (Di Monaco et al., 2011, EACFM)                       
 !-------------------------------------------------------------------------------
 subroutine AddBoundaryContribution_to_CE2D(npi,IntNcbs,BCrodivV)
 !------------------------
@@ -42,7 +42,7 @@ integer(4),intent(IN) :: npi,IntNcbs
 double precision,intent(INOUT) :: BCrodivV
 integer(4) :: pd,icbs,iside,sidestr,ibdt,ibdp
 double precision :: IntWds,roi,vin 
-integer(4),dimension(1:PLANEDIM)    :: acix
+integer(4),dimension(1:PLANEDIM) :: acix
 double precision,dimension(1:PLANEDIM) :: IntLocXY,nnlocal,Dvel
 type (TyBoundarySide) :: RifBoundarySide
 character(4) :: strtype
@@ -55,11 +55,11 @@ character(4) :: strtype
 !------------------------
 ! Initializations
 !------------------------
-! Active coordinate indexes
-acix(1) = 1        
-acix(2) = 3
 BCrodivV = zero
 if (IntNcbs<=0) return
+! Active coordinate indices
+acix(1) = 1        
+acix(2) = 3
 roi = pg(npi)%dens
 ibdt = BoundaryDataPointer(3,npi)
 !------------------------
@@ -77,7 +77,7 @@ do icbs=1,IntNcbs
       IntWdS = BoundaryDataTab(ibdp)%BoundaryIntegral(1)
       vin = zero
       do pd=1,PLANEDIM
-         nnlocal(pd) = RifBoundarySide%T(acix(pd), acix(2))
+         nnlocal(pd) = RifBoundarySide%T(acix(pd),acix(2))
       enddo
       select case (strtype)
          case ("fixe")
@@ -88,7 +88,7 @@ do icbs=1,IntNcbs
          case ("tapi")
             do pd=1,PLANEDIM
                Dvel(pd) = pg(npi)%var(acix(pd)) -                              &
-                  RifBoundarySide%velocity(acix(pd))
+                          RifBoundarySide%velocity(acix(pd))
             enddo
             vin = Dvel(1) * nnlocal(1) + Dvel(2) * nnlocal(2)
          case ("velo", "flow", "sour")
@@ -101,11 +101,10 @@ do icbs=1,IntNcbs
       endselect
 ! Boundary contribution to the continuity equation 
       BCrodivV = BCrodivV + two * vin * roi * IntWdS
-   endif 
+   endif
 enddo
 !------------------------
 ! Deallocations
 !------------------------
 return
 end subroutine AddBoundaryContribution_to_CE2D
-

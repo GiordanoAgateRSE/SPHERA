@@ -433,7 +433,7 @@ loop_nag: do npi=1,nag
 !$omp end critical (free_surface_detection)        
          else
 ! In case of no free surface in the column and no erosion criterion, updating 
-! the mixture - fixed bed interface       
+! the mixture - fixed bed interface     
             if (Granular_flows_options%erosion_flag<2) then
 !$omp critical (fixed_bed_detection)
                abs_vel = dsqrt(dot_product(pg(npi)%vel,pg(npi)%vel))
@@ -650,8 +650,8 @@ if (Granular_flows_options%KTGF_config>0) then
                if (Granular_flows_options%minimum_saturation_flag(i_grid,j_grid&
                   ).eqv..true.) then
 ! Phreatic zone
-                  Granular_flows_options%saturation_conditions(i_grid,j_grid) =&
-                     1
+                  Granular_flows_options%saturation_conditions(i_grid,j_grid)  &
+                     = 1
                   else
 ! Dry soil
                      Granular_flows_options%saturation_conditions(i_grid,      &
@@ -798,7 +798,7 @@ if (n_bodies>0) then
                   gradmod = gradmod * ke_coef
                   KerDer_bp_f_cub_spl(npartint) = gradmod * denom 
 ! Kernel gradients (Gallati's kernel derivative)
-                  gradmodwacl = - 12.0d0 - 3.0d0 * rij_su_h_quad + 12.0d0 *    &
+                  gradmodwacl = - 12.d0 - 3.d0 * rij_su_h_quad + 12.d0 *       &
                                 rij_su_h 
                   gradmodwacl = gradmodwacl * kacl_coef
                   KerDer_bp_f_Gal(npartint) = gradmodwacl * denom 

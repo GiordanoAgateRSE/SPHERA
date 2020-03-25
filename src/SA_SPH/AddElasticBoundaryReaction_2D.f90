@@ -31,7 +31,6 @@
 !                zi is the distance of the particle Pi from the boundary face;
 !                d is a reference distance from which the reaction is added.
 !              Check that the elastic boundary reaction never works.
-!              To compute the boundary integral IntWdS 
 !              (Di Monaco et al., 2011, EACFM).                        
 !-------------------------------------------------------------------------------
 subroutine AddElasticBoundaryReaction_2D(npi,Ncbs,BoundReaction)
@@ -48,7 +47,7 @@ implicit none
 integer(4),intent(IN) :: npi,Ncbs
 double precision,intent(INOUT),dimension(1:SPACEDIM) :: BoundReaction
 double precision,parameter :: ymincoeff = 0.25d0
-double precision,parameter :: reafactor = 1.0d0
+double precision,parameter :: reafactor = 1.d0
 integer(4) :: sd,icbs,iside,nt,ibdt,ibdp,mate
 double precision :: xpi,ypi,ypimin,celer02,vin,normreact
 !------------------------
@@ -75,7 +74,7 @@ do icbs=1,Ncbs
       xpi = BoundaryDataTab(ibdp)%LocXYZ(1)
       ypi = BoundaryDataTab(ibdp)%LocXYZ(2)
       if (ypi<ypimin) then
-         if (xpi>zero.and.xpi<BoundarySide(iside)%Length) then  
+         if ((xpi>zero).and.(xpi<BoundarySide(iside)%Length)) then
 ! The projection of the particle position, which is normal to the plane of the 
 ! side "iside", is internal to "iside".
             vin = zero
@@ -83,11 +82,11 @@ do icbs=1,Ncbs
                vin = vin + pg(npi)%var(sd) * BoundarySide(iside)%T(sd,3)
             enddo
             if (vin<zero) then
-               normreact = -reafactor * celer02 * DLog((Domain%h + ypi -       &
-                  ypimin) / Domain%h) / Domain%h
+               normreact = -reafactor * celer02 * dlog((Domain%h + ypi -       &
+                           ypimin) / Domain%h) / Domain%h
                do sd=1,SPACEDIM
                   BoundReaction(sd) = BoundReaction(sd) + normreact *          &
-                     BoundarySide(iside)%T(sd,3)
+                                      BoundarySide(iside)%T(sd,3)
                enddo
             endif
          endif
@@ -99,4 +98,3 @@ enddo
 !------------------------
 return 
 end subroutine AddElasticBoundaryReaction_2D
-

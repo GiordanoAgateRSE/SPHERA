@@ -4,8 +4,6 @@
 ! Copyright 2005-2020 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 
-
-
 ! SPHERA authors and email contact are provided on SPHERA documentation.
 
 ! This file is part of SPHERA v.9.0.0
@@ -20,14 +18,12 @@
 ! You should have received a copy of the GNU General Public License
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
-
 !-------------------------------------------------------------------------------
 ! Program unit: BoundaryMassForceMatrix2D                                
 ! Description: Generation of the generalized boundary mass force matrix RN, on 
 !              the base of the cosine matrix T and the parameter Fi. (Di Monaco 
 !              et al., 2011, EACFM)                        
 !-------------------------------------------------------------------------------
-
 subroutine BoundaryMassForceMatrix2D(T,RN,FiS,FiN) 
 !------------------------
 ! Modules
@@ -61,4 +57,3 @@ RN(3,3) = FiS * T(3,1) * T(3,1) + FiN * T(1,1) * T(1,1)
 !------------------------
 return
 end subroutine BoundaryMassForceMatrix2D
-

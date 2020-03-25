@@ -412,11 +412,9 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
                if (Domain%tipo=="semi") then
                   pg(npi)%acc(:) = tpres(:) + tdiss(:) + tvisc(:) +            &
                                    Domain%grav(:)
-                  else
-                     if (Domain%tipo=="bsph") then
-                        pg(npi)%acc(:) = (tpres(:) + tdiss(:) + tvisc(:)) /    &
-                                         pg(npi)%Gamma + Domain%grav(:)
-                     endif         
+                  elseif (Domain%tipo=="bsph") then
+                     pg(npi)%acc(:) = (tpres(:) + tdiss(:) + tvisc(:)) /       &
+                                      pg(npi)%Gamma + Domain%grav(:)
                endif
          endif
       enddo
@@ -693,7 +691,7 @@ ITERATION_LOOP: do while (it<=Domain%itmax)
 ! Boundary type is "fixe" or "tapis" or "level"
                if (pg(npi)%koddens==0) then
                   if (Domain%tipo=="semi") pg(npi)%dens = pg(npi)%dens + dt *  &
-                     pg(npi)%dden
+                                                          pg(npi)%dden
                   if (Domain%density_thresholds==1) then        
                      if (pg(npi)%dens<(0.9d0*Med(pg(npi)%imed)%den0))          &
                         pg(npi)%dens = 0.9d0*Med(pg(npi)%imed)%den0

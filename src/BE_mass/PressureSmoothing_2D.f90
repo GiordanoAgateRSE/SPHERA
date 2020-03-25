@@ -22,7 +22,7 @@
 ! Program unit: PressureSmoothing_2D
 ! Description: Partial smoothing for pressure (Di Monaco et al., 2011), also 
 !              with DB-SPH boundary treatment scheme. This subroutine is not 
-!              just the formal 2D extension of PressureSmoothing_3D: 
+!              just the formal 2D extension of "PressureSmoothing_3D.f90": 
 !              differences are appreciable.
 !-------------------------------------------------------------------------------
 subroutine PressureSmoothing_2D
@@ -45,8 +45,9 @@ double precision :: Appunity,smoothpi,IntWdV
 integer(4),dimension(1:PLANEDIM) :: acix
 double precision,dimension(1:2) :: IntDpWdV
 double precision,dimension(1:PLANEDIM) :: IntLocXY,sss,nnn,massforce
-double precision,dimension(:),allocatable :: sompW_vec,AppUnity_vec    
-character(1),parameter :: SmoothVersion = "b" !="a"(SPHERA),"b"(FreeSurf),"c"
+double precision,dimension(:),allocatable :: sompW_vec,AppUnity_vec
+!="a"(SPHERA),"b"(FreeSurf),"c"
+character(1),parameter :: SmoothVersion = "b"
 character(4) :: strtype
 !------------------------
 ! Explicit interfaces
@@ -96,13 +97,13 @@ do ii=1,indarrayFlu
          p0i = Domain%prif
          pi = pg(npi)%pres
          sompW = zero
-         do j = 1,Nsp
+         do j=1,Nsp
             npartint = (npi - 1) * NMAXPARTJ + j
             npj = PartIntorno(npartint)
             pesoj = pg(npj)%mass * PartKernel(4,npartint) / pg(npj)%dens
             Appunity = Appunity + pesoj
             sompW = sompW + (pg(npj)%pres - pi) * pesoj
-         end do
+         enddo
          if (n_bodies>0) then
             sompW = sompW + sompW_vec(npi)
             AppUnity = AppUnity + AppUnity_vec(npi)
@@ -129,7 +130,7 @@ do ii=1,indarrayFlu
                   do i=1,PLANEDIM
                      sss(i) = BoundarySide(iside)%T(acix(i),1)
                      nnn(i) = BoundarySide(iside)%T(acix(i),3)
-                  end do
+                  enddo
                   massforce(1) = sss(1) * Domain%grav(acix(1)) + sss(2) *      &
                                  Domain%grav(acix(2))
                   massforce(2) = nnn(1) * Domain%grav(acix(1)) + nnn(2) *      &
@@ -149,10 +150,10 @@ do ii=1,indarrayFlu
                               press_so = ro0i * Domain%grav(3) *               &
                                  (pg(npi)%coord(3) - partz(izonelocal)%valp)
                         endif
-                        else if (strtype=="crit") then
+                        elseif (strtype=="crit") then
                            VIntWdV_OSP = VIntWdV_OSP + IntWdV
 ! Implicitly press_osp = pi
-                           else if (strtype=="leve") then
+                           elseif (strtype=="leve") then
                               VIntWdV_OSB = VIntWdV_OSB + IntWdV
                               izonelocal = pg(npi)%izona
                               vin = BoundarySide(iside)%T(acix(1), 3) *        &
@@ -201,7 +202,8 @@ enddo
 !$omp private(npi,ii)
 do ii=1,indarrayFlu
    npi = Array_Flu(ii)
-! Excluding particles close to the face with conditions "flow", "velo" and "sour"
+! Excluding particles close to the face with conditions "flow", "velo" and 
+! "sour"
    if (pg(npi)%koddens==0) then 
       pg(npi)%pres = pg(npi)%vpres
       pg(npi)%dens = Med(pg(npi)%imed)%den0 * (one + (pg(npi)%vpres -          &

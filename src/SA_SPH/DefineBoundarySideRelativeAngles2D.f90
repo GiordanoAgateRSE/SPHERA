@@ -36,7 +36,7 @@ use Dynamic_allocation_module
 implicit none
 integer(4) :: nti,ntj,isi,jsi,ksi
 double precision :: sinangle,cosangle
-double precision,dimension(1:SPACEDIM,1:SPACEDIM) :: Tmx, PTmx
+double precision,dimension(1:SPACEDIM,1:SPACEDIM) :: Tmx,PTmx
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -52,9 +52,9 @@ double precision,dimension(1:SPACEDIM,1:SPACEDIM) :: Tmx, PTmx
 ! Loop over all the domain boundary sides
 do isi=1,NumBSides
    nti = BoundarySide(isi)%stretch
-! .. skips the perimeter and pool types
+! Skip the perimeter and pool types
    if ((Tratto(nti)%tipo/="peri").AND.(Tratto(nti)%tipo/="pool")) then
-! .. loops on all the other sides
+! Loop on all the other sides
       ksi=0
       do jsi=1,NumBSides
          ntj = BoundarySide(jsi)%stretch
@@ -86,4 +86,3 @@ enddo
 !------------------------
 return
 end subroutine DefineBoundarySideRelativeAngles2D
-

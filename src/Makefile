@@ -7,7 +7,7 @@ VERSION = 9_0_0
 #    bin
 #    debug
 #    debug_omp
-EXECUTION = debug_omp
+EXECUTION = bin
 # Suggested values for COMPILATION_FLAGS
 #   "gfortran_debug" and "gfortran_debug_omp"
 #      -g -O0 -fbacktrace -C -Wall -fbounds-check
@@ -17,17 +17,18 @@ EXECUTION = debug_omp
 #      -g -O0 -traceback -C -check bounds -check noarg_temp_created -debug all -fpe0
 #   "ifort_bin"
 #      -O2
-COMPILATION_FLAGS = -g -O0 -fbacktrace -C -Wall -fbounds-check
+COMPILATION_FLAGS_O2 = -O2
+COMPILATION_FLAGS_O1 = -O1
 # Suggested values for COMPILER
 #    gfortran
 #    ifort
-COMPILER = gfortran
+COMPILER = ifort
 # Suggested values for OMP_FLAG
 #    -fopenmp (gfortran_bin and gfortran_debug_omp)
 #    -qopenmp (ifort_bin and ifort_debug_omp) 
-OMP_FLAG = -fopenmp
+OMP_FLAG = -qopenmp
 EXE_DIR = ../$(EXECUTION)/
-SOURCES = \
+SOURCES_O2_a = \
 ./Modules/Static_allocation_module.f90 \
 ./Modules/Hybrid_allocation_module.f90 \
 ./Modules/Dynamic_allocation_module.f90 \
@@ -44,33 +45,45 @@ $(wildcard ./DB_SPH/*.f90) \
 $(wildcard ./Erosion_Criterion/*.f90) \
 $(wildcard ./Geometry/*.f90) \
 $(wildcard ./IC/*.f90) \
-$(wildcard ./Interface_dispersion/*.f90) \
 ./Main_algorithm/Gest_Dealloc.f90 \
-./Main_algorithm/Gest_Trans.f90 \
+./Main_algorithm/Gest_Trans.f90 
+SOURCES_O1_a = \
 ./Main_algorithm/time_step_loop.f90 \
-$(wildcard ./Neighbouring_Search/*.f90) \
+./Neighbouring_Search/CalcVarLength.f90  
+#$(wildcard ./Neighbouring_Search/*.f90)
+SOURCES_O2_b = \
+./Neighbouring_Search/CellIndices.f90 \
+./Neighbouring_Search/CellNumber.f90 \
+./Neighbouring_Search/CreaGrid.f90 \
+./Neighbouring_Search/InterFix.f90 \
+./Neighbouring_Search/OrdGrid1.f90 \
+./Neighbouring_Search/ParticleCellNumber.f90 \
+./Neighbouring_Search/w.f90 \
 $(wildcard ./Post_processing/*.f90) \
 $(wildcard ./Pre_processing/*.f90) \
 $(wildcard ./SA_SPH/*.f90) \
 $(wildcard ./Strings/*.f90) \
 $(wildcard ./Time_Integration/*.f90)
+SOURCES_O1_b = 
 # Other variables
 MAIN_FILE_ROOT = ./Main_algorithm/sphera
 CODE = $(EXE_DIR)SPHERA_v_$(VERSION)_$(COMPILER)_$(EXECUTION)
-OBJECTS = $(patsubst %.f90,%.o,$(SOURCES))
+OBJECTS = $(patsubst %.f90,%.o,$(SOURCES_O2_a)$(SOURCES_O1_a)$(SOURCES_O2_b)$(SOURCES_O1_b))
 # Targets
 #    Correct sequence to compile+link:
-#       make touch
 #       make
-all: touch compile link remove 
-#    "compiling" cannot be launched together with "touching" as ".o" files
-#    would not be available yet
-compile: $(SOURCES)
-%.f90: %.o
-	$(COMPILER) $@ -o $< $(OMP_FLAG) $(COMPILATION_FLAGS) -c 
+all: touch compile_O2_a compile_O1_a compile_O2_b compile_O1_b link remove 
+compile_O2_a: $(SOURCES_O2_a)
+compile_O2_b: $(SOURCES_O2_b)
+$(SOURCES_O2_a) $(SOURCES_O2_b): %.f90: %.o
+	$(COMPILER) $@ -o $< $(OMP_FLAG) $(COMPILATION_FLAGS_O2) -c
+compile_O1_a: $(SOURCES_O1_a)
+compile_O1_b: $(SOURCES_O1_b)
+$(SOURCES_O1_a) $(SOURCES_O1_b): %.f90: %.o
+	$(COMPILER) $@ -o $< $(OMP_FLAG) $(COMPILATION_FLAGS_O1) -c
 link: $(OBJECTS)
 	touch $(CODE).x
-	$(COMPILER) $(MAIN_FILE_ROOT).f90 $^ -o $(CODE).x $(OMP_FLAG) $(COMPILATION_FLAGS)
+	$(COMPILER) $(MAIN_FILE_ROOT).f90 $^ -o $(CODE).x $(OMP_FLAG) $(COMPILATION_FLAGS_O2)
 	rm -f $(MAIN_FILE_ROOT).o
 remove: $(OBJECTS)
 	rm -f $^
@@ -79,4 +92,3 @@ touch:
 	touch $(OBJECTS)
 clean: 
 	rm -f $(CODE).x 
-

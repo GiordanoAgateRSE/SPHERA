@@ -37,10 +37,14 @@ use Static_allocation_module
 ! Declarations
 !------------------------
 implicit none
-double precision,parameter :: KS2D = 0.454728408833987d0 != 10 / (7*pigreco)
-double precision,parameter :: KA2D = 0.09947192d0        !=5./(16*pigreco)
-double precision,parameter :: KS3D = 0.31830989d0        != 1 / pigreco
-double precision,parameter :: KA3D = 0.07460394d0        !=15./(16*pigreco)
+! 10/(7*PI)
+double precision,parameter :: KS2D = 0.454728408833987d0
+! 5/(16*PI)
+double precision,parameter :: KA2D = 0.09947192d0
+! 1/PI
+double precision,parameter :: KS3D = 0.31830989d0
+! 15/(16*PI)
+double precision,parameter :: KA3D = 0.07460394d0
 integer(4),intent(IN) :: SD,n,kernel
 double precision,intent(IN) :: ro
 double precision :: ro2,ro3,ro4,ro5,duemro
@@ -66,7 +70,6 @@ select case (kernel)
 ! Cubic spline  Kernel
       select case (n)
          case(0)      
-! n = 0
             if ((ro>=zero).and.(ro<one)) then
                JdWsRn = -one + (1.5d0 - 0.75d0 * ro) * ro2
                elseif ((ro>=one).and.(ro<two)) then
@@ -74,21 +77,18 @@ select case (kernel)
                   JdWsRn = -0.25d0 * duemro * duemro * duemro
             endif
          case(1)
-! n = 1
             if ((ro>=zero).and.(ro<one)) then
                JdWsRn = -0.75d0 + (one - 0.5625d0 * ro) * ro3
                elseif ((ro>=one).and.(ro<two)) then
                   JdWsRn = -one + (1.5d0 - one * ro + 0.1875d0 * ro2) * ro2
             endif
          case(2)
-! n = 2
             if ((ro>=zero).and.(ro<one)) then
                JdWsRn = -0.7d0 + (0.75d0 - 0.45d0 * ro) * ro4
                elseif (ro>=one .And. ro<two) then
                   JdWsRn = -0.8d0 + (one - 0.75d0 * ro + 0.15d0 * ro2) * ro3
             endif
          case(3)      
-! n = 3
             if ((ro>=zero).and.(ro<one)) then
                JdWsRn = -0.75d0 + (0.6d0 - 0.375d0 * ro) * ro5
                elseif ((ro>=one).and.(ro<two)) then
@@ -111,19 +111,16 @@ select case (kernel)
 ! Gallati anti-cluster kernel 
       select case (n)
          case(1)      
-! n = 1
             if (ro<two) then
-               JdWsRn = -4.0d0 + (6.0d0 - 4.0d0 * ro + 0.75d0 * ro2) * ro2
+               JdWsRn = -4.d0 + (6.d0 - 4.d0 * ro + 0.75d0 * ro2) * ro2
             endif
-         case(2)      
-! n = 2
+         case(2)
             if (ro<two) then
-               JdWsRn = -3.2d0 + (4.0d0 - 3.0d0 * ro + 0.6d0* ro2) * ro3
+               JdWsRn = -3.2d0 + (4.d0 - 3.d0 * ro + 0.6d0* ro2) * ro3
             endif
          case(3)   
-! n = 3
             if (ro<two) then
-               JdWsRn = -3.2d0 + (3.0d0 - 2.4d0 * ro + 0.5d0 * ro2) * ro4
+               JdWsRn = -3.2d0 + (3.d0 - 2.4d0 * ro + 0.5d0 * ro2) * ro4
             endif
          case default
             JdWsRn = zero
@@ -145,4 +142,3 @@ endselect
 !------------------------
 return
 end function JdWsRn
-

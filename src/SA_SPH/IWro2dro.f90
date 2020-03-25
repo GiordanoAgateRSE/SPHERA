@@ -39,9 +39,12 @@ double precision,parameter :: a1 = 0.333333333333333d0
 double precision,parameter :: a2 = 0.3d0               
 double precision,parameter :: a3 = 0.125d0             
 double precision,parameter :: a4 = 0.25d0
-double precision,parameter :: b1 = 0.0625d0             != 1 / 16
-double precision,parameter :: b2 = 0.025d0              != 1 / 40
-double precision,parameter :: b3 = 4.16666666666667d-03 != 1 / 240
+! 1/16
+double precision,parameter :: b1 = 0.0625d0
+! 1/40
+double precision,parameter :: b2 = 0.025d0
+! 1/240
+double precision,parameter :: b3 = 4.16666666666667d-03
 double precision,intent(IN) :: ro
 double precision :: ro2,ro3,duemro,duemro2,duemro4,IWro2dro1,IWro2dro2
 !------------------------
@@ -76,4 +79,3 @@ endif
 !------------------------
 return
 end function IWro2dro
-

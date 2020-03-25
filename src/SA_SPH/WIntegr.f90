@@ -24,7 +24,7 @@
 !2h
 !S W(r,h)rdr
 !ri
-!               (Di Monaco et al., 2011, EACFM)                        
+!               (Di Monaco et al., 2011, EACFM)                       
 !-------------------------------------------------------------------------------
 double precision function WIntegr(ri,h) 
 !------------------------
@@ -36,13 +36,13 @@ use Hybrid_allocation_module
 ! Declarations
 !------------------------
 implicit none
-double precision,parameter :: a   =  0.5d0
-double precision,parameter :: a2  = -0.375d0
-double precision,parameter :: a3  =  0.15d0
-double precision,parameter :: aa  = -0.125d0
-double precision,parameter :: aa1 =  0.05d0
-double precision,parameter :: b   =  0.35d0
 double precision,intent(IN) :: ri,h
+double precision,parameter :: a =  0.5d0
+double precision,parameter :: a2 = -0.375d0
+double precision,parameter :: a3 =  0.15d0
+double precision,parameter :: aa = -0.125d0
+double precision,parameter :: aa1 =  0.05d0
+double precision,parameter :: b =  0.35d0
 double precision :: WIntegr1,WIntegr2,ro,ro2,ro3,q1,q2,q4
 !------------------------
 ! Explicit interfaces
@@ -77,4 +77,3 @@ endif
 !------------------------
 return
 end function WIntegr
-

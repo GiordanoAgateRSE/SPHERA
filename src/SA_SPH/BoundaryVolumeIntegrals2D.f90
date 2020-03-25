@@ -24,7 +24,7 @@
 !              (Di Monaco et al., 2011, EACFM)                        
 !-------------------------------------------------------------------------------
 subroutine BoundaryVolumeIntegrals2D(icbs,LocXY,xpmin,xpmax,interlen,IntWdV,   &
-   IntDpWdV)
+                                     IntDpWdV)
 !------------------------
 ! Modules
 !------------------------
@@ -62,8 +62,8 @@ IntDpWdV = zero
 !------------------------
 if (interlen<=zero) return
 yplimite = eps * Domain%h
-xpi = LocXY(1, icbs)
-ypi = LocXY(2, icbs)
+xpi = LocXY(1,icbs)
+ypi = LocXY(2,icbs)
 if (ypi<yplimite) ypi = yplimite
 csiPA = xpmin - xpi
 csiPB = xpmax - xpi
@@ -94,4 +94,3 @@ endif
 !------------------------
 return
 end subroutine BoundaryVolumeIntegrals2D
-

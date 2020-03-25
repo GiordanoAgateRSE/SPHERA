@@ -37,7 +37,7 @@ use I_O_file_module
 ! Declarations
 !------------------------
 implicit none
-double precision,parameter :: pibmink = 10.0d0
+double precision,parameter :: pibmink = 10.d0
 double precision,parameter :: eps = 0.1d0
 integer(4),intent(IN) :: npi,IntNcbs
 double precision,intent(INOUT),dimension(1:SPACEDIM) :: tpres,tdiss,tvisc
@@ -139,7 +139,7 @@ do icbs=1,IntNcbs
          level = Tratto(sidestr)%ShearCoeff  
          if (pg(npi)%coord(3)<level) then    
             pressj = Med(imed)%den0 * Domain%grav(3) * (pg(npi)%coord(3) -     &
-               level)
+                     level)
             Qsj = pressj / Med(imed)%den0  
             SomQsiQsj = Qsi + Qsj        
             DiffQsiQsj = Qsi - Qsj       

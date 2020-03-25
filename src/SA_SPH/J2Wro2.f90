@@ -31,8 +31,10 @@ use Static_allocation_module
 ! Declarations
 !------------------------
 implicit none
-double precision,parameter :: a1 = 0.00833333333333333d0 != 1 / 120
-double precision,parameter :: a2 = 0.26666666666666667d0 != 8 / 30
+! 1/120
+double precision,parameter :: a1 = 0.00833333333333333d0
+! 8/30
+double precision,parameter :: a2 = 0.26666666666666667d0
 double precision,intent(IN) :: ro
 double precision :: ro2,ro3
 !------------------------
@@ -50,11 +52,11 @@ ro3 = ro2 * ro
 ! Statements
 !------------------------
 if ((zero<=ro).and.(ro<one)) then
-   J2Wro2 = KERNELCONST2D * (0.25d0 - (a1 * (40.0d0 - 36.0d0 * ro2 + 15.0d0 *  &
-      ro3) * ro3))
+   J2Wro2 = KERNELCONST2D * (0.25d0 - (a1 * (40.d0 - 36.d0 * ro2 + 15.d0 * ro3 &
+            ) * ro3))
    elseif ((one<=ro).and.(ro<two)) then
-      J2Wro2 = KERNELCONST2D * (a2 - (a1 * (80.0d0 - 90.0d0 * ro + 36.0d0 *    &
-         ro2 - 5.0d0 * ro3) * ro3))
+      J2Wro2 = KERNELCONST2D * (a2 - (a1 * (80.d0 - 90.d0 * ro + 36.d0 * ro2 - &
+               5.d0 * ro3) * ro3))
       else
          J2Wro2 = zero
 endif
@@ -63,4 +65,3 @@ endif
 !------------------------
 return
 end function J2Wro2
-

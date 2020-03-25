@@ -234,7 +234,7 @@ ___
 !-------------------------------------------------------------------------------
 ![?] if (Boundary_type=="fixed") then
 ![?] <Shear_stress_coefficient>
-!    =1. (no-slip, under assessment in 3D with SA-SPH)
+!    =1. (no-slip)
 !    =0. (free-slip, default choice in 3D with SA-SPH)
 ![?] <laminar_flag_check>
 !    =.true. (check on laminar regime to activate shear stress terms at 

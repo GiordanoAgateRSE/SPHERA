@@ -65,7 +65,7 @@ if (interlen>zero) then
       ypi = zero 
    endif    
    ypiq = ypi * ypi
-   ndiv = Int(interlen / dsrif + half)
+   ndiv = int(interlen / dsrif + half)
    if (ndiv<ndivrif) then
       ndiv = ndivrif
    endif
@@ -85,4 +85,3 @@ endif
 !------------------------
 return
 end subroutine ComputeSurfaceIntegral_WdS2D
-

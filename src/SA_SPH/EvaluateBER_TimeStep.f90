@@ -44,7 +44,7 @@ double precision :: DTlocal
 !------------------------
 ! Initializations
 !------------------------
-DTminBER = 1.0d30
+DTminBER = 1.d30
 !------------------------
 ! Statements
 !------------------------
@@ -58,4 +58,3 @@ DTminBER = sqrttwo * DTminBER
 !------------------------
 return
 end subroutine EvaluateBER_TimeStep
-

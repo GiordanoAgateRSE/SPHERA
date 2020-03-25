@@ -27,12 +27,12 @@
 !              from x=0 to bsidelen = BoundarySide(iside)%Length. It returns:
 !                 xpmin: minimum abscissa of intersected segment
 !                 xpmax: maximum abscissa of intersected segment
-!                 interlen: length of the intersected segment   
+!                 interlen: length of the intersected segment 
 !              (Di Monaco et al., 2011, EACFM)                        
 !-------------------------------------------------------------------------------
 subroutine FindBoundaryIntersection2D(icbs,Cloboside,LocXY,BoundarySide,xpmin, &
    xpmax,interlen)
-   !------------------------
+!------------------------
 ! Modules
 !------------------------
 use Static_allocation_module
@@ -66,7 +66,7 @@ if (ypi<zero) then
 ! If the particle is out of the fluid domain, it is considered as if 
 ! it were on the boundary
    ypi = zero            
-endif    
+endif
 !------------------------
 ! Statements
 !------------------------
@@ -94,4 +94,3 @@ endif
 !------------------------
 return
 end subroutine FindBoundaryIntersection2D
-

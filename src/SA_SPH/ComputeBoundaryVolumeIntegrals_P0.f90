@@ -77,7 +77,7 @@ zpmin = eps * Domain%h
 ! Statements
 !------------------------
 ! Local coordinates of particle Pi
-LocPi(:) = LocX(:, icbf)                     
+LocPi(:) = LocX(:,icbf)                     
 if (LocPi(3)<zero) return
 if (LocPi(3)<zpmin) LocPi(3) = zpmin
 robpre = 2.1d0
@@ -156,4 +156,3 @@ endif
 !------------------------
 return
 end subroutine ComputeBoundaryVolumeIntegrals_P0
-

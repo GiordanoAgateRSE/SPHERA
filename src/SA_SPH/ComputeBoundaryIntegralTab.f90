@@ -59,19 +59,19 @@ double precision :: delta_fimz,duesendelta_fimz
 !------------------------
 delta_fi = FI_INTERVAL / FI_STEPS
 delta_fimz = half * delta_fi
-duesendelta_fimz = two * Sin(delta_fimz)
+duesendelta_fimz = two * sin(delta_fimz)
 delta_teta = TETA_INTERVAL / TETA_STEPS
 points = 0
 fi = -half * delta_fi
 do i=1,FI_STEPS
    fi = fi + delta_fi
    teta = -half * delta_teta
-   zp = -doubleh * Cos(fi)
+   zp = -doubleh * cos(fi)
    do j=1,TETA_STEPS
       teta = teta + delta_teta
-      xp = doubleh * Sin(fi) * Cos(teta)
-      yp = doubleh * Sin(fi) * Sin(teta)
-      delta_alpha = delta_teta * duesendelta_fimz * Sin(fi)
+      xp = doubleh * sin(fi) * cos(teta)
+      yp = doubleh * sin(fi) * sin(teta)
+      delta_alpha = delta_teta * duesendelta_fimz * sin(fi)
       points = points + 1
       BoundIntegralTab(points,1) = xp
       BoundIntegralTab(points,2) = yp
@@ -88,4 +88,3 @@ enddo
 !------------------------
 return
 end subroutine ComputeBoundaryIntegralTab
-
