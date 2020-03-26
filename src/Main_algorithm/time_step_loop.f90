@@ -201,7 +201,7 @@ if (it_start==0) call time_step_duration
 it = it_start
 ! Computing the time elapsed before the actual simulation
 if (exetype=="linux") then
-   if (Domain%tmax>0.d0) then
+   if (Domain%tmax>1.d-15) then
       call system("date +%j%H%M%S>date_pre_iterations.txt")
       open(unit_time_elapsed,file='date_pre_iterations.txt',status="unknown",  &
          form="formatted")

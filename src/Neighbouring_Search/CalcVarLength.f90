@@ -273,7 +273,7 @@ loop_nag: do npi=1,nag
                   endif
 ! Searching for the nearest mobile/fixed particle (if cycle apparently less 
 ! efficient than the previous one because we have to compute the interface 
-! normal)              
+! normal)
                   if (pg(npi)%state/=pg(npj)%state) then
                      if (pg(npi)%state=="flu") then
                         if (index(Med(pg(npi)%imed)%tipo,"granular")>0)  &
@@ -749,7 +749,7 @@ if (n_bodies>0) then
       aux2 = 0
       do while (i<npi) 
          i = i+1 
-         if (bp_arr(i)%area>0.d0) aux2 = aux2+1
+         if (bp_arr(i)%area>1.d-15) aux2 = aux2 + 1
       enddo
       nceli = bp_arr(npi)%cell
       if (nceli==0) cycle
@@ -808,7 +808,7 @@ if (n_bodies>0) then
                loop_bp: do bp=Icont_bp(ncelj),Icont_bp(ncelj+1)-1
                   npj = NPartOrd_bp(bp)
 ! Only neighbours belonging to a surface of another body
-                  if ((bp_arr(npi)%area>0.d0).and.(bp_arr(npj)%area>0.d0)      &
+                  if ((bp_arr(npi)%area>1.d-15).and.(bp_arr(npj)%area>1.d-15)  &
                      .and.(bp_arr(npi)%body/=bp_arr(npj)%body)) then
 ! Relative positions and distances
                      ragtemp(1:3) = bp_arr(npi)%pos(1:3) - bp_arr(npj)%pos(1:3)  
