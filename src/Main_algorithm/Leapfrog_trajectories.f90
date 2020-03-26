@@ -19,26 +19,20 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: PreSourceParticles_2D
-! Description: To generate new source particles at the inlet section (only in 2D
-!              and with one inlet section).
+! Program unit: Leapfrog_trajectories
+! Description: Leapfrog time integration scheme (fluid particle trajectories)
 !-------------------------------------------------------------------------------
-subroutine PreSourceParticles_2D
+subroutine Leapfrog_trajectories
 !------------------------
 ! Modules
 !------------------------
 use Static_allocation_module
-use I_O_file_module
-use Hybrid_allocation_module
 use Dynamic_allocation_module
 !------------------------
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: nt,nA,isi,sd,ip,i_source
-double precision :: deltapart,linedist,sidelen,eps
-double precision,dimension(1:SPACEDIM) :: A,ss
-integer(4), external :: ParticleCellNumber
+integer(4) :: npi
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -48,50 +42,28 @@ integer(4), external :: ParticleCellNumber
 !------------------------
 ! Initializations
 !------------------------
-! Searching the ID of the source side
-SourceSide = 0
-SpCount = 0
-i_source=0
 !------------------------
 ! Statements
 !------------------------
-do isi=1,NumBSides
-   if (BoundarySide(isi)%tipo=="sour") then
-      SourceSide = isi
-      i_source=i_source+1
-      nt = BoundarySide(SourceSide)%stretch
-      irz = Tratto(nt)%zone
-      mat = partz(irz)%Medium 
-      nA = BoundarySide(SourceSide)%Vertex(1)
-      do sd=1,SPACEDIM
-         A(sd) = Vertice(sd,nA)
-         ss(sd) = BoundarySide(SourceSide)%T(sd,1)
-         nn(sd) = BoundarySide(SourceSide)%T(sd,3)
-      end do
-      deltapart = Domain%dx
-      sidelen = BoundarySide(SourceSide)%length
-      NumPartperLine(i_source) = Int(sidelen / deltapart + 0.01d0)
-      eps = -half
-      yfila = eps * deltapart 
-      linedist = -half * deltapart
-      do ip=1,NumPartperLine(i_source)
-         linedist = linedist + deltapart
-         do sd=1,SPACEDIM
-            PartLine(i_source, ip, sd) = A(sd) + linedist * ss(sd)
-         end do
-      end do
-      ParticleVolume = Domain%PVolume
-      RowPeriod = ParticleVolume * NumPartperLine(i_source) / Tratto(nt)%FlowRate 
-      RowVelocity(i_source) = Domain%dx / RowPeriod
-      Tratto(nt)%NormVelocity = RowVelocity(i_source)
-      partz(irz)%vel(1) = RowVelocity(i_source) * nn(1)
-      partz(irz)%vel(2) = RowVelocity(i_source) * nn(2)
-      partz(irz)%vel(3) = RowVelocity(i_source) * nn(3)
-      pinttimeratio = -1
-   endif 
+!$omp parallel do default(none)                                                &
+!$omp shared(nag,pg,dt)                                                        &
+!$omp private(npi)
+! Loop over the active particles
+do npi=1,nag
+   if (pg(npi)%cella==0) cycle
+! To save the old coordinates
+   pg(npi)%CoordOld(:) = pg(npi)%coord(:)
+   if (pg(npi)%vel_type/="std") then
+! If the motion type is not "std", velocities are assigned
+      pg(npi)%coord(:) = pg(npi)%coord(:) + dt * pg(npi)%vstart(:)
+      else
+! Otherwise, the partial smoothed velocity field is integrated in time
+         pg(npi)%coord(:) = pg(npi)%coord(:) + dt * pg(npi)%vel(:)  
+   endif
 enddo
+!$omp end parallel do
 !------------------------
 ! Deallocations
 !------------------------
 return
-end subroutine PreSourceParticles_2D
+end subroutine Leapfrog_trajectories

@@ -34,7 +34,7 @@ type (TyBoundarySide),     dimension(:),   allocatable :: BoundarySide
 type (TyBoundaryFace),     dimension(:),   allocatable :: BoundaryFace
 type (TyCtlPoint),         dimension(:),   allocatable :: Control_Points
 type (TyCtlLine),          dimension(:),   allocatable :: Control_Lines
-type (TyParticle),         dimension(:),   allocatable :: Pg
+type (TyParticle),         dimension(:),   allocatable :: pg
 type (Tytime_stage),       dimension(:),   allocatable :: ts0_pg
 type(TyBoundaryConvexEdge),dimension(:),   allocatable :: BoundaryConvexEdge
 ! Icont(grid%nmax+1) contains the ID of the first particle in the cell. Here 

@@ -19,26 +19,22 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: PreSourceParticles_2D
-! Description: To generate new source particles at the inlet section (only in 2D
-!              and with one inlet section).
+! Program unit: velocity_smoothing_2
+! Description: Partial smoothing of the fluid velocity field (part 2)
 !-------------------------------------------------------------------------------
-subroutine PreSourceParticles_2D
+subroutine velocity_smoothing_2
 !------------------------
 ! Modules
 !------------------------
 use Static_allocation_module
-use I_O_file_module
-use Hybrid_allocation_module
 use Dynamic_allocation_module
+use Hybrid_allocation_module
 !------------------------
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: nt,nA,isi,sd,ip,i_source
-double precision :: deltapart,linedist,sidelen,eps
-double precision,dimension(1:SPACEDIM) :: A,ss
-integer(4), external :: ParticleCellNumber
+integer(4) :: npi,ii
+double precision :: TetaV1
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -48,50 +44,34 @@ integer(4), external :: ParticleCellNumber
 !------------------------
 ! Initializations
 !------------------------
-! Searching the ID of the source side
-SourceSide = 0
-SpCount = 0
-i_source=0
 !------------------------
 ! Statements
 !------------------------
-do isi=1,NumBSides
-   if (BoundarySide(isi)%tipo=="sour") then
-      SourceSide = isi
-      i_source=i_source+1
-      nt = BoundarySide(SourceSide)%stretch
-      irz = Tratto(nt)%zone
-      mat = partz(irz)%Medium 
-      nA = BoundarySide(SourceSide)%Vertex(1)
-      do sd=1,SPACEDIM
-         A(sd) = Vertice(sd,nA)
-         ss(sd) = BoundarySide(SourceSide)%T(sd,1)
-         nn(sd) = BoundarySide(SourceSide)%T(sd,3)
-      end do
-      deltapart = Domain%dx
-      sidelen = BoundarySide(SourceSide)%length
-      NumPartperLine(i_source) = Int(sidelen / deltapart + 0.01d0)
-      eps = -half
-      yfila = eps * deltapart 
-      linedist = -half * deltapart
-      do ip=1,NumPartperLine(i_source)
-         linedist = linedist + deltapart
-         do sd=1,SPACEDIM
-            PartLine(i_source, ip, sd) = A(sd) + linedist * ss(sd)
-         end do
-      end do
-      ParticleVolume = Domain%PVolume
-      RowPeriod = ParticleVolume * NumPartperLine(i_source) / Tratto(nt)%FlowRate 
-      RowVelocity(i_source) = Domain%dx / RowPeriod
-      Tratto(nt)%NormVelocity = RowVelocity(i_source)
-      partz(irz)%vel(1) = RowVelocity(i_source) * nn(1)
-      partz(irz)%vel(2) = RowVelocity(i_source) * nn(2)
-      partz(irz)%vel(3) = RowVelocity(i_source) * nn(3)
-      pinttimeratio = -1
-   endif 
+!$omp parallel do default(none)                                                &
+!$omp shared(pg,Med,Domain,dt,indarrayFlu,Array_Flu)                           &
+!$omp private(npi,ii,TetaV1)
+! Loop over all the active particles
+do ii=1,indarrayFlu
+   npi = Array_Flu(ii)
+   if (Domain%TetaV>1.d-9) then
+! TetaV depending on the time step
+      TetaV1 = Domain%TetaV * Med(pg(npi)%imed)%Celerita * dt / Domain%h
+      if (pg(npi)%kodvel==0) then              
+! The particle is inside the domain and far from boundaries
+         pg(npi)%var(:) = pg(npi)%vel(:) + TetaV1 * pg(npi)%var(:)     
+         pg(npi)%vel(:) = pg(npi)%var(:)                                        
+         else
+! The particle is close to a "source", "level" or "normal velocity boundary
+! (kodvel=1 or kodvel=2): the final velocity is kept unmodified
+            pg(npi)%var(:) = pg(npi)%vel(:)                                
+      endif
+      else
+         pg(npi)%var(:) = pg(npi)%vel(:)
+   endif
 enddo
+!$omp end parallel do
 !------------------------
 ! Deallocations
 !------------------------
 return
-end subroutine PreSourceParticles_2D
+end subroutine velocity_smoothing_2

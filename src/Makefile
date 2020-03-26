@@ -7,7 +7,7 @@ VERSION = 9_0_0
 #    bin
 #    debug
 #    debug_omp
-EXECUTION = bin
+EXECUTION = debug_omp
 # Suggested values for COMPILATION_FLAGS
 #   "gfortran_debug" and "gfortran_debug_omp"
 #      -g -O0 -fbacktrace -C -Wall -fbounds-check
@@ -17,16 +17,16 @@ EXECUTION = bin
 #      -g -O0 -traceback -C -check bounds -check noarg_temp_created -debug all -fpe0
 #   "ifort_bin"
 #      -O2
-COMPILATION_FLAGS_O2 = -O2
-COMPILATION_FLAGS_O1 = -O1
+COMPILATION_FLAGS_O2 = -g -O0 -fbacktrace -C -Wall -fbounds-check
+COMPILATION_FLAGS_O1 = -g -O0 -fbacktrace -C -Wall -fbounds-check
 # Suggested values for COMPILER
 #    gfortran
 #    ifort
-COMPILER = ifort
+COMPILER = gfortran
 # Suggested values for OMP_FLAG
 #    -fopenmp (gfortran_bin and gfortran_debug_omp)
 #    -qopenmp (ifort_bin and ifort_debug_omp) 
-OMP_FLAG = -qopenmp
+OMP_FLAG = -fopenmp
 EXE_DIR = ../$(EXECUTION)/
 SOURCES_O2_a = \
 ./Modules/Static_allocation_module.f90 \
@@ -49,6 +49,20 @@ $(wildcard ./IC/*.f90) \
 ./Main_algorithm/Gest_Trans.f90 
 SOURCES_O1_a = \
 ./Main_algorithm/time_step_loop.f90 \
+./Main_algorithm/densass_koddens.f90 \
+./Main_algorithm/final_post_processing.f90 \
+./Main_algorithm/fluid_particle_imposed_kinematics.f90 \
+./Main_algorithm/KTGF_update.f90 \
+./Main_algorithm/Leapfrog_continuity.f90 \
+./Main_algorithm/Leapfrog_momentum.f90 \
+./Main_algorithm/Leapfrog_trajectories.f90 \
+./Main_algorithm/liquid_particle_array_ID.f90 \
+./Main_algorithm/removing_DBSPH_fictitious_reservoirs.f90 \
+./Main_algorithm/RHS_momentum_equation.f90 \
+./Main_algorithm/SASPH_continuity.f90 \
+./Main_algorithm/time_elapsed_IC.f90 \
+./Main_algorithm/time_step_post_processing.f90 \
+./Main_algorithm/velocity_smoothing_2.f90 \
 ./Neighbouring_Search/CalcVarLength.f90  
 #$(wildcard ./Neighbouring_Search/*.f90)
 SOURCES_O2_b = \

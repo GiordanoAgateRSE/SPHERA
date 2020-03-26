@@ -19,26 +19,21 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: PreSourceParticles_2D
-! Description: To generate new source particles at the inlet section (only in 2D
-!              and with one inlet section).
+! Program unit: fluid_particle_imposed_kinematics
+! Description: Possible imposed velocities for the fluid particles.
 !-------------------------------------------------------------------------------
-subroutine PreSourceParticles_2D
+subroutine fluid_particle_imposed_kinematics
 !------------------------
 ! Modules
 !------------------------
 use Static_allocation_module
-use I_O_file_module
-use Hybrid_allocation_module
 use Dynamic_allocation_module
+use I_O_file_module
 !------------------------
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: nt,nA,isi,sd,ip,i_source
-double precision :: deltapart,linedist,sidelen,eps
-double precision,dimension(1:SPACEDIM) :: A,ss
-integer(4), external :: ParticleCellNumber
+integer(4) :: i_zone,npi
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -48,50 +43,46 @@ integer(4), external :: ParticleCellNumber
 !------------------------
 ! Initializations
 !------------------------
-! Searching the ID of the source side
-SourceSide = 0
-SpCount = 0
-i_source=0
 !------------------------
 ! Statements
 !------------------------
-do isi=1,NumBSides
-   if (BoundarySide(isi)%tipo=="sour") then
-      SourceSide = isi
-      i_source=i_source+1
-      nt = BoundarySide(SourceSide)%stretch
-      irz = Tratto(nt)%zone
-      mat = partz(irz)%Medium 
-      nA = BoundarySide(SourceSide)%Vertex(1)
-      do sd=1,SPACEDIM
-         A(sd) = Vertice(sd,nA)
-         ss(sd) = BoundarySide(SourceSide)%T(sd,1)
-         nn(sd) = BoundarySide(SourceSide)%T(sd,3)
-      end do
-      deltapart = Domain%dx
-      sidelen = BoundarySide(SourceSide)%length
-      NumPartperLine(i_source) = Int(sidelen / deltapart + 0.01d0)
-      eps = -half
-      yfila = eps * deltapart 
-      linedist = -half * deltapart
-      do ip=1,NumPartperLine(i_source)
-         linedist = linedist + deltapart
-         do sd=1,SPACEDIM
-            PartLine(i_source, ip, sd) = A(sd) + linedist * ss(sd)
-         end do
-      end do
-      ParticleVolume = Domain%PVolume
-      RowPeriod = ParticleVolume * NumPartperLine(i_source) / Tratto(nt)%FlowRate 
-      RowVelocity(i_source) = Domain%dx / RowPeriod
-      Tratto(nt)%NormVelocity = RowVelocity(i_source)
-      partz(irz)%vel(1) = RowVelocity(i_source) * nn(1)
-      partz(irz)%vel(2) = RowVelocity(i_source) * nn(2)
-      partz(irz)%vel(3) = RowVelocity(i_source) * nn(3)
-      pinttimeratio = -1
-   endif 
+! One might loop over particles instead of over zones
+do i_zone=1,NPartZone 
+   if (Partz(i_zone)%move/="fix") cycle
+! It assigns the movement with an imposed kinematics ("npointv" velocity data)
+   if (Partz(i_zone)%npointv>1) then
+      call vellaw(Partz(i_zone)%vlaw,Partz(i_zone)%vel,Partz(i_zone)%npointv)
+      write(ulog,"(f12.4,a,i2,a,3e12.4)") simulation_time,"  zona",i_zone,     &
+         "  vel.",Partz(i_zone)%vel
+! As an alternative, one may loop over particles 
+      do npi=Partz(i_zone)%limit(1),Partz(i_zone)%limit(2) 
+         if (pg(npi)%cella==0) cycle
+         pg(npi)%var(:) = Partz(i_zone)%vel(:)
+         if (simulation_time>=pg(npi)%tstop) then
+            pg(npi)%vstart(:) = zero
+            pg(npi)%vel(:) = zero
+            else
+               pg(npi)%vstart(:) = Partz(i_zone)%vel(:)
+               pg(npi)%vel(:) = Partz(i_zone)%vel(:)
+         endif
+      enddo
+! Fixed value of velocity (npointv=1)
+      elseif (Partz(i_zone)%npointv==1) then
+! As an alternative, one may loop over particles 
+         do npi=Partz(i_zone)%limit(1),Partz(i_zone)%limit(2)
+            if (pg(npi)%cella==0) cycle
+            pg(npi)%var(:) = Partz(i_zone)%vel(:)
+            if (simulation_time>=pg(npi)%tstop) then
+               pg(npi)%vstart(:) = zero
+               pg(npi)%vel(:)    = zero
+               else
+                  pg(npi)%vel(:) = Partz(i_zone)%vel(:)
+            endif
+         enddo
+   endif
 enddo
 !------------------------
 ! Deallocations
 !------------------------
 return
-end subroutine PreSourceParticles_2D
+end subroutine fluid_particle_imposed_kinematics

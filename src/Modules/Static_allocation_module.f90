@@ -51,7 +51,7 @@ double precision,public,parameter :: FI_INTERVAL = PIGRECO/2.0d0
 double precision,public,parameter :: TETA_INTERVAL = PIGRECO + PIGRECO 
 double precision,public,parameter :: zero = 0.d0  
 double precision,public,parameter :: one = 1.d0  
-double precision,public,parameter :: two = 2.d0  
+double precision,public,parameter :: two = 2.d0
 double precision,public,parameter :: four = 4.d0 
 double precision,public,parameter :: half = 0.5d0 
 double precision,public,parameter :: quarter = 0.25d0
@@ -72,7 +72,9 @@ integer(4) :: ncord,NMedium,NPartZone
 integer(4) :: npointst,NPoints,NPointsl,NPointse,NLines,GCBFVecDim
 integer(4) :: NumVertici,NumFacce,NumTratti,NumBVertices,NumBSides
 integer(4) :: nag,nagpg,PARTICLEBUFFER
-integer(4) :: it_start,on_going_time_step,it_eff,indarrayFlu,indarraySol
+! Variable to count the particles, which are not "sol"
+integer(4) :: indarrayFlu
+integer(4) :: it_start,on_going_time_step,it_eff,indarraySol
 double precision :: simulation_time,dt,pesodt,dt_average,DTminBER
 ! Global variables: end
 ! Global variables for inlet sections: start

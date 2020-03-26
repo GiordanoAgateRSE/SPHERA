@@ -19,26 +19,24 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: PreSourceParticles_2D
-! Description: To generate new source particles at the inlet section (only in 2D
-!              and with one inlet section).
+! Program unit: KTGF_update
+! Description: To update some quantities associated with dense granular flows 
+!              (Kinetic Theory of Granular Flow under the packing limit, 
+!              Amicarelli et al., 2017, IJCFD)
 !-------------------------------------------------------------------------------
-subroutine PreSourceParticles_2D
+subroutine KTGF_update
 !------------------------
 ! Modules
 !------------------------
-use Static_allocation_module
-use I_O_file_module
 use Hybrid_allocation_module
+use Static_allocation_module
 use Dynamic_allocation_module
 !------------------------
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: nt,nA,isi,sd,ip,i_source
-double precision :: deltapart,linedist,sidelen,eps
-double precision,dimension(1:SPACEDIM) :: A,ss
-integer(4), external :: ParticleCellNumber
+integer(4) :: npi,ncel,aux,igridi,jgridi,kgridi
+integer(4),external :: ParticleCellNumber,CellIndices
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -48,50 +46,44 @@ integer(4), external :: ParticleCellNumber
 !------------------------
 ! Initializations
 !------------------------
-! Searching the ID of the source side
-SourceSide = 0
-SpCount = 0
-i_source=0
 !------------------------
 ! Statements
 !------------------------
-do isi=1,NumBSides
-   if (BoundarySide(isi)%tipo=="sour") then
-      SourceSide = isi
-      i_source=i_source+1
-      nt = BoundarySide(SourceSide)%stretch
-      irz = Tratto(nt)%zone
-      mat = partz(irz)%Medium 
-      nA = BoundarySide(SourceSide)%Vertex(1)
-      do sd=1,SPACEDIM
-         A(sd) = Vertice(sd,nA)
-         ss(sd) = BoundarySide(SourceSide)%T(sd,1)
-         nn(sd) = BoundarySide(SourceSide)%T(sd,3)
-      end do
-      deltapart = Domain%dx
-      sidelen = BoundarySide(SourceSide)%length
-      NumPartperLine(i_source) = Int(sidelen / deltapart + 0.01d0)
-      eps = -half
-      yfila = eps * deltapart 
-      linedist = -half * deltapart
-      do ip=1,NumPartperLine(i_source)
-         linedist = linedist + deltapart
-         do sd=1,SPACEDIM
-            PartLine(i_source, ip, sd) = A(sd) + linedist * ss(sd)
-         end do
-      end do
-      ParticleVolume = Domain%PVolume
-      RowPeriod = ParticleVolume * NumPartperLine(i_source) / Tratto(nt)%FlowRate 
-      RowVelocity(i_source) = Domain%dx / RowPeriod
-      Tratto(nt)%NormVelocity = RowVelocity(i_source)
-      partz(irz)%vel(1) = RowVelocity(i_source) * nn(1)
-      partz(irz)%vel(2) = RowVelocity(i_source) * nn(2)
-      partz(irz)%vel(3) = RowVelocity(i_source) * nn(3)
-      pinttimeratio = -1
-   endif 
+if (Granular_flows_options%KTGF_config==1) then
+!$omp parallel do default(none)                                                &
+!$omp shared(pg,nag)                                                           &
+!$omp private(npi,ncel)
+   do npi=1,nag
+      pg(npi)%vel_old(:) = pg(npi)%vel(:)
+      pg(npi)%normal_int_old(:) = pg(npi)%normal_int(:)
+      call initialization_fixed_granular_particle(npi)             
+   enddo
+!$omp end parallel do
+endif
+!$omp parallel do default(none)                                                &
+!$omp shared(pg,nag)                                                           &
+!$omp private(npi) 
+do npi=1,nag
+   call Shields(npi)
 enddo
+!$omp end parallel do
+if (Granular_flows_options%KTGF_config==1) then
+! Initializing viscosity for fixed particles
+!$omp parallel do default(none)                                                &
+!$omp shared(pg,nag,Granular_flows_options,Med)                                &
+!$omp private(npi,ncel,aux,igridi,jgridi,kgridi)
+   do npi=1,nag
+      ncel = ParticleCellNumber(pg(npi)%coord)
+      aux = CellIndices(ncel,igridi,jgridi,kgridi)
+      if (pg(npi)%state=="sol") then
+         pg(npi)%mu = Med(pg(npi)%imed)%mumx
+         pg(npi)%kin_visc = pg(npi)%mu / pg(npi)%dens
+      endif
+   enddo
+!$omp end parallel do
+endif
 !------------------------
 ! Deallocations
 !------------------------
 return
-end subroutine PreSourceParticles_2D
+end subroutine KTGF_update
