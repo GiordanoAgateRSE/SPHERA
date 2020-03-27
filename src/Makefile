@@ -16,7 +16,7 @@ EXECUTION = debug_omp
 #   "ifort_debug" and "ifort_debug_omp"
 #      -g -O0 -traceback -C -check bounds -check noarg_temp_created -debug all -fpe0
 #   "ifort_bin"
-#      -O2
+#      -O2 -ipo
 COMPILATION_FLAGS_O2 = -g -O0 -fbacktrace -C -Wall -fbounds-check
 # To be used only for development purposes
 COMPILATION_FLAGS_O1 = -g -O0 -fbacktrace -C -Wall -fbounds-check
