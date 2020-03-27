@@ -40,29 +40,15 @@ $(wildcard ./BC/*.f90) \
 $(wildcard ./BE_mass/*.f90) \
 $(wildcard ./BE_momentum/*.f90) \
 $(wildcard ./Body_Transport/*.f90) \
-$(wildcard ./Constitutive_Equation/*.f90) \
 $(wildcard ./DB_SPH/*.f90) \
 $(wildcard ./Erosion_Criterion/*.f90) \
 $(wildcard ./Geometry/*.f90) \
 $(wildcard ./IC/*.f90) \
+$(wildcard ./KTGF_tools/*.f90) \
 ./Main_algorithm/Gest_Dealloc.f90 \
-./Main_algorithm/Gest_Trans.f90 
+./Main_algorithm/Gest_Trans.f90 \
+./Main_algorithm/time_step_loop.f90 
 SOURCES_O1_a = \
-./Main_algorithm/time_step_loop.f90 \
-./Main_algorithm/densass_koddens.f90 \
-./Main_algorithm/final_post_processing.f90 \
-./Main_algorithm/fluid_particle_imposed_kinematics.f90 \
-./Main_algorithm/KTGF_update.f90 \
-./Main_algorithm/Leapfrog_continuity.f90 \
-./Main_algorithm/Leapfrog_momentum.f90 \
-./Main_algorithm/Leapfrog_trajectories.f90 \
-./Main_algorithm/liquid_particle_ID_array.f90 \
-./Main_algorithm/removing_DBSPH_fictitious_reservoirs.f90 \
-./Main_algorithm/RHS_momentum_equation.f90 \
-./Main_algorithm/SASPH_continuity.f90 \
-./Main_algorithm/time_elapsed_IC.f90 \
-./Main_algorithm/time_step_post_processing.f90 \
-./Main_algorithm/velocity_smoothing_2.f90 \
 ./Neighbouring_Search/CalcVarLength.f90  
 #$(wildcard ./Neighbouring_Search/*.f90)
 SOURCES_O2_b = \
@@ -73,6 +59,7 @@ SOURCES_O2_b = \
 ./Neighbouring_Search/OrdGrid1.f90 \
 ./Neighbouring_Search/ParticleCellNumber.f90 \
 ./Neighbouring_Search/w.f90 \
+./Neighbouring_Search/liquid_particle_ID_array.f90 \
 $(wildcard ./Post_processing/*.f90) \
 $(wildcard ./Pre_processing/*.f90) \
 $(wildcard ./SA_SPH/*.f90) \
