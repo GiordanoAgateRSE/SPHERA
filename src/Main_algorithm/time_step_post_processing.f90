@@ -34,8 +34,9 @@ use I_O_file_module
 ! Declarations
 !------------------------
 implicit none
-integer(4),intent(in) :: it_print,it_memo,it_rest,it
+integer(4),intent(in) :: it
 double precision,intent(in) :: dtvel
+integer(4),intent(inout) :: it_print,it_memo,it_rest
 integer(4) :: npi
 double precision :: xmax,ymax,zmax
 !------------------------

@@ -56,7 +56,7 @@ SOURCES_O1_a = \
 ./Main_algorithm/Leapfrog_continuity.f90 \
 ./Main_algorithm/Leapfrog_momentum.f90 \
 ./Main_algorithm/Leapfrog_trajectories.f90 \
-./Main_algorithm/liquid_particle_array_ID.f90 \
+./Main_algorithm/liquid_particle_ID_array.f90 \
 ./Main_algorithm/removing_DBSPH_fictitious_reservoirs.f90 \
 ./Main_algorithm/RHS_momentum_equation.f90 \
 ./Main_algorithm/SASPH_continuity.f90 \

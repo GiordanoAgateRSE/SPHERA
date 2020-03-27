@@ -352,8 +352,7 @@ TIME_STEP_DO: do while (it<=Domain%itmax)
       endif
    enddo TIME_STAGE_DO
    if (Domain%time_split==0) dtvel = dt
-   call time_step_post_processing(it_print,it_memo,it_rest,it,                 &
-                                  on_going_time_step,dtvel)
+   call time_step_post_processing(it_print,it_memo,it_rest,it,dtvel)
 ! If the "kill file" exists, then the run is stopped and last results are saved.
    inquire(file=nomefilekill,EXIST=kill_flag)
    if (kill_flag) exit TIME_STEP_DO
