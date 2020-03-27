@@ -18,6 +18,7 @@ EXECUTION = debug_omp
 #   "ifort_bin"
 #      -O2
 COMPILATION_FLAGS_O2 = -g -O0 -fbacktrace -C -Wall -fbounds-check
+# To be used only for development purposes
 COMPILATION_FLAGS_O1 = -g -O0 -fbacktrace -C -Wall -fbounds-check
 # Suggested values for COMPILER
 #    gfortran
@@ -47,24 +48,15 @@ $(wildcard ./IC/*.f90) \
 $(wildcard ./KTGF_tools/*.f90) \
 ./Main_algorithm/Gest_Dealloc.f90 \
 ./Main_algorithm/Gest_Trans.f90 \
-./Main_algorithm/time_step_loop.f90 
-SOURCES_O1_a = \
-./Neighbouring_Search/CalcVarLength.f90  
-#$(wildcard ./Neighbouring_Search/*.f90)
-SOURCES_O2_b = \
-./Neighbouring_Search/CellIndices.f90 \
-./Neighbouring_Search/CellNumber.f90 \
-./Neighbouring_Search/CreaGrid.f90 \
-./Neighbouring_Search/InterFix.f90 \
-./Neighbouring_Search/OrdGrid1.f90 \
-./Neighbouring_Search/ParticleCellNumber.f90 \
-./Neighbouring_Search/w.f90 \
-./Neighbouring_Search/liquid_particle_ID_array.f90 \
+./Main_algorithm/time_step_loop.f90 \
+$(wildcard ./Neighbouring_Search/*.f90) \
 $(wildcard ./Post_processing/*.f90) \
 $(wildcard ./Pre_processing/*.f90) \
 $(wildcard ./SA_SPH/*.f90) \
 $(wildcard ./Strings/*.f90) \
 $(wildcard ./Time_Integration/*.f90)
+SOURCES_O1_a = 
+SOURCES_O2_b = 
 SOURCES_O1_b = 
 # Other variables
 MAIN_FILE_ROOT = ./Main_algorithm/sphera
