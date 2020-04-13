@@ -726,7 +726,7 @@ ___ ___
 ![?] endif (fluid_type==liquid)
 ![?] if (fluid_type==granular) then
 !-------------------------------------------------------------------------------
-![*] <solid_phase_density> <solid_phase_bulk_modulus>
+![*] <solid_phase_density_initial_conditions> <solid_phase_bulk_modulus>
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
 ___ ___

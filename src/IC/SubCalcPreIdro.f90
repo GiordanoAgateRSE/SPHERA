@@ -21,7 +21,8 @@
 !-------------------------------------------------------------------------------
 ! Program unit: SubCalcPreIdro      
 ! Description: Hydrostatic pressure profiles (in case they are imposed as 
-!              initial conditions).                 
+!              initial conditions). It is formally correct only in case of 
+!              maximum 2 media along the vertical.            
 !-------------------------------------------------------------------------------
 subroutine SubCalcPreIdro
 !------------------------
