@@ -94,7 +94,6 @@ do icbs=1,IntNcbs
          case ("velo", "flow", "sour")
             if ((Domain%time_stage==1).or.(Domain%time_split==1)) then 
                pg(npi)%koddens = 2
-               pg(npi)%densass = roi
                BCrodivV = zero
             endif
             return

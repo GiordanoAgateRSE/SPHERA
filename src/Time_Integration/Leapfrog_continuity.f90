@@ -53,22 +53,14 @@ do ii=1,indarrayFlu
    npi = Array_Flu(ii)
    if ((pg(npi)%cella==0).or.(pg(npi)%vel_type/="std")) cycle
    if (Domain%tipo=="bsph") pg(npi)%dden = pg(npi)%dden / pg(npi)%uni
-! Boundary type is "fixe" or "tapis" or "level"
-   if (pg(npi)%koddens==0) then
-      if (Domain%tipo=="semi") pg(npi)%dens = pg(npi)%dens + dt * pg(npi)%dden
-      if (Domain%density_thresholds==1) then        
-         if (pg(npi)%dens<(0.9d0*Med(pg(npi)%imed)%den0)) then
-            pg(npi)%dens = 0.9d0*Med(pg(npi)%imed)%den0
-         endif
-         if (pg(npi)%dens>(1.1d0*Med(pg(npi)%imed)%den0)) then
-            pg(npi)%dens = 1.1d0 * Med(pg(npi)%imed)%den0
-         endif
+   if (Domain%tipo=="semi") pg(npi)%dens = pg(npi)%dens + dt * pg(npi)%dden
+   if (Domain%density_thresholds==1) then        
+      if (pg(npi)%dens<(0.9d0*Med(pg(npi)%imed)%den0)) then
+         pg(npi)%dens = 0.9d0*Med(pg(npi)%imed)%den0
       endif
-! Boundary type is "velocity" or "source"
-      pg(npi)%densass = zero
-      elseif (pg(npi)%koddens==2) then
-! Density is kept constant
-         pg(npi)%dens = pg(npi)%densass  
+      if (pg(npi)%dens>(1.1d0*Med(pg(npi)%imed)%den0)) then
+         pg(npi)%dens = 1.1d0 * Med(pg(npi)%imed)%den0
+      endif
    endif
 enddo
 !$omp end parallel do

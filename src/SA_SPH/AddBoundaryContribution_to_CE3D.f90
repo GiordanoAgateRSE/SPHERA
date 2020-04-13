@@ -86,7 +86,6 @@ do icbf=1,Ncbf
       elseif (boundtype=="velo".or.boundtype=="flow".or.boundtype=="sour") then
          if ((Domain%time_stage==1).or.(Domain%time_split==1)) then 
             pg(npi)%koddens = 2
-            pg(npi)%densass = roi
             BCtorodivV = zero
          endif
          return
@@ -97,4 +96,3 @@ enddo
 !------------------------
 return
 end subroutine AddBoundaryContribution_to_CE3D
-

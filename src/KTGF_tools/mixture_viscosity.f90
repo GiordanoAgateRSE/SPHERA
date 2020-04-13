@@ -202,7 +202,7 @@ do npi=1,nag
 ! in the transition zone of elastic-plastic regime are held fixed. This is 
 ! consistent with negible strain rates and saves computational time in the 
 ! transition zone in the elasto-platic strain rate regime.
-      if (pg(npi)%mu>=Med(pg(npi)%imed)%mumx) then
+      if (pg(npi)%mu>(Med(pg(npi)%imed)%mumx-1.d-12)) then
          pg(npi)%mu = Med(pg(npi)%imed)%mumx
          pg(npi)%vel(:) = 0.d0
          elseif(pg(npi)%mu>Med(pg(npi)%imed)%limiting_viscosity) then

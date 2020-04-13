@@ -171,7 +171,6 @@ type TyParticle
 ! "Shep" evolution)                           
    integer(4) :: FS
    integer(4) :: laminar_flag
-   double precision :: densass                        
    double precision :: mass
 ! Density                          
    double precision :: dens

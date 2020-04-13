@@ -99,7 +99,6 @@ PgZero%vel(3) = zero
 PgZero%velass(1) = zero
 PgZero%velass(2) = zero
 PgZero%velass(3) = zero
-PgZero%densass = zero
 PgZero%acc(1) = zero
 PgZero%acc(2) = zero
 PgZero%acc(3) = zero

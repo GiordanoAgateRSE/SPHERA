@@ -277,7 +277,7 @@ ___ ___
 !    <slip_condition>
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
-___ ___ ___ ___ ___
+std ___ ___ ___ ___
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
 ![?] endif (motion_type=std)
@@ -290,7 +290,7 @@ ___ ___ ___ ___ ___
 ![*] <motion_type> <n_records>
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
-___ ___
+law ___
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
 ![?] It follows the list of records for the imposed 3D translational 
@@ -387,22 +387,29 @@ ___ ___
 !    "point_inout_convex_non_degenerate_polygon" must be replaced with other 
 !    calls to subroutines such as "point_inout_quadrilateral"). From a plan 
 !    view, the vertices are provided anticlockwise.                    
+!-------------------------------------------------------------------------------
+![*] <dam_zone_ID> <dam_zone_n_vertices>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+___ ___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] if (dam_zone_ID>0) then
 ![?] <circum_dam_1_x>,<circum_dam_1_y>: first point of the 2D figure 
 !    circumscribing the horizontal projection of the dam zone
 ![?] <circum_dam_last_x>,<circum_dam_last_y>: last point of the 2D figure above
 !-------------------------------------------------------------------------------
-![*] <dam_zone_ID> <n_circum_dam>
 ![*] <circum_dam_1_x> <circum_dam_1_y>
 ![*] ...
 ![*] <circum_dam_last_x> <circum_dam_last_y>
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
 ___ ___
-___ ___
 ...
 ___ ___
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
+![?] endif (dam_zone_ID>0)
 ![?] endif (IC_reservoir_type==2)
 ![?] endif (Boundary_type=="perimeter")
 ![?] if (Boundary_type=="open") then
@@ -974,7 +981,7 @@ ___ ___ ___ ___ ___ ___
 ![?] <factor>: weighting factor to estimate dt (draft variable)
 !    =0. (recommended value)
 ![?] <dt_alfa_Mon>: logical flag possibly making Monaghan artificial viscosity 
-!    coefficient to influence dt)
+!    coefficient to influence dt
 ![?] <teta_p>, <teta_u>: coefficients for partial smoothing of pressure and 
 !    velocity)
 ![?] <var>
@@ -1069,9 +1076,9 @@ ___
 !    =step
 ![?] <restart_time_value>: positive time value in seconds or step number, 
 !    according to "restart_mode"; "restart_time_value" has to be smaller than 
-!    the time value of the last restart output; default choice: "2*dt_out_PV". 
-!    The following constraint "restart_time_value>=dt_out_PV" is highly 
-!    suggested because it permits easier post-processing. 
+!    the time value of the last restart output. As "restart_time_value" has to 
+!    be positive, restart from the very initial conditions is not possible at 
+!    the moment.
 ![?] <restart_file>: restart file name (with file extension)
 !-------------------------------------------------------------------------------
 ![*] <restart_mode> <restart_time_value>
@@ -1089,7 +1096,9 @@ ___
 ![?] Post-processing parameters for .txt files
 ![?] <dt_out>: writing time step for the water front (output file ".fro")
 ![?] <dt_restart>: restart time frequency; default value: 
-!    (2 * "vtkconverter any")
+!    2*"vtkconverter any"="2*dt_out_PV". The following constraint 
+!    "restart_time_value>=dt_out_PV" is highly suggested because it permits 
+!    easier post-processing. 
 ![?] <log_file_frequency>: log file writing time step in terms of time step 
 !    number
 ![?] <dt_out_mon>: writing time step for monitoring elements

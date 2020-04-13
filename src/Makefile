@@ -19,7 +19,7 @@ EXECUTION = debug_omp
 #      -O2 
 COMPILATION_FLAGS_O2 = -g -O0 -fbacktrace -C -Wall -fbounds-check
 # To be used only for development purposes
-COMPILATION_FLAGS_O1 = -g -O0 -fbacktrace -C -Wall -fbounds-check
+COMPILATION_FLAGS_O1 = 
 # Suggested values for COMPILER
 #    gfortran
 #    ifort

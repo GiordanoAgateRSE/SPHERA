@@ -75,8 +75,8 @@ if (indarrayFlu==0) then
          npi = Array_Flu(ii)
          if (Med(pg(npi)%imed)%tipo=="granular") then
 ! Redundant and safety check
-            if ((pg(npi)%state=="sol").or.(pg(npi)%mu==Med(pg(npi)%imed)%mumx))&
-               cycle
+            if ((pg(npi)%state=="sol").or.                                     &
+               (pg(npi)%mu>(Med(pg(npi)%imed)%mumx-1.d-12))) cycle
             if ((pg(npi)%coord(1)<Granular_flows_options%x_min_dt).or.         &
                (pg(npi)%coord(1)>Granular_flows_options%x_max_dt).or.          &
                (pg(npi)%coord(2)<Granular_flows_options%y_min_dt).or.          &

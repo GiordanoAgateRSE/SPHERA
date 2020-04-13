@@ -82,11 +82,8 @@ do ii=1,indarrayFlu
          else
             pg(npi)%dden = pg(npi)%dden - BCrodivV
       endif
-      elseif (pg(npi)%koddens==1) then
-         pg(npi)%dden = zero  
-! Boundary type is "velocity" or "source"
-         elseif (pg(npi)%koddens==2) then
-            pg(npi)%dden = zero
+      else
+         pg(npi)%dden = zero
    endif
 enddo
 !$omp end parallel do

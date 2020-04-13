@@ -211,24 +211,18 @@ if (((DBSPH%n_w+DBSPH%n_inlet+DBSPH%n_outlet)>0).and.(Domain%tipo=="bsph")) &
          if (nPartIntorno_fw(npi)==0) pg(npi)%Gamma = one 
       endif      
       pg(npi)%dden = pg(npi)%dden / pg(npi)%Gamma
-! Boundary type is fixe or tapis or level(?)
-      if (pg(npi)%koddens==0) then
 ! SPH approximation of density (alternative to the continuity equation)
-         if (pg(npi)%FS==0) then
-            pg(npi)%dens = pg(npi)%rhoSPH_new / pg(npi)%Gamma
-            else
-               pg(npi)%dens = pg(npi)%rhoSPH_new / pg(npi)%sigma 
-               if (pg(npi)%dens<(0.98d0*med(1)%den0)) pg(npi)%dens = 0.98d0 *  &
-                                                                     med(1)%den0 
-         endif
+     if (pg(npi)%FS==0) then
+        pg(npi)%dens = pg(npi)%rhoSPH_new / pg(npi)%Gamma
+        else
+           pg(npi)%dens = pg(npi)%rhoSPH_new / pg(npi)%sigma 
+           if (pg(npi)%dens<(0.98d0*med(1)%den0)) pg(npi)%dens = 0.98d0 *      &
+                                                                 med(1)%den0 
+     endif
 ! Possible interesting test, according to Ferrand et al. (2013):
 ! beta = exp(-30000.*(min((pg(npi)%sigma/pg(npi)%Gamma),1.)-1.)**2) ,
 ! pg(npi)%dens =  pg(npi)%rhoSPH_new / (beta*pg(npi)%Gamma+(1.-beta) 
 ! * pg(npi)%sigma)
-         pg(npi)%densass = zero
-         elseif (pg(npi)%koddens==2) then
-            pg(npi)%dens = pg(npi)%densass  
-      endif
 ! Impose boundary conditions at inlet and outlet sections (DB-SPH)
       call DBSPH_inlet_outlet(npi)
    enddo
@@ -241,13 +235,7 @@ if (((DBSPH%n_w+DBSPH%n_inlet+DBSPH%n_outlet)>0).and.(Domain%tipo=="bsph")) &
 ! Time integration for density (continuity equation)
       do ii=1,indarrayFlu
          npi = Array_Flu(ii)
-! Boundary type is fixe or tapis or level(?)
-         if (pg(npi)%koddens==0) then
-            pg(npi)%dens = pg(npi)%dens + dt * pg(npi)%dden
-            pg(npi)%densass = zero
-            elseif (pg(npi)%koddens==2) then
-               pg(npi)%dens = pg(npi)%densass  
-         endif
+         pg(npi)%dens = pg(npi)%dens + dt * pg(npi)%dden
       enddo
 !$omp end parallel do
 endif

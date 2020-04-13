@@ -215,10 +215,8 @@ TIME_STEP_DO: do while (it<=Domain%itmax)
             endif
 ! Partial smoothing for velocity: start 
             call start_and_stop(2,7)
-            if (Domain%TetaV>1.d-9) then
-               call velocity_smoothing
-               call velocity_smoothing_2
-            endif
+            if (Domain%TetaV>1.d-9) call velocity_smoothing
+            call velocity_smoothing_2
             call start_and_stop(3,7)
 ! Partial smoothing for velocity: end
 ! Update the particle positions
@@ -270,7 +268,7 @@ TIME_STEP_DO: do while (it<=Domain%itmax)
             if (Domain%time_split==1) call liquid_particle_ID_array
       endif
       if ((Domain%time_stage==1).or.(Domain%time_split==1)) then
-         call densass_koddens
+         pg(:)%koddens = 0
       endif
       if (Domain%tipo=="semi") call SASPH_continuity
       if (Domain%time_split==0) then   

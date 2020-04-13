@@ -32,7 +32,7 @@
 !                              intercepted) the faces, whose vertices all lie in
 !                              one of the semispaces (defined by the planes 
 !                              containing the cell faces), which do not include
-!                              the cell itself.  
+!                              the cell itself. 
 !                 Second phase: for every remaining face, it verifies if all the
 !                               8 cell vertices belong to one of the semispaces 
 !                               defined by the plane containing the face. In the
@@ -86,7 +86,7 @@ flpointer = 0
 !$omp private(nf,nodes,Found,sd,Signcount,no,XYZnod,CellNodeZita,deltaXYZ)     &
 !$omp private(i_flpointer,flpointer_cell,GCBFVector_cell)
 do nc=1,Grid%nmax
-   GCBFPointers(nc,1) = zero
+   GCBFPointers(nc,1) = 0
 ! To detect the cell IDs 
    irestocell = CellIndices(nc,i,j,k)        
 ! To assess the minimum and maximum coordinates of the cell 

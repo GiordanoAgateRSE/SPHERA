@@ -123,13 +123,8 @@ enddo
 do ii=1,indarrayFlu
    npi = Array_Flu(ii)
    if ((pg(npi)%cella==0).or.(pg(npi)%vel_type/="std")) cycle
-   if (pg(npi)%koddens==0) then
-      pg(npi)%dens = ts0_pg(npi)%ts_dens + half * dt * (ts0_pg(npi)%ts_dden    &
-         + pg(npi)%dden)
-      pg(npi)%densass = zero
-      elseif (pg(npi)%koddens==2) then
-         pg(npi)%dens = pg(npi)%densass  
-   endif
+   pg(npi)%dens = ts0_pg(npi)%ts_dens + half * dt * (ts0_pg(npi)%ts_dden +     &
+                  pg(npi)%dden)
 enddo
 !$omp end parallel do
 !------------------------
