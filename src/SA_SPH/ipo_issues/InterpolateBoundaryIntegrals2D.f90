@@ -3,9 +3,9 @@
 ! Computational Fluid Dynamics code).
 ! Copyright 2005-2020 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
-
+!
 ! SPHERA authors and email contact are provided on SPHERA documentation.
-
+!
 ! This file is part of SPHERA v.9.0.0
 ! SPHERA v.9.0.0 is free software: you can redistribute it and/or modify
 ! it under the terms of the GNU General Public License as published by
@@ -19,23 +19,32 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: BoundaryMassForceMatrix2D                                
-! Description: Generation of the generalized boundary mass force matrix RN, on 
-!              the base of the cosine matrix T and the parameter Fi. (Di Monaco 
-!              et al., 2011, EACFM)                        
+! Program unit: InterpolateBoundaryIntegrals2D                                       
+! Description:  Interpolation in table "BoundIntegralTab(:,:)", defined in
+!               module "SA_SPH_module", the values in columns "Colmn(nc), nc=1,
+!               Ncols" corresponding to the input value "x" to be interpolated,
+!               in turn, in column 0. It returns:
+!                  Func(nc), nc=1, Ncols : values interpolated in columns 
+!                                          Col(nc), nc=1, Ncols
+!               (Di Monaco et al., 2011, EACFM)                        
 !-------------------------------------------------------------------------------
-subroutine BoundaryMassForceMatrix2D(T,RN,FiS,FiN) 
+subroutine InterpolateBoundaryIntegrals2D(Ncols,Colmn,xx,Func)
 !------------------------
 ! Modules
 !------------------------
 use Static_allocation_module
 use Hybrid_allocation_module
+use SA_SPH_module
 !------------------------
 ! Declarations
 !------------------------
 implicit none
-double precision :: FiS, FiN 
-double precision,dimension(1:SPACEDIM,1:SPACEDIM) :: T,RN
+integer(4),intent(in) :: Ncols
+integer(4),dimension(1:NUMCOLS_BIT),intent(in) :: Colmn
+double precision,intent(inout) :: xx
+double precision,dimension(1:NUMCOLS_BIT),intent(out) :: Func
+integer(4) :: nc,i,j
+double precision :: xi,fi,fip1
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -48,12 +57,17 @@ double precision,dimension(1:SPACEDIM,1:SPACEDIM) :: T,RN
 !------------------------
 ! Statements
 !------------------------
-RN(1,1) = FiS * T(1,1) * T(1,1) + FiN * T(3,1) * T(3,1)
-RN(1,3) = (FiS - FiN) * T(1,1) * T(3,1) 
-RN(3,1) = RN(1,3)         
-RN(3,3) = FiS * T(3,1) * T(3,1) + FiN * T(1,1) * T(1,1)
+if (xx<BoundIntegralTab2D(1,0)) xx = BoundIntegralTab2D(1,0)
+i = int((xx - BoundIntegralTab2D(1,0)) / DELTAX_BIT) + 1
+xi = BoundIntegralTab2D(i,0)
+do nc=1,Ncols
+   j = Colmn(nc)
+   fi = BoundIntegralTab2D(i,j)
+   fip1 = BoundIntegralTab2D(i+1,j)
+   Func(nc) = fi + (fip1 - fi) * (xx - xi) / DELTAX_BIT
+enddo
 !------------------------
 ! Deallocations
 !------------------------
 return
-end subroutine BoundaryMassForceMatrix2D
+end subroutine InterpolateBoundaryIntegrals2D

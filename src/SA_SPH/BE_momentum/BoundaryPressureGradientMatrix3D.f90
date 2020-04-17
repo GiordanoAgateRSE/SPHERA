@@ -19,10 +19,12 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: J2Wro2                                         
-! Description: (Di Monaco et al., 2011, EACFM)                        
+! Program unit: BoundaryPressureGradientMatrix3D                                
+! Description: To generate the pressure gradient matrix RRP, based on the cosine
+!              matrix T and the parameter vector Psi.
+!              (Di Monaco et al., 2011, EACFM)                        
 !-------------------------------------------------------------------------------
-double precision function J2Wro2(ro)
+subroutine BoundaryPressureGradientMatrix3D(T,RGP,Psi)
 !------------------------
 ! Modules
 !------------------------
@@ -31,12 +33,10 @@ use Static_allocation_module
 ! Declarations
 !------------------------
 implicit none
-! 1/120
-double precision,parameter :: a1 = 0.00833333333333333d0
-! 8/30
-double precision,parameter :: a2 = 0.26666666666666667d0
-double precision,intent(IN) :: ro
-double precision :: ro2,ro3
+double precision,intent(INOUT),dimension(SPACEDIM) :: Psi
+double precision,intent(INOUT),dimension(SPACEDIM,SPACEDIM) :: T,RGP
+Integer(4) :: i
+double precision,dimension(SPACEDIM,SPACEDIM) :: Diag,PsiR,TTR
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -46,22 +46,18 @@ double precision :: ro2,ro3
 !------------------------
 ! Initializations
 !------------------------
-ro2 = ro * ro
-ro3 = ro2 * ro
+Diag = zero
 !------------------------
 ! Statements
 !------------------------
-if ((zero<=ro).and.(ro<one)) then
-   J2Wro2 = KERNELCONST2D * (0.25d0 - (a1 * (40.d0 - 36.d0 * ro2 + 15.d0 * ro3 &
-            ) * ro3))
-   elseif ((one<=ro).and.(ro<two)) then
-      J2Wro2 = KERNELCONST2D * (a2 - (a1 * (80.d0 - 90.d0 * ro + 36.d0 * ro2 - &
-               5.d0 * ro3) * ro3))
-      else
-         J2Wro2 = zero
-endif
+do i=1,SPACEDIM
+   Diag(i,i) = Psi(i)
+enddo
+call MatrixTransposition(T,TTR,SPACEDIM,SPACEDIM)
+call MatrixProduct(Diag,TTR,PsiR,SPACEDIM,SPACEDIM,SPACEDIM)
+call MatrixProduct(T,PsiR,RGP,SPACEDIM,SPACEDIM,SPACEDIM)
 !------------------------
 ! Deallocations
 !------------------------
 return
-end function J2Wro2
+end subroutine BoundaryPressureGradientMatrix3D

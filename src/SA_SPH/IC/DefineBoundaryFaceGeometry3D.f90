@@ -19,32 +19,25 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: InterpolateBoundaryIntegrals2D                                       
-! Description:  Interpolation in table "BoundIntegralTab(:,:)", defined in
-!               module "SA_SPH_module", the values in columns "Colmn(nc), nc=1,
-!               Ncols" corresponding to the input value "x" to be interpolated,
-!               in turn, in column 0. It returns:
-!                  Func(nc), nc=1, Ncols : values interpolated in columns 
-!                                          Col(nc), nc=1, Ncols
-!               (Di Monaco et al., 2011, EACFM)                        
+! Program unit: DefineBoundaryFaceGeometry3D                                    
+! Description: To define boundary faces from 3D geometry.
+!              (Di Monaco et al., 2011, EACFM)                        
 !-------------------------------------------------------------------------------
-subroutine InterpolateBoundaryIntegrals2D(x,Ncols,Colmn,Func)
+subroutine DefineBoundaryFaceGeometry3D
 !------------------------
 ! Modules
 !------------------------
 use Static_allocation_module
 use Hybrid_allocation_module
-use SA_SPH_module
+use Dynamic_allocation_module
 !------------------------
 ! Declarations
 !------------------------
 implicit none
-double precision :: x 
-integer(4) :: Ncols
-integer(4),dimension(1:NUMCOLS_BIT) :: Colmn
-double precision,dimension(1:NUMCOLS_BIT) :: Func
-integer(4) :: nc,i,j
-double precision :: xi,fi,fip1
+integer(4) :: Kf,Nf,Nt
+double precision,dimension(SPACEDIM) :: Fi
+double precision,dimension(SPACEDIM,SPACEDIM) :: TT,RGP,RMF
+Data Fi /1.d0,1.d0,1.d0/
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -57,17 +50,24 @@ double precision :: xi,fi,fip1
 !------------------------
 ! Statements
 !------------------------
-if (x<BoundIntegralTab2D(1,0)) x = BoundIntegralTab2D(1,0)
-i = Int((x-BoundIntegralTab2D(1,0))/DELTAX_BIT)+1
-xi = BoundIntegralTab2D(i,0)
-do nc=1,Ncols
-   j = Colmn(nc)
-   fi = BoundIntegralTab2D(i,j)
-   fip1 = BoundIntegralTab2D(i+1,j)
-   Func(nc) = fi+(fip1-fi)*(x-xi)/DELTAX_BIT
+do Kf=1,NumFacce,1
+   Nf = BFaceList(Kf)
+   if (Nf==0) cycle
+   Nt = BoundaryFace(Nf)%stretch
+   call DefineLocalSystemVersors (Nf)
+   TT(1:SPACEDIM,1:SPACEDIM) = BoundaryFace(nf)%T(1:SPACEDIM,1:SPACEDIM)
+   RGP = zero
+   RMF = zero
+   call BoundaryMassForceMatrix3D(TT,RMF,Fi)
+   BoundaryFace(nf)%RFi(1:SPACEDIM,1:SPACEDIM) = RMF(1:SPACEDIM,1:SPACEDIM)
+   if (Tratto(nt)%tipo=="tapi") then
+      BoundaryFace(nf)%velocity(1:SPACEDIM) = Tratto(nt)%velocity(1:SPACEDIM)
+      else
+         BoundaryFace(nf)%velocity(1:SPACEDIM) = zero
+   endif
 enddo
 !------------------------
 ! Deallocations
 !------------------------
 return
-end subroutine InterpolateBoundaryIntegrals2D
+end subroutine DefineBoundaryFaceGeometry3D

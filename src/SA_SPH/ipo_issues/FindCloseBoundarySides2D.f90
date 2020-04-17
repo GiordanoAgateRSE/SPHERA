@@ -19,7 +19,7 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: FindCloseBoundarySides2D                                       
+! Program unit: FindCloseBoundarySides2D                                      
 ! Description: To find the "close" boundary sides, i.e. those sited at a 
 !              distance from particle npi<=2h. It returns:
 !                 Ncbs: number of close boundary sides (= 0, 1, 2)
@@ -61,9 +61,9 @@ character(len=lencard) :: nomsub = "FindCloseBoundarySides2D"
 !------------------------
 ! Initializations
 !------------------------
-acix(1) = 1  
+acix(1) = 1
 acix(2) = 3
-Cloboside = 0
+Cloboside(:) = 0
 LocXY = zero
 Ncbs  = 0
 Plocal(:) = pg(npi)%coord(acix(:))
@@ -178,7 +178,7 @@ do icbs=1,Ncbs
 enddo
 ! An inlet section ("source") has been found: the other nearest sides are 
 ! deleted
-if (isous>0) then   
+if (isous>0) then
    Ncbs = 1
    Cloboside(Ncbs) = Cloboside(isous)
    LocXY(1,Ncbs) = LocXY(1,isous)

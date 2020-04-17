@@ -19,25 +19,35 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: DefineBoundaryFaceGeometry3D                                    
-! Description: To define boundary faces from 3D geometry.
+! Program unit: FindBoundaryIntersection2D                                       
+! Description: To find the intersection segment between the kernel support of 
+!              particle "i", whose local coordinates are xpi=LocXY(1,icbs) and
+!              ypi=LocXY(2,icbs), and the straight boundary side
+!              iside=Cloboside(icbs), which lies on the local x-axis and extends
+!              from x=0 to bsidelen = BoundarySide(iside)%Length. It returns:
+!                 xpmin: minimum abscissa of intersected segment
+!                 xpmax: maximum abscissa of intersected segment
+!                 interlen: length of the intersected segment 
 !              (Di Monaco et al., 2011, EACFM)                        
 !-------------------------------------------------------------------------------
-subroutine DefineBoundaryFaceGeometry3D
+subroutine FindBoundaryIntersection2D(icbs,Cloboside,LocXY,BoundarySide,xpmin, &
+                                      xpmax,interlen)
 !------------------------
 ! Modules
 !------------------------
 use Static_allocation_module
 use Hybrid_allocation_module
-use Dynamic_allocation_module
 !------------------------
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: Kf,Nf,Nt
-double precision,dimension(SPACEDIM) :: Fi
-double precision,dimension(SPACEDIM,SPACEDIM) :: TT,RGP,RMF
-Data Fi /1.0d0,1.0d0,1.0d0/
+integer(4),intent(in) :: icbs
+integer(4),dimension(1:MAXCLOSEBOUNDSIDES),intent(in) :: Cloboside
+double precision,dimension(1:PLANEDIM,1:MAXCLOSEBOUNDSIDES),intent(in) :: LocXY
+type (TyBoundarySide),dimension(1:NumBSides),intent(in) :: BoundarySide
+double precision,intent(inout) :: xpmin,xpmax,interlen
+integer(4) :: iside
+double precision :: xpi,ypi,ypiq,bsidelen,halfchord,minlen,eps,XA,XB
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -47,28 +57,40 @@ Data Fi /1.0d0,1.0d0,1.0d0/
 !------------------------
 ! Initializations
 !------------------------
+eps = 0.01d0
+minlen = eps * Domain%h
+interlen = zero
+xpi = LocXY(1,icbs)
+ypi = LocXY(2,icbs)
+if (ypi<zero) then    
+! If the particle is out of the fluid domain, then it is considered as if 
+! it were on the boundary
+   ypi = zero            
+endif
 !------------------------
 ! Statements
 !------------------------
-do Kf=1,NumFacce,1
-   Nf = BFaceList(Kf)
-   if (Nf==0) cycle
-   Nt = BoundaryFace(Nf)%stretch
-   call DefineLocalSystemVersors (Nf)
-   TT(1:SPACEDIM,1:SPACEDIM) = BoundaryFace(nf)%T(1:SPACEDIM,1:SPACEDIM)
-   RGP = zero
-   RMF = zero
-   call BoundaryMassForceMatrix3D (TT, RMF, Fi)
-   BoundaryFace(nf)%RFi(1:SPACEDIM,1:SPACEDIM) = RMF(1:SPACEDIM,1:SPACEDIM)
-   if (Tratto(nt)%tipo=="tapi") then
-      BoundaryFace(nf)%velocity(1:SPACEDIM) = Tratto(nt)%velocity(1:SPACEDIM)
-      else
-         BoundaryFace(nf)%velocity(1:SPACEDIM) = zero
-   endif
-enddo
+ypiq = ypi * ypi
+halfchord = dsqrt(square_doubleh - ypiq)
+XA = xpi - halfchord
+XB = xpi + halfchord
+iside = Cloboside(icbs)
+bsidelen = BoundarySide(iside)%Length
+xpmin = zero
+if (XA>xpmin) then
+   xpmin = XA
+endif
+xpmax = bsidelen
+if (XB<xpmax) then
+   xpmax = XB
+endif
+interlen = xpmax - xpmin
+if (interlen<=minlen) then
+! Intersection is too small
+   interlen = zero               
+endif
 !------------------------
 ! Deallocations
 !------------------------
 return
-end subroutine DefineBoundaryFaceGeometry3D
-
+end subroutine FindBoundaryIntersection2D

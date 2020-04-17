@@ -18,16 +18,22 @@ EXECUTION = debug_omp
 #   "ifort_bin"
 #      -O2 
 COMPILATION_FLAGS_O2 = -g -O0 -fbacktrace -C -Wall -fbounds-check
-# To be used only for development purposes
-COMPILATION_FLAGS_O1 = 
 # Suggested values for COMPILER
 #    gfortran
 #    ifort
 COMPILER = gfortran
 # Suggested values for OMP_FLAG
 #    -fopenmp (gfortran_bin and gfortran_debug_omp)
-#    -qopenmp (ifort_bin and ifort_debug_omp) 
+#    -qopenmp (ifort_bin and ifort_debug_omp)
 OMP_FLAG = -fopenmp
+# To be deactivated for debug purposes
+#   "gfortran"
+#      
+#   "ifort" 
+#      -ipo 
+COMPILATION_FLAG_IPO = 
+# To be assigned for debug purposes as an alternative to COMPILATION_FLAGS_O2
+COMPILATION_FLAGS_O1 =
 EXE_DIR = ../$(EXECUTION)/
 SOURCES_O2_a = \
 ./Modules/Static_allocation_module.f90 \
@@ -52,11 +58,20 @@ $(wildcard ./KTGF_tools/*.f90) \
 $(wildcard ./Neighbouring_Search/*.f90) \
 $(wildcard ./Post_processing/*.f90) \
 $(wildcard ./Pre_processing/*.f90) \
-$(wildcard ./SA_SPH/*.f90) \
+$(wildcard ./SA_SPH/BE_mass/*.f90) \
+$(wildcard ./SA_SPH/BE_momentum/*.f90) \
+$(wildcard ./SA_SPH/IC/*.f90) \
+$(wildcard ./SA_SPH/integrals/*.f90) \
+$(wildcard ./SA_SPH/ipo_issues/*.f90) \
+$(wildcard ./SA_SPH/Neighbouring_Search/*.f90) \
+$(wildcard ./SA_SPH/Time_integration/*.f90) \
 $(wildcard ./Strings/*.f90) \
-$(wildcard ./Time_Integration/*.f90)
-SOURCES_O1_a = 
+$(wildcard ./Time_Integration/*.f90) 
+# To be assigned for debug purposes as an alternative to SOURCES_O2_a
+SOURCES_O1_a =   
+# To be assigned for debug purposes as an alternative to SOURCES_O2_a
 SOURCES_O2_b = 
+# To be assigned for debug purposes as an alternative to SOURCES_O2_a
 SOURCES_O1_b = 
 # Other variables
 MAIN_FILE_ROOT = ./Main_algorithm/sphera
@@ -69,7 +84,7 @@ all: touch compile_O2_a compile_O1_a compile_O2_b compile_O1_b link remove
 compile_O2_a: $(SOURCES_O2_a)
 compile_O2_b: $(SOURCES_O2_b)
 $(SOURCES_O2_a) $(SOURCES_O2_b): %.f90: %.o
-	$(COMPILER) $@ -o $< $(OMP_FLAG) $(COMPILATION_FLAGS_O2) -c
+	$(COMPILER) $@ -o $< $(OMP_FLAG) $(COMPILATION_FLAGS_O2) $(COMPILATION_FLAG_IPO) -c
 compile_O1_a: $(SOURCES_O1_a)
 compile_O1_b: $(SOURCES_O1_b)
 $(SOURCES_O1_a) $(SOURCES_O1_b): %.f90: %.o

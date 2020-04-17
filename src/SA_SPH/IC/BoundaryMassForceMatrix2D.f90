@@ -3,9 +3,9 @@
 ! Computational Fluid Dynamics code).
 ! Copyright 2005-2020 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
-!
+
 ! SPHERA authors and email contact are provided on SPHERA documentation.
-!
+
 ! This file is part of SPHERA v.9.0.0
 ! SPHERA v.9.0.0 is free software: you can redistribute it and/or modify
 ! it under the terms of the GNU General Public License as published by
@@ -19,21 +19,24 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: CompleteBoundaries3D                                  
-! Description: (Di Monaco et al., 2011, EACFM)                        
+! Program unit: BoundaryMassForceMatrix2D                                
+! Description: Generation of the generalized boundary mass force matrix RN, on 
+!              the base of the cosine matrix T and the parameter Fi. (Di Monaco 
+!              et al., 2011, EACFM)                        
 !-------------------------------------------------------------------------------
-subroutine CompleteBoundaries3D
+subroutine BoundaryMassForceMatrix2D(FiS,FiN,TT,RN) 
 !------------------------
 ! Modules
 !------------------------
 use Static_allocation_module
 use Hybrid_allocation_module
-use Dynamic_allocation_module
 !------------------------
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: Kf,Nt,Nf
+double precision,intent(in) :: FiS,FiN 
+double precision,dimension(1:SPACEDIM,1:SPACEDIM),intent(in) :: TT
+double precision,dimension(1:SPACEDIM,1:SPACEDIM),intent(inout) :: RN
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -43,29 +46,15 @@ integer(4) :: Kf,Nt,Nf
 !------------------------
 ! Initializations
 !------------------------
-Kf = 0
-BFaceList(1:NumFacce) = 0
 !------------------------
 ! Statements
 !------------------------
-do Nt=1,NumTratti
-   Tratto(Nt)%inivertex = 0
-   Tratto(Nt)%numvertices = 0
-   do Nf=1,NumFacce
-      if (BoundaryFace(Nf)%stretch==Nt) then
-         Kf = Kf + 1
-         if (Tratto(Nt)%iniface==0) then 
-! To store the initial face index
-            Tratto(Nt)%iniface = Kf
-         endif
-         BFaceList(Kf) = Nf
-         Tratto(Nt)%numvertices = Tratto(Nt)%numvertices + 1
-      endif
-   enddo
-enddo
+RN(1,1) = FiS * TT(1,1) * TT(1,1) + FiN * TT(3,1) * TT(3,1)
+RN(1,3) = (FiS - FiN) * TT(1,1) * TT(3,1) 
+RN(3,1) = RN(1,3)         
+RN(3,3) = FiS * TT(3,1) * TT(3,1) + FiN * TT(1,1) * TT(1,1)
 !------------------------
 ! Deallocations
 !------------------------
 return
-end subroutine CompleteBoundaries3D
-
+end subroutine BoundaryMassForceMatrix2D

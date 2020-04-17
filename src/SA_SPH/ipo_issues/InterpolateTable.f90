@@ -19,31 +19,32 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: WIntegr                                          
-! Description: Computing the definite integral  
-!2h
-!S W(r,h)rdr
-!ri
-!               (Di Monaco et al., 2011, EACFM)                       
+! Program unit: InterpolateTable                                       
+! Description: It interpolates values in the array "Table()" with "nrows" rows
+!              and "ncols" columns. Independent variables are in column 0 of 
+!              Table():
+!                 nicols: number of columns of dependent variables to be
+!                         interpolated
+!                 icol(): list of columns of dependent variables to be 
+!                         interpolated
+!                 ivalue(): list of the "nicols" interpolated values 
+!               (Di Monaco et al., 2011, EACFM)                        
 !-------------------------------------------------------------------------------
-double precision function WIntegr(ri,h) 
+subroutine InterpolateTable(xval,nicols,icol,ivalue)
 !------------------------
 ! Modules
 !------------------------
 use Static_allocation_module
-use Hybrid_allocation_module
 !------------------------
 ! Declarations
 !------------------------
 implicit none
-double precision,intent(IN) :: ri,h
-double precision,parameter :: a =  0.5d0
-double precision,parameter :: a2 = -0.375d0
-double precision,parameter :: a3 =  0.15d0
-double precision,parameter :: aa = -0.125d0
-double precision,parameter :: aa1 =  0.05d0
-double precision,parameter :: b =  0.35d0
-double precision :: WIntegr1,WIntegr2,ro,ro2,ro3,q1,q2,q4
+integer(4),intent(in) :: nicols
+double precision,intent(in) :: xval
+integer(4),dimension(1:nicols),intent(in) :: icol
+double precision,dimension(1:nicols),intent(out) :: ivalue
+integer(4) :: nr0,nc,ic,nr1
+double precision :: xval0,csi,deltaX
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -53,27 +54,33 @@ double precision :: WIntegr1,WIntegr2,ro,ro2,ro3,q1,q2,q4
 !------------------------
 ! Initializations
 !------------------------
-! KERNELCONST2D = 0.454728408833987d0 =10/(7*pigreco), as defined in the modules
-ro = ri / h
+deltaX = ktdelta
+xval0 = kerneltab(0,0)
+nr0 = int((xval - xval0) / deltaX)
 !------------------------
 ! Statements
 !------------------------
-if ((zero<=ro).and.(ro<one)) then
-   ro2 = ro * ro
-   ro3 = ro2 * ro
-   WIntegr1 = (a + a2 * ro2 + a3 * ro3) * ro2
-   WIntegr = KERNELCONST2D * (b - WIntegr1)
-   elseif ((one<=ro).and.(ro<two)) then
-      q1 = two - ro
-      q2 = q1 * q1
-      q4 = q2 * q2
-      WIntegr2 = (aa + aa1 * q1) * q4
-      WIntegr = -KERNELCONST2D * WIntegr2
+if (nr0<=0) then
+   do ic=1,nicols
+      nc = icol(ic)
+      ivalue(ic) = kerneltab(0,nc)
+   enddo
+   elseif (nr0>=ktrows) then
+      do ic=1,nicols
+         nc = icol(ic)
+         ivalue(ic) = kerneltab(ktrows,nc)
+      enddo
       else
-         WIntegr = zero
+         nr1 = nr0 + 1
+         csi = (xval - kerneltab(nr0,0)) / deltaX
+         do ic=1,nicols
+            nc = icol(ic)
+            ivalue(ic) = kerneltab(nr0,nc) + csi * (kerneltab(nr1,nc) -        &
+                         kerneltab(nr0,nc))
+         enddo
 endif
 !------------------------
 ! Deallocations
 !------------------------
 return
-end function WIntegr
+end subroutine InterpolateTable

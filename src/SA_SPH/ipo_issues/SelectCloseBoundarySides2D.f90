@@ -23,7 +23,7 @@
 ! Description:  Selecting among the close boundary sides, those that really give
 !               contribution to the equations of particle 'npi'. It returns:
 !                  IntNcbs: number of close boundary sides, which give 
-!                           contribution (= 0, 1, 2)
+!                           contribution (=0,1,2)
 !                  Intboside(1:IntNcbs): list of close boundary sides, which 
 !                                        give contribution
 !                  IntLocXY(1:PLANEDIM,1:Ncbs): local coordinates of particle np
@@ -32,7 +32,7 @@
 !               (Di Monaco et al., 2011, EACFM)           
 !-------------------------------------------------------------------------------
 subroutine SelectCloseBoundarySides2D(npi,Ncbs,Cloboside,LocXY,IntNcbs,        &
-   Intboside,IntLocXY)
+                                      Intboside,IntLocXY)
 !------------------------
 ! Modules
 !------------------------

@@ -282,7 +282,7 @@ do icbs=1,IntNcbs
    endif
 enddo
 do i=1,PLANEDIM
-   tpres(acix(i)) = - RHS(i) 
+   tpres(acix(i)) = - RHS(i)
    tdiss(acix(i)) = tdiss(acix(i)) - ViscoMon(i)
    tvisc(acix(i)) = tvisc(acix(i)) - ViscoShear(i)
 enddo

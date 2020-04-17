@@ -107,7 +107,7 @@ do nt=1,NumTratti
             FiN = zero
       endselect                                   
       call BoundaryReflectionMatrix2D(TT,RR,PsiS,PsiN)
-      call BoundaryMassForceMatrix2D(TT,RRN,FiS,FiN) 
+      call BoundaryMassForceMatrix2D(FiS,FiN,TT,RRN) 
       BoundarySide(NumBS)%R = RR
       BoundarySide(NumBS)%RN = RRN
       if (Tratto(nt)%tipo=="tapi") then

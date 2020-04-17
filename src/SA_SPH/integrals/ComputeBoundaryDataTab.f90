@@ -121,7 +121,7 @@ if (ncord==2) then
                   Colmn(3) = 5
                   ypi = IntLocXY(2,icbs)
                   deltai = ypi / Domain%h
-                  call InterpolateBoundaryIntegrals2D(deltai,Ncols,Colmn,Func)
+                  call InterpolateBoundaryIntegrals2D(Ncols,Colmn,deltai,Func)
                   IntWd1s0 = Func(1) / squareh
                   IntWd3s0 = Func(2) / squareh
                   IntWd1s2 = Func(3) / squareh
@@ -143,7 +143,7 @@ if (ncord==2) then
                      Colmn(5) = 5
                      ypi = IntLocXY(2, icbs)
                      deltai = ypi / Domain%h
-                     call InterpolateBoundaryIntegrals2D(deltai,Ncols,Colmn,   &
+                     call InterpolateBoundaryIntegrals2D(Ncols,Colmn,deltai,   &
                         Func)
                      IntWdS = Func(1) / Domain%h
                      IntWdV = Func(2)

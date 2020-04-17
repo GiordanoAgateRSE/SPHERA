@@ -19,30 +19,21 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: InterpolateTable                                       
-! Description: It interpolates values in the array "Table()" with "nrows" rows
-!              and "ncols" columns. Independent variables are in column 0 of 
-!              Table():
-!                 nicols: number of columns of dependent variables to be
-!                         interpolated
-!                 icol(): list of columns of dependent variables to be 
-!                         interpolated
-!                 ivalue(): list of the "nicols" interpolated values 
-!               (Di Monaco et al., 2011, EACFM)                        
+! Program unit: CompleteBoundaries3D                                  
+! Description: (Di Monaco et al., 2011, EACFM)                        
 !-------------------------------------------------------------------------------
-subroutine InterpolateTable(xval,nicols,icol,ivalue)
+subroutine CompleteBoundaries3D
 !------------------------
 ! Modules
 !------------------------
 use Static_allocation_module
+use Hybrid_allocation_module
+use Dynamic_allocation_module
 !------------------------
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: nicols,nr0,nc,ic,nr1
-double precision :: xval,xval0,csi,deltaX
-integer(4),dimension(1:nicols) :: icol
-double precision,dimension(1:nicols) :: ivalue
+integer(4) :: Kf,Nt,Nf
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -52,33 +43,28 @@ double precision,dimension(1:nicols) :: ivalue
 !------------------------
 ! Initializations
 !------------------------
-deltaX = ktdelta
-xval0 = kerneltab(0,0)
-nr0 = int((xval - xval0) / deltaX)
+Kf = 0
+BFaceList(1:NumFacce) = 0
 !------------------------
 ! Statements
 !------------------------
-if (nr0<=0) then
-   do ic=1,nicols
-      nc = icol(ic)
-      ivalue(ic) = kerneltab(0,nc)
+do Nt=1,NumTratti
+   Tratto(Nt)%inivertex = 0
+   Tratto(Nt)%numvertices = 0
+   do Nf=1,NumFacce
+      if (BoundaryFace(Nf)%stretch==Nt) then
+         Kf = Kf + 1
+         if (Tratto(Nt)%iniface==0) then 
+! To store the initial face index
+            Tratto(Nt)%iniface = Kf
+         endif
+         BFaceList(Kf) = Nf
+         Tratto(Nt)%numvertices = Tratto(Nt)%numvertices + 1
+      endif
    enddo
-   elseif (nr0>=ktrows) then
-      do ic=1,nicols
-         nc = icol(ic)
-         ivalue(ic) = kerneltab(ktrows,nc)
-      enddo
-      else
-         nr1 = nr0 + 1
-         csi = (xval - kerneltab(nr0,0)) / deltaX
-         do ic=1,nicols
-            nc = icol(ic)
-            ivalue(ic) = kerneltab(nr0,nc) + csi * (kerneltab(nr1,nc) -        &
-                         kerneltab(nr0,nc))
-         enddo
-endif
+enddo
 !------------------------
 ! Deallocations
 !------------------------
 return
-end subroutine InterpolateTable
+end subroutine CompleteBoundaries3D

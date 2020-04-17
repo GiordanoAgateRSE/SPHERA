@@ -306,7 +306,7 @@ ___ ___ ___ ___ ___
 !-------------------------------------------------------------------------------
 ![?] enddo NUMBER_OF_RECORDS_PARTICLE_KINEMATICS
 !-------------------------------------------------------------------------------
-![?] endif (motion_type=law
+![?] endif (motion_type=law)
 ![?] <IC_pressure_type>
 !    =pa (homogeneous conditions)
 !    =qp (hydrostatic conditions with equivalent free surface level as input)
@@ -655,7 +655,7 @@ ___ ___ ___
 ![?] <dt_out>: writing time step
 ![?] <erosion_convergence_criterion>: convergence criterion for the erosion 
 !    scheme
-![?] <n_max_iterations>: maximum number of iterations for the erosion criterion)
+![?] <n_max_iterations>: maximum number of iterations for the erosion criterion
 !-------------------------------------------------------------------------------
 ![*] <velocity_fixed_bed> <erosion_flag>
 ![*] <deposition_at_frontiers> <Gamma_slope_flag>
@@ -782,10 +782,10 @@ ___ ___ ___
 !-------------------------------------------------------------------------------
 ![?] endif ((fluid_type==granular).and.(KTGF_config==1))
 ![?] if ((fluid_type==granular).and.(KTGF_config>1)) then
-![?] <max_step_still>: number of time steps during which mixture particles are 
-!    kept still)
 ![?] <roughness_coefficient>: roughness coefficient for the 2D erosion criterion
 !    (Manenti et al., 2012)            
+![?] <max_step_still>: number of time steps during which mixture particles are 
+!    kept still)
 !-------------------------------------------------------------------------------
 ![*] <roughness_coefficient> <d_50>
 ![*] <max_step_still>
