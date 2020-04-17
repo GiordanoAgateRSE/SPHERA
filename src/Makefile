@@ -61,8 +61,8 @@ $(wildcard ./Pre_processing/*.f90) \
 $(wildcard ./SA_SPH/BE_mass/*.f90) \
 $(wildcard ./SA_SPH/BE_momentum/*.f90) \
 $(wildcard ./SA_SPH/IC/*.f90) \
-$(wildcard ./SA_SPH/integrals/*.f90) \
-$(wildcard ./SA_SPH/ipo_issues/*.f90) \
+$(wildcard ./SA_SPH/integrals_IC/*.f90) \
+$(wildcard ./SA_SPH/integrals_time_steps/*.f90) \
 $(wildcard ./SA_SPH/Neighbouring_Search/*.f90) \
 $(wildcard ./SA_SPH/Time_integration/*.f90) \
 $(wildcard ./Strings/*.f90) \
