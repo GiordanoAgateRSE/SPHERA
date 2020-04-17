@@ -39,8 +39,8 @@ use I_O_file_module
 implicit none
 double precision,parameter :: pibmink = 10.d0
 double precision,parameter :: eps = 0.1d0
-integer(4),intent(IN) :: npi,IntNcbs
-double precision,intent(INOUT),dimension(1:SPACEDIM) :: tpres,tdiss,tvisc
+integer(4),intent(in) :: npi,IntNcbs
+double precision,intent(inout),dimension(1:SPACEDIM) :: tpres,tdiss,tvisc
 integer(4) :: imed,i,j,icbs,ibdt,ibdp,iside,sidestr
 double precision :: IntWds,IntWdV,cinvisci,Monvisc,roi,ro0,celeri,pressi      
 double precision :: alfaMon,xpi,ypi,SVforce,SVcoeff,TN,ypimin,ypigradN 
@@ -133,7 +133,7 @@ do icbs=1,IntNcbs
       endif
       PressB = pressib - ro0 * GravN * distpi 
       QiiIntWdS = IntWdS * (pressib + PressB) / roi
-! Sub-critical flow   
+! Sub-critical flow
       elseif (strtype=="leve") then   
          Qsi = pressi / roi
          level = Tratto(sidestr)%ShearCoeff  
@@ -188,7 +188,7 @@ do icbs=1,IntNcbs
                   pg(npi)%velass(1) = Tratto(sidestr)%NormVelocity * nnlocal(1)
                   pg(npi)%velass(2) = zero            
                   pg(npi)%velass(3) = Tratto(sidestr)%NormVelocity * nnlocal(2)
-               endif        
+               endif
                return
                elseif (strtype=="sour") then
                   if (xpi>=zero.AND.xpi<=RifBoundarySide%length) then
@@ -209,7 +209,7 @@ do icbs=1,IntNcbs
                      velix = pg(npi)%vel(1)
                      veliz = pg(npi)%vel(3)         
                      veliq = velix * velix + veliz * veliz  
-                     hcrit = veliq / Abs(Domain%grav(3))        
+                     hcrit = veliq / abs(Domain%grav(3))        
                      hcritmin = Tratto(sidestr)%ShearCoeff       
                      if (hcritmin<Domain%h) hcritmin = Domain%h       
                      if (hcrit<hcritmin) hcrit = hcritmin          

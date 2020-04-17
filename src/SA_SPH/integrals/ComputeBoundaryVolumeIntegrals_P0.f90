@@ -34,12 +34,12 @@ use Dynamic_allocation_module
 ! Declarations
 !------------------------
 implicit none
-integer(4),intent(IN) :: icbf
-integer(4),intent(IN),dimension(1:Domain%MAXCLOSEBOUNDFACES) :: Clobface
-double precision,intent(IN),dimension(1:SPACEDIM,1:Domain%MAXCLOSEBOUNDFACES) :: LocX
-double precision,intent(OUT) :: IntWdV,IntdWrm1dV,IntGWZrm1dV
-double precision,intent(OUT),dimension(1:SPACEDIM) :: IntGWdV
-double precision,intent(OUT),dimension(1:SPACEDIM,1:SPACEDIM) :: IntGWrRdV
+integer(4),intent(in) :: icbf
+integer(4),intent(in),dimension(1:Domain%MAXCLOSEBOUNDFACES) :: Clobface
+double precision,intent(in),dimension(1:SPACEDIM,1:Domain%MAXCLOSEBOUNDFACES) :: LocX
+double precision,intent(out) :: IntWdV,IntdWrm1dV,IntGWZrm1dV
+double precision,intent(out),dimension(1:SPACEDIM) :: IntGWdV
+double precision,intent(out),dimension(1:SPACEDIM,1:SPACEDIM) :: IntGWrRdV
 integer(4),parameter :: nicols = 4
 double precision,parameter :: eps = 0.05d0
 integer(4) :: SD,sdj,ipk,fkod,iface

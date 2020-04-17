@@ -26,7 +26,7 @@
 !               in turn, in column 0. It returns:
 !                  Func(nc), nc=1, Ncols : values interpolated in columns 
 !                                          Col(nc), nc=1, Ncols
-!               (Di Monaco et al., 2011, EACFM)                        
+!               (Di Monaco et al., 2011, EACFM)
 !-------------------------------------------------------------------------------
 subroutine InterpolateBoundaryIntegrals2D(Ncols,Colmn,xx,Func)
 !------------------------
@@ -43,7 +43,7 @@ integer(4),intent(in) :: Ncols
 integer(4),dimension(1:NUMCOLS_BIT),intent(in) :: Colmn
 double precision,intent(inout) :: xx
 double precision,dimension(1:NUMCOLS_BIT),intent(out) :: Func
-integer(4) :: nc,i,j
+integer(4) :: nc,ii,jj
 double precision :: xi,fi,fip1
 !------------------------
 ! Explicit interfaces
@@ -58,12 +58,12 @@ double precision :: xi,fi,fip1
 ! Statements
 !------------------------
 if (xx<BoundIntegralTab2D(1,0)) xx = BoundIntegralTab2D(1,0)
-i = int((xx - BoundIntegralTab2D(1,0)) / DELTAX_BIT) + 1
-xi = BoundIntegralTab2D(i,0)
+ii = int((xx - BoundIntegralTab2D(1,0)) / DELTAX_BIT) + 1
+xi = BoundIntegralTab2D(ii,0)
 do nc=1,Ncols
-   j = Colmn(nc)
-   fi = BoundIntegralTab2D(i,j)
-   fip1 = BoundIntegralTab2D(i+1,j)
+   jj = Colmn(nc)
+   fi = BoundIntegralTab2D(ii,jj)
+   fip1 = BoundIntegralTab2D(ii+1,jj)
    Func(nc) = fi + (fip1 - fi) * (xx - xi) / DELTAX_BIT
 enddo
 !------------------------

@@ -44,8 +44,8 @@ use Dynamic_allocation_module
 ! Declarations
 !------------------------
 implicit none
-integer(4),intent(IN) :: npi,Ncbs
-double precision,intent(INOUT),dimension(1:SPACEDIM) :: BoundReaction
+integer(4),intent(in) :: npi,Ncbs
+double precision,intent(inout),dimension(1:SPACEDIM) :: BoundReaction
 double precision,parameter :: ymincoeff = 0.25d0
 double precision,parameter :: reafactor = 1.d0
 integer(4) :: sd,icbs,iside,nt,ibdt,ibdp,mate
@@ -59,6 +59,7 @@ double precision :: xpi,ypi,ypimin,celer02,vin,normreact
 !------------------------
 ! Initializations
 !------------------------
+BoundReaction(:) = zero
 mate = pg(npi)%imed
 ypimin = ymincoeff * Domain%dx
 celer02 = Med(mate)%eps / Med(mate)%den0

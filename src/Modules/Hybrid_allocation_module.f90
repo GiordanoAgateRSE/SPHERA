@@ -594,7 +594,7 @@ type TyBoundarySide
    double precision :: angle
    double precision :: velocity(1:SPACEDIM)
 ! Direction cosines of the local reference system of the boundary (the last one
-! is the normal)   
+! is the normal) 
    double precision :: T(1:SPACEDIM,1:SPACEDIM)
    double precision :: R(1:SPACEDIM,1:SPACEDIM)      
    double precision :: RN(1:SPACEDIM,1:SPACEDIM)

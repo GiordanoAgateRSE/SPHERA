@@ -63,7 +63,7 @@ logical,external :: IsPointInternal
 !------------------------
 ! Initializations
 !------------------------
-BoundReaction = zero
+BoundReaction(:) = zero
 mate = pg(npi)%imed
 zimin = zmincoeff * Domain%dx
 celer02 = Med(mate)%eps / Med(mate)%den0
@@ -145,7 +145,7 @@ do ne=1,NumBEdges
             vin = vin + pg(npi)%var(sd) * QPcosdir(sd)
          enddo
          if (vin<zero) then
-            normreact = -reafactor * celer02 * DLog(zi / zimin) / zimin
+            normreact = -reafactor * celer02 * dlog(zi / zimin) / zimin
             BoundReaction(:) = BoundReaction(:) +  normreact * QPcosdir(:)
          endif
       endif
@@ -156,4 +156,3 @@ enddo
 !------------------------
 return 
 end subroutine AddElasticBoundaryReaction_3D
-

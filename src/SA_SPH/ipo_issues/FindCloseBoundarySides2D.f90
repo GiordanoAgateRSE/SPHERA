@@ -86,8 +86,8 @@ side_loop: do isi=1,NumBSides
       do sd=1,PLANEDIM
          P1(sd) = Vertice(acix(sd),v1)
          P1P(sd) = Plocal(sd) - P1(sd)
-         sss(sd) = BoundarySide(isi)%T(acix(sd), acix(1))
-         nnn(sd) = BoundarySide(isi)%T(acix(sd), acix(2))
+         sss(sd) = BoundarySide(isi)%T(acix(sd),acix(1))
+         nnn(sd) = BoundarySide(isi)%T(acix(sd),acix(2))
       enddo
 ! Particle coordinates "xp" and "yp" in the side local reference 
 ! system, where x-axis is aligned with the side segment and y-axis is normal 
