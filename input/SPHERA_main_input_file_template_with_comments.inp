@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 ! SPHERA v.9.0.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
-! Copyright 2005-2019 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! Copyright 2005-2020 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided in SPHERA documentation.
@@ -841,7 +841,7 @@ ___ ___ ___ ___ ___ ___ ___ ___
 ![?] if (n_bodies>0) then
 ![?] <ID_first_body>
 !    =1
-![?] <n_elem>: number of elements of the body)
+![?] <n_elem>: number of elements of the body
 ![?] <pos_CM>: position of the centre of mass (Initial Conditions)
 ![?] <Ic_flag>
 !    =0 (mass moment of inertia is computed)
@@ -916,7 +916,7 @@ ___ ___ ___ ___ ___ ___ ___
 !-------------------------------------------------------------------------------
 ![?] NUMBER_OF_BODY_ELEMENTS: do i=1,n_body_elements
 !-------------------------------------------------------------------------------
-![?] <element_ID> (ID of the current element of the body)
+![?] <element_ID>: ID of the current element of the body
 ![?] <L_x>,<L_y>,<L_z>: side lengths of the element
 ![?] <pos_CM_elem>: position of the centre of mass of the element at "t=0"
 ![?] Rotation of the body element with respect to the reference system at 
@@ -1014,7 +1014,7 @@ ___ ___ ___ ___ ___ ___
 !    elements, thus, it is sufficient to overestimate this number as the number 
 !    of faces times the number of the positioning grid cells, further, reducing 
 !    "GCBFVecDim" does not imply any appreciable variation in the computational
-!    time).
+!    time). The positioning grid is made of cubes whose side length is 2h. 
 ![?] <density_thresholds_flag>
 !    =0 (default value, no density limiters)
 !    =1 (density limiters for debug)
@@ -1279,7 +1279,7 @@ ___ ___
 !    =1 (high-voltage)
 !    =2 (medium-voltage)
 !    =3 (low-voltage)
-![?] <n_vertices>: number of vertices describing the substation)
+![?] <n_vertices>: number of vertices describing the substation
 !    =3
 !    =4
 !    =5
