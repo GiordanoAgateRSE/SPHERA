@@ -32,6 +32,7 @@
 !              point, necessary for integrations) is stored. BITcols = 4.
 !              (Di Monaco et al., 2011, EACFM)                        
 !-------------------------------------------------------------------------------
+#ifdef SPACE_3D
 subroutine ComputeBoundaryIntegralTab
 !------------------------
 ! Modules
@@ -88,3 +89,4 @@ enddo
 !------------------------
 return
 end subroutine ComputeBoundaryIntegralTab
+#endif

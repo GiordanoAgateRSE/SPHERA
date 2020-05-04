@@ -52,40 +52,60 @@ restartcode = 0
 !------------------------
 ! Statements
 !------------------------
-! Post-processing for first (and last) step 
+! Post-processing for first (and last) step
 if (index(str,'inizio')/=0) then
    nrecords = 5
    if (NumVertici>0) nrecords = nrecords + 1
-   if (NumFacce>0) nrecords = nrecords + 1
-   if (NumFacce>0) nrecords = nrecords + 1
+#ifdef SPACE_3D
+      if (NumFacce>0) nrecords = nrecords + 2
+#endif
    if (NumTratti>0) nrecords = nrecords + 1
    if (NPartZone>0) nrecords = nrecords + 1
    if (NumBVertices>0) nrecords = nrecords + 1
-   if (NumBSides>0) nrecords = nrecords + 1
-   if ((Domain%tipo=="semi").and.(ncord==3)) then
-      if ((allocated(GCBFVector)).and.(GCBFVecDim>0)) nrecords = nrecords + 1
-      if ((allocated(GCBFPointers)).and.(Grid%nmax>1)) nrecords = nrecords + 1
-   endif
+#ifdef SPACE_2D
+      if (NumBSides>0) nrecords = nrecords + 1
+#endif
+#ifdef SPACE_3D
+      if (Domain%tipo=="semi") then
+         if ((allocated(GCBFVector)).and.(GCBFVecDim>0)) nrecords = nrecords + 1
+         if ((allocated(GCBFPointers)).and.(Grid%nmax>1)) nrecords = nrecords  &
+                                                                     + 1
+      endif
+#endif
    write(nres) version,nrecords
+#ifdef SPACE_3D
    write(nres) ncord,Nag,NMedium,NPartZone,NumVertici,NumFacce,NumTratti,      &   
-      NumBVertices,NumBSides,GCBFVecDim,Grid%nmax,npointst,NPoints,NPointsl,   &
+      NumBVertices,GCBFVecDim,Grid%nmax,npointst,NPoints,NPointsl,             &
       NPointse,NLines,doubleh
+#elif defined SPACE_2D
+   write(nres) ncord,Nag,NMedium,NPartZone,NumVertici,NumTratti,               &   
+      NumBVertices,NumBSides,Grid%nmax,npointst,NPoints,NPointsl,              &
+      NPointse,NLines,doubleh
+#endif
    write(nres) domain
    write(nres) Grid
    write(nres) Med(1:NMedium)
    if (NumVertici>0) write(nres) Vertice(1:SPACEDIM,1:NumVertici)
-   if (NumFacce>0) write(nres) BoundaryFace(1:NumFacce)
-   if (NumFacce>0) write(nres) BFaceList(1:NumFacce)
+#ifdef SPACE_3D
+   if (NumFacce>0) then
+      write(nres) BoundaryFace(1:NumFacce)
+      write(nres) BFaceList(1:NumFacce)
+   endif
+#endif
    if (NumTratti>0) write(nres) Tratto(1:NumTratti)
    if (NPartZone>0) write(nres) Partz(1:NPartZone)
    if (NumBVertices>0) write(nres) BoundaryVertex(1:NumBVertices)
+#ifdef SPACE_2D
    if (NumBSides>0) write(nres) BoundarySide(1:NumBSides)
-   if ((Domain%tipo=="semi").and.(ncord==3)) then
-      if ((allocated(GCBFVector)).and.(GCBFVecDim>0)) write(nres)              &
-         GCBFVector(1:GCBFVecDim)
-      if ((allocated(GCBFPointers)).and.(Grid%nmax>1)) write(nres)             &
-         GCBFPointers(1:Grid%nmax,1:2)
-   endif
+#endif
+#ifdef SPACE_3D
+      if (Domain%tipo=="semi") then
+         if ((allocated(GCBFVector)).and.(GCBFVecDim>0)) write(nres)           &
+            GCBFVector(1:GCBFVecDim)
+         if ((allocated(GCBFPointers)).and.(Grid%nmax>1)) write(nres)          &
+            GCBFPointers(1:Grid%nmax,1:2)
+      endif
+#endif
    flush(nres)
    write(ulog,'(a)')                                                           &
 " ----------------------------------------------------------------------------"
@@ -134,9 +154,10 @@ if ((it_rest==it).or.(index(str,'inizio')/=0).or.(index(str,'fine')/=0)) then
    enddo
    if (allocated(bp_arr)) write(nres) bp_arr(1:n_body_part)
    if (allocated(surf_body_part)) write(nres) surf_body_part(1:n_surf_body_part)
-   if (allocated(Z_fluid_max)) write(nres)                                     &
-      Z_fluid_max(1:Grid%ncd(1)*Grid%ncd(2),1:2)
-   if (allocated(q_max)) write(nres) q_max(1:size(q_max))
+#ifdef SPACE_3D
+      if (allocated(Z_fluid_max)) write(nres)                                  &
+         Z_fluid_max(1:Grid%ncd(1)*Grid%ncd(2),1:2)
+      if (allocated(q_max)) write(nres) q_max(1:size(q_max))
    if (allocated(substations%sub)) then
       write(nres) substations%sub(1:substations%n_sub)%POS_fsum(1),            &
          substations%sub(1:substations%n_sub)%POS_fsum(2)
@@ -145,6 +166,7 @@ if ((it_rest==it).or.(index(str,'inizio')/=0).or.(index(str,'fine')/=0)) then
       write(nres) substations%sub(1:substations%n_sub)%EOT(1),                 &
          substations%sub(1:substations%n_sub)%EOT(2)
    endif
+#endif
    if (allocated(Granular_flows_options%minimum_saturation_flag)) write(nres)  &
       Granular_flows_options%minimum_saturation_flag(1:Grid%ncd(1),            &
       1:Grid%ncd(2))
@@ -166,8 +188,8 @@ if ((it_rest==it).or.(index(str,'inizio')/=0).or.(index(str,'fine')/=0)) then
       write(nres) it,simulation_time,dt,nag,ncord,restartcode
       write(nres) pg(1:nag)%coord(1),pg(1:nag)%coord(2),pg(1:nag)%coord(3),    &
          pg(1:nag)%vel(1),pg(1:nag)%vel(2),pg(1:nag)%vel(3),pg(1:nag)%pres,    &
-         pg(1:nag)%dens,pg(1:nag)%mass,pg(1:nag)%kin_visc,pg(1:nag)%VolFra,    &
-         pg(1:nag)%imed,pg(1:nag)%icol
+         pg(1:nag)%dens,pg(1:nag)%mass,pg(1:nag)%kin_visc,pg(1:nag)%imed,      &
+         pg(1:nag)%icol
       flush(nres)
       if (index(str,'inizio')==0) then
          write(ulog,'(a)')                                                     &

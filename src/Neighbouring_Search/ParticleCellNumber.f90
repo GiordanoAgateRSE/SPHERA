@@ -54,13 +54,13 @@ xp = coord(1) - Grid%extr(1,1)
 yp = coord(2) - Grid%extr(2,1)
 zp = coord(3) - Grid%extr(3,1)
 i = ceiling(xp / Grid%dcd(1))
-k = ceiling(zp / Grid%dcd(3)) 
-if (ncord==3) then
+k = ceiling(zp / Grid%dcd(3))
+#ifdef SPACE_3D
    j = ceiling(yp / Grid%dcd(2))
-   else
+#elif defined SPACE_2D
       j = 1
-end if
-ParticleCellNumber = CellNumber(i, j, k)
+#endif
+ParticleCellNumber = CellNumber(i,j,k)
 !------------------------
 ! Deallocations
 !------------------------

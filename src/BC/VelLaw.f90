@@ -32,9 +32,9 @@ use Hybrid_allocation_module
 ! Declarations
 !------------------------
 implicit none
-integer(4),intent(IN) :: np
-double precision,intent(IN),dimension(0:3,MAXPOINTSVLAW) :: vlaw
-double precision,intent(OUT),dimension(3) :: vel
+integer(4),intent(in) :: np
+double precision,intent(in),dimension(0:3,MAXPOINTSVLAW) :: vlaw
+double precision,intent(out),dimension(3) :: vel
 integer(4) :: n
 double precision :: fra
 !------------------------
@@ -62,4 +62,3 @@ vel(1:3) = vlaw(1:3,np)
 !------------------------
 return
 end subroutine VelLaw
-

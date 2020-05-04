@@ -32,6 +32,7 @@
 !              npi, and cancels the repeated ones.
 !              (Di Monaco et al., 2011, EACFM)                        
 !-------------------------------------------------------------------------------
+#ifdef SPACE_3D
 subroutine FindCloseBoundaryFaces3D(npi,Ncbf,Clobface,LocX,Nfzn)
 !------------------------
 ! Modules
@@ -45,10 +46,10 @@ use I_O_diagnostic_module
 ! Declarations
 !------------------------
 implicit none
-integer(4),intent(IN) :: npi
-integer(4),intent(INOUT) :: Ncbf, Nfzn
-integer(4),intent(INOUT),dimension(1:Domain%MAXCLOSEBOUNDFACES) :: Clobface
-double precision,intent(INOUT),dimension(1:SPACEDIM,1:Domain%MAXCLOSEBOUNDFACES) :: LocX
+integer(4),intent(in) :: npi
+integer(4),intent(inout) :: Ncbf, Nfzn
+integer(4),intent(inout),dimension(1:Domain%MAXCLOSEBOUNDFACES) :: Clobface
+double precision,intent(inout),dimension(1:SPACEDIM,1:Domain%MAXCLOSEBOUNDFACES) :: LocX
 logical :: Thereis
 integer(4) :: nc,ic,jc,kc,i,j,k,sdi,sdj,nodes,irestocell,fkod  
 integer(4) :: flpini,flp,flpfin,nfpercell,intbf,icbf,nbface,stretch
@@ -190,4 +191,4 @@ endif
 !------------------------
 return
 end subroutine FindCloseBoundaryFaces3D
-
+#endif

@@ -37,11 +37,11 @@ integer :: count_i,counts_per_second,count_maximum
 integer(4) :: i,hours,days,minutes,seconds,ishost,string_index,string_size
 integer(4), dimension(8) :: dat_array
 double precision :: time_increment
-character(LEN=256) :: exe_name,string_aux 
-character(LEN=8) :: dat
-character(LEN=5) :: zone
-character(LEN=10) :: ct
-character(LEN=3),dimension(12) :: mesi
+character(len=256) :: exe_name,string_aux 
+character(len=8) :: dat
+character(len=5) :: zone
+character(len=10) :: ct
+character(len=3),dimension(12) :: mesi
 double precision,external :: omp_get_wtime
 data mesi/"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov",   &
    "Dec"/
@@ -76,9 +76,9 @@ select case (iset)
       read (ct(3:4),'(i2)') itime_struct%imin
       read (ct(5:6),'(i2)') itime_struct%isec
 ! Reading the name of SPHERA executable file
-      call getarg (0,exe_name)
+      call getarg(0,exe_name)
       exe_name = adjustl(exe_name)
-      string_index = index(exe_name,"SPHERA_v_")
+      string_index = index(exe_name,"SPHERA_v")
       string_size = len(exe_name)
       string_aux = exe_name(string_index:string_size) 
       exe_name = string_aux
@@ -97,7 +97,7 @@ select case (iset)
       call system_clock(count=count_i,count_rate=counts_per_second,            &
          count_max=count_maximum)
       tot_times(numb_subr,2) = dfloat(count_i) - tot_times(numb_subr,1)
-      if (tot_times(numb_subr,2).lt.0.d0) tot_times(numb_subr,2) =             &
+      if (tot_times(numb_subr,2)<0.d0) tot_times(numb_subr,2) =                &
          tot_times(numb_subr,2) + dfloat(count_maximum)   
       tot_times(numb_subr,2) = tot_times(numb_subr,2)/dfloat(counts_per_second)
       call DATE_AND_TIME(dat,ct,zone,dat_array)

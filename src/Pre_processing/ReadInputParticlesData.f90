@@ -42,7 +42,7 @@ double precision,dimension(0:3,maxpointsvlaw),intent(inout) :: valuev
 character(1),intent(inout) :: bends,slip,comment
 character(2),intent(inout) :: pressu
 character(3),intent(inout) :: move
-character(LEN=lencard),intent(inout) :: ainp
+character(len=lencard),intent(inout) :: ainp
 integer(4) :: ioerr,i,n,icord
 character(100) :: token
 character(6) :: token_color
@@ -62,10 +62,10 @@ character(100),external :: lcase,GetToken
 !------------------------
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 read(ainp,*,iostat=ioerr) Medium
-if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"MEDIUM INDEX",ninp,ulog)) return
+if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"MEDIUM INDEX",ninp,ulog)) return
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 token = GetToken(ainp,1,ioerr)
-if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"COLOURING TYPE",ninp,ulog)) return
+if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"COLOURING TYPE",ninp,ulog)) return
 bends = trim(lcase(token(1:1)))
 token = GetToken(ainp,2,ioerr)
 ! Saving colours 
@@ -73,10 +73,10 @@ token_color(1:2) = token(5:6)
 token_color(3:4) = token(3:4)
 token_color(5:6) = token(1:2) 
 read(token_color,'(Z6)',iostat=ioerr) icolor
-if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"COLOUR",ninp,ulog)) return
+if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"COLOUR",ninp,ulog)) return
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 move = trim(GetToken(ainp,1,ioerr))
-if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"INITIAL MOVE STATUS TYPE",ninp,ulog))&
+if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"INITIAL MOVE STATUS TYPE",ninp,ulog))&
    return
 values3(:) = zero
 slip = " "                             
@@ -87,23 +87,21 @@ select case (lcase(move))
       do n=1,3
          token = GetToken(ainp,(n+1),ioerr)
          read(token,*,iostat=ioerr) values3(n)
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"INITIAL VELOCITY",ninp,ulog)&
+         if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"INITIAL VELOCITY",ninp,ulog)&
             ) return
       enddo
    case ("fix")
       npointv = 1
       valuev = zero
-! NumberEntities(1) is the spatial dimensionality (it is or it will be equal to 
-! the variable "ncord")
-      do n=1,NumberEntities(1)
+      do n=1,ncord
          token = GetToken(ainp,(n+1),ioerr)
          read(token,*,iostat=ioerr) values3(n)
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"INITIAL VELOCITY",ninp,ulog &
+         if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"INITIAL VELOCITY",ninp,ulog &
             )) return
       enddo
 ! No-slip / free-slip
-      token = GetToken(ainp,(NumberEntities(1)+2),ioerr)
-      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"NO_SLIP/FREE_SLIP",ninp,ulog)) &
+      token = GetToken(ainp,(ncord+2),ioerr)
+      if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"NO_SLIP/FREE_SLIP",ninp,ulog)) &
          return
       if (lcase(token(1:7))=="no_slip") then
          slip = "n"
@@ -115,7 +113,7 @@ select case (lcase(move))
                else
                   slip = "?"
                   ioerr= 1
-                  if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                    &
+                  if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                    &
                      "NO_SLIP/FREE_SLIP/CONT_SLIP",ninp,ulog)) return
       endif
    case ("law")
@@ -124,18 +122,18 @@ select case (lcase(move))
       valuev  = zero  
       token = GetToken(ainp,2,ioerr)
       read(token,*,iostat=ioerr) npointv
-      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"POINTS OF VELOCITY LAW",ninp,  &
+      if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"POINTS OF VELOCITY LAW",ninp,  &
          ulog)) return
       slip = "n"
       do i=1,npointv
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"VALUES OF VELOCITY LAW",    &
+         if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"VALUES OF VELOCITY LAW",    &
             ninp,ulog)) return
-         if ((ioerr/=0).or.(ncord<=0)) cycle
-         do n=0,NumberEntities(1)
+         if ((ioerr/=0).or.(input_second_read.eqv..false.)) cycle
+         do n=0,ncord
             icord = icoordp(n,ncord-1)
             token = GetToken(ainp,(n+1),ioerr)
-            if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"VALUES OF VELOCITY LAW", &
+            if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"VALUES OF VELOCITY LAW", &
                ninp,ulog)) return
             read(token,*,iostat=ioerr) valuev(n,i)
          enddo
@@ -147,37 +145,37 @@ select case (lcase(move))
 endselect
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 pressu = trim(GetToken(ainp,1,ioerr))
-if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"INITIAL PRESSURE TYPE",ninp,ulog))   &
+if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"INITIAL PRESSURE TYPE",ninp,ulog))   &
    return
 ! IC uniform pressure ("pa") is assigned 
 if (pressu=="pa") then  
    token = lcase(GetToken(ainp,2,ioerr))
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"PRESSURE VALUES",ninp,ulog)) return
+   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"PRESSURE VALUES",ninp,ulog)) return
    read(token,*,iostat=ioerr) valp
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"PRESSURE VALUES",ninp,ulog)) return
+   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"PRESSURE VALUES",ninp,ulog)) return
 ! IC hydrostatic pressure based on a reference free surface height ("qp")
    elseif (pressu=="qp") then 
       token = lcase(GetToken(ainp,2,ioerr))
-      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"INITIAL PIEZO LINE",ninp,ulog))&
+      if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"INITIAL PIEZO LINE",ninp,ulog))&
          return
       read(token,*,iostat=ioerr) valp
-      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"INITIAL PIEZO LINE",ninp,ulog))&
+      if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"INITIAL PIEZO LINE",ninp,ulog))&
          return
 ! IC hydrostatic pressure based on the maximum level ("pl") of
 ! an assigned fluid 
          elseif (pressu=="pl") then
             token = lcase(GetToken(ainp,2,ioerr))
-            if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"FREE LEVEL LINE",ninp,   &
+            if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"FREE LEVEL LINE",ninp,   &
                ulog)) return
             read(token,*,iostat=ioerr) valp
-            if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"FREE LEVEL LINE",ninp,   &
+            if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"FREE LEVEL LINE",ninp,   &
                ulog)) return
             else
                if (ulog>0) write(ulog,*) "Unknown option: ",trim(ainp)
                stop
 endif
-if (ncord>0) then
-   if ((bends=="b").AND.(icolor>5)) then
+if (input_second_read.eqv..true.) then
+   if ((bends=="b").and.(icolor>5)) then
       icolor = 5
       if (ulog>0) write(ulog,*) "Maximum number of bends is 5!"
    endif

@@ -26,6 +26,7 @@
 !              adjacent boundary side icbs.
 !              (Di Monaco et al., 2011, EACFM)                        
 !-------------------------------------------------------------------------------
+#ifdef SPACE_2D
 subroutine ComputeVolumeIntegral_WdV2D(icbs,Ncbslocal,Cloboside,LocXY,         &
    BoundarySide,xpmin,xpmax,interlen,VIntWdV)
 !------------------------
@@ -41,12 +42,12 @@ use I_O_diagnostic_module
 implicit none
 integer(4),parameter :: Nalfadiv = 10
 double precision,parameter :: eps=0.05d0
-integer(4),intent(IN) :: icbs,Ncbslocal
-double precision,intent(IN) :: xpmin,xpmax,interlen
-integer(4),intent(IN),dimension(1:MAXCLOSEBOUNDSIDES) :: Cloboside
-double precision,intent(IN),dimension(1:PLANEDIM,1:MAXCLOSEBOUNDSIDES) :: LocXY
-type (TyBoundarySide),intent(IN),dimension(1:NumBSides) :: BoundarySide
-double precision,intent(INOUT) :: VIntWdV
+integer(4),intent(in) :: icbs,Ncbslocal
+double precision,intent(in) :: xpmin,xpmax,interlen
+integer(4),intent(in),dimension(1:MAXCLOSEBOUNDSIDES) :: Cloboside
+double precision,intent(in),dimension(1:PLANEDIM,1:MAXCLOSEBOUNDSIDES) :: LocXY
+type (TyBoundarySide),intent(in),dimension(1:NumBSides) :: BoundarySide
+double precision,intent(inout) :: VIntWdV
 integer(4) :: jcbs,ndiv,ipt
 double precision :: xpi,ypi,yplimite,ypj,angle,dalfarif,Intalfa,tanalfa,ris
 double precision :: dalfa,alfaA,alfaB,alfa,csiPA,etaPA,csiPB,etaPB
@@ -98,9 +99,9 @@ if (ypi>=yplimite) then
       elseif (ypi<yplimite.and.Ncbslocal==2) then
 ! There can be two sides close to the particle 
 ! Index of the second side, which is close to the particle 
-         jcbs = Ncbslocal + 1 - icbs        
+         jcbs = Ncbslocal + 1 - icbs
 ! Distance between the particle and the second side      
-         ypj = LocXY(2, jcbs)                    
+         ypj = LocXY(2,jcbs)                    
          if (ypj<=yplimite) then               
 ! The particle is very close to the vertex, which is in common between the sides 
             angle = zero
@@ -129,3 +130,4 @@ endif
 !------------------------
 return
 end subroutine ComputeVolumeIntegral_WdV2D
+#endif

@@ -22,8 +22,13 @@
 ! Program unit: ReadInputExternalFile                       
 ! Description:                        
 !-------------------------------------------------------------------------------
+#ifdef SPACE_3D
 subroutine ReadInputExternalFile(NumberEntities,ainp,comment,nrighe,ier,       &
                                  OnlyTriangle,ninp,ulog,ninp2)
+#elif defined SPACE_2D
+subroutine ReadInputExternalFile(NumberEntities,ainp,comment,nrighe,ier,       &
+                                 ninp,ulog,ninp2)
+#endif
 !------------------------
 ! Modules
 !------------------------
@@ -37,8 +42,10 @@ implicit none
 integer(4) :: nrighe,ier,ninp,ulog,ninp2
 integer(4),dimension(20) :: NumberEntities
 character(1) :: comment
-character(LEN=lencard) :: ainp
+character(len=lencard) :: ainp
+#ifdef SPACE_3D
 logical :: OnlyTriangle
+#endif
 integer(4) :: ioerr
 logical,external :: ReadCheck
 character(100),external :: lcase,GetToken
@@ -55,8 +62,10 @@ character(100),external :: lcase,GetToken
 ! Statements
 !------------------------
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"GEOMETRY FILE",ninp,ulog)) return
-OnlyTriangle = .TRUE.
+if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"GEOMETRY FILE",ninp,ulog)) return
+#ifdef SPACE_3D
+OnlyTriangle = .true.
+#endif
 do while (trim(lcase(ainp))/="##### end geometry file #####")
    open(ninp2,file=trim(ainp),form="formatted",status="old",iostat=ioerr)
    if (ulog>0) then
@@ -67,26 +76,29 @@ do while (trim(lcase(ainp))/="##### end geometry file #####")
             return
       endif
    endif
-! To read the first line of the file 
+! To read the first line of the file
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp2)
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"GEOMETRY FILE",ninp2,ulog)) return
+   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"GEOMETRY FILE",ninp2,ulog)) return
    SECTION_LOOP: do while (ioerr==0)
       select case (trim(lcase(trim(ainp))))
          case ("##### vertices #####")
             call ReadInputVertices (NumberEntities,Vertice,ainp,comment,       &
-                                    nrighe,ier,.FALSE.,ninp2,ulog)
+                                    nrighe,ier,.false.,ninp2,ulog)
+#ifdef SPACE_2D
          case ("##### lines #####")
             call ReadInputLines(NumberEntities,BoundaryVertex,Tratto,ainp,     &
                                 comment,nrighe,ier,ninp2,ulog)
+#elif defined SPACE_3D
          case ("##### faces #####")
-            call ReadInputFaces(NumberEntities,ainp,comment,nrighe,ier,.FALSE.,&
+            call ReadInputFaces(NumberEntities,ainp,comment,nrighe,ier,.false.,&
                                 ninp2,ulog)
+#endif
          case default
       endselect
       call ReadRiga(ainp,comment,nrighe,ioerr,ninp2)
 ! In case of EOF, then it exits, otherwise it checks the error 
       if (ioerr==-1) cycle SECTION_LOOP
-      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"GEOMETRY FILE",ninp,ulog))     &
+      if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"GEOMETRY FILE",ninp,ulog))     &
          return
    enddo SECTION_LOOP
    close (ninp2)
@@ -94,7 +106,7 @@ do while (trim(lcase(ainp))/="##### end geometry file #####")
       write(ulog,"(1x,3a)") "End Reading Geometry File"
    endif
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"GEOMETRY FILE",ninp,ulog)) return
+   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"GEOMETRY FILE",ninp,ulog)) return
 enddo
 !------------------------
 ! Deallocations

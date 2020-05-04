@@ -25,6 +25,7 @@
 !              just the formal 3D extension of PressureSmoothing_2D: 
 !              differences are appreciable.
 !-------------------------------------------------------------------------------
+#ifdef SPACE_3D
 subroutine PressureSmoothing_3D
 !------------------------
 ! Modules
@@ -152,3 +153,4 @@ if (n_bodies>0) then
 endif
 return
 end subroutine PressureSmoothing_3D
+#endif

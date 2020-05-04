@@ -59,17 +59,17 @@ end interface
 !------------------------
 ! Initializations
 !------------------------
-if (ncord==3) then
-   n_adj_faces_max=3
-   else
-      n_adj_faces_max=2
-endif
+#ifdef SPACE_3D
+   n_adj_faces_max = 3
+#elif defined SPACE_2D
+      n_adj_faces_max = 2
+#endif
 !------------------------
 ! Statements
 !------------------------
 ! Loop over the DBSPH surface elements
 !$omp parallel do default(none)                                                &
-!$omp shared(DBSPH,pg_w,ncord,Domain,Med,pg,ulog,n_adj_faces_max)              &
+!$omp shared(DBSPH,pg_w,Domain,Med,pg,ulog,n_adj_faces_max)                    &
 !$omp private(aux_scalar,i,j,alfa,alfa_sum,aux_adjacent_faces,aux_face1)       &
 !$omp private(aux_face2,aux_false_hyp,aux_scalar_2,aux_vec,ID_P_b_iso)         &
 !$omp private(ID_P_0_iso)
@@ -93,12 +93,12 @@ DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(pg_w(i)%adjacent_faces(j))%vert_l
 DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(pg_w(i)%adjacent_faces(j))%vert_list(2))%pos(:)
       aux_face2(3,:) =                                                         &
 DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(pg_w(i)%adjacent_faces(j))%vert_list(3))%pos(:)
-      if (ncord==2) then
+#ifdef SPACE_2D
          aux_face1(4,:) =                                                      &
          DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(i)%vert_list(4))%pos(:)
          aux_face2(4,:) =                                                      &
 DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(pg_w(i)%adjacent_faces(j))%vert_list(4))%pos(:)
-      endif
+#endif
       aux_adjacent_faces = aux_adjacent_faces + 1          
       call adjacent_faces_isolated_points(aux_face1,aux_face2,ID_P_0_iso,      &
                                           ID_P_b_iso,aux_false_hyp)
@@ -158,4 +158,3 @@ endif
 !------------------------
 return
 end subroutine semi_particle_volumes
-

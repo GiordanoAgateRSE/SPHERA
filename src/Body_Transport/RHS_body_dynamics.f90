@@ -41,11 +41,17 @@ integer(4) :: n_interactions,aux2,aux3,test,aux_int
 integer(4) :: aux_scal_test
 double precision :: k_masses,r_per,r_par,alfa_boun
 double precision :: aux_impact_vel,aux4,aux_scalar,aux_scalar_2
-double precision :: friction_limiter,aux_locx_min,aux_locx_max
+double precision :: friction_limiter
+#ifdef SPACE_2D
+double precision :: aux_locx_max,aux_locx_min
+#endif
 double precision :: f_pres(3),r_par_vec(3),f_coll_bp_bp(3)          
-double precision :: f_coll_bp_boun(3),pos_aux(3),normal_plane(3)
+double precision :: f_coll_bp_boun(3),normal_plane(3)
 double precision :: u_rel(3),x_rel(3),aux_vec(3),aux_vec_2(3),rel_pos(3)
-double precision :: loc_pos(3),aux_locx_vert(3)
+double precision :: loc_pos(3)
+#ifdef SPACE_2D
+double precision :: aux_locx_vert(3),pos_aux(3)
+#endif
 double precision :: sliding_friction(3)
 double precision :: aux_mat(3,3)
 ! "inter_front": Number of neighbouring frontiers for a given body. It is 
@@ -96,7 +102,7 @@ interface
       double precision,intent(in) :: point(2),point_pol_1(2),point_pol_2(2)
       double precision,intent(in) :: point_pol_3(2),point_pol_4(2)
       double precision,intent(in) :: point_pol_5(2),point_pol_6(2)
-      integer(4),intent(INOUT) :: test
+      integer(4),intent(inout) :: test
       double precision :: dis1,dis2
       double precision :: normal(2)
    end subroutine point_inout_convex_non_degenerate_polygon
@@ -132,8 +138,11 @@ end interface
 !------------------------
 ! Allocations
 !------------------------
-if (ncord==2) aux = n_bodies+NumBSides
-if (ncord==3) aux = n_bodies+NumFacce
+#ifdef SPACE_3D
+   aux = n_bodies + NumFacce
+#elif defined SPACE_2D
+      aux = n_bodies + NumBSides
+#endif
 if (.not.allocated(Force_bod_flu)) then
    allocate(Force_bod_flu(n_bodies,3),STAT=alloc_stat)
    if (alloc_stat/=0) then
@@ -275,7 +284,7 @@ do npi=1,n_body_part
 enddo
 ! Loop over the transported bodies (gravity forces and Ic initialization)
 !$omp parallel do default(none) private(i)                                     &
-!$omp shared(n_bodies,body_arr,Domain,it_start,on_going_time_step,ncord)       &
+!$omp shared(n_bodies,body_arr,Domain,it_start,on_going_time_step)             &
 !$omp shared(aux_gravity,simulation_time,time_max_no_body_gravity_force)
 do i=1,n_bodies
    if (body_arr(i)%imposed_kinematics==0) then
@@ -398,7 +407,7 @@ do npi=1,n_body_part
          enddo
 ! Loop over boundaries (body-boundary impacts, partial contributions) (3D case) 
          if (simulation_time>time_max_no_body_frontier_impingements) then
-         if (ncord==3) then
+#ifdef SPACE_3D
             do j=1,NumFacce
             if ((Tratto(BoundaryFace(j)%stretch)%tipo=="fixe") .or.            &
                (Tratto(BoundaryFace(j)%stretch)%tipo == "tapi")) then
@@ -468,13 +477,13 @@ do npi=1,n_body_part
                      endif
                   endif  
                endif
-            enddo 
-         endif
+            enddo
+#endif
          inter_front(bp_arr(npi)%body) = max(inter_front(bp_arr(npi)%body),    &
                                          aux_scal_test)
          aux_scal_test = 0
 ! 2D case
-         if (ncord==2) then
+#ifdef SPACE_2D
             do j=1,NumBSides
                if ((BoundarySide(j)%tipo=="fixe") .or.                         &
                   (BoundarySide(j)%tipo == "tapi")) then  
@@ -551,7 +560,7 @@ do npi=1,n_body_part
                   endif
                endif
             enddo 
-         endif
+#endif
          endif
       endif
    endif
@@ -562,7 +571,7 @@ do npi=1,n_body_part
    if (body_arr(bp_arr(npi)%body)%imposed_kinematics==0) then
       if (body_arr(bp_arr(npi)%body)%Ic_imposed==0) then
 ! Contributions to the moment of inertia coefficients (diagonal elements)
-         if (ncord==3) then
+#ifdef SPACE_3D
             body_arr(bp_arr(npi)%body)%Ic(1,1) =                               &
                body_arr(bp_arr(npi)%body)%Ic(1,1) + bp_arr(npi)%mass *         &
                (bp_arr(npi)%rel_pos(2) ** 2 + bp_arr(npi)%rel_pos(3) ** 2)
@@ -582,19 +591,20 @@ do npi=1,n_body_part
             body_arr(bp_arr(npi)%body)%Ic(2,3) =                               &
                body_arr(bp_arr(npi)%body)%Ic(2,3) - bp_arr(npi)%mass *         &
                (bp_arr(npi)%rel_pos(2) * bp_arr(npi)%rel_pos(3)) 
-         endif
-         if ((ncord==2).and.((it_start+1)==on_going_time_step)) then
-            body_arr(bp_arr(npi)%body)%Ic(2,2) =                               &
-               body_arr(bp_arr(npi)%body)%Ic(2,2) + bp_arr(npi)%mass *         &
-               (bp_arr(npi)%rel_pos(1) ** 2 + bp_arr(npi)%rel_pos(3) ** 2)
-         endif
+#elif SPACE_2D
+               if ((it_start+1)==on_going_time_step) then
+                  body_arr(bp_arr(npi)%body)%Ic(2,2) =                         &
+                     body_arr(bp_arr(npi)%body)%Ic(2,2) + bp_arr(npi)%mass *   &
+                     (bp_arr(npi)%rel_pos(1) ** 2 + bp_arr(npi)%rel_pos(3) ** 2)
+               endif
+#endif
       endif 
    endif
 enddo     
 ! Loop over the transported bodies (global contributions from body-body and 
 ! boundary-body interactions; computation of Ic and its inverse)
 !$omp parallel do default(none) private(i,j,k_masses,alfa_boun,aux_int)        &
-!$omp shared(n_bodies,body_arr,ncord,it_start,on_going_time_step,aux,r_per_min)&
+!$omp shared(n_bodies,body_arr,it_start,on_going_time_step,aux,r_per_min)      &
 !$omp shared(Domain,alfa_denom,Force_bod_sol,Moment_bod_sol,inter_front)       &
 !$omp shared(Force_bod_flu)
 do i=1,n_bodies
@@ -626,17 +636,18 @@ do i=1,n_bodies
             endif
          endif
       enddo
-! Ic and its inverse 
-      if (ncord==3) then
+! Ic and its inverse
+#ifdef SPACE_3D
          body_arr(i)%Ic(2,1) = body_arr(i)%Ic(1,2)
          body_arr(i)%Ic(3,1) = body_arr(i)%Ic(1,3)
          body_arr(i)%Ic(3,2) = body_arr(i)%Ic(2,3)
          call Matrix_Inversion_3x3(body_arr(i)%Ic,body_arr(i)%Ic_inv,aux_int)
-      endif
-      if ((ncord==2).and.((it_start+1)==on_going_time_step)) then
-         body_arr(i)%Ic_inv = 0.d0 
-         body_arr(i)%Ic_inv(2,2) = 1.d0/body_arr(i)%Ic(2,2)
-      endif
+#elif defined SPACE_2D
+            if ((it_start+1)==on_going_time_step) then
+               body_arr(i)%Ic_inv(:,:) = 0.d0 
+               body_arr(i)%Ic_inv(2,2) = 1.d0 / body_arr(i)%Ic(2,2)
+            endif
+#endif
    endif
 enddo
 !$omp end parallel do     

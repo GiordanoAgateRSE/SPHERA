@@ -34,7 +34,7 @@ use Hybrid_allocation_module
 implicit none
 integer(4) :: nrighe,ier, ninp,ulog
 character(1) :: comment
-character(LEN=lencard) :: ainp
+character(len=lencard) :: ainp
 character(4) :: steptime
 integer(4) :: ioerr
 character(100) :: token
@@ -53,7 +53,7 @@ logical,external :: ReadCheck
 ! Statements
 !------------------------
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DRAW OPTIONS DATA",ninp,ulog)) return
+if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"DRAW OPTIONS DATA",ninp,ulog)) return
 do while (trim(lcase(ainp))/="##### end draw options #####")
    select case (lcase(GetToken(ainp,1,ioerr)))
       case("vtkconverter")
@@ -62,14 +62,18 @@ do while (trim(lcase(ainp))/="##### end draw options #####")
             case("any")
                token = lcase(GetToken(ainp,(3),ioerr))
                read (token,*,iostat=ioerr) freq_time
-               if ((ncord>0).and.(ulog>0)) write(ulog,"(1x,a,1pe12.4,a)")      &
-                  "VTKConversion any :",freq_time," seconds."
+               if ((input_second_read.eqv..true.).and.(ulog>0)) then
+                  write(ulog,"(1x,a,1pe12.4,a)")                               &
+                     "VTKConversion any :",freq_time," seconds."
+               endif
                val_time  = zero  
             case("at")
                token = lcase(GetToken(ainp,(3),ioerr))
                read (token,*,iostat=ioerr) freq_time
-               if ((ncord>0).and.(ulog>0)) write(ulog,"(1x,a,1pe12.4,a)")      &
-                  "VTKConversion at :",freq_time," second."
+               if ((input_second_read.eqv..true.).and.(ulog>0)) then
+                  write(ulog,"(1x,a,1pe12.4,a)")                               &
+                     "VTKConversion at :",freq_time," second."
+               endif
                   val_time  = freq_time
                   freq_time = -freq_time
             case("all")
@@ -77,35 +81,42 @@ do while (trim(lcase(ainp))/="##### end draw options #####")
                read (token,*,iostat=ioerr) steptime
                if (steptime=='time') then
                   freq_time = Domain%memo_fr
-                  val_time  = zero  
-                  if ((ncord>0).and.(ulog>0)) write(ulog,"(1x,a,1pe12.4,a)")   &
-                     "VTKConversion every :",freq_time," second."
+                  val_time = zero  
+                  if ((input_second_read.eqv..true.).and.(ulog>0)) then
+                     write(ulog,"(1x,a,1pe12.4,a)")                            &
+                        "VTKConversion every :",freq_time," second."
+                  endif
                   elseif (steptime=='step') then
                      freq_time = zero
                      val_time  = const_m_9999
-                     if ((ncord>0).and.(ulog>0)) write(ulog,"(1x,a)")          &
-                        "VTKConversion all steps."
+                     if ((input_second_read.eqv..true.).and.(ulog>0)) then
+                        write(ulog,"(1x,a)")                                   &
+                           "VTKConversion all steps."
+                     endif
                      else
                         freq_time = Domain%memo_fr
                         val_time  = zero 
-                        if ((ncord>0).and.(ulog>0)) write(ulog,                &
-                           "(1x,a,1pe12.4,a)") "VTKConversion every :",        &
-                           freq_time," second."
+                        if ((input_second_read.eqv..true.).and.(ulog>0)) then
+                           write(ulog,"(1x,a,1pe12.4,a)")                      &
+                              "VTKConversion every :",freq_time," second."
+                        endif
                endif
             case default
                freq_time = Domain%memo_fr
                val_time = zero
-               if ((ncord)>0.and.(ulog>0)) write(ulog,"(1x,a,1pe12.4,a)")      &
-                  "VTKConversion every :",freq_time," second."
+               if ((input_second_read.eqv..true.).and.(ulog>0)) then
+                  write(ulog,"(1x,a,1pe12.4,a)")                               &
+                     "VTKConversion every :",freq_time," second."
+               endif
          endselect
-         if ((ncord>0).and.(ulog>0)) write(ulog,"(1x,a)") " "
-         vtkconv = .TRUE.
+         if ((input_second_read.eqv..true.).and.(ulog>0)) write(ulog,"(1x,a)") " "
+         vtkconv = .true.
       case default
          ier = 4
          return
    endselect
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DRAW OPTIONS DATA",ninp,ulog))    &
+   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"DRAW OPTIONS DATA",ninp,ulog))    &
       return
 enddo
 !------------------------
@@ -113,4 +124,3 @@ enddo
 !------------------------
 return
 end subroutine ReadInputDrawOptions
-

@@ -112,6 +112,7 @@ enddo
 do j=1,SPACEDIM
    Vertice(j,1:NumVertici) = zero
 enddo
+#ifdef SPACE_3D
 do i=1,size(BoundaryFace)
    do j=1,MAXFACENODES
       BoundaryFace(i)%Node(j)%name = 0
@@ -139,6 +140,7 @@ if (allocated(BFaceList)) then
       BFaceList(i) = 0
    enddo
 endif
+#endif
 do i=1,size(BoundaryVertex)
    BoundaryVertex(i) = 0
 enddo
@@ -147,8 +149,11 @@ do i=1,size(Tratto)
    Tratto(i)%ColorCode = 0
    Tratto(i)%numvertices = 0
    Tratto(i)%inivertex = 0
-   Tratto(i)%iniside = 0
-   Tratto(i)%iniface = 0
+#ifdef SPACE_3D
+      Tratto(i)%iniface = 0
+#elif defined SPACE_2D
+         Tratto(i)%iniside = 0
+#endif
    Tratto(i)%medium = 0
    Tratto(i)%zone = 0
    Tratto(i)%NormVelocity = zero
@@ -159,6 +164,7 @@ do i=1,size(Tratto)
       Tratto(i)%FiCoeff(j)  = zero
    enddo
 enddo
+#ifdef SPACE_2D
 do i=1,size(BoundarySide)
    BoundarySide(i)%tipo = "    "
    BoundarySide(i)%stretch = 0
@@ -177,6 +183,7 @@ do i=1,size(BoundarySide)
       BoundarySide(i)%velocity(j) = zero
    enddo
 enddo
+#endif
 ! In case of restart, it does not zero "domain" and "grid"
 if (Restart) return
 do j=1,3

@@ -32,9 +32,9 @@ use Hybrid_allocation_module
 ! Declarations
 !------------------------
 implicit none
-integer(4),intent(IN) :: ir
-type (TyZone),intent(IN),dimension(NPartZone) :: partz
-type (TyParticle),intent(INOUT) :: pg
+integer(4),intent(in) :: ir
+type (TyZone),intent(in),dimension(NPartZone) :: partz
+type (TyParticle),intent(inout) :: pg
 integer(4) :: nbande, numbanda
 double precision :: aldx
 integer(4),dimension(5) :: iclnumb
@@ -75,4 +75,3 @@ endif
 !------------------------
 return
 end subroutine defcolpartzero
-

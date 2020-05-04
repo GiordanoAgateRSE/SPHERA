@@ -24,6 +24,7 @@
 !              ViscoF). Equations refer to particle npi. It performs implicit 
 !              computation of gradPsuro (Di Monaco et al., 2011, EACFM).                        
 !-------------------------------------------------------------------------------
+#ifdef SPACE_3D
 subroutine AddBoundaryContributions_to_ME3D(npi,Ncbf,tpres,tdiss,tvisc)
 !------------------------
 ! Modules
@@ -36,8 +37,8 @@ use I_O_file_module
 ! Declarations
 !------------------------
 implicit none
-integer(4),intent(IN) :: npi,Ncbf
-double precision,intent(INOUT),dimension(1:SPACEDIM) :: tpres,tdiss,tvisc
+integer(4),intent(in) :: npi,Ncbf
+double precision,intent(inout),dimension(1:SPACEDIM) :: tpres,tdiss,tvisc
 integer(4) :: sd,icbf,iface,ibdp,sdj,i,j,mati,stretch
 double precision :: IntdWrm1dV,cinvisci,Monvisc,cinviscmult,pressi,dvn
 double precision :: FlowRate1,Lb,L,minquotanode,maxquotanode
@@ -82,7 +83,7 @@ face_loop: do icbf = 1,Ncbf
    if (stretchtype=="fixe".or.stretchtype=="tapi") then
 ! Local coordinates for particle Pi   
       LocPi(:) = BoundaryDataTab(ibdp)%LocXYZ(:) 
-      if (LocPi(3)>zero) then                  
+      if (LocPi(3)>zero) then                
 ! The face "iface" interacts with particle Pi
          dvn = zero
          do SD=1,SPACEDIM
@@ -147,7 +148,7 @@ face_loop: do icbf = 1,Ncbf
                pg(npi)%kodvel = 2
 ! Normal component of velocity 
                if (BoundaryFace(iface)%CloseParticles>0) then
-                  minquotanode = 9999.0d0
+                  minquotanode = 9999.d0
                   maxquotanode = const_m_9999
                   do i=1,BoundaryFace(iface)%nodes
                      if (minquotanode>                                         &
@@ -171,7 +172,7 @@ face_loop: do icbf = 1,Ncbf
                pg(npi)%velass(:) = Tratto(stretch)%NormVelocity * nnlocal(:) 
             endif
             return
-! Inlet sections 
+! Inlet sections
             elseif (stretchtype=="sour") then         
                if ((Domain%time_stage==1).or.(Domain%time_split==1)) then 
                   pg(npi)%kodvel = 2
@@ -190,3 +191,4 @@ enddo face_loop
 !------------------------
 return
 end subroutine AddBoundaryContributions_to_ME3D
+#endif

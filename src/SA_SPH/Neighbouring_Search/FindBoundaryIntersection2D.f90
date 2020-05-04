@@ -30,6 +30,7 @@
 !                 interlen: length of the intersected segment 
 !              (Di Monaco et al., 2011, EACFM)                        
 !-------------------------------------------------------------------------------
+#ifdef SPACE_2D
 subroutine FindBoundaryIntersection2D(icbs,Cloboside,LocXY,BoundarySide,xpmin, &
                                       xpmax,interlen)
 !------------------------
@@ -94,3 +95,4 @@ endif
 !------------------------
 return
 end subroutine FindBoundaryIntersection2D
+#endif

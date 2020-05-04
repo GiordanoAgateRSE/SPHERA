@@ -22,6 +22,7 @@
 ! Program unit: quadratic_equation   
 ! Description: To solve a quadratic equation.       
 !-------------------------------------------------------------------------------
+#ifdef SPACE_3D
 subroutine quadratic_equation(a,b,c,n_roots,root1,root2)
 !------------------------
 ! Modules
@@ -76,4 +77,4 @@ endif
 !------------------------
 return
 end subroutine quadratic_equation
-
+#endif

@@ -147,11 +147,11 @@ if (uni>=1.d-1) then
 ! In case the dicrete Shepard coefficient is smaller than 0.1 the monitor 
 ! element assumes null pressure, velocity and density.
    if (ID_closest_fb>0) then
-      if (ncord==3) then
+#ifdef SPACE_3D
          number_SASPH_neighbours = BoundaryDataPointer(1,ID_closest_fb)
-         elseif (ncord==2) then
+#elif defined SPACE_2D
             number_SASPH_neighbours = BoundaryDataPointer(2,ID_closest_fb)
-      endif
+#endif
    endif
    if ((ID_closest_fb>0).and.(number_SASPH_neighbours>0)) then
 ! If the possible closest fluid particle has neighbouring SA-SPH frontiers, 
@@ -177,4 +177,3 @@ endif
 !------------------------
 return
 end subroutine interpolations_for_monitoring_element
-

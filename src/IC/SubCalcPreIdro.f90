@@ -36,7 +36,7 @@ use I_O_diagnostic_module
 ! Declarations
 !------------------------
 implicit none
-logical          :: foundcell
+logical :: foundcell
 integer(4) :: idpel,Nz,pl_id,npi,iappo,i,j,k,numcell,ncelcorr,m,nnlocal,igridi
 integer(4) :: jgridi,kgridi,nnsave
 double precision :: ZQuotaMediumCorr,ZQuotaColonna,ZQuotaSecondMedium,affond1
@@ -95,7 +95,7 @@ particle_loop: do npi=1,nag
 ! To check if there is a cell including a medium interface in the column.
 ! If this is so, it evaluates the medium interface level.
    idpel = 0
-   foundcell = .FALSE.
+   foundcell = .false.
    ZQuotaMediumCorr = pg(npi)%coord(3)
    ZQuotaColonna = pg(npi)%coord(3)
    ZQuotaSecondMedium = pg(npi)%coord(3)

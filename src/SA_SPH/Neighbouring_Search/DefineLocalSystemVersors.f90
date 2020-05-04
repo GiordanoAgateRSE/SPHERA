@@ -25,6 +25,7 @@
 !               account pentagon and hexagon faces (only for complex "perimeter"
 !               zones / fluid reseroirs, not for SASPH frontiers).                       
 !-------------------------------------------------------------------------------
+#ifdef SPACE_3D
 subroutine DefineLocalSystemVersors(Nf)
 !------------------------
 ! Modules
@@ -50,7 +51,6 @@ integer(4),dimension(2,3) :: nindex
 !------------------------
 ! Initializations
 !------------------------
-! Modification for compatibility with IBM Fortran compiler (xlf90)
 nindex(1,1) = 1
 nindex(1,2) = 2
 nindex(1,3) = 3
@@ -120,3 +120,4 @@ enddo
 !------------------------
 return
 end subroutine DefineLocalSystemVersors
+#endif

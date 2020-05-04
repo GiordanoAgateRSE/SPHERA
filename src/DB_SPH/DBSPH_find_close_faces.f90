@@ -52,7 +52,7 @@ integer(4),external :: CellIndices,CellNumber
 ! Statements
 !------------------------
 ! Loop over the DBSPH surface elements
-!$omp parallel do default(none) shared(DBSPH,pg_w,Icont_w,ncord,NPartOrd_w)    &
+!$omp parallel do default(none) shared(DBSPH,pg_w,Icont_w,NPartOrd_w)          &
 !$omp private(npi,irestocell,i_cell_comp,j_cell_comp,k_cell_comp,j_cell_min)   &
 !$omp private(j_cell_max,ID_cell,i_cell,j_cell,k_cell,npj,i_vert,j_vert)       &
 !$omp private(aux_adjacent_faces,ww,aux_common_vertices,n_vert)
@@ -79,11 +79,11 @@ loop_surface_elements: do npi = 1,DBSPH%n_w
 ! Avoid considering inlet and outlet DB-SPH elements    
                if (npj>DBSPH%n_w) cycle
                aux_common_vertices = 0
-               if (ncord==3) then
+#ifdef SPACE_3D
                   n_vert = 3
-                  else
+#elif defined SPACE_2D
                      n_vert = 4
-               endif      
+#endif
 ! Loop over the vertices of the computational element  
                do i_vert=1,n_vert
 ! Loop over the vertices of the neighbouring element
@@ -98,22 +98,22 @@ DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(npj)%vert_list(j_vert))%pos(3)) )
                         if (aux_common_vertices==2) then
                            pg_w(npi)%adjacent_faces(aux_adjacent_faces+1) = npj 
                            aux_adjacent_faces = aux_adjacent_faces + 1
-                           if (aux_adjacent_faces==ncord) cycle                &
-                                                          loop_surface_elements
+                           if (aux_adjacent_faces==ncord) then
+                              cycle loop_surface_elements
+                           endif
                            cycle loop_neighbour_surface_elements
                         endif
                      endif
                   enddo
                enddo
-            end do loop_neighbour_surface_elements
-         end do    
-      end do 
-   end do 
-end do loop_surface_elements
+            enddo loop_neighbour_surface_elements
+         enddo    
+      enddo 
+   enddo 
+enddo loop_surface_elements
 !$omp end parallel do
 !------------------------
 ! Deallocations
 !------------------------
 return
 end subroutine DBSPH_find_close_faces
-

@@ -94,7 +94,7 @@ endif
 !$omp private(normal_int_sat_top_abs)                                          &                 
 !$omp shared(nag,pg,Domain,Med,Icont,Npartord,NMAXPARTJ,rag,nPartIntorno)      &
 !$omp shared(Partintorno,PartKernel,ke_coef,kacl_coef,Doubleh,square_doubleh)  &
-!$omp shared(squareh,nomsub,ncord,eta,eta2,ulog,uerr,ind_interfaces,DBSPH,pg_w)&
+!$omp shared(squareh,nomsub,eta,eta2,ulog,uerr,ind_interfaces,DBSPH,pg_w)      &
 !$omp shared(Icont_w,Npartord_w,rag_fw,nPartIntorno_fw,Partintorno_fw)         &
 !$omp shared(kernel_fw,dShep_old,Granular_flows_options,NMedium)
 loop_nag: do npi=1,nag
@@ -154,7 +154,7 @@ loop_nag: do npi=1,nag
             ncelj = CellNumber (irang,jrang,krang)
 ! Cell out of domain
             if (ncelj==0) cycle    
-! Loop over the particles in the cell 
+! Loop over the particles in the cell
             loop_mm: do mm=Icont(ncelj),Icont(ncelj+1)-1 
 ! Warning. A computational particle has reached the maximum number of   
 ! fluid particle neighbours allowed.                
@@ -738,7 +738,7 @@ if (n_bodies>0) then
 !$omp private(jrang,krang,bp_f,npj,npartint,ncelj,ragtemp,rijtemp,rijtemp2)    &
 !$omp private(rij_su_h,rij_su_h_quad,denom,index_rij_su_h,gradmod,bp)          &
 !$omp private(gradmodwacl,i,aux2)                                              &
-!$omp shared(NMAXPARTJ,ke_coef,kacl_coef,square_doubleh,squareh,ncord,Domain)  &
+!$omp shared(NMAXPARTJ,ke_coef,kacl_coef,square_doubleh,squareh,Domain)        &
 !$omp shared(Icont_bp,NPartOrd_bp,bp_arr,nPartIntorno_bp_bp,PartIntorno_bp_bp) &
 !$omp shared(rag_bp_bp,n_body_part,Icont,n_bodies,nPartIntorno_bp_f)           &
 !$omp shared(PartIntorno_bp_f,rag_bp_f,KerDer_bp_f_cub_spl,KerDer_bp_f_Gal)    &
@@ -754,8 +754,8 @@ if (n_bodies>0) then
       nceli = bp_arr(npi)%cell
       if (nceli==0) cycle
       irestocell = CellIndices (nceli,igridi,jgridi,kgridi)
-      jgrid1 = jgridi - (ncord-2)
-      jgrid2 = jgridi + (ncord-2)
+      jgrid1 = jgridi - (ncord - 2)
+      jgrid2 = jgridi + (ncord - 2)
 ! Loop over the adjacent cells
       do jrang = jgrid1,jgrid2         
          do irang = igridi-1,igridi+1      
@@ -785,8 +785,10 @@ if (n_bodies>0) then
                   rij_su_h_quad = rijtemp2 / squareh
                   index_rij_su_h = int(rij_su_h)
                   denom = one / (rijtemp + eta)
-                  rag_bp_f(1:3,npartint) = ragtemp(1:3)  
-                  if (ncord==2) rag_bp_f(2,npartint) = 0.d0
+                  rag_bp_f(1:3,npartint) = ragtemp(1:3)
+#ifdef SPACE_2D
+                     rag_bp_f(2,npartint) = 0.d0
+#endif
 ! Kernel gradients (cubic spline)
                   gradmod = zero
                   KerDer_bp_f_cub_spl(npartint) = zero
@@ -822,8 +824,10 @@ if (n_bodies>0) then
                                 nPartIntorno_bp_bp(aux2)
                      PartIntorno_bp_bp(npartint) = npj
 ! Relative distance
-                     rag_bp_bp(1:3,npartint) = ragtemp(1:3)  
-                     if (ncord==2) rag_bp_bp(2,npartint) = 0.d0   
+                     rag_bp_bp(1:3,npartint) = ragtemp(1:3)
+#ifdef SPACE_2D  
+                        rag_bp_bp(2,npartint) = 0.d0
+#endif
                   endif
                enddo loop_bp
             enddo 

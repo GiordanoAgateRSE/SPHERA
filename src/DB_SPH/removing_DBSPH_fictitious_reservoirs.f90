@@ -55,6 +55,7 @@ do npi=1,nag
       OpCount(pg(npi)%imed) = OpCount(pg(npi)%imed) + 1    
       pg(npi)%cella = -1
    endif
+#ifdef SPACE_3D
 ! Fictitious fluid reservoir top
    if (Partz(pg(npi)%izona)%IC_source_type==2) then
       if (pg(npi)%coord(3)>Partz(pg(npi)%izona)%H_res) then
@@ -62,6 +63,7 @@ do npi=1,nag
          pg(npi)%cella = -1
       endif
    endif
+#endif
 enddo
 !$omp end parallel do
 !------------------------

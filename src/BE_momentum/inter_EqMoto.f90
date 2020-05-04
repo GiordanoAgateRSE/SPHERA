@@ -36,8 +36,8 @@ use Dynamic_allocation_module
 ! Declarations
 !------------------------
 implicit none
-integer(4),intent(IN) :: npi
-double precision,intent(INOUT),dimension(1:SPACEDIM) :: tpres,tdiss,tvisc
+integer(4),intent(in) :: npi
+double precision,intent(inout),dimension(1:SPACEDIM) :: tpres,tdiss,tvisc
 integer(4) :: npj,contj,npartint,index_rij_su_h
 double precision :: rhoi,rhoj,amassj,pi,pj,alpha,veln,velti,veltj,deltan,pre   
 double precision :: coeff,secinv,nupa,nu,modderveln,moddervelt,moddervel
@@ -75,7 +75,7 @@ tdiss(:) = zero
 tvisc(:) = zero
 dervel(:) = zero
 dervelmorr(:) = zero
-deltan = 1.d+07
+deltan = 1.d7
 ke_coef = Domain%coefke / Domain%h
 kacl_coef = Domain%coefkacl / Domain%h
 rvw_sum(:) = zero
@@ -95,10 +95,10 @@ if (Domain%Slip) then
       denorm = max(zero,(rag(1,npartint) * pg(npj)%zer(1) + rag(2,npartint)    &
                * pg(npj)%zer(2) + rag(3,npartint) * pg(npj)%zer(3)))
       deltan = min(deltan,denorm)
-   end do
+   enddo
 endif 
 do contj=1,nPartIntorno(npi)
-   npartint = (npi - 1)* NMAXPARTJ + contj
+   npartint = (npi - 1) * NMAXPARTJ + contj
    npj = PartIntorno(npartint)
 ! To check if this term is needed in the previous loop 
    if (npi==npj) cycle  
@@ -127,7 +127,7 @@ do contj=1,nPartIntorno(npi)
       PartKernel(1:4,npartint) = zero
       if (index_rij_su_h>=2) cycle
       gradmod = -two * rij_su_h + 1.5d0 * rij_su_h_quad
-      gradmodwacl = -12.0d0 - 3.0d0 * rij_su_h_quad + 12.0d0 * rij_su_h 
+      gradmodwacl = -12.d0 - 3.d0 * rij_su_h_quad + 12.d0 * rij_su_h 
       wu = 0.666666667d0 + rij_su_h_quad * (rij_su_h * half - one)
       if (index_rij_su_h>0) then
          gradmod = -gradmod + rij_su_h_quad - two

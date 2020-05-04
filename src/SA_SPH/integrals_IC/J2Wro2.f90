@@ -22,6 +22,7 @@
 ! Program unit: J2Wro2                                         
 ! Description: (Di Monaco et al., 2011, EACFM)                        
 !-------------------------------------------------------------------------------
+#ifdef SPACE_2D
 double precision function J2Wro2(ro)
 !------------------------
 ! Modules
@@ -65,3 +66,4 @@ endif
 !------------------------
 return
 end function J2Wro2
+#endif

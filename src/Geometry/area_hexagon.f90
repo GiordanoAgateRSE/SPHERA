@@ -31,8 +31,8 @@ subroutine area_hexagon(P1,P2,P3,P4,P5,P6,area)
 ! Declarations
 !------------------------
 implicit none
-double precision,intent(IN) :: P1(3),P2(3),P3(3),P4(3),P5(3),P6(3)
-double precision,intent(INOUT) :: area
+double precision,intent(in) :: P1(3),P2(3),P3(3),P4(3),P5(3),P6(3)
+double precision,intent(inout) :: area
 double precision :: aux_scalar
 double precision :: aux_normal(3)
 !------------------------
@@ -41,9 +41,9 @@ double precision :: aux_normal(3)
 interface
    subroutine area_triangle(P1,P2,P3,area,normal)
       implicit none
-      double precision,intent(IN) :: P1(3),P2(3),P3(3)
-      double precision,intent(OUT) :: area
-      double precision,intent(OUT) :: normal(3)
+      double precision,intent(in) :: P1(3),P2(3),P3(3)
+      double precision,intent(out) :: area
+      double precision,intent(out) :: normal(3)
    end subroutine area_triangle
 end interface
 !------------------------
@@ -77,4 +77,3 @@ area = area + aux_scalar
 !------------------------
 return
 end subroutine area_hexagon
-

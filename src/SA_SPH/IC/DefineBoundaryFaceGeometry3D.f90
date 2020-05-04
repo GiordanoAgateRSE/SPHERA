@@ -23,6 +23,7 @@
 ! Description: To define boundary faces from 3D geometry.
 !              (Di Monaco et al., 2011, EACFM)                        
 !-------------------------------------------------------------------------------
+#ifdef SPACE_3D
 subroutine DefineBoundaryFaceGeometry3D
 !------------------------
 ! Modules
@@ -71,3 +72,4 @@ enddo
 !------------------------
 return
 end subroutine DefineBoundaryFaceGeometry3D
+#endif

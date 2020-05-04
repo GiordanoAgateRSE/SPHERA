@@ -178,7 +178,7 @@ do npi=1,nag
       pg(npi)%sigma_prime_m = max(pg(npi)%pres - max(pg(npi)%pres_fluid,0.d0), &
                               0.d0) 
 ! Liquefaction model
-      if (Granular_flows_options%t_liq>=0.000001) then
+      if (Granular_flows_options%t_liq>=1.d-6) then
          if ((simulation_time>=Granular_flows_options%t_q0).and.               &
             (simulation_time<=Granular_flows_options%t_liq).and.               &
             (pg(npi)%pres_fluid>0.d0)) then

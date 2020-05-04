@@ -26,6 +26,7 @@
 !ro
 !               (Di Monaco et al., 2011, EACFM)                        
 !-------------------------------------------------------------------------------
+#ifdef SPACE_3D
 double precision function IWro2dro(ro)
 !------------------------
 ! Modules
@@ -45,7 +46,7 @@ double precision,parameter :: b1 = 0.0625d0
 double precision,parameter :: b2 = 0.025d0
 ! 1/240
 double precision,parameter :: b3 = 4.16666666666667d-03
-double precision,intent(IN) :: ro
+double precision,intent(in) :: ro
 double precision :: ro2,ro3,duemro,duemro2,duemro4,IWro2dro1,IWro2dro2
 !------------------------
 ! Explicit interfaces
@@ -67,15 +68,16 @@ if ((ro>=zero).and.(ro<one)) then
    elseif ((ro>=one).and.(ro<two)) then
       ro2 = ro * ro
       duemro = two - ro
-     duemro2 = duemro * duemro
-     duemro4 = duemro2 * duemro2
-     IWro2dro2 = -(b1 * ro2 + b2 * duemro * ro + b3 * duemro2) * duemro4
-     IWro2dro = KERNELCONST3D * (-IWro2dro2)
-     else
-        IWro2dro = zero
+      duemro2 = duemro * duemro
+      duemro4 = duemro2 * duemro2
+      IWro2dro2 = -(b1 * ro2 + b2 * duemro * ro + b3 * duemro2) * duemro4
+      IWro2dro = KERNELCONST3D * (-IWro2dro2)
+      else
+         IWro2dro = zero
 endif
 !------------------------
 ! Deallocations
 !------------------------
 return
 end function IWro2dro
+#endif

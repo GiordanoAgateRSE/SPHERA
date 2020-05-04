@@ -23,6 +23,7 @@
 ! Description: Detection of the previous adjacent side and associated relative
 !              angle (for each boundary side). (Di Monaco et al., 2011, EACFM)                        
 !-------------------------------------------------------------------------------
+#ifdef SPACE_2D
 subroutine DefineBoundarySideRelativeAngles2D
 !------------------------
 ! Modules
@@ -53,7 +54,7 @@ double precision,dimension(1:SPACEDIM,1:SPACEDIM) :: Tmx,PTmx
 do isi=1,NumBSides
    nti = BoundarySide(isi)%stretch
 ! Skip the perimeter and pool types
-   if ((Tratto(nti)%tipo/="peri").AND.(Tratto(nti)%tipo/="pool")) then
+   if ((Tratto(nti)%tipo/="peri").and.(Tratto(nti)%tipo/="pool")) then
 ! Loop on all the other sides
       ksi=0
       do jsi=1,NumBSides
@@ -61,7 +62,7 @@ do isi=1,NumBSides
          if ((Tratto(ntj)%tipo=="peri").or.(Tratto(ntj)%tipo=="pool")) cycle
 ! To check if the sides are adjacents ("ksi" is the previous adjacent side)
          if (BoundarySide(jsi)%Vertex(2)==BoundarySide(isi)%Vertex(1)) then
-            ksi = jsi                    
+            ksi = jsi                   
             exit
          endif
       enddo
@@ -70,7 +71,7 @@ do isi=1,NumBSides
       if (ksi>0) then
 ! To compute the angle between the two sides (in radians)
          ntj = BoundarySide(ksi)%stretch
-         if ((Tratto(ntj)%tipo/="peri").AND.(Tratto(ntj)%tipo/="pool")) then
+         if ((Tratto(ntj)%tipo/="peri").and.(Tratto(ntj)%tipo/="pool")) then
             Tmx  = BoundarySide(isi)%T
             PTmx = BoundarySide(ksi)%T
             sinangle = PTmx(1,1) * Tmx(3,1) - PTmx(3,1) * Tmx(1,1)
@@ -86,3 +87,4 @@ enddo
 !------------------------
 return
 end subroutine DefineBoundarySideRelativeAngles2D
+#endif

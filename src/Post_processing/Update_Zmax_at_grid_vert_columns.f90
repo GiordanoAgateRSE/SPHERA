@@ -29,6 +29,7 @@
 !              (current time step), at the same frequency of the water depth 
 !              (only in 3D).            
 !-------------------------------------------------------------------------------
+#ifdef SPACE_3D
 subroutine Update_Zmax_at_grid_vert_columns(print_flag)
 !------------------------
 ! Modules
@@ -368,4 +369,4 @@ if (allocated(compact_fluid)) then
 endif
 return
 end subroutine Update_Zmax_at_grid_vert_columns
-
+#endif

@@ -55,11 +55,11 @@ integer(4) :: test_face1,test_face2,i,j,n_vert
 test_face1 = 0
 test_face2 = 0
 false_hyp = .false.
-if (ncord==3) then
+#ifdef SPACE_3D
    n_vert = 3
-   else
+#elif defined SPACE_2D
       n_vert = 4
-endif
+#endif
 !------------------------
 ! Statements
 !------------------------
@@ -73,20 +73,20 @@ do_vertices_face1: do i=1,n_vert
 ! isolated and it updates test_face1/2 (the sum 
 ! of the 2 non-isolated vertex IDs of face 1/2; in 2D the ID squares are 
 ! considered to avoid ambiguities in the following computations)
-         if (ncord==3) then
+#ifdef SPACE_3D
             test_face1 = test_face1 + i 
             test_face2 = test_face2 + j 
-            else
-               test_face1 = test_face1 + i**2 
-               test_face2 = test_face2 + j**2    
-         endif
+#elif defined SPACE_2D
+               test_face1 = test_face1 + i ** 2 
+               test_face2 = test_face2 + j ** 2
+#endif
          cycle do_vertices_face1
       endif
    enddo
 enddo do_vertices_face1
 ! The only/first vertex (in 3D/2D) of the 1st face, not contributing to 
 ! test_face1, is finally found
-if (ncord==3) then
+#ifdef SPACE_3D
    select case (test_face1)
       case(5)
          ID_face1_iso = 1
@@ -97,7 +97,7 @@ if (ncord==3) then
       case default
          ID_face1_iso = 0
    endselect
-   else
+#elif defined SPACE_2D
       select case (test_face1)
          case(13,20,25)
             ID_face1_iso = 1
@@ -108,10 +108,10 @@ if (ncord==3) then
          case default
             ID_face1_iso = 0
       endselect   
-endif
+#endif
 ! The only/first vertex (in 3D/2D) of the 2nd face, not contributing to   
 ! test_face2, is finally found
-if (ncord==3) then
+#ifdef SPACE_3D
    select case (test_face2)
       case(5)
          ID_face2_iso = 1
@@ -122,7 +122,7 @@ if (ncord==3) then
       case default
          ID_face2_iso = 0
    endselect  
-   else
+#elif defined SPACE_2D
       select case (test_face2)
          case(13,20,25)
             ID_face2_iso = 1
@@ -133,11 +133,10 @@ if (ncord==3) then
          case default
             ID_face2_iso = 0
       endselect 
-endif
+#endif
 if ((ID_face1_iso==0).or.(ID_face2_iso==0)) false_hyp = .true.
 !------------------------
 ! Deallocations
 !------------------------
 return
 end subroutine adjacent_faces_isolated_points
-

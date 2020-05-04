@@ -29,15 +29,24 @@ subroutine RHS_momentum_equation
 use Static_allocation_module
 use Dynamic_allocation_module
 use Hybrid_allocation_module
+#ifdef SPACE_3D
 use I_O_file_module
 use I_O_diagnostic_module
+#endif
 !------------------------
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: Ncbf_Max,ii,npi,Ncbf,Ncbs,IntNcbs
+integer(4) :: ii,npi
+#ifdef SPACE_3D
+integer(4) :: Ncbf_Max,Ncbf
+#elif defined SPACE_2D
+integer(4) :: Ncbs,IntNcbs
+#endif
 double precision,dimension(1:SPACEDIM) :: tpres,tdiss,tvisc,BoundReaction
+#ifdef SPACE_3D
 character(len=lencard) :: nomsub = "RHS_momentum_equation"
+#endif
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -47,14 +56,25 @@ character(len=lencard) :: nomsub = "RHS_momentum_equation"
 !------------------------
 ! Initializations
 !------------------------
+#ifdef SPACE_3D
+Ncbf_Max = 0
+#endif
 !------------------------
 ! Statements
 !------------------------
-Ncbf_Max = 0
 !$omp parallel do default(none)                                                &
-!$omp shared(pg,Domain,BoundaryDataPointer,Ncbf_Max,indarrayFlu,Array_Flu,Med) &
-!$omp shared(nag,ncord)                                                        &
-!$omp private(npi,ii,tpres,tdiss,tvisc,Ncbf,BoundReaction,Ncbs,IntNcbs)
+!$omp shared(pg,Domain,BoundaryDataPointer,indarrayFlu,Array_Flu,Med)          &
+#ifdef SPACE_3D
+!$omp shared(Ncbf_Max)                                                         &
+#endif
+!$omp shared(nag)                                                              &
+!$omp private(npi,ii,tpres,tdiss,tvisc)                                        &
+#ifdef SPACE_3D
+!$omp private(Ncbf)                                                            &
+#elif defined SPACE_2D
+!$omp private(Ncbs,IntNcbs)                                                    &
+#endif
+!$omp private(BoundReaction)
 ! Loop over particles
 do ii = 1,indarrayFlu
    npi = Array_Flu(ii)
@@ -72,35 +92,40 @@ do ii = 1,indarrayFlu
       pg(npi)%velass = zero
    endif
    if (Domain%tipo=="semi") then
-      if (ncord==3) then
+#ifdef SPACE_3D
          Ncbf = BoundaryDataPointer(1,npi)
-         else
+#elif defined SPACE_2D
             Ncbs = BoundaryDataPointer(1,npi)
             IntNcbs = BoundaryDataPointer(2,npi)
-      endif
+#endif
       else
-         if (ncord==3) then
+#ifdef SPACE_3D
             Ncbf = 0
-            else
+#elif defined SPACE_2D
                Ncbs = 0
                IntNcbs = 0
-         endif
+#endif
    endif
-   if ((Domain%tipo=="semi").and.((Ncbf>0).or.((Ncbs>0).and.(IntNcbs>0)))) then
-      if (ncord==3) then
+   if ((Domain%tipo=="semi").and.                                              &
+#ifdef SPACE_3D   
+      (Ncbf>0)) then
+#elif defined SPACE_2D
+      (Ncbs>0).and.(IntNcbs>0)) then
+#endif
+#ifdef SPACE_3D
 !$omp critical (omp_Ncbf_Max)
          Ncbf_Max = max(Ncbf_Max,Ncbf)
 !$omp end critical (omp_Ncbf_Max)
          call AddBoundaryContributions_to_ME3D(npi,Ncbf,tpres,tdiss,tvisc)
-         else
+#elif defined SPACE_2D
             call AddBoundaryContributions_to_ME2D(npi,IntNcbs,tpres,tdiss,tvisc)
-      endif
+#endif
       if (pg(npi)%kodvel==0) then
-         if (ncord==3) then
+#ifdef SPACE_3D
             call AddElasticBoundaryReaction_3D(npi,Ncbf,BoundReaction)
-            else
+#elif defined SPACE_2D
                call AddElasticBoundaryReaction_2D(npi,IntNcbs,BoundReaction)
-         endif
+#endif
          pg(npi)%acc(:) = tpres(:) + tdiss(:) + tvisc(:) + Domain%grav(:) +    &
                           BoundReaction(:)
          else
@@ -116,11 +141,13 @@ do ii = 1,indarrayFlu
    endif
 enddo
 !$omp end parallel do
+#ifdef SPACE_3D
 if (Ncbf_Max>Domain%MAXCLOSEBOUNDFACES) then
    write(ulog,"(a,i5,a,i5)") "Increase parameter MAXCLOSEBOUNDFACES from",     &
       Domain%MAXCLOSEBOUNDFACES," to ",Ncbf_Max
    call diagnostic(arg1=9,arg2=3,arg3=nomsub)
 endif
+#endif
 !------------------------
 ! Deallocations
 !------------------------

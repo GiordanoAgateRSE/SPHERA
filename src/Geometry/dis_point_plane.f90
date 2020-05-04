@@ -30,9 +30,9 @@ subroutine dis_point_plane(P0,P1_plane,P2_plane,P3_plane,dis,normal)
 ! Declarations
 !------------------------
 implicit none
-double precision,intent(IN) :: P0(3),P1_plane(3),P2_plane(3),P3_plane(3) 
-double precision,intent(INOUT) :: dis
-double precision,intent(INOUT) :: normal(3)
+double precision,intent(in) :: P0(3),P1_plane(3),P2_plane(3),P3_plane(3) 
+double precision,intent(inout) :: dis
+double precision,intent(inout) :: normal(3)
 double precision :: a,b,c,d
 !------------------------
 ! Explicit interfaces
@@ -63,4 +63,3 @@ dis = abs((a * P0(1) + b * P0(2) + c * P0(3) + d) /                            &
 !------------------------
 return
 end subroutine dis_point_plane
-

@@ -20,7 +20,9 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: Matrix_Inversion_3x3  
-! Description: Computation of the inverse (inv) of a provided 3x3 matrix (mat).   
+! Description: Computation of the inverse (inv) of a provided 3x3 matrix (mat).
+!              It is also called in 2D. The program unit "Matrix_Inversion_2x2" 
+!              was available until SPHERA v.9.0.0.   
 !-------------------------------------------------------------------------------
 subroutine Matrix_Inversion_3x3(mat,inv,test)
 !------------------------
@@ -30,9 +32,9 @@ subroutine Matrix_Inversion_3x3(mat,inv,test)
 ! Declarations
 !------------------------
 implicit none
-double precision,intent(IN) :: mat(3,3) 
-double precision,intent(INOUT) :: inv(3,3)
-integer(4),intent(INOUT) :: test  
+double precision,intent(in) :: mat(3,3) 
+double precision,intent(inout) :: inv(3,3)
+integer(4),intent(inout) :: test  
 double precision :: det
 !------------------------
 ! Explicit interfaces
@@ -69,4 +71,3 @@ endif
 !------------------------
 return
 end subroutine Matrix_Inversion_3x3
-

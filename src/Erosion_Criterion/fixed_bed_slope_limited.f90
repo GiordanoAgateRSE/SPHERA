@@ -38,7 +38,7 @@ use Dynamic_allocation_module
 !------------------------
 implicit none
 integer(4),intent(in) :: npi,igridi,jgridi
-logical,intent(INOUT) :: test
+logical,intent(inout) :: test
 integer(4) :: aux_ID
 double precision :: Velocity2,fixed_bed_tolerance,pretot
 double precision :: aux_vec(3)
@@ -54,11 +54,11 @@ double precision :: aux_vec(3)
 !------------------------
 ! Statements
 !------------------------
-if (ncord==3) then
+#ifdef SPACE_3D
    fixed_bed_tolerance = 4.d0 * Domain%h
-   elseif (ncord==2) then
+#elif defined SPACE_2D
       fixed_bed_tolerance = 2.d0 * Domain%h
-endif    
+#endif    
 if (ind_interfaces(igridi,jgridi,4)>0) then
    if (pg(npi)%coord(3)<(pg(ind_interfaces(igridi,jgridi,4))%coord(3)-         &
       fixed_bed_tolerance)) then
@@ -104,4 +104,3 @@ endif
 !------------------------
 return
 end subroutine fixed_bed_slope_limited
-

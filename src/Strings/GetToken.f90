@@ -56,7 +56,7 @@ do n=1,len_trim(ainp)
       number_token = number_token + 1
       index_token(1,number_token) = n
       index_token(2,number_token) = n
-      blank = .FALSE.
+      blank = .false.
       elseif ((.not.blank).and.(ainp(n:n)/=" ")) then
          index_token(2,number_token) = n
          elseif (ainp(n:n)==" ") then 
@@ -75,4 +75,3 @@ endif
 !------------------------
 return
 end function GetToken
-

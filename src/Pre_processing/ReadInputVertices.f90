@@ -38,7 +38,7 @@ integer(4) :: nrighe,ier,ninp,ulog
 integer(4),dimension(20) :: NumberEntities
 double precision,dimension(1:SPACEDIM,NumVertici) :: Vertice
 character(1) :: comment
-character(LEN=lencard) :: ainp
+character(len=lencard) :: ainp
 integer(4) :: n,i,icord,ioerr
 double precision,dimension(3) :: values1
 character(8) :: label
@@ -60,26 +60,26 @@ character(100),external :: lcase, GetToken
 if (restart) then
    do while (trim(lcase(ainp))/="##### end vertices #####")
       call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
-      if (.NOT.ReadCheck (ioerr,ier,nrighe,ainp,"VERTICES DATA",ninp,ulog))    &
+      if (.not.ReadCheck (ioerr,ier,nrighe,ainp,"VERTICES DATA",ninp,ulog))    &
          return
    enddo
   return
 endif
 call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
-if (.NOT.ReadCheck (ioerr,ier,nrighe,ainp,"VERTICES DATA",ninp,ulog)) return
-if ((ncord>0).and.(ulog>0).and.(prtopt)) then
+if (.not.ReadCheck (ioerr,ier,nrighe,ainp,"VERTICES DATA",ninp,ulog)) return
+if ((input_second_read.eqv..true.).and.(ulog>0).and.(prtopt)) then
    write(ulog,"(1x,a)") "List of vertices:"
 endif
 do while (trim(lcase(ainp))/="##### end vertices #####")
    select case (TRIM(Domain%tipo))
       case ("semi","bsph") 
-         read (ainp,*,iostat=ioerr) i, values1(1:NumberEntities(1))
+         read (ainp,*,iostat=ioerr) i, values1(1:ncord)
          write(label,"(i8)") i
-         if (.NOT.ReadCheck (ioerr,ier,nrighe,ainp,"VERTEX n."//label,ninp,    &
+         if (.not.ReadCheck (ioerr,ier,nrighe,ainp,"VERTEX n."//label,ninp,    &
             ulog)) return
          NumberEntities(7) = max(i,NumberEntities(7))
-         if (ncord>0) then
-            do n=1,NumberEntities(1)
+         if (input_second_read.eqv..true.) then
+            do n=1,ncord
                icord = icoordp(n,ncord-1)
                if (NumberEntities(7)==1) then
                   Domain%coord(icord,1) = values1(n)
@@ -97,15 +97,15 @@ do while (trim(lcase(ainp))/="##### end vertices #####")
          ier = 2
          return
    endselect
-   if ((ncord>0).and.(ulog>0).and.(prtopt)) then
+   if ((input_second_read.eqv..true.).and.(ulog>0).and.(prtopt)) then
       write(ulog,"(i6,1p,3(2x,a,e12.4))") i,(xyzlabel(icoordp(n,ncord-1)),     &
          Vertice(icoordp(n,ncord-1),i),n=1,ncord)
    endif
    call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
-   if (.NOT.ReadCheck (ioerr,ier,nrighe,ainp,"VERTICES DATA",ninp,ulog)) return
+   if (.not.ReadCheck (ioerr,ier,nrighe,ainp,"VERTICES DATA",ninp,ulog)) return
 enddo
-if ((ncord>0).and.(ulog>0)) then
-   do n=1,NumberEntities(1)
+if ((input_second_read.eqv..true.).and.(ulog>0)) then
+   do n=1,ncord
       icord = icoordp(n,ncord-1)
       write(ulog,"(1x,a,a,1p,e12.4)") xyzlabel(icord)," coordinate min. ",     &
          Domain%coord(icord,1)
@@ -119,4 +119,3 @@ endif
 !------------------------
 return
 end subroutine ReadInputVertices
-

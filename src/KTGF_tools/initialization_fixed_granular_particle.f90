@@ -19,20 +19,22 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: Matrix_Inversion_2x2  
-! Description: Computation of the inverse (inv) of a provided 2x2 matrix (mat).   
+! Program unit: initialization_fixed_granular_particle     
+! Description: To initialize the most of the fixed SPH mixture particles
+!              (bed-load transport).              
 !-------------------------------------------------------------------------------
-subroutine Matrix_Inversion_2x2(mat,inv)
+subroutine initialization_fixed_granular_particle(npi)
 !------------------------
 ! Modules
 !------------------------
+use Static_allocation_module 
+use Hybrid_allocation_module
+use Dynamic_allocation_module
 !------------------------
 ! Declarations
 !------------------------
 implicit none
-double precision,intent(IN) :: mat(2,2) 
-double precision,intent(INOUT) :: inv(2,2)
-double precision :: det
+integer(4),intent(in) :: npi
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -42,18 +44,20 @@ double precision :: det
 !------------------------
 ! Initializations
 !------------------------
+pg(npi)%Beta_slope = -999.d0
+#ifdef SPACE_3D
+pg(npi)%Gamma_slope = -999.d0
+pg(npi)%C_L = 0.d0
+pg(npi)%C_D = 0.d0
+#endif 
+pg(npi)%u_star = 0.d0
+pg(npi)%k_BetaGamma = -999.d0
+pg(npi)%tau_tauc = 0.0d0
 !------------------------
 ! Statements
 !------------------------
-det = mat(1,1) * mat(2,2) - mat(2,1) * mat(1,2)
-inv(1,1) = mat(2,2)
-inv(1,2) = -mat(2,1)
-inv(2,1) = -mat(1,2)
-inv(2,2) = mat(1,1)
-inv(:,:) = inv(:,:) / det
 !------------------------
 ! Deallocations
 !------------------------
 return
-end subroutine Matrix_Inversion_2x2
-
+end subroutine initialization_fixed_granular_particle

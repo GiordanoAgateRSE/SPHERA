@@ -36,7 +36,7 @@ use Dynamic_allocation_module
 ! Declarations
 !------------------------
 implicit none
-character(6),intent(IN) :: str
+character(6),intent(in) :: str
 integer(4) :: npi,i,j,k,k1,k2,numcells,numpoints
 double precision :: curtime
 integer(4),dimension(24) :: iappo
@@ -338,7 +338,7 @@ if (nag>0) then
             pg(finger(k))%dvel(1,2),pg(finger(k))%dvel(1,3),k=k1,k2)
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
-      if (ncord==3) then
+#ifdef SPACE_3D
 ! Gradient of the y-component of velocity
          write(unitvtk,'(a)')                                                  &
 '      <DataArray type="Float32" Name="d(u_y) vectors"  NumberOfComponents="3"  format="ascii" >'
@@ -350,7 +350,7 @@ if (nag>0) then
                pg(finger(k))%dvel(2,2),pg(finger(k))%dvel(2,3),k=k1,k2)
          enddo
          write(unitvtk,'(a)') '      </DataArray>'
-      endif
+#endif
 ! Gradient of the z-component of velocity
       write(unitvtk,'(a)')                                                     &
 '      <DataArray type="Float32" Name="d(u_z) vectors"  NumberOfComponents="3"  format="ascii" >'
@@ -499,7 +499,7 @@ if (nag>0) then
          enddo
          write(unitvtk,'(a)') '      </DataArray>'    
          if (Granular_flows_options%KTGF_config==1) then  
-            if (ncord==3) then    
+#ifdef SPACE_3D    
 ! C_D
                write(unitvtk,'(a)')                                            &
             '      <DataArray type="Float32" Name="C_D" format="ascii" >'
@@ -520,7 +520,7 @@ if (nag>0) then
                   write(unitvtk,'(8x,16(1x,ES12.4E3))') (pg(finger(k))%C_L,k=k1,k2)
                enddo
                write(unitvtk,'(a)') '      </DataArray>'
-! Gamma
+! Gamma_slope
                write(unitvtk,'(a)')                                            &
 '      <DataArray type="Float32" Name="Gamma(radians)" format="ascii" >'
                do i=1,numpoints,16
@@ -531,7 +531,7 @@ if (nag>0) then
                      (pg(finger(k))%Gamma_slope,k=k1,k2)
                enddo
                write(unitvtk,'(a)') '      </DataArray>' 
-            endif
+#endif
 ! k_BetaGamma
             write(unitvtk,'(a)')                                               &
          '      <DataArray type="Float32" Name="k_BetaGamma" format="ascii" >'
@@ -690,13 +690,13 @@ if (nag>0) then
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
 ! Weight
-      if (ncord==2) then
+#ifdef SPACE_2D
          write(unitvtk,'(a)')                                                  &
             '      <DataArray type="Float32" Name="weight (m)" format="ascii" >'
-         else
+#elif defined SPACE_3D
             write(unitvtk,'(a)')                                               &
 '      <DataArray type="Float32" Name="weight (m^2)" format="ascii" >'
-      endif
+#endif
       do i=1,numpoints,16
          k1 = i
          k2 = k1 + 15
@@ -1066,7 +1066,7 @@ if (nag>0) then
                                                k=k1,k2)
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
-! Second row 
+! Second row
       write(unitvtk,'(a)')                                                     &
 '      <DataArray type="Float32" Name="Ic(y,:)"  NumberOfComponents="3"  format="ascii" >'
       do i=1,numpoints,6
@@ -1092,7 +1092,7 @@ if (nag>0) then
                                                k=k1,k2)
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
-! Mass 
+! Mass
       write(unitvtk,'(a)')                                                     &
          '      <DataArray type="Float32" Name="mass (kg)" format="ascii" >'
       do i=1,numpoints,16
@@ -1130,7 +1130,7 @@ endif
 if (freq_time>zero) then
    val_time = val_time + abs(freq_time)
    elseif ((curtime>=val_time).and.(val_time>zero)) then
-      val_time = 1.e20
+      val_time = 1.d20
 endif
 !------------------------
 ! Deallocations

@@ -26,8 +26,8 @@
 ! are considered.
 !-------------------------------------------------------------------------------
 subroutine viscomorris(mass_comput_part,dens_comput_part,                      &
-kin_visc_comput_part,mass_neighbour,dens_neighbour,kin_visc_neighbour,         &
-kernel_der,vel_type,rel_dis,dervel,rvw)
+   kin_visc_comput_part,mass_neighbour,dens_neighbour,kin_visc_neighbour,      &
+   kernel_der,vel_type,rel_dis,dervel,rvw)
 !------------------------
 ! Modules
 !------------------------
@@ -64,8 +64,8 @@ if (vel_type/="std") then
    else
       amassj = mass_neighbour
       rhotilde = (kin_visc_comput_part * dens_comput_part + kin_visc_neighbour &
-                  * dens_neighbour + 0.001d0)
-      anuitilde = 4.0d0 * (kin_visc_comput_part * kin_visc_neighbour)
+                  * dens_neighbour + 1.d-3)
+      anuitilde = 4.d0 * (kin_visc_comput_part * kin_visc_neighbour)
 endif
 factivis = amassj * anuitilde / rhotilde
 rvw(1:3) = factivis * (-dervel(1:3) * kernel_der * dot_product(rel_dis,rel_dis))

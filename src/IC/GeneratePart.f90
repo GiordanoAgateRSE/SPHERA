@@ -19,35 +19,51 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: GeneratePart     
-! Description: Particle positions (initial conditions).             
+! Program unit: GeneratePart
+! Description: Particle positions (initial conditions).
 !-------------------------------------------------------------------------------
+#ifdef SPACE_3D
 subroutine GeneratePart(IC_loop)
+#elif defined SPACE_2D
+subroutine GeneratePart
+#endif
 !------------------------
 ! Modules
 !------------------------
-use I_O_file_module
 use Static_allocation_module
 use Hybrid_allocation_module
 use Dynamic_allocation_module
+#ifdef SPACE_3D
+use I_O_file_module
 use I_O_diagnostic_module
+#endif
 !------------------------
 ! Declarations
 !------------------------
 implicit none
-integer(4),intent(IN) :: IC_loop
-integer(4) :: Nt,Nz,Mate,IsopraS,NumParticles,i,j,k,dimensioni,NumPartPrima    
-integer(4) :: aux_factor,i_vertex,j_vertex,test_xy,test_z,n_levels,nag_aux
-integer(4) :: i_face,npi,ier,test_face,test_dam,test_xy_2,alloc_stat
-double precision :: distance_hor,z_min,aux_scal,rnd
+#ifdef SPACE_3D
+integer(4),intent(in) :: IC_loop
+#endif
+integer(4) :: Nt,Nz,Mate,IsopraS,NumParticles,i,dimensioni,NumPartPrima,test_z
+#ifdef SPACE_3D
+integer(4) :: aux_factor,i_vertex,j_vertex,test_xy,test_xy_2,test_face,test_dam
+integer(4) :: n_levels,nag_aux,alloc_stat,i_face,j,k,npi
+double precision :: z_min,distance_hor,aux_scal,rnd
 double precision :: aux_vec(3)
+#endif
 integer(4),dimension(SPACEDIM) :: Npps
+#ifdef SPACE_3D
 double precision,dimension(NPartZone) :: h_reservoir
+#endif
 double precision,dimension(SPACEDIM) :: MinOfMin,XminReset
+#ifdef SPACE_3D
 double precision,dimension(:),allocatable :: z_aux
+#endif
 double precision,dimension(:,:),allocatable :: Xmin,Xmax
+#ifdef SPACE_3D
 character(len=lencard)  :: nomsub = "GeneratePart"
-type(TyParticle),dimension(:),allocatable    :: pg_aux
+type(TyParticle),dimension(:),allocatable :: pg_aux
+#endif
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -64,7 +80,7 @@ interface
       double precision,intent(in) :: point(2),point_pol_1(2),point_pol_2(2)
       double precision,intent(in) :: point_pol_3(2),point_pol_4(2)
       double precision,intent(in) :: point_pol_5(2),point_pol_6(2)
-      integer(4),intent(INOUT) :: test
+      integer(4),intent(inout) :: test
       double precision :: dis1,dis2
       double precision :: normal(2)
    end subroutine point_inout_convex_non_degenerate_polygon
@@ -72,11 +88,11 @@ end interface
 !------------------------
 ! Allocations
 !------------------------
-if (ncord == 2) then
-   dimensioni = NumTratti
-   else
-      dimensioni = NumFacce
-endif
+#ifdef SPACE_3D
+   dimensioni = NumFacce
+#elif defined SPACE_2D
+      dimensioni = NumTratti
+#endif
 allocate(xmin(spacedim,dimensioni),xmax(spacedim,dimensioni))
 !------------------------
 ! Initializations
@@ -84,6 +100,7 @@ allocate(xmin(spacedim,dimensioni),xmax(spacedim,dimensioni))
 call random_seed()
 NumParticles = 0
 test_z = 0
+#ifdef SPACE_3D
 if (IC_loop==2) then
    do Nz=1,NPartZone
       if (Partz(Nz)%IC_source_type==2) then
@@ -91,7 +108,9 @@ if (IC_loop==2) then
       endif
    enddo
 endif
+#endif
 if (test_z==0) nag = 0
+#ifdef SPACE_3D
 do Nz=1,NPartZone
    if (Domain%tipo=="bsph") then
 ! In case of DB-SPH boundary treatment, there is a fictitious fluid reservoir
@@ -101,6 +120,7 @@ do Nz=1,NPartZone
          h_reservoir(Nz) = Partz(Nz)%H_res
    endif
 enddo
+#endif
 MinOfMin = max_positive_number
 !------------------------
 ! Statements
@@ -116,14 +136,12 @@ first_cycle: do Nz=1,NPartZone
       Xmin(1:SPACEDIM,nt) =  max_positive_number
       Xmax(1:SPACEDIM,nt) =  max_negative_number
 ! To search for the minimum and maximum coordinates of the current zone 
-! In 2D
-      if (ncord==2) then
-         call FindLine(Xmin,Xmax,Nt)
-! To search for the minimum and maximum coordinates of the current subzone 
-! in 3D
-         else
-            call FindFrame(Xmin,Xmax,Nt)
-      endif
+#ifdef SPACE_3D
+! To search for the minimum and maximum coordinates of the current subzone in 3D
+         call FindFrame(Xmin,Xmax,Nt)
+#elif defined SPACE_2D
+            call FindLine(Xmin,Xmax,Nt)
+#endif
 ! To evaluate the minimum and maximum coordinates of the zone checking for 
 ! all the subzones
       do i=1,Spacedim
@@ -139,17 +157,18 @@ enddo first_cycle
 ! Loop over the zone in order to set the particle locations
 second_cycle: do Nz=1,NPartZone
 ! To skip the boundaries not having types equal to "perimeter" or "pool"
-   if ((Partz(Nz)%tipo/="peri").AND.(Partz(Nz)%tipo/="pool")) cycle second_cycle
+   if ((Partz(Nz)%tipo/="peri").and.(Partz(Nz)%tipo/="pool")) cycle second_cycle
 ! "perimeter" or "pool" conditions are set
    Mate = Partz(Nz)%Medium
    Partz(Nz)%limit(1) = NumParticles + 1
    if ((Partz(Nz)%tipo=="peri").and.(Partz(Nz)%IC_source_type==2)) then
+#ifdef SPACE_3D
 ! During the first IC loop
       if (IC_loop==1) then
 ! Update number of points/vertices of the zone
          Partz(Nz)%npoints = Partz(Nz)%ID_last_vertex -                        &
                              Partz(Nz)%ID_first_vertex + 1
-         aux_factor = nint(Partz(Nz)%dx_CartTopog / Domain%dx) 
+         aux_factor = nint(Partz(Nz)%dx_CartTopog / Domain%dx)
 ! Allocation of the auxiliary array z_aux
          if (.not.allocated(z_aux)) then
 ! The number of points is increased due to the eventual presence of the 
@@ -267,7 +286,7 @@ second_cycle: do Nz=1,NPartZone
                                  if (aux_scal<=0.d0) test_z=1
                               endif
                            endif
-                        enddo 
+                        enddo
 !$omp end parallel do
 ! Check the presence of a dam zone
                         test_dam = 0
@@ -372,49 +391,57 @@ if ((Tratto(BoundaryFace(i_face)%stretch)%zone==Partz(Nz)%dam_zone_ID).and.    &
 !$omp end parallel do
             NumParticles = Partz(Nz)%limit(2)
       endif
+#endif
       else
 ! Loop over the different regions belonging to a same zone
          do Nt = Partz(Nz)%Indix(1),Partz(Nz)%Indix(2)
 ! To evaluate the number of particles for the subdomain Npps along all the 
 ! directions
-            if ((Xmin(1,nt)== max_positive_number).or.                         &
-                (Xmax(1,nt)== max_negative_number)) then
+            if ((Xmin(1,nt)==max_positive_number).or.                          &
+                (Xmax(1,nt)==max_negative_number)) then
 ! The zone is declared but is not used
                Npps = -1
                else
-               do i=1,SPACEDIM
-                  NumPartPrima = nint((Xmin(i,nt) - MinOfMin(i)) / Domain%dx)
-                  Xminreset(i) = MinOfMIn(i) + NumPartPrima * Domain%dx
-                  Npps(i) = nint((Xmax(i,nt) - XminReset(i)) / Domain%dx)
-               enddo
+                  do i=1,SPACEDIM
+                     NumPartPrima = nint((Xmin(i,nt) - MinOfMin(i)) / Domain%dx)
+                     Xminreset(i) = MinOfMIn(i) + NumPartPrima * Domain%dx
+                     Npps(i) = nint((Xmax(i,nt) - XminReset(i)) / Domain%dx)
+                  enddo
             endif
+#ifdef SPACE_2D
 ! To force almost one particle if the domain width in a direction is smaller  
 ! than dx
-            if (ncord==2) where (Npps==0) Npps = 1
+               where (Npps==0) Npps = 1
+#endif
 ! To consider the "pool" condition: set "Isopra=1" if it crosses the 
 ! "virtual" side
             if (Partz(Nz)%tipo=="pool") then
                Xmax(Partz(Nz)%ipool,Nt) = Partz(Nz)%pool
-               IsopraS = 1   
+               IsopraS = 1
                else
                   IsopraS = 0
-            endif     
+            endif
 ! To set the particles in the zone
+#ifdef SPACE_3D
             call SetParticles(Nt,Nz,Mate,XminReset,Npps,NumParticles,IsopraS)
+#elif defined SPACE_2D
+            call SetParticles(Nt,Nz,Mate,XminReset,Npps,NumParticles)
+#endif
          enddo
 ! To set the upper pointer for the particles in the nz-th zone
          Partz(Nz)%limit(2) = NumParticles
    endif
 enddo second_cycle
+#ifdef SPACE_3D
 if (allocated(pg_aux)) then
 ! Allocation of the fluid particle array in the presence of at least one  
 ! reservoir extruded from topography       
    NumParticles = NumParticles - 1
    PARTICLEBUFFER = int(NumParticles * Domain%COEFNMAXPARTI) + 1
-   allocate(pg(PARTICLEBUFFER),stat=ier)
-   if (ier/=0) then
+   allocate(pg(PARTICLEBUFFER),stat=alloc_stat)
+   if (alloc_stat/=0) then
       write(ulog,'(1x,a,i2)')                                                 &
-         "    Array PG not allocated. Error code: ",ier
+         "    Array PG not allocated. Error code: ",alloc_stat
       call diagnostic(arg1=4,arg3=nomsub)
       else
          write(ulog,'(1x,a)') "    Array PG successfully allocated "
@@ -423,10 +450,10 @@ if (allocated(pg_aux)) then
 ! Loop over the auxiliary particle array
 !$omp parallel do default(none) shared(pg,pg_aux,NumParticles) private(npi)
    do npi=1,NumParticles
-! Copy fluid particle array from the corresponding auxiliary array
+! Copy the fluid particle array from the corresponding auxiliary array
       pg(npi) = pg_aux(npi)
    enddo
-!$omp end parallel do  
+!$omp end parallel do
 ! Deallocation of the auxiliary array z_aux
    deallocate(z_aux,STAT=alloc_stat)
    if (alloc_stat/=0) then
@@ -442,12 +469,15 @@ if (allocated(pg_aux)) then
       stop
    endif
 endif
+#endif
 test_z = 0
+#ifdef SPACE_3D
 if (IC_loop==2) then
    do Nz=1,NPartZone
       if (Partz(Nz)%IC_source_type==2) test_z = 1
    enddo
 endif
+#endif
 if (test_z==0) nag = NumParticles
 nagpg = nag
 !------------------------
@@ -456,4 +486,3 @@ nagpg = nag
 deallocate(xmin,xmax)
 return
 end subroutine GeneratePart
-

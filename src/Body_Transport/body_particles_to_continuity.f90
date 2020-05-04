@@ -54,7 +54,7 @@ double precision,external :: w
 ! Loop over the body particles 
 !$omp parallel do default(none)                                                &
 !$omp shared(n_body_part,bp_arr,nPartIntorno_bp_f,NMAXPARTJ,PartIntorno_bp_f)  &
-!$omp shared(KerDer_bp_f_cub_spl,rag_bp_f,pg,Domain,dx_dxbodies,ncord)         &
+!$omp shared(KerDer_bp_f_cub_spl,rag_bp_f,pg,Domain,dx_dxbodies)               &
 !$omp shared(FSI_free_slip_conditions,ulog,on_going_time_step,n_surf_body_part)&
 !$omp shared(surf_body_part)                                                   &
 !$omp private(npi,sum_W_vol,W_vol,j,npartint,npj,k,temp_dden,aux,dis,dis_min)  &
@@ -151,7 +151,7 @@ do npi=1,n_body_part
       bp_arr(npi)%vel_mir(:) = bp_arr(npi)%vel_mir(:) + (dvar(:) +             &
                                pg(npj)%vel(:)) * W_vol
       sum_W_vol = sum_W_vol + W_vol
-! Contributions to the continuity equation       
+! Contributions to the continuity equation
       temp_dden = pg(npj)%mass / (dx_dxbodies ** ncord) *                      &
                   KerDer_bp_f_cub_spl(npartint) * (dvar(1) * ( -               &
                   rag_bp_f(1,npartint)) + dvar(2) * ( - rag_bp_f(2,npartint))  &
@@ -169,4 +169,3 @@ enddo
 !------------------------
 return
 end subroutine body_particles_to_continuity
-

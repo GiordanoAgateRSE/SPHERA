@@ -32,6 +32,7 @@
 !              depth: the first (i_fil==1) is a raw estimation; the latter 
 !              (i_fil==2) filters the atomization and the wave breaking effects.
 !-------------------------------------------------------------------------------
+#ifdef SPACE_3D
 subroutine electrical_substations
 !------------------------
 ! Modules
@@ -78,7 +79,7 @@ interface
       double precision,intent(in) :: point(2),point_pol_1(2),point_pol_2(2)
       double precision,intent(in) :: point_pol_3(2),point_pol_4(2)
       double precision,intent(in) :: point_pol_5(2),point_pol_6(2)
-      integer(4),intent(INOUT) :: test
+      integer(4),intent(inout) :: test
    end subroutine point_inout_convex_non_degenerate_polygon
    subroutine point_inout_hexagon(point,point_pol_1,point_pol_2,               &
                                   point_pol_3,point_pol_4,point_pol_5,         &
@@ -87,7 +88,7 @@ interface
       double precision,intent(in) :: point(2),point_pol_1(2),point_pol_2(2)
       double precision,intent(in) :: point_pol_3(2),point_pol_4(2)
       double precision,intent(in) :: point_pol_5(2),point_pol_6(2)
-      integer(4),intent(INOUT) :: test
+      integer(4),intent(inout) :: test
    end subroutine point_inout_hexagon
    subroutine point_inout_pentagon(point,point_pol_1,point_pol_2,              &
                                    point_pol_3,point_pol_4,point_pol_5,test)
@@ -95,35 +96,35 @@ interface
       double precision,intent(in) :: point(2),point_pol_1(2),point_pol_2(2)
       double precision,intent(in) :: point_pol_3(2),point_pol_4(2)
       double precision,intent(in) :: point_pol_5(2)
-      integer(4),intent(INOUT) :: test
+      integer(4),intent(inout) :: test
    end subroutine point_inout_pentagon
    subroutine point_inout_quadrilateral(point,point_pol_1,point_pol_2,         &
                                         point_pol_3,point_pol_4,test)
       implicit none
       double precision,intent(in) :: point(2),point_pol_1(2),point_pol_2(2)
       double precision,intent(in) :: point_pol_3(2),point_pol_4(2)
-      integer(4),intent(INOUT) :: test
+      integer(4),intent(inout) :: test
    end subroutine point_inout_quadrilateral
    subroutine area_hexagon(P1,P2,P3,P4,P5,P6,area)
       implicit none
       double precision,intent(IN) :: P1(3),P2(3),P3(3),P4(3),P5(3),P6(3)
-      double precision,intent(INOUT) :: area
+      double precision,intent(inout) :: area
    end subroutine area_hexagon  
    subroutine area_pentagon(P1,P2,P3,P4,P5,area)
       implicit none
-      double precision,intent(IN) :: P1(3),P2(3),P3(3),P4(3),P5(3)
-      double precision,intent(INOUT) :: area
+      double precision,intent(in) :: P1(3),P2(3),P3(3),P4(3),P5(3)
+      double precision,intent(inout) :: area
    end subroutine area_pentagon
    subroutine area_quadrilateral(P1,P2,P3,P4,area)
       implicit none
-      double precision,intent(IN) :: P1(3),P2(3),P3(3),P4(3)
-      double precision,intent(INOUT) :: area
+      double precision,intent(in) :: P1(3),P2(3),P3(3),P4(3)
+      double precision,intent(inout) :: area
    end subroutine area_quadrilateral
    subroutine area_triangle(P1,P2,P3,area,normal)
       implicit none
-      double precision,intent(IN) :: P1(3),P2(3),P3(3)
-      double precision,intent(OUT) :: area
-      double precision,intent(OUT) :: normal(3)
+      double precision,intent(in) :: P1(3),P2(3),P3(3)
+      double precision,intent(out) :: area
+      double precision,intent(out) :: normal(3)
    end subroutine area_triangle
 end interface
 !------------------------
@@ -478,4 +479,4 @@ if (allocated(Vul)) then
 endif
 return
 end subroutine electrical_substations
-
+#endif

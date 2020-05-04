@@ -30,9 +30,9 @@ subroutine distance_point_line_2D(P0,P1_line,P2_line,dis,normal)
 ! Declarations
 !------------------------
 implicit none
-double precision,intent(IN) :: P0(2),P1_line(2),P2_line(2)
-double precision,intent(INOUT) :: dis
-double precision,intent(INOUT) :: normal(2)
+double precision,intent(in) :: P0(2),P1_line(2),P2_line(2)
+double precision,intent(inout) :: dis
+double precision,intent(inout) :: normal(2)
 double precision :: a,b,c
 !------------------------
 ! Explicit interfaces
@@ -57,4 +57,3 @@ dis = (a * P0(1) + b * P0(2) + c) / dsqrt(a ** 2 + b ** 2)
 !------------------------
 return
 end subroutine distance_point_line_2D
-

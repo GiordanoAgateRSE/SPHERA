@@ -29,6 +29,7 @@
 !                                           (vertex V1) 
 !              (Di Monaco et al., 2011, EACFM)
 !-------------------------------------------------------------------------------
+#ifdef SPACE_2D
 subroutine FindCloseBoundarySides2D(npi,Ncbs,Cloboside,LocXY)
 !------------------------
 ! Modules
@@ -76,7 +77,7 @@ pg(npi)%CloseBcOut = 0
 ! Loop over all the boundary sides of the domain
 side_loop: do isi=1,NumBSides
 ! The boundary types "perimeter" and "pool" are skipped
-   if (BoundarySide(isi)%tipo/="peri".AND.BoundarySide(isi)%tipo/="pool") then
+   if (BoundarySide(isi)%tipo/="peri".and.BoundarySide(isi)%tipo/="pool") then
 ! To load the side coordinates P1 and the local directional cosines "sss" and 
 ! "nnn"
 ! To estimate the distances between the current particle position "Plocal"  
@@ -102,7 +103,7 @@ side_loop: do isi=1,NumBSides
       xpmax = sidel + doubleh
 ! To check if the particle has local coordinates falling inside the 
 ! interaction area
-      if (((xpmin<xp).AND.(xp<xpmax)).AND.((ypmin<yp).AND.(yp<ypmax))) then
+      if (((xpmin<xp).and.(xp<xpmax)).and.((ypmin<yp).and.(yp<ypmax))) then
          if (xp<zero) then
             xpq = xp * xp
             ypmx = dsqrt(square_doubleh - xpq)
@@ -117,7 +118,7 @@ side_loop: do isi=1,NumBSides
                   ypmn = -ypmx 
          endif
 ! The boundary must be considered for the current particle as a close boundary
-         if ((ypmn<yp).AND.(yp<ypmx)) then
+         if ((ypmn<yp).and.(yp<ypmx)) then
 ! The number of close boundaries is increased
             Ncbs = Ncbs + 1
 ! To check the maximum number allowed for closest boundaries
@@ -155,7 +156,7 @@ do icbs=1,Ncbs
    if (BoundarySide(isi)%tipo=="sour") then
       XP = LocXY(1,icbs)
       sidel = BoundarySide(isi)%length
-      if ((XP>zero).AND.(XP<sidel)) then
+      if ((XP>zero).and.(XP<sidel)) then
 ! To mark the inlet section to erase the other possible close sides 
          isous = icbs    
          exit
@@ -210,3 +211,4 @@ endif
 !------------------------
 return
 end subroutine FindCloseBoundarySides2D
+#endif

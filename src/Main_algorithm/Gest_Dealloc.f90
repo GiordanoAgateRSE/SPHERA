@@ -36,7 +36,7 @@ use I_O_diagnostic_module
 implicit none
 logical :: check
 integer(4) :: alloc_stat,i
-character(LEN=lencard), intent(IN) :: nomsub
+character(len=lencard), intent(in) :: nomsub
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -73,6 +73,7 @@ if (allocated(Tratto)) then
          write(ulog,'(1x,a)') "   Array: TRATTO successfully deallocated "
    endif
 endif
+#ifdef SPACE_3D
 if (allocated(BoundaryFace)) then
    deallocate(BoundaryFace,stat=alloc_stat)
    if (alloc_stat/=0) then
@@ -95,6 +96,7 @@ if (allocated(BFaceList)) then
          write(ulog,'(1x,a)') "   Array: BFACELIST successfully deallocated "
    endif
 endif 
+#endif
 if (allocated(BoundaryVertex)) then
    deallocate(BoundaryVertex,stat=alloc_stat)
    if (alloc_stat/=0) then
@@ -106,6 +108,7 @@ if (allocated(BoundaryVertex)) then
          write(ulog,'(1x,a)') "   Array: BOUNDARYVERTEX successfully dealloc."
    endif
 endif
+#ifdef SPACE_2D
 if (allocated(BoundarySide)) then
    deallocate(BoundarySide,stat=alloc_stat)
    if (alloc_stat/=0) then
@@ -117,6 +120,7 @@ if (allocated(BoundarySide)) then
          write(ulog,'(1x,a)') "   Array: BOUNDARYSIDE successfully deallocated"
    endif
 endif
+#endif
 if (allocated(Partz)) then
    deallocate(Partz,stat=alloc_stat)
    if (alloc_stat/=0) then
@@ -207,15 +211,15 @@ if (allocated(Control_Lines)) then
             "   Array: CONTROL_LINES successfully deallocated "
    endif
 endif
-if (allocated(Pg)) then
-   deallocate(Pg,stat=alloc_stat)
+if (allocated(pg)) then
+   deallocate(pg,stat=alloc_stat)
    if (alloc_stat/=0) then
       write(uerr,'(1x,a,i2)')                                                  &
-         "   Array: PG not deallocated with error code: ",alloc_stat
+         "   Array: pg not deallocated with error code: ",alloc_stat
       check = .false.
       stop
       else
-         write(ulog,'(1x,a)') "   Array: PG successfully deallocated "
+         write(ulog,'(1x,a)') "   Array: pg successfully deallocated "
    endif
 endif
 if (allocated(ts0_pg)) then
@@ -594,6 +598,7 @@ if (allocated(impact_vel)) then
          write(ulog,'(1x,a)') "   Array: impact_vel successfully deallocated "
    endif
 endif
+#ifdef SPACE_3D
 if (allocated(BoundaryConvexEdge)) then
    deallocate(BoundaryConvexEdge,stat=alloc_stat)
    if (alloc_stat/=0) then
@@ -680,6 +685,7 @@ if (allocated(substations%sub)) then
             'subroutine "Gest_Dealloc" is successfully completed.'
    endif
 endif
+#endif
 if(allocated(Granular_flows_options%lines)) then
    deallocate(Granular_flows_options%lines,STAT=alloc_stat)
    if (alloc_stat/=0) then
@@ -792,4 +798,3 @@ call diagnostic(arg1=3,arg3=nomsub)
 !------------------------
 return
 end subroutine Gest_dealloc
-

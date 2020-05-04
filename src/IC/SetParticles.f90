@@ -22,7 +22,11 @@
 ! Program unit: SetParticles    
 ! Description: Particle coordinates (initial conditions).                
 !-------------------------------------------------------------------------------
+#ifdef SPACE_3D
 subroutine SetParticles(Nt,Nz,mate,Xmin,npps,NumParticles,IsopraS)
+#elif defined SPACE_2D
+subroutine SetParticles(Nt,Nz,mate,Xmin,npps,NumParticles)
+#endif
 !------------------------
 ! Modules
 !------------------------
@@ -38,13 +42,20 @@ implicit none
 integer(4),intent(in) :: Nt,Nz,mate
 integer(4),intent(in) :: npps(SPACEDIM)
 double precision,intent(in) :: Xmin(SPACEDIM)
-integer(4),intent(INOUT) :: NumParticles,IsopraS
+integer(4),intent(inout) :: NumParticles
+#ifdef SPACE_3D
+integer(4),intent(inout) :: IsopraS
+#endif
 logical :: particellainterna
 integer(4) :: i,j,k,iaux,test,Nz_aux,nag_aux,pg_size
 double precision :: aux1,aux2,aux3,rnd,tstop
 double precision,dimension(SPACEDIM) :: PX
 character(len=lencard) :: nomsub = "SetParticles"
-logical,external :: IsParticleInternal3D,IsParticleInternal2D
+#ifdef SPACE_3D
+logical,external :: IsParticleInternal3D
+#elif defined SPACE_2D
+logical,external :: IsParticleInternal2D
+#endif
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -64,11 +75,11 @@ if (nagpg>0) then
    call vellaw(partz(Nz)%vlaw,Partz(Nz)%vel,Partz(Nz)%npointv)
 endif
 if (Domain%tipo=="bsph") then
-   if (ncord==3) then
+#ifdef SPACE_3D
       aux1 = + 0.25d0 * Domain%dx
-      else
+#elif defined SPACE_2D
          aux1 = - 0.25d0 * Domain%dx
-   endif
+#endif
    aux2 = - 0.25d0 * Domain%dx 
    aux3 = - 0.25d0 * Domain%dx 
    iaux = 0
@@ -85,7 +96,9 @@ if (npps(1)<0) return
 do i=1,(npps(1)-iaux)
    PX(1) = PX(1) + Domain%dx
    PX(2) = Xmin(2) + aux2
-   if (ncord==2) iaux = 0
+#ifdef SPACE_2D
+      iaux = 0
+#endif
 ! Loop over the Y direction
    do j=1,(npps(2)-iaux)   
       PX(2) = PX(2) + Domain%dx
@@ -94,11 +107,11 @@ do i=1,(npps(1)-iaux)
       do k=1,(npps(3)-iaux)
          PX(3) = PX(3) + Domain%dx
 ! To check if the particle falls inside the zone
-         if (ncord==2) then
-            particellainterna = IsParticleInternal2D(Nt,PX)
-            else 
-                particellainterna = IsParticleInternal3D(Nt,PX,IsopraS)
-         endif
+#ifdef SPACE_3D
+            particellainterna = IsParticleInternal3D(Nt,PX,IsopraS)
+#elif defined SPACE_2D
+               particellainterna = IsParticleInternal2D(Nt,PX)
+#endif
 ! In case the particle is inside the zone
          if (particellainterna) then
 ! The zone counter is increased
@@ -111,7 +124,7 @@ do i=1,(npps(1)-iaux)
             enddo
             if (test==0) then
                nag = nag + 1
-               nag_aux = nag 
+               nag_aux = nag
                else
                   nag_aux = NumParticles
             endif
@@ -157,4 +170,3 @@ enddo
 !------------------------
 return
 end subroutine SetParticles
-

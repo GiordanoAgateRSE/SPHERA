@@ -25,6 +25,7 @@
 !              computation of gradPsuro. 
 !              (Di Monaco et al., 2011, EACFM)                        
 !-------------------------------------------------------------------------------
+#ifdef SPACE_3D
 subroutine AddBoundaryContribution_to_CE3D(npi,Ncbf,BCtorodivV)
 !------------------------
 ! Modules
@@ -36,8 +37,8 @@ use Dynamic_allocation_module
 ! Declarations
 !------------------------
 implicit none
-integer(4),intent(IN)    :: npi,Ncbf
-double precision,intent(INOUT) :: BCtorodivV
+integer(4),intent(in)    :: npi,Ncbf
+double precision,intent(inout) :: BCtorodivV
 integer(4) :: sd,sdj,icbf,iface,ibdt,ibdp,stretch        
 double precision :: roi,scaprod
 double precision,dimension(1:SPACEDIM) :: vb,vi,dvij,LocPi, LocDvij
@@ -65,7 +66,7 @@ do icbf=1,Ncbf
    iface = BoundaryDataTab(ibdp)%CloBoNum
    stretch = BoundaryFace(iface)%stretch
    boundtype = Tratto(stretch)%tipo
-   if (boundtype=="fixe".OR.boundtype=="tapi") then
+   if (boundtype=="fixe".or.boundtype=="tapi") then
 ! The face "iface" interacts with particle Pi
       if (LocPi(3)>zero) then          
          vb(:) = BoundaryFace(iface)%velocity(:)
@@ -96,3 +97,4 @@ enddo
 !------------------------
 return
 end subroutine AddBoundaryContribution_to_CE3D
+#endif

@@ -25,6 +25,7 @@
 !              just the formal 2D extension of "PressureSmoothing_3D.f90": 
 !              differences are appreciable.
 !-------------------------------------------------------------------------------
+#ifdef SPACE_2D
 subroutine PressureSmoothing_2D
 !------------------------
 ! Modules
@@ -137,7 +138,7 @@ do ii=1,indarrayFlu
                                  Domain%grav(acix(2))
                   IntWdV = BoundaryDataTab(ibdp)%BoundaryIntegral(2)
                   IntDpWdV(1:2) = BoundaryDataTab(ibdp)%BoundaryIntegral(4:5)
-                  if ((strtype=="fixe").OR.(strtype=="tapi")) then
+                  if ((strtype=="fixe").or.(strtype=="tapi")) then
                      VIntWdV_FT = VIntWdV_FT + IntWdV
                      sompW = sompW + ro0i * (massforce(1) * IntDpWdV(1) +      &
                              massforce(2) * IntDpWdV(2))
@@ -220,3 +221,4 @@ if (n_bodies>0) then
 endif
 return
 end subroutine PressureSmoothing_2D
+#endif

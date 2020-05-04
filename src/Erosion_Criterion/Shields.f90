@@ -51,9 +51,12 @@ integer(4) :: imed,intliq_id,intsol_id,indpeloloc,aux_ID,ncelcorr,igridi
 integer(4) :: jgridi,kgridi,iappo,contatore,ind_neigh,ind_ref_interface 
 double precision :: interf_liq,interf_sol,partLiq_pres,Ks,Ustar
 double precision :: Ustarold,Z0,Velocity,Velocity2,Taub,Restar,RestarC
-double precision :: Tetacr,Taubcror,Taubcr,phi,beta,gamma,Kbeta,Kgamma
+double precision :: Tetacr,Taubcror,Taubcr,phi,beta,Kbeta,Kgamma
 double precision :: nu_ustar,deltanu,DistZmin,pretot,DifRel
 double precision :: vel_s(3),aux_vec(3)
+#ifdef SPACE_3D
+double precision :: gamma
+#endif
 character(len=lencard)  :: nomsub = "Shields"
 integer(4),external :: ParticleCellNumber,CellIndices,CellNumber
 !------------------------
@@ -240,9 +243,9 @@ if (ind_neigh==0) then
       endif
       pg(npi)%dens = med(imed)%den0 + (pretot / (Med(imed)%celerita *          &
                      Med(imed)%celerita))
-   end if
+   endif
    return 
-end if
+endif
 ! Pure fluid - bed load transport layer interface 
 if (Granular_flows_options%KTGF_config==1) then
    intliq_id = ind_neigh
@@ -290,7 +293,7 @@ if (Velocity2==zero) then
       pg(npi)%pres_fluid = 0.d0
    endif
    return 
-end if
+endif
 ! To compute roughness (k): c_4=k/d_50 (from input, Shields 2D) or c_4=3 
 ! (Shields 3D)
 if (Granular_flows_options%KTGF_config==1) then
@@ -365,7 +368,7 @@ iter_ustar: do while ((flagz0).and.                                            &
       flagz0 = .false.
       if (DistZmin > Z0) Ustar = vKconst * Velocity / Dlog(DistZmin / Z0)
       exit iter_ustar
-   end if
+   endif
    nu_ustar = pg(intliq_id)%mu / (Med(pg(intliq_id)%imed)%den0 * Ustar)
    RestarC = Ks / nu_ustar
    deltanu = 11.6d0 * nu_ustar
@@ -381,7 +384,7 @@ iter_ustar: do while ((flagz0).and.                                            &
                else
 ! Internediate boundary regime (Manenti et al., 2012, JHE)
                   Z0 = 0.11d0 * nu_ustar + 0.033d0 * Ks
-         end if
+         endif
          Ustarold = Ustar
          if (DistZmin>Z0) then
             Ustar = vKconst * Velocity / Dlog(DistZmin / Z0)
@@ -403,27 +406,31 @@ iter_ustar: do while ((flagz0).and.                                            &
                   '      pg(npi)%coord = ',pg(npi)%coord(1),pg(npi)%coord(2),  &
                   pg(npi)%coord(3)
                write(ueroerr,*) '  DistZmin',DistZmin,'  Z0',Z0
-         end if
+         endif
    endif
 enddo iter_ustar 
 if (isnan(Ustar)) then
    call diagnostic(arg1=11,arg2=1,arg3=nomsub)
-end if
+endif
 Taub = Ustar * Ustar * Med(pg(intliq_id)%imed)%den0
 Restar = Med(pg(intliq_id)%imed)%den0 * Ustar * med(imed)%d50 / pg(intliq_id)%mu
-if (Restar>=500.0D0) then
+if (Restar>=5.d2) then
    Tetacr = 0.068D0
    elseif (Restar<=1.d0) then
       Tetacr = 0.1d0    
       else
-         Tetacr = 0.010595D0 * Dlog(Restar) + 0.110476D0 / Restar + 0.0027197D0
-end if
+         Tetacr = 0.010595d0 * Dlog(Restar) + 0.110476d0 / Restar + 0.0027197d0
+endif
 ! To compute Shields critical parameter for flat beds 
 Taubcror = Tetacr * GI * med(imed)%d50 * (Med(pg(intsol_id)%imed)%den0_s -     &
            Med(pg(intliq_id)%imed)%den0)
 if (Granular_flows_options%KTGF_config==1) then
    pg(npi)%u_star = Ustar
-   call compute_k_BetaGamma(npi,intliq_id,DistZmin)
+#ifdef SPACE_3D
+      call compute_k_BetaGamma(npi,intliq_id,DistZmin)
+#elif defined SPACE_2D
+         call compute_k_BetaGamma(npi,intliq_id)
+#endif
    Taubcr = Taubcror * pg(npi)%k_BetaGamma
    else
 ! Slope angle
@@ -437,20 +444,20 @@ if (Granular_flows_options%KTGF_config==1) then
                Kbeta = Dsin(phi - beta) / Dsin(phi)  
                else
                   Kbeta = Dsin(phi + beta) / Dsin(phi)   
-            end if
-      end if
-      if (ncord==2) then
+            endif
+      endif
+#ifdef SPACE_2D
          Kgamma = one
-         else
-            gamma = Dabs(Datan(pg(intliq_id)%vel(3) / pg(intliq_id)%vel(2)))
-            Kgamma = one - Dtan(gamma) * Dtan(gamma) / (Dtan(phi) *            &
-                     Dtan(phi))
+#elif defined SPACE_3D
+            gamma = dabs(Datan(pg(intliq_id)%vel(3) / pg(intliq_id)%vel(2)))
+            Kgamma = one - dtan(gamma) * dtan(gamma) / (dtan(phi) *            &
+                     dtan(phi))
             if (kgamma>zero) then
-               Kgamma = Dcos(gamma) * dsqrt(kgamma)
+               Kgamma = dcos(gamma) * dsqrt(kgamma)
                else
                   kgamma = zero
-            end if
-      end if
+            endif
+#endif
       kgamma = one
 ! 2D critical Shields parameter, according to Zhang (2006).
       Taubcr = Taubcror * Kbeta * Kgamma

@@ -30,8 +30,8 @@ subroutine distance_point_line_3D(P0,P1_line,P2_line,dis)
 ! Declarations
 !------------------------
 implicit none
-double precision,intent(IN) :: P0(3),P1_line(3),P2_line(3) 
-double precision,intent(INOUT) :: dis
+double precision,intent(in) :: P0(3),P1_line(3),P2_line(3) 
+double precision,intent(inout) :: dis
 integer(4) :: test_point
 double precision :: a1,b1,c1,d1,a2,b2,c2,d2,a3,b3,c3,d3
 double precision :: P3_plane1(3),P3_plane2(3),intersection_pl(3),aux_vec(3)
@@ -57,7 +57,7 @@ P3_plane2(2) = P1_line(2) - 999.d0
 if (P2_line(3)==P2_line(3)) then
    P3_plane2(3) = P1_line(3) - 999.d0
    else
-   P3_plane2(3) = P1_line(3)
+      P3_plane2(3) = P1_line(3)
 endif 
 ! Finding the coefficients for the Cartesian equation of the planes
 ! Plane 1: first auxiliary plane passing for the line 
@@ -94,4 +94,3 @@ dis = sqrt(dot_product(aux_vec,aux_vec))
 !------------------------
 return
 end subroutine distance_point_line_3D
-

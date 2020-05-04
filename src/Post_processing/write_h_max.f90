@@ -27,6 +27,7 @@
 !              task for the 2D field of the maximum (over time) specific flow 
 !              rates.              
 !-------------------------------------------------------------------------------
+#ifdef SPACE_3D
 subroutine write_h_max
 !------------------------
 ! Modules
@@ -86,7 +87,7 @@ do i_zone=1,NPartZone
       do i_vertex=Partz(i_zone)%ID_first_vertex,Partz(i_zone)%ID_last_vertex
          pos(1) = Vertice(1,i_vertex)
          pos(2) = Vertice(2,i_vertex)
-         pos(3) = Grid%extr(3,1) + 0.0000001d0
+         pos(3) = Grid%extr(3,1) + 1.d-7
          GridColumn = ParticleCellNumber(pos)
          h_max(i_vertex-Partz(i_zone)%ID_first_vertex+1,1) =                   &
             max((Z_fluid_max(GridColumn,1) - Vertice(3,i_vertex)),0.d0)
@@ -127,4 +128,4 @@ endif
 !------------------------
 return
 end subroutine write_h_max
-
+#endif

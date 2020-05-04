@@ -90,26 +90,26 @@ pg_w(:)%mass = 0.d0
 pg_w(:)%k_d = 0.d0
 pg_w(:)%volume = 0.d0
 pg_w(:)%kin_visc_semi_part = 0.d0 
-!$omp parallel do default(none) shared(DBSPH,pg_w,Med,pg,ncord) private(i)
-do i=1,DBSPH%n_w 
-   if (ncord==3) then
+!$omp parallel do default(none) shared(DBSPH,pg_w,Med,pg) private(i)
+do i=1,DBSPH%n_w
+#ifdef SPACE_3D
       pg_w(i)%coord(:) =                                                       &
 (DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(i)%vert_list(1))%pos(:) +      &
 DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(i)%vert_list(2))%pos(:) +       &
 DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(i)%vert_list(3))%pos(:))        &
          / 3.d0
-      else
+#elif defined SPACE_2D
          pg_w(i)%coord(:) =                                                    &
 (DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(i)%vert_list(1))%pos(:) +      &
 DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(i)%vert_list(2))%pos(:) +       &
 DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(i)%vert_list(3))%pos(:) +       &
 DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(i)%vert_list(4))%pos(:) ) / 4.d0    
-   endif
+#endif
    pg_w(i)%cella = ParticleCellNumber(pg_w(i)%coord)
    pg_w(i)%dens = Med(1)%den0                         
    pg_w(i)%normal(:) = DBSPH%surf_mesh%faces(i)%normal(:)
    pg_w(i)%weight = DBSPH%surf_mesh%faces(i)%area
-end do
+enddo
 !$omp end parallel do
 ! Initializing fictitious surface elements representing DB-SPH inlet sections
 !$omp parallel do default(none) shared(DBSPH,pg_w,Med,pg) private(i,j)
@@ -120,7 +120,7 @@ do i=(DBSPH%n_w+1),(DBSPH%n_w+DBSPH%n_inlet)
    pg_w(i)%vel(:) = DBSPH%inlet_sections(j,7:9)
    pg_w(i)%dens = Med(1)%den0                         
    pg_w(i)%normal(:) = DBSPH%inlet_sections(j,4:6)                      
-end do
+enddo
 !$omp end parallel do
 ! Initializing fictitious surface elements representing DB-SPH outlet sections
 !$omp parallel do default(none) shared(DBSPH,pg_w,Med,pg) private(i,j)
@@ -130,11 +130,10 @@ do i=(DBSPH%n_w+DBSPH%n_inlet+1),(DBSPH%n_w+DBSPH%n_inlet+DBSPH%n_outlet)
    pg_w(i)%cella = ParticleCellNumber(pg_w(i)%coord)
    pg_w(i)%dens = Med(1)%den0                         
    pg_w(i)%normal(:) = DBSPH%outlet_sections(j,4:6)                      
-end do
+enddo
 !$omp end parallel do
 !------------------------
 ! Deallocations
 !------------------------
 return
 end subroutine DBSPH_IC_surface_elements
-

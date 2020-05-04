@@ -23,6 +23,7 @@
 ! Description: To generate triangles from quadrilaterals (partitioning along the
 !              shortest diagonal)                 
 !-------------------------------------------------------------------------------
+#ifdef SPACE_3D
 subroutine ModifyFaces(NumberEntities)
 !------------------------
 ! Modules
@@ -34,7 +35,7 @@ use Dynamic_allocation_module
 ! Declarations
 !------------------------
 implicit none
-integer(4),intent(IN),dimension(20) :: NumberEntities
+integer(4),intent(in),dimension(20) :: NumberEntities
 integer(4) :: n,i,new
 double precision :: d13,d24
 !------------------------
@@ -87,4 +88,4 @@ enddo
 !------------------------
 return
 end subroutine ModifyFaces
-
+#endif

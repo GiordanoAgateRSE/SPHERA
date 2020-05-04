@@ -154,4 +154,3 @@ endif
 !------------------------
 return
 end subroutine point_inout_convex_non_degenerate_polygon
-

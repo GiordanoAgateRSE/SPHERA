@@ -187,24 +187,24 @@ do
 ! (worst case with all hexagonal faces). To allocate                           &
 ! DBSPH%surf_mesh%surface_mesh_file_ID and auxiliary arrays, accordingly.
    if (.not.allocated(DBSPH%surf_mesh%faces)) then
-      if (ncord==3) then
+#ifdef SPACE_3D
          allocate(DBSPH%surf_mesh%faces((DBSPH%ply_n_face_vert-2)*n_faces),    &
             STAT=alloc_stat)
-         else
+#elif defined SPACE_2D
             allocate(DBSPH%surf_mesh%faces(n_faces),STAT=alloc_stat)
-      endif
+#endif
       if (alloc_stat/=0) then
          write(uerr,*) 'Allocation of DBSPH%surf_mesh%faces in ',              &
             'Import_ply_surface_mesh failed; the program stops here.'
          stop 
       endif
       if (.not.allocated(aux_der_type_faces)) then
-         if (ncord==3) then
+#ifdef SPACE_3D
             allocate(aux_der_type_faces((DBSPH%ply_n_face_vert-2)*n_faces),    &
                STAT=alloc_stat)
-            else
+#elif defined SPACE_2D
                allocate(aux_der_type_faces(n_faces),STAT=alloc_stat)
-         endif
+#endif
          if (alloc_stat/=0) then
             write(uerr,*) 'Allocation of aux_der_type_faces in ',              &
                'Import_ply_surface_mesh failed; the program stops here.'
@@ -212,13 +212,13 @@ do
          endif
       endif
       if (.not.allocated(DBSPH%surf_mesh%surface_mesh_file_ID)) then
-         if (ncord==3) then
+#ifdef SPACE_3D
             allocate(DBSPH%surf_mesh%surface_mesh_file_ID(                     &
                (DBSPH%ply_n_face_vert-2)*n_faces),STAT=alloc_stat)
-            else
+#elif defined SPACE_2D
                allocate(DBSPH%surf_mesh%surface_mesh_file_ID(n_faces),         &
                   STAT=alloc_stat)
-         endif
+#endif
          if (alloc_stat/=0) then
             write(uerr,*) 'Allocation of DBSPH%surf_mesh%surface_mesh_file_ID',&
                ' in Import_ply_surface_mesh failed; the program stops here.'
@@ -226,12 +226,12 @@ do
          endif
       endif
       if (.not.allocated(aux_surface_mesh_file_ID)) then
-         if (ncord==3) then
+#ifdef SPACE_3D
             allocate(aux_surface_mesh_file_ID(                                 &
                (DBSPH%ply_n_face_vert-2)*n_faces),STAT=alloc_stat)
-            else
+#elif defined SPACE_2D
                allocate(aux_surface_mesh_file_ID(n_faces),STAT=alloc_stat)
-         endif
+#endif
          if (alloc_stat/=0) then
             write(uerr,*) 'Allocation of aux_surface_mesh_file_ID ',           &
                'in Import_ply_surface_mesh failed; the program stops here.'
@@ -241,12 +241,12 @@ do
       old_size_face = 0
       else
          old_size_face = size(DBSPH%surf_mesh%faces)
-         if (ncord==3) then
+#ifdef SPACE_3D
             new_size_face = old_size_face + (DBSPH%ply_n_face_vert - 2) *      &
                             n_faces
-            else
+#elif defined SPACE_2D
                new_size_face = old_size_face + n_faces
-         endif
+#endif
          aux_der_type_faces(:) = DBSPH%surf_mesh%faces(:)
          deallocate(DBSPH%surf_mesh%faces,STAT=dealloc_stat)
          if (dealloc_stat/=0) then
@@ -313,7 +313,7 @@ do
       read(unit_DBSPH_mesh,*) face_vert_num,aux_face_vert(1:face_vert_num)
 ! Assignation of vertices with eventual conversion of any 4/5/6-side face
 ! into 2/3/4 triangles; computation of area and normal
-      if (ncord==3) then
+#ifdef SPACE_3D
          select case (face_vert_num)
             case(3)
 ! To import vertices of the triangular face
@@ -454,11 +454,11 @@ DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(k-1)%vert_list(3))%pos,         &
                DBSPH%surf_mesh%faces(k-1)%area,                                &
                DBSPH%surf_mesh%faces(k-1)%normal)
          endselect
-         else
+#elif defined SPACE_2D
             DBSPH%surf_mesh%faces(k)%vert_list(1:4) = old_size_vert +          &
                                                       aux_face_vert(1:4) + 1
             DBSPH%surf_mesh%surface_mesh_file_ID(k) = surface_mesh_file_ID
-            k = k+1
+            k = k + 1
 ! Computation of normal (area will be re-written)             
             call area_triangle(                                                &
 DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(k-1)%vert_list(1))%pos,         &
@@ -473,7 +473,7 @@ DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(k-1)%vert_list(1))%pos          &
 DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(k-1)%vert_list(1))%pos          &
 - DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(k-1)%vert_list(3))%pos)) /    &
                                               dsqrt(2.d0)
-      endif
+#endif
    enddo  
    close(unit_DBSPH_mesh,IOSTAT=file_stat)
    if (file_stat/=0) then
@@ -484,13 +484,13 @@ DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(k-1)%vert_list(1))%pos          &
 ! Read the face vertices: end   
 ! Resize DBSPH%surf_mesh%faces on the actual number of faces
 ! new_size_face = estimated_new_size_face - local overestimation
-   if (ncord==3) then
+#ifdef SPACE_3D
       new_size_face = size(DBSPH%surf_mesh%faces) - ((DBSPH%ply_n_face_vert - &
                       2) * n_faces - (k - 1 - old_size_face))
-      else
+#elif defined  SPACE_2D
          new_size_face = size(DBSPH%surf_mesh%faces) - (n_faces - (k - 1 -     &
                          old_size_face))
-   endif
+#endif
    old_size_face = size(DBSPH%surf_mesh%faces)
    if (new_size_face<old_size_face) then
       aux_der_type_faces(:) = DBSPH%surf_mesh%faces(:)
@@ -591,4 +591,3 @@ if (allocated(aux_surface_mesh_file_ID)) then
 endif
 return
 end subroutine Import_ply_surface_meshes
-

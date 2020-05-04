@@ -22,6 +22,7 @@
 ! Program unit: CompleteBoundaries3D                                  
 ! Description: (Di Monaco et al., 2011, EACFM)                        
 !-------------------------------------------------------------------------------
+#ifdef SPACE_3D
 subroutine CompleteBoundaries3D
 !------------------------
 ! Modules
@@ -68,3 +69,4 @@ enddo
 !------------------------
 return
 end subroutine CompleteBoundaries3D
+#endif

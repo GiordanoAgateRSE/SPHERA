@@ -64,7 +64,7 @@ neigh_w = 0
 do npi=1,DBSPH%n_w
    pg_w(npi)%pres = zero
    pg_w(npi)%dens = med(1)%den0
-   if (pg_w(npi)%sigma>0.000001d0) then
+   if (pg_w(npi)%sigma>1d-6) then
 ! Kinematic viscosity of the semi-particles
       pg_w(npi)%kin_visc_semi_part = pg_w(npi)%kin_visc_semi_part /            &
                                      pg_w(npi)%sigma
@@ -125,9 +125,9 @@ do npi=1,nag
       rhorif = Med(pg(npi)%imed)%den0
       c2 = Med(pg(npi)%imed)%eps / rhorif
       pstar = c2 * (rhostar-rhorif) + Domain%prif
-      if (pstar<-99000.d0) then
-         pstar = -99000.d0
-      endif 
+      if (pstar<-99.d3) then
+         pstar = -99.d3
+      endif
 ! Linearized Partial Riemann Solver: end
 ! "den" is an auxiliary vector to add contributions to the density and 
 ! pressure denominators
@@ -156,4 +156,3 @@ deallocate(den)
 deallocate(neigh_w) 
 return
 end subroutine BC_wall_elements
-

@@ -35,8 +35,8 @@ use I_O_diagnostic_module
 ! Declarations
 !------------------------
 implicit none
-double precision,intent(INOUT) :: tstop
-type(TyZone),intent(INOUT) :: partzlocal
+double precision,intent(inout) :: tstop
+type(TyZone),intent(inout) :: partzlocal
 logical :: out
 integer(4) :: k,n,icord
 double precision :: tstopc,acc,deltat,spo,dspo,rad
@@ -82,7 +82,7 @@ if (partzlocal%move=="fix") then
       enddo
       tlimits = zero
       dxyz = zero
-      out = .FALSE.
+      out = .false.
       LAW_ZONE_LOOP: do k=2,partzlocal%npointv
          COORDS_LOOP: do n=1,ncord
             icord = icoordp(n,ncord-1)
@@ -97,7 +97,7 @@ if (partzlocal%move=="fix") then
 ! To check on the minimum limit has been overridden and how much time has 
 ! been required.
             if ((partzlocal%coordMM(icord,1)+spo)<vlimits(icord,1)) then
-               out = .TRUE.
+               out = .true.
                dspo = vlimits(icord,1) - (partzlocal%coordMM(icord,1) +        &
                   dxyz(icord))
                if (acc==zero) then
@@ -108,7 +108,7 @@ if (partzlocal%move=="fix") then
                   endif
                   else
                      rad  = partzlocal%vlaw(icord,k-1) *                       &
-                        partzlocal%vlaw(icord,k-1) - 4.0d0 * 0.5d0 * acc * dspo
+                        partzlocal%vlaw(icord,k-1) - 4.d0 * 0.5d0 * acc * dspo
                      if (rad>=zero) then
                         rad = dsqrt(rad)  
                         deltat = (partzlocal%vlaw(icord,k-1) + rad) / (2.d0 *  &
@@ -123,7 +123,7 @@ if (partzlocal%move=="fix") then
 ! To check on the minimum limit has been overridden and how much time has 
 ! been required.
             if ((partzlocal%coordMM(icord,2)+spo)>vlimits(icord,2)) then 
-               out = .TRUE.
+               out = .true.
                dspo = vlimits(icord,2) - (partzlocal%coordMM(icord,2) +       &
                   dxyz(icord))
                if (acc==zero) then
@@ -134,7 +134,7 @@ if (partzlocal%move=="fix") then
                   endif
                   else
                   rad = partzlocal%vlaw(icord,k-1) * partzlocal%vlaw(icord,k-1)&
-                     - 4.0d0 * 0.5d0 * acc * dspo
+                     - 4.d0 * 0.5d0 * acc * dspo
                   if (rad>=zero) then
                      rad = dsqrt(rad)  
                      deltat = (-partzlocal%vlaw(icord,k-1) + rad) / (2.d0 *    &

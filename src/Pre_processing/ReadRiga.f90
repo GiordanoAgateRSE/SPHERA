@@ -47,7 +47,7 @@ ioerr = 0
 READ_LOOP: do while (ioerr==0)
    read(ninp,"(a)",iostat=ioerr) ainp
    nrighe = nrighe + 1
-   if ((ioerr==0).AND.(trim(ainp)/="")) then
+   if ((ioerr==0).and.(trim(ainp)/="")) then
 ! Replacing tabs with blank spaces 
       if (ainp(1:1)/=comment ) then
          do n=1,len(trim(ainp))
@@ -55,7 +55,7 @@ READ_LOOP: do while (ioerr==0)
          enddo
          l = index(ainp,comment)
          if (l>0) then
-            do n = l,len(trim(ainp))
+            do n=l,len(trim(ainp))
                ainp(n:n)=" "
             enddo
          endif
@@ -72,4 +72,3 @@ ier = ioerr
 !------------------------
 return
 end subroutine ReadRiga
-

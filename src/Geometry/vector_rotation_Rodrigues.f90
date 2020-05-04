@@ -21,7 +21,8 @@
 !-------------------------------------------------------------------------------
 ! Program unit: vector_rotation_Rodrigues
 ! Description: 3D rotation of a given vector, provided the rotation axis and 
-!              the rotation angle, based on Rodrigues formula.           
+!              the rotation angle, based on Rodrigues formula. It is also 
+!              called in 2D.         
 !-------------------------------------------------------------------------------
 subroutine vector_rotation_Rodrigues(n_R,teta_R,vector)
 !------------------------
@@ -33,7 +34,7 @@ subroutine vector_rotation_Rodrigues(n_R,teta_R,vector)
 implicit none
 double precision,intent(in) :: teta_R
 double precision,intent(in) :: n_R(3)
-double precision,intent(INOUT) :: vector(3)
+double precision,intent(inout) :: vector(3)
 double precision :: aux_vector(3)
 double precision :: R_Rodrigues(3,3)
 !------------------------
@@ -72,4 +73,3 @@ vector(3) = dot_product(R_Rodrigues(3,:),aux_vector)
 !------------------------
 return
 end subroutine vector_rotation_Rodrigues
-

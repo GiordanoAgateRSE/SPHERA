@@ -20,7 +20,7 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: time_integration                                          
-! Description: Explicit Runge-Kutta time integration schemes. 
+! Description: Explicit Runge-Kutta time integration schemes.
 !-------------------------------------------------------------------------------
 subroutine time_integration  
 !------------------------

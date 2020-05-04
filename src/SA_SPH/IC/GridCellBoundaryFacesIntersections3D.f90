@@ -39,6 +39,7 @@
 !                               positive case, the face is excluded.  
 !              (Di Monaco et al., 2011, EACFM)                        
 !-------------------------------------------------------------------------------
+#ifdef SPACE_3D
 subroutine GridCellBoundaryFacesIntersections3D(NumCellmax)
 !------------------------
 ! Modules
@@ -52,7 +53,7 @@ use I_O_file_module
 ! Declarations
 !------------------------
 implicit none
-integer(4),intent(IN) :: NumCellmax
+integer(4),intent(in) :: NumCellmax
 logical :: Found
 integer(4) :: nc,nf,kf,i,j,k,i0,j0,k0,flpointer,nodes,no,sd,ier,flpointer_cell 
 integer(4) :: i_flpointer,irestocell,ii,jj,kk,nv
@@ -229,4 +230,4 @@ enddo
 deallocate(GCBFVector_aux)
 return
 end subroutine GridCellBoundaryFacesIntersections3D
-
+#endif

@@ -33,9 +33,9 @@ subroutine reference_system_change(pos_old_ref,new_origin_old_ref,             &
 !------------------------
 implicit none
 integer(4) :: i,aux_int
-double precision,intent(IN) :: pos_old_ref(3),new_origin_old_ref(3) 
-double precision,intent(IN) :: new_cos_dir_old_ref(3,3)
-double precision,intent(INOUT) :: pos_new_ref(3)
+double precision,intent(in) :: pos_old_ref(3),new_origin_old_ref(3) 
+double precision,intent(in) :: new_cos_dir_old_ref(3,3)
+double precision,intent(inout) :: pos_new_ref(3)
 double precision :: aux_vec(3)
 double precision :: inv_new_cos_dir_old_ref(3,3)
 !------------------------
@@ -60,4 +60,3 @@ enddo
 !------------------------
 return
 end subroutine reference_system_change
-

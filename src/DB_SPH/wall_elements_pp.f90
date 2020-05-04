@@ -67,8 +67,8 @@ den_wpp = zero
 !------------------------
 ! Loop over the wall elements
 !$omp parallel do default(none)                                                &
-!$omp shared(DBSPH,pg_w,ncord,Icont_w,NPartOrd_w,pres_wpp,Domain,den_wpp)      &
-!$omp shared(square_doubleh,squareh)                                            &
+!$omp shared(DBSPH,pg_w,Icont_w,NPartOrd_w,pres_wpp,Domain,den_wpp)            &
+!$omp shared(square_doubleh,squareh)                                           &
 !$omp private(npi,irestocell,igridi,jgridi,jgrid1,jgrid2,kgridi,jrang,irang)   &
 !$omp private(krang,ncelj,ww,npj,rijtemp,ragtemp,rijtemp2,rij_su_h)            &
 !$omp private(rij_su_h_quad,index_rij_su_h,wu)
@@ -112,17 +112,17 @@ do npi = 1,DBSPH%n_w
                  den_wpp(npi)  = den_wpp(npi) +  wu * Domain%coefke *          &
                                  pg_w(npj)%weight
               endif
-           end do
-        end do loop_krang       
-      end do loop_irang       
-   end do loop_jrang   
-end do 
+           enddo
+        enddo loop_krang       
+      enddo loop_irang       
+   enddo loop_jrang   
+enddo 
 !$omp end parallel do
 ! Loop over the wall particles to update the pressure values for post-processing
 !$omp parallel do default(none) shared(DBSPH,den_wpp,pres_wpp) private(npi)
 do npi=1,DBSPH%n_w
    if (den_wpp(npi)>0.d0) pres_wpp(npi) = pres_wpp(npi) / den_wpp(npi) 
-end do
+enddo
 !$omp end parallel do
 ! Writing the pressure force (post-processing) (provided a region)
 if (DBSPH%n_monitor_regions==1) then
@@ -143,7 +143,7 @@ if (DBSPH%n_monitor_regions==1) then
          if (pg_w(npi)%normal(1)/=0.d0) Fx = Fx + pres_wpp(npi) *              &
                                            pg_w(npi)%normal(1)*pg_w(npi)%weight
       endif
-   end do
+   enddo
    write(unit_dbsph_Fx,'(2(1x,g14.7))') simulation_time,Fx
    close (unit_dbsph_Fx)
 endif
@@ -171,7 +171,7 @@ if (DBSPH%n_monitor_regions==1) then
             simulation_time,on_going_time_step,i,pg_w(npi)%coord(:),           &
             pg_w(npi)%vel(:),pg_w(npi)%pres,pres_wpp(npi),pg_w(npi)%wet 
       endif
-   end do
+   enddo
    close (unit_dbsph_se_reg)
 endif
 ! Writing the wall element pressure values derived from post-processing 
@@ -192,7 +192,7 @@ if (DBSPH%n_monitor_points>0) then
          on_going_time_step,i,pg_w(DBSPH%monitor_IDs(i))%coord(:),             &
          pg_w(DBSPH%monitor_IDs(i))%vel(:),pg_w(DBSPH%monitor_IDs(i))%pres,    &
          pres_wpp(DBSPH%monitor_IDs(i)),pg_w(DBSPH%monitor_IDs(i))%wet           
-   end do   
+   enddo   
    close (unit_dbsph_se_ID)
 endif
 !------------------------
@@ -202,4 +202,3 @@ deallocate(pres_wpp)
 deallocate(den_wpp)
 return
 end subroutine wall_elements_pp
-

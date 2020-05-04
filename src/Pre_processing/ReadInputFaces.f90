@@ -22,6 +22,7 @@
 ! Program unit: ReadInputFaces                         
 ! Description:                        
 !-------------------------------------------------------------------------------
+#ifdef SPACE_3D
 subroutine ReadInputFaces(NumberEntities,ainp,comment,nrighe,ier,prtopt,ninp,  &
                           ulog)
 !------------------------
@@ -38,7 +39,7 @@ integer(4) :: nrighe,ier,ninp,ulog
 logical(4) :: prtopt
 integer(4),dimension(20) :: NumberEntities
 character(1) :: comment
-character(LEN=lencard) :: ainp
+character(len=lencard) :: ainp
 integer(4) :: n,i,ioerr,stretch
 integer(4) :: ivalues(MAXFACENODES)
 character(8) :: label
@@ -60,12 +61,12 @@ character(100),external :: lcase,GetToken
 if (restart) then
    do while (trim(lcase(ainp))/="##### end faces #####")
       call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"FACES DATA",ninp,ulog)) return
+      if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"FACES DATA",ninp,ulog)) return
    enddo
    return
 endif
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"FACES DATA",ninp,ulog)) return
+if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"FACES DATA",ninp,ulog)) return
 do while (trim(lcase(ainp))/="##### end faces #####")
    select case (TRIM(Domain%tipo))
       case ("semi","bsph") 
@@ -73,12 +74,12 @@ do while (trim(lcase(ainp))/="##### end faces #####")
 ! ivalues(4) is the 4-th vertex (null in case of triangles)
          read(ainp,*,iostat=ioerr) i,ivalues,stretch  
          write(label,"(i8)") i
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"FACE n."//label,ninp,ulog)) &
+         if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"FACE n."//label,ninp,ulog)) &
             return
          NumberEntities(11) = max(i,NumberEntities(11))
 ! To count quadrilaterals to be splitted in triangles (if required)
          if (ivalues(4)>0) NumberEntities(18) = NumberEntities(18) + 1
-         if (ncord>0) then
+         if (input_second_read.eqv..true.) then
             if (BoundaryFace(i)%Node(1)%name<=0) then 
                BoundaryFace(i)%Node(1:MAXFACENODES)%name =                     &
                   ivalues(1:MAXFACENODES)
@@ -101,9 +102,9 @@ do while (trim(lcase(ainp))/="##### end faces #####")
          return
    endselect
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"FACES DATA",ninp,ulog)) return
+   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"FACES DATA",ninp,ulog)) return
 enddo
-if ((ncord>0).AND.(ulog>0).AND.(prtopt)) then
+if ((input_second_read.eqv..true.).and.(ulog>0).and.(prtopt)) then
    write(ulog,*)
    write(ulog,"(1x,a)") "List of faces:"
    do n=1,NumberEntities(11)
@@ -118,4 +119,4 @@ endif
 !------------------------
 return
 end subroutine ReadInputFaces
-
+#endif

@@ -35,9 +35,9 @@ use Dynamic_allocation_module
 ! Declarations
 !------------------------
 implicit none
-integer(4), intent(IN)  :: npi,npj,npartint
-double precision,intent(IN) :: dervel(3)
-double precision,intent(OUT) :: rvwalfa(3),rvwbeta(3)
+integer(4), intent(in)  :: npi,npj,npartint
+double precision,intent(in) :: dervel(3)
+double precision,intent(out) :: rvwalfa(3),rvwbeta(3)
 double precision :: celtilde,rhotilde,amassj,vrij,TermMon
 !------------------------
 ! Explicit interfaces

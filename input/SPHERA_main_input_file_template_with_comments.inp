@@ -34,7 +34,8 @@
 !    ...  possible repetitions of the above/previous data
 !    !<<< beginning of a section to be filled with input data. The lines of 
 !         this section must be replaced with a "!" if they do not have to be 
-!         filled for the test case chosen.
+!         filled for the test case chosen (included the start line and the end 
+!         line of the unusable sections).
 !    ___  space to be replaced with an input value
 !    !>>> end of a section to be filled with input data
 !    =    start of a variable value
@@ -65,9 +66,6 @@ ___
 ##### DOMAIN #####
 !-------------------------------------------------------------------------------
 ![?] Input parameters for spatial resolution and boundary treatment scheme
-![?] <D>: spatial dimensionality
-!    =2 (2D)
-!    =3 (3D)
 ![?] <BC_string>: boundary treatment scheme
 !    =semi (SA-SPH)
 !    =bsph (DB-SPH)
@@ -77,11 +75,11 @@ ___
 ![?] <random_distribution>: optional letter
 !    =r (white noise to the IC -Initial Conditions- particle positions)
 !-------------------------------------------------------------------------------
-![*] <D> <BC_string>
+![*] <BC_string>
 ![*] <dx> <h/dx> <random_distribution>
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
-___ ___
+___
 ___ ___ ___
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
@@ -340,7 +338,7 @@ ___ ___
 ___ ___ ___
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
-![?] if (IC_reservoir_type==2) then
+![?] if ((IC_reservoir_type==2).and.(3D)) then
 ![?] <dx_CartTopog>: spatial resolution of the Cartesian topography; 
 !    dx_CartTopog>=dx
 ![?] <H_res>: height of the reservoir free surface
@@ -410,7 +408,7 @@ ___ ___
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
 ![?] endif (dam_zone_ID>0)
-![?] endif (IC_reservoir_type==2)
+![?] endif (IC_reservoir_type==2) (3D)
 ![?] endif (Boundary_type=="perimeter")
 ![?] if (Boundary_type=="open") then
 ![?] In case particles exit the numerical domain without passing through an 
@@ -645,26 +643,50 @@ ___ ___ ___
 !    =0 (erosion scheme activated far from fronts)
 !    =1 (erosion scheme inactive)
 !    =2 (erosion scheme active everywhere)
+!-------------------------------------------------------------------------------
+![*] <velocity_fixed_bed> <erosion_flag>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+___ ___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] if (3D) then
 ![?] <deposition_at_frontiers>
 !    =1 (imposed)
 !    =0 (not imposed)
 ![?] <Gamma_slope_flag>
 !    =1 (Gamma slope angle computed)
 !    =0 (null Gamma slope angle)
+!-------------------------------------------------------------------------------
+![*] <deposition_at_frontiers> <Gamma_slope_flag>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+___ ___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] endif (3D)
+![?] if (2D) then
+![?] <deposition_at_frontiers>
+!    =1 (imposed)
+!    =0 (not imposed)
+!-------------------------------------------------------------------------------
+![*] <deposition_at_frontiers>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] endif (2D)
 ![?] <n_monitor_lines>: number of monitoring lines aligned with x- or y-axis)
 ![?] <dt_out>: writing time step
 ![?] <erosion_convergence_criterion>: convergence criterion for the erosion 
 !    scheme
 ![?] <n_max_iterations>: maximum number of iterations for the erosion criterion
 !-------------------------------------------------------------------------------
-![*] <velocity_fixed_bed> <erosion_flag>
-![*] <deposition_at_frontiers> <Gamma_slope_flag>
 ![*] <n_monitor_lines> <dt_out> <erosion_convergence_criterion> 
 !    <n_max_iterations>
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
-___ ___
-___ ___
 ___ ___ ___ ___
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
@@ -1000,6 +1022,20 @@ ___ ___ ___ ___ ___ ___
 ![?] <body_part_reorder>: for DB-SPH
 !    =0 (fixed frontiers)
 !    =1 (mobile frontiers)
+!-------------------------------------------------------------------------------
+![*] <final_time> <final_time_step>
+![*] <CFL> <vsc_coeff> <Leapfrog_flag> <scheme_order> <factor> <dt_alfa_Mon>
+![*] <teta_p> <teta_u> <var> 
+![*] <COEFNMAXPARTI> <COEFNMAXPARTJ> <body_part_reorder>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+___ ___
+___ ___ ___ ___ ___ ___
+___ ___ ___
+___ ___ ___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] if (3D) then
 ![?] <nag_aux>: rough overestimation of the number of fluid particles in the 
 !    domain, it is only related to the very first allocation of the particle 
 !    array, it is influential only in case of reservoir extruded from 
@@ -1015,25 +1051,24 @@ ___ ___ ___ ___ ___ ___
 !    of faces times the number of the positioning grid cells, further, reducing 
 !    "GCBFVecDim" does not imply any appreciable variation in the computational
 !    time). The positioning grid is made of cubes whose side length is 2h. 
+!-------------------------------------------------------------------------------
+![*] <nag_aux> <MAXCLOSEBOUNDFACES> <MAXNUMCONVEXEDGES> <GCBFVecDim>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+___ ___ ___ ___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] endif (3D)
+!-------------------------------------------------------------------------------
 ![?] <density_thresholds_flag>
 !    =0 (default value, no density limiters)
 !    =1 (density limiters for debug)
 !    Density limiters do not apply to the mixture particles which are held 
 !    fixed (elasto-plastic strain rate regime)
 !-------------------------------------------------------------------------------
-![*] <final_time> <final_time_step>
-![*] <CFL> <vsc_coeff> <Leapfrog_flag> <scheme_order> <factor> <dt_alfa_Mon>
-![*] <teta_p> <teta_u> <var> 
-![*] <COEFNMAXPARTI> <COEFNMAXPARTJ> <body_part_reorder>
-![*] <nag_aux> <MAXCLOSEBOUNDFACES> <MAXNUMCONVEXEDGES> <GCBFVecDim>
 ![*] <density_thresholds_flag>
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
-___ ___
-___ ___ ___ ___ ___ ___
-___ ___ ___
-___ ___ ___
-___ ___ ___ ___
 ___
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
@@ -1201,6 +1236,9 @@ ___
 !-------------------------------------------------------------------------------
 ##### end control lines #####
 
+!-------------------------------------------------------------------------------
+![?] if (3D) then
+!-------------------------------------------------------------------------------
 ##### section flow rate #####
 !-------------------------------------------------------------------------------
 ![?] Input parameters on monitoring sections for the flow rate. These sections 
@@ -1304,3 +1342,6 @@ ___ ___ ___
 ![?] enddo NUMBER_OF_SUBSTATIONS
 !-------------------------------------------------------------------------------
 ##### end substations #####
+!-------------------------------------------------------------------------------
+![?] endif (3D)
+!-------------------------------------------------------------------------------

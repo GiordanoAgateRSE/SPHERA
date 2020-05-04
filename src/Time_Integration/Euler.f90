@@ -116,7 +116,7 @@ call start_and_stop(3,7)
 call start_and_stop(2,17)
 !$omp parallel do default(none)                                                &
 !$omp private(npi)                                                             &
-!$omp shared(nag,Pg,Domain,dt,ts0_pg)
+!$omp shared(nag,pg,Domain,dt,ts0_pg)
 ! Time integration for position and density (trajectories and continuity
 !  equation)
 do npi=1,nag
@@ -164,15 +164,15 @@ if (((DBSPH%n_w+DBSPH%n_inlet+DBSPH%n_outlet)>0).and.(Domain%tipo=="bsph")) &
 ! sides)
    if ((Domain%time_split==0).and.(Domain%time_stage==Domain%RKscheme)) then
       call start_and_stop(2,9)
-      if (ncord==2) then 
+#ifdef SPACE_2D
          if (NumOpenSides>0) call CancelOutgoneParticles_2D
 ! Adds new particles at the inlet sections
          if (SourceSide/=0) call GenerateSourceParticles
-         else
+#elif defined SPACE_3D
             if (NumOpenFaces>0) call CancelOutgoneParticles_3D
 ! Adds new particles at the inlet sections
             if (SourceFace/=0) call GenerateSourceParticles 
-      endif
+#endif
 ! Particle reordering on the backround positioning grid 
       call OrdGrid1
       call start_and_stop(3,9)

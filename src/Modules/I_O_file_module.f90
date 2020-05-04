@@ -66,7 +66,9 @@ integer(4) :: unit_dbsph_Fx = 59
 ! DB-SPH post-processing (selection of a domain region) to write the surface 
 ! element values
 integer(4) :: unit_dbsph_se_reg = 60
+#ifdef SPACE_3D
 ! Substation post-processing
 integer(4) :: unit_substations = 61
+#endif
 character(255), dimension(0:7) :: nomefile
 end module

@@ -34,7 +34,7 @@ use Hybrid_allocation_module
 implicit none
 integer(4) :: nrighe,ier,ninp,ulog
 character(1) :: comment
-character(LEN=lencard) :: ainp
+character(len=lencard) :: ainp
 logical :: restartOK
 integer(4) :: ioerr
 character(100) :: token
@@ -53,17 +53,17 @@ character(100),external :: lcase,GetToken
 ! Statements
 !------------------------
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-if (.NOT.ReadCheck (ioerr,ier,nrighe,ainp,"RESTART DATA",ninp,ulog)) return
+if (.not.ReadCheck (ioerr,ier,nrighe,ainp,"RESTART DATA",ninp,ulog)) return
 do while (trim(lcase(ainp))/="##### end restart #####")
    select case (trim(lcase(GetToken(ainp,1,ioerr))))
       case ("step")
          token = lcase(GetToken(ainp,2,ioerr))
-         if (.NOT.ReadCheck (ioerr,ier,nrighe,ainp,"RESTART DATA STEP value",  &
+         if (.not.ReadCheck (ioerr,ier,nrighe,ainp,"RESTART DATA STEP value",  &
             ninp,ulog)) return
          read(token,*,iostat=ioerr) Domain%istart
-         if (.NOT.ReadCheck (ioerr,ier,nrighe,ainp,"RESTART DATA STEP value",  &
+         if (.not.ReadCheck (ioerr,ier,nrighe,ainp,"RESTART DATA STEP value",  &
             ninp,ulog)) return
-         if ((ncord>0).AND.(ulog>0)) then
+         if ((input_second_read.eqv..true.).and.(ulog>0)) then
             write(ulog,"(1x,a,i12)") "Restart from step: ",Domain%istart
             if (Domain%istart<0) write(ulog,"(1x,a)") "Negative restart step!"
 ! Only the last read option keeps active 
@@ -75,12 +75,12 @@ do while (trim(lcase(ainp))/="##### end restart #####")
          endif
       case ("time")
          token = lcase(GetToken(ainp,2,ioerr))
-         if (.NOT.ReadCheck (ioerr,ier,nrighe,ainp,"RESTART DATA TIME value",  &
+         if (.not.ReadCheck (ioerr,ier,nrighe,ainp,"RESTART DATA TIME value",  &
             ninp,ulog)) return
          read(token,*,iostat=ioerr) Domain%start
-         if (.NOT.ReadCheck (ioerr,ier,nrighe,ainp,"RESTART DATA TIME value",  &
+         if (.not.ReadCheck (ioerr,ier,nrighe,ainp,"RESTART DATA TIME value",  &
             ninp,ulog)) return
-         if ((ncord>0).and.(ulog>0)) then
+         if ((input_second_read.eqv..true.).and.(ulog>0)) then
             write(ulog,"(1x,a,f20.12)") "Restart from time: ",Domain%start
             if (Domain%start<zero) write(ulog,"(1x,a)")                        &
                "Negative restart time!"
@@ -93,7 +93,7 @@ do while (trim(lcase(ainp))/="##### end restart #####")
          endif
       case default
          Domain%file = ainp
-         if ((ncord>0).and.(ulog>0)) then
+         if ((input_second_read.eqv..true.).and.(ulog>0)) then
             inquire(file=Domain%file,exist=restartOK)
             if (restartOK) then
                write(ulog,"(1x,3a)") "Restart file: ",trim(Domain%file)
@@ -104,7 +104,7 @@ do while (trim(lcase(ainp))/="##### end restart #####")
          endif
    endselect
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"RESTART DATA",ninp,ulog)) return
+   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"RESTART DATA",ninp,ulog)) return
 enddo
 !------------------------
 ! Deallocations

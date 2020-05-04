@@ -33,6 +33,7 @@
 !              Check that the elastic boundary reaction never works.
 !              (Di Monaco et al., 2011, EACFM).                        
 !-------------------------------------------------------------------------------
+#ifdef SPACE_3D
 subroutine AddElasticBoundaryReaction_3D(npi,Ncbf,BoundReaction)
 !------------------------
 ! Modules
@@ -44,10 +45,10 @@ use Dynamic_allocation_module
 ! Declarations
 !------------------------
 implicit none
-integer(4),intent(IN) :: npi, Ncbf
-double precision,intent(INOUT),dimension(1:SPACEDIM) :: BoundReaction
+integer(4),intent(in) :: npi, Ncbf
+double precision,intent(inout),dimension(1:SPACEDIM) :: BoundReaction
 double precision,parameter :: zmincoeff = 0.25d0
-double precision,parameter :: reafactor = 1.0d0
+double precision,parameter :: reafactor = 1.d0
 integer(4) :: sd,icbf,iface,nt,ibdt,ibdp,mate,fkod,ne,NCloseEdgeF
 double precision :: zi,zimin,celer02,vin,normreact 
 double precision :: scaprod,edgelen2,tau,edgedist2
@@ -93,7 +94,7 @@ do icbf=1,Ncbf
                normreact = -reafactor * celer02 * DLog((Domain%h + zi - zimin) &
                   / Domain%h) / Domain%h
                BoundReaction(:) = BoundReaction(:) + normreact *               &
-                  BoundaryFace(iface)%T(:, 3)
+                  BoundaryFace(iface)%T(:,3)
             endif
             ReaFace(icbf) = .true.
             else
@@ -156,3 +157,4 @@ enddo
 !------------------------
 return 
 end subroutine AddElasticBoundaryReaction_3D
+#endif

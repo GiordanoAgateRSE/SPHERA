@@ -23,6 +23,7 @@
 ! Description: Input management for monitoring the electrical substations (ref. 
 !              template input file)                  
 !-------------------------------------------------------------------------------
+#ifdef SPACE_3D
 subroutine ReadSubstations(ainp,comment,nrighe,ier)
 !------------------------
 ! Modules
@@ -40,7 +41,7 @@ integer(4) :: type_ID
 double precision :: dt_out
 character(1) :: comment
 character(100) :: lcase
-character(LEN=lencard) :: ainp
+character(len=lencard) :: ainp
 double precision :: vertex(6,2)
 logical,external :: ReadCheck
 !------------------------
@@ -56,11 +57,11 @@ logical,external :: ReadCheck
 ! Statements
 !------------------------
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"Substations DATA",ninp,ulog)) return
+if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"Substations DATA",ninp,ulog)) return
 do while (trim(lcase(ainp))/="##### end substations #####")
 ! Reading the number of substations and their writing time step
    read (ainp,*,iostat=ioerr) n_sub,dt_out
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"Substations GENERAL INPUT",ninp,  &
+   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"Substations GENERAL INPUT",ninp,  &
       ulog)) return
 ! Writing the number of substations and the writing time step on the log file
    if (ulog>0) then
@@ -100,35 +101,35 @@ do while (trim(lcase(ainp))/="##### end substations #####")
 ! Reading the substation variables
       call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
       read (ainp,*,iostat=ioerr) substation_ID
-      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"substation_ID",ninp,ulog))     &
+      if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"substation_ID",ninp,ulog))     &
          return
       call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
       read (ainp,*,iostat=ioerr) type_ID,n_vertices
-      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"type_ID,n_vertices",ninp,ulog))&
+      if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"type_ID,n_vertices",ninp,ulog))&
          return
       call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
       read (ainp,*,iostat=ioerr) vertex(1,1),vertex(1,2)
-      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"vertex_1",ninp,ulog)) return
+      if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"vertex_1",ninp,ulog)) return
       call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
       read (ainp,*,iostat=ioerr) vertex(2,1),vertex(2,2)
-      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"vertex_2",ninp,ulog)) return
+      if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"vertex_2",ninp,ulog)) return
       call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
       read (ainp,*,iostat=ioerr) vertex(3,1),vertex(3,2)
-      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"vertex_3",ninp,ulog)) return
+      if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"vertex_3",ninp,ulog)) return
       if (n_vertices>3) then
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read (ainp,*,iostat=ioerr) vertex(4,1),vertex(4,2)
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"vertex_4",ninp,ulog)) return           
+         if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"vertex_4",ninp,ulog)) return           
       endif
       if (n_vertices>4) then
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read (ainp,*,iostat=ioerr) vertex(5,1),vertex(5,2)
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"vertex_5",ninp,ulog)) return           
+         if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"vertex_5",ninp,ulog)) return           
       endif
       if (n_vertices>5) then
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read (ainp,*,iostat=ioerr) vertex(6,1),vertex(6,2)
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"vertex_6",ninp,ulog)) return           
+         if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"vertex_6",ninp,ulog)) return           
       endif
 ! Assignation to the substation variables
       substations%sub(i)%type_ID = type_ID
@@ -166,7 +167,7 @@ do while (trim(lcase(ainp))/="##### end substations #####")
       endif
    enddo
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"Substations DATA",ninp,ulog))     &
+   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"Substations DATA",ninp,ulog))     &
       return
 enddo
 !------------------------
@@ -174,4 +175,4 @@ enddo
 !------------------------
 return
 end subroutine ReadSubstations
-
+#endif

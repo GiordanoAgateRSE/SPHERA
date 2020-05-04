@@ -22,7 +22,7 @@
 ! Program unit: ReadInputDomain                       
 ! Description:                        
 !-------------------------------------------------------------------------------
-subroutine ReadInputDomain(NumberEntities,ainp,comment,nrighe,ier,ninp,ulog)
+subroutine ReadInputDomain(ainp,comment,nrighe,ier,ninp,ulog)
 !------------------------
 ! Modules
 !------------------------
@@ -33,9 +33,8 @@ use Hybrid_allocation_module
 !------------------------
 implicit none
 integer(4) :: nrighe,ier, ninp,ulog
-integer(4),dimension(20) :: NumberEntities
 character(1) :: comment
-character(LEN=lencard) :: ainp
+character(len=lencard) :: ainp
 integer(4) :: ioerr
 double precision :: dx, trunc
 character(100) :: token
@@ -59,28 +58,20 @@ character(100),external :: lcase,GetToken
 if (restart) then
    do while (trim(lcase(ainp))/="##### end domain #####")
       call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DOMAIN DATA",ninp,ulog))       &
+      if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"DOMAIN DATA",ninp,ulog))       &
          return
    enddo
    return
 endif
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DOMAIN DATA",ninp,ulog)) return
+if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"DOMAIN DATA",ninp,ulog)) return
 do while (trim(lcase(ainp))/="##### end domain #####")
    token = lcase(GetToken(ainp,1,ioerr))
-   read(token,*,iostat=ioerr) NumberEntities(1)
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DOMAIN COORDINATES NUMBER",ninp,  &
-      ulog)) return 
-   if ((ncord>0).and.(ulog>0)) then
-      write(ulog,"(1x,a,i3,1x,a)") "Domain Dimension       : ",ncord,          &
-         ncordlabel(ncord)
-   endif
-   token = lcase(GetToken(ainp,2,ioerr))
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DOMAIN TYPE",ninp,ulog)) return 
+   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"DOMAIN TYPE",ninp,ulog)) return 
    select case (token(1:4))
       case ("bsph","semi") 
          Domain%tipo = token(1:4)
-         if (ncord>0.and.ulog>0) then
+         if ((input_second_read.eqv..true.).and.(ulog>0)) then
             write(ulog,"(1x,a,1x,a)"  ) "Domain Type            : ",           &
                trim(token)
          endif      
@@ -90,7 +81,7 @@ do while (trim(lcase(ainp))/="##### end domain #####")
    endselect
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
    if (ioerr==0) read(ainp,*,iostat=ioerr) dx,trunc
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DD & TRUNC",ninp,ulog)) return
+   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"DD & TRUNC",ninp,ulog)) return
    Domain%dx = dx
    Domain%trunc = trunc
    token = lcase(GetToken(ainp,3,ioerr))
@@ -99,18 +90,17 @@ do while (trim(lcase(ainp))/="##### end domain #####")
       else
          Domain%RandomPos = 'n'
    endif
-   if ((ncord>0).and.(ulog>0)) then
+   if ((input_second_read.eqv..true.).and.(ulog>0)) then
       write(ulog,"(1x,a,1pe12.4)") "dx                     : ",dx
       write(ulog,"(1x,a,1pe12.4)") "Trunc                  : ",trunc
       write(ulog,"(1x,a,1x,a)") "Random Initial Position: ",Domain%RandomPos
       write(ulog,"(1x,a)")  " "
    endif
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DOMAIN DATA",ninp,ulog)) return
+   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"DOMAIN DATA",ninp,ulog)) return
 enddo
 !------------------------
 ! Deallocations
 !------------------------
 return
 end subroutine ReadInputDomain
-

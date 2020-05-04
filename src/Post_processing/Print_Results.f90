@@ -34,9 +34,9 @@ use Dynamic_allocation_module
 ! Declarations
 !------------------------
 implicit none
-integer(4),intent(IN) :: it
-character(6),intent(IN) :: str
-integer(4),intent(INOUT) :: it_print
+integer(4),intent(in) :: it
+character(6),intent(in) :: str
+integer(4),intent(inout) :: it_print
 integer(4) :: npi,i,codice,dummy,OpCountot,SpCountot,minlocvelo,maxlocvelo,nbi
 integer(4) :: minlocvelx,maxlocvelx,minlocvely,maxlocvely,minlocvelz,maxlocvelz
 integer(4) :: minlocpres,maxlocpres,minlocdens,maxlocdens,minlocvisc,maxlocvisc
@@ -327,6 +327,7 @@ if (nag>0) then
          maxlock_BetaGamma = pos(1)      
       endif   
    endif
+! Elapsed time
    if (exetype=="linux") then
       if (Domain%tmax>0.d0) then
          call system("date +%j%H%M%S>date_now.txt")

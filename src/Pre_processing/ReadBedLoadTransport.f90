@@ -36,13 +36,16 @@ implicit none
 integer(4) :: nrighe,ier,ninp,ulog,uerr,ioerr,KTGF_config,alloc_stat
 integer(4) :: ID_main_fluid,monitoring_lines,i,line_ID
 integer(4) :: n_max_iterations,erosion_flag
-integer(4) :: deposition_at_frontiers,Gamma_slope_flag,saturation_scheme
+integer(4) :: deposition_at_frontiers,saturation_scheme
+#ifdef SPACE_3D
+integer(4) :: Gamma_slope_flag
+#endif
 double precision :: dt_out,x_fixed,y_fixed,conv_crit_erosion,velocity_fixed_bed
 double precision :: x_min_dt,x_max_dt,y_min_dt,y_max_dt,time_minimum_saturation
 double precision :: z_min_dt,z_max_dt,t_q0,t_liq,time_maximum_saturation
 character(1) :: comment
 character(100) :: lcase
-character(LEN=lencard) :: ainp
+character(len=lencard) :: ainp
 logical,external :: ReadCheck
 !------------------------
 ! Explicit interfaces
@@ -57,50 +60,54 @@ logical,external :: ReadCheck
 ! Statements
 !------------------------
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"BED LOAD TRANSPORT DATA",ninp,ulog)) &
+if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"BED LOAD TRANSPORT DATA",ninp,ulog)) &
    return
 do while (trim(lcase(ainp)) /= "##### end bed load transport #####")
 ! Reading input parameters (first part)
    read(ainp,*,iostat=ioerr) KTGF_config,ID_main_fluid
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"BED-LOAD TRANSPORT INPUT LINE 1", &
+   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"BED-LOAD TRANSPORT INPUT LINE 1", &
       ninp,ulog)) return
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
    read(ainp,*,iostat=ioerr) saturation_scheme,time_minimum_saturation,        &
       time_maximum_saturation
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"BED-LOAD TRANSPORT INPUT LINE 2", &
+   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"BED-LOAD TRANSPORT INPUT LINE 2", &
       ninp,ulog)) return
    if (KTGF_config>0) then
       call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
       read(ainp,*,iostat=ioerr) velocity_fixed_bed,erosion_flag
-      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                                &
+      if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                                &
          "VELOCITY FIXED BED, EROSION FLAG",ninp,ulog)) return
-      call ReadRiga(ainp,comment,nrighe,ioerr,ninp)   
-      read(ainp,*,iostat=ioerr) deposition_at_frontiers,Gamma_slope_flag
-      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"OTHER EROSION PARAMETERS",ninp,&
+      call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+#ifdef SPACE_3D
+         read(ainp,*,iostat=ioerr) deposition_at_frontiers,Gamma_slope_flag
+#elif defined SPACE_2D
+            read(ainp,*,iostat=ioerr) deposition_at_frontiers
+#endif
+      if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"OTHER EROSION PARAMETERS",ninp,&
          ulog)) return
       call ReadRiga(ainp,comment,nrighe,ioerr,ninp)   
       read(ainp,*,iostat=ioerr) monitoring_lines,dt_out,conv_crit_erosion,     &
          n_max_iterations
-      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                                &
+      if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                                &
          "BED LOAD TRANSPORT MONITORING LINES",ninp,ulog)) return
       call ReadRiga(ainp,comment,nrighe,ioerr,ninp)   
       read(ainp,*,iostat=ioerr) x_min_dt,x_max_dt
-      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"X_MIN_DT,X_MAX_DT",ninp,ulog)) &
+      if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"X_MIN_DT,X_MAX_DT",ninp,ulog)) &
          return      
       call ReadRiga(ainp,comment,nrighe,ioerr,ninp)   
       read(ainp,*,iostat=ioerr) y_min_dt,y_max_dt
-      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"Y_MIN_DT,Y_MAX_DT",ninp,ulog)) &
+      if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"Y_MIN_DT,Y_MAX_DT",ninp,ulog)) &
          return 
       call ReadRiga(ainp,comment,nrighe,ioerr,ninp)   
       read(ainp,*,iostat=ioerr) z_min_dt,z_max_dt
-      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"Z_MIN_DT,Z_MAX_DT",ninp,ulog)) &
+      if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"Z_MIN_DT,Z_MAX_DT",ninp,ulog)) &
          return
       call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
       read(ainp,*,iostat=ioerr) t_q0,t_liq
-      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"t_q0,t_liq",ninp,ulog)) return          
+      if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"t_q0,t_liq",ninp,ulog)) return          
    endif
 ! Writing input parameters (first part)
-   if ((ncord>0).and.(ulog > 0)) then
+   if ((input_second_read.eqv..true.).and.(ulog>0)) then
       select case (KTGF_config)
       case (0)
          write(ulog,"(1x,a,1p,i12,a)") "KTGF_config:...................",      &
@@ -127,8 +134,10 @@ do while (trim(lcase(ainp)) /= "##### end bed load transport #####")
             erosion_flag
          write(ulog,"(1x,a,1p,i12)") "deposition_at_frontiers:......",         &
             deposition_at_frontiers
-         write(ulog,"(1x,a,1p,i12)") "deposition_at_frontiers:......",         &
-            Gamma_slope_flag         
+#ifdef SPACE_3D
+         write(ulog,"(1x,a,1p,i12)") "Gamma_slope_flag:.............",         &
+            Gamma_slope_flag
+#endif         
          write(ulog,"(1x,a,1p,i12)") "monitoring_lines:.............",         &
             monitoring_lines
          write(ulog,"(1x,a,1p,g12.5)") "dt_out:.......................",       &
@@ -158,7 +167,9 @@ do while (trim(lcase(ainp)) /= "##### end bed load transport #####")
       Granular_flows_options%velocity_fixed_bed = velocity_fixed_bed
       Granular_flows_options%erosion_flag = erosion_flag
       Granular_flows_options%deposition_at_frontiers = deposition_at_frontiers
+#ifdef SPACE_3D
       Granular_flows_options%Gamma_slope_flag = Gamma_slope_flag     
+#endif
       Granular_flows_options%monitoring_lines = monitoring_lines 
       Granular_flows_options%dt_out = dt_out 
       Granular_flows_options%conv_crit_erosion = conv_crit_erosion
@@ -191,30 +202,28 @@ do while (trim(lcase(ainp)) /= "##### end bed load transport #####")
       do i=1,monitoring_lines
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read(ainp,*,iostat=ioerr) line_ID
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                             &
+         if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                             &
             "BED LOAD TRANSPORT MONITORING LINES",ninp,ulog)) return      
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read(ainp,*,iostat=ioerr) x_fixed,y_fixed
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                             &
+         if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                             &
             "BED LOAD TRANSPORT MONITORING LINES",ninp,ulog)) return
 ! Assignation of the section parameters 
          Granular_flows_options%lines(i,1) = x_fixed
          Granular_flows_options%lines(i,2) = y_fixed
 ! Writing on the log file
-         if (ncord>0) then
-            if (ulog>0) then
-               write(ulog,"(1x,a,i12)") "ID_line:....................",i
-               write(ulog,"(1x,a,1p,2e12.4)") "x_fixed,y_fixed:............",  &
-                  Granular_flows_options%lines(i,1),                           &
-                  Granular_flows_options%lines(i,2)
-               write(ulog,"(1x,a)")  " "
-            endif
+         if ((input_second_read.eqv..true.).and.(ulog>0)) then
+            write(ulog,"(1x,a,i12)") "ID_line:....................",i
+            write(ulog,"(1x,a,1p,2e12.4)") "x_fixed,y_fixed:............",     &
+               Granular_flows_options%lines(i,1),                              &
+               Granular_flows_options%lines(i,2)
+            write(ulog,"(1x,a)")  " "
          endif
       enddo  
    endif   
 ! Reading the last line 
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"BED LOAD TRANSPORT DATA",ninp,ulog&
+   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"BED LOAD TRANSPORT DATA",ninp,ulog&
       )) return
 enddo
 !------------------------

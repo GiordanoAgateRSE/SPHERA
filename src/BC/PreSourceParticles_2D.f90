@@ -23,6 +23,7 @@
 ! Description: To generate new source particles at the inlet section (only in 2D
 !              and with one inlet section).
 !-------------------------------------------------------------------------------
+#ifdef SPACE_2D
 subroutine PreSourceParticles_2D
 !------------------------
 ! Modules
@@ -95,3 +96,4 @@ enddo
 !------------------------
 return
 end subroutine PreSourceParticles_2D
+#endif

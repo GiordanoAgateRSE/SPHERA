@@ -29,6 +29,7 @@
 !              the input point" and "faces intercepted by the vertical (passing 
 !              for the input point) below the input point" are odd.
 !-------------------------------------------------------------------------------
+#ifdef SPACE_3D
 logical function IsParticleInternal3D(mib,PX,IsopraS)
 !------------------------
 ! Modules
@@ -51,7 +52,6 @@ integer(4) :: test
 double precision :: tpar
 double precision :: P1(SPACEDIM),Pint(SPACEDIM),LPint(SPACEDIM)
 double precision,dimension(Tratto(mib)%numvertices) :: XYInts
-logical,external :: IsPointInternal
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -68,7 +68,7 @@ interface
       double precision,intent(in) :: point(2),point_pol_1(2),point_pol_2(2)
       double precision,intent(in) :: point_pol_3(2),point_pol_4(2)
       double precision,intent(in) :: point_pol_5(2),point_pol_6(2)
-      integer(4),intent(INOUT) :: test
+      integer(4),intent(inout) :: test
       double precision :: dis1,dis2
       double precision :: normal(2)
    end subroutine point_inout_convex_non_degenerate_polygon
@@ -77,7 +77,7 @@ interface
       implicit none
       double precision,intent(in) :: point(2),point_pol_1(2),point_pol_2(2)
       double precision,intent(in) :: point_pol_3(2),point_pol_4(2)
-      integer(4),intent(INOUT) :: test
+      integer(4),intent(inout) :: test
    end subroutine point_inout_quadrilateral
    subroutine point_inout_pentagon(point,point_pol_1,point_pol_2,              &
                                    point_pol_3,point_pol_4,point_pol_5,test)
@@ -85,7 +85,7 @@ interface
       double precision,intent(in) :: point(2),point_pol_1(2),point_pol_2(2)
       double precision,intent(in) :: point_pol_3(2),point_pol_4(2)
       double precision,intent(in) :: point_pol_5(2)
-      integer(4),intent(INOUT) :: test
+      integer(4),intent(inout) :: test
    end subroutine point_inout_pentagon
    subroutine point_inout_hexagon(point,point_pol_1,point_pol_2,               &
                                   point_pol_3,point_pol_4,point_pol_5,         &
@@ -94,7 +94,7 @@ interface
       double precision,intent(in) :: point(2),point_pol_1(2),point_pol_2(2)
       double precision,intent(in) :: point_pol_3(2),point_pol_4(2)
       double precision,intent(in) :: point_pol_5(2),point_pol_6(2)
-      integer(4),intent(INOUT) :: test
+      integer(4),intent(inout) :: test
    end subroutine point_inout_hexagon
 end interface
 !------------------------
@@ -218,3 +218,4 @@ endif
 !------------------------
 return
 end function IsParticleInternal3D
+#endif

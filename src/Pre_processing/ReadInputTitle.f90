@@ -26,14 +26,15 @@ subroutine ReadInputTitle(ainp,comment,nrighe,ier,ninp,ulog)
 !------------------------
 ! Modules
 !------------------------
-use Static_allocation_module                            
+use Static_allocation_module
+use Hybrid_allocation_module
 !------------------------
 ! Declarations
 !------------------------
 implicit none
 integer(4) :: nrighe,ier,ninp,ulog
 character(1) :: comment
-character(LEN=lencard) :: ainp
+character(len=lencard) :: ainp
 integer(4) :: n,ioerr
 character(100),external :: lcase
 logical,external :: ReadCheck
@@ -50,18 +51,18 @@ logical,external :: ReadCheck
 ! Statements
 !------------------------
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"TITLE DATA",ninp,ulog)) return 
+if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"TITLE DATA",ninp,ulog)) return 
 n = 0
 do while (trim(lcase(ainp))/="##### end title #####" )
    n = n + 1
    if (n<=maxtit) then
       title(n) = ainp
-      if ((ncord>0).AND.(ulog>0)) write(ulog,"(1x,a)") title(n)
+      if ((input_second_read.eqv..true.).and.(ulog>0)) write(ulog,"(1x,a)") title(n)
    endif
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"TITLE DATA",ninp,ulog)) return 
+   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"TITLE DATA",ninp,ulog)) return 
 enddo
-if ((ncord>0).AND.(ulog>0)) write(ulog,"(1x,a)") " "
+if ((input_second_read.eqv..true.).and.(ulog>0)) write(ulog,"(1x,a)") " "
 !------------------------
 ! Deallocations
 !------------------------

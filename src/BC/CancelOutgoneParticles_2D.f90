@@ -23,6 +23,7 @@
 ! Description: To count and delete the outgoing particles on boundaries of type
 !              "leve", "flow", "velo", "crit", "open".
 !-------------------------------------------------------------------------------
+#ifdef SPACE_2D
 subroutine CancelOutgoneParticles_2D
 !------------------------
 ! Modules
@@ -107,3 +108,4 @@ enddo
 !------------------------
 return
 end subroutine CancelOutgoneParticles_2D
+#endif

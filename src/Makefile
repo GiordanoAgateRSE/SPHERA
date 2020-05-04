@@ -49,15 +49,15 @@ EXECUTION = debug
 #             " NO"
 PARALLELIZATION = OMP
 
-#    Pre-Processor Directives (PPD): start
+#    Preprocessor Directives (PD): start
 
-#       DIMENSIONALITY
+#       SPACE DIMENSIONALITY
 #          Suggested values:
 #             3D
-#                " -DDIMENSIONALITY=3D"
+#                " -DSPACE_3D"
 #             2D
-#                " -DDIMENSIONALITY=2D"
-PPD_DIMENSIONALITY = -DDIMENSIONALITY=2D
+#                " -DSPACE_2D"
+PD_SPACE = -DSPACE_2D
 
 #       VERBOSITY
 #          Suggested values:
@@ -65,17 +65,17 @@ PPD_DIMENSIONALITY = -DDIMENSIONALITY=2D
 #                " "
 #             Verbose output
 #                " -DVERBOSITY"
-PPD_VERBOSITY =  
+PD_VERBOSITY =  
 
 #       KTGF
 #          Suggested values:
 #             KTGF scheme with possible 2-interface 3D erosion criterion
-#                " -DKTGF=FULL"
+#                " -DKTGF_FULL"
 #             no KTGF scheme
-#                " -DKTGF=NO"
+#                " -DKTGF_NO"
 #             KTGF scheme with possible 1-interface 2D erosion criterion
-#                " -DKTGF=EC2D"
-PPD_KTGF = -DKTGF=NO
+#                " -DKTGF_EC2D"
+PD_KTGF = -DKTGF_NO
 
 #       SOLID_BODIES
 #          Suggested values:
@@ -83,44 +83,44 @@ PPD_KTGF = -DKTGF=NO
 #                " -DSOLID_BODIES"
 #             No body transport
 #                " "          
-PPD_SOLID_BODIES = -DSOLID_BODIES
+PD_SOLID_BODIES = -DSOLID_BODIES
 
-#       BOUNDARY_TREATMENT
+#       BOUNDARY_TREATMENT METHOD
 #          Suggested values:
 #             SASPH
-#                " -DBOUNDARY_TREATMENT=SASPH"
+#                " -DBTM_SASPH"
 #             DBSPH
-#                " -DBOUNDARY_TREATMENT=DBSPH"
-PPD_BOUNDARY_TREATMENT = -DBOUNDARY_TREATMENT=SASPH
+#                " -DBTM_DBSPH"
+PD_BTM = -DBTM_SASPH
 
-#       TIME_INTEGRATION
+#       TIME_INTEGRATION SCHEME
 #          Suggested values:
 #             Leapfrog scheme
-#                " -DTIME_INTEGRATION=LEAPFROG"
+#                " -DTIS_LEAPFROG"
 #             Euler scheme
-#                " -DTIME_INTEGRATION=EULER"
+#                " -DTIS_EULER"
 #             Heun scheme
-#                " -DTIME_INTEGRATION=HEUN"
-PPD_TIME_INTEGRATION = -DTIME_INTEGRATION=LEAPFROG
+#                " -DTIS_HEUN"
+PD_TIS = -DTIS_LEAPFROG
 
-#    Pre-Processor Directives (PPD): end
+#    Preprocessor Directives (PD): end
 
 # Variables to be modified: end
 
 # Variable which might be assigned for debug purposes as an alternative to 
 # COMPILATION_FLAGS for some program units
-COMPILATION_FLAGS_issues =  
+COMPILATION_FLAGS_ISSUES =  
 
-# Code scheme incompatibilities (PPD)
-ifneq ($(PPD_KTGF), -DKTGF=NO)
-   PPD_BOUNDARY_TREATMENT = -DBOUNDARY_TREATMENT=SASPH
+# Code scheme incompatibilities (PD)
+ifneq ($(PD_KTGF), -DKTGF_NO)
+   PD_BTM = -DBTM_SASPH
 endif
-ifeq ($(PPD_SOLID_BODIES), -DSOLID_BODIES)
-   PPD_BOUNDARY_TREATMENT = -DBOUNDARY_TREATMENT=SASPH
-   PPD_TIME_INTEGRATION = -DTIME_INTEGRATION=LEAPFROG
+ifeq ($(PD_SOLID_BODIES), -DSOLID_BODIES)
+   PD_BTM = -DBTM_SASPH
+   PD_TIS = -DTIS_LEAPFROG
 endif
-ifeq ($(PPD_BOUNDARY_TREATMENT), -DBOUNDARY_TREATMENT=DBSPH)
-   PPD_TIME_INTEGRATION = -DTIME_INTEGRATION=EULER
+ifeq ($(PD_BTM), -DBTM_DBSPH)
+   PD_TIS = -DTIS_EULER
 endif
 
 # IDs of the above choices reported in the name of the executable code
@@ -139,39 +139,39 @@ ifeq ($(PARALLELIZATION), NO)
    else ifeq ($(PARALLELIZATION), OMP)
       ID_PARALLELIZATION = 1
 endif
-ifeq ($(PPD_DIMENSIONALITY), -DDIMENSIONALITY=3D)
-   ID_PPD_DIMENSIONALITY = 3
-   else ifeq ($(PPD_DIMENSIONALITY), -DDIMENSIONALITY=2D)
-      ID_PPD_DIMENSIONALITY = 2
+ifeq ($(PD_SPACE), -DSPACE_3D)
+   ID_PD_SPACE = 3
+   else ifeq ($(PD_SPACE), -DSPACE_2D)
+      ID_PD_SPACE = 2
 endif
-ifeq ($(PPD_VERBOSITY), -DVERBOSITY)
-   ID_PPD_VERBOSITY = 1
+ifeq ($(PD_VERBOSITY), -DVERBOSITY)
+   ID_PD_VERBOSITY = 1
    else
-      ID_PPD_VERBOSITY = 0
+      ID_PD_VERBOSITY = 0
 endif
-ifeq ($(PPD_KTGF), -DKTGF=FULL)
-   ID_PPD_KTGF = 1
-   else ifeq ($(PPD_KTGF), -DKTGF=NO)
-      ID_PPD_KTGF = 0
-      else ifeq ($(PPD_KTGF), -DKTGF=EC2D)
-         ID_PPD_DIMENSIONALITY = 2
+ifeq ($(PD_KTGF), -DKTGF_FULL)
+   ID_PD_KTGF = 1
+   else ifeq ($(PD_KTGF), -DKTGF_NO)
+      ID_PD_KTGF = 0
+      else ifeq ($(PD_KTGF), -DKTGF_EC2D)
+         ID_PD_KTGF = 2
 endif
-ifeq ($(PPD_SOLID_BODIES), -DSOLID_BODIES)
-   ID_PPD_SOLID_BODIES = 1
+ifeq ($(PD_SOLID_BODIES), -DSOLID_BODIES)
+   ID_PD_SOLID_BODIES = 1
    else
-      ID_PPD_SOLID_BODIES = 0
+      ID_PD_SOLID_BODIES = 0
 endif
-ifeq ($(PPD_BOUNDARY_TREATMENT), -DBOUNDARY_TREATMENT=SASPH)
-   ID_PPD_BOUNDARY_TREATMENT = 1
-   else ifeq ($(PPD_BOUNDARY_TREATMENT), -DBOUNDARY_TREATMENT=DBSPH)
-      ID_PPD_DIMENSIONALITY = 2
+ifeq ($(PD_BTM), -DBTM_SASPH)
+   ID_PD_BTM = 1
+   else ifeq ($(PD_BTM), -DBTM_DBSPH)
+      ID_PD_BTM = 2
 endif
-ifeq ($(PPD_TIME_INTEGRATION), -DTIME_INTEGRATION=EULER)
-   ID_PPD_TIME_INTEGRATION = 1
-   else ifeq ($(PPD_TIME_INTEGRATION), -DTIME_INTEGRATION=HEUN)
-      ID_PPD_TIME_INTEGRATION = 2
-      else ifeq ($(PPD_TIME_INTEGRATION), -DTIME_INTEGRATION=LEAPFROG)
-         ID_PPD_TIME_INTEGRATION = 3
+ifeq ($(PD_TIS), -DTIS_EULER)
+   ID_PD_TIS = 1
+   else ifeq ($(PD_TIS), -DTIS_HEUN)
+      ID_PD_TIS = 2
+      else ifeq ($(PD_TIS), -DTIS_LEAPFROG)
+         ID_PD_TIS = 3
 endif
 
 # COMPILATION_FLAGS
@@ -246,7 +246,7 @@ SOURCES_issues_b =
 MAIN_FILE_ROOT = ./Main_algorithm/sphera
 
 EXE_CODE = \
-$(EXE_DIR)SPHERA_$(VERSION)_$(ID_COMPILER)$(ID_EXECUTION)$(ID_PARALLELIZATION)$(ID_PPD_DIMENSIONALITY)$(ID_PPD_VERBOSITY)$(ID_PPD_KTGF)$(ID_PPD_SOLID_BODIES)$(ID_PPD_BOUNDARY_TREATMENT)$(ID_PPD_TIME_INTEGRATION)
+$(EXE_DIR)SPHERA_$(VERSION)_$(ID_COMPILER)$(ID_EXECUTION)$(ID_PARALLELIZATION)$(ID_PD_SPACE)$(ID_PD_VERBOSITY)$(ID_PD_KTGF)$(ID_PD_SOLID_BODIES)$(ID_PD_BTM)$(ID_PD_TIS)
 
 OBJECTS = \
 $(patsubst %.f90,%.o,$(SOURCES)$(SOURCES_issues)$(SOURCES_b)$(SOURCES_issues_b))
@@ -255,35 +255,35 @@ $(patsubst %.f90,%.o,$(SOURCES)$(SOURCES_issues)$(SOURCES_b)$(SOURCES_issues_b))
 #    Correct sequence to compile+link from a Linux terminal: 
 #       "make"
 
-all: touch compile compile_issues compile_b compile_issues_b link remove 
+all: touch compile compile_issues compile_b compile_issues_b link clean 
 
 compile: $(SOURCES)
 
 compile_b: $(SOURCES_b)
 
 $(SOURCES) $(SOURCES_b): %.f90: %.o
-	$(COMPILER) $@ -o $< $(OMP_FLAG) $(COMPILATION_FLAGS_O2) $(COMPILATION_FLAG_IPO) -c $(PPD_DIMENSIONALITY) $(PPD_VERBOSITY) $(PPD_KTGF) $(PPD_SOLID_BODIES) $(PPD_BOUNDARY_TREATMENT) $(PPD_TIME_INTEGRATION)
+	$(COMPILER) $@ -o $< $(OMP_FLAG) $(COMPILATION_FLAGS) $(COMPILATION_FLAG_IPO) -c -cpp $(PD_SPACE) $(PD_VERBOSITY) $(PD_KTGF) $(PD_SOLID_BODIES) $(PD_BTM) $(PD_TIS)
 
 compile_issues: $(SOURCES_issues)
 
 compile_issues_b: $(SOURCES_issues_b)
 
 $(SOURCES_issues) $(SOURCES_issues_b): %.f90: %.o
-	$(COMPILER) $@ -o $< $(OMP_FLAG) $(COMPILATION_FLAGS_O1) -c $(PPD_DIMENSIONALITY) $(PPD_VERBOSITY) $(PPD_KTGF) $(PPD_SOLID_BODIES) $(PPD_BOUNDARY_TREATMENT) $(PPD_TIME_INTEGRATION)
+	$(COMPILER) $@ -o $< $(OMP_FLAG) $(COMPILATION_FLAGS_ISSUES) -c -cpp $(PD_SPACE) $(PD_VERBOSITY) $(PD_KTGF) $(PD_SOLID_BODIES) $(PD_BTM) $(PD_TIS)
 
 link: $(OBJECTS)
 	touch $(EXE_CODE).x
-	$(COMPILER) $(MAIN_FILE_ROOT).f90 $^ -o $(EXE_CODE).x $(OMP_FLAG) $(COMPILATION_FLAGS_O2) $(PPD_DIMENSIONALITY) $(PPD_VERBOSITY) $(PPD_KTGF) $(PPD_SOLID_BODIES) $(PPD_BOUNDARY_TREATMENT) $(PPD_TIME_INTEGRATION)
+	$(COMPILER) $(MAIN_FILE_ROOT).f90 $^ -o $(EXE_CODE).x $(OMP_FLAG) $(COMPILATION_FLAGS) -cpp $(PD_SPACE) $(PD_VERBOSITY) $(PD_KTGF) $(PD_SOLID_BODIES) $(PD_BTM) $(PD_TIS)
 	rm -f $(MAIN_FILE_ROOT).o
 
-remove: $(OBJECTS)
+clean: $(OBJECTS)
 	rm -f $^
 	rm -f *.mod
 
 touch:
 	touch $(OBJECTS)
 
-clean: 
+remove: 
 	rm -f $(EXE_CODE).x
 
 # Targets: end

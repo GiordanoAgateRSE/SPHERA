@@ -23,6 +23,7 @@
 ! Description: To compute the boundary volume integrals IntWdV. 
 !              (Di Monaco et al., 2011, EACFM)                        
 !-------------------------------------------------------------------------------
+#ifdef SPACE_2D
 subroutine BoundaryVolumeIntegrals2D(icbs,LocXY,xpmin,xpmax,interlen,IntWdV,   &
                                      IntDpWdV)
 !------------------------
@@ -36,11 +37,11 @@ use Hybrid_allocation_module
 implicit none
 integer(4),parameter :: Nalfadiv = 10
 double precision,parameter :: eps = 0.05d0
-integer(4),intent(IN) :: icbs
-double precision,intent(IN) :: xpmin,xpmax,interlen
-double precision,intent(IN),dimension(1:PLANEDIM,1:MAXCLOSEBOUNDSIDES) :: LocXY
-double precision,intent(INOUT) :: IntWdV
-double precision,intent(INOUT),dimension(1:2) :: IntDpWdV
+integer(4),intent(in) :: icbs
+double precision,intent(in) :: xpmin,xpmax,interlen
+double precision,intent(in),dimension(1:PLANEDIM,1:MAXCLOSEBOUNDSIDES) :: LocXY
+double precision,intent(inout) :: IntWdV
+double precision,intent(inout),dimension(1:2) :: IntDpWdV
 integer(4) :: k,ndiv
 double precision :: xpi,ypi,yplimite,dalfarif,Intalfa,dalfa,alfaA,alfaB,alfa_k
 double precision :: csiPA,csiPB,sinalfa,cosalfa,rb,rob,mult
@@ -67,8 +68,8 @@ ypi = LocXY(2,icbs)
 if (ypi<yplimite) ypi = yplimite
 csiPA = xpmin - xpi
 csiPB = xpmax - xpi
-alfaA = Atan2(csiPA, ypi)
-alfaB = Atan2(csiPB, ypi)
+alfaA = atan2(csiPA,ypi)
+alfaB = atan2(csiPB,ypi)
 Intalfa = alfaB - alfaA
 ndiv = Int(intalfa / dalfarif + half)
 if (ndiv<1) ndiv = 1
@@ -83,7 +84,7 @@ do k=1,ndiv
    mult = Domain%h * J2Wro2(rob) * dalfa
    IntDpWdV(1) = IntDpWdV(1) + sinalfa * mult
    IntDpWdV(2) = IntDpWdV(2) - cosalfa * mult
-   IntWdV = IntWdV + WIntegr(rb, Domain%h) * dalfa
+   IntWdV = IntWdV + WIntegr(rb,Domain%h) * dalfa
 enddo
 ! To check if the particle is very close the the internal side  
 if (ypi==yplimite) then
@@ -94,3 +95,4 @@ endif
 !------------------------
 return
 end subroutine BoundaryVolumeIntegrals2D
+#endif

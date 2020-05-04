@@ -26,15 +26,19 @@ module Static_allocation_module
 ! Global constants: start
 integer(4),public,parameter :: SPACEDIM = 3
 integer(4),public,parameter :: PLANEDIM = 2
-integer(4),public,parameter :: MAXCLOSEBOUNDSIDES = 4 
+! MAXOPENSIDES applies both in 3D and 2D
 integer(4),public,parameter :: MAXOPENSIDES = 10
-integer(4),public,parameter :: MAXOPENFACES = 50
+! MAXPARTLINE applies both in 3D and 2D
 integer(4),public,parameter :: MAXPARTLINE = 2000
-integer(4),public,parameter :: LIMCLOSEBOUNDSIDES = 4
+#ifdef SPACE_3D
+integer(4),public,parameter :: MAXOPENFACES = 50
 integer(4),public,parameter :: MAXFACENODES = 6
-integer(4),public,parameter :: NUMCOLS_BIT = 5
-integer(4),public,parameter :: NUMROWS_BIT = 22
 integer(4),public,parameter :: INT_KERNELTABLE = 40
+#elif defined SPACE_2D
+integer(4),public,parameter :: MAXCLOSEBOUNDSIDES = 4
+integer(4),public,parameter :: LIMCLOSEBOUNDSIDES = 4
+integer(4),public,parameter :: NUMCOLS_BIT = 5
+#endif
 integer(4),public,parameter :: INIPARTICLEBUFFER = 225000
 integer(4),public,parameter :: FI_STEPS = 8
 integer(4),public,parameter :: TETA_STEPS = 4 * FI_STEPS
@@ -44,13 +48,16 @@ integer(4),public,parameter :: menouno = - 1
 double precision,public,parameter :: max_positive_number = 3.4d+38
 double precision,public,parameter :: max_negative_number = -3.4d+38
 double precision,public,parameter :: PIGRECO = 3.14159265358979d0
-! 10/(7*PIGRECO) 
+#ifdef SPACE_3D
+double precision,public,parameter :: KERNELCONST3D = 1.d0 / PIGRECO
+#elif defined SPACE_2D
+! 10/(7*PIGRECO)
 double precision,public,parameter :: KERNELCONST2D = 0.454728408833987d0 
-double precision,public,parameter :: KERNELCONST3D = 1.0d0 / PIGRECO 
-double precision,public,parameter :: FI_INTERVAL = PIGRECO/2.0d0  
+#endif
+double precision,public,parameter :: FI_INTERVAL = PIGRECO / 2.0d0  
 double precision,public,parameter :: TETA_INTERVAL = PIGRECO + PIGRECO 
-double precision,public,parameter :: zero = 0.d0  
-double precision,public,parameter :: one = 1.d0  
+double precision,public,parameter :: zero = 0.d0
+double precision,public,parameter :: one = 1.d0 
 double precision,public,parameter :: two = 2.d0
 double precision,public,parameter :: four = 4.d0 
 double precision,public,parameter :: half = 0.5d0 
@@ -68,9 +75,24 @@ double precision,public,parameter :: vKconst = 0.41
 ! Global constants: end
 ! Global variables: start 
 logical :: dt_alfa_Mon
-integer(4) :: ncord,NMedium,NPartZone
-integer(4) :: npointst,NPoints,NPointsl,NPointse,NLines,GCBFVecDim
-integer(4) :: NumVertici,NumFacce,NumTratti,NumBVertices,NumBSides
+! Flag to pinpoint the second read of the input files
+logical :: input_second_read
+#ifdef SPACE_3D
+integer(4),public,parameter :: ncord = 3
+#elif defined SPACE_2D
+integer(4),public,parameter :: ncord = 2 
+#endif
+integer(4) :: NMedium,NPartZone
+integer(4) :: npointst,NPoints,NPointsl,NPointse,NLines
+#ifdef SPACE_3D
+integer(4) :: GCBFVecDim
+#endif
+integer(4) :: NumVertici,NumTratti,NumBVertices
+#ifdef SPACE_3D
+integer(4) :: NumFacce
+#elif defined SPACE_2D
+integer(4) :: NumBSides
+#endif
 integer(4) :: nag,nagpg,PARTICLEBUFFER
 ! Variable to count the particles, which are not "sol"
 integer(4) :: indarrayFlu
@@ -78,25 +100,36 @@ integer(4) :: it_start,on_going_time_step,it_eff,indarraySol
 double precision :: simulation_time,dt,pesodt,dt_average,DTminBER
 ! Global variables: end
 ! Global variables for inlet sections: start
-integer(4) :: NumOpenSides,SourceSide,mat,irz,izone
-integer(4) :: SourceFace,NumOpenFaces,pinttimeratio,itime_jet
+integer(4) :: mat,irz,izone
+#ifdef SPACE_3D
+integer(4) :: NumOpenFaces,SourceFace
+#elif defined SPACE_2D
+integer(4) :: NumOpenSides,SourceSide
+#endif
+integer(4) :: pinttimeratio,itime_jet
 double precision :: RowPeriod,yfila,ParticleVolume,zfila
-integer(4),dimension(1:MAXOPENSIDES) :: NumPartperLine, NumPartFace
-integer(4),dimension(1:MAXOPENSIDES) :: Openside
+#ifdef SPACE_3D
 integer(4),dimension(1:MAXOPENFACES) :: OpenFace
+integer(4),dimension(1:MAXOPENSIDES) :: NumPartFace
+#elif defined SPACE_2D
+integer(4),dimension(1:MAXOPENSIDES) :: NumPartperLine,OpenSide
+#endif
 double precision,dimension(1:MAXOPENSIDES) :: RowVelocity
 double precision,dimension(1:SPACEDIM) :: P
 double precision,dimension(1:SPACEDIM) :: Q
 double precision,dimension(1:SPACEDIM) :: nn
+! This array applies both to 3D and 2D
 double precision,dimension(1:MAXOPENSIDES,1:MAXPARTLINE,1:SPACEDIM) :: PartLine
 ! Global variables for inlet sections: end
 ! Global variables to compute SA-SPH integrals: start
 integer(4),parameter :: BITrows = FI_STEPS * TETA_STEPS
 integer(4),parameter :: BITcols = 7
+#ifdef SPACE_3D
 integer(4),parameter :: ktrows = INT_KERNELTABLE
 integer(4),parameter :: ktcols = 4
 double precision :: ktdelta
 double precision,dimension(0:ktrows,0:ktcols) :: kerneltab
+#endif
 double precision,dimension(1:BITrows,1:BITcols) :: BoundIntegralTab
 ! Global variables to compute SA-SPH integrals: end
 ! Global variables for Paraview output files : start
@@ -107,7 +140,7 @@ logical :: vtkconv
 ! Number of current blocks
 integer(4) :: nblocchi,block
 ! Writing time step
-double precision :: freq_time, val_time
+double precision :: freq_time,val_time
 ! Array to store the number of blocks
 integer(4),dimension(maxnumblock) :: blocchi
 ! Array to store the time of the blocks
@@ -133,18 +166,23 @@ logical :: body_maximum_pressure_limiter
 logical :: FSI_free_slip_conditions
 ! Max number of neighbouring particles
 integer(4) :: NMAXPARTJ
-! Max number of close boundary sides for the current particle
-integer(4) :: MaxNcbs
+#ifdef SPACE_3D
 ! Max number of close boundary faces for the current particle
 integer(4) :: MaxNcbf
+#elif defined SPACE_2D
+! Max number of close boundary sides for the current particle
+integer(4) :: MaxNcbs
+#endif
 ! Total number of body particles
 integer(4) :: n_body_part
 ! Total number of surface body particles
 integer(4) :: n_surf_body_part
 ! Total number of bodies 
 integer(4) :: n_bodies
+#ifdef SPACE_3D
 ! Number of convex edges
 integer(4) :: NumBEdges
+#endif
 ! Input variable
 double precision :: friction_angle
 ! 0.001 * Domain%h 
@@ -157,8 +195,6 @@ double precision :: doubleh
 double precision :: squareh
 ! doubleh * doubleh
 double precision :: square_doubleh
-! Domain%h*Domain%h*Domain%h 
-double precision :: cubich
 ! 1./Domain%h
 double precision :: unosuh
 ! 1./(Domain%h*Domain%h)
@@ -176,7 +212,7 @@ integer(4),dimension(14,3) :: indicecelle
 integer(4),dimension(0:3,2) :: icoordp
 character(len=8),parameter :: acode = "SPHERA  "
 character(len=8),parameter :: version = "9.0.0 "
-character(255) :: nomecaso, nomecas2
+character(255) :: nomecaso,nomecas2
 character(1),dimension(0:3) :: xyzlabel = (/ "T", "X", "Y", "Z" /)  
 character(4),dimension(3) :: ncordlabel = (/ "    ", "(2D)", "(3D)" /)
 ! Killer file name
@@ -189,5 +225,5 @@ character(10) :: exetype = "linux"
 character(255) :: nomefileerr
 ! "original" or "euristic"
 character(len=8) :: dt_opt = "original"
-character(LEN=lencard),dimension(MAXTIT) :: title
+character(len=lencard),dimension(MAXTIT) :: title
 end module

@@ -33,6 +33,7 @@
 !              Check that the elastic boundary reaction never works.
 !              (Di Monaco et al., 2011, EACFM).                        
 !-------------------------------------------------------------------------------
+#ifdef SPACE_2D
 subroutine AddElasticBoundaryReaction_2D(npi,Ncbs,BoundReaction)
 !------------------------
 ! Modules
@@ -99,3 +100,4 @@ enddo
 !------------------------
 return 
 end subroutine AddElasticBoundaryReaction_2D
+#endif

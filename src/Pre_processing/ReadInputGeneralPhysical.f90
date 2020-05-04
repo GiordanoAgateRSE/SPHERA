@@ -22,7 +22,7 @@
 ! Program unit: ReadInputGeneralPhysical                          
 ! Description:                        
 !-------------------------------------------------------------------------------
-subroutine ReadInputGeneralPhysical(NumberEntities,ainp,comment,nrighe,ier,ninp,ulog)
+subroutine ReadInputGeneralPhysical(ainp,comment,nrighe,ier,ninp,ulog)
 !------------------------
 ! Modules
 !------------------------
@@ -33,9 +33,8 @@ use Hybrid_allocation_module
 !------------------------
 implicit none
 integer(4) :: nrighe,ier, ninp,ulog
-integer(4),dimension(20) :: NumberEntities
 character(1) :: comment
-character(LEN=lencard) :: ainp
+character(len=lencard) :: ainp
 integer(4) :: n,icord,ioerr
 double precision :: prif
 double precision,dimension(3) :: values1
@@ -54,23 +53,23 @@ logical,external :: ReadCheck
 ! Statements
 !------------------------
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"GENERAL PHYSICAL PROPERTIES DATA",   &
+if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"GENERAL PHYSICAL PROPERTIES DATA",   &
    ninp,ulog)) return
 do while (trim(lcase(ainp))/="##### end general physical properties #####")
-   read (ainp,*,iostat=ioerr) values1(1:NumberEntities(1))
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"GRAVITAL ACCELERATION VECTOR",ninp&
+   read (ainp,*,iostat=ioerr) values1(1:ncord)
+   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"GRAVITAL ACCELERATION VECTOR",ninp&
       ,ulog)) return
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
    read (ainp,*,iostat=ioerr) prif
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"REFERENCE PRESSURE",ninp,ulog))   &
+   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"REFERENCE PRESSURE",ninp,ulog))   &
       return
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"GENERAL PHYSICAL PROPERTIES DATA",&
+   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"GENERAL PHYSICAL PROPERTIES DATA",&
       ninp,ulog)) return
 enddo
-if (ncord>0) then
+if (input_second_read.eqv..true.) then
    Domain%grav(:) = zero            
-   do n=1,NumberEntities(1)
+   do n=1,ncord
       icord = icoordp(n,ncord-1)
       Domain%grav(icord) = values1(n)
       if (ulog>0) write(ulog,"(1x,a,a,1p,e12.4)") xyzlabel(icord),             &

@@ -28,7 +28,8 @@
 !              JdWsRn(n=3): Integral (dW_norm/dq * q**3 * dq) * h**2 
 !                           (from q_0b to 2)             
 !-------------------------------------------------------------------------------
-double precision function JdWsRn(ro,SD,n,kernel)
+#ifdef SPACE_3D
+double precision function JdWsRn(ro,n,kernel)
 !------------------------
 ! Modules
 !------------------------
@@ -37,16 +38,12 @@ use Static_allocation_module
 ! Declarations
 !------------------------
 implicit none
-! 10/(7*PI)
-double precision,parameter :: KS2D = 0.454728408833987d0
-! 5/(16*PI)
-double precision,parameter :: KA2D = 0.09947192d0
-! 1/PI
+! 1/PI (in 2D: 10/(7*PI))
 double precision,parameter :: KS3D = 0.31830989d0
-! 15/(16*PI)
+! 15/(16*PI) (in 2D: 5/(16*PI))
 double precision,parameter :: KA3D = 0.07460394d0
-integer(4),intent(IN) :: SD,n,kernel
-double precision,intent(IN) :: ro
+integer(4),intent(in) :: n,kernel
+double precision,intent(in) :: ro
 double precision :: ro2,ro3,ro4,ro5,duemro
 !------------------------
 ! Explicit interfaces
@@ -97,18 +94,9 @@ select case (kernel)
          case default
             JdWsRn = zero
       endselect
-      select case (SD)
-         case(2)      
-! 2D geometry
-            JdWsRn = JdWsRn * KS2D
-         case(3)      
-! 3D geometry
-            JdWsRn = JdWsRn * KS3D
-         case default
-            JdWsRn = zero
-      endselect
+      JdWsRn = JdWsRn * KS3D
    case(2)              
-! Gallati anti-cluster kernel 
+! Gallati anti-cluster kernel
       select case (n)
          case(1)      
             if (ro<two) then
@@ -125,16 +113,7 @@ select case (kernel)
          case default
             JdWsRn = zero
       endselect
-      select case (SD)
-         case(2)      
-! 2D geometry
-            JdWsRn = JdWsRn * KA2D
-         case(3)
-! 3D geometry
-            JdWsRn = JdWsRn * KA3D
-         case default
-            JdWsRn = zero
-      endselect
+      JdWsRn = JdWsRn * KA3D
    case default
 endselect
 !------------------------
@@ -142,3 +121,4 @@ endselect
 !------------------------
 return
 end function JdWsRn
+#endif

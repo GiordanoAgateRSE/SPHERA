@@ -47,11 +47,11 @@ double precision :: dis_ref,dis_bp_f
 !------------------------
 ! Initializations
 !------------------------
-if (ncord==3) then
+#ifdef SPACE_3D
    dis_ref = dsqrt(3.d0) * Domain%dx / dx_dxbodies / 2.d0
-   elseif (ncord==2) then
+#elif defined SPACE_2D
       dis_ref = dsqrt(2.d0) * Domain%dx / dx_dxbodies / 2.d0
-endif
+#endif
 !------------------------
 ! Statements
 !------------------------

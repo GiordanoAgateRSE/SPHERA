@@ -23,6 +23,7 @@
 ! Description: It finds extremes of the rectangular frame which contains the 
 !              boundary mib. 
 !-------------------------------------------------------------------------------
+#ifdef SPACE_3D
 subroutine FindFrame(Xmin,Xmax,Nt)
 !------------------------
 ! Modules
@@ -34,8 +35,8 @@ use Dynamic_allocation_module
 ! Declarations
 !------------------------
 implicit none
-integer(4),intent(IN) :: Nt
-double precision,intent(INOUT),dimension(SPACEDIM,NumFacce) :: Xmin,Xmax
+integer(4),intent(in) :: Nt
+double precision,intent(inout),dimension(SPACEDIM,NumFacce) :: Xmin,Xmax
 integer(4) :: i,n,iv,nf,nod
 !------------------------
 ! Explicit interfaces
@@ -54,15 +55,15 @@ do iv=Tratto(Nt)%iniface,(Tratto(Nt)%iniface+Tratto(Nt)%numvertices-1)
    do n=1,6
       nod = BoundaryFace(nf)%Node(n)%name
       if (nod<=0) cycle
-      do i=1,Ncord
+      do i=1,ncord
          if (Vertice(i,nod)<Xmin(i,Nt)) Xmin(i,Nt) = Vertice(i,nod)
          if (Vertice(i,nod)>Xmax(i,Nt)) Xmax(i,Nt) = Vertice(i,nod)
-      end do
-   end do
-end do
+      enddo
+   enddo
+enddo
 !------------------------
 ! Deallocations
 !------------------------
 return
 end subroutine FindFrame
-
+#endif

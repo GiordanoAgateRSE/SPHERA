@@ -29,15 +29,25 @@ subroutine SASPH_continuity
 use Static_allocation_module
 use Dynamic_allocation_module
 use Hybrid_allocation_module
+#ifdef SPACE_3D
 use I_O_file_module
 use I_O_diagnostic_module
+#endif
 !------------------------
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: ii,npi,Ncbf,Ncbf_Max,Ncbs,IntNcbs
-double precision :: BCtorodivV,BCrodivV
+integer(4) :: ii,npi
+#ifdef SPACE_3D
+integer(4) :: Ncbf,Ncbf_Max
+double precision :: BCtorodivV
+#elif defined SPACE_2D
+integer(4) :: Ncbs,IntNcbs
+double precision :: BCrodivV
+#endif
+#ifdef SPACE_3D
 character(len=lencard) :: nomsub = "SASPH_continuity"
+#endif
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -47,17 +57,27 @@ character(len=lencard) :: nomsub = "SASPH_continuity"
 !------------------------
 ! Initializations
 !------------------------
+#ifdef SPACE_3D
 Ncbf_Max = 0
+#endif
 !------------------------
 ! Statements
 !------------------------
 !$omp parallel do default(none)                                                & 
-!$omp shared(nag,pg,BoundaryDataPointer,Ncbf_Max,indarrayFlu,Array_Flu,ncord)  &
-!$omp private(npi,ii,BCtorodivV,BCrodivV,Ncbf,Ncbs,IntNcbs)
+!$omp shared(nag,pg,BoundaryDataPointer,indarrayFlu,Array_Flu)                 &
+#ifdef SPACE_3D
+!$omp shared(Ncbf_Max)                                                         &
+#endif
+!$omp private(npi,ii)                                                          &
+#ifdef SPACE_3D
+!$omp private(Ncbf,BCtorodivV)
+#elif defined SPACE_2D
+!$omp private(BCrodivV,Ncbs,IntNcbs)
+#endif
 do ii=1,indarrayFlu
    npi = Array_Flu(ii)
 ! Seaching for the neighbouring faces/sides of the particle "npi"
-   if (ncord==3) then
+#ifdef SPACE_3D
       BCtorodivV = zero
       Ncbf = BoundaryDataPointer(1,npi)
 ! Detecting the faces with actual contributions
@@ -67,7 +87,7 @@ do ii=1,indarrayFlu
 !$omp end critical (omp_Ncbf_Max_2)
          call AddBoundaryContribution_to_CE3D(npi,Ncbf,BCtorodivV)
       endif
-      else
+#elif defined SPACE_2D
          BCrodivV = zero
          Ncbs = BoundaryDataPointer(1,npi)
          IntNcbs = BoundaryDataPointer(2,npi)
@@ -75,23 +95,25 @@ do ii=1,indarrayFlu
          if ((Ncbs>0).and.(IntNcbs>0)) then
             call AddBoundaryContribution_to_CE2D(npi,IntNcbs,BCrodivV)
          endif
-   endif
+#endif
    if (pg(npi)%koddens==0) then
-      if (ncord==3) then
+#ifdef SPACE_3D
          pg(npi)%dden = pg(npi)%dden - BCtorodivV
-         else
+#elif defined SPACE_2D
             pg(npi)%dden = pg(npi)%dden - BCrodivV
-      endif
+#endif
       else
          pg(npi)%dden = zero
    endif
 enddo
 !$omp end parallel do
-if (Ncbf_Max>Domain%MAXCLOSEBOUNDFACES) then
-   write(ulog,"(a,i5,a,i5)") "Increase parameter MAXCLOSEBOUNDFACES from ",    &
-      Domain%MAXCLOSEBOUNDFACES," to ",Ncbf_Max
-   call diagnostic(arg1=9,arg2=4,arg3=nomsub)
-endif
+#ifdef SPACE_3D
+   if (Ncbf_Max>Domain%MAXCLOSEBOUNDFACES) then
+      write(ulog,"(a,i5,a,i5)") "Increase parameter MAXCLOSEBOUNDFACES from ", &
+         Domain%MAXCLOSEBOUNDFACES," to ",Ncbf_Max
+      call diagnostic(arg1=9,arg2=4,arg3=nomsub)
+   endif
+#endif
 !------------------------
 ! Deallocations
 !------------------------

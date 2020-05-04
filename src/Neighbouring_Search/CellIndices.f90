@@ -33,9 +33,9 @@ use Hybrid_allocation_module
 ! Declarations
 !------------------------
 implicit none
-integer(4),intent(IN) :: nc
-integer(4),intent(OUT) :: i,j,k
-integer(4) :: ncij, nucellsij,ni,nj 
+integer(4),intent(in) :: nc
+integer(4),intent(out) :: i,j,k
+integer(4) :: ncij,nucellsij,ni,nj 
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -63,4 +63,3 @@ CellIndices = ncij
 ! Deallocations
 !------------------------
 end function CellIndices
-

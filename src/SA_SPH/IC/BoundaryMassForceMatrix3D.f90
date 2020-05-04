@@ -24,6 +24,7 @@
 !              the base of the cosine matrix T and the parameter Fi. (Di Monaco 
 !              et al., 2011, EACFM)                        
 !-------------------------------------------------------------------------------
+#ifdef SPACE_3D
 subroutine BoundaryMassForceMatrix3D(T,RMF,Fi)
 !------------------------
 ! Modules
@@ -33,8 +34,8 @@ use Static_allocation_module
 ! Declarations
 !------------------------
 implicit none
-double precision,intent(INOUT),dimension(SPACEDIM) :: Fi
-double precision,intent(INOUT),dimension(SPACEDIM,SPACEDIM) :: T,RMF
+double precision,intent(inout),dimension(SPACEDIM) :: Fi
+double precision,intent(inout),dimension(SPACEDIM,SPACEDIM) :: T,RMF
 integer(4) :: i
 double precision,dimension(SPACEDIM,SPACEDIM) :: Diag,FiR,TTR
 !------------------------
@@ -61,4 +62,4 @@ call MatrixProduct(T,FiR,RMF,SPACEDIM,SPACEDIM,SPACEDIM)
 !------------------------
 return
 end subroutine BoundaryMassForceMatrix3D
-
+#endif

@@ -31,9 +31,9 @@ subroutine area_triangle(P1,P2,P3,area,normal)
 ! Declarations
 !------------------------
 implicit none
-double precision,intent(IN) :: P1(3),P2(3),P3(3)
-double precision,intent(OUT) :: area
-double precision,intent(OUT) :: normal(3)
+double precision,intent(in) :: P1(3),P2(3),P3(3)
+double precision,intent(out) :: area
+double precision,intent(out) :: normal(3)
 double precision :: vec_1(3),vec_2(3)
 !------------------------
 ! Explicit interfaces
@@ -57,4 +57,3 @@ normal(:) = normal(:) / (2.d0 * area)
 !------------------------
 return
 end subroutine area_triangle
-

@@ -51,8 +51,11 @@ integer(4),external :: CellNumber
 on_going_time_step = -999
 EpOrdGrid = 0
 num_out = 0
-SourceFace = 0
-SourceSide = 0
+#ifdef SPACE_3D
+   SourceFace = 0
+#elif defined SPACE_2D
+      SourceSide = 0
+#endif
 it_eff = it_start
 it_print = it_start
 it_memo = it_start
@@ -65,11 +68,11 @@ IC_removal_flag = .false.
 !------------------------
 call liquid_particle_ID_array
 ! Introductory procedure for inlet conditions
-if (ncord==3) then
+#ifdef SPACE_3D
    call PreSourceParticles_3D
-   else
+#elif defined SPACE_2D
       call PreSourceParticles_2D
-endif
+#endif
 ! SPH parameters 
 call start_and_stop(2,10)
 if (Domain%tipo=="bsph") on_going_time_step = -2
@@ -125,7 +128,11 @@ endif
 ! the corresponding boundary integrals (SA-SPH).
 if (Domain%tipo=="semi") then
    call start_and_stop(2,11)
-   call ComputeBoundaryDataTab
+#ifdef SPACE_3D
+      call ComputeBoundaryDataTab_3D
+#elif defined SPACE_2D
+         call ComputeBoundaryDataTab_2D
+#endif
    call start_and_stop(3,11)
 endif
 ! To evaluate the properties that must be attributed to the fixed particles
@@ -177,7 +184,11 @@ TIME_STEP_DO: do while (it<=Domain%itmax)
 ! Computation and storage of the boundary integrals
          if (Domain%tipo=="semi") then
             call start_and_stop(2,11)
-            call ComputeBoundaryDataTab
+#ifdef SPACE_3D
+               call ComputeBoundaryDataTab_3D
+#elif defined SPACE_2D
+                  call ComputeBoundaryDataTab_2D
+#endif
             call start_and_stop(3,11)
             endif
       endif
@@ -226,10 +237,19 @@ TIME_STEP_DO: do while (it<=Domain%itmax)
 ! Check on the particles gone out of the domain throughout the opened 
 ! faces/sides
             call start_and_stop(2,9)
+#ifdef SPACE_3D
             if (NumOpenFaces>0) call CancelOutgoneParticles_3D
-            if (NumOpenSides>0) call CancelOutgoneParticles_2D
+#elif defined SPACE_2D
+               if (NumOpenSides>0) call CancelOutgoneParticles_2D
+#endif
 ! Adding new particles from the inlet section
-            if ((SourceFace/=0).or.(SourceSide/=0)) call GenerateSourceParticles
+#ifdef SPACE_3D
+            if (SourceFace/=0) then
+#elif defined SPACE_2D
+            if (SourceSide/=0) then
+#endif
+               call GenerateSourceParticles
+            endif
 ! Particle reordering
             call OrdGrid1
             call start_and_stop(3,9)
@@ -245,7 +265,11 @@ TIME_STEP_DO: do while (it<=Domain%itmax)
 ! Computation and storage of the boundary integrals
             if (Domain%tipo=="semi") then
                call start_and_stop(2,11)
-               call ComputeBoundaryDataTab
+#ifdef SPACE_3D
+                  call ComputeBoundaryDataTab_3D
+#elif defined SPACE_2D
+                     call ComputeBoundaryDataTab_2D
+#endif
                call start_and_stop(3,11)
             endif
       endif
@@ -296,11 +320,11 @@ TIME_STEP_DO: do while (it<=Domain%itmax)
          if (Domain%Psurf=='s') then
             call inter_SmoothPres
             elseif (Domain%Psurf=='a') then
-               if (ncord==3) then
-                  call PressureSmoothing_3D
-                  else
+#ifdef SPACE_3D
+                  call PressureSmoothing_3D         
+#elif defined SPACE_2D
                      call PressureSmoothing_2D
-               endif
+#endif
          endif
          call start_and_stop(3,14)
       endif
@@ -319,10 +343,19 @@ TIME_STEP_DO: do while (it<=Domain%itmax)
          if ((Domain%time_split==0).and.(Domain%time_stage==Domain%RKscheme))  &
             then
             call start_and_stop(2,9)
+#ifdef SPACE_3D
             if (NumOpenFaces>0) call CancelOutgoneParticles_3D
-            if (NumOpenSides>0) call CancelOutgoneParticles_2D
+#elif defined SPACE_2D
+               if (NumOpenSides>0) call CancelOutgoneParticles_2D
+#endif
 ! Adding new particles at the inlet section
-            if ((SourceFace/=0).or.(SourceSide/=0)) call GenerateSourceParticles
+#ifdef SPACE_3D
+            if (SourceFace/=0) then
+#elif defined SPACE_2D
+            if (SourceSide/=0) then
+#endif
+               call GenerateSourceParticles
+            endif
 ! Particle reordering on the background positioning grid
             call OrdGrid1
             call start_and_stop(3,9)

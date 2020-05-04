@@ -36,8 +36,10 @@ implicit none
 double precision,intent(in) :: dtvel
 integer(4) :: i,npi,j
 double precision :: mod_normal,aux_umax
-double precision :: vec_temp(3),vec2_temp(3),vec3_temp(3),domega_dt(3)
-double precision :: aux_vel(3)
+double precision :: vec_temp(3),vec2_temp(3),domega_dt(3),aux_vel(3)
+#ifdef SPACE_3D
+double precision :: vec3_temp(3)
+#endif
 double precision,allocatable,dimension(:,:) :: teta
 !------------------------
 ! Explicit interfaces
@@ -54,37 +56,41 @@ allocate(teta(n_bodies,3))
 !------------------------
 ! Loop over bodies (body dynamics)
 !$omp parallel do default(none)                                                &
-!$omp private(i,vec_temp,vec2_temp,vec3_temp,domega_dt)                        &
-!$omp shared(n_bodies,body_arr,dt,ncord,teta,dtvel,simulation_time)
+!$omp shared(n_bodies,body_arr,dt,teta,dtvel,simulation_time)                  &
+#ifdef SPACE_3D
+!$omp private(vec3_temp)                                                       &
+#endif
+!$omp private(i,vec_temp,vec2_temp,domega_dt)
 do i=1,n_bodies
 ! Staggered parameters (velocity and angular velocity)
    if (body_arr(i)%imposed_kinematics==0) then
-! Computed kinematics       
-      if (ncord==2) then
+! Computed kinematics
+#ifdef SPACE_2D
          body_arr(i)%Force(2) = zero
          body_arr(i)%Moment(1) = zero
          body_arr(i)%Moment(3) = zero
-      endif
+#endif
       body_arr(i)%u_CM(:) = body_arr(i)%u_CM(:) + body_arr(i)%Force(:) /       &
-         body_arr(i)%mass * dtvel 
-      if (ncord==3) then
+         body_arr(i)%mass * dtvel
+#ifdef SPACE_3D
          vec_temp(1) = dot_product(body_arr(i)%Ic(1,:),body_arr(i)%omega)
          vec_temp(2) = dot_product(body_arr(i)%Ic(2,:),body_arr(i)%omega)
          vec_temp(3) = dot_product(body_arr(i)%Ic(3,:),body_arr(i)%omega)
          call Vector_Product(body_arr(i)%omega,vec_temp,vec3_temp,3)
          vec2_temp = body_arr(i)%Moment(:) - vec3_temp(:)
-      endif
-      if (ncord==2) vec2_temp = body_arr(i)%Moment(:) 
+#elif defined SPACE_2D
+            vec2_temp = body_arr(i)%Moment(:)
+#endif
       domega_dt(1) = dot_product(body_arr(i)%Ic_inv(1,:),vec2_temp)
       domega_dt(2) = dot_product(body_arr(i)%Ic_inv(2,:),vec2_temp)
       domega_dt(3) = dot_product(body_arr(i)%Ic_inv(3,:),vec2_temp)
       body_arr(i)%omega(:) = body_arr(i)%omega(:) + domega_dt(:) * dtvel
-      if (ncord==2) then
+#ifdef SPACE_2D
          body_arr(i)%x_CM(2) = zero 
          body_arr(i)%u_CM(2) = zero
          body_arr(i)%omega(1) = zero
          body_arr(i)%omega(3) = zero
-      endif
+#endif
       else
 ! Imposed kinematics
          do j=1,body_arr(i)%n_records
@@ -122,29 +128,33 @@ enddo
 ! Loop over body particles (kinematics)
 !$omp parallel do default(none)                                                &
 !$omp private(npi,vec_temp,mod_normal,vec2_temp,aux_vel,aux_umax)              &
-!$omp shared(n_body_part,body_arr,bp_arr,dt,ncord,teta,dtvel)
+!$omp shared(n_body_part,body_arr,bp_arr,dt,teta,dtvel)
 do npi=1,n_body_part
 ! Staggered parameters
    call Vector_Product(body_arr(bp_arr(npi)%body)%omega,bp_arr(npi)%rel_pos,   &
       vec_temp,3)
    aux_vel(:) = bp_arr(npi)%vel(:) 
    bp_arr(npi)%vel(:) = body_arr(bp_arr(npi)%body)%u_CM(:) + vec_temp(:)
-   if (ncord==2) bp_arr(npi)%vel(2) = zero 
+#ifdef SPACE_2D
+      bp_arr(npi)%vel(2) = zero
+#endif
    bp_arr(npi)%acc(:) = (bp_arr(npi)%vel(:) - aux_vel(:)) / dtvel
 ! Non-staggered parameters
    vec2_temp(:) = teta(bp_arr(npi)%body,:)
    call vector_rotation_Euler_angles(bp_arr(npi)%rel_pos,vec2_temp)
-   if (ncord==2) bp_arr(npi)%rel_pos(2) = zero
+#ifdef SPACE_2D
+      bp_arr(npi)%rel_pos(2) = zero
+#endif
    bp_arr(npi)%pos(:) = bp_arr(npi)%rel_pos(:) +                               &
       body_arr(bp_arr(npi)%body)%x_CM(:)
    call vector_rotation_Euler_angles(bp_arr(npi)%normal,vec2_temp)
    mod_normal = dsqrt(dot_product(bp_arr(npi)%normal,bp_arr(npi)%normal))
    if (mod_normal>one) bp_arr(npi)%normal(:) = bp_arr(npi)%normal(:) /         &
       mod_normal
-   if (ncord==2) then
+#ifdef SPACE_2D
       bp_arr(npi)%rel_pos(2) = zero
       bp_arr(npi)%normal(2) = zero
-   endif
+#endif
 ! Updating max velocity within every body
    aux_umax = dsqrt(dot_product(bp_arr(npi)%vel,bp_arr(npi)%vel))
 !$omp critical (body_maximum_velocity)
@@ -153,69 +163,6 @@ do npi=1,n_body_part
 !$omp end critical (body_maximum_velocity)
 enddo
 !$omp end parallel do
-! Interesting part for RK1, not for Leapfrog: start
-! Loop over body particles (kinematics)
-!  do npi=1,n_body_part
-!     bp_arr(npi)%pos(:) = bp_arr(npi)%pos(:) + bp_arr(npi)%vel(:) * dt
-!     if (ncord==2) bp_arr(npi)%pos(2) = zero 
-!  enddo
-! Loop over bodies (body dynamics)
-!  do i=1,n_bodies
-!     if (ncord==2) then
-!        body_arr(i)%Force(2) = zero
-!        body_arr(i)%Moment(1) = zero
-!        body_arr(i)%Moment(3) = zero
-!     endif
-!     body_arr(i)%x_CM(:) = body_arr(i)%x_CM(:) + body_arr(i)%u_CM(:) * dt 
-!     teta(i,:) =  body_arr(i)%omega(:) * dt 
-!     body_arr(i)%alfa(:) = body_arr(i)%alfa(:) + teta(i,:) 
-!     body_arr(i)%u_CM(:) = body_arr(i)%u_CM(:) + body_arr(i)%Force(:) / &
-!        body_arr(i)%mass * dt 
-!     if (ncord==3) then
-!        vec_temp(1) = dot_product(body_arr(i)%Ic(1,:),body_arr(i)%omega)
-!        vec_temp(2) = dot_product(body_arr(i)%Ic(2,:),body_arr(i)%omega)
-!        vec_temp(3) = dot_product(body_arr(i)%Ic(3,:),body_arr(i)%omega)
-!        call Vector_Product(body_arr(i)%omega,vec_temp,vec3_temp,3)
-!        vec2_temp = body_arr(i)%Moment(:) - vec3_temp(:)
-!     endif
-!     if (ncord==2) vec2_temp = body_arr(i)%Moment(:) 
-!     domega_dt(1) = dot_product(body_arr(i)%Ic_inv(1,:),vec2_temp)
-!     domega_dt(2) = dot_product(body_arr(i)%Ic_inv(2,:),vec2_temp)
-!     domega_dt(3) = dot_product(body_arr(i)%Ic_inv(3,:),vec2_temp)
-!     body_arr(i)%omega(:) = body_arr(i)%omega(:) + domega_dt(:) * dt
-!     if (ncord==2) then
-!        body_arr(i)%x_CM(2) = zero 
-!        body_arr(i)%u_CM(2) = zero
-!        body_arr(i)%omega(1) = zero
-!        body_arr(i)%omega(3) = zero
-!     endif
-! Initializing umax (maximum particle velocity of the body)
-!     body_arr(i)%umax = zero 
-!  enddo
-!
-! Loop over body particles (static kinematics)
-!  do npi=1,n_body_part
-!     call Vector_Product(body_arr(bp_arr(npi)%body)%omega,bp_arr(npi)%rel_pos,&
-!        vec_temp,3)
-!     bp_arr(npi)%vel(:) = body_arr(bp_arr(npi)%body)%u_CM(:) + vec_temp(:)
-!     bp_arr(npi)%rel_pos(:) = bp_arr(npi)%pos(:) -       &
-!        body_arr(bp_arr(npi)%body)%x_CM(:)
-!     vec2_temp(:) = teta(bp_arr(npi)%body,:)
-!     call vector_rotation_Euler_angles(bp_arr(npi)%normal,vec2_temp)
-!     mod_normal = dsqrt(dot_product(bp_arr(npi)%normal,bp_arr(npi)%normal))
-!     if (mod_normal>1.) bp_arr(npi)%normal(:) = bp_arr(npi)%normal(:) / &
-!         mod_normal    
-!     if (ncord==2) then
-!        bp_arr(npi)%vel(2) = zero 
-!        bp_arr(npi)%rel_pos(2) = zero
-!        bp_arr(npi)%normal(2) = zero
-!     endif 
-! Update of umax
-!     aux_umax = dsqrt(dot_product(bp_arr(npi)%vel,bp_arr(npi)%vel))        
-!     body_arr(bp_arr(npi)%body)%umax = max(body_arr(bp_arr(npi)%body)%umax, &
-!       aux_umax)   
-!  enddo
-! Interesting part for RK1, not for Leapfrog: end
 !------------------------
 ! Deallocations
 !------------------------

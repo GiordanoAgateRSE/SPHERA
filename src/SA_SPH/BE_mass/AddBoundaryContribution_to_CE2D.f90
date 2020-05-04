@@ -25,6 +25,7 @@
 !              computation of "gradPsuro".
 !              (Di Monaco et al., 2011, EACFM)                       
 !-------------------------------------------------------------------------------
+#ifdef SPACE_2D
 subroutine AddBoundaryContribution_to_CE2D(npi,IntNcbs,BCrodivV)
 !------------------------
 ! Modules
@@ -38,8 +39,8 @@ use SA_SPH_module
 ! Declarations
 !------------------------
 implicit none
-integer(4),intent(IN) :: npi,IntNcbs
-double precision,intent(INOUT) :: BCrodivV
+integer(4),intent(in) :: npi,IntNcbs
+double precision,intent(inout) :: BCrodivV
 integer(4) :: pd,icbs,iside,sidestr,ibdt,ibdp
 double precision :: IntWds,roi,vin 
 integer(4),dimension(1:PLANEDIM) :: acix
@@ -72,8 +73,8 @@ do icbs=1,IntNcbs
    RifBoundarySide = BoundarySide(iside)
    sidestr = RifBoundarySide%stretch
    strtype = Tratto(sidestr)%tipo
-   if (strtype=="fixe".OR.strtype=="tapi".OR.strtype=="velo".OR.               &
-      strtype=="flow".OR.strtype=="sour") then 
+   if (strtype=="fixe".or.strtype=="tapi".or.strtype=="velo".or.               &
+      strtype=="flow".or.strtype=="sour") then 
       IntWdS = BoundaryDataTab(ibdp)%BoundaryIntegral(1)
       vin = zero
       do pd=1,PLANEDIM
@@ -107,3 +108,4 @@ enddo
 !------------------------
 return
 end subroutine AddBoundaryContribution_to_CE2D
+#endif

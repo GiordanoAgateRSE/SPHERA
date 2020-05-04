@@ -34,7 +34,7 @@ use Dynamic_allocation_module
 ! Declarations
 !------------------------
 implicit none
-double precision,dimension(nag),intent(INOUT) :: sompW_vec,AppUnity_vec
+double precision,dimension(nag),intent(inout) :: sompW_vec,AppUnity_vec
 integer(4) :: npi,j,npartint,npj
 double precision :: W_vol,dis
 double precision, external :: w

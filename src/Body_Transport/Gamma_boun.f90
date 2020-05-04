@@ -23,7 +23,7 @@
 ! Description: Interpolative function defined by Monaghan (2005) for boundary
 !              force particles (Amicarelli et al.,2015,CAF).     
 !-------------------------------------------------------------------------------
-double precision function Gamma_boun(r,h)
+double precision function Gamma_boun(rr,hh)
 !------------------------
 ! Modules
 !------------------------
@@ -31,7 +31,7 @@ double precision function Gamma_boun(r,h)
 ! Declarations
 !------------------------
 implicit none
-double precision :: r,h,q
+double precision :: rr,hh,qq
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -41,16 +41,16 @@ double precision :: r,h,q
 !------------------------
 ! Initializations
 !------------------------
-q = r / h
+qq = rr / hh
 !------------------------
 ! Statements
 !------------------------
-if (q<=(2.d0/3.d0)) then
+if (qq<=(2.d0/3.d0)) then
    Gamma_boun = 2.d0 / 3.d0
-   else if (q<=1.0d0) then
-      Gamma_boun = 2.d0 * q - (3.d0 / 2.d0) * q * q 
-      else if (q<=2.0d0) then
-         Gamma_boun = 0.5d0 * ((2.d0 - q) ** 2)
+   else if (qq<=1.d0) then
+      Gamma_boun = 2.d0 * qq - (3.d0 / 2.d0) * qq * qq 
+      else if (qq<=2.d0) then
+         Gamma_boun = 0.5d0 * ((2.d0 - qq) ** 2)
          else
             Gamma_boun = 0.d0
 end if
@@ -59,4 +59,4 @@ Gamma_boun = dabs(Gamma_boun)
 ! Deallocations
 !------------------------
 return
-end function Gamma_boun 
+end function Gamma_boun

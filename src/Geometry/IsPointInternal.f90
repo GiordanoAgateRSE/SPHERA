@@ -27,8 +27,9 @@
 !              by the subroutine "point_inout_convex_non_degenerate_polygon"
 !              (already available in SPHERA), which is more effective and can be
 !              applied to any polygon (it already works for triangles and
-!              quadrilaterals).
+!              quadrilaterals). Only in 3D.
 !-------------------------------------------------------------------------------
+#ifdef SPACE_3D
 logical function IsPointInternal(fk,csi)
 !------------------------
 ! Modules
@@ -40,7 +41,7 @@ use Static_allocation_module
 implicit none
 integer(4),intent(in) :: fk
 double precision,intent(in) :: csi(SPACEDIM)
-integer(4) :: i
+integer(4) :: ii
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -56,16 +57,16 @@ IsPointInternal = .false.
 !------------------------
 if (fk==1) then            
 ! Triangle
-   do i=1,3
-     if (csi(i)<zero) return
-     if (csi(i)>one) return
+   do ii=1,3
+     if (csi(ii)<zero) return
+     if (csi(ii)>one) return
    enddo
    IsPointInternal = .true.
    elseif (fk==2) then
 ! Quadrilateral 
-      do i=1,2
-         if (csi(i)<zero) return
-         if (csi(i)>one) return
+      do ii=1,2
+         if (csi(ii)<zero) return
+         if (csi(ii)>one) return
       enddo
       IsPointInternal = .true.
 endif
@@ -74,4 +75,4 @@ endif
 !------------------------
 return
 end function IsPointInternal
-
+#endif

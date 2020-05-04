@@ -31,15 +31,15 @@ integer(4),parameter :: numb_subr = 21
 integer(4) :: ifiout
 integer(4),dimension(numb_subr) :: tot_call
 double precision, dimension(numb_subr,2) :: tot_times
-character(LEN=40), dimension(numb_subr) :: tot_routines
+character(len=40), dimension(numb_subr) :: tot_routines
 character(len=redcard) :: routine
 character(len=lencard) :: prefix,date_exec,nomefile_sta,                       &
                           nomecaso_rest,nomefile_inp,nomefile_msh,nomefile_cad,&
                           nomefile_sec,nomefile_spy,nomefile_res,nomefile_txt, &
                           nomefile_chk,nomefile_neu,case_title,case_subtitle
 character(len=32) :: host_name
-character(LEN=16) :: case_data  
-character(LEN=8) :: case_hour
+character(len=16) :: case_data  
+character(len=8) :: case_hour
 type iiar                                 
    sequence
    integer(4) ihr

@@ -19,10 +19,10 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: sphera           
+! Program unit: SPHERA           
 ! Description: Main program unit.                   
 !-------------------------------------------------------------------------------
-program sphera
+program SPHERA
 !------------------------
 ! Modules
 !------------------------
@@ -37,7 +37,7 @@ implicit none
 integer(4) :: ier,i,n,narg
 double precision :: starttime,endtime
 character(len=255) :: nomearg
-character(len=lencard) :: nomsub = "Sphera"
+character(len=lencard) :: nomsub = "SPHERA"
 character(100),external :: lcase
 double precision,external :: omp_get_wtime
 !------------------------
@@ -59,24 +59,30 @@ icoordp(1,2) = 1
 icoordp(2,2) = 2
 icoordp(3,2) = 3
 pinttimeratio = 0
-NumOpenSides = 0
-SourceSide = 0
-Openside = 0
-NumOpenFaces = 0
-SourceFace = 0
-OpenFace = 0
+#ifdef SPACE_3D
+   NumOpenFaces = 0
+   SourceFace = 0
+   OpenFace = 0
+#elif defined SPACE_2D
+      OpenSide = 0
+      NumOpenSides = 0
+      SourceSide = 0
+#endif
 mat = 0
 itime_jet = 0
 do i=1,MAXOPENSIDES
    RowVelocity(i) = zero
-   NumPartperLine(i) = 0
-   NumPartFace(i) = 0
+#ifdef SPACE_2D
+      NumPartperLine(i) = 0
+#elif defined SPACE_3D
+         NumPartFace(i) = 0
+#endif
 enddo
 RowPeriod = zero
 yfila = zero
 zfila = zero
 ParticleVolume = zero
-kill_flag = .False.
+kill_flag = .false.
 PgZero%vel_type = "   "
 PgZero%slip = " "
 PgZero%state = "   "
@@ -131,7 +137,6 @@ PgZero%velmorr(3) = zero
 PgZero%tstop = zero
 PgZero%mno = zero
 PgZero%ang = zero
-PgZero%VolFra = zero
 PgZero%rhoc = zero
 PgZero%rhow = zero
 PgZero%tiroc = zero
@@ -329,4 +334,4 @@ endif
 return
 end subroutine check_files
 
-end program sphera
+end program SPHERA

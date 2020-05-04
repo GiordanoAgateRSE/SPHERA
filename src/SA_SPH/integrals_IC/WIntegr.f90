@@ -26,6 +26,7 @@
 !ri
 !               (Di Monaco et al., 2011, EACFM)                       
 !-------------------------------------------------------------------------------
+#ifdef SPACE_2D
 double precision function WIntegr(ri,hh) 
 !------------------------
 ! Modules
@@ -77,3 +78,4 @@ endif
 !------------------------
 return
 end function WIntegr
+#endif

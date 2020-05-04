@@ -21,7 +21,7 @@
 !-------------------------------------------------------------------------------
 ! Program unit: vector_rotation_Euler_angles
 ! Description: 3D rotation of a given vector, provided the vector of Euler's 
-!              angles (3D).
+!              angles (3D). It is als ocalled in 2D.
 !-------------------------------------------------------------------------------
 subroutine vector_rotation_Euler_angles(vector,angle)
 !------------------------
@@ -31,8 +31,8 @@ subroutine vector_rotation_Euler_angles(vector,angle)
 ! Declarations
 !------------------------
 implicit none
-double precision,intent(IN) :: angle(3) 
-double precision,intent(INOUT) :: vector(3)
+double precision,intent(in) :: angle(3) 
+double precision,intent(inout) :: vector(3)
 double precision :: vec_temp(3)
 double precision :: mat1_temp(3,3),mat2_temp(3,3),mat3_temp(3,3),mat4_temp(3,3)
 double precision :: cos_dir(3,3)
@@ -86,4 +86,3 @@ vector(3) = dot_product(cos_dir(3,:),vec_temp)
 !------------------------
 return
 end subroutine vector_rotation_Euler_angles
-

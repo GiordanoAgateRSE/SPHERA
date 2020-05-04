@@ -36,8 +36,10 @@ use I_O_diagnostic_module
 !------------------------
 implicit none
 integer(4),parameter :: ner0 = 0
-integer(4) :: npi,NumCellmax,i,ier,k,kk,k1,k2,nlinee,nvalori,alloc_stat
-integer(4) :: aux_integer
+integer(4) :: npi,i,ier,k,k1,k2,nlinee,nvalori,alloc_stat
+#ifdef SPACE_3D
+integer(4) :: aux_integer,NumCellmax,kk
+#endif
 character(len=lencard) :: nomsub = "GEST_TRANS"
 character(len=lencard) :: filename,stringa,prefix,filevtk
 character(len=200)     :: cargo
@@ -72,8 +74,11 @@ nblocchi = 0
 blocchi = 0
 block = - 1
 Time_Block = zero
-MaxNcbs = int(MAXCLOSEBOUNDSIDES * PARTICLEBUFFER)
+#ifdef SPACE_3D
 MaxNcbf = int(Domain%MAXCLOSEBOUNDFACES * PARTICLEBUFFER)
+#elif defined SPACE_2D
+MaxNcbs = int(MAXCLOSEBOUNDSIDES * PARTICLEBUFFER)
+#endif
 if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph"))  then
    allocate(BoundaryDataPointer(1:3,1:PARTICLEBUFFER),stat=ier)
    if (ier/=0) then
@@ -84,7 +89,7 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph"))  then
          write(ulog,'(1x,a)')                                                  &
             "   Array BoundaryDataPointer successfully allocated "
    endif
-   if (ncord==2) then
+#ifdef SPACE_2D
       write(ulog,'(a,i15)') "     Max num of close boundary sides: MaxNcbs = ",&
          MaxNcbs
       allocate(BoundaryDataTab(1:MaxNcbs),stat=ier)
@@ -96,7 +101,7 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph"))  then
             write(ulog,'(1x,a)')                                               &
                "   Array BoundaryDataTab successfully allocated "
       endif
-      else
+#elif defined SPACE_3D
          write(ulog,'(a,i15)')                                                 &
             "     Max num of close boundary faces: MaxNcbf = ",MaxNcbf
          allocate(BoundaryDataTab(1:MaxNcbf),stat=ier)
@@ -108,7 +113,7 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph"))  then
                write(ulog,'(1x,a)')                                            &
                   "   Array BoundaryDataTab successfully allocated"
          endif
-   endif
+#endif
 endif
 NMAXPARTJ = int(Domain%COEFNMAXPARTJ * (Domain%h * four / Domain%dx) **        &
             ncord) + 1
@@ -267,10 +272,11 @@ if (n_bodies>0) then
       else
          write(ulog,'(1x,a)') "   Array rag_bp_bp successfully allocated "
    endif
-   if (ncord==2)                                                               &
-      allocate(impact_vel(n_surf_body_part,(n_bodies+NumBSides)),stat=ier)
-   if (ncord==3)                                                               &
+#ifdef SPACE_3D
       allocate(impact_vel(n_surf_body_part,(n_bodies+NumFacce)),stat=ier)
+#elif defined SPACE_2D
+         allocate(impact_vel(n_surf_body_part,(n_bodies+NumBSides)),stat=ier)
+#endif
    if (ier/=0) then
       write(ulog,'(1x,a,i2)')                                                  &
          "   Array impact_vel not allocated. Error code: ",ier
@@ -278,7 +284,7 @@ if (n_bodies>0) then
       else
          write(ulog,'(1x,a)') "   Array impact_vel successfully allocated "
    endif
-   impact_vel = 0.d0
+   impact_vel(:,:) = 0.d0
 endif
 write(ulog,'(1x,a)') "..."
 write(ulog,'(a,i15)') " Max number of particles  : PARTICLEBUFFER = ",         &
@@ -406,13 +412,13 @@ write(ulog,*)
 write(ulog,*) "Transient loop begins..."
 write(ulog,*)
 ! To initialize the post-processing file 
-if ((Domain%imemo_fr>0).OR.(Domain%memo_fr>zero)) then
+if ((Domain%imemo_fr>0).or.(Domain%memo_fr>zero)) then
    open(nres,file=nomefile(2),status="unknown",access="sequential"             &
       ,form="unformatted")
    else
       nres = -nres
 endif
-if ((Domain%ipllb_fr>0).OR.(Domain%pllb_fr>zero)) then
+if ((Domain%ipllb_fr>0).or.(Domain%pllb_fr>zero)) then
    open(nplb,file=nomefile(4),status="unknown",access="sequential",            &
       form="formatted")
    write(nplb,"(a)") "time          free_surface_quota"
@@ -423,7 +429,7 @@ if ((Domain%ipllb_fr>0).OR.(Domain%pllb_fr>zero)) then
       nplb = - nplb
       uzlft = - uzlft
 endif
-if ((Domain%imemo_fr>0).OR.(Domain%memo_fr>zero)) then
+if ((Domain%imemo_fr>0).or.(Domain%memo_fr>zero)) then
    open(nfro,file=nomefile(5),status="unknown",access="sequential"             &
       ,form="formatted")
    write(nfro,"(a)") "time          x fronte      (y fronte)    z fronte"
@@ -452,10 +458,10 @@ if (vtkconv) then
       write(unitvtk,'(8x,a)') stringa(1:len_trim(stringa))
    enddo
 ! 2D case
-   if (ncord==2) then
+#ifdef SPACE_2D
       nlinee = 0
       nvalori = 0
-      do i=1,numbsides
+      do i=1,NumBSides
          if (boundaryside(i)%TIPO=='peri') cycle
          nlinee = nlinee + 1
          nvalori = nvalori + 1
@@ -464,7 +470,7 @@ if (vtkconv) then
       write(unitvtk,'(a,2i8)') 'LINES ', nlinee, nvalori
       allocate(verticecolore(numvertici))
       verticecolore = zero
-      do i=1,numbsides
+      do i=1,NumBSides
          if (boundaryside(i)%TIPO=='peri') cycle
          stringa = ' '
          k1 = boundaryside(i)%VERTEX(1) - 1
@@ -498,10 +504,11 @@ if (vtkconv) then
       write(unitvtk,'(a)') '0.0 0.0 1.0 1.0'
       write(unitvtk,'(a)') '1.0 0.0 0.0 1.0'
 ! 3D case
+#elif defined SPACE_3D
       else
          nlinee = 0
          nvalori = 0
-         do i=1,numfacce
+         do i=1,NumFacce
             if (tratto(BoundaryFace(i)%stretch)%tipo=='peri') cycle
             nlinee = nlinee + 1
             nvalori = nvalori + 1 + BoundaryFace(i)%nodes + 1
@@ -509,7 +516,7 @@ if (vtkconv) then
          write(unitvtk,'(a,2i8)') 'LINES ',nlinee,nvalori
          allocate(verticecolore(numvertici))
          verticecolore = 0.0
-         do i=1,numfacce
+         do i=1,NumFacce
             if (tratto(BoundaryFace(i)%stretch)%tipo=='peri') cycle
             stringa = ' '
             do k=1,BoundaryFace(i)%nodes,8
@@ -553,7 +560,7 @@ if (vtkconv) then
          write(unitvtk,'(a)') '0.0 0.0 0.0 1.0'
          write(unitvtk,'(a)') '0.0 0.0 1.0 1.0'
          write(unitvtk,'(a)') '1.0 0.0 0.0 1.0'
-   endif
+#endif
    flush(unitvtk)
    close (unitvtk)
 endif
@@ -614,11 +621,11 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
          endif
       endif
    endif
-   if (ncord==2) then
+#ifdef SPACE_2D
       call start_and_stop(2,5)
       call time_step_loop 
       call start_and_stop(3,5)
-      elseif (ncord==3) then
+#elif defined SPACE_3D
          NumCellmax = Grid%nmax
          if ((restart.eqv..false.).or.(Domain%tipo=="bsph")) then
             allocate(GCBFPointers(NumCellmax,2),stat=ier)
@@ -693,7 +700,7 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
                endif
                exit
             endif
-         enddo  
+         enddo
          call start_and_stop(2,5)
 ! Main loop
          call time_step_loop
@@ -723,7 +730,7 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
                      'the array "Z_fluid_step" is successfully completed.'
             endif
          endif
-   endif
+#endif
    else
       call diagnostic(arg1=10,arg2=5,arg3=nomsub)
 endif

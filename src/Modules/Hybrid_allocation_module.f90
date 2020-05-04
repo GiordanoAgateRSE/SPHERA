@@ -19,7 +19,7 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: Hybrid_allocation_module            
+! Program unit: Hybrid_allocation_module          
 ! Description: Module to define derived types of both dynamically and statically
 !              allocated variables (Di Monaco et al., 2011, EACFM; Manenti et 
 !              al., 2012; JHE; Amicarelli et al., 2013, IJNME; Amicarelli et 
@@ -50,13 +50,15 @@ type TyGlobal
    integer(4) :: itmax
 ! Flag for body particles reordering
    integer(4) :: body_part_reorder
+#ifdef SPACE_3D
 ! Rough and slight overestimation of the number of fluid particles in the 
-! reservoir (auxiliary parameter useful for extruded reservoir IC)           
+! reservoir (auxiliary parameter useful for extruded reservoir IC)  
    integer(4) :: nag_aux
 ! Maximum number of neighbouring SA-SPH faces for a computational particle
    integer(4) :: MAXCLOSEBOUNDFACES
 ! Maximum number of convex edges
    integer(4) :: MAXNUMCONVEXEDGES
+#endif
 ! Density_thresholds flag (default=0; =1 for very low bulk modulus -preliminary 
 ! simulations-)            
    integer(4) :: density_thresholds
@@ -64,7 +66,7 @@ type TyGlobal
    integer(4) :: time_split
 ! RK scheme (1,2,3,4) (time_split=0)                    
    integer(4) :: RKscheme
-! Stage of RK schemes                       
+! Stage of RK schemes          
    integer(4) :: time_stage
 ! Maximum physical time                                           
    double precision :: tmax
@@ -116,7 +118,7 @@ type TyGlobal
 ! Coordinates of 2 vertices of a diagonal of the parallelepiped domain                                            
    double precision :: coord(3,2)
    character(4) :: tipo
-   character(LEN=lencard) :: file
+   character(len=lencard) :: file
    character(1) :: Psurf
 ! IC particle distribution noise. "r": slight white noise is added, otherwise 
 ! no noise.
@@ -198,8 +200,7 @@ type TyParticle
 ! Stop time                 
    double precision :: tstop                          
    double precision :: mno    
-   double precision :: ang                       
-   double precision :: VolFra                         
+   double precision :: ang
    double precision :: rhoc                           
    double precision :: rhow                          
    double precision :: tiroc                          
@@ -230,19 +231,23 @@ type TyParticle
 ! Main slope angle of the fixed bed (along the direction aligned with the mean 
 ! flow; bed-load transport)
    double precision :: Beta_slope
+#ifdef SPACE_3D
 ! Transversal slope angle of the fixed bed (along the direction transversal to 
 ! the mean flow; bed-load transport)
    double precision :: Gamma_slope
+#endif
 ! Mean of the effective normal stresses
    double precision :: sigma_prime_m
 ! Pressure of the fluid phase (bed-load transport)
    double precision :: pres_fluid
 ! Friction velocity representative of the Surface Neutral Boundary Layer 
    double precision :: u_star
+#ifdef SPACE_3D
 ! Lift coefficient for the 3D erosion criterion
    double precision :: C_L
 ! Drag coefficient for 3D erosion criterion
    double precision :: C_D
+#endif
 ! Ratio (tau/tau_c) between bottom shear stress and critical shear stress 
 ! (from erosion criterion)
    double precision :: tau_tauc
@@ -468,6 +473,7 @@ type TyZone
 ! Zone describing the Cartesian topography, which contains the reservoir 
 ! (Car_top_zone=0 when IC_source_type=1)
    integer(4) :: Car_top_zone
+#ifdef SPACE_3D   
 ! Number of points describing the reservoir if (IC_source_type==2)
    integer(4) :: plan_reservoir_points
 ! ID of the first vertex of topography (for a fluid zone extruded from 
@@ -486,6 +492,7 @@ type TyZone
    double precision :: dx_CartTopog
 ! Height of the reservoir free surface
    double precision :: H_res
+#endif
    double precision :: pool
 ! IC for pressure or free surface height 
    double precision :: valp
@@ -499,9 +506,11 @@ type TyZone
 ! Horizontal coordinates of the points (3 or 4), which describe the reservoir,
 ! if (IC_source_type==2)
    double precision :: plan_reservoir_pos(4,2)
+#ifdef SPACE_3D
 ! Horizontal coordinates of the points (3 or 4), which describe the dam zone, 
 ! if (dam_zone_ID>1)
    double precision :: dam_zone_vertices(4,2)
+#endif
 ! Initial velocity
    double precision :: vlaw(0:3,MAXPOINTSVLAW)
    character(1) :: shape
@@ -525,14 +534,17 @@ type TyBoundaryStretch
    integer(4) :: ColorCode
    integer(4) :: numvertices
    integer(4) :: inivertex
-   integer(4) :: iniside
+#ifdef SPACE_3D
    integer(4) :: iniface
+#elif defined SPACE_2D
+   integer(4) :: iniside
+#endif
    integer(4) :: medium
    integer(4) :: zone
 ! Absolute value of the velocity component which is normal to the face 
    double precision :: NormVelocity
 ! Flow rate exiting the face
-   double precision :: FlowRate 
+   double precision :: FlowRate
    double precision :: ShearCoeff
 ! Velocity for "TAPI" zones
    double precision :: velocity(1:SPACEDIM)
@@ -581,6 +593,7 @@ type TyMedium
    character(8) :: tipo
 end type TyMedium
 
+#ifdef SPACE_2D
 ! Boundary side
 type TyBoundarySide
    integer(4) :: stretch
@@ -601,6 +614,7 @@ type TyBoundarySide
 ! Type: "PERI", "SOUR", "OPEN"(, "FLOW", "VELO", "CRIT", "LEVE", "TAPI", "POOL")
    character(4) :: tipo
 end type TyBoundarySide
+#endif
 
 ! Node
 type TyNode
@@ -611,6 +625,7 @@ type TyNode
    double precision :: LX(1:SPACEDIM)
 end type TyNode
 
+#ifdef SPACE_3D
 ! Face
 type TyBoundaryFace
    integer(4) :: nodes
@@ -628,11 +643,12 @@ type TyBoundaryFace
    double precision :: velocity(1:SPACEDIM)
    type(TyNode) :: Node(1:MAXFACENODES)
 end type TyBoundaryFace
+#endif
 
 ! Close boundary data table
 type TyBoundaryData
 ! Number of neighbouring faces for a particle
-   integer(4)       :: CloBoNum
+   integer(4) :: CloBoNum
 ! Face normal vectors in the local reference system
    double precision :: LocXYZ(1:SPACEDIM)
 ! Table of integrals
@@ -641,12 +657,14 @@ type TyBoundaryData
    double precision :: IntGiWrRdV(1:SPACEDIM,1:SPACEDIM)
 end type TyBoundaryData
 
+#ifdef SPACE_3D
 type TyBoundaryConvexEdge
    double precision :: length                         
    integer(4) :: face(1:2)
    double precision :: component(1:SPACEDIM)         
    type(TyNode) :: Node(1:2)
 end type TyBoundaryConvexEdge
+#endif
 
 ! Control point
 type TyCtlPoint
@@ -671,6 +689,7 @@ type TyCtlLine
    character(8) :: label
 end type TyCtlLine
 
+#ifdef SPACE_3D
 ! Monitoring section for flow rate (ID depends on the input order)
 type tyQ_section_array
 ! Number of vertices describing a monitoring section for the flow rate (3 or 4)
@@ -740,6 +759,7 @@ type type_substations
 ! type for the substation array
    type(type_substation),dimension(:),allocatable :: sub          
 end type
+#endif
 
 ! Derived type for bed-load transport layer 
 type TyGranular_flows_options
@@ -757,8 +777,10 @@ type TyGranular_flows_options
    integer(4) :: erosion_flag
 ! Forced deposition at frontiers 
    integer(4) :: deposition_at_frontiers
+#ifdef SPACE_3D
 ! Flag to activate (or not) Gamma_slope
    integer(4) :: Gamma_slope_flag
+#endif
    integer(4) :: saturation_scheme
    double precision :: time_minimum_saturation
    double precision :: time_maximum_saturation
@@ -871,8 +893,10 @@ type(TyGlobal) :: Domain
 type(TyGriglia) :: Grid
 type(TyParticle) :: PgZero
 type(Tytime_stage) :: ts_pgZero
+#ifdef SPACE_3D
 type(TyQ_section) :: Q_sections
 type(type_substations) :: substations
+#endif
 type(TyGranular_flows_options) :: Granular_flows_options
 type(DBSPH_der_type) :: DBSPH
 

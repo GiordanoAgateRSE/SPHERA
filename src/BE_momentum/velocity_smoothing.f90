@@ -63,7 +63,7 @@ if (n_bodies>0) then
 endif
 !$omp parallel do default(none)                                                &
 !$omp shared(pg,Med,nPartIntorno,NMAXPARTJ,PartIntorno,PartKernel,indarrayFlu) &
-!$omp shared(Array_Flu,Domain,n_bodies,dervel_mat,ncord)                       &
+!$omp shared(Array_Flu,Domain,n_bodies,dervel_mat)                             &
 !$omp private(ii,npi,contj,npartint,npj,rhoi,rhoj,amassj,dervel,moddervel)     &
 !$omp private(pesoj)
 do ii=1,indarrayFlu
@@ -97,11 +97,11 @@ do ii=1,indarrayFlu
    if (Domain%tipo=="bsph") then
       call DBSPH_inlet_outlet(npi)
       else
-         if (ncord==3) then
+#ifdef SPACE_3D
             call velocity_smoothing_SA_SPH_3D(npi)
-            else
+#elif defined SPACE_2D
                call velocity_smoothing_SA_SPH_2D(npi)
-         endif
+#endif
    endif
 enddo
 !$omp end parallel do
@@ -111,4 +111,3 @@ enddo
 if (n_bodies>0) deallocate(dervel_mat)
 return
 end subroutine velocity_smoothing
-

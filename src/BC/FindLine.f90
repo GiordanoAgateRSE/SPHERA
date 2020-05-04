@@ -23,6 +23,7 @@
 ! Description: Finds extremes of the rectangular frame which contains the
 !              boundary mib.
 !-------------------------------------------------------------------------------
+#ifdef SPACE_2D
 subroutine FindLine (Xmin,Xmax,Nt)
 !------------------------
 ! Modules
@@ -71,4 +72,4 @@ end do
 !------------------------
 return
 end subroutine FindLine
-
+#endif

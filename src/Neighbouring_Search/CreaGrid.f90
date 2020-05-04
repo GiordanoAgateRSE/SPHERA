@@ -66,7 +66,9 @@ Grid%ncd(:) = NINT(dextr(:) / doubleh)
 ! the cubic cell into a real hesaedric regular cell
 Grid%dcd(:) = dextr(:) / Grid%ncd(:)
 ! In 2D, the number of cells in the y direction is forced to be 1
-if (ncord==2) Grid%ncd(2) = 1
+#ifdef SPACE_2D
+   Grid%ncd(2) = 1
+#endif
 ! To assess the maximum number of cells covering the grid 
 ! domain (a parallelepiped)
 Grid%nmax = Grid%ncd(1) * Grid%ncd(2) * Grid%ncd(3)
@@ -89,4 +91,3 @@ endif
 !------------------------
 return
 end subroutine CreaGrid
-

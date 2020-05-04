@@ -33,6 +33,7 @@
 !              b) Otherwise, simply pg(npi)%cella = 0 (particle out of the 
 !                 domain boundaries).
 !-------------------------------------------------------------------------------
+#ifdef SPACE_3D
 subroutine CancelOutgoneParticles_3D 
 !------------------------
 ! Modules
@@ -169,3 +170,4 @@ enddo
 !------------------------
 return
 end subroutine CancelOutgoneParticles_3D
+#endif

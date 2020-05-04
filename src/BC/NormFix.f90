@@ -48,7 +48,7 @@ double precision,dimension(3) :: appo
 !------------------------
 ! Statements
 !------------------------
-if (ncord==2) then
+#ifdef SPACE_2D
 !$omp parallel do default(none) private(npi,appo,unity) shared(nag,pg)
    do npi=1,nag
       if ((pg(npi)%cella==0).or.(pg(npi)%vel_type=="std")) cycle
@@ -68,7 +68,7 @@ if (ncord==2) then
       endif
    enddo
 !$omp end parallel do
-   elseif (ncord==3) then
+#elif defined SPACE_3D
 !$omp parallel do default(none) private(npi,appo,unity) shared(nag,pg)
       do npi=1,nag
          if ((pg(npi)%cella==0).or.(pg(npi)%vel_type=="std")) cycle
@@ -78,7 +78,7 @@ if (ncord==2) then
          pg(npi)%zer(:) = appo(:) / (pg(npi)%mno + 0.0001d0)
       enddo
 !$omp end parallel do
-endif
+#endif
 !------------------------
 ! Deallocations
 !------------------------

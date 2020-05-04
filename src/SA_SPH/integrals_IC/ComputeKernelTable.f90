@@ -32,20 +32,19 @@
 !                 kerneltab(0:ktrows,4) = Integral (dW/dq * q**3 * dq) 
 !                                         (from q_0b to 2)
 !-------------------------------------------------------------------------------
+#ifdef SPACE_3D
 subroutine ComputeKernelTable
 !------------------------
 ! Modules
 !------------------------
 use Static_allocation_module
 use Hybrid_allocation_module
-use I_O_diagnostic_module
 !------------------------
 ! Declarations
 !------------------------
 implicit none
 integer(4) :: nr
 double precision :: rob
-character(len=lencard) :: nomsub = "ComputeKernelTable"
 double precision,external :: IWro2dro,JdWsRn
 !------------------------
 ! Explicit interfaces
@@ -60,20 +59,17 @@ ktdelta = two / INT_KERNELTABLE
 !------------------------
 ! Statements
 !------------------------
-if (ncord==3) then
-   do nr=0,ktrows
-     rob = ktdelta * nr
-     kerneltab(nr,0) = rob
-     kerneltab(nr,1) = IWro2dro(rob)
-     kerneltab(nr,2) = JdWsRn(rob,3,1,1) * Unosusquareh
-     kerneltab(nr,3) = JdWsRn(rob,3,2,1) * Unosuh
-     kerneltab(nr,4) = JdWsRn(rob,3,3,1)
-   enddo
-   elseif (ncord==2) then
-      call diagnostic(arg1=8,arg2=3,arg3=nomsub)
-endif
+do nr=0,ktrows
+  rob = ktdelta * nr
+  kerneltab(nr,0) = rob
+  kerneltab(nr,1) = IWro2dro(rob)
+  kerneltab(nr,2) = JdWsRn(rob,1,1) * Unosusquareh
+  kerneltab(nr,3) = JdWsRn(rob,2,1) * Unosuh
+  kerneltab(nr,4) = JdWsRn(rob,3,1)
+enddo
 !------------------------
 ! Deallocations
 !------------------------
 return
 end subroutine ComputeKernelTable
+#endif

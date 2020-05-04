@@ -41,8 +41,14 @@ use I_O_diagnostic_module
 !------------------------
 implicit none
 integer(4),intent(in) :: i_inlet
-integer(4) :: npart1,npart2,i
-double precision :: Length1,Length2,rnd
+integer(4) :: npart1
+#ifdef SPACE_3D
+integer(4) :: ii,npart2
+#endif
+double precision :: rnd
+#ifdef SPACE_3D
+double precision :: Length1,Length2
+#endif
 double precision,dimension(3) :: cos_dir_1
 !------------------------
 ! Explicit interfaces
@@ -53,17 +59,19 @@ double precision,dimension(3) :: cos_dir_1
 !------------------------
 ! Initializations
 !------------------------
+npart1 = 0
+#ifdef SPACE_3D
 Length1 = 0.d0
 Length2 = 0.d0
-npart1 = 0
 npart2 = 0
+#endif
 !------------------------
 ! Statements
 !------------------------
-if (ncord==2) then
+#ifdef SPACE_2D
    npart1 = NumPartperLine(i_inlet)
    cos_dir_1(:) = BoundarySide(i_inlet)%T(:,1)
-   else
+#elif defined SPACE_3D
 ! Length1 and Length 2 are the length scales of the inlet section: they are 
 ! computed as the distance between the first and the last inlet vertices 
 ! and the third and the last inlet vertices, respectively.
@@ -73,19 +81,19 @@ if (ncord==2) then
 ! P3-P1.
 ! In case of a quadrilateral inlet, we have particles distributed along two 
 ! directions: P4-P1 and P4-P3.
-      do i=1,3
-         Length1 = Length1 + (BoundaryFace(i_inlet)%Node(1)%GX(i) -            &
-            BoundaryFace(i_inlet)%Node(BoundaryFace(i_inlet)%nodes)%GX(i)) ** 2
-         Length2 = Length2 + (BoundaryFace(i_inlet)%Node(3)%GX(i) -            &
-            BoundaryFace(i_inlet)%Node(BoundaryFace(i_inlet)%nodes)%GX(i)) ** 2
-      end do
+      do ii=1,3
+         Length1 = Length1 + (BoundaryFace(i_inlet)%Node(1)%GX(ii) -           &
+            BoundaryFace(i_inlet)%Node(BoundaryFace(i_inlet)%nodes)%GX(ii)) ** 2
+         Length2 = Length2 + (BoundaryFace(i_inlet)%Node(3)%GX(ii) -           &
+            BoundaryFace(i_inlet)%Node(BoundaryFace(i_inlet)%nodes)%GX(ii)) ** 2
+      enddo
       Length1 = dsqrt(Length1)
       Length2 = dsqrt(Length2)
-      npart1 = Int(Length1 / Domain%dx+0.01d0)
-      npart2 = Int(Length2 / Domain%dx+0.01d0)
+      npart1 = int(Length1 / Domain%dx + 1.d-2)
+      npart2 = int(Length2 / Domain%dx + 1.d-2)
       npart1 = npart1 * npart2 
       cos_dir_1(:) = BoundaryFace(i_inlet)%T(:,1)
-endif
+#endif
 ! ID particle (=nag) indicates the last generated particle (of the on-going 
 ! inlet section)
 select case (mod(itime_jet,4))
@@ -102,4 +110,3 @@ pg(nag)%coord(:) = pg(nag)%coord(:) + (two * rnd - one) * 0.1d0 * Domain%dx    &
 !------------------------
 return
 end subroutine wavy_inlet
-

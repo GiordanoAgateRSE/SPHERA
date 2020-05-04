@@ -20,7 +20,8 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: three_plane_intersection   
-! Description: Computation of the intersection of 3 planes.         
+! Description: Computation of the intersection of 3 planes. It is also called 
+!              in 2D.         
 !-------------------------------------------------------------------------------
 subroutine three_plane_intersection(a1,b1,c1,d1,a2,b2,c2,d2,a3,b3,c3,d3,       &
                                     test_point,intersection_pl)
@@ -29,8 +30,8 @@ subroutine three_plane_intersection(a1,b1,c1,d1,a2,b2,c2,d2,a3,b3,c3,d3,       &
 !------------------------
 implicit none
 double precision,intent(in) :: a1,b1,c1,d1,a2,b2,c2,d2,a3,b3,c3,d3
-integer(4),intent(INOUT) :: test_point
-double precision,intent(INOUT) :: intersection_pl(3)
+integer(4),intent(inout) :: test_point
+double precision,intent(inout) :: intersection_pl(3)
 integer(4) :: test
 double precision :: b_vec(3)
 double precision :: matrix(3,3),inverted(3,3)
@@ -75,4 +76,3 @@ endif
 !------------------------
 return
 end subroutine three_plane_intersection
-

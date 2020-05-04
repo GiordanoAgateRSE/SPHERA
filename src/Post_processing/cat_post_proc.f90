@@ -56,6 +56,7 @@ if (n_bodies>0) then
    call system("rm -f *Body_particles*")
    call system("mv Body-particles.txt Body_particles.txt")
 endif
+#ifdef SPACE_3D
 if (Q_sections%n_sect>0) then
    call system("touch Q_sections.txt draft_Q_sections_draft.txt")
    call system("cat Q_sections.txt *Q_sections_* > Q-sections.txt")
@@ -68,6 +69,7 @@ if (substations%n_sub>0) then
    call system("rm -f *substations*")
    call system("mv sub-stations.txt substations.txt")
 endif
+#endif
 if (nlines>0) then
     call system("touch monitoring_lines.txt draft.cln")
     call system("cat monitoring_lines.txt *.cln > monitoring-lines.txt")
@@ -109,4 +111,3 @@ endif
 !------------------------
 return
 end subroutine cat_post_proc
-

@@ -46,10 +46,10 @@ character(*) :: ainp,listadati
 !------------------------
 if (IoErr==0) then
    Ier = 0
-   ReadCheck = .TRUE.
+   ReadCheck = .true.
    else
       Ier = 4
-      ReadCheck = .FALSE.
+      ReadCheck = .false.
       write(ulog,"(1x,a)")    ">>>>>>>>>>>>>> Warning:"
       write(ulog,"(1x,a)")  
       write(ulog,"(1x,a,i5)") "Error reading unit:  ",ninp

@@ -35,14 +35,19 @@ use I_O_diagnostic_module
 !------------------------
 implicit none
 integer(4), parameter :: ner0 = 0
-! Flag transformation quadrilateral face in two triangular faces 
-logical :: OnlyTriangle 
-integer(4) :: npi,ier,i,n,isi,nfc,nt,nrecords,IC_loop,InputErr,alloc_stat
+#ifdef SPACE_3D
+! Flag for the transformation of a quadrilateral face in two triangular faces 
+logical :: OnlyTriangle
+integer(4) :: IC_loop,nt,nfc
+#elif defined SPACE_2D
+integer(4) :: isi
+#endif
+integer(4) :: npi,ier,i,n,nrecords,InputErr,alloc_stat
 integer(4) :: machine_Julian_day,machine_hour,machine_minute,machine_second
 integer(4),dimension(20) :: NumberEntities 
 double precision :: eps_f
-character(LEN=lencard) :: nomsub = "GEST_INPUT"
-character(LEN=lencard) :: ainp,msg_err
+character(len=lencard) :: nomsub = "GEST_INPUT"
+character(len=lencard) :: ainp,msg_err
 character(100), external :: lcase
 !------------------------
 ! Explicit interfaces
@@ -56,16 +61,20 @@ character(100), external :: lcase
 write(ulog,'(1x,a)') ">> Input data management starts... "
 ! Array deallocation
 call Gest_Dealloc(nomsub)
-! Spatial dimensionality
-ncord = 0                         
+! This line seems redundant, but it is useful to distinguish between the first 
+! and the second execution of the reading program units. "dx" is the first 
+! variable to be read from the main input file (beyond the strings).
+Domain%dx = zero
 NumberEntities = 0
 Domain%istart = 0    
 Domain%start = zero            
 Domain%file = " " 
-Domain%NormFix = .FALSE.         
-Domain%Slip = .FALSE.
-OnlyTriangle = .FALSE.
-restart = .FALSE.
+Domain%NormFix = .false.         
+Domain%Slip = .false.
+#ifdef SPACE_3D
+   OnlyTriangle = .false.
+#endif
+restart = .false.
 simulation_time = zero
 dt = zero
 it_start = 0
@@ -83,16 +92,20 @@ if (exetype=="linux") then
 endif
 ! Allocations of temporary arrays
 write(ulog,'(1x,a)') ">> Temporary storage allocation in routine "//trim(nomsub)
+#ifdef SPACE_3D
 allocate(Vertice(SPACEDIM,1),BoundaryFace(1),Tratto(1),BoundaryVertex(1),      &
    stat=ier)
+#elif defined SPACE_2D
+allocate(Vertice(SPACEDIM,1),Tratto(1),BoundaryVertex(1),stat=ier)
+#endif
    if (ier/=0) then
       write(ulog,'(1x,a,i2)')                                                  &
-"    Arrays VERTICE, BoundaryFace, TRATTO, BOUNDARYVERTEX not allocated. Error code: "&
+"    Arrays VERTICE, possibly BoundaryFace, TRATTO, BOUNDARYVERTEX not allocated. Error code: "&
          ,ier
    call diagnostic(arg1=4,arg3=nomsub)
    else
       write(ulog,'(1x,a)')                                                     &
-"    Arrays VERTICE, BoundaryFace, TRATTO, BOUNDARYVERTEX successfully allocated "
+"    Arrays VERTICE, possibly BoundaryFace, TRATTO, BOUNDARYVERTEX successfully allocated "
 endif
 allocate(Partz(1),Med(1),Control_Points(1),Control_Lines(1),stat=ier)
    if (ier/=0) then
@@ -106,16 +119,24 @@ allocate(Partz(1),Med(1),Control_Points(1),Control_Lines(1),stat=ier)
 endif
 ! Input data reading
 ! To read for the first time the input file to get the parameters for 
-! array sizing 
+! array sizing
 NumVertici = 1
-NumFacce = 1
+#ifdef SPACE_3D
+   NumFacce = 1
+#endif
 NumTratti = 1
 NumBVertices = 1
 NPartZone = 1
 NMedium = 1
 npoints = 1
 NLines = 1
+input_second_read = .false.
+#ifdef SPACE_3D
 call ReadInput(NumberEntities,OnlyTriangle,InputErr,ainp)
+#elif defined SPACE_2D
+call ReadInput(NumberEntities,InputErr,ainp)
+#endif
+input_second_read = .true.
 ! An error was detected in the input data. Execution fails.
 msg_err = trim("dimensioning")
 if (InputErr/=0) then
@@ -126,15 +147,19 @@ write(ulog,'(1x,a)')                                                           &
    ">Data are read from an ASCII input file in the routine ReadInput"
 ! Deallocations of temporary arrays
 write(ulog,'(1x,a)') ">> Deallocation of temporary arrays "
+#ifdef SPACE_3D
 deallocate(Vertice,BoundaryFace,Tratto,BoundaryVertex,stat=ier)
+#elif defined SPACE_2D
+deallocate(Vertice,Tratto,BoundaryVertex,stat=ier)
+#endif
 if (ier/=0) then
    write(ulog,'(1x,a,i2)')                                                     &
-"    Arrays VERTICE, BoundaryFace, TRATTO, BOUNDARYVERTEX not deallocated. Error code: "&
+"    Arrays VERTICE, possibly BoundaryFace, TRATTO, BOUNDARYVERTEX not deallocated. Error code: "&
       ,ier
       call diagnostic(arg1=4,arg3=nomsub)
       else
          write(ulog,'(1x,a)')                                                  &
-"    Arrays VERTICE, BoundaryFace, TRATTO, BOUNDARYVERTEX successfully deallocated "
+"    Arrays VERTICE, possibly BoundaryFace, TRATTO, BOUNDARYVERTEX successfully deallocated "
 endif
 deallocate(Partz,Med,Control_Points,Control_Lines,stat=ier)
 if (ier/=0) then
@@ -175,7 +200,6 @@ if ((Domain%istart>0).or.(Domain%start>zero)) then
    NPointse = NumberEntities(13)
    else
 ! No restart: standard initialization
-      ncord = NumberEntities(1)
       NMedium = NumberEntities(2)
       NPartZone = NumberEntities(3)
       npoints = NumberEntities(4)
@@ -185,26 +209,33 @@ if ((Domain%istart>0).or.(Domain%start>zero)) then
       NumVertici = NumberEntities(7)
       NumTratti = NumberEntities(8)
       NumBVertices = NumberEntities(9)
-      NumBSides = NumberEntities(10)
-      NumFacce = NumberEntities(11)
-      if (OnlyTriangle) NumFacce = NumFacce + NumberEntities(18)
+#ifdef SPACE_3D
+         NumFacce = NumberEntities(11)
+         if (OnlyTriangle) NumFacce = NumFacce + NumberEntities(18)
+#elif defined SPACE_2D
+            NumBSides = NumberEntities(10)
+#endif
       NPointse = NumberEntities(13)
-      if (NumberEntities(19)==1) Domain%Slip = .TRUE.
-      if (NumberEntities(20)==1) Domain%NormFix = .TRUE.
+      if (NumberEntities(19)==1) Domain%Slip = .true.
+      if (NumberEntities(20)==1) Domain%NormFix = .true.
 endif
 ! Array allocations 
 write(ulog,'(1x,a)') ">> Final storage allocation in routine "//trim(nomsub)
+#ifdef SPACE_3D
 allocate(Vertice(SPACEDIM,max(1,NumVertici)),BoundaryFace(max(1,NumFacce)),    &
-   Tratto(max(1,NumTratti)),BoundaryVertex(max(1,NumBVertices)),               & 
-   BoundarySide(max(1,NumBSides)),stat=ier)
+   Tratto(max(1,NumTratti)),BoundaryVertex(max(1,NumBVertices)),stat=ier)
+#elif defined SPACE_2D
+allocate(Vertice(SPACEDIM,max(1,NumVertici)),Tratto(max(1,NumTratti)),         &
+   BoundaryVertex(max(1,NumBVertices)),BoundarySide(max(1,NumBSides)),stat=ier)
+#endif
 if (ier/=0) then
    write(ulog,'(1x,a,i2)')                                                     &
-"    Arrays VERTICE, BoundaryFace, TRATTO, BOUNDARYVERTEX, BOUNDARYSIDE not allocated. Error code: "&
+"    Arrays VERTICE, BoundaryFace/BoundarySide, TRATTO, BOUNDARYVERTEX not allocated. Error code: "&
       ,ier
    call diagnostic(arg1=4,arg3=nomsub)
    else
       write(ulog,'(1x,a)')                                                     &
-"    Arrays VERTICE, BoundaryFace, TRATTO, BOUNDARYVERTEX, BOUNDARYSIDE successfully allocated "
+"    Arrays VERTICE, BoundaryFace/BoundarySide, TRATTO, BOUNDARYVERTEX successfully allocated "
 endif
 allocate(Partz(NPartZone),Med(NMedium),OpCount(NMedium),SpCount(NMedium),      &
    EpCount(NMedium),EpOrdGrid(NMedium),Control_Points(max(1,npointst)),        &
@@ -223,7 +254,11 @@ rewind(ninp)
 call Init_Arrays
 ! No restart
 if (.not.restart) then
+#ifdef SPACE_3D
    call ReadInput(NumberEntities,OnlyTriangle,InputErr,ainp)
+#elif defined SPACE_2D
+   call ReadInput(NumberEntities,InputErr,ainp)
+#endif
    msg_err = trim("readinput")
    if (InputErr/=0) then
       InputErr = InputErr + 300
@@ -231,26 +266,24 @@ if (.not.restart) then
    endif
    close(ninp)
    nag = 0
-   if (ncord==2)then
+#ifdef SPACE_2D
 ! 10 / (7 * pigreco) *(3./2.) /(h**2)
-      Domain%coefke = 0.682093d0 / squareh  
+      Domain%coefke = 0.682093d0 / (Domain%h ** ncord)
 ! 5 / (16 * pigreco)/(h**2)
-      Domain%coefkacl = 0.099472d0 / squareh   
-! Particle volume
-      Domain%PVolume = Domain%dx * Domain%dx
-      elseif (ncord==3)then
+      Domain%coefkacl = 0.099472d0 / (Domain%h ** ncord)
+#elif defined SPACE_3D
 ! 1 / pigreco/(h**3)
-         Domain%coefke    = 0.477464d0 / cubich   
+         Domain%coefke = 0.477464d0 / (Domain%h ** ncord) 
 ! 15 / (64 * pigreco)/(h**3)
-         Domain%coefkacl = 0.074603d0 / cubich    
+         Domain%coefkacl = 0.074603d0 / (Domain%h ** ncord)
+#endif
 ! Particle volume
-         Domain%PVolume = Domain%dx * Domain%dx * Domain%dx
-   endif
+   Domain%PVolume = Domain%dx ** ncord
 ! An irregular domain is considered 
    if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
-      if (ncord==2) then
+#ifdef SPACE_2D
          call DefineBoundarySideGeometry2D
-         elseif (ncord==3) then
+#elif defined SPACE_3D
 ! To replace 4-sided geometries with 3-sided geometries
             if (OnlyTriangle) call ModifyFaces(NumberEntities)
             allocate(BFaceList(NumFacce),stat=ier) 
@@ -274,7 +307,7 @@ if (.not.restart) then
                      "   Array BoundaryConvexEdge successfully allocated "
             endif
             call FindBoundaryConvexEdges3D
-      endif
+#endif
       nagpg = 0
       if (Granular_flows_options%KTGF_config>0) then
          do i=1,NMedium
@@ -292,8 +325,12 @@ if (.not.restart) then
             endif
          enddo
       endif
+#ifdef SPACE_3D
       IC_loop = 1
       call GeneratePart(IC_loop)
+#elif defined SPACE_2D
+      call GeneratePart
+#endif
       if (.not.(allocated(pg))) then      
 ! To assess the number of particles. Total number of particles is 
 ! allocated depending on the value "nag". 
@@ -335,14 +372,22 @@ if (.not.restart) then
 ! The background positioning grid is generated
       call CreaGrid
 ! Particles are created and initialized
+#ifdef SPACE_3D
       IC_loop = 2
       call GeneratePart(IC_loop)
+#elif defined SPACE_2D
+      call GeneratePart
+#endif
       else
          call diagnostic(arg1=10,arg2=5,arg3=nomsub)
    endif
    else
 ! A restart option is active
+#ifdef SPACE_3D
       call ReadInput(NumberEntities,OnlyTriangle,InputErr,ainp)
+#elif defined SPACE_2D
+      call ReadInput(NumberEntities,InputErr,ainp)
+#endif
       msg_err = trim("restart reading?")
       if (InputErr/=0) then
          InputErr = InputErr + 300
@@ -458,6 +503,7 @@ if (.not.restart) then
                ts0_pg(:) = ts_pgZero
          endif
       endif
+#ifdef SPACE_3D
       allocate(BFaceList(NumFacce),stat=ier)
       if (ier/=0) then
          write(ulog,'(1x,a,i2)')                                               &
@@ -466,6 +512,7 @@ if (.not.restart) then
          else
             write(ulog,'(1x,a)') "    Array BFACELIST successfully allocated "
       endif
+#endif
       call ReadRestartFile(trim("reading"),ier,nrecords)
       msg_err = trim("reading")
       if (ier/=0) then
@@ -545,7 +592,7 @@ endif
 ! To initialize pressure and density fields
 if (.not.restart) call SubCalcPreIdro
 ! To assess and save the sides with condition "open" (2D) 
-if (ncord==2) then     
+#ifdef SPACE_2D     
 ! Searching for the sides with condition "open" 
    NumOpenSides = 0
    do isi=1,NumBSides
@@ -561,7 +608,7 @@ if (ncord==2) then
       endif
    enddo
 ! To assess and save the faces with condition "open" (3D)
-   else
+#elif defined SPACE_3D
 ! Searching for the faces with condition "open" 
       NumOpenFaces = 0
       do nfc=1,NumFacce
@@ -575,7 +622,7 @@ if (ncord==2) then
             OpenFace(NumOpenFaces) = nfc
          endif
       enddo
-endif
+#endif
 OpCount = 0
 EpCount = 0
 EpOrdGrid = 0

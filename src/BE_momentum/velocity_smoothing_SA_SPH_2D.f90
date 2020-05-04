@@ -22,6 +22,7 @@
 ! Program unit: velocity_smoothing_SA_SPH_2D 
 ! Description: To calculate a corrective term for velocity.    
 !-------------------------------------------------------------------------------
+#ifdef SPACE_2D
 subroutine velocity_smoothing_SA_SPH_2D(npi)
 !------------------------
 ! Modules
@@ -93,4 +94,4 @@ endif
 !------------------------
 return
 end subroutine velocity_smoothing_SA_SPH_2D
-
+#endif

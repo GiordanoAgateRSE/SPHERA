@@ -86,4 +86,3 @@ write(ncpt,'(8(g14.6,1x))') simulation_time,pos_aux(1),pos_aux(2),             &
 !------------------------
 return
 end subroutine write_Granular_flows_interfaces
-

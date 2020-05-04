@@ -47,7 +47,7 @@ integer(4) :: i_zone,npi
 ! Statements
 !------------------------
 ! One might loop over particles instead of over zones
-do i_zone=1,NPartZone 
+do i_zone=1,NPartZone
    if (Partz(i_zone)%move/="fix") cycle
 ! It assigns the movement with an imposed kinematics ("npointv" velocity data)
    if (Partz(i_zone)%npointv>1) then

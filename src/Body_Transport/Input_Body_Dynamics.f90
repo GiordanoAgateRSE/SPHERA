@@ -49,7 +49,7 @@ interface
       implicit none
       double precision,intent(in) :: teta_R
       double precision,intent(in) :: n_R(3)
-      double precision,intent(INOUT) :: vector(3)
+      double precision,intent(inout) :: vector(3)
    end subroutine vector_rotation_Rodrigues
 end interface
 !------------------------
@@ -68,26 +68,34 @@ aux_integer = 0
 ! Statements
 !------------------------
 ! Loop over the transported bodies
-!$omp parallel do default(none) private(i) &
-!$omp shared(n_bodies,body_arr,ncord,Domain,n_body_part,dx_dxbodies)
+!$omp parallel do default(none)                                                &
+!$omp shared(n_bodies,body_arr,Domain,n_body_part,dx_dxbodies)                 &
+!$omp private(i)
 do i=1,n_bodies
    body_arr(i)%npart = 0
    do j=1,body_arr(i)%n_elem
 ! Particle length scales for the element
+#ifdef SPACE_3D
       body_arr(i)%elem(j)%dx(:) = body_arr(i)%elem(j)%L_geom(:) /              &
          (int(body_arr(i)%elem(j)%L_geom(:) / (Domain%dx/dx_dxbodies)))
+#elif defined SPACE_2D
+      body_arr(i)%elem(j)%dx(1) = body_arr(i)%elem(j)%L_geom(1) /              &
+         (int(body_arr(i)%elem(j)%L_geom(1) / (Domain%dx/dx_dxbodies)))
+      body_arr(i)%elem(j)%dx(2) = 1.d0
+      body_arr(i)%elem(j)%dx(3) = body_arr(i)%elem(j)%L_geom(3) /              &
+         (int(body_arr(i)%elem(j)%L_geom(3) / (Domain%dx/dx_dxbodies)))
+#endif
 ! Number of body particles of the element
-      if (ncord==3) then
+#ifdef SPACE_3D
          body_arr(i)%elem(j)%npart = int(body_arr(i)%elem(j)%L_geom(1) /       &
             body_arr(i)%elem(j)%dx(1)) * int(body_arr(i)%elem(j)%L_geom(2) /   &
             body_arr(i)%elem(j)%dx(2)) * int(body_arr(i)%elem(j)%L_geom(3) /   &
             body_arr(i)%elem(j)%dx(3))
-      endif
-      if (ncord==2) then
-         body_arr(i)%elem(j)%npart = int(body_arr(i)%elem(j)%L_geom(1) /       &
-            body_arr(i)%elem(j)%dx(1)) * int(body_arr(i)%elem(j)%L_geom(3) /   &
-            body_arr(i)%elem(j)%dx(3))
-      endif
+#elif defined SPACE_2D
+            body_arr(i)%elem(j)%npart = int(body_arr(i)%elem(j)%L_geom(1) /    &
+               body_arr(i)%elem(j)%dx(1)) * int(body_arr(i)%elem(j)%L_geom(3)  &
+               / body_arr(i)%elem(j)%dx(3))
+#endif
 ! Update of the number of body particles of the body
       body_arr(i)%npart = body_arr(i)%npart + body_arr(i)%elem(j)%npart         
    end do
@@ -120,7 +128,9 @@ do nbi=1,n_bodies
    do nei=1,body_arr(nbi)%n_elem
       vec_temp(:) = int(body_arr(nbi)%elem(nei)%L_geom(:) /                    &
                     body_arr(nbi)%elem(nei)%dx(:))     
-      if (ncord==2) vec_temp(2) = 1     
+#ifdef SPACE_2D 
+         vec_temp(2) = 1     
+#endif
       do i=1,vec_temp(1)
          do j=1,vec_temp(2)
             do k=1,vec_temp(3)
@@ -130,12 +140,13 @@ do nbi=1,n_bodies
                bp_arr(npi)%rel_pos(1) = - body_arr(nbi)%elem(nei)%L_geom(1) /  &
                   2.d0 + body_arr(nbi)%elem(nei)%dx(1) / 2.d0 + (i - 1) *      &
                   body_arr(nbi)%elem(nei)%dx(1)
-               if (ncord==2) bp_arr(npi)%rel_pos(2) = 0.d0
-               if (ncord==3) then
+#ifdef SPACE_3D                  
                   bp_arr(npi)%rel_pos(2) = - body_arr(nbi)%elem(nei)%L_geom(2) &
                      / 2.d0 + body_arr(nbi)%elem(nei)%dx(2) / 2.d0 + (j - 1) * &
                      body_arr(nbi)%elem(nei)%dx(2)  
-               endif
+#elif defined SPACE_2D
+                     bp_arr(npi)%rel_pos(2) = 0.d0
+#endif
                bp_arr(npi)%rel_pos(3) = - body_arr(nbi)%elem(nei)%L_geom(3) /  &
                   2.d0 + body_arr(nbi)%elem(nei)%dx(3) / 2.d0 + (k - 1) *      &
                   body_arr(nbi)%elem(nei)%dx(3) 
@@ -145,20 +156,28 @@ do nbi=1,n_bodies
                bp_arr(npi)%normal = 0.d0
                if ((i==1).and.(body_arr(nbi)%elem(nei)%normal_act(5)==1)) then
                   bp_arr(npi)%normal(1) = 1.d0
-                  if (ncord==2) bp_arr(npi)%area = bp_arr(npi)%area +          &
-                     body_arr(nbi)%elem(nei)%dx(3)
-                  if (ncord==3) bp_arr(npi)%area = bp_arr(npi)%area +          &
-                     body_arr(nbi)%elem(nei)%dx(2)*body_arr(nbi)%elem(nei)%dx(3)
+#ifdef SPACE_3D
+                     bp_arr(npi)%area = bp_arr(npi)%area +                     &
+                                        body_arr(nbi)%elem(nei)%dx(2) *        &
+                                        body_arr(nbi)%elem(nei)%dx(3)
+#elif defined SPACE_2D
+                        bp_arr(npi)%area = bp_arr(npi)%area +                  &
+                                           body_arr(nbi)%elem(nei)%dx(3)
+#endif
                endif
                if ((i==vec_temp(1)).and.                                       &
                   (body_arr(nbi)%elem(nei)%normal_act(6)==1)) then
                   bp_arr(npi)%normal(1) = -1.d0
-                  if (ncord==2) bp_arr(npi)%area = bp_arr(npi)%area +          &
-                     body_arr(nbi)%elem(nei)%dx(3)
-                  if (ncord==3) bp_arr(npi)%area = bp_arr(npi)%area +          &
-                     body_arr(nbi)%elem(nei)%dx(2)*body_arr(nbi)%elem(nei)%dx(3)
+#ifdef SPACE_3D
+                     bp_arr(npi)%area = bp_arr(npi)%area +                     &
+                                        body_arr(nbi)%elem(nei)%dx(2) *        &
+                                        body_arr(nbi)%elem(nei)%dx(3)
+#elif defined SPACE_2D
+                        bp_arr(npi)%area = bp_arr(npi)%area +                  &
+                                           body_arr(nbi)%elem(nei)%dx(3)
+#endif
                endif
-               if (ncord==3) then
+#ifdef SPACE_3D
                   if ((j==1).and.(body_arr(nbi)%elem(nei)%normal_act(3)==1))   &
                      then
                      bp_arr(npi)%normal(2) = 1.d0
@@ -173,22 +192,29 @@ do nbi=1,n_bodies
                                         body_arr(nbi)%elem(nei)%dx(1) *        &
                                         body_arr(nbi)%elem(nei)%dx(3) 
                   endif
-               endif
+#endif
                if ((k==1).and.(body_arr(nbi)%elem(nei)%normal_act(1)==1)) then
                   bp_arr(npi)%normal(3) = 1.d0
-                  if (ncord==2) bp_arr(npi)%area = bp_arr(npi)%area +          &
-                     body_arr(nbi)%elem(nei)%dx(1)
-                  if (ncord==3) bp_arr(npi)%area = bp_arr(npi)%area +          &
-                     body_arr(nbi)%elem(nei)%dx(1)*body_arr(nbi)%elem(nei)%dx(2)
+#ifdef SPACE_3D                  
+                     bp_arr(npi)%area = bp_arr(npi)%area +                     &
+                                        body_arr(nbi)%elem(nei)%dx(1) *        &
+                                        body_arr(nbi)%elem(nei)%dx(2)
+#elif defined SPACE_2D
+                        bp_arr(npi)%area = bp_arr(npi)%area +                  &
+                                           body_arr(nbi)%elem(nei)%dx(1)
+#endif
                endif
                if ((k==vec_temp(3)).and.                                       &
                   (body_arr(nbi)%elem(nei)%normal_act(2)==1)) then
                   bp_arr(npi)%normal(3) = -1.d0
-                  if (ncord==2) bp_arr(npi)%area = bp_arr(npi)%area +          &
-                     body_arr(nbi)%elem(nei)%dx(1)
-                  if (ncord==3) bp_arr(npi)%area = bp_arr(npi)%area +          &
-                     body_arr(nbi)%elem(nei)%dx(1) *                           &
-                     body_arr(nbi)%elem(nei)%dx(2)
+#ifdef SPACE_3D
+                     bp_arr(npi)%area = bp_arr(npi)%area +                     &
+                                        body_arr(nbi)%elem(nei)%dx(1) *        &
+                                        body_arr(nbi)%elem(nei)%dx(2)
+#elif defined SPACE_2D
+                        bp_arr(npi)%area = bp_arr(npi)%area +                  &
+                                           body_arr(nbi)%elem(nei)%dx(1)
+#endif
                endif
                mod_normal =                                                    &
                   dsqrt(dot_product(bp_arr(npi)%normal,bp_arr(npi)%normal))
@@ -201,7 +227,9 @@ do nbi=1,n_bodies
                call vector_rotation_Rodrigues(                                 &
                   body_arr(nbi)%elem(nei)%n_R_IO(:),                           &
                   body_arr(nbi)%elem(nei)%teta_R_IO,bp_arr(npi)%rel_pos(:))
-               if (ncord==2) bp_arr(npi)%rel_pos(2) = 0.d0
+#ifdef SPACE_2D
+                  bp_arr(npi)%rel_pos(2) = 0.d0
+#endif
 ! Preliminary value of the absolute positions after
 ! translation of rel_pos of the distance "corresponding element - 
 ! reference system origin")
@@ -234,27 +262,35 @@ do nbi=1,n_bodies
                call vector_rotation_Rodrigues(                                 &
                   body_arr(nbi)%elem(nei)%n_R_IO(:),                           &
                   body_arr(nbi)%elem(nei)%teta_R_IO,bp_arr(npi)%normal(:))
-               if (ncord==2) bp_arr(npi)%normal(2) = 0.d0
+#ifdef SPACE_2D
+                  bp_arr(npi)%normal(2) = 0.d0
+#endif
 ! Rotations around the centre of rotation provided in input
                bp_arr(npi)%rel_pos(:) = bp_arr(npi)%pos(:) -                   &
                                         body_arr(nbi)%x_rotC(:)
                call vector_rotation_Rodrigues(body_arr(nbi)%n_R_IO(:),         &
                body_arr(nbi)%teta_R_IO,bp_arr(npi)%rel_pos(:))
-               if (ncord==2) bp_arr(npi)%rel_pos(2) = 0.d0
+#ifdef SPACE_2D
+                  bp_arr(npi)%rel_pos(2) = 0.d0
+#endif
                bp_arr(npi)%pos(:) = bp_arr(npi)%rel_pos(:) +                   &
                                     body_arr(nbi)%x_rotC(:) 
                bp_arr(npi)%rel_pos(:) = bp_arr(npi)%pos(:) -                   &
                   body_arr(nbi)%x_CM(:)
                call vector_rotation_Rodrigues(body_arr(nbi)%n_R_IO(:),         &
                body_arr(nbi)%teta_R_IO,bp_arr(npi)%normal(:))
-               if (ncord==2) bp_arr(npi)%normal(2) = 0.d0
+#ifdef SPACE_2D
+                  bp_arr(npi)%normal(2) = 0.d0
+#endif
 ! Initial cell
                bp_arr(npi)%cell =  ParticleCellNumber(bp_arr(npi)%pos)
 ! Velocity
                call Vector_Product(body_arr(nbi)%omega,bp_arr(npi)%rel_pos,    &
                   vec2_temp,3)
-               bp_arr(npi)%vel(:) = body_arr(nbi)%u_CM(:) + vec2_temp(:) 
-               if (ncord==2) bp_arr(npi)%vel(2) = 0.d0 
+               bp_arr(npi)%vel(:) = body_arr(nbi)%u_CM(:) + vec2_temp(:)
+#ifdef SPACE_2D
+                  bp_arr(npi)%vel(2) = 0.d0
+#endif                   
 ! Update of umax
                aux_umax = dsqrt(dot_product(bp_arr(npi)%vel,bp_arr(npi)%vel))        
                body_arr(bp_arr(npi)%body)%umax =                               &

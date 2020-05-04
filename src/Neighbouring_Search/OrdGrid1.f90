@@ -56,7 +56,7 @@ Icont(:) = 0
 ! 1st loop: to find the particle cell and to count the number of particles
 ! in every cell.
 npi = 0
-do while ((nag>0).AND.(npi<nag))
+do while ((nag>0).and.(npi<nag))
    npi = npi + 1
    ncel = ParticleCellNumber(pg(npi)%coord)
    if (pg(npi)%cella<=0) then

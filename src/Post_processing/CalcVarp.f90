@@ -76,4 +76,3 @@ enddo
 !------------------------
 return
 end subroutine CalcVarp
-

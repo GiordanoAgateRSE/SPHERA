@@ -31,6 +31,7 @@
 !                                               which gives contribution                                
 !               (Di Monaco et al., 2011, EACFM)           
 !-------------------------------------------------------------------------------
+#ifdef SPACE_2D
 subroutine SelectCloseBoundarySides2D(npi,Ncbs,Cloboside,LocXY,IntNcbs,        &
                                       Intboside,IntLocXY)
 !------------------------
@@ -123,3 +124,4 @@ enddo
 !------------------------
 return
 end subroutine SelectCloseBoundarySides2D
+#endif

@@ -20,7 +20,7 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: diagnostic                   
-! Description: Diagnostic (error) messages.                
+! Description: Diagnostic (error) messages.
 !-------------------------------------------------------------------------------
 subroutine diagnostic(ierr,ivalue,avalue)
 !------------------------
@@ -34,12 +34,12 @@ use Static_allocation_module
 implicit none
 integer(4),intent(in) :: ierr
 integer(4),intent(in),optional :: ivalue
-character(LEN=lencard),intent(in),optional :: avalue
+character(len=lencard),intent(in),optional :: avalue
 logical :: print_out
 integer(4) :: dato,la,it1,it2,it3
 double precision :: dtvel
 character(len=lencard) :: stringa
-character(LEN=2) :: error
+character(len=2) :: error
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -177,35 +177,40 @@ select case (ierr)
       write(ulog,'(1x,a)') 'An error was detected analyzing the boundaries'
       write(ulog,'(1x,a)') 'Specific code error is:'
       select case (dato)
+#ifdef SPACE_2D
          case (1); write(ulog,'(1x,a,i10,2a)')                                 &
 ' 1 - New Max num particles*BoundaryCloseSides the new value is: MaxNcbs = ',  &
             MaxNcbs,'.  Routine ->',stringa(1:la)
+#elif defined SPACE_3D
          case (2); write(ulog,'(1x,a,i10,2a)')                                 &
 ' 2 - New Max num particles*BoundaryCloseFaces the new value is: MaxNcbf = ',  &
             MaxNcbf,'.  Routine ->',stringa(1:la)
-         case (3); write(ulog,'(1x,2a)')                                       &
-' 3 - The kernel table is not implemented for 2D case.  Routine ->',           &
-            stringa(1:la)
+#endif
          case (4); write(ulog,'(1x,2a)')                                       &
 ' 4 - Sides are not consecutive.  Routine ->',stringa(1:la)
          case (5); write(ulog,'(1x,3a)')                                       &
 ' 5 - Number of cell calculated is different from the number stored for the ', &
             'current particle.  Routine ->',stringa(1:la)
-         case (6); write(ulog,'(1x,2a)')                                       &
+#ifdef SPACE_3D
+            case (6); write(ulog,'(1x,2a)')                                    &
 ' 6 - Number of close boundary faces ncbf > MAXCLOSEBOUNDFACES (a).  Routine ->'&
-            ,stringa(1:la)
-         case (7); write(ulog,'(1x,2a)')                                       &
+               ,stringa(1:la)
+            case (7); write(ulog,'(1x,2a)')                                    &
 ' 7 - Number of close boundary faces ncbf > MAXCLOSEBOUNDFACES (b).  Routine ->'&
-            ,stringa(1:la)
+               ,stringa(1:la)
+#elif defined SPACE_2D
          case (8); write(ulog,'(1x,2a)')                                       &
 ' 8 - Number of close boundary sides Ncbs > MAXCLOSEBOUNDSIDES.  Routine ->',  &
             stringa(1:la)
          case (9); write(ulog,'(1x,2a)')                                       &
 ' 9 - Number of close boundary sides Ncbs > LIMCLOSEBOUNDSIDES.  Routine ->',  &
             stringa(1:la)
+#endif
+#ifdef SPACE_3D
          case (10); write(ulog,'(1x,2a)')                                      &
 '10 - Number of convex edges NumBEdges > MAXNUMCONVEXEDGES.  Routine ->',      &
             stringa(1:la)
+#endif
       endselect
    case (9)
 ! Error during the simulation
@@ -218,8 +223,10 @@ select case (ierr)
          case (2); write(ulog,'(1x,a,i10,2a)')                                 &
 ' 2 - Number of fluid particles array Array_Flu greater than max ',            &
             PARTICLEBUFFER,' (b).  Routine ->',stringa(1:la)
-         case (3); write(ulog,'(1x,2a)')                                       &
+#ifdef SPACE_3D
+            case (3); write(ulog,'(1x,2a)')                                    &
 ' 3 - Increase parameter MAXCLOSEBOUNDFACES.  Routine ->',stringa(1:la)
+#endif
       endselect
       print_out = .true.
    case (10)    
@@ -241,12 +248,15 @@ select case (ierr)
             stringa(1:la)
          case (5); write(ulog,'(1x,2a)')                                       &
             ' 5 - Unknown Domain Type. Routine -> ',stringa(1:la)
+#if defined SPACE_2D
          case (6); write(ulog,'(1x,2a)')                                       &
 ' 6 - Number of open sides NumOpenSides > MAXOPENSIDES. Routine -> ',          &
             stringa(1:la)
+#elif defined SPACE_3D
          case (7); write(ulog,'(1x,2a)')                                       &
 ' 7 - Number of open faces NumOpenFaces > MAXOPENFACES. Routine -> ',          &
             stringa(1:la)
+#endif
          case (8); write(ulog,'(1x,2a)')                                       &
 ' 8 - Free level condition is not found. Routine -> ',                         &
             stringa(1:la)
@@ -307,4 +317,3 @@ stop
 ! Deallocations
 !------------------------
 end subroutine diagnostic
-

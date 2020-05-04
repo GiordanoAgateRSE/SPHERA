@@ -34,9 +34,9 @@ use I_O_diagnostic_module
 ! Declarations
 !------------------------
 implicit none
-integer(4),intent(INOUT) :: nrighe,ier,ninp,ulog
-character(1),intent(INOUT) :: comment
-character(LEN=lencard),intent(INOUT) :: ainp
+integer(4),intent(inout) :: nrighe,ier,ninp,ulog
+character(1),intent(inout) :: comment
+character(len=lencard),intent(inout) :: ainp
 logical :: MUSCL_boundary_flag,in_built_monitors,Gamma_limiter_flag
 logical :: negative_wall_p_allowed,FS_allowed
 integer(4) :: ioerr,n_monitor_points,n_monitor_regions,i,alloc_stat   
@@ -63,20 +63,20 @@ n_kinematics_records(:) = 0
 ! Statements
 !------------------------
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DBSPH DATA",ninp,ulog)) return
+if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"DBSPH DATA",ninp,ulog)) return
 do while (trim(lcase(ainp))/="##### end dbsph #####")
 ! Reading the ratio between the fluid and the semi-particle sizes (dx/dx_w)
    read(ainp,*,iostat=ioerr) dx_dxw,MUSCL_boundary_flag,k_w,slip_ID,           &
       Gamma_limiter_flag
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DBSPH GENERAL INPUT",ninp,ulog))  &
+   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"DBSPH GENERAL INPUT",ninp,ulog))  &
       return
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
    read(ainp,*,iostat=ioerr) negative_wall_p_allowed,FS_allowed
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DBSPH GENERAL INPUT 2",ninp,ulog))&
+   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"DBSPH GENERAL INPUT 2",ninp,ulog))&
       return
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
    read(ainp,*,iostat=ioerr) n_monitor_points,n_monitor_regions
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DBSPH_monitor_numbers",ninp,ulog))&
+   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"DBSPH_monitor_numbers",ninp,ulog))&
       return
    if (n_monitor_points>0) then
       if (.not.allocated(monitor_IDs)) allocate(monitor_IDs(n_monitor_points), &
@@ -89,24 +89,24 @@ do while (trim(lcase(ainp))/="##### end dbsph #####")
       endif
       call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
       read(ainp,*,iostat=ioerr) monitor_IDs(:)
-      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DBSPH_monitor_IDs",ninp,ulog)) &
+      if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"DBSPH_monitor_IDs",ninp,ulog)) &
          return
       endif
       if (n_monitor_regions==1) then
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read(ainp,*,iostat=ioerr) monitor_region(:)
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DBSPH_monitor_region",ninp, &
+         if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"DBSPH_monitor_region",ninp, &
             ulog)) return
       endif
       call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
       read(ainp,*,iostat=ioerr) surface_mesh_files,in_built_monitors
-      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"SURFACE_MESH_FILES",ninp,ulog))&
+      if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"SURFACE_MESH_FILES",ninp,ulog))&
          return  
       do i=1,surface_mesh_files
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          read(ainp,*,iostat=ioerr) n_kinematics_records(i),                    &
             rotation_centre(i,1:3)
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DBSPH_KINEMATICS",ninp,ulog &
+         if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"DBSPH_KINEMATICS",ninp,ulog &
             )) return
          if ((.not.(allocated(DBSPH%kinematics))).and.                         &
             (n_kinematics_records(i)/=0)) then
@@ -126,13 +126,13 @@ do while (trim(lcase(ainp))/="##### end dbsph #####")
          do j=1,n_kinematics_records(i)
             call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
             read(ainp,*,iostat=ioerr) DBSPH%kinematics(i,j,1:7)
-            if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DBSPH_KINEMATICS_RECORDS"&
+            if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"DBSPH_KINEMATICS_RECORDS"&
                ,ninp,ulog)) return
          enddo
       enddo
       call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
       read(ainp,*,iostat=ioerr) n_inlet,n_outlet,ply_n_face_vert
-      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                                &
+      if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                                &
          "DBSPH_INLET_OUTLET_PLY_N_FACE_VERT",ninp,ulog)) return
       if (n_inlet>0) then
          if (.not.allocated(DBSPH%inlet_sections)) then
@@ -149,7 +149,7 @@ do while (trim(lcase(ainp))/="##### end dbsph #####")
       call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 ! Reading position, normal and velocity of an inlet surface element      
       read(ainp,*,iostat=ioerr) DBSPH%inlet_sections(j,:)  
-      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DBSPH_INLET_SECTIONS",ninp,    &
+      if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"DBSPH_INLET_SECTIONS",ninp,    &
          ulog)) return            
    enddo 
    if (n_outlet>0) then
@@ -167,11 +167,11 @@ do while (trim(lcase(ainp))/="##### end dbsph #####")
    do j=1,n_outlet
       call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
       read(ainp,*,iostat=ioerr) DBSPH%outlet_sections(j,:)  
-      if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DBSPH_OUTLET_SECTIONS",ninp,   &
+      if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"DBSPH_OUTLET_SECTIONS",ninp,   &
          ulog)) return            
    enddo
 ! Writing the DB-SPH input parameters on the log file
-   if ((ncord>0).and.(ulog > 0)) then
+   if ((input_second_read.eqv..true.).and.(ulog>0)) then
       write(ulog,"(1x,a,1p,e12.4)")                                            &
 "dx/dx_w:........................",dx_dxw
       write(ulog,"(1x,a,1p,l12)")                                              &
@@ -312,11 +312,10 @@ do while (trim(lcase(ainp))/="##### end dbsph #####")
       endif   
    endif   
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DBSPH DATA",ninp,ulog)) return
+   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"DBSPH DATA",ninp,ulog)) return
 enddo
 !------------------------
 ! Deallocations
 !------------------------
 return
 end subroutine ReadDBSPH
-

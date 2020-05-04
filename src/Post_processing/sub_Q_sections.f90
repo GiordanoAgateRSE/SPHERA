@@ -23,6 +23,7 @@
 ! Description: Writing flow rate at monitoring sections provided in input for 
 !              the flow rate (only in 3D).           
 !-------------------------------------------------------------------------------
+#ifdef SPACE_3D
 subroutine sub_Q_sections
 !------------------------
 ! Modules
@@ -57,7 +58,7 @@ interface
       double precision,intent(in) :: point(2),point_pol_1(2),point_pol_2(2)
       double precision,intent(in) :: point_pol_3(2),point_pol_4(2)
       double precision,intent(in) :: point_pol_5(2),point_pol_6(2)
-      integer(4),intent(INOUT) :: test
+      integer(4),intent(inout) :: test
       double precision :: dis1,dis2
       double precision :: normal(2)
    end subroutine point_inout_convex_non_degenerate_polygon
@@ -135,7 +136,7 @@ if (.not.(allocated(Q_sections%section(1)%flow_rate))) then
       endif
 ! Allocating and initializing the flow rate vector
       allocate(Q_sections%section(i_sect)%flow_rate(Q_sections%n_fluid_types+1))
-      Q_sections%section(i_sect)%flow_rate(:) = 0.0d0
+      Q_sections%section(i_sect)%flow_rate(:) = 0.d0
    enddo
 !$omp end parallel do 
    else
@@ -213,7 +214,7 @@ if (.not.(allocated(Q_sections%section(1)%flow_rate))) then
                Q_sections%section(i_sect)%flow_rate(Q_sections%n_fluid_types+1)&
                + Q_sections%section(i_sect)%flow_rate(j)       
 ! Zeroing the flow rate per fluid type    
-            Q_sections%section(i_sect)%flow_rate(j) = 0.0d0
+            Q_sections%section(i_sect)%flow_rate(j) = 0.d0
          enddo
 ! Writing the global flow rate on a ".txt" file  
          j = Q_sections%n_fluid_types + 1
@@ -223,8 +224,7 @@ if (.not.(allocated(Q_sections%section(1)%flow_rate))) then
             Q_sections%dt_out,Q_sections%section(i_sect)%normal(:),            &
             Q_sections%section(i_sect)%vertex(1,:) 
 ! Zeroing the flow rate per fluid type    
-         Q_sections%section(i_sect)%flow_rate(Q_sections%n_fluid_types+1) =    &
-            0.0d0    
+         Q_sections%section(i_sect)%flow_rate(Q_sections%n_fluid_types+1) = 0.d0    
       enddo
 endif 
 close(ncpt)
@@ -241,4 +241,4 @@ if (allocated(n_particles)) then
 endif
 return
 end subroutine sub_Q_sections
-
+#endif

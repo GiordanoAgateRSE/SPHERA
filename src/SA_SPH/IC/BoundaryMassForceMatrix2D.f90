@@ -24,6 +24,7 @@
 !              the base of the cosine matrix T and the parameter Fi. (Di Monaco 
 !              et al., 2011, EACFM)                        
 !-------------------------------------------------------------------------------
+#ifdef SPACE_2D
 subroutine BoundaryMassForceMatrix2D(FiS,FiN,TT,RN) 
 !------------------------
 ! Modules
@@ -58,3 +59,4 @@ RN(3,3) = FiS * TT(3,1) * TT(3,1) + FiN * TT(1,1) * TT(1,1)
 !------------------------
 return
 end subroutine BoundaryMassForceMatrix2D
+#endif

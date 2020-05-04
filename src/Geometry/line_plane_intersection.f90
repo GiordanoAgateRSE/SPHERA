@@ -32,10 +32,10 @@ subroutine line_plane_intersection(P1_line,P2_line,P1_plane3,P2_plane3,        &
 ! Declarations
 !------------------------
 implicit none
-double precision,intent(IN) :: P1_line(3),P2_line(3),P1_plane3(3),P2_plane3(3)
-double precision,intent(IN) :: P3_plane3(3) 
-integer(4),intent(INOUT) :: test_point
-double precision,intent(INOUT) :: intersection_pl(3)
+double precision,intent(in) :: P1_line(3),P2_line(3),P1_plane3(3),P2_plane3(3)
+double precision,intent(in) :: P3_plane3(3) 
+integer(4),intent(inout) :: test_point
+double precision,intent(inout) :: intersection_pl(3)
 double precision :: a1,b1,c1,d1,a2,b2,c2,d2,a3,b3,c3,d3
 double precision :: P3_plane1(3),P3_plane2(3)
 !------------------------
@@ -97,4 +97,3 @@ call three_plane_intersection(a1,b1,c1,d1,a2,b2,c2,d2,a3,b3,c3,d3,test_point,  &
 !------------------------
 return
 end subroutine line_plane_intersection
-

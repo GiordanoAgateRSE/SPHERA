@@ -35,7 +35,7 @@ use Dynamic_allocation_module
 !------------------------
 implicit none
 integer(4),intent(in) :: i_0,i_a,npartint
-double precision,intent(INOUT) :: DBSPH_wall_she_vis_term(3)
+double precision,intent(inout) :: DBSPH_wall_she_vis_term(3)
 !------------------------
 ! Explicit interfaces
 !------------------------

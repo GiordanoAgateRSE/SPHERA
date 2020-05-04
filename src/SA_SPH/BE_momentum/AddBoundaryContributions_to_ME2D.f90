@@ -24,6 +24,7 @@
 !              (gradPsuro,ViscoF). Equations refer to particle npi. (Di Monaco 
 !              et al., 2011, EACFM).                        
 !-------------------------------------------------------------------------------
+#ifdef SPACE_2D
 subroutine AddBoundaryContributions_to_ME2D(npi,IntNcbs,tpres,tdiss,tvisc) 
 !------------------------
 ! Modules
@@ -102,7 +103,7 @@ do icbs=1,IntNcbs
    IntWd3s0 = BoundaryDataTab(ibdp)%BoundaryIntegral(7)
    IntWd1s2 = BoundaryDataTab(ibdp)%BoundaryIntegral(8)
    GravN = zero 
-   do i = 1, PLANEDIM
+   do i=1,PLANEDIM
       ss(i) = RifBoundarySide%T(acix(i), acix(1))
       nnlocal(i) = RifBoundarySide%T(acix(i), acix(2))
       gradbPsuro(i) = Domain%grav(acix(i))
@@ -120,7 +121,7 @@ do icbs=1,IntNcbs
    endselect
 ! Boundary contribution to "gradP" 
 ! (pressure gradient term in the momentum equation) 
-   if ((strtype=="fixe").OR.(strtype=="tapi"))  then
+   if ((strtype=="fixe").or.(strtype=="tapi"))  then
       do i=1,PLANEDIM
          Dvel(i) = two * (pg(npi)%var(acix(i)) - sidevel(i))   
       enddo
@@ -191,7 +192,7 @@ do icbs=1,IntNcbs
                endif
                return
                elseif (strtype=="sour") then
-                  if (xpi>=zero.AND.xpi<=RifBoundarySide%length) then
+                  if (xpi>=zero.and.xpi<=RifBoundarySide%length) then
                      if ((Domain%time_stage==1).or.(Domain%time_split==1)) then 
                         pg(npi)%kodvel = 2
                         pg(npi)%velass(1) = Tratto(sidestr)%NormVelocity *     &
@@ -213,14 +214,14 @@ do icbs=1,IntNcbs
                      hcritmin = Tratto(sidestr)%ShearCoeff       
                      if (hcritmin<Domain%h) hcritmin = Domain%h       
                      if (hcrit<hcritmin) hcrit = hcritmin          
-                     zbottom = Vertice(3, RifBoundarySide%vertex(1))    
-                     if (zbottom>Vertice(3, RifBoundarySide%vertex(2)))        &
-                        zbottom = Vertice(3, RifBoundarySide%vertex(2))
+                     zbottom = Vertice(3,RifBoundarySide%vertex(1))    
+                     if (zbottom>Vertice(3,RifBoundarySide%vertex(2)))         &
+                        zbottom = Vertice(3,RifBoundarySide%vertex(2))
                      level = zbottom + hcrit          
                      if (pg(npi)%coord(3)<level) then          
                         pressj = Med(imed)%den0 * Domain%grav(3) *             &
                            (pg(npi)%coord(3) - level)
-                        Qsj = pressj / Med(imed)%den0       
+                        Qsj = pressj / Med(imed)%den0
                         SomQsiQsj = Qsi + Qsj              
                         DiffQsiQsj = Qsi - Qsj             
                         else                                       
@@ -253,8 +254,8 @@ do icbs=1,IntNcbs
       RHS(i) = RHS(i) - nnlocal(i) * QiiIntWdS + RG(i)
    enddo
 ! Volume viscosity force (with changed sign) and artificial viscosity term
-   if (strtype=="fixe".OR.strtype=="tapi") then
-      if (xpi>=zero.AND.xpi<=RifBoundarySide%length) then
+   if (strtype=="fixe".or.strtype=="tapi") then
+      if (xpi>=zero.and.xpi<=RifBoundarySide%length) then
          SVcoeff = Tratto(sidestr)%ShearCoeff
          do i=1,PLANEDIM
             Dvel(i) = two * (pg(npi)%var(acix(i)) - sidevel(i))
@@ -291,3 +292,4 @@ enddo
 !------------------------
 return
 end subroutine AddBoundaryContributions_to_ME2D
+#endif

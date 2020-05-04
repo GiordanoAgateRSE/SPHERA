@@ -26,6 +26,7 @@
 !               ypi=LocXY(2,icbs), on the adjacent boundary side icbs.
 !              (Di Monaco et al., 2011, EACFM)                        
 !-------------------------------------------------------------------------------
+#ifdef SPACE_2D
 subroutine ComputeSurfaceIntegral_WdS2D(icbs,LocXY,xpmin,interlen,SIntWds)
 !------------------------
 ! Modules
@@ -37,11 +38,11 @@ use Hybrid_allocation_module
 !------------------------
 implicit none
 integer(4), parameter :: ndivrif = 2
-integer(4),intent(IN) :: icbs
-double precision,intent(IN) :: xpmin,interlen
-double precision,intent(IN),dimension(1:PLANEDIM,1:MAXCLOSEBOUNDSIDES) :: LocXY
-double precision,intent(INOUT) :: SIntWds
-integer(4) :: ndiv,ipt 
+integer(4),intent(in) :: icbs
+double precision,intent(in) :: xpmin,interlen
+double precision,intent(in),dimension(1:PLANEDIM,1:MAXCLOSEBOUNDSIDES) :: LocXY
+double precision,intent(inout) :: SIntWds
+integer(4) :: ndiv,ipt
 double precision :: xpi,ypi,ypiq,dsrif,deltas,xpip,dxpip,ris,risq,Wds
 double precision,external :: w
 !------------------------
@@ -59,8 +60,8 @@ dsrif = Domain%h / ndivrif
 ! Statements
 !------------------------
 if (interlen>zero) then
-   xpi = LocXY(1, icbs)
-   ypi = LocXY(2, icbs)
+   xpi = LocXY(1,icbs)
+   ypi = LocXY(2,icbs)
    if (ypi<zero) then      
       ypi = zero 
    endif    
@@ -85,3 +86,4 @@ endif
 !------------------------
 return
 end subroutine ComputeSurfaceIntegral_WdS2D
+#endif

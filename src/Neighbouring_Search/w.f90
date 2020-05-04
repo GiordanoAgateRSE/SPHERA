@@ -19,7 +19,7 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: w              
+! Program unit: w
 ! Description: kernel function 
 !-------------------------------------------------------------------------------
 double precision function w(r,h,coef)
@@ -45,13 +45,13 @@ double precision :: r,h,s,q,dms,coef
 ! Statements
 !------------------------
 s = r / h
-if (s<=1.0d0) then
-   q = a1 + s * s * (s * 0.5d0 - 1.0d0)
-   elseif (s>=2.0d0) then
-      q = 0.0d0
+if (s<=1.d0) then
+   q = a1 + s * s * (s * 0.5d0 - 1.d0)
+   elseif (s>=2.d0) then
+      q = 0.d0
       else 
-         dms = 2.0d0 - s
-         q = dms * dms * dms / 6.0d0
+         dms = 2.d0 - s
+         q = dms * dms * dms / 6.d0
 endif
 w = q * coef
 !------------------------
@@ -59,4 +59,3 @@ w = q * coef
 !------------------------
 return
 end function w
-

@@ -28,6 +28,7 @@
 !                                          Col(nc), nc=1, Ncols
 !               (Di Monaco et al., 2011, EACFM)
 !-------------------------------------------------------------------------------
+#ifdef SPACE_2D
 subroutine InterpolateBoundaryIntegrals2D(Ncols,Colmn,xx,Func)
 !------------------------
 ! Modules
@@ -71,3 +72,4 @@ enddo
 !------------------------
 return
 end subroutine InterpolateBoundaryIntegrals2D
+#endif

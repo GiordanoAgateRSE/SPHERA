@@ -28,6 +28,7 @@
 !              points. This procedure applies for triangular faces and simplier 
 !              works for rectangular faces (not for quadrilateral faces).
 !-------------------------------------------------------------------------------
+#ifdef SPACE_3D
 subroutine LocalNormalCoordinates(PX,csi,nf)
 !------------------------
 ! Modules
@@ -41,8 +42,8 @@ use Dynamic_allocation_module
 implicit none
 integer(4),intent(in) :: nf
 double precision,intent(in) :: PX(SPACEDIM)
-double precision,intent(INOUT) :: csi(SPACEDIM)
-integer(4) :: i,j,k,nodes,fkod
+double precision,intent(inout) :: csi(SPACEDIM)
+integer(4) :: ii,jj,kk,nodes,fkod
 double precision :: AA,BB,CC,DueArea,UsuDueArea,xj,yj,xk,yk
 integer(4),dimension(3) :: iseg = (/ 2,3,1 /)
 integer(4) :: mainod(2,3)
@@ -71,17 +72,17 @@ UsuDueArea = one / DueArea
 !------------------------
 ! Statements
 !------------------------
-do i=1,2
-   j = iseg(i)
-   k = iseg(j)
-   xj = BoundaryFace(nf)%Node(mainod(fkod,j))%LX(1)
-   yj = BoundaryFace(nf)%Node(mainod(fkod,j))%LX(2)
-   xk = BoundaryFace(nf)%Node(mainod(fkod,k))%LX(1)
-   yk = BoundaryFace(nf)%Node(mainod(fkod,k))%LX(2)
+do ii=1,2
+   jj = iseg(ii)
+   kk = iseg(jj)
+   xj = BoundaryFace(nf)%Node(mainod(fkod,jj))%LX(1)
+   yj = BoundaryFace(nf)%Node(mainod(fkod,jj))%LX(2)
+   xk = BoundaryFace(nf)%Node(mainod(fkod,kk))%LX(1)
+   yk = BoundaryFace(nf)%Node(mainod(fkod,kk))%LX(2)
    AA = xj * yk - xk * yj
    BB = yj - yk
    CC = xk - xj
-   csi(i) = (AA + BB * PX(1) + CC * PX(2)) * UsuDueArea
+   csi(ii) = (AA + BB * PX(1) + CC * PX(2)) * UsuDueArea
 enddo
 csi(3) = one - (csi(1) + csi(2))
 !------------------------
@@ -89,4 +90,4 @@ csi(3) = one - (csi(1) + csi(2))
 !------------------------
 return
 end subroutine LocalNormalCoordinates
-
+#endif

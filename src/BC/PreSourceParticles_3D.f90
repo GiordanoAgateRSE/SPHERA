@@ -23,6 +23,7 @@
 ! Description: To generate new source particles at the inlet section (only in 3D
 !              and with one quadrilateral inlet section).  
 !-------------------------------------------------------------------------------
+#ifdef SPACE_3D
 subroutine PreSourceParticles_3D 
 !------------------------
 ! Modules
@@ -129,3 +130,4 @@ enddo
 !------------------------
 return
 end subroutine PreSourceParticles_3D
+#endif

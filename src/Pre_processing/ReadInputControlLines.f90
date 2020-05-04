@@ -38,7 +38,7 @@ integer(4),dimension(20) :: NumberEntities
 type (TyCtlPoint),dimension(npointst) :: Control_Points
 type (TyCtlLine),dimension(NLines) :: Control_Lines
 character(1) :: comment
-character(LEN=lencard) :: ainp
+character(len=lencard) :: ainp
 integer(4) :: n,i,ndiv,icord,ioerr,npts
 double precision :: vp
 double precision,dimension(3) :: values1,values2,values3
@@ -59,7 +59,7 @@ character(100), external :: lcase
 ! Statements
 !------------------------
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"CONTROL LINES DATA",ninp,ulog))      &
+if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"CONTROL LINES DATA",ninp,ulog))      &
    return
 npts = npoints
 do while (trim(lcase(ainp))/="##### end control lines #####")
@@ -67,24 +67,24 @@ do while (trim(lcase(ainp))/="##### end control lines #####")
    values2 = zero
    values3 = zero
    NumberEntities(5) = NumberEntities(5) + 1
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"CONTROL LINE LABEL",ninp,ulog))   &
+   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"CONTROL LINE LABEL",ninp,ulog))   &
       return
    label(1:8) = ainp(1:8)
    write(txt,"(i5)") NumberEntities(5)
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
    read(ainp,*,iostat=ioerr) values1(1:ncord)
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                                   &
+   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                                   &
       "CONTROL LINE"//txt//" - FIRST POINT",ninp,ulog)) return
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
    read(ainp,*,iostat=ioerr) values2(1:ncord)
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                                   &
+   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                                   &
       "CONTROL LINE"//txt//" - SECOND POINT",ninp,ulog)) return
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
    read(ainp,*,iostat=ioerr) ndiv
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                                   &
+   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                                   &
       "CONTROL LINE"//txt//" - POINTS NUMBER",ninp,ulog)) return
    NumberEntities(6) = NumberEntities(6) + ndiv
-   if (ncord>0) then
+   if (input_second_read.eqv..true.) then
       control_lines(NumberEntities(5))%label = label
       control_lines(NumberEntities(5))%icont(1) = npts + 1
       control_lines(NumberEntities(5))%icont(2) = npts + ndiv
@@ -121,7 +121,7 @@ do while (trim(lcase(ainp))/="##### end control lines #####")
       write(ulog,"(1x,a)") " "
    endif
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"CONTROL LINES DATA",ninp,ulog))   &
+   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"CONTROL LINES DATA",ninp,ulog))   &
       return
 enddo
 !------------------------
@@ -129,4 +129,3 @@ enddo
 !------------------------
 return
 end subroutine ReadInputControlLines
-

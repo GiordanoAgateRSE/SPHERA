@@ -22,6 +22,7 @@
 ! Program unit: ReadInputLines                          
 ! Description:                        
 !-------------------------------------------------------------------------------
+#ifdef SPACE_2D
 subroutine ReadInputLines(NumberEntities,BoundaryVertex,Tratto,ainp,comment,   &
                           nrighe,ier,ninp,ulog)
 !------------------------
@@ -38,7 +39,7 @@ integer(4),dimension(20) :: NumberEntities
 integer(4),dimension(NumBVertices) :: BoundaryVertex
 type (TyBoundaryStretch),dimension(NumTratti) :: Tratto
 character(1) :: comment
-character(LEN=lencard) :: ainp
+character(len=lencard) :: ainp
 integer(4),parameter :: MAXLINENODES = 820
 integer(4) :: n,i,ioerr,i1,index,numv,numv_line,ipointer
 character(5) :: txt
@@ -58,7 +59,7 @@ character(100),external :: lcase,GetToken
 ! Statements
 !------------------------
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"LINES DATA",ninp,ulog)) return
+if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"LINES DATA",ninp,ulog)) return
 do while (trim(lcase(ainp))/="##### end lines #####")
    select case (trim(Domain%tipo))
       case ("semi","bsph") 
@@ -75,11 +76,11 @@ do while (trim(lcase(ainp))/="##### end lines #####")
             token = GetToken(ainp,numv_line,ioerr)
 ! It exits when either it finds a comment beginning, or the EOR 
 ! (no more data on the input line)
-            if ((ioerr/=0).OR.(trim(token)=="").OR.(ichar(trim(token(1:1)))==9)&
-               .OR.(token(1:1)=="!")) exit VERTEX_LOOP
-            if ((token(1:1)=="&").OR.(token(1:1)==">")) then
+            if ((ioerr/=0).or.(trim(token)=="").or.(ichar(trim(token(1:1)))==9)&
+               .or.(token(1:1)=="!")) exit VERTEX_LOOP
+            if ((token(1:1)=="&").or.(token(1:1)==">")) then
                call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-               if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                       &
+               if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                       &
                   "VERTICES LIST (continue...)",ninp,ulog)) return
                numv_line = 0
                cycle VERTEX_LOOP
@@ -93,18 +94,17 @@ do while (trim(lcase(ainp))/="##### end lines #####")
             read (token,*,iostat=ioerr) i
             write(txt,"(i5)") i
             if (numv==1) i1 = i
-            if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"VERTEX n."//txt,ninp,ulog&
+            if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"VERTEX n."//txt,ninp,ulog&
                )) return
-            if (ncord>0) then
+            if (input_second_read.eqv..true.) then
                if (numv==1) ipointer = NumberEntities(9)
                BoundaryVertex(NumberEntities(9)) = i
             endif
          enddo VERTEX_LOOP
-! To count the number of "BoundarySide"
          NumberEntities(10) = NumberEntities(10) + numv - 1
-         if (ncord>0) then
+         if (input_second_read.eqv..true.) then
             Tratto(index)%numvertices = numv
-            Tratto(index)%inivertex   = ipointer
+            Tratto(index)%inivertex = ipointer
          endif
       case default
          if (ulog>0) then
@@ -114,9 +114,9 @@ do while (trim(lcase(ainp))/="##### end lines #####")
          return
    endselect
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"LINES DATA",ninp,ulog)) return
+   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"LINES DATA",ninp,ulog)) return
 enddo
-if ((ncord>0).AND.(ulog>0)) then
+if ((input_second_read.eqv..true.).and.(ulog>0)) then
    write(ulog,"(1x,a)") "List of lines"
    write(ulog,*)
    do n=1,NumberEntities(8)
@@ -135,4 +135,4 @@ endif
 !------------------------
 return
 end subroutine ReadInputLines
-
+#endif

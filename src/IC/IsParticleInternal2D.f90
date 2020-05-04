@@ -20,8 +20,9 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: IsParticleInternal2D
-! Description: To check whether a particle is internal to the 2D domain. 
+! Description: To check whether a particle is internal to the 2D domain.
 !-------------------------------------------------------------------------------
+#ifdef SPACE_2D
 logical function IsParticleInternal2D(Nt,PX)
 !------------------------
 ! Modules
@@ -35,8 +36,8 @@ use I_O_diagnostic_module
 ! Declarations
 !------------------------
 implicit none
-integer(4),intent(IN) :: Nt
-double precision,intent(IN),dimension(SPACEDIM) :: PX
+integer(4),intent(in) :: Nt
+double precision,intent(in),dimension(SPACEDIM) :: PX
 integer(4) :: inizio,fine,iv,ni,n,n2
 double precision :: xa,za,xba,zba,xi,zs
 character(len=lencard) :: nomsub = "IsParticleInternal2D"
@@ -49,7 +50,7 @@ character(len=lencard) :: nomsub = "IsParticleInternal2D"
 !------------------------
 ! Initializations
 !------------------------
-IsParticleInternal2D = .FALSE.
+IsParticleInternal2D = .false.
 ni = 0
 inizio = Tratto(Nt)%inivertex
 fine = Tratto(Nt)%inivertex + Tratto(Nt)%numvertices - 2
@@ -75,9 +76,9 @@ do iv=inizio,fine
    xba = Vertice(1,n2)
    zba = Vertice(3,n2)
 ! The current segment is not vertical
-   if (abs(xa-xba)>=xyz_tolerance) then
+   if (dabs(xa-xba)>=xyz_tolerance) then
 ! The current segment is not horizontal
-      if (abs(za-zba)>=xyz_tolerance) then
+      if (dabs(za-zba)>=xyz_tolerance) then
 ! It evaluates the x coordinate of the particle projection on the segment 
 ! along X
          xi = xa + (xba - xa) * (px(3) - za) / (zba - za)
@@ -96,18 +97,18 @@ do iv=inizio,fine
       zba=zs
    endif
 ! The Z value of the particle is inside the segment Z values
-   if (((PX(3)-za)>xyz_tolerance).AND.((PX(3)-zba)<xyz_tolerance)) then
+   if (((PX(3)-za)>xyz_tolerance).and.((PX(3)-zba)<xyz_tolerance)) then
       if (xi>PX(1)) then
          ni = ni + 1
       endif
    endif
 enddo
-if (MOD(ni,2)==1) then
-   IsParticleInternal2D = .TRUE.
+if (mod(ni,2)==1) then
+   IsParticleInternal2D = .true.
 endif
 !------------------------
 ! Deallocations
 !------------------------
 return
 end function IsParticleInternal2D
-
+#endif

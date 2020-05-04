@@ -51,6 +51,7 @@ double precision :: xmax,ymax,zmax
 !------------------------
 ! Statements
 !------------------------
+#ifdef SPACE_3D
 if (allocated(Z_fluid_max)) then
    if ((int(simulation_time/Domain%depth_dt_out)>Domain%depth_it_out_last).or. &
       (on_going_time_step==1)) then
@@ -60,6 +61,7 @@ if (allocated(Z_fluid_max)) then
          call Update_Zmax_at_grid_vert_columns(0)
    endif
 endif
+#endif
 if (ulog>0) then
    call Print_Results(it_eff,it_print,'loop__')
 endif
@@ -116,6 +118,7 @@ if (Granular_flows_options%monitoring_lines>0) then
       call interface_post_processing
    endif
 endif
+#ifdef SPACE_3D
 if (Q_sections%n_sect>0) then
    if ((int(simulation_time/Q_sections%dt_out)>Q_sections%it_out_last).or.     &
       (on_going_time_step==1)) then
@@ -130,6 +133,7 @@ if (substations%n_sub>0) then
       call electrical_substations
    endif
 endif
+#endif
 ! Post-processing for the water front
 if (Domain%imemo_fr>0) then
    if (mod(it,Domain%imemo_fr)==0) then
@@ -139,18 +143,18 @@ if (Domain%imemo_fr>0) then
       do npi=1,nag
          if ((pg(npi)%vel_type/="std").or.(pg(npi)%cella==0)) cycle
          xmax = max(xmax,pg(npi)%coord(1))
-         if (ncord==3) then
+#ifdef SPACE_3D
             ymax = max(ymax,pg(npi)%coord(2))
             zmax = max(zmax,pg(npi)%coord(3))
-            else
+#elif defined SPACE_2D
                ymax = max(ymax,pg(npi)%coord(3))
-         endif
+#endif
       enddo
-      if (ncord==3) then
+#ifdef SPACE_3D
          write(nfro,'(4g14.7)') simulation_time,xmax,ymax,zmax
-         else
+#elif defined SPACE_2D
             write(nfro,'(2g14.7,13x,a,g14.7)') simulation_time,xmax,'-',ymax
-      endif
+#endif
    endif
    elseif (Domain%memo_fr>zero) then
       if (it>1.and.mod(simulation_time,Domain%memo_fr)<=dtvel) then
@@ -160,18 +164,18 @@ if (Domain%imemo_fr>0) then
          do npi=1,nag
             if (pg(npi)%vel_type/="std".or.pg(npi)%cella==0) cycle
             xmax = max(xmax,pg(npi)%coord(1))
-            if (ncord==3) then
+#ifdef SPACE_3D
                ymax = max(ymax,pg(npi)%coord(2))
                zmax = max(zmax,pg(npi)%coord(3))
-               else
+#elif defined SPACE_2D
                   ymax = max(ymax,pg(npi)%coord(3))
-            endif
+#endif
          enddo
-         if (ncord==3) then
+#ifdef SPACE_3D
             write(nfro,'(4g14.7)') simulation_time,xmax,ymax,zmax
-            else
+#elif defined SPACE_2D
                write(nfro,'(2g14.7,13x,a,g14.7)') simulation_time,xmax,'-',ymax
-         endif
+#endif
       endif
 endif
 ! Paraview output and .txt file concatenation

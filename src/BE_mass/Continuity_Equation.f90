@@ -36,9 +36,17 @@ use Dynamic_allocation_module
 !------------------------
 implicit none
 integer(4) :: npi,npj,contj,npartint
-double precision :: rhoi,rhoj,amassj,moddervel,det,moddia,modout,appo
+double precision :: rhoi,rhoj,amassj,moddervel,appo
+#ifdef SPACE_3D
+double precision :: moddia,modout
+#elif defined SPACE_2D
+double precision :: det
+#endif
 double precision,dimension(3) :: pesogradj,dvar
-double precision,dimension(9) :: aij,dvdi
+double precision,dimension(9) :: dvdi
+#ifdef SPACE_2D
+double precision,dimension(9) :: aij
+#endif
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -53,16 +61,25 @@ double precision,dimension(9) :: aij,dvdi
 !------------------------
 !$omp parallel do default(none)                                                &
 !$omp shared(nag,pg,nPartIntorno,NMAXPARTJ,PartIntorno,PartKernel,rag)         &
-!$omp shared(Granular_flows_options,pg_w,nPartIntorno_fw,PartIntorno_fw,DBSPH) &
-!$omp shared(kernel_fw,rag_fw,Domain,ncord)                                    &
-!$omp private(npi,dvar,aij,dvdi,contj,npartint,npj,rhoi,rhoj,modout,appo)      &
-!$omp private(amassj,moddervel,pesogradj,det,moddia)
+#ifdef SPACE_2D
+!$omp shared(kernel_fw,pg_w,nPartIntorno_fw,PartIntorno_fw,rag_fw,Domain)      &
+#endif
+!$omp shared(Granular_flows_options)                                           &
+!$omp private(npi,dvar,dvdi,contj,npartint,npj,rhoi,rhoj,appo)                 &
+#ifdef SPACE_3D
+!$omp private(moddia,modout)                                                   &
+#elif defined SPACE_2D
+!$omp private(aij,det)                                                         &
+#endif
+!$omp private(amassj,moddervel,pesogradj)
 ! Loop over all the active particles
 do npi=1,nag
    if ((pg(npi)%vel_type/="std").or.(pg(npi)%cella==0)) cycle
    pg(npi)%dden  = zero
    dvar(:) = zero
+#ifdef SPACE_2D
    aij(:) = zero
+#endif
    dvdi(:) = zero
 ! First loop to find interacting particles and saving 
    do contj=1,nPartIntorno(npi)
@@ -76,9 +93,9 @@ do npi=1,nag
          rhoj = rhoi
          amassj = pg(npi)%mass
 ! Particles with "fix" movement, but not still.
-         dvar(:) = pg(npj)%vel(:) - pg(npi)%var(:)        
-         if ((pg(npj)%vel(1)==zero).AND.(pg(npj)%vel(2)==zero).AND.            &
-            (pg(npj)%vel(3)==zero)) then  
+         dvar(:) = pg(npj)%vel(:) - pg(npi)%var(:)
+         if ((pg(npj)%vel(1)==zero).and.(pg(npj)%vel(2)==zero).and.            &
+            (pg(npj)%vel(3)==zero)) then
             if (pg(npj)%slip=="f") then 
                moddervel = - two * (pg(npi)%var(1) * pg(npj)%zer(1) +          &
                            pg(npi)%var(3) * pg(npj)%zer(3))
@@ -87,8 +104,7 @@ do npi=1,nag
          endif
       endif
 ! Continuity equation
-      pesogradj(1:3) = amassj * rag(1:3,npartint) * PartKernel(1,npartint) /   &
-                       rhoj
+      pesogradj(:) = amassj * rag(:,npartint) * PartKernel(1,npartint) / rhoj
       if (Granular_flows_options%KTGF_config.ne.1) then
          appo = amassj * PartKernel(1,npartint) *                              &
                 (dvar(1)*rag(1,npartint) + dvar(2)*rag(2,npartint) +           &
@@ -102,7 +118,7 @@ do npi=1,nag
 ! Velocity derivatives 
       if (pg(npj)%vel_type/="std") cycle
       if (Granular_flows_options%KTGF_config==1) then
-         if (ncord==3) then
+#ifdef SPACE_3D
 !du/dy
             dvdi(2) = dvdi(2) + pesogradj(2) * dvar(1)
 !dv/dx
@@ -113,7 +129,7 @@ do npi=1,nag
             dvdi(6) = dvdi(6) + pesogradj(3) * dvar(2)
 !dw/dy
             dvdi(8) = dvdi(8) + pesogradj(2) * dvar(3)
-         endif
+#endif
 !du/dx
          dvdi(1) = dvdi(1) + pesogradj(1) * dvar(1)
 !du/dz 
@@ -122,7 +138,7 @@ do npi=1,nag
          dvdi(7) = dvdi(7) + pesogradj(1) * dvar(3)
 !dw/dz
          dvdi(9) = dvdi(9) + pesogradj(3) * dvar(3)
-         if (ncord==2) then
+#ifdef SPACE_2D
             aij(1) = aij(1) + (pg(npj)%coord(1) - pg(npi)%coord(1)) *          &
                      pesogradj(1)
             aij(2) = aij(2) + (pg(npj)%coord(3) - pg(npi)%coord(3)) *          &
@@ -131,34 +147,36 @@ do npi=1,nag
                      pesogradj(3)
             aij(4) = aij(4) + (pg(npj)%coord(3) - pg(npi)%coord(3)) *          &
                      pesogradj(3)
-         endif
+#endif
       endif
    enddo
 ! Boundary contributions (DB-SPH)
-   if ((Domain%tipo=="bsph").and.(ncord==2)) then
-      do contj=1,nPartIntorno_fw(npi)
-         npartint = (npi - 1) * NMAXPARTJ + contj
-         npj = PartIntorno_fw(npartint)
-         dvar(:) = pg_w(npj)%vel(:) - pg(npi)%var(:)
-         appo = - pg_w(npj)%dens * pg_w(npj)%weight * kernel_fw(1,npartint) *  &
-                pg(npi)%Gamma * (dvar(1) * pg_w(npj)%normal(1) + dvar(2) *     &
-                pg_w(npj)%normal(2) + dvar(3) * pg_w(npj)%normal(3))
-         appo = appo - pg_w(npj)%mass * kernel_fw(2,npartint) *                &
-                (dvar(1) * rag_fw(1,npartint) + dvar(2) * rag_fw(2,npartint) + &
-                dvar(3) * rag_fw(3,npartint))
-         pg(npi)%dden = pg(npi)%dden + appo
-      enddo
-   endif
+#ifdef SPACE_2D
+      if (Domain%tipo=="bsph") then
+         do contj=1,nPartIntorno_fw(npi)
+            npartint = (npi - 1) * NMAXPARTJ + contj
+            npj = PartIntorno_fw(npartint)
+            dvar(:) = pg_w(npj)%vel(:) - pg(npi)%var(:)
+            appo = - pg_w(npj)%dens * pg_w(npj)%weight * kernel_fw(1,npartint) &
+                   * pg(npi)%Gamma * (dvar(1) * pg_w(npj)%normal(1) + dvar(2)  &
+                   * pg_w(npj)%normal(2) + dvar(3) * pg_w(npj)%normal(3))
+            appo = appo - pg_w(npj)%mass * kernel_fw(2,npartint) *             &
+                   (dvar(1) * rag_fw(1,npartint) + dvar(2) *                   &
+                   rag_fw(2,npartint) + dvar(3) * rag_fw(3,npartint))
+            pg(npi)%dden = pg(npi)%dden + appo
+         enddo
+      endif
+#endif
    if (Granular_flows_options%KTGF_config==1) then
-      if (ncord==3) then
+#ifdef SPACE_3D
          moddia = (dvdi(1) * dvdi(1) + dvdi(5) * dvdi(5) + dvdi(9) * dvdi(9))
          modout = ((dvdi(2) + dvdi(4)) * (dvdi(2) + dvdi(4)) + (dvdi(3) +      &
                    dvdi(7)) * (dvdi(3) + dvdi(7)) + (dvdi(6)+dvdi(8))*(dvdi(6)+&
                    dvdi(8)))
          pg(npi)%secinv = dsqrt( half * moddia + quarter * modout)
-         else
+#elif defined SPACE_2D
             det = aij(1) * aij(4) - aij(2) * aij(3)
-            if (det<0.001d0) det = 0.001d0
+            if (det<1.d-3) det = 1.d-3
             pg(npi)%dudx = (dvdi(1) * aij(4) - dvdi(3) * aij(2)) / det       
             pg(npi)%dudy = ( - dvdi(1) * aij(3) + dvdi(3) * aij(1)) / det       
             pg(npi)%dvdx = ( dvdi(7) * aij(4) - dvdi(9) * aij(2)) / det       
@@ -167,7 +185,7 @@ do npi=1,nag
                              pg(npi)%dvdy * pg(npi)%dvdy + quarter *           &
                              (pg(npi)%dudy + pg(npi)%dvdx) * (pg(npi)%dudy +   &
                              pg(npi)%dvdx)) 
-      endif
+#endif
    endif
 enddo
 !$omp end parallel do

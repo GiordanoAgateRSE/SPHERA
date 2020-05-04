@@ -34,11 +34,14 @@ use Hybrid_allocation_module
 implicit none
 integer(4) :: nrighe,ier,ninp,ulog,uerr
 character(1) :: comment
-character(LEN=lencard) :: ainp
+character(len=lencard) :: ainp
 integer(4) :: itmax
 double precision :: tmax,CFL,TetaP,TetaV,COEFNMAXPARTJ,COEFNMAXPARTI,vsc_coeff
-integer(4) :: ioerr,time_split,RKscheme,body_part_reorder,MAXCLOSEBOUNDFACES
-integer(4) :: MAXNUMCONVEXEDGES,GCBFVecDim_loc,density_thresholds,nag_aux
+integer(4) :: ioerr,time_split,RKscheme,body_part_reorder
+#ifdef SPACE_3D
+integer(4) :: MAXCLOSEBOUNDFACES,MAXNUMCONVEXEDGES,GCBFVecDim_loc,nag_aux
+#endif
+integer(4) :: density_thresholds
 character(1) :: Psurf
 character(100) :: token
 logical,external :: ReadCheck
@@ -56,11 +59,11 @@ character(100),external :: lcase,GetToken
 ! Statements
 !------------------------
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"RUN PARAMETERS DATA",ninp,ulog))     &
+if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"RUN PARAMETERS DATA",ninp,ulog))     &
    return
 do while (trim(lcase(ainp))/="##### end run parameters #####")
    read (ainp,*,iostat=ioerr) tmax
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"MAX. TRANSIENT TIME & ITERATIONS",&
+   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"MAX. TRANSIENT TIME & ITERATIONS",&
       ninp,ulog)) return
    if (ioerr==0) then
       token = GetToken(ainp,2,ioerr)
@@ -74,11 +77,11 @@ do while (trim(lcase(ainp))/="##### end run parameters #####")
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
    read (ainp,*,iostat=ioerr) CFL,vsc_coeff,time_split,RKscheme,pesodt,        &
       dt_alfa_Mon
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"TIME INTEGRATION",ninp,ulog))     &
+   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"TIME INTEGRATION",ninp,ulog))     &
       return
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
    read(ainp,*,iostat=ioerr) TetaP,TetaV
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"TETAP & TETAV",ninp,ulog)) return
+   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"TETAP & TETAV",ninp,ulog)) return
    token = GetToken(ainp,3,ioerr)
    if (ioerr==0) then
       read (token,*,iostat=ioerr) Psurf
@@ -98,24 +101,26 @@ do while (trim(lcase(ainp))/="##### end run parameters #####")
    endif
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
    read (ainp,*,iostat=ioerr) COEFNMAXPARTI,COEFNMAXPARTJ,body_part_reorder
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"COEFNMAXPARTI and COEFNMAXPARTJ ",&
+   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"COEFNMAXPARTI and COEFNMAXPARTJ ",&
       ninp,ulog)) return
+#ifdef SPACE_3D
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-   read (ainp,*,iostat=ioerr) nag_aux,MAXCLOSEBOUNDFACES,MAXNUMCONVEXEDGES,    &
-      GCBFVecDim_loc
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                                   &
-      "NAG_AUX, MAXCLOSEBOUNDFACES, MAXNUMCONVEXEDGES, GCBFVECDIM_LOC ",ninp,  &
-      ulog)) return
+      read (ainp,*,iostat=ioerr) nag_aux,MAXCLOSEBOUNDFACES,MAXNUMCONVEXEDGES, &
+         GCBFVecDim_loc
+      if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                                &
+         "NAG_AUX, MAXCLOSEBOUNDFACES, MAXNUMCONVEXEDGES, GCBFVECDIM_LOC ",    &
+         ninp,ulog)) return
+#endif
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
    read (ainp,*,iostat=ioerr) density_thresholds
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DENSITY_THRESHOLDS ",ninp,ulog))  &
+   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"DENSITY_THRESHOLDS ",ninp,ulog))  &
       return
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"RUN PARAMETERS DATA",ninp,ulog))  &
+   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"RUN PARAMETERS DATA",ninp,ulog))  &
       return
 enddo
 ! Assigning the values read
-if (ncord>0) then
+if (input_second_read.eqv..true.) then
    Domain%tmax = tmax
    Domain%itmax = itmax
    Domain%CFL = CFL
@@ -141,10 +146,12 @@ if (ncord>0) then
    Domain%COEFNMAXPARTI = COEFNMAXPARTI
    Domain%COEFNMAXPARTJ = COEFNMAXPARTJ
    Domain%body_part_reorder = body_part_reorder
-   Domain%MAXCLOSEBOUNDFACES = MAXCLOSEBOUNDFACES
-   Domain%MAXNUMCONVEXEDGES = MAXNUMCONVEXEDGES
-   Domain%nag_aux = nag_aux
-   if (.not.restart) GCBFVecDim = GCBFVecDim_loc
+#ifdef SPACE_3D
+      Domain%MAXCLOSEBOUNDFACES = MAXCLOSEBOUNDFACES
+      Domain%MAXNUMCONVEXEDGES = MAXNUMCONVEXEDGES
+      if (.not.restart) GCBFVecDim = GCBFVecDim_loc
+      Domain%nag_aux = nag_aux
+#endif
    Domain%density_thresholds = density_thresholds
    if (ulog>0) then
       write(ulog,"(1x,a,1p,e12.4)") "TMAX                       : ",           &
@@ -178,6 +185,7 @@ if (ncord>0) then
          Domain%COEFNMAXPARTJ
       write(ulog,"(1x,a,1p,i1)")    "body_part_reorder          : ",           &
          Domain%body_part_reorder
+#ifdef SPACE_3D
       write(ulog,"(1x,a,1p,i12)")   "NAG_AUX                    : ",           &
          Domain%nag_aux
       write(ulog,"(1x,a,1p,i12)")   "MAXCLOSEBOUNDFACES         : ",           &
@@ -188,6 +196,7 @@ if (ncord>0) then
       write(ulog,"(1x,a,1p,i12)")   "GCBFVecDim (input file)    : ",           &
          GCBFVecDim
       endif
+#endif
       write(ulog,"(1x,a,1p,i1)")    "density_thresholds         : ",           &
          Domain%density_thresholds       
       write(ulog,"(1x,a)") " "
@@ -198,4 +207,3 @@ endif
 !------------------------
 return
 end subroutine ReadInputRunParameters
-

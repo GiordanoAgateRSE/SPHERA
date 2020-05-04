@@ -37,7 +37,7 @@ integer(4) :: nrighe,ier,ninp,ulog
 integer(4),dimension(20) :: NumberEntities
 type (TyCtlPoint),dimension(npointst) :: Control_Points
 character(1) :: comment
-character(LEN=lencard) :: ainp
+character(len=lencard) :: ainp
 integer(4) :: n,i,icord,ioerr
 double precision,dimension(3) :: values1
 logical,external :: ReadCheck
@@ -55,14 +55,14 @@ character(100),external :: lcase
 ! Statements
 !------------------------
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"CONTROL POINTS DATA",ninp,ulog))     &
+if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"CONTROL POINTS DATA",ninp,ulog))     &
    return
 do while (trim(lcase(ainp))/="##### end control points #####" )
    NumberEntities(4) = NumberEntities(4) + 1
    read(ainp,*,iostat=ioerr) values1(1:ncord)
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"CONTROL POINT COORDINATES",ninp,  &
+   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"CONTROL POINT COORDINATES",ninp,  &
       ulog)) return
-   if (ncord>0) then
+   if (input_second_read.eqv..true.) then
       Control_Points(NumberEntities(4))%coord(1:3) = zero
       Control_Points(NumberEntities(4))%dist = zero
       do n=1,ncord
@@ -77,7 +77,7 @@ do while (trim(lcase(ainp))/="##### end control points #####" )
        endif
     endif
     call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-    if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"CONTROL POINTS DATA",ninp,ulog)) &
+    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"CONTROL POINTS DATA",ninp,ulog)) &
        return
 enddo
 !------------------------
@@ -85,4 +85,3 @@ enddo
 !------------------------
 return
 end subroutine ReadInputControlPoints
-

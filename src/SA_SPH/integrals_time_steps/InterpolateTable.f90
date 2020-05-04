@@ -30,6 +30,7 @@
 !                 ivalue(): list of the "nicols" interpolated values 
 !               (Di Monaco et al., 2011, EACFM)                        
 !-------------------------------------------------------------------------------
+#ifdef SPACE_3D
 subroutine InterpolateTable(xval,nicols,icol,ivalue)
 !------------------------
 ! Modules
@@ -84,3 +85,4 @@ endif
 !------------------------
 return
 end subroutine InterpolateTable
+#endif

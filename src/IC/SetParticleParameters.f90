@@ -51,14 +51,12 @@ integer(4), external :: ParticleCellNumber
 ! Statements
 !------------------------
 if (Domain%RKscheme>1) ts0_pg(npi) = ts_pgZero
-pg(npi)%izona = Nz     
-if (ncord == 2) then
-   pg(npi)%mass = Domain%PVolume * Med(Mate)%den0 
+pg(npi)%izona = Nz
+pg(npi)%mass = Domain%PVolume * Med(Mate)%den0
+#ifdef SPACE_2D
    pg(npi)%coord(2) = zero              
-   pg(npi)%CoordOld(2) = zero              
-   else 
-      pg(npi)%mass = Domain%PVolume * Med(Mate)%den0
-endif
+   pg(npi)%CoordOld(2) = zero
+#endif
 ! Current velocity and initial velocity
 pg(npi)%vel = partz(Nz)%vel
 pg(npi)%vstart = partz(Nz)%vel
@@ -97,8 +95,8 @@ if (Granular_flows_options%KTGF_config>0) then
       pg(npi)%kin_visc = Med(Granular_flows_options%ID_main_fluid)%kin_visc
    endif
    call initialization_fixed_granular_particle(npi)
-   pg(npi)%sigma_prime_m = 0.0d0
-   pg(npi)%pres_fluid = 0.0d0
+   pg(npi)%sigma_prime_m = 0.d0
+   pg(npi)%pres_fluid = 0.d0
 endif
 ! Particle status, depending on the velocity components (fluid or solid).
 if (index(Med(Mate)%tipo,"liquid")>0) then

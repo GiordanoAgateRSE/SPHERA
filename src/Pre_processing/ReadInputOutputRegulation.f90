@@ -36,7 +36,7 @@ implicit none
 type (TyMedium), dimension(NMedium) :: Med
 integer(4) :: nrighe,ier, ninp,ulog
 character(1) :: comment
-character(LEN=lencard) :: ainp
+character(len=lencard) :: ainp
 integer(4) :: iplot_fr,imemo_fr,irest_fr,icpoi_fr,ipllb_fr,ipllb_md,n,ioutopt
 integer(4) :: ioutpo2,ioerr
 double precision :: plot_fr,memo_fr,rest_fr,cpoi_fr,pllb_fr,depth_dt_out
@@ -66,124 +66,124 @@ ipllb_md = 0
 pllb_fr = zero
 ioutopt = 0
 ioutpo2 = 3
-depth_dt_out = 0.0d0
+depth_dt_out = 0.d0
 !------------------------
 ! Statements
 !------------------------
 call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"OUTPUT REGULATION DATA",ninp,ulog))  &
+if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"OUTPUT REGULATION DATA",ninp,ulog))  &
    return
 do while (trim(lcase(ainp))/="##### end output regulation #####")
    select case (trim(lcase(GetToken(ainp,1,ioerr))))
       case ("display")
          token = lcase(GetToken(ainp,2,ioerr))
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                             &
+         if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                             &
             "DISPLAY FREQUENCY STEP/TIME",ninp,ulog)) return
          if (token(1:4)=="step") then 
             token = lcase(GetToken(ainp,3,ioerr))
-            if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                          &
+            if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                          &
                "DISPLAY FREQUENCY STEP value",ninp,ulog)) return
             read(token,*,iostat=ioerr) iplot_fr
-            if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                          &
+            if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                          &
                "DISPLAY FREQUENCY STEP value",ninp,ulog)) return
             elseif (token(1:4)=="time") then 
                token = lcase(GetToken(ainp,3,ioerr))
-               if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                       &
+               if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                       &
                   "DISPLAY FREQUENCY TIME value",ninp,ulog)) return
                read(token,*,iostat=ioerr)  plot_fr
-               if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                       &
+               if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                       &
                   "DISPLAY FREQUENCY TIME value",ninp,ulog)) return
          endif
       case ("results")
          token = lcase(GetToken(ainp,2,ioerr))
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                             &
+         if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                             &
             "RESULTS SAVING FREQUENCY STEP/TIME",ninp,ulog)) return
          if (token(1:4)=="step") then 
             token = lcase(GetToken(ainp,3,ioerr))
-            if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                          &
+            if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                          &
                "RESULTS SAVING FREQUENCY STEP value",ninp,ulog)) return
             read(token,*,iostat=ioerr) imemo_fr
-            if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                          &
+            if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                          &
                "RESULTS SAVING FREQUENCY STEP value",ninp,ulog)) return
             elseif (token(1:4)=="time") then 
                token = lcase(GetToken(ainp,3,ioerr))
-               if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                       &
+               if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                       &
                   "RESULTS SAVING FREQUENCY TIME value",ninp,ulog)) return
                read(token,*,iostat=ioerr)  memo_fr
-               if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                       &
+               if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                       &
                   "RESULTS SAVING FREQUENCY TIME value",ninp,ulog)) return
          endif
       case ("restart")
          token = lcase(GetToken(ainp,2,ioerr))
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                             &
+         if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                             &
             "RESTART SAVING FREQUENCY STEP/TIME",ninp,ulog)) return
          if(token(1:4)=="step") then 
             token = lcase(GetToken(ainp,3,ioerr))
-            if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                          &
+            if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                          &
                "RESTART SAVING FREQUENCY STEP value",ninp,ulog)) return
             read(token,*,iostat=ioerr) irest_fr
-            if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                          &
+            if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                          &
                "RESTART SAVING FREQUENCY STEP value",ninp,ulog)) return
             elseif (token(1:4)=="time") then 
                token = lcase(GetToken(ainp,3,ioerr))
-               if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                       &
+               if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                       &
                   "RESTART SAVING FREQUENCY TIME value",ninp,ulog)) return
                read(token,*,iostat=ioerr)  rest_fr
-               if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                       &
+               if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                       &
                   "RESTART SAVING FREQUENCY TIME value",ninp,ulog)) return
          endif
       case ("control")
          token = lcase(GetToken(ainp,2,ioerr))
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                             &
+         if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                             &
             "CONTROL POINTS SAVING FREQUENCY STEP/TIME",ninp,ulog)) return
          if(token(1:4)=="step") then 
             token = lcase(GetToken(ainp,3,ioerr))
-            if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                          &
+            if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                          &
                "CONTROL POINTS SAVING FREQUENCY STEP value",ninp,ulog))        &
                return
             read(token,*,iostat=ioerr) icpoi_fr
-            if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                          &
+            if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                          &
                "CONTROL POINTS SAVING FREQUENCY STEP value",ninp,ulog))        &
                return
             elseif (token(1:4)=="time") then 
                token = lcase(GetToken(ainp,3,ioerr))
-               if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                       &
+               if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                       &
                   "CONTROL POINTS SAVING FREQUENCY TIME value",ninp,ulog))     &
                   return
                read(token,*,iostat=ioerr)  cpoi_fr
-               if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                       &
+               if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                       &
                   "CONTROL POINTS SAVING FREQUENCY TIME value",ninp,ulog))     &
                   return
          endif
       case ("level")
          do n=1,2
             token = lcase(GetToken(ainp,2*n,ioerr))
-            if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"LEVEL OPTION",ninp,      &
+            if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"LEVEL OPTION",ninp,      &
                ulog)) return
             if (token(1:4)=="step") then 
                token = lcase(GetToken(ainp,2*n+1,ioerr))
-               if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                       &
+               if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                       &
                   "LEVEL STEP FREQUENCY SAVING",ninp,ulog)) return
                read(token,*,iostat=ioerr) ipllb_fr
-               if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                       &
+               if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                       &
                   "LEVEL STEP FREQUENCY SAVING",ninp,ulog)) return
                elseif (token(1:4)=="time") then 
                   token = lcase(GetToken(ainp,2*n+1,ioerr))
-                  if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                    &
+                  if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                    &
                      "LEVEL TIME FREQUENCY SAVING",ninp,ulog)) return
                   read(token,*,iostat=ioerr)  pllb_fr
-                  if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                    &
+                  if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                    &
                      "LEVEL TIME FREQUENCY SAVING",ninp,ulog)) return
                   elseif (token(1:6)=="medium") then 
                      token = lcase(GetToken(ainp,2*n+1,ioerr))
-                     if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                 &
+                     if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                 &
                         "LEVEL MEDIUM INDEX",ninp,ulog)) return
                      read(token,*,iostat=ioerr) ipllb_md
-                     if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                 &
+                     if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                 &
                         "LEVEL MEDIUM INDEX",ninp,ulog)) return
                      if (ipllb_md==0) then
                         ioerr = 5
-                        if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,              &
+                        if (.not.ReadCheck(ioerr,ier,nrighe,ainp,              &
                            "LEVEL MEDIUM INDEX",ninp,ulog)) return
                      endif
                      else 
@@ -193,35 +193,35 @@ do while (trim(lcase(ainp))/="##### end output regulation #####")
          enddo
       case ("depth")
          token = lcase(GetToken(ainp,2,ioerr))
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DEPTH OPTION",ninp,ulog))   &
+         if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"DEPTH OPTION",ninp,ulog))   &
             return
          if (token(1:4)=="dt_o") then 
             token = lcase(GetToken(ainp,2+1,ioerr))
-            if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DEPTH DT_OUT SAVING",    &
+            if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"DEPTH DT_OUT SAVING",    &
                ninp,ulog)) return
             read(token,*,iostat=ioerr) depth_dt_out
-            if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"DEPTH DT_OUT SAVING",    &
+            if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"DEPTH DT_OUT SAVING",    &
                ninp,ulog)) return
          endif
       case ("print")
          token = lcase(GetToken(ainp,2,ioerr))
-         if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                             &
+         if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                             &
             "PRINT MODE AND FREQUENCY FULL/MINIMUM/NULL",ninp,ulog)) return
          if(token(1:4)=="full") then 
             token = lcase(GetToken(ainp,3,ioerr))
-            if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                          &
+            if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                          &
                "PRINT MINIMUM FREQUENCY step",ninp,ulog)) return
             read(token,*,iostat=ioerr)  ioutopt
-            if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                          &
+            if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                          &
                "PRINT MINIMUM FREQUENCY step",ninp,ulog)) return
             ioutopt =-1*abs(ioutopt)
             ioutpo2 = 1
             elseif (token(1:7)=="partial") then 
                token = lcase(GetToken(ainp,3,ioerr))
-               if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                       &
+               if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                       &
                   "PRINT MINIMUM FREQUENCY step",ninp,ulog)) return
                read(token,*,iostat=ioerr)  ioutopt
-               if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,                       &
+               if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                       &
                   "PRINT MINIMUM FREQUENCY step",ninp,ulog)) return
                ioutpo2 = 2
                elseif (token(1:4)=="null") then 
@@ -233,10 +233,10 @@ do while (trim(lcase(ainp))/="##### end output regulation #####")
         return
    endselect
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-   if (.NOT.ReadCheck(ioerr,ier,nrighe,ainp,"OUTPUT REGULATION DATA",ninp,     &
+   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"OUTPUT REGULATION DATA",ninp,     &
       ulog)) return
 enddo
-if (ncord>0) then
+if (input_second_read.eqv..true.) then
    Domain%iplot_fr = iplot_fr
    Domain%plot_fr = plot_fr
    Domain%imemo_fr = imemo_fr
@@ -291,4 +291,3 @@ endif
 !------------------------
 return
 end subroutine ReadInputOutputRegulation
-

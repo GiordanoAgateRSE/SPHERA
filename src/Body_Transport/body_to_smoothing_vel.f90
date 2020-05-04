@@ -34,7 +34,7 @@ use Dynamic_allocation_module
 ! Declarations
 !------------------------
 implicit none
-double precision,dimension(nag,3),intent(INOUT) :: dervel_mat
+double precision,dimension(nag,3),intent(inout) :: dervel_mat
 integer(4) :: npi,j,npartint,npj
 double precision :: W_vol,dis
 double precision, external :: w

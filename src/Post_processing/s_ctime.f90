@@ -20,7 +20,7 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: s_ctime                
-! Description:         
+! Description: 
 !-------------------------------------------------------------------------------
 subroutine s_ctime
 !------------------------
@@ -32,11 +32,11 @@ use I_O_file_module
 !------------------------
 implicit none
 integer(4),dimension(8) :: dat_array
-character(LEN=8) :: dat
-character(LEN=10) :: ct
-character(LEN=5) :: zone
-character(LEN=160) :: date_exec
-character(LEN=3),dimension(12) :: mesi
+character(len=8) :: dat
+character(len=10) :: ct
+character(len=5) :: zone
+character(len=160) :: date_exec
+character(len=3),dimension(12) :: mesi
 data mesi/"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov",   &
    "Dec"/
 !------------------------
@@ -51,8 +51,8 @@ data mesi/"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov",   &
 !------------------------
 ! Statements
 !------------------------
-call DATE_AND_TIME(dat,ct,zone,dat_array)
-date_exec = mesi(dat_array(2))//" "//dat(7:8)//", "//dat(1:4)//          &
+call date_and_time(dat,ct,zone,dat_array)
+date_exec = mesi(dat_array(2))//" "//dat(7:8)//", "//dat(1:4)//                &
             " at "//ct(1:2)//":"//ct(3:4)//":"//ct(5:10)//" "//zone//" GMT"
 write(ulog,'(a)') trim(date_exec)
 !------------------------

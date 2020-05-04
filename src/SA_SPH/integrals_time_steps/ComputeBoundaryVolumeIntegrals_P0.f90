@@ -20,8 +20,9 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: ComputeBoundaryVolumeIntegrals_P0                                   
-! Description: (Di Monaco et al., 2011, EACFM)                   
+! Description: (only in 3D) (Di Monaco et al., 2011, EACFM)                   
 !-------------------------------------------------------------------------------
+#ifdef SPACE_3D
 subroutine ComputeBoundaryVolumeIntegrals_P0(icbf,Clobface,LocX,IntWdV,        &
    IntdWrm1dV,IntGWZrm1dV,IntGWdV,IntGWrRdV)
 !------------------------
@@ -96,7 +97,7 @@ do ipk=1,BITrows
       PXLoc(3) = zero
       call LocalNormalCoordinates (PXLoc, csi, iface)
       fkod = BoundaryFace(iface)%nodes - 2
-      if (IsPointInternal(fkod, csi)) then    
+      if (IsPointInternal(fkod,csi)) then    
 ! "PX" belongs to the face. Thus, Pj contributes to the boundary integral
 ! Distance between "Pi" and "Px" 
          PiPxdist = zero
@@ -108,7 +109,7 @@ do ipk=1,BITrows
 ! Normalised distance and related functions 
          delta_alpha = BoundIntegralTab(ipk,4)
          rob = PiPxdist / Domain%h
-         if (dabs(rob-robpre)>0.001d0) then
+         if (dabs(rob-robpre)>1.d-3) then
             ivalue(:) = zero
             call InterpolateTable(rob,nicols,icol,ivalue)
             JW3ro2dA  = ivalue(1) * delta_alpha
@@ -146,7 +147,7 @@ if (LocPi(3)==zpmin) then
    if (IsPointInternal(fkod,csi)) then    
 ! The particle projection belongs to the face
       IntWdV = half
-      else                                    
+      else                             
 ! The particle projection is external to the face
          IntWdV = zero
    endif
@@ -156,3 +157,4 @@ endif
 !------------------------
 return
 end subroutine ComputeBoundaryVolumeIntegrals_P0
+#endif

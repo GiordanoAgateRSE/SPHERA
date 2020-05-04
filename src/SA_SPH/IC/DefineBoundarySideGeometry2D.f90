@@ -22,6 +22,7 @@
 ! Program unit: DefineBoundarySideGeometry2D                                     
 ! Description: Definition of the boundary sides. (Di Monaco et al., 2011, EACFM)                        
 !-------------------------------------------------------------------------------
+#ifdef SPACE_2D
 subroutine DefineBoundarySideGeometry2D
 !------------------------
 ! Modules
@@ -124,3 +125,4 @@ call DefineBoundarySideRelativeAngles2D
 !------------------------
 return
 end subroutine DefineBoundarySideGeometry2D
+#endif

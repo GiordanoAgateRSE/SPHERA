@@ -52,47 +52,49 @@ integer(4),external :: ParticleCellNumber
 ! Initializations
 !------------------------
 Time = simulation_time
-if (ncord==3) then
+#ifdef SPACE_3D
    inlet_zone = izone
-   else
+#elif defined SPACE_2D
       inlet_zone = irz
-endif
+#endif
 !------------------------
 ! Statements
 !------------------------
-if (ncord==3) then
+#ifdef SPACE_3D
    if (SourceFace==0) return
-   else
+#elif defined SPACE_2D
       if (SourceSide==0) return
-endif
-inttimeratio = Int(Time / RowPeriod)
+#endif
+inttimeratio = int(Time / RowPeriod)
 if (inttimeratio>pinttimeratio) then
    itime_jet = itime_jet + 1
    SourceTime = inttimeratio * RowPeriod
    TimeFrac = Time - SourceTime
    i_source=0
-   if (ncord==3) then
+#ifdef SPACE_3D
       boundary_number = NumFacce
-      else
+#elif defined SPACE_2D
          boundary_number = NumBSides
-   endif
+#endif
    do isi=1,boundary_number
-      SourceFace = isi
-      if (ncord==3) then
+#ifdef SPACE_3D
+         SourceFace = isi
          nt = BoundaryFace(SourceFace)%stretch
          boundary_type = tratto(nt)%tipo
-         else
+#elif defined SPACE_2D
             boundary_type = BoundarySide(isi)%tipo
-      endif
+#endif
       if (boundary_type=="sour") then
-         if (ncord==2) SourceSide = isi
+#ifdef SPACE_2D
+         SourceSide = isi
+#endif
          i_source = i_source + 1
          DisplFrac = RowVelocity(i_source) * TimeFrac
-         if (ncord==3) then
+#ifdef SPACE_3D
             NumPartperBound = NumPartFace(i_source)
-            else
+#elif defined SPACE_2D
                NumPartperBound = NumPartperLine(i_source)
-         endif         
+#endif
          do ip=1,NumPartperBound
 ! To generate a new particle row 
             nag = nag + 1
@@ -105,17 +107,19 @@ if (inttimeratio>pinttimeratio) then
 ! Initialization of the quantities of the new particle
             pg(nag) = PgZero
             if (Domain%RKscheme>1) ts0_pg(nag) = ts_pgZero
-            if (ncord==2) nt = BoundarySide(SourceSide)%stretch
+#ifdef SPACE_2D
+            nt = BoundarySide(SourceSide)%stretch
+#endif
             do sd=1,SPACEDIM
-               if (ncord==3) then
+#ifdef SPACE_3D
                   nn(sd) = BoundaryFace(SourceFace)%T(sd,3)
                   pg(nag)%coord(sd) = PartLine(i_source,ip,sd) + (zfila +      &
                                       DisplFrac) * nn(sd)
-                  else
+#elif defined SPACE_2D
                      nn(sd) = BoundarySide(SourceSide)%T(sd,3)
                      pg(nag)%coord(sd) = PartLine(i_source,ip,sd) - (yfila +   &
                                          DisplFrac) * nn(sd)
-               endif
+#endif
                pg(nag)%vel(sd) = Tratto(nt)%NormVelocity * nn(sd)
                pg(nag)%var(sd) = pg(nag)%vel(sd)
             enddo

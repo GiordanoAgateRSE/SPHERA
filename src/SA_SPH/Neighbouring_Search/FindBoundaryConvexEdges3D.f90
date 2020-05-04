@@ -25,6 +25,7 @@
 !              TyBoundaryConvexEdge.
 !              (Di Monaco et al., 2011, EACFM)                        
 !-------------------------------------------------------------------------------
+#ifdef SPACE_3D
 subroutine FindBoundaryConvexEdges3D
 !------------------------
 ! Modules
@@ -148,4 +149,4 @@ enddo
 !------------------------
 return
 end subroutine FindBoundaryConvexEdges3D
-
+#endif

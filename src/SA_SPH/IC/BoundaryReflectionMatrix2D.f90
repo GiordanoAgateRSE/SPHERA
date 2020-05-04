@@ -24,6 +24,7 @@
 !              cosine matrix T and the parameters PsiS and PsiN.
 !              (Di Monaco et al., 2011, EACFM)                      
 !-------------------------------------------------------------------------------
+#ifdef SPACE_2D
 subroutine BoundaryReflectionMatrix2D(T,R,PsiS,PsiN)
 !------------------------
 ! Modules
@@ -57,3 +58,4 @@ R(3,3) = PsiS * T(3,1) * T(3,1) + PsiN * T(1,1) * T(1,1)
 !------------------------
 return
 end subroutine BoundaryReflectionMatrix2D
+#endif

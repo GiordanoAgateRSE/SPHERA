@@ -32,7 +32,7 @@ use Hybrid_allocation_module
 ! Declarations
 !------------------------
 implicit none
-integer(4),intent(IN) :: i,j,k
+integer(4),intent(in) :: i,j,k
 integer(4) :: ni,nj,nk
 !------------------------
 ! Explicit interfaces
@@ -50,14 +50,13 @@ nk = Grid%ncd(3)
 ! Statements
 !------------------------
 if ((i<1).or.(i>ni).or.(j<1).or.(j>nj).or.(k<1).or.(k>nk)) then
-! .. the cell is outside the grid limits
+! The cell is outside the grid limits
    CellNumber = 0  
    else
-! .. return the cell number
+! Return the cell number
       CellNumber = ((k - 1) * nj + (j - 1)) * ni + i
 end if
 !------------------------
 ! Deallocations
 !------------------------
 end function CellNumber
-
