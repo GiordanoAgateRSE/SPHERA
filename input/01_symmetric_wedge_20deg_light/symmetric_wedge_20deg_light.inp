@@ -66,9 +66,6 @@ symmetric_wedge_20deg_light
 ##### DOMAIN #####
 !-------------------------------------------------------------------------------
 ![?] Input parameters for spatial resolution and boundary treatment scheme
-![?] <D>: spatial dimensionality
-!    =2 (2D)
-!    =3 (3D)
 ![?] <BC_string>: boundary treatment scheme
 !    =semi (SA-SPH)
 !    =bsph (DB-SPH)
@@ -78,11 +75,11 @@ symmetric_wedge_20deg_light
 ![?] <random_distribution>: optional letter
 !    =r (white noise to the IC -Initial Conditions- particle positions)
 !-------------------------------------------------------------------------------
-![*] <D> <BC_string>
+![*] <BC_string>
 ![*] <dx> <h/dx> <random_distribution>
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
-2 semi
+semi
 0.0013 1.3
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
@@ -114,12 +111,11 @@ symmetric_wedge_20deg_light
 ! boundary
 1 -1.2 -1.2
 2  1.2 -1.2
-5 -1.2  0.8
-6  1.2  0.8
+3 -1.2  0.8
+4  1.2  0.8
 ! reservoir
-9 -1.2 0.0
-11 1.2 -1.2
-12 1.2 0.0
+5 -1.2 0.0
+6 1.2 0.0
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
 ##### END VERTICES #####
@@ -147,9 +143,9 @@ symmetric_wedge_20deg_light
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
 ! boundary
-1 5 1 2 6 		
+1 3 1 2 4 		
 ! reservoir
-2 9 1 11 12 9
+2 5 1 2 6 5
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
 ##### END LINES #####
@@ -160,7 +156,7 @@ symmetric_wedge_20deg_light
 !-------------------------------------------------------------------------------
 ![?] if (3D) then
 !-------------------------------------------------------------------------------
-##### FACES #####
+!##### FACES #####
 !-------------------------------------------------------------------------------
 ![?] 3D input parameters for the boundary faces of the fluid domain
 ![?] 3D boundary faces for wall frontiers, inlet/outlet sections, fluid 
@@ -202,7 +198,7 @@ symmetric_wedge_20deg_light
 !___ ___ ... ___ ___
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
-##### END FACES #####
+!##### END FACES #####
 !-------------------------------------------------------------------------------
 ![?] endif (3D)
 !-------------------------------------------------------------------------------
@@ -342,7 +338,7 @@ fixed
 !___ ___ ___
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
-![?] if (IC_reservoir_type==2) then
+![?] if ((IC_reservoir_type==2).and.(3D)) then
 ![?] <dx_CartTopog>: spatial resolution of the Cartesian topography; 
 !    dx_CartTopog>=dx
 ![?] <H_res>: height of the reservoir free surface
@@ -405,7 +401,7 @@ fixed
 !___ ___
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
-![?] endif (IC_reservoir_type==2)
+![?] endif (IC_reservoir_type==2) (3D)
 ![?] endif (Boundary_type=="perimeter")
 ![?] if (Boundary_type=="open") then
 ![?] In case particles exit the numerical domain without passing through an 
@@ -567,7 +563,7 @@ qp 0.
 1 0 .false.
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
-![?] if (IC_reservoir_type==2) then
+![?] if ((IC_reservoir_type==2).and.(3D)) then
 ![?] <dx_CartTopog>: spatial resolution of the Cartesian topography; 
 !    dx_CartTopog>=dx
 ![?] <H_res>: height of the reservoir free surface
@@ -630,7 +626,7 @@ qp 0.
 !___ ___
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
-![?] endif (IC_reservoir_type==2)
+![?] endif (IC_reservoir_type==2) (3D)
 ![?] endif (Boundary_type=="perimeter")
 ![?] if (Boundary_type=="open") then
 ![?] In case particles exit the numerical domain without passing through an 
@@ -856,33 +852,58 @@ qp 0.
 1 0. 0.
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
-![?] if (erosion_criterion_ID>0) then
+!-------------------------------------------------------------------------------
+![?] if (KTGF_config>0) then
 ![?] <velocity_fixed_bed>: velocity threshold (e.g. equal to velocity scale 
 !    divided by 100) to detect the fixed bed
 ![?] <erosion_flag>
 !    =0 (erosion scheme activated far from fronts)
 !    =1 (erosion scheme inactive)
 !    =2 (erosion scheme active everywhere)
+!-------------------------------------------------------------------------------
+![*] <velocity_fixed_bed> <erosion_flag>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___ ___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] if (3D) then
 ![?] <deposition_at_frontiers>
 !    =1 (imposed)
 !    =0 (not imposed)
 ![?] <Gamma_slope_flag>
 !    =1 (Gamma slope angle computed)
 !    =0 (null Gamma slope angle)
+!-------------------------------------------------------------------------------
+![*] <deposition_at_frontiers> <Gamma_slope_flag>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___ ___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] endif (3D)
+![?] if (2D) then
+![?] <deposition_at_frontiers>
+!    =1 (imposed)
+!    =0 (not imposed)
+!-------------------------------------------------------------------------------
+![*] <deposition_at_frontiers>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] endif (2D)
 ![?] <n_monitor_lines>: number of monitoring lines aligned with x- or y-axis)
 ![?] <dt_out>: writing time step
 ![?] <erosion_convergence_criterion>: convergence criterion for the erosion 
 !    scheme
 ![?] <n_max_iterations>: maximum number of iterations for the erosion criterion)
 !-------------------------------------------------------------------------------
-![*] <velocity_fixed_bed> <erosion_flag>
-![*] <deposition_at_frontiers> <Gamma_slope_flag>
 ![*] <n_monitor_lines> <dt_out> <erosion_convergence_criterion> 
 !    <n_max_iterations>
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
-!___ ___
-!___ ___
 !___ ___ ___ ___
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
@@ -1268,7 +1289,7 @@ liquid
 ![?] <factor>: weighting factor to estimate dt (draft variable)
 !    =0. (recommended value)
 ![?] <dt_alfa_Mon>: logical flag possibly making Monaghan artificial viscosity 
-!    coefficient to influence dt)
+!    coefficient to influence dt
 ![?] <teta_p>, <teta_u>: coefficients for partial smoothing of pressure and 
 !    velocity)
 ![?] <var>
@@ -1287,6 +1308,20 @@ liquid
 ![?] <body_part_reorder>: for DB-SPH
 !    =0 (fixed frontiers)
 !    =1 (mobile frontiers)
+!-------------------------------------------------------------------------------
+![*] <final_time> <final_time_step>
+![*] <CFL> <vsc_coeff> <Leapfrog_flag> <scheme_order> <factor> <dt_alfa_Mon>
+![*] <teta_p> <teta_u> <var> 
+![*] <COEFNMAXPARTI> <COEFNMAXPARTJ> <body_part_reorder>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+0.1 10000000
+0.1 0.05 1 1 0. .false.
+0.3 0.3 A
+1.1 2. 0
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] if (3D) then
 ![?] <nag_aux>: rough overestimation of the number of fluid particles in the 
 !    domain, it is only related to the very first allocation of the particle 
 !    array, it is influential only in case of reservoir extruded from 
@@ -1301,26 +1336,25 @@ liquid
 !    elements, thus, it is sufficient to overestimate this number as the number 
 !    of faces times the number of the positioning grid cells, further, reducing 
 !    "GCBFVecDim" does not imply any appreciable variation in the computational
-!    time).
+!    time). The positioning grid is made of cubes whose side length is 2h. 
+!-------------------------------------------------------------------------------
+![*] <nag_aux> <MAXCLOSEBOUNDFACES> <MAXNUMCONVEXEDGES> <GCBFVecDim>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___ ___ ___ ___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] endif (3D)
+!-------------------------------------------------------------------------------
 ![?] <density_thresholds_flag>
 !    =0 (default value, no density limiters)
 !    =1 (density limiters for debug)
 !    Density limiters do not apply to the mixture particles which are held 
 !    fixed (elasto-plastic strain rate regime)
 !-------------------------------------------------------------------------------
-![*] <final_time> <final_time_step>
-![*] <CFL> <vsc_coeff> <Leapfrog_flag> <scheme_order> <factor> <dt_alfa_Mon>
-![*] <teta_p> <teta_u> <var> 
-![*] <COEFNMAXPARTI> <COEFNMAXPARTJ> <body_part_reorder>
-![*] <nag_aux> <MAXCLOSEBOUNDFACES> <MAXNUMCONVEXEDGES> <GCBFVecDim>
 ![*] <density_thresholds_flag>
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
-0.1 10000000
-0.1 0.05 1 1 0. .false.
-0.3 0.3 A
-1.1 2. 0
-100000 9 100 3000
 0
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
@@ -1486,7 +1520,10 @@ vtkconverter any 0.002
 !-------------------------------------------------------------------------------
 ##### end control lines #####
 
-##### section flow rate #####
+!-------------------------------------------------------------------------------
+![?] if (3D) then
+!-------------------------------------------------------------------------------
+!##### section flow rate #####
 !-------------------------------------------------------------------------------
 ![?] Input parameters on monitoring sections for the flow rate. These sections 
 !    must be convex non-degenerate quadrilaterals. Otherwise, the subroutine 
@@ -1500,7 +1537,7 @@ vtkconverter any 0.002
 ![*] <n_sect> <dt_out> <n_fluid_types>
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
-0 1. 1
+!___ ___ ___
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
 ![?] NUMBER_OF_SECTIONS: do i=1,NUMBER_OF_SECTIONS
@@ -1540,9 +1577,9 @@ vtkconverter any 0.002
 !-------------------------------------------------------------------------------
 ![?] enddo NUMBER_OF_SECTIONS
 !-------------------------------------------------------------------------------
-##### end section flow rate #####
+!##### end section flow rate #####
 
-##### substations #####
+!##### substations #####
 !-------------------------------------------------------------------------------
 ![?] Input variables for monitoring the electrical substations (both 
 !    high-voltage transmission substations, medium-voltage distribution 
@@ -1555,7 +1592,7 @@ vtkconverter any 0.002
 ![*] <n_sub> <dt_out_sub>
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
-0 0.
+!___ ___
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
 ![?] NUMBER_OF_SUBSTATIONS: do i=1,NUMBER_OF_SUBSTATIONS
@@ -1588,4 +1625,7 @@ vtkconverter any 0.002
 !-------------------------------------------------------------------------------
 ![?] enddo NUMBER_OF_SUBSTATIONS
 !-------------------------------------------------------------------------------
-##### end substations #####
+!##### end substations #####
+!-------------------------------------------------------------------------------
+![?] endif (3D)
+!-------------------------------------------------------------------------------

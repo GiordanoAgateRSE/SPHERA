@@ -143,7 +143,7 @@ if (pg(npi)%Beta_slope>=Med(pg(npi)%imed)%Phi) then
                   if (Re>=17.5e3) then
                      pg(npi)%C_L = 0.5d0
                      else
-                        pg(npi)%C_L = (9.d0 * (10.d0 ** -5.d0)) * (Re **       &
+                        pg(npi)%C_L = (9.d0 * (10.d0 ** (-5.d0))) * (Re **     &
                                       0.882d0)
                   endif
             endif    
