@@ -231,21 +231,56 @@ ___
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
 ![?] if (Boundary_type=="fixed") then
-![?] <Shear_stress_coefficient>
-!    =1. (no-slip)
-!    =0. (free-slip, default choice in 3D with SA-SPH)
+![?] <slip_coefficient_mode>
+!    =1 (slip coefficient from input)
+!    =2 (slip coefficient computed to impose the correct boundary shear stress, 
+!        as function of the Neutral Surface Boundary Layer velocity profile and 
+!        the active viscosity)
 ![?] <laminar_flag_check>
 !    =.true. (check on laminar regime to activate shear stress terms at 
 !             boundaries in case of no-slip conditions; laminar regime check 
 !             has no effect in the inner domain)
 !    =.false. (no check: it always imposes no-slip conditions in case 
-!              "Shear_stress_coefficient" is 1.)
+!              "slip_coefficient" is 1.)
 !-------------------------------------------------------------------------------
-![*] <Shear_stress_coefficient> <laminar_flag_check>
-![*] <RGBColor>
+![*] <slip_coefficient_mode> <laminar_flag_check>
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
 ___ ___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] if (slip_coefficient_mode==1) then
+![?] <slip_coefficient>
+!    =1. (no-slip conditions; default choice for: laminar flows included dense 
+!        granular flows; 2D turbulent flows with very fine spatial resolution)
+!    =0. (free-slip conditions; default choice for turbulent flows)
+!-------------------------------------------------------------------------------
+![*] <slip_coefficient>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] endif (slip_coefficient_mode==1)
+![?] if (slip_coefficient_mode==2) then
+![?] Slip coefficient is computed accoding to the mixing-length turbulent 
+![?]    viscosity and the wall function velocity of the Surface Neutral 
+![?]    Boundary Layer (SNBL) for rough walls. Advanced choice for turbulent 
+![?]    flows.
+![?] <d_50>: mean diameter of the wall roughness elements around the wall 
+![?]         faces/lines.
+!-------------------------------------------------------------------------------
+![*] <d_50>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] endif (slip_Coefficient_mode==2)
+!-------------------------------------------------------------------------------
+![*] <RGBColor>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
 ___
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
@@ -1333,11 +1368,13 @@ ___ ___
 ![*] ...
 ![*] <vertex_last_x> <vertex_last_y> <vertex_last_z>
 !-------------------------------------------------------------------------------
+!<<<****************************************************************************
 ___
 ___ ___
 ___ ___ ___
 ...
 ___ ___ ___
+!>>>****************************************************************************
 !-------------------------------------------------------------------------------
 ![?] enddo NUMBER_OF_SUBSTATIONS
 !-------------------------------------------------------------------------------

@@ -49,7 +49,7 @@ integer(4) :: case_test
 #endif
 double precision :: k_Beta0
 #ifdef SPACE_3D
-double precision :: k_v,U_inf,Re,z_aux,DELTA_Seminara,aux_var,aa,bb,cc,root1
+double precision :: U_inf,Re,z_aux,DELTA_Seminara,aux_var,aa,bb,cc,root1
 double precision :: root2
 #elif defined SPACE_2D
 double precision :: alfa
@@ -69,7 +69,6 @@ integer(4), external :: ParticleCellNumber,CellIndices
 ! Initializations
 !------------------------
 #ifdef SPACE_3D
-   k_v = 0.41d0
    test_root1 = 0
    test_root2 = 0
 #endif

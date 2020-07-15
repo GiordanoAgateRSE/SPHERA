@@ -36,8 +36,9 @@ use Dynamic_allocation_module
 implicit none
 integer(4),intent(in) :: npi
 integer(4) :: i,j,ibdt,ibdp,Ncbf,icbf,iface,facestr
-double precision :: IntWdV
+double precision :: IntWdV,u_t_0,aux_scalar,slip_coefficient
 double precision,dimension(1:SPACEDIM) :: DVLoc,DVGlo,BCLoc,BCGlo,LocX
+double precision,dimension(1:SPACEDIM) :: u_t_0_vector
 character(4) :: strtype
 !------------------------
 ! Explicit interfaces
@@ -73,14 +74,27 @@ if (Ncbf>0) then
       enddo
       IntWdV = BoundaryDataTab(ibdp)%BoundaryIntegral(2)
       if ((strtype=='fixe').or.(strtype=='tapi')) then
-         BCLoc(1) = DVLoc(1) * IntWdV * Tratto(facestr)%ShearCoeff
-         BCLoc(2) = DVLoc(2) * IntWdV * Tratto(facestr)%ShearCoeff
+      if (Partz(Tratto(facestr)%zone)%slip_coefficient_mode==1) then
+! Slip coefficient from input
+            slip_coefficient = Partz(Tratto(facestr)%zone)%BC_shear_stress_input
+            elseif (Partz(Tratto(facestr)%zone)%slip_coefficient_mode==2) then
+! Slip coefficient computed
+! Particle tangential (relative) velocity (vector)
+               u_t_0_vector(:) = 0.5d0 * (DVGlo(:) - DVLoc(3) *                &
+                                 BoundaryFace(iface)%T(:,3))
+! Particle tangential (relative) velocity (absolute value)
+               u_t_0 = dsqrt(dot_product(u_t_0_vector(:),u_t_0_vector(:)))
+! To assess the slip coefficient
+               call wall_function_for_SASPH(u_t_0,                             &
+                  Partz(Tratto(facestr)%zone)%BC_shear_stress_input,           &
+                  pg(npi)%dens,LocX(3),slip_coefficient,aux_scalar)
+         endif
+         BCLoc(1:2) = DVLoc(1:2) * IntWdV * slip_coefficient
          BCLoc(3) = DVLoc(3) * IntWdV
          do i=1,SPACEDIM
             BCGlo(i) = zero
             do j=1,SPACEDIM
-               BCGlo(i) = BCGlo(i) + BoundaryFace(iface)%T(i,j) *     &
-                          BCLoc(j)
+               BCGlo(i) = BCGlo(i) + BoundaryFace(iface)%T(i,j) * BCLoc(j)
             enddo
          enddo
          pg(npi)%var(:) = pg(npi)%var(:) + BCGlo(:)   

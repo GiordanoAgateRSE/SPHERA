@@ -41,14 +41,23 @@ integer(4),intent(in) :: npi,Ncbf
 double precision,intent(inout),dimension(1:SPACEDIM) :: tpres,tdiss,tvisc
 integer(4) :: sd,icbf,iface,ibdp,sdj,i,j,mati,stretch
 double precision :: IntdWrm1dV,cinvisci,Monvisc,cinviscmult,pressi,dvn
-double precision :: FlowRate1,Lb,L,minquotanode,maxquotanode
-double precision :: Qii,roi,celeri,alfaMon,Mmult,IntGWZrm1dV
+double precision :: FlowRate1,Lb,L,minquotanode,maxquotanode,u_t_0
+double precision :: Qii,roi,celeri,alfaMon,Mmult,IntGWZrm1dV,slip_coefficient
 double precision,dimension(1:SPACEDIM) :: vb,vi,dvij,RHS,nnlocal,Grav_Loc 
 double precision,dimension(1:SPACEDIM) :: ViscoMon,ViscoShear,LocPi,Gpsurob_Loc
-double precision,dimension(1:SPACEDIM) :: Gpsurob_Glo
+double precision,dimension(1:SPACEDIM) :: Gpsurob_Glo,u_t_0_vector
 character(4) :: stretchtype
+double precision,dimension(1:size(Partz)) :: slip_coeff_counter
+!------------------------
+! Explicit interfaces
+!------------------------
+!------------------------
+! Allocations
+!------------------------
+!------------------------
+! Initializations
+!------------------------
 mati = pg(npi)%imed
-cinvisci = pg(npi)%kin_visc
 roi = pg(npi)%dens
 pressi = pg(npi)%pres
 Qii = (pressi + pressi) / roi
@@ -60,19 +69,11 @@ if ((Domain%time_stage==1).or.(Domain%time_split==1)) then
    pg(npi)%kodvel = 0
    pg(npi)%velass(:) = zero
 endif
-!------------------------
-! Explicit interfaces
-!------------------------
-!------------------------
-! Allocations
-!------------------------
-!------------------------
-! Initializations
-!------------------------
+slip_coeff_counter(:) = 0
 !------------------------
 ! Statements
 !------------------------
-face_loop: do icbf = 1,Ncbf
+face_loop: do icbf=1,Ncbf
    ibdp = BoundaryDataPointer(3,npi) + icbf - 1 
    iface = BoundaryDataTab(ibdp)%CloBoNum
    stretch = BoundaryFace(iface)%stretch
@@ -89,11 +90,11 @@ face_loop: do icbf = 1,Ncbf
          do SD=1,SPACEDIM
             vb(SD) = BoundaryFace(iface)%velocity(SD)
             dvij(SD) = two * (vi(SD) - vb(SD))
-            dvn = dvn + BoundaryFace(iface)%T(SD, 3) * dvij(SD)
+            dvn = dvn + BoundaryFace(iface)%T(SD,3) * dvij(SD)
 ! Gravity local components
             Grav_Loc(SD) = zero                           
             do sdj=1,SPACEDIM
-               Grav_Loc(SD) = Grav_Loc(SD) + BoundaryFace(iface)%T(sdj, SD) *  &
+               Grav_Loc(SD) = Grav_Loc(SD) + BoundaryFace(iface)%T(sdj,SD) *   &
                   Domain%grav(sdj)
             enddo
          enddo
@@ -119,7 +120,7 @@ face_loop: do icbf = 1,Ncbf
          IntGWZrm1dV = BoundaryDataTab(ibdp)%BoundaryIntegral(7)
          IntdWrm1dV = BoundaryDataTab(ibdp)%BoundaryIntegral(3)
          alfaMon = Med(mati)%alfaMon
-         if (alfaMon>zero.or.cinvisci>zero) then
+         if (alfaMon>zero) then
 ! The volume viscosity term, depending on velocity divergence, can be 
 ! neglected (otherwise it may cause several problems); 
 ! further Monaghan's term is activated even for separating particles
@@ -128,11 +129,32 @@ face_loop: do icbf = 1,Ncbf
             Mmult = -Monvisc * dvn * IntGWZrm1dV
             ViscoMon(:) = ViscoMon(:) + Mmult * nnlocal(:)
          endif
+         if (Partz(Tratto(stretch)%zone)%slip_coefficient_mode==1) then
+! Slip coefficient from input
+            cinvisci = pg(npi)%kin_visc
+            elseif (Partz(Tratto(stretch)%zone)%slip_coefficient_mode==2) then
+! Slip coefficient computed
+! Particle tangential (relative) velocity (vector)
+               u_t_0_vector(:) = 0.5d0 * (dvij(:) - dvn *                      &
+                                 BoundaryFace(iface)%T(:,3))
+! Particle tangential (relative) velocity (absolute value)
+               u_t_0 = dsqrt(dot_product(u_t_0_vector(:),u_t_0_vector(:)))
+! To assess the slip coefficient and the turbulent viscosity
+               call wall_function_for_SASPH(u_t_0,                             &
+                  Partz(Tratto(stretch)%zone)%BC_shear_stress_input,           &
+                  pg(npi)%dens,LocPi(3),slip_coefficient,cinvisci)
+! Update of the incremental sum of the slip coefficient values
+               Partz(Tratto(stretch)%zone)%avg_comp_slip_coeff =               &
+                  Partz(Tratto(stretch)%zone)%avg_comp_slip_coeff +            &
+                  slip_coefficient
+               slip_coeff_counter(Tratto(stretch)%zone) =                      &
+                  slip_coeff_counter(Tratto(stretch)%zone) + 1
+         endif
          if (cinvisci>zero) then
             if ((pg(npi)%laminar_flag==1).or.                                  &
-                (Tratto(stretch)%laminar_no_slip_check.eqv..false.)) then
+               (Tratto(stretch)%laminar_no_slip_check.eqv..false.)) then
 ! The factor 2 is already present in "dvij"
-               cinviscmult = cinvisci * IntdWrm1dV * Tratto(stretch)%ShearCoeff
+               cinviscmult = cinvisci * IntdWrm1dV * slip_coefficient
                ViscoShear(:) = ViscoShear(:) + cinviscmult * dvij(:)
             endif
          endif
@@ -181,11 +203,18 @@ face_loop: do icbf = 1,Ncbf
                return                                                          
    endif
 enddo face_loop
+! Update of the average slip coefficient for each boundary zone
+do i=1,size(Partz)
+   if (slip_coeff_counter(i)>0) then
+      Partz(i)%avg_comp_slip_coeff = Partz(i)%avg_comp_slip_coeff /            &
+                                     slip_coeff_counter(i)
+   endif
+enddo
 ! Adding boundary contributions to the momentum equation
-  tpres(:) = tpres(:) - RHS(:)
-  tdiss(:) = tdiss(:) - ViscoMon(:)
+tpres(:) = tpres(:) - RHS(:)
+tdiss(:) = tdiss(:) - ViscoMon(:)
 ! For the sign of "ViscoShear", refer to the mathematical model
-  tvisc(:) = tvisc(:) + ViscoShear(:)
+tvisc(:) = tvisc(:) + ViscoShear(:)
 !------------------------
 ! Deallocations
 !------------------------

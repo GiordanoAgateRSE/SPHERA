@@ -38,7 +38,7 @@ use Hybrid_allocation_module
 !------------------------
 implicit none
 logical :: DBSPH_fictitious_reservoir_flag,laminar_no_slip_check
-integer(4) :: nrighe,ier,ninp,ulog
+integer(4) :: nrighe,ier,ninp,ulog,slip_coefficient_mode
 integer(4),dimension(20) :: NumberEntities
 #ifdef SPACE_2D
 integer(4),dimension(NumBVertices) :: BoundaryVertex
@@ -55,7 +55,7 @@ integer(4) :: ID_first_vertex,ID_last_vertex
 #elif defined SPACE_2D
 integer(4) :: i2,i1
 #endif
-double precision :: pool_value,shear,velocity,valp,flowrate
+double precision :: pool_value,velocity,valp,flowrate,BC_shear_stress_input
 #ifdef SPACE_3D
 double precision :: dx_CartTopog,H_res
 #endif
@@ -86,6 +86,8 @@ character(100), external :: lcase,GetToken
 npointv = 0
 values3 = zero
 valp = zero
+slip_coefficient_mode = 0
+BC_shear_stress_input = -9.99d9
 !------------------------
 ! Statements
 !------------------------
@@ -126,7 +128,7 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
    values3 = zero
    pool_plane = " "
    pool_value = zero
-   shear = zero
+   slip_coefficient_mode = 0
    velocity = zero
    flowrate = zero
    pressu = "  "
@@ -161,10 +163,20 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
       case("fixe")    
          NumberEntities(3) = NumberEntities(3) + 1
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         if (ioerr==0) read(ainp,*,iostat=ioerr) shear,laminar_no_slip_check
+         if (ioerr==0) read(ainp,*,iostat=ioerr) slip_coefficient_mode,        &
+            laminar_no_slip_check
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                             &
-            "FIXED: SHEAR STRESS COEFFICIENT, LAMINAR NO-SLIP CHECK",ninp,     &
-            ulog)) return
+            "FIXED: SLIP COEFFICIENT MODE, LAMINAR NO-SLIP CHECK",ninp,ulog))  &
+            return
+         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+         if (ioerr==0) read(ainp,*,iostat=ioerr) BC_shear_stress_input
+         if (slip_coefficient_mode==1) then
+            if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"SLIP COEFFICIENT",ninp,  &
+               ulog)) return
+            elseif (slip_coefficient_mode==2) then
+               if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"WALL MEAN ROUGHNESS", &
+                  ninp,ulog)) return
+         endif
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          token = GetToken(ainp,1,ioerr)
          token_color(1:2) = token(5:6)
@@ -320,9 +332,9 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
             endif
 #endif
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         if (ioerr==0) read(ainp,*,iostat=ioerr) shear
+         if (ioerr==0) read(ainp,*,iostat=ioerr) BC_shear_stress_input
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                             &
-            "TAPIS: SHEAR STRESS COEFFICIENT",ninp,ulog)) return
+            "TAPIS: SLIP COEFFICIENT",ninp,ulog)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"TAPIS: VELOCITY COMPONENTS",&
             ninp,ulog)) return
@@ -389,7 +401,6 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
       Partz(Izona)%icol = icolor
       Partz(Izona)%bend = bends
       Partz(Izona)%move = move
-      Partz(Izona)%slip = slip
       if (npointv/=0) then
          Partz(Izona)%npointv = npointv
          Partz(Izona)%vlaw(icoordp(0:ncord,ncord-1),1:npointv) =               &
@@ -401,18 +412,19 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
       Partz(Izona)%valp = valp
       Partz(Izona)%Indix(1) = indexi
       Partz(Izona)%Indix(2) = indexf
+      Partz(Izona)%slip_coefficient_mode = slip_coefficient_mode
+      Partz(Izona)%BC_shear_stress_input = BC_shear_stress_input
       if ((pool_plane=="X").or.(pool_plane=="x")) Partz(Izona)%ipool = 1
       if ((pool_plane=="Y").or.(pool_plane=="y")) Partz(Izona)%ipool = 2
       if ((pool_plane=="Z").or.(pool_plane=="z")) Partz(Izona)%ipool = 3
       Partz(Izona)%pool = pool_value
 ! Constraints
-      MULTI_INDEX_LOOP: do index=indexi, indexf       
+      MULTI_INDEX_LOOP: do index=indexi,indexf       
          Tratto(index)%tipo = tipo
 #ifdef SPACE_3D
             Tratto(index)%numvertices = numv
             Tratto(index)%inivertex = ipointer
 #endif
-         Tratto(index)%ShearCoeff = shear
          Tratto(index)%laminar_no_slip_check = laminar_no_slip_check
          Tratto(index)%Medium = Medium
          Tratto(index)%velocity = values1
@@ -428,19 +440,15 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
                "Boundary        : ",indexi,"   to",indexf
             write(ulog,"(1x,a,2x,a)") "Type            : ",Tratto(index)%tipo 
             if (tipo=="fixe") then
-               write(ulog,"(1x,a,1pe12.4)") "Shear coeff.    : ",              &
-                  Tratto(index)%ShearCoeff
-               write(ulog,"(1x,a,l12)")     "Laminar no-slip check: ",         &
+               write(ulog,"(1x,a,l12)") "Laminar no-slip check: ",             &
                   Tratto(index)%laminar_no_slip_check
                elseif (tipo=="peri") then
-                  write(ulog,"(1x,a,i3,1x,a)") "Medium Index    : ",           &
+                  write(ulog,"(1x,a,i3)") "Medium Index    : ",                &
                      Tratto(index)%Medium
                   elseif (tipo=="pool") then
                      write(ulog,"(1x,a,i3,1x,a)") "Medium Index    : ",        &
                         Tratto(index)%Medium
                      elseif (tipo=="tapi") then
-                        write(ulog,"(1x,a,1pe12.4)") "Shear coeff.    : ",     &
-                           Tratto(index)%ShearCoeff
                         do n=1,ncord
                            icord = icoordp(n,ncord-1)
                            write(ulog,"(1x,a,a,1pe12.4)") xyzlabel(icord),     &
@@ -472,9 +480,13 @@ BoundaryVertex(Tratto(index)%inivertex:Tratto(index)%inivertex+Tratto(index)%num
 #elif defined SPACE_2D
                      numv = Tratto(index)%numvertices
                      if (numv/=2) then 
-                        if (ulog>0) write(ulog,'(a,i15)')                      &
-                           "TAPIS boundary type: 2 vertices are requested:",   &
-                           numv
+                        if (ulog>0) then
+                           write(ulog,'(a,i15)')                               &
+                              "TAPIS boundary type: 2 vertices are requested:",&
+                              numv
+                           write(ulog,"(1x,a,1pe12.4)") "Slip coeff.    : ",   &
+                              Partz(Izona)%BC_shear_stress_input
+                        endif
                         ier = 103
                         return
                      endif
@@ -502,8 +514,15 @@ BoundaryVertex(Tratto(index)%inivertex+Tratto(index)%numvertices-1)
                         Partz(Izona)%bend
                      write(ulog,"(1x,a,2x,a)") "Movement Type   : ",           &
                         Partz(Izona)%move
-                     write(ulog,"(1x,a,2x,a)") "Boundary Cond.  : ",           &
-                        Partz(Izona)%slip
+                     write(ulog,"(1x,a,i3)")   "Slip coef. mode : ",           &
+                        Partz(Izona)%slip_coefficient_mode
+                     if (slip_coefficient_mode==1) then
+                        write(ulog,"(1x,a,1pe12.4)") "Slip coeff.    : ",      &
+                           Partz(Izona)%BC_shear_stress_input
+                        elseif (slip_coefficient_mode==2) then
+                           write(ulog,"(1x,a,1pe12.4)") "Wall mean roughness:",&
+                              Partz(Izona)%BC_shear_stress_input
+                     endif
                      if (Partz(Izona)%move=="law") then
                         write(ulog,"(1x,a,i3)")                                & 
                            "Velocity Table - Number of Points: ",              &

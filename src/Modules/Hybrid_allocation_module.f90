@@ -293,7 +293,7 @@ type TyParticle
    double precision :: velass(3)
 ! Velocity gradient (SPH pseudo-consistent approximation over fluid particles) 
    double precision :: dvel(3,3)
-! BC conditions for fixed particles (f=free slip; n=no slip; c=cont slip)
+! BC conditions for fixed particles (f=free-slip; n=no-slip; c=cont slip)
    character(1) :: slip
 ! Movement type
    character(3) :: vel_type
@@ -473,6 +473,7 @@ type TyZone
 ! Zone describing the Cartesian topography, which contains the reservoir 
 ! (Car_top_zone=0 when IC_source_type=1)
    integer(4) :: Car_top_zone
+   integer(4) :: slip_coefficient_mode
 #ifdef SPACE_3D   
 ! Number of points describing the reservoir if (IC_source_type==2)
    integer(4) :: plan_reservoir_points
@@ -493,6 +494,12 @@ type TyZone
 ! Height of the reservoir free surface
    double precision :: H_res
 #endif
+! Input variable for the boundary shear stress: 
+!    slip coefficient (if slip_coefficient_mode==1)
+!    mean diameter of the wall roughness elements (if slip_coefficient_mode==2) 
+   double precision :: BC_shear_stress_input
+! Average computed slip coefficient
+   double precision :: avg_comp_slip_coeff
    double precision :: pool
 ! IC for pressure or free surface height 
    double precision :: valp
@@ -516,8 +523,6 @@ type TyZone
    character(1) :: shape
 ! Colour pattern: uniform or stripped 
    character(1) :: bend
-! Boundary slip condition for fixed particles ("f": free-slip; "n": no-slip)
-   character(1) :: slip
 ! Assigning IC constant pressure or hydrostatic distribution 
    character(2) :: pressure
 ! Motion type: standard or fixed
@@ -545,7 +550,6 @@ type TyBoundaryStretch
    double precision :: NormVelocity
 ! Flow rate exiting the face
    double precision :: FlowRate
-   double precision :: ShearCoeff
 ! Velocity for "TAPI" zones
    double precision :: velocity(1:SPACEDIM)
    double precision :: PsiCoeff(1:SPACEDIM)
@@ -606,8 +610,8 @@ type TyBoundarySide
    double precision :: CloseParticles_maxQuota
    double precision :: angle
    double precision :: velocity(1:SPACEDIM)
-! Direction cosines of the local reference system of the boundary (the last one
-! is the normal) 
+! Direction cosines of the local reference system of the boundary 
+! (T(SPACEDIM,1:SPACEDIM) is the normal) 
    double precision :: T(1:SPACEDIM,1:SPACEDIM)
    double precision :: R(1:SPACEDIM,1:SPACEDIM)      
    double precision :: RN(1:SPACEDIM,1:SPACEDIM)
@@ -635,8 +639,8 @@ type TyBoundaryFace
    double precision :: area
 ! Maximum height among the neighbouring particles
    double precision :: CloseParticles_maxQuota
-! Direction cosines of the local reference system of the boundary (the last 
-! one is the normal)
+! Direction cosines of the local reference system of the boundary 
+! (T(SPACEDIM,1:SPACEDIM) is the normal)
    double precision :: T(1:SPACEDIM,1:SPACEDIM)
    double precision :: RPsi(1:SPACEDIM,1:SPACEDIM)
    double precision :: RFi(1:SPACEDIM,1:SPACEDIM)
@@ -649,7 +653,7 @@ end type TyBoundaryFace
 type TyBoundaryData
 ! Number of neighbouring faces for a particle
    integer(4) :: CloBoNum
-! Face normal vectors in the local reference system
+! Neighbouring particle coordinates in the frontier local reference system
    double precision :: LocXYZ(1:SPACEDIM)
 ! Table of integrals
    double precision :: BoundaryIntegral(1:8)

@@ -68,7 +68,6 @@ do i=1,size(Partz)
    Partz(i)%bend = " "
    Partz(i)%pressure = "  "
    Partz(i)%move = "   "
-   Partz(i)%slip = " "
    Partz(i)%ipool = 0
    Partz(i)%npoints = 0
    Partz(i)%icol = 0
@@ -90,6 +89,9 @@ do i=1,size(Partz)
       enddo
    enddo
    Partz(i)%valp = zero
+   Partz(i)%BC_shear_stress_input = zero
+   Partz(i)%slip_Coefficient_mode = 0
+   Partz(i)%avg_comp_slip_coeff = 0.d0
 enddo
 do i=1,size(Control_Points)
    Control_Points(i)%cella = 0
@@ -157,7 +159,6 @@ do i=1,size(Tratto)
    Tratto(i)%medium = 0
    Tratto(i)%zone = 0
    Tratto(i)%NormVelocity = zero
-   Tratto(i)%ShearCoeff = zero
    do j=1,SPACEDIM
       Tratto(i)%velocity(j) = zero
       Tratto(i)%PsiCoeff(j) = zero

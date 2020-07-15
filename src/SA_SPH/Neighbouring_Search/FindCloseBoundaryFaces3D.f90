@@ -105,7 +105,7 @@ do i=(ic-1),(ic+1)
 ! To check if the face "intbf" is already included in the array "Clobface"
                if (Ncbf>0) thereis = any(Clobface(1:Ncbf)==intbf)
 ! The face is not yet considered
-               if (.Not. Thereis) then         
+               if (.Not.Thereis) then         
 ! Normal to the face "intbf"
                   nodes = BoundaryFace(intbf)%nodes
                   do sdi=1,SPACEDIM
@@ -121,7 +121,7 @@ do i=(ic-1),(ic+1)
                   call LocalNormalCoordinates(PXLoc,csi,intbf)
                   fkod = BoundaryFace(intbf)%nodes - 2
 ! Distance between the particle and the face is bigger than zero and
-! smaller then 2h 
+! smaller then 2h
 ! The face is considered and it is added to the array "Clobface"
                   if (pin>=pinmin.and.pin<pinmax) then 
                      if ((Tratto(stretch)%tipo=="sour").or.                    &
@@ -133,7 +133,7 @@ do i=(ic-1),(ic+1)
                            Ncbf = ncbf + 1 
                            if (ncbf<=Domain%MAXCLOSEBOUNDFACES) then
                               Clobface(Ncbf) = intbf
-                              LocX(3, Ncbf) = pin
+                              LocX(3,Ncbf) = pin
                               pg(npi)%CloseBcOut = 1
                               else
                                  call diagnostic(arg1=8,arg2=6,arg3=nomsub)
@@ -143,7 +143,7 @@ do i=(ic-1),(ic+1)
                            Ncbf = ncbf + 1 
                            if (ncbf<=Domain%MAXCLOSEBOUNDFACES) then
                               Clobface(Ncbf) = intbf
-                              LocX(3, Ncbf) = pin
+                              LocX(3,Ncbf) = pin
                               else
                                  call diagnostic(arg1=8,arg2=7,arg3=nomsub)
                            endif

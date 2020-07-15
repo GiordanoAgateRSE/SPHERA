@@ -111,8 +111,6 @@ endif
 ! Motion index
 pg(npi)%vel_type = partz(Nz)%move        
 if (partz(Nz)%move/="std") pg(npi)%kin_visc = zero
-! Boundary slip condition
-pg(npi)%slip = partz(Nz)%slip  
 ! Grid cell 
 pg(npi)%cella = ParticleCellNumber(pg(npi)%coord)
 ! Particle color definition, as defined in the input file.

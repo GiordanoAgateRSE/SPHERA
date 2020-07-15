@@ -41,7 +41,7 @@ integer(4),intent(in)    :: npi,Ncbf
 double precision,intent(inout) :: BCtorodivV
 integer(4) :: sd,sdj,icbf,iface,ibdt,ibdp,stretch        
 double precision :: roi,scaprod
-double precision,dimension(1:SPACEDIM) :: vb,vi,dvij,LocPi, LocDvij
+double precision,dimension(1:SPACEDIM) :: vb,vi,dvij,LocPi,LocDvij
 character(4) :: boundtype
 !------------------------
 ! Explicit interfaces

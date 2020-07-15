@@ -483,6 +483,13 @@ if (nag>0) then
 "% of mixture particles needs the shear viscous term in the momentum equation. "
       endif
    endif
+   do i=1,size(Partz)
+      if (Partz(i)%slip_coefficient_mode==2) then
+         write(ulog,'(a,i3,a,a,g12.3,a)') "Zone ",i,": the average value ",    &
+            "computed for the slip coefficient is ",                           &
+            Partz(i)%avg_comp_slip_coeff," ."
+      endif
+   enddo
    else
       write(ulog,'(128("."))')
       write(ulog,'(a)') "No particles inside the domain at the moment"

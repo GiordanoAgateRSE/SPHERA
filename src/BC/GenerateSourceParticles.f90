@@ -147,8 +147,6 @@ if (inttimeratio>pinttimeratio) then
 ! Movement/kinematics index
             pg(nag)%vel_type = partz(inlet_zone)%move        
             if (partz(inlet_zone)%move/="std") pg(nag)%kin_visc = zero
-! Boundary conditions 
-            pg(nag)%slip = partz(inlet_zone)%slip        
             pg(nag)%cella = ParticleCellNumber(pg(nag)%coord)
 ! Particle colour 
             call defcolpartzero(inlet_zone,partz,pg(nag))

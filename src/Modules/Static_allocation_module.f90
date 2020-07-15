@@ -48,6 +48,9 @@ integer(4),public,parameter :: menouno = - 1
 double precision,public,parameter :: max_positive_number = 3.4d+38
 double precision,public,parameter :: max_negative_number = -3.4d+38
 double precision,public,parameter :: PIGRECO = 3.14159265358979d0
+double precision,public,parameter :: Nepero_number = 2.718281828d0
+! von Karman's constant
+double precision,public,parameter :: k_v = 0.41d0
 #ifdef SPACE_3D
 double precision,public,parameter :: KERNELCONST3D = 1.d0 / PIGRECO
 #elif defined SPACE_2D

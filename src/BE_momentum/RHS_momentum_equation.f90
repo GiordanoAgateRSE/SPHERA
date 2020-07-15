@@ -56,6 +56,7 @@ character(len=lencard) :: nomsub = "RHS_momentum_equation"
 !------------------------
 ! Initializations
 !------------------------
+Partz(:)%avg_comp_slip_coeff = 0.d0
 #ifdef SPACE_3D
 Ncbf_Max = 0
 #endif

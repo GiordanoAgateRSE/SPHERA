@@ -26,7 +26,7 @@
 
 #    CODE VERSION
 #       Suggested values:
-#          " v9_UserInitials_CommitData"
+#          " v9_UserInitials_CommitDate"
 VERSION = v9_
 
 #    COMPILER
@@ -234,6 +234,7 @@ $(wildcard ./SA_SPH/integrals_IC/*.f90) \
 $(wildcard ./SA_SPH/integrals_time_steps/*.f90) \
 $(wildcard ./SA_SPH/Neighbouring_Search/*.f90) \
 $(wildcard ./SA_SPH/Time_integration/*.f90) \
+$(wildcard ./SA_SPH/Turbulence/*.f90) \
 $(wildcard ./Strings/*.f90) \
 $(wildcard ./Time_Integration/*.f90) 
 

@@ -120,24 +120,26 @@ do jrang = jgridi-1,jgridi+1
             endif
          endif
 ! Contributions from body particles
-         if ((n_bodies>0).and.(Icont_bp(ncel+1)>Icont_bp(ncel))) then
+         if (n_bodies>0) then
+            if (Icont_bp(ncel+1)>Icont_bp(ncel)) then
 ! Loop over the neighbouring solid particles in the cell
-            do sb=Icont_bp(ncel),Icont_bp(ncel+1)-1
-               npj = NPartOrd_bp(sb)
+               do sb=Icont_bp(ncel),Icont_bp(ncel+1)-1
+                  npj = NPartOrd_bp(sb)
 ! Relative positions and distances
-               raglocal(:) = pglocal%coord(:) - bp_arr(npj)%pos(:)
-               rijlocal = dot_product(raglocal,raglocal)
-               if (rijlocal>square_doubleh) cycle
+                  raglocal(:) = pglocal%coord(:) - bp_arr(npj)%pos(:)
+                  rijlocal = dot_product(raglocal,raglocal)
+                  if (rijlocal>square_doubleh) cycle
 ! The body particle lies within the "kernel support" of the monitoring element
-               rijlocal = dsqrt(rijlocal)
+                  rijlocal = dsqrt(rijlocal)
 ! "Inner" and surface body particles are both useful
-               pesoj = w(rijlocal,Domain%h,Domain%coefke) *                    &
-                       ((Domain%dx / dx_dxbodies) ** ncord)
-               uni = uni + pesoj
-               plocal = plocal  + bp_arr(npj)%pres * pesoj
-               vel(:) = vel(:) + bp_arr(npj)%vel_mir(:) * pesoj
+                  pesoj = w(rijlocal,Domain%h,Domain%coefke) *                 &
+                          ((Domain%dx / dx_dxbodies) ** ncord)
+                  uni = uni + pesoj
+                  plocal = plocal  + bp_arr(npj)%pres * pesoj
+                  vel(:) = vel(:) + bp_arr(npj)%vel_mir(:) * pesoj
 ! Fluid density cannot be interpolated from solid body particles
-            enddo
+               enddo
+            endif
          endif
       enddo
    enddo

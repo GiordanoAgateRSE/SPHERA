@@ -43,8 +43,8 @@ double precision,parameter :: eps = 0.1d0
 integer(4),intent(in) :: npi,IntNcbs
 double precision,intent(inout),dimension(1:SPACEDIM) :: tpres,tdiss,tvisc
 integer(4) :: imed,i,j,icbs,ibdt,ibdp,iside,sidestr
-double precision :: IntWds,IntWdV,cinvisci,Monvisc,roi,ro0,celeri,pressi      
-double precision :: alfaMon,xpi,ypi,SVforce,SVcoeff,TN,ypimin,ypigradN 
+double precision :: IntWds,IntWdV,cinvisci,Monvisc,roi,ro0,celeri,pressi,u_t_0     
+double precision :: alfaMon,xpi,ypi,SVforce,slip_coefficient,TN,ypimin,ypigradN 
 double precision :: GradNpsuro,IntWd1s0,IntWd1s2,IntWd3s0,DvelN,viscN  
 double precision :: GravN,PressB,distpi,distpimin,pressib,pressibmin
 double precision :: QiiIntWdS,level,pressj,Qsi,Qsj,velix,veliz,veliq,hcrit
@@ -53,8 +53,10 @@ double precision :: SomQsiQsj,DiffQsiQsj
 integer(4),dimension(1:PLANEDIM) :: acix
 double precision,dimension(1:PLANEDIM) :: IntLocXY,RHS,RG,ss,nnlocal,gradbPsuro
 double precision,dimension(1:PLANEDIM) :: ViscoMon,ViscoShear,sidevel,TT,Dvel
+double precision,dimension(1:SPACEDIM) :: u_t_0_vector
 type (TyBoundarySide) :: RifBoundarySide
 character(4):: strtype
+double precision,dimension(1:size(Partz)) :: slip_coeff_counter
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -73,7 +75,6 @@ if ((Domain%time_stage==1).or.(Domain%time_split==1)) then
 endif
 imed = pg(npi)%imed
 ro0 = Med(imed)%den0
-cinvisci = pg(npi)%kin_visc
 roi = pg(npi)%dens
 pressi = pg(npi)%pres
 distpimin = Domain%dx
@@ -84,6 +85,7 @@ ViscoMon(2) = zero
 ViscoShear(1) = zero
 ViscoShear(2) = zero
 ibdt = BoundaryDataPointer(3,npi)
+slip_coeff_counter(:) = 0
 !------------------------
 ! Statements
 !------------------------
@@ -104,8 +106,8 @@ do icbs=1,IntNcbs
    IntWd1s2 = BoundaryDataTab(ibdp)%BoundaryIntegral(8)
    GravN = zero 
    do i=1,PLANEDIM
-      ss(i) = RifBoundarySide%T(acix(i), acix(1))
-      nnlocal(i) = RifBoundarySide%T(acix(i), acix(2))
+      ss(i) = RifBoundarySide%T(acix(i),acix(1))
+      nnlocal(i) = RifBoundarySide%T(acix(i),acix(2))
       gradbPsuro(i) = Domain%grav(acix(i))
       GravN = GravN + Domain%grav(acix(i)) * nnlocal(i) 
    enddo
@@ -137,7 +139,9 @@ do icbs=1,IntNcbs
 ! Sub-critical flow
       elseif (strtype=="leve") then   
          Qsi = pressi / roi
-         level = Tratto(sidestr)%ShearCoeff  
+! The BC_shear_stress_input (formerly Shear_coeff) was used before SPHERA v.7.0 
+! for other purposes in case of boundaries of type "leve"
+         level = Partz(Tratto(sidestr)%zone)%BC_shear_stress_input
          if (pg(npi)%coord(3)<level) then    
             pressj = Med(imed)%den0 * Domain%grav(3) * (pg(npi)%coord(3) -     &
                      level)
@@ -210,11 +214,14 @@ do icbs=1,IntNcbs
                      velix = pg(npi)%vel(1)
                      veliz = pg(npi)%vel(3)         
                      veliq = velix * velix + veliz * veliz  
-                     hcrit = veliq / abs(Domain%grav(3))        
-                     hcritmin = Tratto(sidestr)%ShearCoeff       
-                     if (hcritmin<Domain%h) hcritmin = Domain%h       
-                     if (hcrit<hcritmin) hcrit = hcritmin          
-                     zbottom = Vertice(3,RifBoundarySide%vertex(1))    
+                     hcrit = veliq / abs(Domain%grav(3))
+! The BC_shear_stress_input (formerly Shear_coeff) was used before SPHERA v.7.0 
+! for other purposes in case of boundaries of type "leve"
+                     hcritmin =                                                &
+                        Partz(Tratto(sidestr)%zone)%BC_shear_stress_input       
+                     if (hcritmin<Domain%h) hcritmin = Domain%h
+                     if (hcrit<hcritmin) hcrit = hcritmin
+                     zbottom = Vertice(3,RifBoundarySide%vertex(1))  
                      if (zbottom>Vertice(3,RifBoundarySide%vertex(2)))         &
                         zbottom = Vertice(3,RifBoundarySide%vertex(2))
                      level = zbottom + hcrit          
@@ -256,11 +263,28 @@ do icbs=1,IntNcbs
 ! Volume viscosity force (with changed sign) and artificial viscosity term
    if (strtype=="fixe".or.strtype=="tapi") then
       if (xpi>=zero.and.xpi<=RifBoundarySide%length) then
-         SVcoeff = Tratto(sidestr)%ShearCoeff
-         do i=1,PLANEDIM
-            Dvel(i) = two * (pg(npi)%var(acix(i)) - sidevel(i))
-         enddo
-         DvelN = Dvel(1) * nnlocal(1) + Dvel(2) * nnlocal(2)
+         if (Partz(Tratto(sidestr)%zone)%slip_coefficient_mode==1) then
+! Slip coefficient from input
+            cinvisci = pg(npi)%kin_visc
+            elseif (Partz(Tratto(sidestr)%zone)%slip_coefficient_mode==2) then
+! Slip coefficient computed
+! Particle tangential (relative) velocity (vector)
+               u_t_0_vector(:) = (pg(npi)%var(:) - RifBoundarySide%velocity(:))&
+                                 - (0.5d0 * DvelN * RifBoundarySide%T(:,3))
+! Particle tangential (relative) velocity (absolute value)
+               u_t_0 = dsqrt(dot_product(u_t_0_vector(:),u_t_0_vector(:)))
+! To assess the slip coefficient and the turbulent viscosity
+               call wall_function_for_SASPH(u_t_0,                             &
+                  Partz(Tratto(sidestr)%zone)%BC_shear_stress_input,           &
+                  pg(npi)%dens,BoundaryDataTab(ibdp)%LocXYZ(3),                &
+                  slip_coefficient,cinvisci)
+! Update of the incremental sum of the slip coefficient values
+                  Partz(Tratto(sidestr)%zone)%avg_comp_slip_coeff =            &
+                     Partz(Tratto(sidestr)%zone)%avg_comp_slip_coeff +         &
+                     slip_coefficient
+                  slip_coeff_counter(Tratto(sidestr)%zone) =                   &
+                     slip_coeff_counter(Tratto(sidestr)%zone) + 1
+         endif
          celeri = Med(imed)%celerita
          alfaMon = Med(imed)%alfaMon
          Monvisc = alfaMon * celeri * Domain%h
@@ -271,7 +295,7 @@ do icbs=1,IntNcbs
          enddo
          if ((pg(npi)%laminar_flag==1).or.                                     &
             (Tratto(sidestr)%laminar_no_slip_check.eqv..false.)) then
-            SVforce = 2.d0 * cinvisci * SVcoeff * IntWd1s0
+            SVforce = 2.d0 * cinvisci * slip_coefficient * IntWd1s0
             else
                SVforce = 0.d0
          endif
@@ -286,6 +310,13 @@ do i=1,PLANEDIM
    tpres(acix(i)) = - RHS(i)
    tdiss(acix(i)) = tdiss(acix(i)) - ViscoMon(i)
    tvisc(acix(i)) = tvisc(acix(i)) - ViscoShear(i)
+enddo
+! Update of the average slip coefficient for each boundary zone
+do i=1,size(Partz)
+   if (slip_coeff_counter(i)>0) then
+      Partz(i)%avg_comp_slip_coeff = Partz(i)%avg_comp_slip_coeff /            &
+                                     slip_coeff_counter(i)
+   endif
 enddo
 !------------------------
 ! Deallocations

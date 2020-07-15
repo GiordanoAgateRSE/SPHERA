@@ -36,10 +36,11 @@ use Dynamic_allocation_module
 implicit none
 integer(4),intent(in) :: npi
 integer(4) :: i,icbs,Ncbs,IntNcbs,ibdt,ibdp,iside,sidestr
-double precision :: IntWdV
+double precision :: IntWdV,u_t_0,slip_coefficient,aux_scalar
 integer(4),dimension(1:PLANEDIM) :: acix
 double precision,dimension(1:PLANEDIM) :: sss,nnn,DVLoc,DVGlo,BCLoc,BCGlo
 double precision,dimension(1:PLANEDIM) :: IntLocXY
+double precision,dimension(1:SPACEDIM) :: u_t_0_vector
 character(4) :: strtype
 !------------------------
 ! Explicit interfaces
@@ -80,7 +81,24 @@ if (IntNcbs>0) then
       DVLoc(2) = nnn(1) * DVGlo(1) + nnn(2) * DVGlo(2)
       IntWdV = BoundaryDataTab(ibdp)%BoundaryIntegral(3)
       if ((strtype=='fixe').or.(strtype=='tapi')) then
-         BCLoc(1) = DVLoc(1) * IntWdV * Tratto(sidestr)%ShearCoeff
+         if (Partz(Tratto(sidestr)%zone)%slip_coefficient_mode==1) then
+! Slip coefficient from input
+            slip_coefficient = Partz(Tratto(sidestr)%zone)%BC_shear_stress_input
+            elseif (Partz(Tratto(sidestr)%zone)%slip_coefficient_mode==2) then
+! Slip coefficient computed
+! Particle tangential (relative) velocity (vector)
+               u_t_0_vector(:) = (Tratto(sidestr)%velocity(:) - pg(npi)%vel(:))&
+                                 - (0.5d0 * DVLoc(2) *                         &
+                                 BoundarySide(iside)%T(:,3))
+! Particle tangential (relative) velocity (absolute value)
+               u_t_0 = dsqrt(dot_product(u_t_0_vector(:),u_t_0_vector(:)))
+! To assess the slip coefficient
+               call wall_function_for_SASPH(u_t_0,                             &
+                  Partz(Tratto(sidestr)%zone)%BC_shear_stress_input,           &
+                  pg(npi)%dens,BoundaryDataTab(ibdp)%LocXYZ(3),                &
+                  slip_coefficient,aux_scalar)
+         endif
+         BCLoc(1) = DVLoc(1) * IntWdV * slip_coefficient
          BCLoc(2) = DVLoc(2) * IntWdV
          BCGlo(1) = sss(1) * BCLoc(1) + nnn(1) * BCLoc(2)
          BCGlo(2) = sss(2) * BCLoc(1) + nnn(2) * BCLoc(2)
