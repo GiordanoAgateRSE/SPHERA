@@ -500,6 +500,8 @@ type TyZone
    double precision :: BC_shear_stress_input
 ! Average computed slip coefficient
    double precision :: avg_comp_slip_coeff
+! Average mixing-length turbulent dynamic viscosity at SASPH walls
+   double precision :: avg_mu_T_SASPH
    double precision :: pool
 ! IC for pressure or free surface height 
    double precision :: valp

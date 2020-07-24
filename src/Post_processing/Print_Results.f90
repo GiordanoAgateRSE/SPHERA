@@ -488,6 +488,9 @@ if (nag>0) then
          write(ulog,'(a,i3,a,a,g12.3,a)') "Zone ",i,": the average value ",    &
             "computed for the slip coefficient is ",                           &
             Partz(i)%avg_comp_slip_coeff," ."
+         write(ulog,'(a,i3,a,a,g12.3,a)') "Zone ",i,": the average value ",    &
+            "for the turbulent dynamic viscosity at SASPH walls is ",          &
+            Partz(i)%avg_mu_T_SASPH," Pa*s."
       endif
    enddo
    else

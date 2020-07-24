@@ -39,7 +39,6 @@ integer(4) :: i,icbs,Ncbs,IntNcbs,ibdt,ibdp,iside,sidestr
 double precision :: IntWdV,u_t_0,slip_coefficient,aux_scalar
 integer(4),dimension(1:PLANEDIM) :: acix
 double precision,dimension(1:PLANEDIM) :: sss,nnn,DVLoc,DVGlo,BCLoc,BCGlo
-double precision,dimension(1:PLANEDIM) :: IntLocXY
 double precision,dimension(1:SPACEDIM) :: u_t_0_vector
 character(4) :: strtype
 !------------------------
@@ -62,7 +61,6 @@ ibdt = BoundaryDataPointer(3,npi)
 if (IntNcbs>0) then
    do icbs=1,IntNcbs
       ibdp = ibdt + icbs - 1
-      IntLocXY(1:PLANEDIM) = BoundaryDataTab(ibdp)%LocXYZ(1:PLANEDIM)
       iside = BoundaryDataTab(ibdp)%CloBoNum
       sidestr = BoundarySide(iside)%stretch
       strtype = Tratto(sidestr)%tipo
@@ -87,6 +85,7 @@ if (IntNcbs>0) then
             elseif (Partz(Tratto(sidestr)%zone)%slip_coefficient_mode==2) then
 ! Slip coefficient computed
 ! Particle tangential (relative) velocity (vector)
+! Both "DVLoc" and "T" are defined with an opposite direction
                u_t_0_vector(:) = (Tratto(sidestr)%velocity(:) - pg(npi)%vel(:))&
                                  - (0.5d0 * DVLoc(2) *                         &
                                  BoundarySide(iside)%T(:,3))
@@ -95,7 +94,7 @@ if (IntNcbs>0) then
 ! To assess the slip coefficient
                call wall_function_for_SASPH(u_t_0,                             &
                   Partz(Tratto(sidestr)%zone)%BC_shear_stress_input,           &
-                  pg(npi)%dens,BoundaryDataTab(ibdp)%LocXYZ(3),                &
+                  pg(npi)%dens,BoundaryDataTab(ibdp)%LocXYZ(2),                &
                   slip_coefficient,aux_scalar)
          endif
          BCLoc(1) = DVLoc(1) * IntWdV * slip_coefficient

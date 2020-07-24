@@ -26,7 +26,7 @@
 !              Boundary Layer (SNBL) for rough walls. The slip coefficient also 
 !              affects the partial smoothing of the velocity field.
 !-------------------------------------------------------------------------------
-subroutine wall_function_for_SASPH(r_0w,u_t_0,d_50,rho_0,slip_coefficient_0w,  &
+subroutine wall_function_for_SASPH(u_t_0,d_50,rho_0,r_0w,slip_coefficient_0w,  &
    mu_T_0w)
 !------------------------
 ! Modules

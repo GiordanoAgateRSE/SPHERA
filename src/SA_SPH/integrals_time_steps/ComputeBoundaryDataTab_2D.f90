@@ -136,7 +136,7 @@ do npi=1,nag
                   Colmn(3) = 3
                   Colmn(4) = 4
                   Colmn(5) = 5
-                  ypi = IntLocXY(2, icbs)
+                  ypi = IntLocXY(2,icbs)
                   deltai = ypi / Domain%h
                   call InterpolateBoundaryIntegrals2D(Ncols,Colmn,deltai,Func)
                   IntWdS = Func(1) / Domain%h

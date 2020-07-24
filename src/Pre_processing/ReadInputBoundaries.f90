@@ -471,6 +471,15 @@ BoundaryVertex(Tratto(index)%inivertex:Tratto(index)%inivertex+Tratto(index)%num
                      Tratto(index)%colorCode
                   Tratto(index)%ColorCode = icolor
 #endif
+                  write(ulog,"(1x,a,i3)")   "Slip coeff. mode : ",             &
+                     Partz(Izona)%slip_coefficient_mode
+                  if (slip_coefficient_mode==1) then
+                     write(ulog,"(1x,a,1pe12.4)") "Slip coeff.    : ",         &
+                        Partz(Izona)%BC_shear_stress_input
+                     elseif (slip_coefficient_mode==2) then
+                        write(ulog,"(1x,a,1pe12.4)") "Wall mean roughness:",   &
+                           Partz(Izona)%BC_shear_stress_input
+                  endif
             case("tapi")
 #ifdef SPACE_3D
                   Tratto(index)%ColorCode = icolor
@@ -514,15 +523,6 @@ BoundaryVertex(Tratto(index)%inivertex+Tratto(index)%numvertices-1)
                         Partz(Izona)%bend
                      write(ulog,"(1x,a,2x,a)") "Movement Type   : ",           &
                         Partz(Izona)%move
-                     write(ulog,"(1x,a,i3)")   "Slip coef. mode : ",           &
-                        Partz(Izona)%slip_coefficient_mode
-                     if (slip_coefficient_mode==1) then
-                        write(ulog,"(1x,a,1pe12.4)") "Slip coeff.    : ",      &
-                           Partz(Izona)%BC_shear_stress_input
-                        elseif (slip_coefficient_mode==2) then
-                           write(ulog,"(1x,a,1pe12.4)") "Wall mean roughness:",&
-                              Partz(Izona)%BC_shear_stress_input
-                     endif
                      if (Partz(Izona)%move=="law") then
                         write(ulog,"(1x,a,i3)")                                & 
                            "Velocity Table - Number of Points: ",              &

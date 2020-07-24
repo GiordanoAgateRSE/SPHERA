@@ -47,6 +47,7 @@ double precision,dimension(1:SPACEDIM) :: tpres,tdiss,tvisc,BoundReaction
 #ifdef SPACE_3D
 character(len=lencard) :: nomsub = "RHS_momentum_equation"
 #endif
+double precision,dimension(1:size(Partz)) :: slip_coeff_counter
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -57,9 +58,11 @@ character(len=lencard) :: nomsub = "RHS_momentum_equation"
 ! Initializations
 !------------------------
 Partz(:)%avg_comp_slip_coeff = 0.d0
+Partz(:)%avg_mu_T_SASPH = 0.d0
 #ifdef SPACE_3D
 Ncbf_Max = 0
 #endif
+slip_coeff_counter(:) = 0
 !------------------------
 ! Statements
 !------------------------
@@ -68,7 +71,7 @@ Ncbf_Max = 0
 #ifdef SPACE_3D
 !$omp shared(Ncbf_Max)                                                         &
 #endif
-!$omp shared(nag)                                                              &
+!$omp shared(nag,slip_coeff_counter)                                           &
 !$omp private(npi,ii,tpres,tdiss,tvisc)                                        &
 #ifdef SPACE_3D
 !$omp private(Ncbf)                                                            &
@@ -117,9 +120,11 @@ do ii = 1,indarrayFlu
 !$omp critical (omp_Ncbf_Max)
          Ncbf_Max = max(Ncbf_Max,Ncbf)
 !$omp end critical (omp_Ncbf_Max)
-         call AddBoundaryContributions_to_ME3D(npi,Ncbf,tpres,tdiss,tvisc)
+         call AddBoundaryContributions_to_ME3D(npi,Ncbf,tpres,tdiss,tvisc,     &
+            slip_coeff_counter)
 #elif defined SPACE_2D
-            call AddBoundaryContributions_to_ME2D(npi,IntNcbs,tpres,tdiss,tvisc)
+            call AddBoundaryContributions_to_ME2D(npi,IntNcbs,tpres,tdiss,     &
+               tvisc,slip_coeff_counter)
 #endif
       if (pg(npi)%kodvel==0) then
 #ifdef SPACE_3D
@@ -149,6 +154,15 @@ if (Ncbf_Max>Domain%MAXCLOSEBOUNDFACES) then
    call diagnostic(arg1=9,arg2=3,arg3=nomsub)
 endif
 #endif
+! Update of the average slip coefficient for each boundary zone
+do ii=1,size(Partz)
+   if (slip_coeff_counter(ii)>0) then
+      Partz(ii)%avg_comp_slip_coeff = Partz(ii)%avg_comp_slip_coeff /          &
+                                      slip_coeff_counter(ii)
+      Partz(ii)%avg_mu_T_SASPH = Partz(ii)%avg_mu_T_SASPH /                    &
+                                 slip_coeff_counter(ii)
+   endif
+enddo
 !------------------------
 ! Deallocations
 !------------------------

@@ -133,7 +133,7 @@ do while (trim(lcase(ainp))/="##### end medium #####")
          endif
       case default
    endselect
-! Assignments 
+! Assignments
    if (input_second_read.eqv..true.) then
       Med(index)%tipo = tipo
       Med(index)%index = index

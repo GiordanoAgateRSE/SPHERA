@@ -25,7 +25,8 @@
 !              computation of gradPsuro (Di Monaco et al., 2011, EACFM).                        
 !-------------------------------------------------------------------------------
 #ifdef SPACE_3D
-subroutine AddBoundaryContributions_to_ME3D(npi,Ncbf,tpres,tdiss,tvisc)
+subroutine AddBoundaryContributions_to_ME3D(npi,Ncbf,tpres,tdiss,tvisc,        &
+   slip_coeff_counter)
 !------------------------
 ! Modules
 !------------------------
@@ -39,6 +40,7 @@ use I_O_file_module
 implicit none
 integer(4),intent(in) :: npi,Ncbf
 double precision,intent(inout),dimension(1:SPACEDIM) :: tpres,tdiss,tvisc
+double precision,intent(inout),dimension(1:size(Partz)) :: slip_coeff_counter
 integer(4) :: sd,icbf,iface,ibdp,sdj,i,j,mati,stretch
 double precision :: IntdWrm1dV,cinvisci,Monvisc,cinviscmult,pressi,dvn
 double precision :: FlowRate1,Lb,L,minquotanode,maxquotanode,u_t_0
@@ -47,7 +49,6 @@ double precision,dimension(1:SPACEDIM) :: vb,vi,dvij,RHS,nnlocal,Grav_Loc
 double precision,dimension(1:SPACEDIM) :: ViscoMon,ViscoShear,LocPi,Gpsurob_Loc
 double precision,dimension(1:SPACEDIM) :: Gpsurob_Glo,u_t_0_vector
 character(4) :: stretchtype
-double precision,dimension(1:size(Partz)) :: slip_coeff_counter
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -69,7 +70,6 @@ if ((Domain%time_stage==1).or.(Domain%time_split==1)) then
    pg(npi)%kodvel = 0
    pg(npi)%velass(:) = zero
 endif
-slip_coeff_counter(:) = 0
 !------------------------
 ! Statements
 !------------------------
@@ -135,6 +135,7 @@ face_loop: do icbf=1,Ncbf
             elseif (Partz(Tratto(stretch)%zone)%slip_coefficient_mode==2) then
 ! Slip coefficient computed
 ! Particle tangential (relative) velocity (vector)
+! Both "dvn" and "T" are defined with an opposite direction
                u_t_0_vector(:) = 0.5d0 * (dvij(:) - dvn *                      &
                                  BoundaryFace(iface)%T(:,3))
 ! Particle tangential (relative) velocity (absolute value)
@@ -143,12 +144,18 @@ face_loop: do icbf=1,Ncbf
                call wall_function_for_SASPH(u_t_0,                             &
                   Partz(Tratto(stretch)%zone)%BC_shear_stress_input,           &
                   pg(npi)%dens,LocPi(3),slip_coefficient,cinvisci)
-! Update of the incremental sum of the slip coefficient values
+!$omp critical (avg_slip_coefficient_3D)
+! Update of the incremental sum for the slip coefficient
                Partz(Tratto(stretch)%zone)%avg_comp_slip_coeff =               &
                   Partz(Tratto(stretch)%zone)%avg_comp_slip_coeff +            &
                   slip_coefficient
+! Update of the incremental sum for the turbulent viscosity
+               Partz(Tratto(stretch)%zone)%avg_mu_T_SASPH =                    &
+                  Partz(Tratto(stretch)%zone)%avg_mu_T_SASPH + cinvisci
+! Update the counter for both the slip coefficient and the turbulent viscosity
                slip_coeff_counter(Tratto(stretch)%zone) =                      &
                   slip_coeff_counter(Tratto(stretch)%zone) + 1
+!$omp end critical (avg_slip_coefficient_3D)
          endif
          if (cinvisci>zero) then
             if ((pg(npi)%laminar_flag==1).or.                                  &
@@ -203,13 +210,6 @@ face_loop: do icbf=1,Ncbf
                return                                                          
    endif
 enddo face_loop
-! Update of the average slip coefficient for each boundary zone
-do i=1,size(Partz)
-   if (slip_coeff_counter(i)>0) then
-      Partz(i)%avg_comp_slip_coeff = Partz(i)%avg_comp_slip_coeff /            &
-                                     slip_coeff_counter(i)
-   endif
-enddo
 ! Adding boundary contributions to the momentum equation
 tpres(:) = tpres(:) - RHS(:)
 tdiss(:) = tdiss(:) - ViscoMon(:)

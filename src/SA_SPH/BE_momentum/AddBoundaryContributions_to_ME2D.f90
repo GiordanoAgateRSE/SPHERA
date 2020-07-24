@@ -25,7 +25,8 @@
 !              et al., 2011, EACFM).                        
 !-------------------------------------------------------------------------------
 #ifdef SPACE_2D
-subroutine AddBoundaryContributions_to_ME2D(npi,IntNcbs,tpres,tdiss,tvisc) 
+subroutine AddBoundaryContributions_to_ME2D(npi,IntNcbs,tpres,tdiss,tvisc,     &
+   slip_coeff_counter) 
 !------------------------
 ! Modules
 !------------------------
@@ -42,6 +43,7 @@ double precision,parameter :: pibmink = 10.d0
 double precision,parameter :: eps = 0.1d0
 integer(4),intent(in) :: npi,IntNcbs
 double precision,intent(inout),dimension(1:SPACEDIM) :: tpres,tdiss,tvisc
+double precision,intent(inout),dimension(1:size(Partz)) :: slip_coeff_counter
 integer(4) :: imed,i,j,icbs,ibdt,ibdp,iside,sidestr
 double precision :: IntWds,IntWdV,cinvisci,Monvisc,roi,ro0,celeri,pressi,u_t_0     
 double precision :: alfaMon,xpi,ypi,SVforce,slip_coefficient,TN,ypimin,ypigradN 
@@ -51,12 +53,11 @@ double precision :: QiiIntWdS,level,pressj,Qsi,Qsj,velix,veliz,veliq,hcrit
 double precision :: hcritmin,zbottom,FlowRate1,Lb,L,minquotanode,maxquotanode
 double precision :: SomQsiQsj,DiffQsiQsj
 integer(4),dimension(1:PLANEDIM) :: acix
-double precision,dimension(1:PLANEDIM) :: IntLocXY,RHS,RG,ss,nnlocal,gradbPsuro
+double precision,dimension(1:PLANEDIM) :: RHS,RG,ss,nnlocal,gradbPsuro
 double precision,dimension(1:PLANEDIM) :: ViscoMon,ViscoShear,sidevel,TT,Dvel
 double precision,dimension(1:SPACEDIM) :: u_t_0_vector
 type (TyBoundarySide) :: RifBoundarySide
 character(4):: strtype
-double precision,dimension(1:size(Partz)) :: slip_coeff_counter
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -85,20 +86,18 @@ ViscoMon(2) = zero
 ViscoShear(1) = zero
 ViscoShear(2) = zero
 ibdt = BoundaryDataPointer(3,npi)
-slip_coeff_counter(:) = 0
 !------------------------
 ! Statements
 !------------------------
 do icbs=1,IntNcbs
    ibdp = ibdt + icbs - 1
-   IntLocXY(1:PLANEDIM) = BoundaryDataTab(ibdp)%LocXYZ(1:PLANEDIM)
    iside = BoundaryDataTab(ibdp)%CloBoNum
    RifBoundarySide = BoundarySide(iside)
    sidestr = RifBoundarySide%stretch
    strtype = Tratto(sidestr)%tipo
    if (strtype=="open") cycle
-   xpi = IntLocXY(1)
-   ypi = IntLocXY(2)
+   xpi = BoundaryDataTab(ibdp)%LocXYZ(1)
+   ypi = BoundaryDataTab(ibdp)%LocXYZ(2)
    IntWdS = BoundaryDataTab(ibdp)%BoundaryIntegral(1)
    IntWdV = BoundaryDataTab(ibdp)%BoundaryIntegral(3)
    IntWd1s0 = BoundaryDataTab(ibdp)%BoundaryIntegral(6)
@@ -269,6 +268,7 @@ do icbs=1,IntNcbs
             elseif (Partz(Tratto(sidestr)%zone)%slip_coefficient_mode==2) then
 ! Slip coefficient computed
 ! Particle tangential (relative) velocity (vector)
+! Both "DvelN" and "T" are defined with an opposite direction
                u_t_0_vector(:) = (pg(npi)%var(:) - RifBoundarySide%velocity(:))&
                                  - (0.5d0 * DvelN * RifBoundarySide%T(:,3))
 ! Particle tangential (relative) velocity (absolute value)
@@ -276,14 +276,20 @@ do icbs=1,IntNcbs
 ! To assess the slip coefficient and the turbulent viscosity
                call wall_function_for_SASPH(u_t_0,                             &
                   Partz(Tratto(sidestr)%zone)%BC_shear_stress_input,           &
-                  pg(npi)%dens,BoundaryDataTab(ibdp)%LocXYZ(3),                &
+                  pg(npi)%dens,BoundaryDataTab(ibdp)%LocXYZ(2),                &
                   slip_coefficient,cinvisci)
-! Update of the incremental sum of the slip coefficient values
+!$omp critical (avg_slip_coefficient_2D)         
+! Update of the incremental sum for the slip coefficient
                   Partz(Tratto(sidestr)%zone)%avg_comp_slip_coeff =            &
                      Partz(Tratto(sidestr)%zone)%avg_comp_slip_coeff +         &
                      slip_coefficient
+! Update of the incremental sum for the turbulent viscosity
+                  Partz(Tratto(sidestr)%zone)%avg_mu_T_SASPH =                 &
+                     Partz(Tratto(sidestr)%zone)%avg_mu_T_SASPH + cinvisci
+! Update the counter for both the slip coefficient and the turbulent viscosity
                   slip_coeff_counter(Tratto(sidestr)%zone) =                   &
                      slip_coeff_counter(Tratto(sidestr)%zone) + 1
+!$omp end critical (avg_slip_coefficient_2D)
          endif
          celeri = Med(imed)%celerita
          alfaMon = Med(imed)%alfaMon
@@ -310,13 +316,6 @@ do i=1,PLANEDIM
    tpres(acix(i)) = - RHS(i)
    tdiss(acix(i)) = tdiss(acix(i)) - ViscoMon(i)
    tvisc(acix(i)) = tvisc(acix(i)) - ViscoShear(i)
-enddo
-! Update of the average slip coefficient for each boundary zone
-do i=1,size(Partz)
-   if (slip_coeff_counter(i)>0) then
-      Partz(i)%avg_comp_slip_coeff = Partz(i)%avg_comp_slip_coeff /            &
-                                     slip_coeff_counter(i)
-   endif
 enddo
 !------------------------
 ! Deallocations

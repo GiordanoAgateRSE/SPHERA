@@ -80,6 +80,7 @@ if (Ncbf>0) then
             elseif (Partz(Tratto(facestr)%zone)%slip_coefficient_mode==2) then
 ! Slip coefficient computed
 ! Particle tangential (relative) velocity (vector)
+! Both "DVLoc" and "T" are defined with an opposite direction
                u_t_0_vector(:) = 0.5d0 * (DVGlo(:) - DVLoc(3) *                &
                                  BoundaryFace(iface)%T(:,3))
 ! Particle tangential (relative) velocity (absolute value)
