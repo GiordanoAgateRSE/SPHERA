@@ -62,11 +62,13 @@ double precision :: z_0
 ! Initializations
 !------------------------
 slip_coefficient_0w = 0.d0
-mu_T_0w = 0.d0
+! Turbulent viscosity is initialized to a non-null value just to avoid the 
+! product "0*0" when assessing the shear stress out of the wall-function depth.
+mu_T_0w = 1.d-12
 !------------------------
 ! Statements
 !------------------------
-if (r_0w<=(0.75d0*Domain%dx)) then
+if (r_0w<=(0.5d0*Domain%dx)) then
 ! Only the particle layer close to the boundary is selected
    z_0 = d_50 / 30.d0
    if (r_0w<(z_0*Nepero_number)) then
