@@ -59,6 +59,7 @@ double precision,dimension(1:size(Partz)) :: slip_coeff_counter
 !------------------------
 Partz(:)%avg_comp_slip_coeff = 0.d0
 Partz(:)%avg_mu_T_SASPH = 0.d0
+Partz(:)%avg_tau_wall_f = 0.d0
 #ifdef SPACE_3D
 Ncbf_Max = 0
 #endif
@@ -160,6 +161,8 @@ do ii=1,size(Partz)
       Partz(ii)%avg_comp_slip_coeff = Partz(ii)%avg_comp_slip_coeff /          &
                                       slip_coeff_counter(ii)
       Partz(ii)%avg_mu_T_SASPH = Partz(ii)%avg_mu_T_SASPH /                    &
+                                 slip_coeff_counter(ii)
+      Partz(ii)%avg_tau_wall_f = Partz(ii)%avg_tau_wall_f /                    &
                                  slip_coeff_counter(ii)
    endif
 enddo

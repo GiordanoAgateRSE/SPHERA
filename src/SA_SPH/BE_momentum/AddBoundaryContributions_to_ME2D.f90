@@ -278,6 +278,7 @@ do icbs=1,IntNcbs
                   Partz(Tratto(sidestr)%zone)%BC_shear_stress_input,           &
                   pg(npi)%dens,BoundaryDataTab(ibdp)%LocXYZ(2),                &
                   slip_coefficient,cinvisci)
+               if (slip_coefficient>1.d-12) then
 !$omp critical (avg_slip_coefficient_2D)         
 ! Update of the incremental sum for the slip coefficient
                   Partz(Tratto(sidestr)%zone)%avg_comp_slip_coeff =            &
@@ -286,10 +287,17 @@ do icbs=1,IntNcbs
 ! Update of the incremental sum for the turbulent viscosity
                   Partz(Tratto(sidestr)%zone)%avg_mu_T_SASPH =                 &
                      Partz(Tratto(sidestr)%zone)%avg_mu_T_SASPH + cinvisci
-! Update the counter for both the slip coefficient and the turbulent viscosity
+! Update of the incremental sum for the wall-function shear stress
+                  Partz(Tratto(sidestr)%zone)%avg_tau_wall_f =                 &
+                     Partz(Tratto(sidestr)%zone)%avg_tau_wall_f +              &
+                     slip_coefficient * cinvisci * u_t_0 /                     &
+                     BoundaryDataTab(ibdp)%LocXYZ(2)
+! Update the counter for both the slip coefficient, the turbulent viscosity and 
+! the wall-function shear stress
                   slip_coeff_counter(Tratto(sidestr)%zone) =                   &
                      slip_coeff_counter(Tratto(sidestr)%zone) + 1
 !$omp end critical (avg_slip_coefficient_2D)
+               endif
          endif
          celeri = Med(imed)%celerita
          alfaMon = Med(imed)%alfaMon

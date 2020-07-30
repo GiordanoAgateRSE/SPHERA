@@ -31,6 +31,7 @@ subroutine wall_function_for_SASPH(u_t_0,d_50,rho_0,r_0w,slip_coefficient_0w,  &
 !------------------------
 ! Modules
 !------------------------
+use Hybrid_allocation_module
 use Static_allocation_module
 !------------------------
 ! Declarations
@@ -60,16 +61,21 @@ double precision :: z_0
 !------------------------
 ! Initializations
 !------------------------
+slip_coefficient_0w = 0.d0
+mu_T_0w = 0.d0
 !------------------------
 ! Statements
 !------------------------
-z_0 = d_50 / 30.d0
-if (r_0w<(z_0*Nepero_number)) then
-   slip_coefficient_0w = 1.d0
-   mu_T_0w = rho_0 * (k_v ** 2) * u_t_0 * z_0 * Nepero_number
-   else
-      slip_coefficient_0w = 1.d0 / log(r_0w / z_0)
-      mu_T_0w = rho_0 * (k_v ** 2) * u_t_0 * r_0w / log(r_0w / z_0)
+if (r_0w<=(0.75d0*Domain%dx)) then
+! Only the particle layer close to the boundary is selected
+   z_0 = d_50 / 30.d0
+   if (r_0w<(z_0*Nepero_number)) then
+      slip_coefficient_0w = 1.d0
+      mu_T_0w = rho_0 * (k_v ** 2) * u_t_0 * z_0 * Nepero_number
+      else
+         slip_coefficient_0w = 1.d0 / log(r_0w / z_0)
+         mu_T_0w = rho_0 * (k_v ** 2) * u_t_0 * r_0w / log(r_0w / z_0)
+   endif
 endif
 !------------------------
 ! Deallocations

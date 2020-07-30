@@ -502,6 +502,8 @@ type TyZone
    double precision :: avg_comp_slip_coeff
 ! Average mixing-length turbulent dynamic viscosity at SASPH walls
    double precision :: avg_mu_T_SASPH
+! Average shear stress computed according to the wall function at SASPH walls
+   double precision :: avg_tau_wall_f
    double precision :: pool
 ! IC for pressure or free surface height 
    double precision :: valp

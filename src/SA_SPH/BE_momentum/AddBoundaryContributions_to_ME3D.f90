@@ -144,18 +144,25 @@ face_loop: do icbf=1,Ncbf
                call wall_function_for_SASPH(u_t_0,                             &
                   Partz(Tratto(stretch)%zone)%BC_shear_stress_input,           &
                   pg(npi)%dens,LocPi(3),slip_coefficient,cinvisci)
+               if (slip_coefficient>1.d-12) then
 !$omp critical (avg_slip_coefficient_3D)
 ! Update of the incremental sum for the slip coefficient
-               Partz(Tratto(stretch)%zone)%avg_comp_slip_coeff =               &
-                  Partz(Tratto(stretch)%zone)%avg_comp_slip_coeff +            &
-                  slip_coefficient
+                  Partz(Tratto(stretch)%zone)%avg_comp_slip_coeff =            &
+                     Partz(Tratto(stretch)%zone)%avg_comp_slip_coeff +         &
+                     slip_coefficient
 ! Update of the incremental sum for the turbulent viscosity
-               Partz(Tratto(stretch)%zone)%avg_mu_T_SASPH =                    &
-                  Partz(Tratto(stretch)%zone)%avg_mu_T_SASPH + cinvisci
-! Update the counter for both the slip coefficient and the turbulent viscosity
-               slip_coeff_counter(Tratto(stretch)%zone) =                      &
-                  slip_coeff_counter(Tratto(stretch)%zone) + 1
+                  Partz(Tratto(stretch)%zone)%avg_mu_T_SASPH =                 &
+                     Partz(Tratto(stretch)%zone)%avg_mu_T_SASPH + cinvisci
+! Update of the incremental sum for the wall-function shear stress
+                  Partz(Tratto(sidestr)%zone)%avg_tau_wall_f =                 &
+                     Partz(Tratto(sidestr)%zone)%avg_tau_wall_f +              &
+                     slip_coefficient * cinvisci * u_t_0 / LocPi(3)
+! Update the counter for both the slip coefficient, the turbulent viscosity and 
+! the wall-function shear stress
+                  slip_coeff_counter(Tratto(stretch)%zone) =                   &
+                     slip_coeff_counter(Tratto(stretch)%zone) + 1
 !$omp end critical (avg_slip_coefficient_3D)
+               endif
          endif
          if (cinvisci>zero) then
             if ((pg(npi)%laminar_flag==1).or.                                  &
