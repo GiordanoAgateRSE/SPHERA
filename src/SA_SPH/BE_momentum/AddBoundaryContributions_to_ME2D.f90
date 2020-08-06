@@ -276,8 +276,7 @@ do icbs=1,IntNcbs
 ! To assess the slip coefficient and the turbulent viscosity
                call wall_function_for_SASPH(u_t_0,                             &
                   Partz(Tratto(sidestr)%zone)%BC_shear_stress_input,           &
-                  pg(npi)%dens,BoundaryDataTab(ibdp)%LocXYZ(2),                &
-                  slip_coefficient,cinvisci)
+                  BoundaryDataTab(ibdp)%LocXYZ(2),slip_coefficient,cinvisci)
                if (slip_coefficient>1.d-12) then
 !$omp critical (avg_slip_coefficient_2D)         
 ! Update of the incremental sum for the slip coefficient
@@ -285,12 +284,12 @@ do icbs=1,IntNcbs
                      Partz(Tratto(sidestr)%zone)%avg_comp_slip_coeff +         &
                      slip_coefficient
 ! Update of the incremental sum for the turbulent viscosity
-                  Partz(Tratto(sidestr)%zone)%avg_mu_T_SASPH =                 &
-                     Partz(Tratto(sidestr)%zone)%avg_mu_T_SASPH + cinvisci
+                  Partz(Tratto(sidestr)%zone)%avg_ni_T_SASPH =                 &
+                     Partz(Tratto(sidestr)%zone)%avg_ni_T_SASPH + cinvisci
 ! Update of the incremental sum for the wall-function shear stress
                   Partz(Tratto(sidestr)%zone)%avg_tau_wall_f =                 &
                      Partz(Tratto(sidestr)%zone)%avg_tau_wall_f +              &
-                     slip_coefficient * cinvisci * u_t_0 /                     &
+                     slip_coefficient * pg(npi)%dens * cinvisci * u_t_0 /      &
                      BoundaryDataTab(ibdp)%LocXYZ(2)
 ! Update the counter for both the slip coefficient, the turbulent viscosity and 
 ! the wall-function shear stress

@@ -500,8 +500,8 @@ type TyZone
    double precision :: BC_shear_stress_input
 ! Average computed slip coefficient
    double precision :: avg_comp_slip_coeff
-! Average mixing-length turbulent dynamic viscosity at SASPH walls
-   double precision :: avg_mu_T_SASPH
+! Average mixing-length turbulent kinematic viscosity at SASPH walls
+   double precision :: avg_ni_T_SASPH
 ! Average shear stress computed according to the wall function at SASPH walls
    double precision :: avg_tau_wall_f
    double precision :: pool

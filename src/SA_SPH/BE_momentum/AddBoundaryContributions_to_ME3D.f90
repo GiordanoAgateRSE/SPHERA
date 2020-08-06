@@ -143,7 +143,7 @@ face_loop: do icbf=1,Ncbf
 ! To assess the slip coefficient and the turbulent viscosity
                call wall_function_for_SASPH(u_t_0,                             &
                   Partz(Tratto(stretch)%zone)%BC_shear_stress_input,           &
-                  pg(npi)%dens,LocPi(3),slip_coefficient,cinvisci)
+                  LocPi(3),slip_coefficient,cinvisci)
                if (slip_coefficient>1.d-12) then
 !$omp critical (avg_slip_coefficient_3D)
 ! Update of the incremental sum for the slip coefficient
@@ -151,12 +151,13 @@ face_loop: do icbf=1,Ncbf
                      Partz(Tratto(stretch)%zone)%avg_comp_slip_coeff +         &
                      slip_coefficient
 ! Update of the incremental sum for the turbulent viscosity
-                  Partz(Tratto(stretch)%zone)%avg_mu_T_SASPH =                 &
-                     Partz(Tratto(stretch)%zone)%avg_mu_T_SASPH + cinvisci
+                  Partz(Tratto(stretch)%zone)%avg_ni_T_SASPH =                 &
+                     Partz(Tratto(stretch)%zone)%avg_ni_T_SASPH + cinvisci
 ! Update of the incremental sum for the wall-function shear stress
                   Partz(Tratto(sidestr)%zone)%avg_tau_wall_f =                 &
                      Partz(Tratto(sidestr)%zone)%avg_tau_wall_f +              &
-                     slip_coefficient * cinvisci * u_t_0 / LocPi(3)
+                     slip_coefficient * pg(npi)%dens * cinvisci * u_t_0 /      &
+                     LocPi(3)
 ! Update the counter for both the slip coefficient, the turbulent viscosity and 
 ! the wall-function shear stress
                   slip_coeff_counter(Tratto(stretch)%zone) =                   &

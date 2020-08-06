@@ -486,11 +486,11 @@ if (nag>0) then
    do i=1,size(Partz)
       if (Partz(i)%slip_coefficient_mode==2) then
          write(ulog,'(a,i3,a,a,g12.3,a)') "Zone ",i,": the average value ",    &
-            "computed for the slip coefficient is ",                           &
+            "computed for the slip coefficient in the wall-function depth is ",&
             Partz(i)%avg_comp_slip_coeff," ."
-         write(ulog,'(a,i3,a,a,ES12.3,a)') "Zone ",i,": the average value ",   &
-            "for the turbulent dynamic viscosity at SASPH walls is ",          &
-            Partz(i)%avg_mu_T_SASPH," Pa*s."
+         write(ulog,'(a,i3,a,a,a,ES12.3,a)') "Zone ",i,": the average value ", &
+            "for the turbulent kinematic viscosity in the wall-function ",     &
+            "depth is ",Partz(i)%avg_ni_T_SASPH," Pa*s."
          write(ulog,'(a,i3,a,a,ES12.3,a)') "Zone ",i,": the average value ",   &
             "for the wall-function shear stress at SASPH walls is ",           &
             Partz(i)%avg_tau_wall_f," Pa."

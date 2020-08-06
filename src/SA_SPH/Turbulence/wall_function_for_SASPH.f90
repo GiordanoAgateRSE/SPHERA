@@ -26,8 +26,7 @@
 !              Boundary Layer (SNBL) for rough walls. The slip coefficient also 
 !              affects the partial smoothing of the velocity field.
 !-------------------------------------------------------------------------------
-subroutine wall_function_for_SASPH(u_t_0,d_50,rho_0,r_0w,slip_coefficient_0w,  &
-   mu_T_0w)
+subroutine wall_function_for_SASPH(u_t_0,d_50,r_0w,slip_coefficient_0w,ni_T_0w)
 !------------------------
 ! Modules
 !------------------------
@@ -41,15 +40,13 @@ implicit none
 double precision,intent(in) :: u_t_0
 ! Mean diameter of the wall roughness elements around the wall frontier
 double precision,intent(in) :: d_50
-! Density of the computational particle
-double precision,intent(in) :: rho_0
 ! Distance between the computational particle and the neighbouring wall element
 double precision,intent(in) :: r_0w
 ! Slip coefficient for the current particle-frontier interaction
 double precision,intent(out) :: slip_coefficient_0w
-! Mixing-length turbulent viscosity for the current particle-frontier 
+! Mixing-length turbulent kinematic viscosity for the current particle-frontier 
 ! interaction
-double precision,intent(out) :: mu_T_0w
+double precision,intent(out) :: ni_T_0w
 ! Roughness length
 double precision :: z_0
 !------------------------
@@ -64,7 +61,7 @@ double precision :: z_0
 slip_coefficient_0w = 0.d0
 ! Turbulent viscosity is initialized to a non-null value just to avoid the 
 ! product "0*0" when assessing the shear stress out of the wall-function depth.
-mu_T_0w = 1.d-12
+ni_T_0w = 1.d-15
 !------------------------
 ! Statements
 !------------------------
@@ -72,11 +69,13 @@ if (r_0w<=(0.5d0*Domain%dx)) then
 ! Only the particle layer close to the boundary is selected
    z_0 = d_50 / 30.d0
    if (r_0w<(z_0*Nepero_number)) then
+! Formulation with underestimation of the wall shear stress, but keeping the 
+! slip coefficient non-larger than the unity.
       slip_coefficient_0w = 1.d0
-      mu_T_0w = rho_0 * (k_v ** 2) * u_t_0 * z_0 * Nepero_number
+      ni_T_0w = (k_v ** 2) * u_t_0 * z_0 * Nepero_number
       else
          slip_coefficient_0w = 1.d0 / log(r_0w / z_0)
-         mu_T_0w = rho_0 * (k_v ** 2) * u_t_0 * r_0w / log(r_0w / z_0)
+         ni_T_0w = (k_v ** 2) * u_t_0 * r_0w / log(r_0w / z_0)
    endif
 endif
 !------------------------

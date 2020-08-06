@@ -94,8 +94,7 @@ if (IntNcbs>0) then
 ! To assess the slip coefficient
                call wall_function_for_SASPH(u_t_0,                             &
                   Partz(Tratto(sidestr)%zone)%BC_shear_stress_input,           &
-                  pg(npi)%dens,BoundaryDataTab(ibdp)%LocXYZ(2),                &
-                  slip_coefficient,aux_scalar)
+                  BoundaryDataTab(ibdp)%LocXYZ(2),slip_coefficient,aux_scalar)
          endif
          BCLoc(1) = DVLoc(1) * IntWdV * slip_coefficient
          BCLoc(2) = DVLoc(2) * IntWdV

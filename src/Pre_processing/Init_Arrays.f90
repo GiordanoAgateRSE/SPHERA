@@ -92,7 +92,7 @@ do i=1,size(Partz)
    Partz(i)%BC_shear_stress_input = zero
    Partz(i)%slip_Coefficient_mode = 0
    Partz(i)%avg_comp_slip_coeff = 0.d0
-   Partz(i)%avg_mu_T_SASPH = 0.d0
+   Partz(i)%avg_ni_T_SASPH = 0.d0
    Partz(i)%avg_tau_wall_f = 0.d0
 enddo
 do i=1,size(Control_Points)

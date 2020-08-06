@@ -37,8 +37,10 @@ use I_O_file_module
 implicit none
 double precision,intent(in) :: dtvel
 integer(4) :: npartint,i,j,npi,npj,aux,nbi,npk,k,nbk,alloc_stat
-integer(4) :: n_interactions,aux2,aux3,test,aux_int
-integer(4) :: aux_scal_test
+integer(4) :: n_interactions,aux2,aux3,test,aux_scal_test
+#ifdef SPACE_3D
+integer(4) :: aux_int
+#endif
 double precision :: k_masses,r_per,r_par,alfa_boun
 double precision :: aux_impact_vel,aux4,aux_scalar,aux_scalar_2
 double precision :: friction_limiter
@@ -603,7 +605,10 @@ do npi=1,n_body_part
 enddo     
 ! Loop over the transported bodies (global contributions from body-body and 
 ! boundary-body interactions; computation of Ic and its inverse)
-!$omp parallel do default(none) private(i,j,k_masses,alfa_boun,aux_int)        &
+!$omp parallel do default(none) private(i,j,k_masses,alfa_boun)                &
+#ifdef SPACE_3D
+!$omp private(aux_int)                                                         &
+#endif
 !$omp shared(n_bodies,body_arr,it_start,on_going_time_step,aux,r_per_min)      &
 !$omp shared(Domain,alfa_denom,Force_bod_sol,Moment_bod_sol,inter_front)       &
 !$omp shared(Force_bod_flu)
