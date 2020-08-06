@@ -65,7 +65,7 @@ PD_SPACE = -DSPACE_2D
 #                " "
 #             Verbose output
 #                " -DVERBOSITY"
-PD_VERBOSITY =  
+PD_VERBOSITY = -DVERBOSITY
 
 #       KTGF
 #          Suggested values:
@@ -75,7 +75,7 @@ PD_VERBOSITY =
 #                " -DKTGF_NO"
 #             KTGF scheme with possible 1-interface 2D erosion criterion
 #                " -DKTGF_EC2D"
-PD_KTGF = -DKTGF_NO
+PD_KTGF = -DKTGF_FULL
 
 #       SOLID_BODIES
 #          Suggested values:

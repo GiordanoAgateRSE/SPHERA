@@ -67,7 +67,7 @@ ni_T_0w = 1.d-15
 !------------------------
 if (r_0w<=(0.5d0*Domain%dx)) then
 ! Only the particle layer close to the boundary is selected
-   z_0 = d_50 / 30.d0
+   z_0 = d_50 / 10.d0
    if (r_0w<(z_0*Nepero_number)) then
 ! Formulation with underestimation of the wall shear stress, but keeping the 
 ! slip coefficient non-larger than the unity.

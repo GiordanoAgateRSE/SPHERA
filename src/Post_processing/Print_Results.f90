@@ -490,7 +490,7 @@ if (nag>0) then
             Partz(i)%avg_comp_slip_coeff," ."
          write(ulog,'(a,i3,a,a,a,ES12.3,a)') "Zone ",i,": the average value ", &
             "for the turbulent kinematic viscosity in the wall-function ",     &
-            "depth is ",Partz(i)%avg_ni_T_SASPH," Pa*s."
+            "depth is ",Partz(i)%avg_ni_T_SASPH," m2/s."
          write(ulog,'(a,i3,a,a,ES12.3,a)') "Zone ",i,": the average value ",   &
             "for the wall-function shear stress at SASPH walls is ",           &
             Partz(i)%avg_tau_wall_f," Pa."
