@@ -154,8 +154,8 @@ face_loop: do icbf=1,Ncbf
                   Partz(Tratto(stretch)%zone)%avg_ni_T_SASPH =                 &
                      Partz(Tratto(stretch)%zone)%avg_ni_T_SASPH + cinvisci
 ! Update of the incremental sum for the wall-function shear stress
-                  Partz(Tratto(sidestr)%zone)%avg_tau_wall_f =                 &
-                     Partz(Tratto(sidestr)%zone)%avg_tau_wall_f +              &
+                  Partz(Tratto(stretch)%zone)%avg_tau_wall_f =                 &
+                     Partz(Tratto(stretch)%zone)%avg_tau_wall_f +              &
                      slip_coefficient * pg(npi)%dens * cinvisci * u_t_0 /      &
                      LocPi(3)
 ! Update the counter for both the slip coefficient, the turbulent viscosity and 
