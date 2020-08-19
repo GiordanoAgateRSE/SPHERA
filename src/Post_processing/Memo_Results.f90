@@ -74,11 +74,11 @@ if (index(str,'inizio')/=0) then
 #endif
    write(nres) version,nrecords
 #ifdef SPACE_3D
-   write(nres) ncord,Nag,NMedium,NPartZone,NumVertici,NumFacce,NumTratti,      &   
+   write(nres) Nag,NMedium,NPartZone,NumVertici,NumFacce,NumTratti,            &   
       NumBVertices,GCBFVecDim,Grid%nmax,npointst,NPoints,NPointsl,             &
       NPointse,NLines,doubleh
 #elif defined SPACE_2D
-   write(nres) ncord,Nag,NMedium,NPartZone,NumVertici,NumTratti,               &   
+   write(nres) Nag,NMedium,NPartZone,NumVertici,NumTratti,                     &   
       NumBVertices,NumBSides,Grid%nmax,npointst,NPoints,NPointsl,              &
       NPointse,NLines,doubleh
 #endif
@@ -136,7 +136,7 @@ endif
 if ((it_rest==it).or.(index(str,'inizio')/=0).or.(index(str,'fine')/=0)) then
 ! If restartcode=1, then to save the whole arrays "pg","pg_w"
    restartcode = 1
-   write(nres) it,simulation_time,dt,nag,ncord,restartcode
+   write(nres) it,simulation_time,dt,nag,restartcode
    write(nres) pg(1:nag)
    if (allocated(pg_w)) write(nres)                                            &
       pg_w(1:DBSPH%n_w+DBSPH%n_inlet+DBSPH%n_outlet)
@@ -185,7 +185,7 @@ if ((it_rest==it).or.(index(str,'inizio')/=0).or.(index(str,'fine')/=0)) then
    elseif (it_memo==it) then
 ! If restartcode=0, then to save "pg" only for visualizations
       restartcode = 0
-      write(nres) it,simulation_time,dt,nag,ncord,restartcode
+      write(nres) it,simulation_time,dt,nag,restartcode
       write(nres) pg(1:nag)%coord(1),pg(1:nag)%coord(2),pg(1:nag)%coord(3),    &
          pg(1:nag)%vel(1),pg(1:nag)%vel(2),pg(1:nag)%vel(3),pg(1:nag)%pres,    &
          pg(1:nag)%dens,pg(1:nag)%mass,pg(1:nag)%kin_visc,pg(1:nag)%imed,      &
