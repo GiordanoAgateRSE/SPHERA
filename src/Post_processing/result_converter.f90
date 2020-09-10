@@ -559,7 +559,7 @@ if (nag>0) then
    deallocate(finger)
    if ((DBSPH%n_w>0).and.(Domain%tipo=="bsph")) then
 ! Open a vtu file for DB-SPH wall and semi-particle parameters  
-! VTKConverter_<casename>_wall_<block>.vtk 
+! VTKConverter_<casename>_wall_<block>.vtu
       write(cargo,'(i8)') block
       cargo = adjustl(cargo)
       filevtk =                                                                &
@@ -774,7 +774,7 @@ if (nag>0) then
 ! Body Transport post-processing for .vtu files: start
 ! Body particles
 ! Open the .vtu unstructured grid formatted file 
-! VTKConverter_<casename>_body-part_<block>.vtk for the results storing
+! VTKConverter_<casename>_body-part_<block>.vtu for the results storing
       write(cargo,'(i8)') block
       cargo = adjustl(cargo)
       filevtk =                                                                &
@@ -944,7 +944,7 @@ if (nag>0) then
       deallocate(finger)
 ! Bodies: start
 ! Open the .vtu unstructured grid formatted file 
-! VTKConverter_<casename>_body_<block>.vtk for the results storing
+! VTKConverter_<casename>_body_<block>.vtu for the results storing
       write(cargo,'(i8)') block
       cargo = adjustl(cargo)
       filevtk =                                                                &

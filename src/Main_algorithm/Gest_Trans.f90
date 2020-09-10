@@ -20,7 +20,8 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: Gest_Trans         
-! Description: Introductory procedure for the main algorithm.                    
+! Description: Introductory procedure for the main algorithm. Writing of the  
+!              ".vtk" geometry file.
 !-------------------------------------------------------------------------------
 subroutine Gest_Trans 
 !------------------------
@@ -505,7 +506,6 @@ if (vtkconv) then
       write(unitvtk,'(a)') '1.0 0.0 0.0 1.0'
 ! 3D case
 #elif defined SPACE_3D
-      else
          nlinee = 0
          nvalori = 0
          do i=1,NumFacce
