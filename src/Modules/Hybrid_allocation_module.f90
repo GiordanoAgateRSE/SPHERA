@@ -481,7 +481,7 @@ type TyZone
 ! topography)
    integer(4) :: ID_first_vertex
 ! ID of the last vertex of topography (for a fluid zone extruded from 
-! topography) 
+! topography)
    integer(4) :: ID_last_vertex
 ! ID of the dam zone, related to the eventual reservoir (dam_zone_ID=0 if no 
 ! dam is present), if(IC_source_type==2) 

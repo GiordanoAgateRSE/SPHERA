@@ -259,7 +259,7 @@ if (on_going_time_step==1) then
 !$omp private(i_vertex,GridColumn,pos,i_aux)
             do i_vertex=Partz(i_zone)%ID_first_vertex,                         &
                Partz(i_zone)%ID_last_vertex
-               i_aux = i_vertex-Partz(i_zone)%ID_first_vertex + 1 
+               i_aux = i_vertex - Partz(i_zone)%ID_first_vertex + 1 
                pos(1) = Vertice(1,i_vertex)
                pos(2) = Vertice(2,i_vertex)
                pos(3) = Grid%extr(3,1) + 1.d-7

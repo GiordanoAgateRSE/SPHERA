@@ -347,7 +347,7 @@ allocate(substations%sub(i_sub)%DEMvert(substations%sub(i_sub)%n_DEM_vertices) &
          do i_aux=1,substations%sub(i_sub)%n_DEM_vertices
             pos(1,1) = Vertice(1,substations%sub(i_sub)%DEMvert(i_aux))
             pos(1,2) = Vertice(2,substations%sub(i_sub)%DEMvert(i_aux))
-            pos(1,3) = Grid%extr(3,1) + 0.0000001d0
+            pos(1,3) = Grid%extr(3,1) + 1.d-7
             GridColumn = ParticleCellNumber(pos(1,1:3))
             Y_step = max((Z_fluid_step(GridColumn,1) -                         &
                          Vertice(3,substations%sub(i_sub)%DEMvert(i_aux))),0.d0)

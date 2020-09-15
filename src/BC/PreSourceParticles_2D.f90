@@ -20,8 +20,8 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: PreSourceParticles_2D
-! Description: To generate new source particles at the inlet section (only in 2D
-!              and with one inlet section).
+! Description: To generate new source particles at the inlet section (only in 
+!              2D).
 !-------------------------------------------------------------------------------
 #ifdef SPACE_2D
 subroutine PreSourceParticles_2D
@@ -59,7 +59,7 @@ i_source=0
 do isi=1,NumBSides
    if (BoundarySide(isi)%tipo=="sour") then
       SourceSide = isi
-      i_source=i_source+1
+      i_source = i_source + 1
       nt = BoundarySide(SourceSide)%stretch
       irz = Tratto(nt)%zone
       mat = partz(irz)%Medium 
@@ -68,21 +68,22 @@ do isi=1,NumBSides
          A(sd) = Vertice(sd,nA)
          ss(sd) = BoundarySide(SourceSide)%T(sd,1)
          nn(sd) = BoundarySide(SourceSide)%T(sd,3)
-      end do
+      enddo
       deltapart = Domain%dx
       sidelen = BoundarySide(SourceSide)%length
-      NumPartperLine(i_source) = Int(sidelen / deltapart + 0.01d0)
+      NumPartperLine(i_source) = int(sidelen / deltapart + 0.01d0)
       eps = -half
-      yfila = eps * deltapart 
+      yfila = eps * deltapart
       linedist = -half * deltapart
       do ip=1,NumPartperLine(i_source)
          linedist = linedist + deltapart
          do sd=1,SPACEDIM
             PartLine(i_source, ip, sd) = A(sd) + linedist * ss(sd)
-         end do
-      end do
+         enddo
+      enddo
       ParticleVolume = Domain%PVolume
-      RowPeriod = ParticleVolume * NumPartperLine(i_source) / Tratto(nt)%FlowRate 
+      RowPeriod = ParticleVolume * NumPartperLine(i_source) /                  &
+                  Tratto(nt)%FlowRate 
       RowVelocity(i_source) = Domain%dx / RowPeriod
       Tratto(nt)%NormVelocity = RowVelocity(i_source)
       partz(irz)%vel(1) = RowVelocity(i_source) * nn(1)

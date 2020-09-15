@@ -357,23 +357,23 @@ ___ ___ ___ ___ ___
 ___ ___
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
-![?] <IC_reservoir_type>
+![?] <IC_source_type>
 !    =1 (vertices and faces)
 !    =2 (from Cartesian topography)
 ![?] <Car_top_zone>: boundary ID of the underlying topography (influence only 
-!    if IC_reservoir_type==2)
+!    if IC_source_type==2)
 ![?] <DBSPH_fictitious_reservoir_flag>
 !    =.true. (DB-SPH fictitious fluid particles to complete the kernel support 
 !             at the free-surface, in pre-processing)
 !    =.false. (no fictitious fluid particles)
 !-------------------------------------------------------------------------------
-![*] <IC_reservoir_type> <Car_top_zone> <DBSPH_fictitious_reservoir_flag>
+![*] <IC_source_type> <Car_top_zone> <DBSPH_fictitious_reservoir_flag>
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
 ___ ___ ___
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
-![?] if ((IC_reservoir_type==2).and.(3D)) then
+![?] if ((IC_source_type==2).and.(3D)) then
 ![?] <dx_CartTopog>: spatial resolution of the Cartesian topography; 
 !    dx_CartTopog>=dx
 ![?] <H_res>: height of the reservoir free surface
@@ -443,7 +443,7 @@ ___ ___
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
 ![?] endif (dam_zone_ID>0)
-![?] endif (IC_reservoir_type==2) (3D)
+![?] endif (IC_source_type==2) (3D)
 ![?] endif (Boundary_type=="perimeter")
 ![?] if (Boundary_type=="open") then
 ![?] In case particles exit the numerical domain without passing through an 
@@ -1175,7 +1175,7 @@ ___
 ![?] <dt_out_FS>: writing time step for free surface post-processing
 ![?] <dt_out_depth>: writing time step for 2D fields of water depth (h) and 
 !    specific flow rate components (q_x=u_m*h, q_y=v_m*h). It is influential 
-!    only "if (IC_reservoir_type==2)"
+!    only "if (IC_source_type==2)"
 !-------------------------------------------------------------------------------
 ![*] results time <dt_out>
 ![*] restart time <dt_restart>
