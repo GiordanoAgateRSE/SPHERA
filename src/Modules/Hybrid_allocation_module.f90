@@ -507,7 +507,6 @@ type TyZone
    double precision :: pool
 ! IC for pressure or free surface height 
    double precision :: valp
-   integer(4) :: Indix(2)
 ! Indices of the first and last particle IDs in the zone  
    integer(4) :: limit(2)
 ! Initial velocity
@@ -537,7 +536,7 @@ type TyZone
    character(8) :: label
 end type TyZone
 
-! Boundary stretch
+! Having removed sub-zones/tratti, this derived type can be integrated in TyZone
 type TyBoundaryStretch
    logical :: laminar_no_slip_check
    integer(4) :: ColorCode

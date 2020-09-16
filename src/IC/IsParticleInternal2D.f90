@@ -23,7 +23,7 @@
 ! Description: To check whether a particle is internal to the 2D domain.
 !-------------------------------------------------------------------------------
 #ifdef SPACE_2D
-logical function IsParticleInternal2D(Nt,PX)
+logical function IsParticleInternal2D(Nz,PX)
 !------------------------
 ! Modules
 !------------------------
@@ -36,7 +36,7 @@ use I_O_diagnostic_module
 ! Declarations
 !------------------------
 implicit none
-integer(4),intent(in) :: Nt
+integer(4),intent(in) :: Nz
 double precision,intent(in),dimension(SPACEDIM) :: PX
 integer(4) :: inizio,fine,iv,ni,n,n2
 double precision :: xa,za,xba,zba,xi,zs
@@ -52,8 +52,8 @@ character(len=lencard) :: nomsub = "IsParticleInternal2D"
 !------------------------
 IsParticleInternal2D = .false.
 ni = 0
-inizio = Tratto(Nt)%inivertex
-fine = Tratto(Nt)%inivertex + Tratto(Nt)%numvertices - 2
+inizio = Tratto(Nz)%inivertex
+fine = Tratto(Nz)%inivertex + Tratto(Nz)%numvertices - 2
 !------------------------
 ! Statements
 !------------------------

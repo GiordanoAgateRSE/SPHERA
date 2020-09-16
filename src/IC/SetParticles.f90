@@ -23,9 +23,9 @@
 ! Description: Particle coordinates (initial conditions).                
 !-------------------------------------------------------------------------------
 #ifdef SPACE_3D
-subroutine SetParticles(Nt,Nz,mate,Xmin,npps,NumParticles,IsopraS)
+subroutine SetParticles(Nz,mate,Xmin,npps,NumParticles,IsopraS)
 #elif defined SPACE_2D
-subroutine SetParticles(Nt,Nz,mate,Xmin,npps,NumParticles)
+subroutine SetParticles(Nz,mate,Xmin,npps,NumParticles)
 #endif
 !------------------------
 ! Modules
@@ -39,7 +39,7 @@ use I_O_diagnostic_module
 ! Declarations
 !------------------------
 implicit none
-integer(4),intent(in) :: Nt,Nz,mate
+integer(4),intent(in) :: Nz,mate
 integer(4),intent(in) :: npps(SPACEDIM)
 double precision,intent(in) :: Xmin(SPACEDIM)
 integer(4),intent(inout) :: NumParticles
@@ -108,9 +108,9 @@ do i=1,(npps(1)-iaux)
          PX(3) = PX(3) + Domain%dx
 ! To check if the particle falls inside the zone
 #ifdef SPACE_3D
-            particellainterna = IsParticleInternal3D(Nt,PX,IsopraS)
+            particellainterna = IsParticleInternal3D(Nz,PX,IsopraS)
 #elif defined SPACE_2D
-               particellainterna = IsParticleInternal2D(Nt,PX)
+               particellainterna = IsParticleInternal2D(Nz,PX)
 #endif
 ! In case the particle is inside the zone
          if (particellainterna) then

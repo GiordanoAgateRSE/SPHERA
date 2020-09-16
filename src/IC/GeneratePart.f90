@@ -44,7 +44,7 @@ implicit none
 #ifdef SPACE_3D
 integer(4),intent(in) :: IC_loop
 #endif
-integer(4) :: Nt,Nz,Mate,IsopraS,NumParticles,i,dimensioni,NumPartPrima,test_z
+integer(4) :: Nz,Mate,IsopraS,NumParticles,i,NumPartPrima,test_z
 #ifdef SPACE_3D
 integer(4) :: aux_factor,i_vertex,j_vertex,test_xy,test_xy_2,test_face,test_dam
 integer(4) :: n_levels,nag_aux,alloc_stat,i_face,j,k,npi
@@ -88,12 +88,7 @@ end interface
 !------------------------
 ! Allocations
 !------------------------
-#ifdef SPACE_3D
-   dimensioni = NumFacce
-#elif defined SPACE_2D
-      dimensioni = NumTratti
-#endif
-allocate(xmin(spacedim,dimensioni),xmax(spacedim,dimensioni))
+allocate(Xmin(SPACEDIM,NPartZone),Xmax(SPACEDIM,NPartZone))
 !------------------------
 ! Initializations
 !------------------------
@@ -126,32 +121,25 @@ MinOfMin = max_positive_number
 ! Statements
 !------------------------
 ! Loop over the zones in order to set the initial minimum and maximum 
-! sub-zone coordinates
+! coordinates of each zone and of the numerical domain
 first_cycle: do Nz=1,NPartZone
 ! To search for the maximum and minimum "partzone" coordinates
-   Partz(Nz)%coordMM(1:Spacedim,1) =  max_positive_number
-   Partz(Nz)%coordMM(1:Spacedim,2) =  max_negative_number
-! Loop over the different regions belonging to a same zone
-   do Nt=Partz(Nz)%Indix(1),Partz(Nz)%Indix(2)
-      Xmin(1:SPACEDIM,nt) =  max_positive_number
-      Xmax(1:SPACEDIM,nt) =  max_negative_number
+   Partz(Nz)%coordMM(1:SPACEDIM,1) = max_positive_number
+   Partz(Nz)%coordMM(1:SPACEDIM,2) = max_negative_number
+   Xmin(1:SPACEDIM,Nz) = max_positive_number
+   Xmax(1:SPACEDIM,Nz) = max_negative_number
 ! To search for the minimum and maximum coordinates of the current zone 
 #ifdef SPACE_3D
-! To search for the minimum and maximum coordinates of the current subzone in 3D
-         call FindFrame(Xmin,Xmax,Nt)
+      call FindFrame(Xmin,Xmax,Nz)
 #elif defined SPACE_2D
-            call FindLine(Xmin,Xmax,Nt)
+         call FindLine(Xmin,Xmax,Nz)
 #endif
-! To evaluate the minimum and maximum coordinates of the zone checking for 
-! all the subzones
-      do i=1,Spacedim
-         if (Xmin(i,nt)<Partz(Nz)%coordMM(i,1)) Partz(Nz)%coordMM(i,1) =       &
-            Xmin(i,nt)
-         if (Xmax(i,nt)>Partz(Nz)%coordMM(i,2)) Partz(Nz)%coordMM(i,2) =       &
-            Xmax(i,nt)
-! To evaluate the minimum of subzones minimum coordinates
-         MinOfMin(i) = min(MinOfMin(i),Xmin(i,nt))
-      enddo
+! To evaluate the minimum and maximum coordinates of the zone
+   do i=1,SPACEDIM
+      if (Xmin(i,Nz)<Partz(Nz)%coordMM(i,1)) Partz(Nz)%coordMM(i,1) = Xmin(i,Nz)
+      if (Xmax(i,Nz)>Partz(Nz)%coordMM(i,2)) Partz(Nz)%coordMM(i,2) = Xmax(i,Nz)
+! To evaluate the overall minimum among the zones
+      MinOfMin(i) = min(MinOfMin(i),Xmin(i,Nz))
    enddo
 enddo first_cycle
 ! Loop over the zone in order to set the particle locations
@@ -393,41 +381,38 @@ if ((Tratto(BoundaryFace(i_face)%stretch)%zone==Partz(Nz)%dam_zone_ID).and.    &
       endif
 #endif
       else
-! Loop over the different regions belonging to a same zone
-         do Nt = Partz(Nz)%Indix(1),Partz(Nz)%Indix(2)
-! To evaluate the number of particles for the subdomain Npps along all the 
+! To evaluate the number of particles Npps for the zone along all the 
 ! directions
-            if ((Xmin(1,nt)==max_positive_number).or.                          &
-                (Xmax(1,nt)==max_negative_number)) then
+         if ((Xmin(1,Nz)==max_positive_number).or.                             &
+             (Xmax(1,Nz)==max_negative_number)) then
 ! The zone is declared but is not used
-               Npps = -1
-               else
-                  do i=1,SPACEDIM
-                     NumPartPrima = nint((Xmin(i,nt) - MinOfMin(i)) / Domain%dx)
-                     Xminreset(i) = MinOfMIn(i) + NumPartPrima * Domain%dx
-                     Npps(i) = nint((Xmax(i,nt) - XminReset(i)) / Domain%dx)
-                  enddo
-            endif
+            Npps = -1
+            else
+               do i=1,SPACEDIM
+                  NumPartPrima = nint((Xmin(i,Nz) - MinOfMin(i)) / Domain%dx)
+                  Xminreset(i) = MinOfMIn(i) + NumPartPrima * Domain%dx
+                  Npps(i) = nint((Xmax(i,Nz) - XminReset(i)) / Domain%dx)
+               enddo
+         endif
 #ifdef SPACE_2D
 ! To force almost one particle if the domain width in a direction is smaller  
 ! than dx
-               where (Npps==0) Npps = 1
+            where (Npps==0) Npps = 1
 #endif
 ! To consider the "pool" condition: set "Isopra=1" if it crosses the 
 ! "virtual" side
-            if (Partz(Nz)%tipo=="pool") then
-               Xmax(Partz(Nz)%ipool,Nt) = Partz(Nz)%pool
-               IsopraS = 1
-               else
-                  IsopraS = 0
-            endif
+         if (Partz(Nz)%tipo=="pool") then
+            Xmax(Partz(Nz)%ipool,Nz) = Partz(Nz)%pool
+            IsopraS = 1
+            else
+               IsopraS = 0
+         endif
 ! To set the particles in the zone
 #ifdef SPACE_3D
-            call SetParticles(Nt,Nz,Mate,XminReset,Npps,NumParticles,IsopraS)
+            call SetParticles(Nz,Mate,XminReset,Npps,NumParticles,IsopraS)
 #elif defined SPACE_2D
-            call SetParticles(Nt,Nz,Mate,XminReset,Npps,NumParticles)
+               call SetParticles(Nz,Mate,XminReset,Npps,NumParticles)
 #endif
-         enddo
 ! To set the upper pointer for the particles in the nz-th zone
          Partz(Nz)%limit(2) = NumParticles
    endif
@@ -483,6 +468,6 @@ nagpg = nag
 !------------------------
 ! Deallocations
 !------------------------
-deallocate(xmin,xmax)
+deallocate(Xmin,Xmax)
 return
 end subroutine GeneratePart

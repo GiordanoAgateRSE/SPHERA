@@ -175,16 +175,16 @@ ___ ___ ... ___
 !    permitted), but only "perimeter" faces can also be generic quadrilaterals 
 !    (not only rectangles), pentagons and hexagons.
 ![?] No gaps on face IDs are permitted
-![?] <face_1_vertex_1>,...,<face_1_vertex_6>,<face_1_Boundary_ID>: first face 
+![?] <face_1_vertex_1>,...,<face_1_vertex_6>,<face_1_zone_ID>: first face 
 !    data. The value "-1" is mandatory for meaningless vertex IDs (e.g., 5th 
 !    and 6th vertices of a quadrilateral).
 ![?] <face_last_ID>,<face_last_vertex_1>,...,<face_last_vertex_6>,
-!    <face_last_Boundary_ID>: last face data
+!    <face_last_zone_ID>: last face data
 !-------------------------------------------------------------------------------
-![*] 1 <face_1_vertex_1> ... <face_1_vertex_6> <face_1_Boundary_ID>
+![*] 1 <face_1_vertex_1> ... <face_1_vertex_6> <face_1_zone_ID>
 ![*] ...
 ![*] <face_last_ID> <face_last_vertex_1> ... <face_last_vertex_6> 
-!    <face_last_Boundary_ID>
+!    <face_last_zone_ID>
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
 1   ___ ... ___ ___
@@ -200,8 +200,8 @@ ___ ___ ... ___ ___
 ##### BOUNDARIES #####
 !-------------------------------------------------------------------------------
 ![?] Input parameters for the following elements: fluid domain boundaries and 
-!    fluid bodies. Both these types of elements are delimited by lines (2D) / 
-!    faces (3D).
+!    fluid bodies. Both these types of elements are here called "boundaries" or 
+!    "zones", and are delimited by lines (2D) / faces (3D).
 ![?] In case of DB-SPH boundary treatment scheme, the parallelepiped domain 
 !    (mandatory) is formally represented by a fictitious SA-SPH frontier, which  
 !    is only used to generate the background positioning grid.

@@ -47,7 +47,7 @@ character(1) :: comment
 character(len=lencard) :: ainp
 type (TyZone),dimension(NPartZone) :: Partz
 type (TyBoundaryStretch),dimension(NumTratti) :: Tratto
-integer(4) :: n,index,numv,indexi,indexf,Izona,ipointer,Medium,icolor,icord    
+integer(4) :: n,numv,zone_ID,ipointer,Medium,icolor,icord    
 integer(4) :: ioerr,npointv,IC_source_type,Car_top_zone
 #ifdef SPACE_3D
 integer(4) :: plan_reservoir_points,i_point,dam_zone_ID,dam_zone_n_vertices,i2
@@ -109,12 +109,8 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"BOUNDARIES INDEX",ninp,ulog))     &
       return
    token = GetToken(ainp,1,ioerr)
-   read(token,*,iostat=ioerr) indexi
-   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"BOUNDARY INDEX",ninp,ulog)) return
-   indexf = indexi
-   token = GetToken(ainp,2,ioerr)
-   if (token/="") read(token,*,iostat=ioerr) indexf
-   NumberEntities(8) = max(indexf,NumberEntities(8))
+   read(token,*,iostat=ioerr) zone_ID
+   NumberEntities(8) = max(zone_ID,NumberEntities(8))
 ! Boundary type
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"BOUNDARY TYPE",ninp,ulog)) return
@@ -149,7 +145,7 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
 #endif
    select case (tipo)
 ! Boundary condition "leve", "crit" or "open"
-      case("leve","crit","open")    
+      case("leve","crit","open")
          NumberEntities(3) = NumberEntities(3) + 1
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          token = GetToken(ainp,1,ioerr)
@@ -230,16 +226,16 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
          token_color(3:4) = token(3:4)
          token_color(5:6) = token(1:2) 
          read(token_color,'(Z6)',iostat=ioerr) icolor
-         if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"FIXED: RRGGBB COLOR",ninp&
-            ,ulog)) return
-         move   = "std"
+         if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"FIXED: RRGGBB COLOR",ninp,  &
+            ulog)) return
+         move = "std"
 ! Boundary condition "velo"
       case("velo")
          NumberEntities(3) = NumberEntities(3) + 1
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          if (ioerr==0) read(ainp,*,iostat=ioerr) velocity
-         if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                             &
-            "VELO: NORMAL VELOCITY",ninp,ulog)) return
+         if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"VELO: NORMAL VELOCITY",ninp,&
+            ulog)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          token = GetToken(ainp,1,ioerr)
          token_color(1:2) = token(5:6)
@@ -256,8 +252,8 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
          NumberEntities(3) = NumberEntities(3) + 1
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          if (ioerr==0) read(ainp,*,iostat=ioerr) flowrate
-         if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"VELO: FLOW RATE",ninp,ulog) &
-            ) return
+         if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"VELO: FLOW RATE",ninp,ulog))&
+            return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          token = GetToken(ainp,1,ioerr)
          token_color(1:2) = token(5:6)
@@ -283,42 +279,42 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
             "IC_source_type, Car_top_zone, DBSPH_fictitious_reservoir_flag",   &
             ninp,ulog)) return
 #ifdef SPACE_3D
-         if (IC_source_type==2) then
-            call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-            if (ioerr==0) read(ainp,*,iostat=ioerr) dx_CartTopog,H_res
-            if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"dx_CartTopog,H_res",ninp,&
-               ulog)) return
-            call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-            if (ioerr==0) read(ainp,*,iostat=ioerr)                            &
-               ID_first_vertex,ID_last_vertex
-            if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                          &
-               "ID_first_vertex,ID_last_vertex",ninp,ulog)) return
-            call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-            if (ioerr==0) read(ainp,*,iostat=ioerr) plan_reservoir_points
-            if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                          &
-               "plan_reservoir_points",ninp,ulog)) return
-            do i2=1,plan_reservoir_points
+            if (IC_source_type==2) then
+               call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+               if (ioerr==0) read(ainp,*,iostat=ioerr) dx_CartTopog,H_res
+               if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"dx_CartTopog,H_res",  &
+                  ninp,ulog)) return
                call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
                if (ioerr==0) read(ainp,*,iostat=ioerr)                         &
-                  plan_reservoir_pos(i2,1),plan_reservoir_pos(i2,2)
+                  ID_first_vertex,ID_last_vertex
                if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                       &
-                  "plan_reservoir_vertices",ninp,ulog)) return
-            enddo
-            call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-            if (ioerr==0) read(ainp,*,iostat=ioerr) dam_zone_ID,               &
-               dam_zone_n_vertices
-            if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                          &
-               "dam_zone_ID and dam_zone_vertices",ninp,ulog)) return
-            if (dam_zone_ID>0) then
-               do i2=1,dam_zone_n_vertices
+                  "ID_first_vertex,ID_last_vertex",ninp,ulog)) return
+               call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+               if (ioerr==0) read(ainp,*,iostat=ioerr) plan_reservoir_points
+               if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                       &
+                  "plan_reservoir_points",ninp,ulog)) return
+               do i2=1,plan_reservoir_points
                   call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
                   if (ioerr==0) read(ainp,*,iostat=ioerr)                      &
-                     dam_zone_vertices(i2,1),dam_zone_vertices(i2,2)
-                  if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"dam zone vertices",&
-                     ninp,ulog)) return
+                     plan_reservoir_pos(i2,1),plan_reservoir_pos(i2,2)
+                  if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                    &
+                     "plan_reservoir_vertices",ninp,ulog)) return
                enddo
+               call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+               if (ioerr==0) read(ainp,*,iostat=ioerr) dam_zone_ID,            &
+                  dam_zone_n_vertices
+               if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                       &
+                  "dam_zone_ID and dam_zone_vertices",ninp,ulog)) return
+               if (dam_zone_ID>0) then
+                  do i2=1,dam_zone_n_vertices
+                     call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+                     if (ioerr==0) read(ainp,*,iostat=ioerr)                   &
+                        dam_zone_vertices(i2,1),dam_zone_vertices(i2,2)
+                     if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                 &
+                        "dam zone vertices",ninp,ulog)) return
+                  enddo
+               endif
             endif
-         endif
 #endif
 ! Boundary condition "tapi"
       case("tapi")
@@ -375,221 +371,207 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
          write(ulog,*) "Unrecognised BOUNDARY type: ",tipo
          ier = 101
          return
-   end  select
+   endselect
    if (input_second_read.eqv..true.) then
-      Izona = NumberEntities(3)
-      Partz(Izona)%label = label
-      Partz(Izona)%tipo = tipo
-      Partz(Izona)%Medium = Medium
-      Partz(Izona)%IC_source_type = IC_source_type
-      Partz(Izona)%Car_top_zone = Car_top_zone
-      Partz(Izona)%DBSPH_fictitious_reservoir_flag =                           &
+      Partz(zone_ID)%label = label
+      Partz(zone_ID)%tipo = tipo
+      Partz(zone_ID)%Medium = Medium
+      Partz(zone_ID)%IC_source_type = IC_source_type
+      Partz(zone_ID)%Car_top_zone = Car_top_zone
+      Partz(zone_ID)%DBSPH_fictitious_reservoir_flag =                         &
          DBSPH_fictitious_reservoir_flag
 #ifdef SPACE_3D
-      if (IC_source_type==2) then
-         Partz(Izona)%dx_CartTopog = dx_CartTopog
-         Partz(Izona)%H_res = H_res
-         Partz(Izona)%ID_first_vertex = ID_first_vertex
-         Partz(Izona)%ID_last_vertex = ID_last_vertex
-         Partz(Izona)%plan_reservoir_points = plan_reservoir_points
-         Partz(Izona)%plan_reservoir_pos = plan_reservoir_pos
-         Partz(Izona)%dam_zone_ID = dam_zone_ID
-         Partz(Izona)%dam_zone_n_vertices = dam_zone_n_vertices
-         if (dam_zone_ID>0) Partz(Izona)%dam_zone_vertices = dam_zone_vertices
-      endif
+         if (IC_source_type==2) then
+            Partz(zone_ID)%dx_CartTopog = dx_CartTopog
+            Partz(zone_ID)%H_res = H_res
+            Partz(zone_ID)%ID_first_vertex = ID_first_vertex
+            Partz(zone_ID)%ID_last_vertex = ID_last_vertex
+            Partz(zone_ID)%plan_reservoir_points = plan_reservoir_points
+            Partz(zone_ID)%plan_reservoir_pos = plan_reservoir_pos
+            Partz(zone_ID)%dam_zone_ID = dam_zone_ID
+            Partz(zone_ID)%dam_zone_n_vertices = dam_zone_n_vertices
+            if (dam_zone_ID>0) Partz(zone_ID)%dam_zone_vertices =              &
+               dam_zone_vertices
+         endif
 #endif
-      Partz(Izona)%icol = icolor
-      Partz(Izona)%bend = bends
-      Partz(Izona)%move = move
+      Partz(zone_ID)%icol = icolor
+      Partz(zone_ID)%bend = bends
+      Partz(zone_ID)%move = move
       if (npointv/=0) then
-         Partz(Izona)%npointv = npointv
-         Partz(Izona)%vlaw(icoordp(0:ncord,ncord-1),1:npointv) =               &
+         Partz(zone_ID)%npointv = npointv
+         Partz(zone_ID)%vlaw(icoordp(0:ncord,ncord-1),1:npointv) =             &
             valuev(0:ncord,1:npointv)
       endif
-      Partz(Izona)%vel = zero
-      Partz(Izona)%vel(icoordp(1:ncord,ncord-1)) = values3(1:ncord)
-      Partz(Izona)%pressure = pressu
-      Partz(Izona)%valp = valp
-      Partz(Izona)%Indix(1) = indexi
-      Partz(Izona)%Indix(2) = indexf
-      Partz(Izona)%slip_coefficient_mode = slip_coefficient_mode
-      Partz(Izona)%BC_shear_stress_input = BC_shear_stress_input
-      if ((pool_plane=="X").or.(pool_plane=="x")) Partz(Izona)%ipool = 1
-      if ((pool_plane=="Y").or.(pool_plane=="y")) Partz(Izona)%ipool = 2
-      if ((pool_plane=="Z").or.(pool_plane=="z")) Partz(Izona)%ipool = 3
-      Partz(Izona)%pool = pool_value
-! Constraints
-      MULTI_INDEX_LOOP: do index=indexi,indexf       
-         Tratto(index)%tipo = tipo
+      Partz(zone_ID)%vel = zero
+      Partz(zone_ID)%vel(icoordp(1:ncord,ncord-1)) = values3(1:ncord)
+      Partz(zone_ID)%pressure = pressu
+      Partz(zone_ID)%valp = valp
+      Partz(zone_ID)%slip_coefficient_mode = slip_coefficient_mode
+      Partz(zone_ID)%BC_shear_stress_input = BC_shear_stress_input
+      if ((pool_plane=="X").or.(pool_plane=="x")) Partz(zone_ID)%ipool = 1
+      if ((pool_plane=="Y").or.(pool_plane=="y")) Partz(zone_ID)%ipool = 2
+      if ((pool_plane=="Z").or.(pool_plane=="z")) Partz(zone_ID)%ipool = 3
+      Partz(zone_ID)%pool = pool_value
+      Tratto(zone_ID)%tipo = tipo
 #ifdef SPACE_3D
-            Tratto(index)%numvertices = numv
-            Tratto(index)%inivertex = ipointer
+         Tratto(zone_ID)%numvertices = numv
+         Tratto(zone_ID)%inivertex = ipointer
 #endif
-         Tratto(index)%laminar_no_slip_check = laminar_no_slip_check
-         Tratto(index)%Medium = Medium
-         Tratto(index)%velocity = values1
-         Tratto(index)%NormVelocity = velocity
-         Tratto(index)%FlowRate = flowrate
-         Tratto(index)%zone = Izona
-         Tratto(index)%ColorCode = icolor
-         if ((ulog>0).and.(index==indexi)) then
-            if (index>1) write(ulog,*)
-            if (indexf==indexi) write(ulog,"(1x,a,i5,1x,a)")                   &
-               "Boundary        : ",indexi
-            if (indexf/=indexi) write(ulog,"(1x,a,i5,1x,a,i5)")                &
-               "Boundary        : ",indexi,"   to",indexf
-            write(ulog,"(1x,a,2x,a)") "Type            : ",Tratto(index)%tipo 
-            if (tipo=="fixe") then
-               write(ulog,"(1x,a,l12)") "Laminar no-slip check: ",             &
-                  Tratto(index)%laminar_no_slip_check
-               elseif (tipo=="peri") then
+      Tratto(zone_ID)%laminar_no_slip_check = laminar_no_slip_check
+      Tratto(zone_ID)%Medium = Medium
+      Tratto(zone_ID)%velocity = values1
+      Tratto(zone_ID)%NormVelocity = velocity
+      Tratto(zone_ID)%FlowRate = flowrate
+      Tratto(zone_ID)%zone = zone_ID
+      Tratto(zone_ID)%ColorCode = icolor
+      if (ulog>0) then
+         if (zone_ID>1) write(ulog,*)
+         write(ulog,"(1x,a,i5,1x)") "Boundary        : ",zone_ID
+         write(ulog,"(1x,a,2x,a)") "Type            : ",Tratto(zone_ID)%tipo 
+         if (tipo=="fixe") then
+            write(ulog,"(1x,a,l12)") "Laminar no-slip check: ",                &
+               Tratto(zone_ID)%laminar_no_slip_check
+            elseif (tipo=="peri") then
+               write(ulog,"(1x,a,i3)") "Medium Index    : ",                   &
+                  Tratto(zone_ID)%Medium
+               elseif (tipo=="pool") then
                   write(ulog,"(1x,a,i3)") "Medium Index    : ",                &
-                     Tratto(index)%Medium
-                  elseif (tipo=="pool") then
-                     write(ulog,"(1x,a,i3,1x,a)") "Medium Index    : ",        &
-                        Tratto(index)%Medium
-                     elseif (tipo=="tapi") then
-                        do n=1,ncord
-                           icord = icoordp(n,ncord-1)
-                           write(ulog,"(1x,a,a,1pe12.4)") xyzlabel(icord),     &
-                              " Velocity      : ",Tratto(index)%velocity(n)
-                        enddo
-            endif
-#ifdef SPACE_2D
-               write(ulog,"(1x,a)") "Vertices List"
-               write(ulog,"(1x,10i5)")                                         &
-BoundaryVertex(Tratto(index)%inivertex:Tratto(index)%inivertex+Tratto(index)%numvertices-1)
-               write(ulog,"(1x,a,z6)") "Color           : ",Tratto(index)%colorCode
-#endif
-         endif
-         select case (tipo)
-            case("fixe")
-#ifdef SPACE_3D
-                  Tratto(index)%ColorCode = icolor
-                  if ((ulog>0).and.(index==indexi)) write(ulog,                &
-                     "(1x,a,z8)") "Color           : ",                        &
-                     Tratto(index)%colorCode
-                  Tratto(index)%ColorCode = icolor
-#endif
-                  write(ulog,"(1x,a,i3)")   "Slip coeff. mode : ",             &
-                     Partz(Izona)%slip_coefficient_mode
-                  if (slip_coefficient_mode==1) then
-                     write(ulog,"(1x,a,1pe12.4)") "Slip coeff.    : ",         &
-                        Partz(Izona)%BC_shear_stress_input
-                     elseif (slip_coefficient_mode==2) then
-                        write(ulog,"(1x,a,1pe12.4)") "Wall mean roughness:",   &
-                           Partz(Izona)%BC_shear_stress_input
-                  endif
-            case("tapi")
-#ifdef SPACE_3D
-                  Tratto(index)%ColorCode = icolor
-                  if (ulog>0.and.index==indexi) write(ulog,"(1x,a,z8)")        &
-                     "Color           : ",Tratto(index)%colorCode
-                  Tratto(index)%ColorCode = icolor
-#elif defined SPACE_2D
-                     numv = Tratto(index)%numvertices
-                     if (numv/=2) then 
-                        if (ulog>0) then
-                           write(ulog,'(a,i15)')                               &
-                              "TAPIS boundary type: 2 vertices are requested:",&
-                              numv
-                           write(ulog,"(1x,a,1pe12.4)") "Slip coeff.    : ",   &
-                              Partz(Izona)%BC_shear_stress_input
-                        endif
-                        ier = 103
-                        return
-                     endif
-#endif
-            case("peri")
-#ifdef SPACE_2D
-                  i1 = BoundaryVertex(Tratto(index)%inivertex)
-                  i2 =                                                         &
-BoundaryVertex(Tratto(index)%inivertex+Tratto(index)%numvertices-1)
-! Error if the first and the last vertices are different 
-                  if (i2/=i1) then 
-                     if (ulog>0) write(ulog,'(a,2i15)')                        &
-"PERIMETER boundary type: first and last vertices are different: ",i2,i1
-                     ier = 102
-                     return
-                  endif
-                  if (ulog>0) then
-                     write(ulog,"(1x,a,i3,1x,a)")                              &
-                        "Zone            : ",Izona,Partz(Izona)%label
-                     write(ulog,"(1x,a,i3)") "Medium Index    : ",             &
-                        Partz(Izona)%Medium
-                     write(ulog,"(1x,a,Z6.6)") "Color           : ",           &
-                        Partz(Izona)%icol
-                     write(ulog,"(1x,a,2x,a)") "Bends           : ",           &
-                        Partz(Izona)%bend
-                     write(ulog,"(1x,a,2x,a)") "Movement Type   : ",           &
-                        Partz(Izona)%move
-                     if (Partz(Izona)%move=="law") then
-                        write(ulog,"(1x,a,i3)")                                & 
-                           "Velocity Table - Number of Points: ",              &
-                           Partz(Izona)%npointv
-                        do i2=1,Partz(Izona)%npointv
-                           write(ulog,"(a,i3,1p,4(2x,a,e12.4))") " Point",i2,  &
-                              (xyzlabel(icoordp(n,ncord-1)),                   &
-                              Partz(Izona)%vlaw(icoordp(n,ncord-1),i2),n=0,    &
-                              ncord)
-                        enddo
-                     endif
+                     Tratto(zone_ID)%Medium
+                  elseif (tipo=="tapi") then
                      do n=1,ncord
                         icord = icoordp(n,ncord-1)
                         write(ulog,"(1x,a,a,1pe12.4)") xyzlabel(icord),        &
-                           " velocity       : ",Partz(Izona)%vel(icord) 
+                           " Velocity      : ",Tratto(zone_ID)%velocity(n)
                      enddo
-                     write(ulog,"(1x,a,2x,a)")    "Pressure Type   : ",        &
-                        Partz(Izona)%pressure
-                     write(ulog,"(1x,a,1pe12.4)") "Pressure Value  : ",        &
-                        Partz(Izona)%valp
-                  endif       
-#elif defined SPACE_3D
-                     Tratto(index)%ColorCode = icolor
-                     if ((ulog>0).and.(index==indexi)) write(ulog,"(1x,a,z8)") &
-                        "Color           : ",Tratto(index)%colorCode
+         endif
+#ifdef SPACE_2D
+            write(ulog,"(1x,a)") "Vertices List"
+            write(ulog,"(1x,10i5)")                                            &
+BoundaryVertex(Tratto(zone_ID)%inivertex:Tratto(zone_ID)%inivertex+Tratto(zone_ID)%numvertices-1)
+            write(ulog,"(1x,a,z6)") "Color           : ",                      &
+               Tratto(zone_ID)%colorCode
 #endif
-               write(ulog,"(1x,a,i12)") "IC_source_type  : ",                  &
-                  Partz(Izona)%IC_source_type
-               write(ulog,"(1x,a,i12)") "Car_top_zone    : ",                  &
-                  Partz(Izona)%Car_top_zone
-               write(ulog,"(1x,a,l12)") "DBSPH_fictitious_reservoir_flag : ",  &
-                  Partz(Izona)%DBSPH_fictitious_reservoir_flag
+      endif
+      select case (tipo)
+         case("fixe")
+#ifdef SPACE_3D
+               Tratto(zone_ID)%ColorCode = icolor
+               if (ulog>0) write(ulog,"(1x,a,z8)") "Color           : ",       &
+                  Tratto(zone_ID)%colorCode
+#endif
+               write(ulog,"(1x,a,i3)")   "Slip coeff. mode : ",                &
+                  Partz(zone_ID)%slip_coefficient_mode
+               if (slip_coefficient_mode==1) then
+                  write(ulog,"(1x,a,1pe12.4)") "Slip coeff.    : ",            &
+                     Partz(zone_ID)%BC_shear_stress_input
+                  elseif (slip_coefficient_mode==2) then
+                     write(ulog,"(1x,a,1pe12.4)") "Wall mean roughness:",      &
+                        Partz(zone_ID)%BC_shear_stress_input
+               endif
+         case("tapi")
+#ifdef SPACE_3D
+               Tratto(zone_ID)%ColorCode = icolor
+               if (ulog>0) write(ulog,"(1x,a,z8)")                             &
+                  "Color           : ",Tratto(zone_ID)%colorCode
+#elif defined SPACE_2D
+                  numv = Tratto(zone_ID)%numvertices
+                  if (numv/=2) then 
+                     if (ulog>0) then
+                        write(ulog,'(2(a),i15)') "TAPIS boundary type: 2 ",    &
+                           "vertices are requested:",numv
+                        write(ulog,"(1x,a,1pe12.4)") "Slip coeff.    : ",      &
+                           Partz(zone_ID)%BC_shear_stress_input
+                     endif
+                     ier = 103
+                     return
+                  endif
+#endif
+         case("peri")
+#ifdef SPACE_2D
+               i1 = BoundaryVertex(Tratto(zone_ID)%inivertex)
+               i2 =                                                            &
+BoundaryVertex(Tratto(zone_ID)%inivertex+Tratto(zone_ID)%numvertices-1)
+! Error if the first and the last vertices are different 
+               if (i2/=i1) then 
+                  if (ulog>0) write(ulog,'(a,2i15)')                           &
+"PERIMETER boundary type: first and last vertices are different: ",i2,i1
+                  ier = 102
+                  return
+               endif
+               if (ulog>0) then
+                  write(ulog,"(1x,a,i3)") "Zone            : ",                &
+                     zone_ID,Partz(zone_ID)%label
+                  write(ulog,"(1x,a,i3)") "Medium Index    : ",                &
+                     Partz(zone_ID)%Medium
+                  write(ulog,"(1x,a,Z6.6)") "Color           : ",              &
+                     Partz(zone_ID)%icol
+                  write(ulog,"(1x,a,2x,a)") "Bends           : ",              &
+                     Partz(zone_ID)%bend
+                  write(ulog,"(1x,a,2x,a)") "Movement Type   : ",              &
+                     Partz(zone_ID)%move
+                  if (Partz(zone_ID)%move=="law") then
+                     write(ulog,"(1x,2(a),i3)") "Velocity Table - Number of ", &
+                        "Points: ",Partz(zone_ID)%npointv
+                     do i2=1,Partz(zone_ID)%npointv
+                        write(ulog,"(a,i3,1p,4(2x,a,e12.4))") " Point",i2,     &
+                           (xyzlabel(icoordp(n,ncord-1)),                      &
+                           Partz(zone_ID)%vlaw(icoordp(n,ncord-1),i2),n=0,ncord)
+                     enddo
+                  endif
+                  do n=1,ncord
+                     icord = icoordp(n,ncord-1)
+                     write(ulog,"(1x,a,a,1pe12.4)") xyzlabel(icord),           &
+                        " velocity       : ",Partz(zone_ID)%vel(icord) 
+                  enddo
+                  write(ulog,"(1x,a,2x,a)")    "Pressure Type   : ",           &
+                     Partz(zone_ID)%pressure
+                  write(ulog,"(1x,a,1pe12.4)") "Pressure Value  : ",           &
+                     Partz(zone_ID)%valp
+               endif       
+#elif defined SPACE_3D
+                  Tratto(zone_ID)%ColorCode = icolor
+                  if (ulog>0) write(ulog,"(1x,a,z8)") "Color           : ",    &
+                     Tratto(zone_ID)%colorCode
+#endif
+            write(ulog,"(1x,a,i12)") "IC_source_type  : ",                     &
+               Partz(zone_ID)%IC_source_type
+            write(ulog,"(1x,a,i12)") "Car_top_zone    : ",                     &
+               Partz(zone_ID)%Car_top_zone
+            write(ulog,"(1x,a,l12)") "DBSPH_fictitious_reservoir_flag : ",     &
+               Partz(zone_ID)%DBSPH_fictitious_reservoir_flag
 #ifdef SPACE_3D
                if (IC_source_type==2) then
                   write(ulog,"(1x,a,1pe12.4)") "dx_CartTopog    : ",           &
-                     Partz(Izona)%dx_CartTopog
+                     Partz(zone_ID)%dx_CartTopog
                   write(ulog,"(1x,a,1pe12.4)") "H_res           : ",           &
-                     Partz(Izona)%H_res  
+                     Partz(zone_ID)%H_res  
                   write(ulog,"(1x,a,i12)") "ID_first_vertex : ",               &
-                     Partz(Izona)%ID_first_vertex
+                     Partz(zone_ID)%ID_first_vertex
                   write(ulog,"(1x,a,i12)") "ID_last_vertex  : ",               &
-                     Partz(Izona)%ID_last_vertex
+                     Partz(zone_ID)%ID_last_vertex
                   write(ulog,"(1x,a,i12)") "plan_reservoir_points: ",          &
-                     Partz(Izona)%plan_reservoir_points
+                     Partz(zone_ID)%plan_reservoir_points
                   do i_point=1,plan_reservoir_points
-                     write(ulog,"(1x,a,3(1pe12.4))") "plan_reservoir_pos   : " &
-                        ,Partz(Izona)%plan_reservoir_pos(i_point,:)                  
+                     write(ulog,"(1x,a,3(1pe12.4))") "plan_reservoir_pos   : ",&
+                        Partz(zone_ID)%plan_reservoir_pos(i_point,:)                  
                   enddo
                   write(ulog,"(1x,a,i12)") "dam_zone_ID          : ",          &
-                     Partz(Izona)%dam_zone_ID
+                     Partz(zone_ID)%dam_zone_ID
                   write(ulog,"(1x,a,i12)") "dam_zone_n_vertices  : ",          &
-                     Partz(Izona)%dam_zone_n_vertices  
+                     Partz(zone_ID)%dam_zone_n_vertices  
                   if (dam_zone_ID>0) then
                      do i_point=1,dam_zone_n_vertices
-                        write(ulog,"(1x,a,3(1pe12.4))")                        &
-                           "dam_zone_vertices    : ",                          &
-                           Partz(Izona)%dam_zone_vertices(i_point,:)                  
+                        write(ulog,"(1x,2(a),3(1pe12.4))") "dam_zone_vertices",&
+                           "    : ",Partz(zone_ID)%dam_zone_vertices(i_point,:)                  
                      enddo
                   endif
                endif
 #endif
-            case("pool")
-               Tratto(index)%ColorCode = icolor
-               if ((ulog>0).and.(index==indexi)) write(ulog,"(1x,a,z8)")       &
-                  "Color           : ",Tratto(index)%colorCode
-         endselect
-      enddo MULTI_INDEX_LOOP
+         case("pool")
+            Tratto(zone_ID)%ColorCode = icolor
+            if (ulog>0) write(ulog,"(1x,a,z8)") "Color           : ",          &
+               Tratto(zone_ID)%colorCode
+      endselect
    endif
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 enddo
