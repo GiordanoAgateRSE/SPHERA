@@ -60,7 +60,7 @@ integer(4),external :: ParticleCellNumber
 ! Allocations
 !------------------------
 do i_zone=1,NPartZone
-   if (Partz(i_zone)%IC_source_type==2) then
+   if (Partz(i_zone)%ID_first_vertex>0) then
       aux_integer = Partz(i_zone)%ID_last_vertex -                             &
                       Partz(i_zone)%ID_first_vertex + 1
       if (.not.allocated(h_step)) then
@@ -251,7 +251,7 @@ if (on_going_time_step==1) then
          open(ncpt,file=nomefile_h_step,status="unknown",form="formatted")
       endif
       do i_zone=1,NPartZone
-         if (Partz(i_zone)%IC_source_type==2) then
+         if (Partz(i_zone)%ID_first_vertex>0) then
 !$omp parallel do default(none)                                                &
 !$omp shared(ncpt,Partz,Vertice,Grid,h_filt_step,h_step,Z_fluid_step,i_zone)   &
 !$omp shared(qx_step,qy_step,qx_step_grid,qy_step_grid,n_part_step,q_max)      &

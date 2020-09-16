@@ -66,7 +66,7 @@ write(ncpt,'(8(a))') "           x(m)","           y(m)","      hu_max(m)",    &
    "   q_max(m^2/s)"
 flush(ncpt) 
 do i_zone=1,NPartZone
-   if (Partz(i_zone)%IC_source_type==2) then
+   if (Partz(i_zone)%ID_first_vertex>0) then
 ! Allocating h_max
       if (.not.allocated(h_max)) then
          aux_integer = Partz(i_zone)%ID_last_vertex -                          &

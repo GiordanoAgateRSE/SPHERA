@@ -197,7 +197,7 @@ if (.not.allocated(substations%sub(1)%DEMvert)) then
 ! Association of the DEM points with the substations: start.
 ! Loop over the zones
    do i_zone=1,NPartZone
-      if (Partz(i_zone)%IC_source_type==2) then
+      if (Partz(i_zone)%ID_first_vertex>0) then
          DEM_points = Partz(i_zone)%ID_last_vertex -                           &
                       Partz(i_zone)%ID_first_vertex + 1
 ! Allocation and initialization of the auxiliary array for the DEM points 
@@ -270,6 +270,7 @@ if (.not.allocated(substations%sub(1)%DEMvert)) then
             enddo
          enddo
 !$omp end parallel do
+         exit
       endif
    enddo
 ! Association of the DEM points with the substations: end.

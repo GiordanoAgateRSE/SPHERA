@@ -549,9 +549,9 @@ type TyBoundaryStretch
 #endif
    integer(4) :: medium
    integer(4) :: zone
-! Absolute value of the velocity component which is normal to the face 
+! Absolute value of the velocity component which is normal to the faces 
    double precision :: NormVelocity
-! Flow rate exiting the face
+! Flow rate exiting the faces
    double precision :: FlowRate
 ! Velocity for "TAPI" zones
    double precision :: velocity(1:SPACEDIM)

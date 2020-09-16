@@ -39,7 +39,7 @@ implicit none
 integer(4),parameter :: ner0 = 0
 integer(4) :: npi,i,ier,k,k1,k2,nlinee,nvalori,alloc_stat
 #ifdef SPACE_3D
-integer(4) :: aux_integer,NumCellmax,kk
+integer(4) :: n_vertices_main_wall,NumCellmax,kk
 #endif
 character(len=lencard) :: nomsub = "GEST_TRANS"
 character(len=lencard) :: filename,stringa,prefix,filevtk
@@ -648,59 +648,53 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
 ! Computation of the boundary contributions for the continuity equation (SA-SPH)
             call ComputeKernelTable
          endif
-! Allocation and initialization of the arrays: Z_fluid_max, Z_fluid_step
-! Loop over the zones
-         do i=1,NPartZone
-            if (Partz(i)%IC_source_type==2) then
-               if (.not.allocated(Z_fluid_max)) then
-                  allocate(Z_fluid_max(Grid%ncd(1)*Grid%ncd(2),2),             &
-                     STAT=alloc_stat)
-                  if (alloc_stat/=0) then
+! Allocation and initialization of the arrays: Z_fluid_max, Z_fluid_step, q_max
+         call main_wall_info(n_vertices_main_wall)
+         if (n_vertices_main_wall>0) then
+! In the absence of walls, there is no allocation.
+            if (.not.allocated(Z_fluid_max)) then
+               allocate(Z_fluid_max(Grid%ncd(1)*Grid%ncd(2),2),STAT=alloc_stat)
+               if (alloc_stat/=0) then
+                  write(ulog,*)                                                &
+                  'Allocation of Z_fluid_max in Gest_Trans failed;',           &
+                  ' the program terminates here.'
+                  stop
+                  else
                      write(ulog,*)                                             &
-                     'Allocation of Z_fluid_max in Gest_Trans failed;',        &
-                     ' the program terminates here.'
-                     stop
-                     else
-                        write(ulog,*)                                          &
-                           'Allocation of Z_fluid_max in Gest_Trans ',         &
-                           'successfully completed.'
-                  endif
-                  Z_fluid_max(:,:) = -999.d0
+                        'Allocation of Z_fluid_max in Gest_Trans ',            &
+                        'successfully completed.'
                endif
-               if (.not.allocated(Z_fluid_step)) then
-                  allocate(Z_fluid_step(Grid%ncd(1)*Grid%ncd(2),2),            &
-                     STAT=alloc_stat)
-                  if (alloc_stat/=0) then
-                     write(ulog,*)                                             &
-                     'Allocation of "Z_fluid_step" in the subroutine ',        &
-                     '"Gest_Trans" failed; the execution terminates here.'
-                     stop
-                     else
-                        write(ulog,*)                                          &
-                           'Allocation of "Z_fluid_step" in the ',             &
-                           'subroutine "Gest_Trans" is successfully completed.'
-                  endif
-                  Z_fluid_step(:,:) = -999.d0
-               endif
-               aux_integer = Partz(i)%ID_last_vertex -                         &
-                             Partz(i)%ID_first_vertex + 1  
-               if (.not.allocated(q_max)) then
-                  allocate(q_max(aux_integer),STAT=alloc_stat)
-                  if (alloc_stat/=0) then
-                     write(ulog,*)                                             &
-                     'Allocation of q_max in Gest_Trans failed;',              &
-                     ' the program terminates here.'
-                     stop ! Stop the main program
-                     else
-                        write(ulog,*)                                          &
-                           'Allocation of q_max in Gest_Trans successfully ',  &
-                           'completed.'
-                  endif
-                  q_max(:) = 0.d0
-               endif
-               exit
+               Z_fluid_max(:,:) = -999.d0
             endif
-         enddo
+            if (.not.allocated(Z_fluid_step)) then
+               allocate(Z_fluid_step(Grid%ncd(1)*Grid%ncd(2),2),STAT=alloc_stat)
+               if (alloc_stat/=0) then
+                  write(ulog,*)                                                &
+                  'Allocation of "Z_fluid_step" in the subroutine ',           &
+                  '"Gest_Trans" failed; the execution terminates here.'
+                  stop
+                  else
+                     write(ulog,*)                                             &
+                        'Allocation of "Z_fluid_step" in the ',                &
+                        'subroutine "Gest_Trans" is successfully completed.'
+               endif
+               Z_fluid_step(:,:) = -999.d0
+            endif
+            if (.not.allocated(q_max)) then
+               allocate(q_max(n_vertices_main_wall),STAT=alloc_stat)
+               if (alloc_stat/=0) then
+                  write(ulog,*)                                                &
+                  'Allocation of q_max in Gest_Trans failed;',                 &
+                  ' the program terminates here.'
+                  stop
+                  else
+                     write(ulog,*)                                             &
+                        'Allocation of q_max in Gest_Trans successfully ',     &
+                        'completed.'
+               endif
+               q_max(:) = 0.d0
+            endif
+         endif
          call start_and_stop(2,5)
 ! Main loop
          call time_step_loop

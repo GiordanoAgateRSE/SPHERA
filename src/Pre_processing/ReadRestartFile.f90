@@ -38,7 +38,7 @@ character(7),intent(in) :: option
 integer(4),intent(inout) :: ier,nrecords
 integer(4) :: restartcode,save_istart,ioerr,i,alloc_stat
 #ifdef SPACE_3D
-integer(4) :: i_aux,aux_integer
+integer(4) :: n_vertices_main_wall
 #endif
 double precision :: save_start
 character(12) :: ainp = "Restart File"
@@ -55,9 +55,6 @@ character(100),external :: lcase
 ! Initializations
 !------------------------
 ier = 0
-#ifdef SPACE_3D
-   aux_integer = 0
-#endif
 !------------------------
 ! Statements
 !------------------------
@@ -197,14 +194,9 @@ if (trim(lcase(option))==trim(lcase("heading"))) then
          endif
       endif
 ! Allocation of the array of the maximum water depth
-      do i_aux=1,NPartZone
-         if(Partz(i_aux)%IC_source_type==2) then
-            aux_integer = Partz(i_aux)%ID_last_vertex -                        &
-                          Partz(i_aux)%ID_first_vertex + 1
-            exit
-         endif
-      enddo
-         if ((aux_integer>0).and.(.not.allocated(Z_fluid_max))) then
+      call main_wall_info(n_vertices_main_wall)
+      if (n_vertices_main_wall>0) then
+         if (.not.allocated(Z_fluid_max)) then
             allocate(Z_fluid_max(Grid%ncd(1)*Grid%ncd(2),2),STAT=alloc_stat)
             if (alloc_stat/=0) then
                write(ulog,*)                                                   &
@@ -218,8 +210,8 @@ if (trim(lcase(option))==trim(lcase("heading"))) then
             endif
          endif
 ! Allocation of the array of the maximum specific flow rate
-         if ((aux_integer>0).and.(.not.allocated(q_max))) then
-            allocate(q_max(aux_integer),STAT=alloc_stat)
+         if (.not.allocated(q_max)) then
+            allocate(q_max(n_vertices_main_wall),STAT=alloc_stat)
             if (alloc_stat/=0) then
                write(ulog,*)                                                   &
                'Allocation of q_max in ReadRestartFile failed;',               &
@@ -231,6 +223,7 @@ if (trim(lcase(option))==trim(lcase("heading"))) then
                      'completed.'
             endif
          endif
+      endif
 #endif
 ! Allocation of the 2D array of the minimum saturation flag (bed-load transport)
       if ((Granular_flows_options%KTGF_config>0).and.                          &

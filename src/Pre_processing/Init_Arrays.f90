@@ -92,6 +92,10 @@ do i=1,size(Partz)
    Partz(i)%avg_comp_slip_coeff = 0.d0
    Partz(i)%avg_ni_T_SASPH = 0.d0
    Partz(i)%avg_tau_wall_f = 0.d0
+#ifdef SPACE_3D
+   Partz(i)%ID_first_vertex = 0
+   Partz(i)%ID_last_vertex = 0
+#endif
 enddo
 do i=1,size(Control_Points)
    Control_Points(i)%cella = 0
