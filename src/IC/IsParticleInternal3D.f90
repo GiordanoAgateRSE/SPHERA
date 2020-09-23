@@ -113,8 +113,6 @@ nnodes = 0
 ! Statements
 !------------------------
 ! Loop on the zone faces: start
-! The number of zone faces is equal to or smaller than the number of zone 
-! vertices minus 1
 do kf=Tratto(mib)%iniface,(Tratto(mib)%iniface+Tratto(mib)%numvertices-1)
 ! Face ID
    nf = BFaceList(kf)

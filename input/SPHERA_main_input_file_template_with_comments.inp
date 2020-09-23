@@ -166,8 +166,8 @@ ___ ___ ... ___
 ![?] The last 1/2/3 vertex IDs are 0 in case of pentagonal / quadrilateral / 
 !    triangular faces.
 ![?] SA-SPH boundary normal vectors and reservoir face normal vectors point 
-!    inward (clockwise list of points if looking from outside the fluid 
-!    domain).
+!    inward the fluid domain (clockwise list of points if looking from outside 
+!    the fluid domain).
 ![?] For "perimeter" boundaries: the vertices have to be adjacent, but there is 
 !    no rule about the vertex order (better clockwise to keep coherence with 
 !    SA-SPH walls).
@@ -212,7 +212,8 @@ ___ ___ ... ___ ___
 !    =fixed (wall frontier)
 !    =perimeter (fluid reservoir)
 !    =source(inlet section)
-!    =open (only removal of the particles crossing the boundary)
+!    =open (only removal of the particles crossing the open section, which 
+!          should beat least 2h far from the domain edges)
 !    =tapis (not recommended)
 !    =leve (not recommended)
 !    =pool (not recommended)
@@ -1281,7 +1282,10 @@ ___
 !    call for "point_inout_convex_non_degenerate_polygon" must be replaced with 
 !    other calls (to subroutines such as "point_inout_quadrilateral"). 
 ![?] <n_sect>: number of the flow rate monitoring sections
-![?] <dt_out>: writing time step for flow rates
+![?] <dt_out>: writing time step for flow rates. Contrarily to the other output 
+!              timing quantities, this variable acts as a time filter because 
+!              the flow rate is a mean quantity between two following writing 
+!              time steps (the flow rate is not an instantaneous quantity).
 ![?] <n_fluid_types>: number of fluid types (the first ID fluid types are 
 !    selected)
 !-------------------------------------------------------------------------------
