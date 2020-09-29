@@ -27,6 +27,7 @@
 !              assessing the 2D synthetic quantities (e.g., maximum water 
 !              depth, maximum specific flow rate).
 !-------------------------------------------------------------------------------
+#ifdef SPACE_3D
 subroutine main_wall_info(n_vertices_main_wall)
 !------------------------
 ! Modules
@@ -82,3 +83,4 @@ endif
 !------------------------
 return
 end subroutine main_wall_info
+#endif
