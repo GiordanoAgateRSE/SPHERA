@@ -217,6 +217,8 @@ do n=1,narg
    if (nomecaso=="??????") then
       nomecaso = nomearg
       nomefile(0) = trim(nomecaso)//".inp"
+! Concatenation of the main input file
+      call system("cat ./input/*/*.inp > ./"//nomefile(0))
       nomefile(1) = trim(nomecaso)//".out"
       nomefile(2) = trim(nomecaso)//".ris"
       nomefile(3) = trim(nomecaso)//".res"
@@ -310,6 +312,8 @@ if (nplb>0) close(nplb)
 if (uzlft>0) close(uzlft)
 if (nfro>0) close(nfro)
 if (ncpt>0) close(ncpt)
+! Remove the concatenated input file
+call system("rm -f ./"//nomefile(0))
 stop
 !------------------------
 ! Contains
