@@ -42,16 +42,6 @@
 !    =    start of a variable value
 !-------------------------------------------------------------------------------
 
-##### BOUNDARIES #####
-!-------------------------------------------------------------------------------
-![?] Input parameters for the following elements: fluid domain boundaries and 
-!    fluid bodies. Both these types of elements are here called "boundaries" or 
-!    "zones", and are delimited by lines (2D) / faces (3D).
-![?] In case of DB-SPH boundary treatment scheme, the parallelepiped domain 
-!    (mandatory) is formally represented by a fictitious SA-SPH frontier, which  
-!    is only used to generate the background positioning grid.
-!-------------------------------------------------------------------------------
-![?] NUMBER_OF_BOUNDARIES: do i=1,number_of_elements
 !-------------------------------------------------------------------------------
 ![?] <Boundary_type>
 !    =fixed (wall frontier)
@@ -326,6 +316,3 @@ ___
 !-------------------------------------------------------------------------------
 ![?] endif (Boundary_type=="source")
 !-------------------------------------------------------------------------------
-![?] enddo NUMBER_OF_BOUNDARIES
-!-------------------------------------------------------------------------------
-##### END BOUNDARIES #####

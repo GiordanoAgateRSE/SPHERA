@@ -1,0 +1,69 @@
+!-------------------------------------------------------------------------------
+! SPHERA v.9.0.0 (Smoothed Particle Hydrodynamics research software; mesh-less
+! Computational Fluid Dynamics code).
+! Copyright 2005-2020 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! formerly CESI-Ricerca di Sistema)
+!
+! SPHERA authors and email contact are provided in SPHERA documentation.
+!
+! This file is part of SPHERA.
+! SPHERA is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! SPHERA is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
+!-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+! Description: 18_00_monitoring_sections_SPHERA_input_template.inp
+!              Part of the main input file template of SPHERA. The commented 
+!              template has to be filled in for any particular test case. 
+!              Comment lines and blank lines do not disturb the execution.
+!-------------------------------------------------------------------------------
+
+!-------------------------------------------------------------------------------
+! Legend:
+!    !    beginning of a comment line. Additional comment lines are permitted.
+!    ![?] beginning of a definition/guideline
+!    <>   the content within these brackets represents an input variable
+!    ![*] beginning of the structure of a line with the names of the input 
+!         variables
+!    ...  possible repetitions of the above/previous data
+!    !<<< beginning of a section to be filled with input data. The lines of 
+!         this section must be replaced with a "!" if they do not have to be 
+!         filled for the test case chosen (included the start line and the end 
+!         line of the unusable sections).
+!    ___  space to be replaced with an input value
+!    !>>> end of a section to be filled with input data
+!    =    start of a variable value
+!-------------------------------------------------------------------------------
+
+!-------------------------------------------------------------------------------
+![?] if (3D) then
+!-------------------------------------------------------------------------------
+##### section flow rate #####
+!-------------------------------------------------------------------------------
+![?] Input parameters on monitoring sections for the flow rate. These sections 
+!    must be convex non-degenerate quadrilaterals. Otherwise, the subroutine 
+!    call for "point_inout_convex_non_degenerate_polygon" must be replaced with 
+!    other calls (to subroutines such as "point_inout_quadrilateral"). 
+![?] <n_sect>: number of the flow rate monitoring sections
+![?] <dt_out>: writing time step for flow rates. Contrarily to the other output 
+!              timing quantities, this variable acts as a time filter because 
+!              the flow rate is a mean quantity between two following writing 
+!              time steps (the flow rate is not an instantaneous quantity).
+![?] <n_fluid_types>: number of fluid types (the first ID fluid types are 
+!    selected)
+!-------------------------------------------------------------------------------
+![*] <n_sect> <dt_out> <n_fluid_types>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+___ ___ ___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] NUMBER_OF_SECTIONS: do i=1,NUMBER_OF_SECTIONS
+!-------------------------------------------------------------------------------
