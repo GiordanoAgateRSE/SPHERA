@@ -19,7 +19,7 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Description: 06_xx_boundaries_and_fluid_bodies_SPHERA_input_template.inp
+! Description: 06_0x_boundaries_and_fluid_bodies_SPHERA_input_template.inp
 !              Part of the main input file template of SPHERA. The commented 
 !              template has to be filled in for any particular test case. 
 !              Comment lines and blank lines do not disturb the execution.

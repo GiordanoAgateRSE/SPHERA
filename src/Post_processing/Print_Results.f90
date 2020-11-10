@@ -158,7 +158,11 @@ if (nag>0) then
       endif
    enddo
    laminar_flag_perc = (100.d0 * laminar_flag_count) / nag
-   blt_laminar_flag_perc = (100.d0 * blt_laminar_flag_count) / mixture_count
+   if (mixture_count>0) then
+      blt_laminar_flag_perc = (100.d0 * blt_laminar_flag_count) / mixture_count
+      else
+         blt_laminar_flag_perc = -999.d0
+   endif
    minvelo = dsqrt(minvelo)
    maxvelo = dsqrt(maxvelo)
    minvelx = minval(pg(1:nag)%vel(1),mask=pg(1:nag)%cella/=0)
