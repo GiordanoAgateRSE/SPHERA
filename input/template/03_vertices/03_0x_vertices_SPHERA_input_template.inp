@@ -57,6 +57,8 @@
 !    the possible topography from which reservoirs are extruded
 ![?] <Last_vertex_ID>,<Last_vertex_x>,<Last_vertex_y>,<Last_vertex_z>: last 
 !    vertex data
+![?] The numerical inlet section is the physical inlet section moved upstream 
+!    for a distance of 2h, with the possible wet walls of the same section.
 !-------------------------------------------------------------------------------
 ![*] 1 <Vertex_x> <Vertex_y> <Vertex_z>
 ![*] ...

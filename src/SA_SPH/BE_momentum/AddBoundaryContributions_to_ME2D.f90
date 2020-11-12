@@ -21,8 +21,9 @@
 !-------------------------------------------------------------------------------
 ! Program unit: AddBoundaryContributions_to_ME2D                                
 ! Description: To compute boundary terms for the 2D momentum equation 
-!              (gradPsuro,ViscoF). Equations refer to particle npi. (Di Monaco 
-!              et al., 2011, EACFM).                        
+!              (gradPsuro,ViscoF). Equations refer to particle npi. In case of 
+!              a neighbouring inlet section, the particle velocity is assigned. 
+!              (Di Monaco et al., 2011, EACFM).                        
 !-------------------------------------------------------------------------------
 #ifdef SPACE_2D
 subroutine AddBoundaryContributions_to_ME2D(npi,IntNcbs,tpres,tdiss,tvisc,     &

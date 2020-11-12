@@ -96,7 +96,7 @@ if (Domain%Slip) then
                * pg(npj)%zer(2) + rag(3,npartint) * pg(npj)%zer(3)))
       deltan = min(deltan,denorm)
    enddo
-endif 
+endif
 do contj=1,nPartIntorno(npi)
    npartint = (npi - 1) * NMAXPARTJ + contj
    npj = PartIntorno(npartint)

@@ -58,6 +58,8 @@
 !              time steps (the flow rate is not an instantaneous quantity).
 ![?] <n_fluid_types>: number of fluid types (the first ID fluid types are 
 !    selected)
+![?] Flow rates are averages between two following output time steps. They are 
+!    not instantaneous values.
 !-------------------------------------------------------------------------------
 ![*] <n_sect> <dt_out> <n_fluid_types>
 !-------------------------------------------------------------------------------

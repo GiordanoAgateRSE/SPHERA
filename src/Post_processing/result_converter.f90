@@ -20,9 +20,9 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: result_converter               
-! Description: Post-processing for .vtu (fluid dynamics parameters) and .vtk 
-!              (geometry) files for Paraview. Subroutine call for the 
-!              concatenation of the .txt temporary output files.      
+! Description: Post-processing for .vtu (fluid dynamics parameters) for 
+!              Paraview. Subroutine call for the concatenation of the .txt 
+!              temporary output files.      
 !-------------------------------------------------------------------------------
 subroutine result_converter(str)
 !------------------------

@@ -22,7 +22,8 @@
 ! Program unit: AddBoundaryContribution_to_CE3D                                 
 ! Description: To compute boundary terms for the 3D continuity equation 
 !              (rodivV). Equation refers to particle npi. It performs implicit 
-!              computation of gradPsuro. 
+!              computation of gradPsuro. In case of a neighbouring inlet 
+!              section, the particle density and pressure do not change.
 !              (Di Monaco et al., 2011, EACFM)                        
 !-------------------------------------------------------------------------------
 #ifdef SPACE_3D

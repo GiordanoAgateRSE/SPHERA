@@ -468,7 +468,7 @@ if (vtkconv) then
          nvalori = nvalori + 1
          nvalori = nvalori + 2
       enddo
-      write(unitvtk,'(a,2i8)') 'LINES ', nlinee, nvalori
+      write(unitvtk,'(a,2i11)') 'LINES ', nlinee, nvalori
       allocate(verticecolore(numvertici))
       verticecolore = zero
       do i=1,NumBSides
@@ -513,7 +513,7 @@ if (vtkconv) then
             nlinee = nlinee + 1
             nvalori = nvalori + 1 + BoundaryFace(i)%nodes + 1
          enddo
-         write(unitvtk,'(a,2i8)') 'LINES ',nlinee,nvalori
+         write(unitvtk,'(a,2i11)') 'LINES ',nlinee,nvalori
          allocate(verticecolore(numvertici))
          verticecolore = 0.0
          do i=1,NumFacce

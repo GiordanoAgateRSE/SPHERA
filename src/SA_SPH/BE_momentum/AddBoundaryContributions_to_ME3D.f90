@@ -22,7 +22,9 @@
 ! Program unit: AddBoundaryContributions_to_ME3D                                
 ! Description: To compute boundary terms for 3D momentum equation (gradPsuro, 
 !              ViscoF). Equations refer to particle npi. It performs implicit 
-!              computation of gradPsuro (Di Monaco et al., 2011, EACFM).                        
+!              computation of "gradPsuro". In case of a neighbouring inlet 
+!              section, the particle velocity is assigned.
+!              (Di Monaco et al., 2011, EACFM)
 !-------------------------------------------------------------------------------
 #ifdef SPACE_3D
 subroutine AddBoundaryContributions_to_ME3D(npi,Ncbf,tpres,tdiss,tvisc,        &
