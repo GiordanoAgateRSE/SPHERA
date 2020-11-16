@@ -148,13 +148,14 @@ if (nag>0) then
          maxvelo = modvel
          maxlocvelo = npi
       endif
-      if (pg(npi)%laminar_flag==1) then
-         laminar_flag_count = laminar_flag_count + 1
-         if (Med(pg(npi)%imed)%tipo=="granular") blt_laminar_flag_count =      &
-            blt_laminar_flag_count + 1
-      endif
-      if (Med(pg(npi)%imed)%tipo=="granular") then
-         mixture_count = mixture_count + 1
+      if (pg(npi)%imed>0) then
+         if (pg(npi)%laminar_flag==1) then
+            laminar_flag_count = laminar_flag_count + 1
+            if (Med(pg(npi)%imed)%tipo=="granular") blt_laminar_flag_count =   &
+               blt_laminar_flag_count + 1
+         endif
+         if (Med(pg(npi)%imed)%tipo=="granular") mixture_count = mixture_count &
+                                                                 + 1
       endif
    enddo
    laminar_flag_perc = (100.d0 * laminar_flag_count) / nag

@@ -180,7 +180,7 @@ if (.not.(allocated(Q_sections%section(1)%flow_rate))) then
                      Q_sections%section(i_sect)%vertex_loc(4,:),               &
                      Q_sections%section(i_sect)%vertex_loc(4,:),test_inout)
                   if (test_inout==1) then
-!$omp critical (omp_Q_Sections)                 
+!$omp critical (omp_Q_Sections)                
 ! To update the number of crossed particles and the flowing mass                  
                      n_particles(i_sect) = n_particles(i_sect) + 1
                      Q_sections%section(i_sect)%flow_rate(pg(npi)%imed) =      &
