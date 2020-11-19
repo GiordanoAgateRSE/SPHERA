@@ -71,7 +71,9 @@
 !    derived from topography, COEFNMAXPARTI takes into account contributions 
 !    from inlet sections and, in case of reservoir derived from topography, 
 !    also the particles of the mixture dam/reservoir (beyond the main water 
-!    reservoir)
+!    reservoir). The way the restart file is read permits to change the input 
+!    value of COEFNMAXPARTI in the input file of a restarted run. It is not 
+!    necessary to run again the whole sequence of jobs.
 ![?] <COEFNMAXPARTJ>: max number of neighbours maxb = COEFNMAXPARTJ * (4h/dx)
 !    ^ D; the same number applies both for fluid neighbours and DB-SPH wall 
 !    element neighbours

@@ -19,7 +19,7 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Description: 09_xx_media_SPHERA_input_template.inp
+! Description: 09_0x_media_SPHERA_input_template.inp
 !              Part of the main input file template of SPHERA. The commented 
 !              template has to be filled in for any particular test case. 
 !              Comment lines and blank lines do not disturb the execution.
@@ -42,11 +42,6 @@
 !    =    start of a variable value
 !-------------------------------------------------------------------------------
 
-##### medium #####
-!-------------------------------------------------------------------------------
-![?] Input parameters for the fluids
-!-------------------------------------------------------------------------------
-![?] NUMBER_OF_FLUIDS: do i=1,number_of_fluids
 !-------------------------------------------------------------------------------
 ![?] <fluid_type>
 !    =liquid
@@ -141,7 +136,3 @@ ___
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
 ![?] endif ((fluid_type==granular).and.(KTGF_config>1))
-!-------------------------------------------------------------------------------
-![?] enddo NUMBER_OF_FLUIDS
-!-------------------------------------------------------------------------------
-##### end medium #####
