@@ -77,7 +77,7 @@ if (ierr/=1) then
    flush(ulog)
 endif
 select case (ierr)
-   case (1)    
+   case (1)
 ! Errors in arguments
       write(uerr,*) "-----------------------------------"
       write(uerr,*) "ERROR in command line argument !!!."

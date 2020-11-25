@@ -56,8 +56,7 @@
 !              timing quantities, this variable acts as a time filter because 
 !              the flow rate is a mean quantity between two following writing 
 !              time steps (the flow rate is not an instantaneous quantity).
-![?] <n_fluid_types>: number of fluid types (the first ID fluid types are 
-!    selected)
+![?] <n_fluid_types>: number of fluid types (the first fluid IDs are selected)
 ![?] Flow rates are averages between two following output time steps. They are 
 !    not instantaneous values.
 !-------------------------------------------------------------------------------
