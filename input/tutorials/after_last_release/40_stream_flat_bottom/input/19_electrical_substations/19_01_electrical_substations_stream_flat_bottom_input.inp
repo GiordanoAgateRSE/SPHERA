@@ -1,0 +1,71 @@
+!-------------------------------------------------------------------------------
+! Software name and copyright: stream_flat_bottom
+!    Copyright 2020 (RSE SpA, authored by Andrea Amicarelli)
+! File description: input file for SPHERA v.9.0.0 (RSE SpA).
+!   2D stream on a flat bottom 
+!   Reference: SPHERA repository on github.com
+!
+! This file is part of stream_flat_bottom.
+! stream_flat_bottom is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! stream_flat_bottom is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with stream_flat_bottom. If not, see <http://www.gnu.org/licenses/>.
+!-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+! File description: 19_01_electrical_substations_stream_flat_bottom_input.inp
+!                   The commented template of the main input file of SPHERA  
+!                   v.9.0.0 (RSE SpA) is integrated in this file, in compliance 
+!                   with the requirements of the licenses of both the software 
+!                   tools.
+!-------------------------------------------------------------------------------
+
+!-------------------------------------------------------------------------------
+! Legend:
+!    !    beginning of a comment line. Additional comment lines are permitted.
+!    ![?] beginning of a definition/guideline
+!    <>   the content within these brackets represents an input variable
+!    ![*] beginning of the structure of a line with the names of the input 
+!         variables
+!    ...  possible repetitions of the above/previous data
+!    !<<< beginning of a section to be filled with input data. The lines of 
+!         this section must be replaced with a "!" if they do not have to be 
+!         filled for the test case chosen (included the start line and the end 
+!         line of the unusable sections).
+!    ___  space to be replaced with an input value
+!    !>>> end of a section to be filled with input data
+!    =    start of a variable value
+!-------------------------------------------------------------------------------
+
+![?] <type_ID>: substation type ID
+!    =1 (high-voltage)
+!    =2 (medium-voltage)
+!    =3 (low-voltage)
+![?] <n_vertices>: number of vertices describing the substation
+!    =3
+!    =4
+!    =5
+!    =6
+![?] <vertex_1_x>, <vertex_1_y>, <vertex_1_z>, ..., <vertex_last_x>, 
+!    <vertex_last_y>, <vertex_last_z>: vertices of the first section 
+!    (anti-clockwise order viewing the substation from the outside of the 
+!    fluid domain: clockwise in plan view)
+!-------------------------------------------------------------------------------
+![*] <substation_ID>
+![*] <type_ID> <n_vertices>
+![*] <vertex_1_x> <vertex_1_y> <vertex_1_z>
+![*] ...
+![*] <vertex_last_x> <vertex_last_y> <vertex_last_z>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___
+!___ ___
+!___ ___ ___
+!...
+!___ ___ ___
+!>>>****************************************************************************

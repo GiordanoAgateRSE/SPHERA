@@ -1,0 +1,134 @@
+!-------------------------------------------------------------------------------
+! Software name and copyright: dam_break_2D_demo
+!    Copyright 2015-2020 (RSE SpA, authored by Andrea Amicarelli)
+! Software description: input file for SPHERA v.9.0.0 (RSE SpA).
+!    Simple and demonstrative test case on a 2D dam break (rough resolution).
+!    Reference: Amicarelli (2020, SPHERA github repository).
+!
+! This file is part of 01_title_2D_demo_input.
+! 01_title_2D_demo_input is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! 01_title_2D_demo_input is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with 01_title_2D_demo_input. If not, see <http://www.gnu.org/licenses/>.
+!-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+! File description: 
+!    11_time_integration_and_numerical_data_dam_break_2D_demo_input.inp
+!                   The commented template of the main input file of SPHERA  
+!                   v.9.0.0 (RSE SpA) is integrated in this file, in compliance 
+!                   with the requirements of the licenses of both the software 
+!                   tools.
+!-------------------------------------------------------------------------------
+
+!-------------------------------------------------------------------------------
+! Legend:
+!    !    beginning of a comment line. Additional comment lines are permitted.
+!    ![?] beginning of a definition/guideline
+!    <>   the content within these brackets represents an input variable
+!    ![*] beginning of the structure of a line with the names of the input 
+!         variables
+!    ...  possible repetitions of the above/previous data
+!    !<<< beginning of a section to be filled with input data. The lines of 
+!         this section must be replaced with a "!" if they do not have to be 
+!         filled for the test case chosen (included the start line and the end 
+!         line of the unusable sections).
+!    ___  space to be replaced with an input value
+!    !>>> end of a section to be filled with input data
+!    =    start of a variable value
+!-------------------------------------------------------------------------------
+
+##### RUN PARAMETERS #####
+!-------------------------------------------------------------------------------
+![?] Input parameters for time integration, partial smoothing and memory 
+!    management
+![?] The run stops when reaching either the final time or the final time step; 
+!    in case of a restarted simulation, these values are reported in the log 
+!    file, but they are actually overwritten by the values read from the input 
+!    restart file (these data have no influence in case of restart)
+![?] <vsc_coeff>: viscous stability condition coefficient
+!    =0.05 (default value)
+![?] <Leapfrog_flag>
+!    =1 (Leapfrog time integration scheme)
+!    =0 (explicit RK time integration schemes)
+![?] <scheme_order>: time integration scheme order (but for Leapfrog is "1")
+![?] <factor>: weighting factor to estimate dt (draft variable)
+!    =0. (recommended value)
+![?] <dt_alfa_Mon>: logical flag possibly making Monaghan artificial viscosity 
+!    coefficient to influence dt
+![?] <teta_p>, <teta_u>: coefficients for partial smoothing of pressure and 
+!    velocity)
+![?] <var>
+!    =A (recommended value)
+![?] <COEFNMAXPARTI>: max number of fluid particles max0 = COEFNMAXPARTI * 
+!    nag; COEFNMAXPARTI considers that the number of particles inside the 
+!    domain can be higher than the first assessment of the number of SPH 
+!    particles (initial particles or reservoir particles (in case reservoir is 
+!    derived from topography, COEFNMAXPARTI takes into account contributions 
+!    from inlet sections and, in case of reservoir derived from topography, 
+!    also the particles of the mixture dam/reservoir (beyond the main water 
+!    reservoir). The way the restart file is read permits to change the input 
+!    value of COEFNMAXPARTI in the input file of a restarted run. It is not 
+!    necessary to run again the whole sequence of jobs.
+![?] <COEFNMAXPARTJ>: max number of neighbours maxb = COEFNMAXPARTJ * (4h/dx)
+!    ^ D; the same number applies both for fluid neighbours and DB-SPH wall 
+!    element neighbours
+![?] <body_part_reorder>: for DB-SPH
+!    =0 (fixed frontiers)
+!    =1 (mobile frontiers)
+!-------------------------------------------------------------------------------
+![*] <final_time> <final_time_step>
+![*] <CFL> <vsc_coeff> <Leapfrog_flag> <scheme_order> <factor> <dt_alfa_Mon>
+![*] <teta_p> <teta_u> <var> 
+![*] <COEFNMAXPARTI> <COEFNMAXPARTJ> <body_part_reorder>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+1. 1000000000 
+0.05 0.05 1 1 0. .false.
+0.2 0.2 A
+1.1 2. 0
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] if (3D) then
+![?] <nag_aux>: rough overestimation of the number of fluid particles in the 
+!    domain, it is only related to the very first allocation of the particle 
+!    array, it is influential only in case of reservoir extruded from 
+!    topography
+![?] <MAXCLOSEBOUNDFACES>: max number of neighbouring boundary face per fluid 
+!    particle
+![?] <MAXNUMCONVEXEDGES>: max number of edges
+![?] <GCBFVecDim>: rough overestimation of the number of Grid Cell - Boundary 
+!    Face intersections  (SA-SPH). In case of restart, this value is only read, 
+!    not used; in case its value is too little, crashes occur without code 
+!    warnings/errors; "GCBFVecDim" only occupies 4B times the number of 
+!    elements, thus, it is sufficient to overestimate this number as the number 
+!    of faces times the number of the positioning grid cells, further, reducing 
+!    "GCBFVecDim" does not imply any appreciable variation in the computational
+!    time). The positioning grid is made of cubes whose side length is 2h. 
+!-------------------------------------------------------------------------------
+![*] <nag_aux> <MAXCLOSEBOUNDFACES> <MAXNUMCONVEXEDGES> <GCBFVecDim>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___ ___ ___ ___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] endif (3D)
+!-------------------------------------------------------------------------------
+![?] <density_thresholds_flag>
+!    =0 (default value, no density limiters)
+!    =1 (density limiters for debug)
+!    Density limiters do not apply to the mixture particles which are held 
+!    fixed (elasto-plastic strain rate regime)
+!-------------------------------------------------------------------------------
+![*] <density_thresholds_flag>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+0
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+##### end RUN PARAMETERS #####

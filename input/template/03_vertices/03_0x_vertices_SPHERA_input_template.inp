@@ -60,12 +60,12 @@
 ![?] The numerical inlet section is the physical inlet section moved upstream 
 !    for a distance of 2h, with the possible wet walls of the same section.
 !-------------------------------------------------------------------------------
-![*] 1 <Vertex_x> <Vertex_y> <Vertex_z>
+![*] <First_vertex_ID> <Vertex_x> <Vertex_y> <Vertex_z>
 ![*] ...
 ![*] <Last_vertex_ID> <Vertex_x> <Vertex_y> <Vertex_z>
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
-1  ___ ___ ___
+___  ___ ___ ___
 ...
 ___ ___ ___ ___
 !>>>****************************************************************************

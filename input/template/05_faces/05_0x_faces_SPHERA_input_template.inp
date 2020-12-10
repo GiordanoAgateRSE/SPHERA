@@ -1,0 +1,83 @@
+!-------------------------------------------------------------------------------
+! SPHERA v.9.0.0 (Smoothed Particle Hydrodynamics research software; mesh-less
+! Computational Fluid Dynamics code).
+! Copyright 2005-2020 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
+! formerly CESI-Ricerca di Sistema)
+!
+! SPHERA authors and email contact are provided in SPHERA documentation.
+!
+! This file is part of SPHERA.
+! SPHERA is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! SPHERA is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
+!-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+! Description: 05_0x_faces_SPHERA_input_template.inp
+!              Part of the main input file template of SPHERA. The commented 
+!              template has to be filled in for any particular test case. 
+!              Comment lines and blank lines do not disturb the execution.
+!-------------------------------------------------------------------------------
+
+!-------------------------------------------------------------------------------
+! Legend:
+!    !    beginning of a comment line. Additional comment lines are permitted.
+!    ![?] beginning of a definition/guideline
+!    <>   the content within these brackets represents an input variable
+!    ![*] beginning of the structure of a line with the names of the input 
+!         variables
+!    ...  possible repetitions of the above/previous data
+!    !<<< beginning of a section to be filled with input data. The lines of 
+!         this section must be replaced with a "!" if they do not have to be 
+!         filled for the test case chosen (included the start line and the end 
+!         line of the unusable sections).
+!    ___  space to be replaced with an input value
+!    !>>> end of a section to be filled with input data
+!    =    start of a variable value
+!-------------------------------------------------------------------------------
+
+![?] 3D input parameters for the boundary faces of the fluid domain
+![?] 3D boundary faces for wall frontiers, inlet/outlet sections, fluid 
+!    reservoirs.
+![?] In case of DB-SPH boundary treatment scheme, the code requires the faces of 
+!    the parallelepiped domain as a "perimeter" and the "fictitious reservoirs".
+![?] In case of SA-SPH boundary treatment scheme, the code requires the 
+!    actual boundary faces.
+![?] In case a fluid reservoir needs to be partitioned, then each partition 
+!    needs a dedicated "perimeter" item.
+![?] Vertex list clockwise (normal vector exiting the frontier/domain; view 
+!    from the semi-space of the normal vector): not the best convention.
+![?] The last 1/2/3 vertex IDs are 0 in case of pentagonal / quadrilateral / 
+!    triangular faces.
+![?] SA-SPH boundary normal vectors and reservoir face normal vectors point 
+!    inward the fluid domain (clockwise list of points if looking from outside 
+!    the fluid domain).
+![?] For "perimeter" boundaries: the vertices have to be adjacent, but there is 
+!    no rule about the vertex order (better clockwise to keep coherence with 
+!    SA-SPH walls).
+![?] Faces can only be triangles or rectangles (generic quadrilaterals are not 
+!    permitted), but only "perimeter" faces can also be generic quadrilaterals 
+!    (not only rectangles), pentagons and hexagons.
+![?] No gaps on face IDs are permitted
+![?] <face_1_vertex_1>,...,<face_1_vertex_6>,<face_1_zone_ID>: first face 
+!    data. The value "-1" is mandatory for meaningless vertex IDs (e.g., 5th 
+!    and 6th vertices of a quadrilateral).
+![?] <face_last_ID>,<face_last_vertex_1>,...,<face_last_vertex_6>,
+!    <face_last_zone_ID>: last face data
+!-------------------------------------------------------------------------------
+![*] 1 <face_first_vertex_1> ... <face_1_vertex_6> <face_1_zone_ID>
+![*] ...
+![*] <face_last_ID> <face_last_vertex_1> ... <face_last_vertex_6> 
+!    <face_last_zone_ID>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+___ ___ ... ___ ___
+...
+___ ___ ... ___ ___
+!>>>****************************************************************************

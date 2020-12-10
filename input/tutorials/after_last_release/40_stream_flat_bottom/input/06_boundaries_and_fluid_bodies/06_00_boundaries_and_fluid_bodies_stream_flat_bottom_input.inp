@@ -1,0 +1,55 @@
+!-------------------------------------------------------------------------------
+! Software name and copyright: stream_flat_bottom
+!    Copyright 2020 (RSE SpA, authored by Andrea Amicarelli)
+! File description: input file for SPHERA v.9.0.0 (RSE SpA).
+!   2D stream on a flat bottom 
+!   Reference: SPHERA repository on github.com
+!
+! This file is part of stream_flat_bottom.
+! stream_flat_bottom is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! stream_flat_bottom is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with stream_flat_bottom. If not, see <http://www.gnu.org/licenses/>.
+!-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+! File description: 06_00_boundaries_and_fluid_bodies_stream_flat_bottom_input.inp
+!                   The commented template of the main input file of SPHERA  
+!                   v.9.0.0 (RSE SpA) is integrated in this file, in compliance 
+!                   with the requirements of the licenses of both the software 
+!                   tools.
+!-------------------------------------------------------------------------------
+
+!-------------------------------------------------------------------------------
+! Legend:
+!    !    beginning of a comment line. Additional comment lines are permitted.
+!    ![?] beginning of a definition/guideline
+!    <>   the content within these brackets represents an input variable
+!    ![*] beginning of the structure of a line with the names of the input 
+!         variables
+!    ...  possible repetitions of the above/previous data
+!    !<<< beginning of a section to be filled with input data. The lines of 
+!         this section must be replaced with a "!" if they do not have to be 
+!         filled for the test case chosen (included the start line and the end 
+!         line of the unusable sections).
+!    ___  space to be replaced with an input value
+!    !>>> end of a section to be filled with input data
+!    =    start of a variable value
+!-------------------------------------------------------------------------------
+
+##### BOUNDARIES #####
+!-------------------------------------------------------------------------------
+![?] Input parameters for the following elements: fluid domain boundaries and 
+!    fluid bodies. Both these types of elements are here called "boundaries" or 
+!    "zones", and are delimited by lines (2D) / faces (3D).
+![?] In case of DB-SPH boundary treatment scheme, the parallelepiped domain 
+!    (mandatory) is formally represented by a fictitious SA-SPH frontier, which  
+!    is only used to generate the background positioning grid.
+!-------------------------------------------------------------------------------
+![?] NUMBER_OF_BOUNDARIES: do i=1,number_of_elements
+!-------------------------------------------------------------------------------

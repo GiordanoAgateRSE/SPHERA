@@ -1,0 +1,67 @@
+!-------------------------------------------------------------------------------
+! Software name and copyright: db_Alpe_Gera_Lanzada_Substations
+!    Copyright 2018-2020 (RSE SpA, authored by Andrea Amicarelli)
+! File description: input file for SPHERA v.9.0.0 (RSE SpA).
+!   Alpe Gera dam-break flood scenario (with volume correction) with 4  
+!      residential areas and damage to the electrical substations of Lanzada 
+!      (Sondrio, Italy). 
+!   Reference: Amicarelli (2020, IJCFD).
+!
+! This file is part of db_Alpe_Gera_Lanzada_Substations.
+! db_Alpe_Gera_Lanzada_Substations is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! db_Alpe_Gera_Lanzada_Substations is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with db_Alpe_Gera_Lanzada_Substations. If not, see <http://www.gnu.org/licenses/>.
+!-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+! File description: 13_restart_db_Alpe_Gera_Lanzada_Substations_input.inp
+!                   The commented template of the main input file of SPHERA  
+!                   v.9.0.0 (RSE SpA) is integrated in this file, in compliance 
+!                   with the requirements of the licenses of both the software 
+!                   tools.
+!-------------------------------------------------------------------------------
+
+!-------------------------------------------------------------------------------
+! Legend:
+!    !    beginning of a comment line. Additional comment lines are permitted.
+!    ![?] beginning of a definition/guideline
+!    <>   the content within these brackets represents an input variable
+!    ![*] beginning of the structure of a line with the names of the input 
+!         variables
+!    ...  possible repetitions of the above/previous data
+!    !<<< beginning of a section to be filled with input data. The lines of 
+!         this section must be replaced with a "!" if they do not have to be 
+!         filled for the test case chosen (included the start line and the end 
+!         line of the unusable sections).
+!    ___  space to be replaced with an input value
+!    !>>> end of a section to be filled with input data
+!    =    start of a variable value
+!-------------------------------------------------------------------------------
+
+##### restart #####
+!-------------------------------------------------------------------------------
+![?] <restart_mode>
+!    =time
+!    =step
+![?] <restart_time_value>: positive time value in seconds or step number, 
+!    according to "restart_mode"; "restart_time_value" has to be smaller than 
+!    the time value of the last restart output. As "restart_time_value" has to 
+!    be positive, restart from the very initial conditions is not possible at 
+!    the moment.
+![?] <restart_file>: restart file name (with file extension)
+!-------------------------------------------------------------------------------
+![*] <restart_mode> <restart_time_value>
+![*] <restart_file>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___ ___
+!___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+##### end restart #####
