@@ -132,7 +132,8 @@ face_loop: do icbf=1,Ncbf
             ViscoMon(:) = ViscoMon(:) + Mmult * nnlocal(:)
          endif
          if (Partz(Tratto(stretch)%zone)%slip_coefficient_mode==1) then
-! Slip coefficient from input
+! Slip coefficient and molecular viscosity from input
+            slip_coefficient = Partz(Tratto(stretch)%zone)%BC_shear_stress_input
             cinvisci = pg(npi)%kin_visc
             elseif (Partz(Tratto(stretch)%zone)%slip_coefficient_mode==2) then
 ! Slip coefficient computed
