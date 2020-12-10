@@ -264,7 +264,8 @@ do icbs=1,IntNcbs
    if (strtype=="fixe".or.strtype=="tapi") then
       if (xpi>=zero.and.xpi<=RifBoundarySide%length) then
          if (Partz(Tratto(sidestr)%zone)%slip_coefficient_mode==1) then
-! Slip coefficient from input
+! Slip coefficient and molecular viscosity from input
+            slip_coefficient = Partz(Tratto(sidestr)%zone)%BC_shear_stress_input
             cinvisci = pg(npi)%kin_visc
             elseif (Partz(Tratto(sidestr)%zone)%slip_coefficient_mode==2) then
 ! Slip coefficient computed
