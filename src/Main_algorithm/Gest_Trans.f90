@@ -76,7 +76,7 @@ blocchi = 0
 block = - 1
 Time_Block = zero
 #ifdef SPACE_3D
-MaxNcbf = int(Domain%MAXCLOSEBOUNDFACES * PARTICLEBUFFER)
+MaxNcbf = int(input_any_t%MAXCLOSEBOUNDFACES * PARTICLEBUFFER)
 #elif defined SPACE_2D
 MaxNcbs = int(MAXCLOSEBOUNDSIDES * PARTICLEBUFFER)
 #endif
@@ -116,7 +116,7 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph"))  then
          endif
 #endif
 endif
-NMAXPARTJ = int(Domain%COEFNMAXPARTJ * (Domain%h * four / Domain%dx) **        &
+NMAXPARTJ = int(input_any_t%COEFNMAXPARTJ * (Domain%h * four / Domain%dx) **   &
             ncord) + 1
 write(ulog,'(2a,i15)') "     Maximum number of neighbouring particles: ",      &
    "NMAXPARTJ = ",NMAXPARTJ
@@ -413,13 +413,13 @@ write(ulog,*)
 write(ulog,*) "Transient loop begins..."
 write(ulog,*)
 ! To initialize the post-processing file 
-if ((Domain%imemo_fr>0).or.(Domain%memo_fr>zero)) then
+if ((Domain%imemo_fr>0).or.(input_any_t%memo_fr>zero)) then
    open(nres,file=nomefile(2),status="unknown",access="sequential"             &
       ,form="unformatted")
    else
       nres = -nres
 endif
-if ((Domain%ipllb_fr>0).or.(Domain%pllb_fr>zero)) then
+if ((Domain%ipllb_fr>0).or.(input_any_t%pllb_fr>zero)) then
    open(nplb,file=nomefile(4),status="unknown",access="sequential",            &
       form="formatted")
    write(nplb,"(a)") "time          free_surface_quota"
@@ -430,7 +430,7 @@ if ((Domain%ipllb_fr>0).or.(Domain%pllb_fr>zero)) then
       nplb = - nplb
       uzlft = - uzlft
 endif
-if ((Domain%imemo_fr>0).or.(Domain%memo_fr>zero)) then
+if ((Domain%imemo_fr>0).or.(input_any_t%memo_fr>zero)) then
    open(nfro,file=nomefile(5),status="unknown",access="sequential"             &
       ,form="formatted")
    write(nfro,"(a)") "time          x fronte      (y fronte)    z fronte"

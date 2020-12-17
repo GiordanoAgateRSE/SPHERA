@@ -149,9 +149,9 @@ do ii = 1,indarrayFlu
 enddo
 !$omp end parallel do
 #ifdef SPACE_3D
-if (Ncbf_Max>Domain%MAXCLOSEBOUNDFACES) then
+if (Ncbf_Max>input_any_t%MAXCLOSEBOUNDFACES) then
    write(ulog,"(a,i5,a,i5)") "Increase parameter MAXCLOSEBOUNDFACES from",     &
-      Domain%MAXCLOSEBOUNDFACES," to ",Ncbf_Max
+      input_any_t%MAXCLOSEBOUNDFACES," to ",Ncbf_Max
    call diagnostic(arg1=9,arg2=3,arg3=nomsub)
 endif
 #endif

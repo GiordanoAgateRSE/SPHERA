@@ -45,6 +45,7 @@
 ##### draw options #####
 !-------------------------------------------------------------------------------
 ![?] Post-processing parameters for Paraview file formats
+![?] The whole section can be effectively modified at any restart time.
 ![?] <dt_out_PV>: writing time step for Paraview ".vtu" files
 !-------------------------------------------------------------------------------
 ![*] vtkconverter any <dt_out_PV>

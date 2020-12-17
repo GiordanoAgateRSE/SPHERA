@@ -238,47 +238,47 @@ do while (trim(lcase(ainp))/="##### end output regulation #####")
 enddo
 if (input_second_read.eqv..true.) then
    Domain%iplot_fr = iplot_fr
-   Domain%plot_fr = plot_fr
+   input_any_t%plot_fr = plot_fr
    Domain%imemo_fr = imemo_fr
-   Domain%memo_fr = memo_fr
+   input_any_t%memo_fr = memo_fr
    Domain%irest_fr = irest_fr
-   Domain%rest_fr = rest_fr
+   input_any_t%rest_fr = rest_fr
    Domain%icpoi_fr = icpoi_fr
-   Domain%cpoi_fr = cpoi_fr
-   Domain%ipllb_md = ipllb_md
+   input_any_t%cpoi_fr = cpoi_fr
+   input_any_t%ipllb_md = ipllb_md
    Domain%ipllb_fr = ipllb_fr
-   Domain%pllb_fr = pllb_fr
-   Domain%depth_dt_out = depth_dt_out
-   Domain%depth_it_out_last = 0.d0    
+   input_any_t%pllb_fr = pllb_fr
+   input_any_t%depth_dt_out = depth_dt_out
+   Domain%depth_it_out_last = 0    
    Domain%ioutopt  = ioutopt
    if (ulog>0) then 
       write(ulog,"(1x,a,i12)")   "Displaying     step frequency : ",           &
          Domain%iplot_fr
       write(ulog,"(1x,a,e12.4)") "Displaying     time frequency : ",           &
-         Domain%plot_fr
+         input_any_t%plot_fr
       write(ulog,"(1x,a,i12)")   "Results saving step frequency : ",           &
          Domain%imemo_fr
       write(ulog,"(1x,a,e12.4)") "Results saving time frequency : ",           &
-         Domain%memo_fr
+         input_any_t%memo_fr
       write(ulog,"(1x,a,i12)")   "Restart saving step frequency : ",           &
          Domain%irest_fr
       write(ulog,"(1x,a,e12.4)") "Restart saving time frequency : ",           &
-         Domain%rest_fr
+         input_any_t%rest_fr
       write(ulog,"(1x,a,i12)")   "Ctrl.Points    step frequency : ",           &
          Domain%icpoi_fr
       write(ulog,"(1x,a,e12.4)") "Ctrl.Points    time frequency : ",           &
-         Domain%cpoi_fr
+         input_any_t%cpoi_fr
       write(ulog,"(1x,a,i12)")   "Level Medium Index            : ",           &
-         Domain%ipllb_md
-      if (Domain%ipllb_md>0) write(ulog,"(1x,a,e12.4)")                        &
+         input_any_t%ipllb_md
+      if (input_any_t%ipllb_md>0) write(ulog,"(1x,a,e12.4)")                   &
                                  "Level Medium Density Limit    : ",           &
-                                 med(Domain%ipllb_md)%den0 * half
+                                 med(input_any_t%ipllb_md)%den0 * half
       write(ulog,"(1x,a,i12)")   "Level          step frequency : ",           &
          Domain%ipllb_fr
       write(ulog,"(1x,a,e12.4)") "Level          time frequency : ",           &
-         Domain%pllb_fr
+         input_any_t%pllb_fr
       write(ulog,"(1x,a,e12.4)") "Depth          dt_out(s)      : ",           &
-         Domain%depth_dt_out
+         input_any_t%depth_dt_out
       write(ulog,"(1x,a,a)")     "Printing Option               : ",           &
          outopt(ioutpo2)
       if (Domain%ioutopt>0) write(ulog,"(1x,a,i12)")                           &

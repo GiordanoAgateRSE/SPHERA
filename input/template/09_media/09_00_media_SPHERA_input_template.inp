@@ -45,5 +45,6 @@
 ##### medium #####
 !-------------------------------------------------------------------------------
 ![?] Input parameters for the fluids
+![?] The whole section can be effectively modified at any restart time.
 !-------------------------------------------------------------------------------
 ![?] NUMBER_OF_FLUIDS: do i=1,number_of_fluids

@@ -36,8 +36,8 @@ use Dynamic_allocation_module
 !------------------------
 implicit none
 integer(4),intent(in) :: icbf
-integer(4),intent(in),dimension(1:Domain%MAXCLOSEBOUNDFACES) :: Clobface
-double precision,intent(in),dimension(1:SPACEDIM,1:Domain%MAXCLOSEBOUNDFACES) :: LocX
+integer(4),intent(in),dimension(1:input_any_t%MAXCLOSEBOUNDFACES) :: Clobface
+double precision,intent(in),dimension(1:SPACEDIM,1:input_any_t%MAXCLOSEBOUNDFACES) :: LocX
 double precision,intent(out) :: IntWdV,IntdWrm1dV,IntGWZrm1dV
 double precision,intent(out),dimension(1:SPACEDIM) :: IntGWdV
 double precision,intent(out),dimension(1:SPACEDIM,1:SPACEDIM) :: IntGWrRdV

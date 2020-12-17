@@ -129,7 +129,7 @@ do ii=1,indarrayFlu
 enddo
 !$omp end parallel do
 !$omp parallel do default(none)                                                &
-!$omp shared(pg,Med,Domain,dt,indarrayFlu,Array_Flu)                           &
+!$omp shared(pg,Med,Domain,dt,indarrayFlu,Array_Flu,input_any_t)               &
 !$omp private(npi,ii,TetaP1)
 do ii=1,indarrayFlu
    npi = Array_Flu(ii)
@@ -137,7 +137,7 @@ do ii=1,indarrayFlu
 ! "sour"
    if (pg(npi)%koddens==0) then 
 ! Computing TetaP depending on the time step
-      TetaP1 = Domain%TetaP * Med(pg(npi)%imed)%Celerita * dt / Domain%h
+      TetaP1 = input_any_t%TetaP * Med(pg(npi)%imed)%Celerita * dt / Domain%h
       pg(npi)%pres = pg(npi)%pres + TetaP1 * pg(npi)%vpres
       pg(npi)%dens = Med(pg(npi)%imed)%den0 * (one + (pg(npi)%pres -           &
                      Domain%Prif) / Med(pg(npi)%imed)%eps)

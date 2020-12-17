@@ -44,6 +44,7 @@
 
 ##### restart #####
 !-------------------------------------------------------------------------------
+![?] The whole section can be effectively modified at any restart time.
 ![?] <restart_mode>
 !    =time
 !    =step

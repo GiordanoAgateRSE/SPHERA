@@ -334,7 +334,7 @@ if (nag>0) then
    endif
 ! Elapsed time
    if (exetype=="linux") then
-      if (Domain%tmax>0.d0) then
+      if (input_any_t%tmax>0.d0) then
          call system("date +%j%H%M%S>date_now.txt")
          open(unit_time_elapsed,file='date_now.txt',status="unknown",          &
             form="formatted")
@@ -361,7 +361,7 @@ if (nag>0) then
       time_elapsed_tot_est = ((Domain%t_pre_iter-Domain%t0) +                  &
                              (machine_Julian_day * 24 * 60 * 60 + machine_hour &
                              * 60 * 60 + machine_minute * 60 + machine_second -&
-                             Domain%t_pre_iter) * (Domain%tmax /               &
+                             Domain%t_pre_iter) * (input_any_t%tmax /          &
                              simulation_time)) / (3600.0d0)  
       if (time_elapsed_tot_est<0.d0) time_elapsed_tot_est =                    &
          time_elapsed_tot_est + 366.d0 * 24.d0 * 60.d0 * 60.d0  

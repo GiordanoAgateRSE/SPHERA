@@ -49,7 +49,7 @@ double precision :: unity,presi,presj,rhoj,amassj,pesoj,appo1,appo2,TetaP1
 !------------------------
 !$omp parallel do default(none) &
 !$omp shared(nag,pg,Med,Domain,nPartIntorno,NMAXPARTJ,PartIntorno,PartKernel)  &
-!$omp shared(indarrayFlu,Array_Flu)                                            &
+!$omp shared(indarrayFlu,Array_Flu,input_any_t)                                &
 !$omp private(npi,ii,unity,appo1,appo2,contj,npartint,npj,presi,rhoj,presj)    &
 !$omp private(amassj,pesoj)
 ! Loop over all the particles
@@ -72,7 +72,7 @@ do ii=1,indarrayFlu
       appo2 = appo2 - Domain%grav(3) * Med(pg(npi)%imed)%den0 *                &
               (pg(npj)%coord(3) - pg(npi)%coord(3)) * pesoj     
    enddo
-   if (Domain%Psurf/='s') then
+   if (input_any_t%Psurf/='s') then
       pg(npi)%vpres = appo1
       elseif (unity>0.8d0) then
          pg(npi)%vpres=appo1
@@ -84,11 +84,11 @@ enddo
 !$omp end parallel do
 !$omp parallel do default(none)                                                &
 !$omp private(npi,ii,TetaP1)                                                   &
-!$omp shared(nag,Pg,Med,Domain,dt,indarrayFlu,Array_Flu)
+!$omp shared(nag,Pg,Med,Domain,dt,indarrayFlu,Array_Flu,input_any_t)
 do ii = 1,indarrayFlu
    npi = Array_Flu(ii)
 ! Computation of TetaP depending on the time step
-   TetaP1 = Domain%TetaP * Med(pg(npi)%imed)%Celerita * dt / Domain%h
+   TetaP1 = input_any_t%TetaP * Med(pg(npi)%imed)%Celerita * dt / Domain%h
    pg(npi)%pres = pg(npi)%pres + TetaP1 * pg(npi)%vpres / pg(npi)%uni
 ! To update density depending on pressure
    pg(npi)%dens = Med(pg(npi)%imed)%den0 * (one + pg(npi)%pres /               &

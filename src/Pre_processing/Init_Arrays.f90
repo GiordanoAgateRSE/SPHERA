@@ -43,9 +43,6 @@ integer(4) :: i,j,n
 !------------------------
 ! Initializations
 !------------------------
-!------------------------
-! Statements
-!------------------------
 do i=1,size(Med)
    Med(i)%tipo = "Empty   "
    Med(i)%index = 0
@@ -200,42 +197,46 @@ enddo
 Grid%nmax = 0
 Domain%tipo = "semi"
 Domain%file = "                                                                                "
-Domain%Psurf = " "
 Domain%RandomPos = " "
 Domain%iplot_fr = 0
 Domain%imemo_fr = 0
 Domain%irest_fr = 0
 Domain%icpoi_fr = 0
 Domain%ipllb_fr = 0
-Domain%ipllb_md = 0
 Domain%istart = 0
 Domain%ioutopt = 0
-Domain%itmax = 0
 do j=1,3
    Domain%coord(j,1) = zero
    Domain%coord(j,2) = zero
    Domain%grav(j) = zero
 enddo
-Domain%tmax = zero
 Domain%dx = zero
-Domain%trunc = zero
 Domain%coefke = zero
 Domain%coefkacl = zero
-Domain%CFL = zero
-Domain%vsc_coeff = zero
 Domain%prif = zero
-Domain%plot_fr = zero
-Domain%memo_fr = zero
-Domain%rest_fr = zero
-Domain%cpoi_fr = zero
-Domain%pllb_fr = zero
-Domain%TetaP = zero
-Domain%TetaV = zero
 Domain%prif = zero
 Domain%h = zero
 Domain%start = zero
 Domain%NormFix = .false.
 Domain%Slip = .false.
+! input_any_t
+input_any_t%itmax = 0
+input_any_t%ipllb_md = 0
+input_any_t%trunc = zero
+input_any_t%tmax = zero
+input_any_t%CFL = zero
+input_any_t%vsc_coeff = zero
+input_any_t%TetaP = zero
+input_any_t%TetaV = zero
+input_any_t%plot_fr = zero
+input_any_t%rest_fr = zero
+input_any_t%memo_fr = zero
+input_any_t%cpoi_fr = zero
+input_any_t%pllb_fr = zero
+input_any_t%Psurf = " "
+!------------------------
+! Statements
+!------------------------
 !------------------------
 ! Deallocations
 !------------------------

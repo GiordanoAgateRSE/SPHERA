@@ -48,14 +48,14 @@ double precision :: TetaV1
 ! Statements
 !------------------------
 !$omp parallel do default(none)                                                &
-!$omp shared(pg,Med,Domain,dt,indarrayFlu,Array_Flu)                           &
+!$omp shared(pg,Med,Domain,dt,indarrayFlu,Array_Flu,input_any_t)               &
 !$omp private(npi,ii,TetaV1)
 ! Loop over all the active particles
 do ii=1,indarrayFlu
    npi = Array_Flu(ii)
-   if (Domain%TetaV>1.d-9) then
+   if (input_any_t%TetaV>1.d-9) then
 ! TetaV depending on the time step
-      TetaV1 = Domain%TetaV * Med(pg(npi)%imed)%Celerita * dt / Domain%h
+      TetaV1 = input_any_t%TetaV * Med(pg(npi)%imed)%Celerita * dt / Domain%h
       if (pg(npi)%kodvel==0) then              
 ! The particle is inside the domain and far from boundaries
          pg(npi)%var(:) = pg(npi)%vel(:) + TetaV1 * pg(npi)%var(:)     

@@ -68,7 +68,7 @@ NBFfin = NumFacce - 1
 !------------------------
 !$omp parallel do default(none)                                                &
 !$omp shared(NBFfin,BFaceList,BoundaryFace,NumFacce,Tratto,Vertice,NumBEdges)  &
-!$omp shared(Domain,nomsub,BoundaryConvexEdge,iseg)                            &
+!$omp shared(Domain,nomsub,BoundaryConvexEdge,iseg,input_any_t)                &
 !$omp private(kf,nf,nt,nodes,fk,NBFini,kf1,nf1,nt1,EdgeFound,nodes1,fk1,i,j)   &
 !$omp private(nodi,nodj,ii,jj,nodii,nodjj,kk,nodkk,zitakk,length2,nodrif,sd)   &
 !$omp private(delta)
@@ -113,7 +113,7 @@ do kf=1,NBFfin
 ! The side of vertices (nodi,nodj) is "convex"
 !$omp critical (omp_FBCE3D)
                         NumBEdges = NumBEdges + 1
-                        if (NumBEdges>Domain%MAXNUMCONVEXEDGES) call           &
+                        if (NumBEdges>input_any_t%MAXNUMCONVEXEDGES) call      &
                            diagnostic(arg1=8,arg2=10,arg3=nomsub)
                         BoundaryConvexEdge(NumBEdges)%face(1) = nf
                         BoundaryConvexEdge(NumBEdges)%face(2) = nf1

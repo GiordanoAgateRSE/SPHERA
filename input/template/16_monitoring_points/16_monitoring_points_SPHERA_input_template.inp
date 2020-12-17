@@ -45,6 +45,7 @@
 ##### control points #####
 !-------------------------------------------------------------------------------
 ![?] Input parameters for monitoring points
+![?] The whole section can be effectively modified at any restart time.
 !-------------------------------------------------------------------------------
 ![*] <x_monitor_point_1> <y_monitor_point_1> <z_monitor_point_1>
 ![*] ...

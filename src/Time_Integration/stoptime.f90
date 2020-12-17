@@ -67,7 +67,7 @@ if (partzlocal%move=="fix") then
             tstopc = (Domain%coord(icord,1) - partzlocal%coordMM(icord,1) +    & 
                one * Domain%dx) / partzlocal%vel(icord)
             else
-               tstopc = Domain%tmax
+               tstopc = input_any_t%tmax
       endif
       tstop = min(tstop,tstopc)
    enddo
@@ -159,7 +159,7 @@ if (partzlocal%move=="fix") then
       enddo
       partzlocal%move = "fix"
       else
-         tstop = Domain%tmax
+         tstop = input_any_t%tmax
 endif
 !------------------------
 ! Deallocations

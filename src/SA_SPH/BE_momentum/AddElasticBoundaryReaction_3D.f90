@@ -52,7 +52,7 @@ double precision,parameter :: reafactor = 1.d0
 integer(4) :: sd,icbf,iface,nt,ibdt,ibdp,mate,fkod,ne,NCloseEdgeF
 double precision :: zi,zimin,celer02,vin,normreact 
 double precision :: scaprod,edgelen2,tau,edgedist2
-logical,dimension(1:Domain%MAXCLOSEBOUNDFACES) :: ReaFace
+logical,dimension(1:input_any_t%MAXCLOSEBOUNDFACES) :: ReaFace
 double precision,dimension(1:SPACEDIM) :: PXLoc,csi,XQ,QP,QPcosdir
 logical,external :: IsPointInternal
 !------------------------

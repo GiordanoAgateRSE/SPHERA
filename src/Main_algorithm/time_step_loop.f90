@@ -155,7 +155,7 @@ endif
 if (it_start==0) call time_step_duration
 it = it_start
 call time_elapsed_IC
-TIME_STEP_DO: do while (it<=Domain%itmax)
+TIME_STEP_DO: do while (it<=input_any_t%itmax)
    done_flag = .false.
 ! Set the time step ID
    it = it + 1
@@ -226,7 +226,7 @@ TIME_STEP_DO: do while (it<=Domain%itmax)
             endif
 ! Partial smoothing for velocity: start 
             call start_and_stop(2,7)
-            if (Domain%TetaV>1.d-9) call velocity_smoothing
+            if (input_any_t%TetaV>1.d-9) call velocity_smoothing
             call velocity_smoothing_2
             call start_and_stop(3,7)
 ! Partial smoothing for velocity: end
@@ -315,13 +315,13 @@ TIME_STEP_DO: do while (it<=Domain%itmax)
       if (Domain%time_split==0) call time_integration
 ! Explicit RK schemes
 ! Partial smoothing for pressure and density update
-      if (Domain%TetaP>zero) then
+      if (input_any_t%TetaP>zero) then
          call start_and_stop(2,14)
-         if (Domain%Psurf=='s') then
+         if (input_any_t%Psurf=='s') then
             call inter_SmoothPres
-            elseif (Domain%Psurf=='a') then
+            elseif (input_any_t%Psurf=='a') then
 #ifdef SPACE_3D
-                  call PressureSmoothing_3D         
+                  call PressureSmoothing_3D
 #elif defined SPACE_2D
                      call PressureSmoothing_2D
 #endif
@@ -387,7 +387,7 @@ TIME_STEP_DO: do while (it<=Domain%itmax)
 ! If the "kill file" exists, then the run is stopped and last results are saved.
    inquire(file=nomefilekill,EXIST=kill_flag)
    if (kill_flag) exit TIME_STEP_DO
-   if (simulation_time>=Domain%tmax) exit TIME_STEP_DO
+   if (simulation_time>=input_any_t%tmax) exit TIME_STEP_DO
 enddo TIME_STEP_DO
 ! Post-processing: log on the last time step
 if (it_eff/=it_print.and.ulog>0) then

@@ -83,7 +83,7 @@ do while (trim(lcase(ainp))/="##### end domain #####")
    if (ioerr==0) read(ainp,*,iostat=ioerr) dx,trunc
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"DD & TRUNC",ninp,ulog)) return
    Domain%dx = dx
-   Domain%trunc = trunc
+   input_any_t%trunc = trunc
    token = lcase(GetToken(ainp,3,ioerr))
    if (token(1:1)=='r') then
       Domain%RandomPos = 'r'

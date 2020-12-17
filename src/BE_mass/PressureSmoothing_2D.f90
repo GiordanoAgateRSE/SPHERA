@@ -80,7 +80,7 @@ endif
 !$omp shared(nag,Pg,Med,Tratto,Partz,Domain,nPartIntorno,PartIntorno,NMAXPARTJ)&
 !$omp shared(PartKernel,kernel_fw,BoundarySide,BoundaryDataPointer)            &
 !$omp shared(BoundaryDataTab,acix,dt,indarrayFlu,Array_Flu,sompW_vec,n_bodies) &
-!$omp shared(AppUnity_vec)                                                     &
+!$omp shared(AppUnity_vec,input_any_t)                                         &
 !$omp private(npi,ii,Appunity,TetaP1,Ncbs,IntNcbs,ibdt,icbs,ibdp,iside)        &
 !$omp private(sidestr,Nsp,mati,ro0i,p0i,pi,SompW,j,npartint,npj,pesoj,smoothpi)&
 !$omp private(VIntWdV_FT,VIntWdV_SO,VIntWdV_OSB,VIntWdV_OSP,press_so,press_osb)&
@@ -110,7 +110,8 @@ do ii=1,indarrayFlu
             AppUnity = AppUnity + AppUnity_vec(npi)
          endif
          if (Domain%tipo=="bsph") then
-            TetaP1 = Domain%TetaP * Med(pg(npi)%imed)%Celerita * dt / Domain%h
+            TetaP1 = input_any_t%TetaP * Med(pg(npi)%imed)%Celerita * dt /     &
+                     Domain%h
             pg(npi)%vpres = pi + TetaP1 * sompW / AppUnity
             else
                VIntWdV_FT = zero
@@ -170,7 +171,7 @@ do ii=1,indarrayFlu
                   endif
                enddo
 ! Computing TetaP depending on the time step
-               TetaP1 = Domain%TetaP * Med(pg(npi)%imed)%Celerita * dt /       &
+               TetaP1 = input_any_t%TetaP * Med(pg(npi)%imed)%Celerita * dt /  &
                         Domain%h
                AppUnity = AppUnity + VIntWdV_FT + VIntWdV_SO + VIntWdV_OSP +   &
                           VIntWdV_OSB

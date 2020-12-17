@@ -82,7 +82,7 @@ flpointer = 0
 ! Loop over all the cells of the grid
 !$omp parallel do default(none)                                                &
 !$omp shared(Grid,GCBFPointers,NumFacce,BFaceList,Tratto,BoundaryFace)         &
-!$omp shared(flpointer,GCBFVector_aux,nomsub,Domain,ulog,uerr)                 &
+!$omp shared(flpointer,GCBFVector_aux,nomsub,Domain,ulog,uerr,input_any_t)     &
 !$omp private(nc,irestocell,i,i0,j,j0,k,k0,CellXYZ,nv,ii,jj,kk,CellNodeXYZ,kf) &
 !$omp private(nf,nodes,Found,sd,Signcount,no,XYZnod,CellNodeZita,deltaXYZ)     &
 !$omp private(i_flpointer,flpointer_cell,GCBFVector_cell)
@@ -114,7 +114,7 @@ do nc=1,Grid%nmax
    enddo
 ! Allocating "GCBFVector_cell" and initializing the private variable 
 ! "flpointer_cell"
-   allocate(GCBFVector_cell(Domain%MAXCLOSEBOUNDFACES))
+   allocate(GCBFVector_cell(input_any_t%MAXCLOSEBOUNDFACES))
    flpointer_cell = 0
 ! Loop over all the boundary faces 
    do kf=1,NumFacce                                    
@@ -183,7 +183,7 @@ do nc=1,Grid%nmax
 ! cell "nc" and is counted.
             if (Found) then        
                flpointer_cell = flpointer_cell + 1
-               if (flpointer_cell>Domain%MAXCLOSEBOUNDFACES) then
+               if (flpointer_cell>input_any_t%MAXCLOSEBOUNDFACES) then
                   write(uerr,'(1x,a)')                                         &
 " Too many faces crossing a given cell. Please increase the parameter MAXCLOSEBOUNDFACES. "
                   call diagnostic(arg1=4,arg3=nomsub)
