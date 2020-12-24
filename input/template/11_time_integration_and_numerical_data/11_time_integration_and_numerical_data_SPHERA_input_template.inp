@@ -68,6 +68,7 @@
 !    restart time.
 ![?] <teta_p>, <teta_u>: coefficients for partial smoothing of pressure and 
 !    velocity); their values can be effectively modified at any restart time.
+!    <teta_p>=0.3+-0.1; <teta_u>=0
 ![?] <var>; its value can be effectively modified at any restart time.
 !    =A (recommended value)
 ![?] <COEFNMAXPARTI>: max number of fluid particles max0 = COEFNMAXPARTI * 

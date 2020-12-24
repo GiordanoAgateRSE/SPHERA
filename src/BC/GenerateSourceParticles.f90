@@ -123,6 +123,7 @@ if (inttimeratio>pinttimeratio) then
                pg(nag)%vel(sd) = Tratto(nt)%NormVelocity * nn(sd)
                pg(nag)%var(sd) = pg(nag)%vel(sd)
             enddo
+            pg(nag)%sect_old_pos(:) = pg(nag)%coord(:)
             if (Domain%tipo=="bsph") call wavy_inlet(i_source)
             if (Domain%tipo=="bsph") then
                pg(nag)%rhoSPH_new = zero

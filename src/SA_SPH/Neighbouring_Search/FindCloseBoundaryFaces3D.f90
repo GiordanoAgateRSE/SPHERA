@@ -171,12 +171,12 @@ if (Ncbf>0) then
       nodes = BoundaryFace(nbface)%nodes
 ! To increase the number of particles close to boundaries 
 ! and to estimate the maximum height 
-!$omp critical (numpa)
+!$omp critical (numpa_3D)
       BoundaryFace(nbface)%CloseParticles =                                    &
          BoundaryFace(nbface)%CloseParticles + 1
       if (BoundaryFace(nbface)%CloseParticles_maxQuota<pg(npi)%coord(3))       &
          BoundaryFace(nbface)%CloseParticles_maxQuota = pg(npi)%coord(3)
-!$omp end critical (numpa)
+!$omp end critical (numpa_3D)
       do sdi=1,PLANEDIM
          LocX(sdi,icbf) = zero
          do sdj=1,SPACEDIM

@@ -151,6 +151,7 @@ do i=1,(npps(1)-iaux)
                   pg(nag_aux)%coord = PX
             endif
             pg(nag_aux)%CoordOld = pg(nag_aux)%coord
+            pg(nag_aux)%sect_old_pos(:) = pg(nag_aux)%coord(:)
 ! Setting Particle Parameters
             if (test==0) then
                call SetParticleParameters(nag,Nz,mate)  

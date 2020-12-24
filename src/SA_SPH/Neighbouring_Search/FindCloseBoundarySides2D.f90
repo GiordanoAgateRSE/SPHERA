@@ -148,11 +148,11 @@ do icbs=1,Ncbs
    isi = Cloboside(icbs)
 ! To increase the number of particles close to boundaries and to compute the 
 ! maximum heigth 
-!$omp critical (numpa)
+!$omp critical (numpa_2D)
    BoundarySide(isi)%CloseParticles = BoundarySide(isi)%CloseParticles + 1
    if (BoundarySide(isi)%CloseParticles_maxQuota<pg(npi)%coord(3))             &
       BoundarySide(isi)%CloseParticles_maxQuota = pg(npi)%coord(3)
-!$omp end critical (numpa)
+!$omp end critical (numpa_2D)
    if (BoundarySide(isi)%tipo=="sour") then
       XP = LocXY(1,icbs)
       sidel = BoundarySide(isi)%length

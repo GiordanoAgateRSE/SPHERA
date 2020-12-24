@@ -315,11 +315,6 @@ if ((Tratto(BoundaryFace(i_face)%stretch)%zone==Partz(Nz)%dam_zone_ID).and.    &
                                        BoundaryFace(i_face)%Node(4)%GX(1:2),   &
                                        test_xy_2)
                                     if (test_xy_2==1) then
-! Note: even if a particle simultanously belongs to 2 faces test_dam will 
-! provide the same results: no matter the face order
-!$omp critical (GeneratePart_cs)
-                                       test_dam = 1  
-                                       test_face = 1
 ! Test if the particle position is invisible (test_dam=1) or visible 
 ! (test_dam=0) to the dam. Visibility to the dam means invisibility to the 
 ! current dam top face. 
@@ -328,8 +323,14 @@ if ((Tratto(BoundaryFace(i_face)%stretch)%zone==Partz(Nz)%dam_zone_ID).and.    &
                                           BoundaryFace(i_face)%Node(1)%GX(:)
                                        aux_scal = dot_product(                &
                                           BoundaryFace(i_face)%T(:,3),aux_vec)
+! Note: even if a particle simultanously belongs to 2 faces test_dam will 
+! provide the same results: no matter the face order
+!$omp critical (GeneratePart_cs)
+                                       test_face = 1
                                        if (aux_scal<0.d0) then 
                                           test_dam=0
+                                          else
+                                             test_dam = 1
                                        endif
 !$omp end critical (GeneratePart_cs)
                                     endif   
@@ -375,6 +376,7 @@ if ((Tratto(BoundaryFace(i_face)%stretch)%zone==Partz(Nz)%dam_zone_ID).and.    &
                   pg(npi)%coord(3) = pg(npi)%coord(3) + (2.d0 * rnd - 1.d0) *  &
                                      0.1d0 * Domain%dx
                endif
+               pg(npi)%sect_old_pos(:) = pg(npi)%coord(:)
             enddo
 !$omp end parallel do
             NumParticles = Partz(Nz)%limit(2)
