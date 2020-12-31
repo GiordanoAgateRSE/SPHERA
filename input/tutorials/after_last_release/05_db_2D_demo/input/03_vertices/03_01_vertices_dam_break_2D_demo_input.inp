@@ -1,0 +1,79 @@
+!-------------------------------------------------------------------------------
+! Software name and copyright: dam_break_2D_demo
+!    Copyright 2015-2020 (RSE SpA, authored by Andrea Amicarelli)
+! Software description: input file for SPHERA v.9.0.0 (RSE SpA).
+!    Simple and demonstrative test case on a 2D dam break (rough resolution).
+!    Reference: Amicarelli (2020, SPHERA github repository).
+!
+! This file is part of 01_title_2D_demo_input.
+! 01_title_2D_demo_input is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! 01_title_2D_demo_input is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with 01_title_2D_demo_input. If not, see <http://www.gnu.org/licenses/>.
+!-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+! File description: 03_01_vertices_dam_break_2D_demo_input.inp
+!                   The commented template of the main input file of SPHERA  
+!                   v.9.0.0 (RSE SpA) is integrated in this file, in compliance 
+!                   with the requirements of the licenses of both the software 
+!                   tools.
+!-------------------------------------------------------------------------------
+
+!-------------------------------------------------------------------------------
+! Legend:
+!    !    beginning of a comment line. Additional comment lines are permitted.
+!    ![?] beginning of a definition/guideline
+!    <>   the content within these brackets represents an input variable
+!    ![*] beginning of the structure of a line with the names of the input 
+!         variables
+!    ...  possible repetitions of the above/previous data
+!    !<<< beginning of a section to be filled with input data. The lines of 
+!         this section must be replaced with a "!" if they do not have to be 
+!         filled for the test case chosen (included the start line and the end 
+!         line of the unusable sections).
+!    ___  space to be replaced with an input value
+!    !>>> end of a section to be filled with input data
+!    =    start of a variable value
+!-------------------------------------------------------------------------------
+
+![?] Input parameters for the boundary vertices of the fluid domain  
+![?] The DB-SPH boundary treatment scheme requires the vertices of the 
+!    parallelepiped domain as a "contour" and the "fictitious air reservoirs" 
+![?] The SA-SPH boundary treatment scheme requires the vertices of the wall 
+!    frontiers
+![?] In the absence of a declared origin, the first vertex is fictitious, and 
+!    does not belong to any boundary (only useful for Paraview)
+![?] At least one SA-SPH frontier is requested to define the edges of the 
+!    numerical domain. This frontier is possibly fictitious and does not 
+!    interact with the SPH particles.
+![?] No gaps on vertex IDs are permitted
+![?] <Vertex_x>,<Vertex_y>,<Vertex_z>: first vertex coordinates starting from 
+!    the possible topography from which reservoirs are extruded
+![?] <Last_vertex_ID>,<Last_vertex_x>,<Last_vertex_y>,<Last_vertex_z>: last 
+!    vertex data
+![?] The numerical inlet section is the physical inlet section moved upstream 
+!    for a distance of 2h, with the possible wet walls of the same section.
+!-------------------------------------------------------------------------------
+![*] 1 <Vertex_x> <Vertex_y> <Vertex_z>
+![*] ...
+![*] <Last_vertex_ID> <Vertex_x> <Vertex_y> <Vertex_z>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+! Boundary
+1 0.000 0.600
+2 0.000 0.000
+3 1.500 0.000
+4 1.500 0.600
+! Reservoir
+5 0.000 0.300
+6 0.000 0.000 
+7 0.600 0.000        
+8 0.600 0.300
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------

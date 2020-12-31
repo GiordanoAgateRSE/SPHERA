@@ -87,15 +87,15 @@ enddo
 call start_and_stop(3,17)
 ! Velocity partial smoothing
 call start_and_stop(2,7)
-if (Domain%TetaV>0.d0) call velocity_smoothing
+if (input_any_t%TetaV>0.d0) call velocity_smoothing
 !$omp parallel do default(none)                                                &
 !$omp private(npi,ii,TetaV1)                                                   &
-!$omp shared(nag,Pg,Med,Domain,dt,indarrayFlu,Array_Flu)
+!$omp shared(nag,Pg,Med,Domain,dt,indarrayFlu,Array_Flu,input_any_t)
 do ii=1,indarrayFlu
    npi = Array_Flu(ii)
-   if (Domain%TetaV>0.d0) then
+   if (input_any_t%TetaV>0.d0) then
 ! To update "TetaV", depending on dt.
-      TetaV1 = Domain%TetaV * Med(pg(npi)%imed)%Celerita * dt / Domain%h
+      TetaV1 = input_any_t%TetaV * Med(pg(npi)%imed)%Celerita * dt / Domain%h
       if (pg(npi)%kodvel==0) then        
 ! Particle is inside the domain and far from the boundaries.
 ! Velocity is partially smoothed.

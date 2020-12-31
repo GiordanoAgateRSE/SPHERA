@@ -79,7 +79,7 @@ if (trim(lcase(option))==trim(lcase("heading"))) then
       flush(uerr)
       stop
    endif
-   read(nsav,iostat=ioerr) nag,NMedium,NPartZone,NumVertici,                   &
+   read(nsav,iostat=ioerr) nag,NPartZone,NumVertici,                           &
 #ifdef SPACE_3D  
       NumFacce,NumTratti,NumBVertices,GCBFVecDim,Grid%nmax,npointst,NPoints,   &
 #elif defined SPACE_2D
@@ -88,7 +88,7 @@ if (trim(lcase(option))==trim(lcase("heading"))) then
       NPointsl,NPointse,NLines,doubleh
    if (.not.ReadCheck(ioerr,ier,it_start,ainp,"nag, ...",nsav,ulog)) return
 #ifdef SPACE_3D
-! The parameter is read from the restart file and not from the input file
+! This quantity has to be read from the restart file (in case of restart):
    write(ulog,"(1x,a,1p,i12)")   "GCBFVecDim (from restart file): ",GCBFVecDim
 ! Allocation of the array "GCBFVector"
    if ((Domain%tipo=="semi").and.(GCBFVecDim>0).and.                           &
@@ -144,8 +144,6 @@ if (trim(lcase(option))==trim(lcase("heading"))) then
          endif
       endif
 #endif
-      read(nsav,iostat=ioerr) Med(1:NMedium)
-      if (.not.ReadCheck(ioerr,ier,it_start,ainp,"Med",nsav,ulog)) return
       if (NumVertici>0) then
          read(nsav,iostat=ioerr) Vertice(1:SPACEDIM,1:NumVertici)
          if (.not.ReadCheck(ioerr,ier,it_start,ainp,"Vertice",nsav,ulog)) return

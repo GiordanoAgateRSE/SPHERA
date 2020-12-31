@@ -121,10 +121,10 @@ do while (trim(lcase(ainp))/="##### end run parameters #####")
 enddo
 ! Assigning the values read
 if (input_second_read.eqv..true.) then
-   Domain%tmax = tmax
-   Domain%itmax = itmax
-   Domain%CFL = CFL
-   Domain%vsc_coeff = vsc_coeff
+   input_any_t%tmax = tmax
+   input_any_t%itmax = itmax
+   input_any_t%CFL = CFL
+   input_any_t%vsc_coeff = vsc_coeff
    Domain%time_split = time_split
    if (time_split==1) then
       Domain%RKscheme = 1
@@ -140,65 +140,65 @@ if (input_second_read.eqv..true.) then
       endif
       Domain%RKscheme  = RKscheme
    endif
-   Domain%TetaP = TetaP
-   Domain%TetaV = TetaV
-   Domain%Psurf = Psurf
+   input_any_t%TetaP = TetaP
+   input_any_t%TetaV = TetaV
+   input_any_t%Psurf = Psurf
    Domain%COEFNMAXPARTI = COEFNMAXPARTI
-   Domain%COEFNMAXPARTJ = COEFNMAXPARTJ
-   Domain%body_part_reorder = body_part_reorder
+   input_any_t%COEFNMAXPARTJ = COEFNMAXPARTJ
+   input_any_t%body_part_reorder = body_part_reorder
 #ifdef SPACE_3D
-      Domain%MAXCLOSEBOUNDFACES = MAXCLOSEBOUNDFACES
-      Domain%MAXNUMCONVEXEDGES = MAXNUMCONVEXEDGES
+      input_any_t%MAXCLOSEBOUNDFACES = MAXCLOSEBOUNDFACES
+      input_any_t%MAXNUMCONVEXEDGES = MAXNUMCONVEXEDGES
       if (.not.restart) GCBFVecDim = GCBFVecDim_loc
       Domain%nag_aux = nag_aux
 #endif
-   Domain%density_thresholds = density_thresholds
+   input_any_t%density_thresholds = density_thresholds
    if (ulog>0) then
       write(ulog,"(1x,a,1p,e12.4)") "TMAX                       : ",           &
-         Domain%tmax
+         input_any_t%tmax
       write(ulog,"(1x,a,i12)")      "ITMAX                      : ",           &
-         Domain%itmax
+         input_any_t%itmax
       write(ulog,"(1x,a,1p,e12.4)") "CFL                        : ",           &
-         Domain%CFL
+         input_any_t%CFL
       write(ulog,"(1x,a,1p,e12.4)") "vsc_coeff                  : ",           &
-         Domain%vsc_coeff
+         input_any_t%vsc_coeff
       write(ulog,"(1x,a,1p,i1)")    "staggering option          : ",           &
          Domain%time_split
       write(ulog,"(1x,a,1p,i1)")    "RKscheme                   : ",           &
          Domain%RKscheme
       write(ulog,"(1x,a,1p,e12.4)") "SMOOTHING PRES             : ",           &
-         Domain%TetaP
+         input_any_t%TetaP
       write(ulog,"(1x,a,1p,e12.4)") "SMOOTHING VEL              : ",           &
-         Domain%TetaV
-      if (Domain%Psurf=='o') then
+         input_any_t%TetaV
+      if (input_any_t%Psurf=='o') then
          write(ulog,"(1x,a,a)") "SMOOTHING Pressure Surface : ","Original"
-         elseif (Domain%Psurf=='s') then
+         elseif (input_any_t%Psurf=='s') then
             write(ulog,"(1x,a,a)")                                             &
 "SMOOTHING Pressure Surface : ","Delta Pressure from hydrostatic"
-            elseif (Domain%Psurf=='a') then
+            elseif (input_any_t%Psurf=='a') then
                write(ulog,"(1x,a,a)")                                          &
 "SMOOTHING Pressure Surface : ","Weight calculation with atmospheric pressure"
       endif
       write(ulog,"(1x,a,1p,e12.4)") "COEFNMAXPARTI              : ",           &
          Domain%COEFNMAXPARTI
       write(ulog,"(1x,a,1p,e12.4)") "COEFNMAXPARTJ              : ",           &
-         Domain%COEFNMAXPARTJ
+         input_any_t%COEFNMAXPARTJ
       write(ulog,"(1x,a,1p,i1)")    "body_part_reorder          : ",           &
-         Domain%body_part_reorder
+         input_any_t%body_part_reorder
 #ifdef SPACE_3D
       write(ulog,"(1x,a,1p,i12)")   "NAG_AUX                    : ",           &
          Domain%nag_aux
       write(ulog,"(1x,a,1p,i12)")   "MAXCLOSEBOUNDFACES         : ",           &
-         Domain%MAXCLOSEBOUNDFACES
+         input_any_t%MAXCLOSEBOUNDFACES
       write(ulog,"(1x,a,1p,i12)")   "MAXNUMCONVEXEDGES          : ",           &
-         Domain%MAXNUMCONVEXEDGES
+         input_any_t%MAXNUMCONVEXEDGES
       if (.not.restart) then
       write(ulog,"(1x,a,1p,i12)")   "GCBFVecDim (input file)    : ",           &
          GCBFVecDim
       endif
 #endif
       write(ulog,"(1x,a,1p,i1)")    "density_thresholds         : ",           &
-         Domain%density_thresholds       
+         input_any_t%density_thresholds       
       write(ulog,"(1x,a)") " "
    endif
 endif

@@ -50,7 +50,7 @@
 !    =bsph (DB-SPH)
 ![?] <dx>: characteristic lenght of the SPH fluid/mixture particles
 ![?] <h/dx>: ratio between the characteristic lenght of the kernel support and 
-!    dx
+!    dx. Its value can be changed at any restart time.
 ![?] <random_distribution>: optional letter
 !    =r (white noise to the IC -Initial Conditions- particle positions)
 !-------------------------------------------------------------------------------

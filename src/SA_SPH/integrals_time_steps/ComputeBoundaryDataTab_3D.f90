@@ -40,9 +40,9 @@ implicit none
 integer(4) :: npi,Ncbf,icbf,ibdt,Nfzn
 double precision :: IntWdV,IntdWrm1dV,IntGWZrm1dV
 character(len=lencard) :: nomsub = "ComputeBoundaryDataTab"
-integer(4),dimension(1:Domain%MAXCLOSEBOUNDFACES) :: Cloboface
+integer(4),dimension(1:input_any_t%MAXCLOSEBOUNDFACES) :: Cloboface
 double precision,dimension(1:SPACEDIM) :: IntGWdV
-double precision,dimension(1:SPACEDIM,1:Domain%MAXCLOSEBOUNDFACES) :: LocX
+double precision,dimension(1:SPACEDIM,1:input_any_t%MAXCLOSEBOUNDFACES) :: LocX
 double precision,dimension(1:SPACEDIM,1:SPACEDIM) :: IntGWrRdV
 !------------------------
 ! Explicit interfaces
@@ -64,7 +64,7 @@ BoundaryFace(:)%CloseParticles_maxQuota = const_m_9999
 !$omp private(npi,Ncbf,Cloboface,LocX,Nfzn,icbf,ibdt)                          &
 !$omp private(IntWdV,IntdWrm1dV,IntGWZrm1dV,IntGWdV,IntGWrRdV)                 &
 !$omp shared(nag,pg,BoundaryDataTab,BoundaryDataPointer,EpCount,MaxNcbf)       &
-!$omp shared(nomsub,Domain)
+!$omp shared(nomsub,Domain,input_any_t)
 loop_particle: do npi=1,nag
    if (pg(npi)%cella==0.or.pg(npi)%vel_type/="std") cycle loop_particle
 ! Searching for the boundary faces, which are the nearest the current          
@@ -82,7 +82,7 @@ loop_particle: do npi=1,nag
          endif
          BoundaryDataPointer(1,npi) = Ncbf
          BoundaryDataPointer(2,npi) = 0
-         ibdt = Domain%MAXCLOSEBOUNDFACES * (npi - 1)
+         ibdt = input_any_t%MAXCLOSEBOUNDFACES * (npi - 1)
          BoundaryDataPointer(3,npi) = ibdt + 1
 ! Check array sizes
          if (ibdt>MaxNcbf) then

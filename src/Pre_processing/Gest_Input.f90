@@ -297,7 +297,8 @@ if (.not.restart) then
             endif
             call CompleteBoundaries3D
             call DefineBoundaryFaceGeometry3D
-            allocate(BoundaryConvexEdge(1:Domain%MAXNUMCONVEXEDGES),stat=ier)
+            allocate(BoundaryConvexEdge(1:input_any_t%MAXNUMCONVEXEDGES),      &
+               stat=ier)
             if (ier/=0) then
                write(ulog,'(1x,a,i2)')                                         &
                   "   Array BoundaryConvexEdge not allocated. Error code: ",ier

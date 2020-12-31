@@ -48,8 +48,8 @@ use I_O_diagnostic_module
 implicit none
 integer(4),intent(in) :: npi
 integer(4),intent(inout) :: Ncbf, Nfzn
-integer(4),intent(inout),dimension(1:Domain%MAXCLOSEBOUNDFACES) :: Clobface
-double precision,intent(inout),dimension(1:SPACEDIM,1:Domain%MAXCLOSEBOUNDFACES) :: LocX
+integer(4),intent(inout),dimension(1:input_any_t%MAXCLOSEBOUNDFACES) :: Clobface
+double precision,intent(inout),dimension(1:SPACEDIM,1:input_any_t%MAXCLOSEBOUNDFACES) :: LocX
 logical :: Thereis
 integer(4) :: nc,ic,jc,kc,i,j,k,sdi,sdj,nodes,irestocell,fkod  
 integer(4) :: flpini,flp,flpfin,nfpercell,intbf,icbf,nbface,stretch
@@ -131,7 +131,7 @@ do i=(ic-1),(ic+1)
 ! The projection of particle "npi" on the plane containing the face "iface"  
 ! is internal to the face itself 
                            Ncbf = ncbf + 1 
-                           if (ncbf<=Domain%MAXCLOSEBOUNDFACES) then
+                           if (ncbf<=input_any_t%MAXCLOSEBOUNDFACES) then
                               Clobface(Ncbf) = intbf
                               LocX(3,Ncbf) = pin
                               pg(npi)%CloseBcOut = 1
@@ -141,7 +141,7 @@ do i=(ic-1),(ic+1)
                         endif
                         else
                            Ncbf = ncbf + 1 
-                           if (ncbf<=Domain%MAXCLOSEBOUNDFACES) then
+                           if (ncbf<=input_any_t%MAXCLOSEBOUNDFACES) then
                               Clobface(Ncbf) = intbf
                               LocX(3,Ncbf) = pin
                               else
@@ -171,12 +171,12 @@ if (Ncbf>0) then
       nodes = BoundaryFace(nbface)%nodes
 ! To increase the number of particles close to boundaries 
 ! and to estimate the maximum height 
-!$omp critical (numpa)
+!$omp critical (numpa_3D)
       BoundaryFace(nbface)%CloseParticles =                                    &
          BoundaryFace(nbface)%CloseParticles + 1
       if (BoundaryFace(nbface)%CloseParticles_maxQuota<pg(npi)%coord(3))       &
          BoundaryFace(nbface)%CloseParticles_maxQuota = pg(npi)%coord(3)
-!$omp end critical (numpa)
+!$omp end critical (numpa_3D)
       do sdi=1,PLANEDIM
          LocX(sdi,icbf) = zero
          do sdj=1,SPACEDIM

@@ -53,9 +53,9 @@ double precision :: xmax,ymax,zmax
 !------------------------
 #ifdef SPACE_3D
 if (allocated(Z_fluid_max)) then
-   if ((int(simulation_time/Domain%depth_dt_out)>Domain%depth_it_out_last).or. &
-      (on_going_time_step==1)) then
-      Domain%depth_it_out_last = int(simulation_time / Domain%depth_dt_out)
+   if ((int(simulation_time/input_any_t%depth_dt_out)>Domain%depth_it_out_last)&
+      .or.(on_going_time_step==1)) then
+      Domain%depth_it_out_last = int(simulation_time / input_any_t%depth_dt_out)
       call Update_Zmax_at_grid_vert_columns(1) 
       else
          call Update_Zmax_at_grid_vert_columns(0)
@@ -77,17 +77,17 @@ if (Domain%icpoi_fr>0) then
    if (n_bodies>0) then
       if (mod(it,Domain%icpoi_fr)==0)  call Body_dynamics_output      
    endif
-   elseif (Domain%cpoi_fr>zero) then
-      if ((mod(simulation_time,Domain%cpoi_fr)<=dtvel).and.npointst>0) then
+   elseif (input_any_t%cpoi_fr>zero) then
+      if ((mod(simulation_time,input_any_t%cpoi_fr)<=dtvel).and.npointst>0) then
          call Memo_Ctl
       endif
       if (n_bodies>0) then
-         if (mod(simulation_time,Domain%cpoi_fr)<=dtvel) then
+         if (mod(simulation_time,input_any_t%cpoi_fr)<=dtvel) then
             call Body_dynamics_output
          endif         
       endif
 ! DB-SPH post-processing and update of the variable "wet" in the array "pg"
-      if ((Domain%tipo=="bsph").and.(mod(simulation_time,Domain%cpoi_fr)<=     &
+      if ((Domain%tipo=="bsph").and.(mod(simulation_time,input_any_t%cpoi_fr)<=&
          dtvel)) then
          if ((DBSPH%n_monitor_points>0).or.(DBSPH%n_monitor_regions==1)) then
             call wall_elements_pp
@@ -105,8 +105,8 @@ if (Domain%ipllb_fr>0) then
    if ((mod(it,Domain%ipllb_fr)==0).and.nlines>0) then
       call calc_pelo
    endif
-   elseif (Domain%pllb_fr>zero) then
-      if ((mod(simulation_time,Domain%pllb_fr)<=dtvel).and.nlines>0) then
+   elseif (input_any_t%pllb_fr>zero) then
+      if ((mod(simulation_time,input_any_t%pllb_fr)<=dtvel).and.nlines>0) then
          call calc_pelo
       endif
 endif
@@ -156,8 +156,8 @@ if (Domain%imemo_fr>0) then
             write(nfro,'(2g14.7,13x,a,g14.7)') simulation_time,xmax,'-',ymax
 #endif
    endif
-   elseif (Domain%memo_fr>zero) then
-      if (it>1.and.mod(simulation_time,Domain%memo_fr)<=dtvel) then
+   elseif (input_any_t%memo_fr>zero) then
+      if (it>1.and.mod(simulation_time,input_any_t%memo_fr)<=dtvel) then
          xmax = - 1.d30
          ymax = - 1.d30
          zmax = - 1.d30

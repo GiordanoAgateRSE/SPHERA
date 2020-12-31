@@ -74,17 +74,16 @@ if (index(str,'inizio')/=0) then
 #endif
    write(nres) version,nrecords
 #ifdef SPACE_3D
-   write(nres) Nag,NMedium,NPartZone,NumVertici,NumFacce,NumTratti,            &   
+   write(nres) nag,NPartZone,NumVertici,NumFacce,NumTratti,                    &   
       NumBVertices,GCBFVecDim,Grid%nmax,npointst,NPoints,NPointsl,             &
       NPointse,NLines,doubleh
 #elif defined SPACE_2D
-   write(nres) Nag,NMedium,NPartZone,NumVertici,NumTratti,                     &   
+   write(nres) nag,NPartZone,NumVertici,NumTratti,                             &   
       NumBVertices,NumBSides,Grid%nmax,npointst,NPoints,NPointsl,              &
       NPointse,NLines,doubleh
 #endif
    write(nres) domain
    write(nres) Grid
-   write(nres) Med(1:NMedium)
    if (NumVertici>0) write(nres) Vertice(1:SPACEDIM,1:NumVertici)
 #ifdef SPACE_3D
    if (NumFacce>0) then
@@ -119,8 +118,8 @@ if (Domain%irest_fr>0) then
       it_rest = it
    endif
 ! Case with restart  
-   elseif (Domain%rest_fr>zero) then
-      if ((it>1).and.(mod(simulation_time,Domain%rest_fr)<=dtvel)) then
+   elseif (input_any_t%rest_fr>zero) then
+      if ((it>1).and.(mod(simulation_time,input_any_t%rest_fr)<=dtvel)) then
          it_rest = it
      endif
 endif
@@ -128,8 +127,8 @@ if (Domain%imemo_fr>0) then
    if (mod(it,Domain%imemo_fr)==0) then
         it_memo = it
    endif
-   elseif (Domain%memo_fr>zero) then
-      if ((it>1).and.(mod(simulation_time,Domain%memo_fr)<=dtvel)) then
+   elseif (input_any_t%memo_fr>zero) then
+      if ((it>1).and.(mod(simulation_time,input_any_t%memo_fr)<=dtvel)) then
          it_memo = it
       endif
 endif

@@ -80,7 +80,7 @@ do while (trim(lcase(ainp))/="##### end draw options #####")
                token = lcase(GetToken(ainp,(3),ioerr))
                read (token,*,iostat=ioerr) steptime
                if (steptime=='time') then
-                  freq_time = Domain%memo_fr
+                  freq_time = input_any_t%memo_fr
                   val_time = zero  
                   if ((input_second_read.eqv..true.).and.(ulog>0)) then
                      write(ulog,"(1x,a,1pe12.4,a)")                            &
@@ -94,7 +94,7 @@ do while (trim(lcase(ainp))/="##### end draw options #####")
                            "VTKConversion all steps."
                      endif
                      else
-                        freq_time = Domain%memo_fr
+                        freq_time = input_any_t%memo_fr
                         val_time  = zero 
                         if ((input_second_read.eqv..true.).and.(ulog>0)) then
                            write(ulog,"(1x,a,1pe12.4,a)")                      &
@@ -102,7 +102,7 @@ do while (trim(lcase(ainp))/="##### end draw options #####")
                         endif
                endif
             case default
-               freq_time = Domain%memo_fr
+               freq_time = input_any_t%memo_fr
                val_time = zero
                if ((input_second_read.eqv..true.).and.(ulog>0)) then
                   write(ulog,"(1x,a,1pe12.4,a)")                               &

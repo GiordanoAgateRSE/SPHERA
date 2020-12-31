@@ -50,7 +50,12 @@
 !    in case of a restarted simulation, these values are reported in the log 
 !    file, but they are actually overwritten by the values read from the input 
 !    restart file (these data have no influence in case of restart)
-![?] <vsc_coeff>: viscous stability condition coefficient
+![?] <final_time>: its value can be effectively modified at any restart time.
+![?] <final_time_step>: its value can be effectively modified at any restart 
+!    time.
+![?] <CFL>: its value can be effectively modified at any restart time.
+![?] <vsc_coeff>: viscous stability condition coefficient; its value can be 
+!    effectively modified at any restart time.
 !    =0.05 (default value)
 ![?] <Leapfrog_flag>
 !    =1 (Leapfrog time integration scheme)
@@ -59,10 +64,12 @@
 ![?] <factor>: weighting factor to estimate dt (draft variable)
 !    =0. (recommended value)
 ![?] <dt_alfa_Mon>: logical flag possibly making Monaghan artificial viscosity 
-!    coefficient to influence dt
+!    coefficient to influence dt; its value can be effectively modified at any 
+!    restart time.
 ![?] <teta_p>, <teta_u>: coefficients for partial smoothing of pressure and 
-!    velocity)
-![?] <var>
+!    velocity); their values can be effectively modified at any restart time.
+!    <teta_p>=0.3+-0.1; <teta_u>=0
+![?] <var>; its value can be effectively modified at any restart time.
 !    =A (recommended value)
 ![?] <COEFNMAXPARTI>: max number of fluid particles max0 = COEFNMAXPARTI * 
 !    nag; COEFNMAXPARTI considers that the number of particles inside the 
@@ -73,11 +80,14 @@
 !    also the particles of the mixture dam/reservoir (beyond the main water 
 !    reservoir). The way the restart file is read permits to change the input 
 !    value of COEFNMAXPARTI in the input file of a restarted run. It is not 
-!    necessary to run again the whole sequence of jobs.
+!    necessary to run again the whole sequence of jobs. Its value can be 
+!    effectively modified at any restart time.
 ![?] <COEFNMAXPARTJ>: max number of neighbours maxb = COEFNMAXPARTJ * (4h/dx)
 !    ^ D; the same number applies both for fluid neighbours and DB-SPH wall 
-!    element neighbours
-![?] <body_part_reorder>: for DB-SPH
+!    element neighbours. Its value can be effectively modified at any restart 
+!    time.
+![?] <body_part_reorder>: for DB-SPH; its value can be effectively modified at 
+!    any restart time.
 !    =0 (fixed frontiers)
 !    =1 (mobile frontiers)
 !-------------------------------------------------------------------------------
@@ -99,8 +109,9 @@ ___ ___ ___
 !    array, it is influential only in case of reservoir extruded from 
 !    topography
 ![?] <MAXCLOSEBOUNDFACES>: max number of neighbouring boundary face per fluid 
-!    particle
-![?] <MAXNUMCONVEXEDGES>: max number of edges
+!    particle; its value can be effectively modified at any restart time.
+![?] <MAXNUMCONVEXEDGES>: max number of edges; its value can be effectively 
+!    modified at any restart time.
 ![?] <GCBFVecDim>: rough overestimation of the number of Grid Cell - Boundary 
 !    Face intersections  (SA-SPH). In case of restart, this value is only read, 
 !    not used; in case its value is too little, crashes occur without code 
@@ -108,7 +119,9 @@ ___ ___ ___
 !    elements, thus, it is sufficient to overestimate this number as the number 
 !    of faces times the number of the positioning grid cells, further, reducing 
 !    "GCBFVecDim" does not imply any appreciable variation in the computational
-!    time). The positioning grid is made of cubes whose side length is 2h. 
+!    time). The positioning grid is made of cubes whose side length is 2h. Its 
+!    input value is read and then updated during the Iniitial Condition setting.
+!    In case of restart, this quantity has to be read from the restart file.
 !-------------------------------------------------------------------------------
 ![*] <nag_aux> <MAXCLOSEBOUNDFACES> <MAXNUMCONVEXEDGES> <GCBFVecDim>
 !-------------------------------------------------------------------------------
@@ -118,7 +131,8 @@ ___ ___ ___ ___
 !-------------------------------------------------------------------------------
 ![?] endif (3D)
 !-------------------------------------------------------------------------------
-![?] <density_thresholds_flag>
+![?] <density_thresholds_flag>: its value can be effectively modified at any 
+!    restart time.
 !    =0 (default value, no density limiters)
 !    =1 (density limiters for debug)
 !    Density limiters do not apply to the mixture particles which are held 

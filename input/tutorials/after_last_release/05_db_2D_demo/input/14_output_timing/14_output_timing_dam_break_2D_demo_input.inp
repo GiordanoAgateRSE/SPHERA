@@ -1,0 +1,77 @@
+!-------------------------------------------------------------------------------
+! Software name and copyright: dam_break_2D_demo
+!    Copyright 2015-2020 (RSE SpA, authored by Andrea Amicarelli)
+! Software description: input file for SPHERA v.9.0.0 (RSE SpA).
+!    Simple and demonstrative test case on a 2D dam break (rough resolution).
+!    Reference: Amicarelli (2020, SPHERA github repository).
+!
+! This file is part of 01_title_2D_demo_input.
+! 01_title_2D_demo_input is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! 01_title_2D_demo_input is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with 01_title_2D_demo_input. If not, see <http://www.gnu.org/licenses/>.
+!-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+! File description: 14_output_timing_dam_break_2D_demo_input.inp
+!                   The commented template of the main input file of SPHERA  
+!                   v.9.0.0 (RSE SpA) is integrated in this file, in compliance 
+!                   with the requirements of the licenses of both the software 
+!                   tools.
+!-------------------------------------------------------------------------------
+
+!-------------------------------------------------------------------------------
+! Legend:
+!    !    beginning of a comment line. Additional comment lines are permitted.
+!    ![?] beginning of a definition/guideline
+!    <>   the content within these brackets represents an input variable
+!    ![*] beginning of the structure of a line with the names of the input 
+!         variables
+!    ...  possible repetitions of the above/previous data
+!    !<<< beginning of a section to be filled with input data. The lines of 
+!         this section must be replaced with a "!" if they do not have to be 
+!         filled for the test case chosen (included the start line and the end 
+!         line of the unusable sections).
+!    ___  space to be replaced with an input value
+!    !>>> end of a section to be filled with input data
+!    =    start of a variable value
+!-------------------------------------------------------------------------------
+
+##### output regulation #####
+!-------------------------------------------------------------------------------
+![?] Post-processing parameters for .txt files
+![?] <dt_out>: writing time step for the water front (output file ".fro")
+![?] <dt_restart>: restart time frequency; default value: 
+!    2*"vtkconverter any"="2*dt_out_PV". The following constraint 
+!    "restart_time_value>=dt_out_PV" is highly suggested because it permits 
+!    easier post-processing. 
+![?] <log_file_frequency>: log file writing time step in terms of time step 
+!    number
+![?] <dt_out_mon>: writing time step for monitoring elements
+![?] <dt_out_FS>: writing time step for free surface post-processing
+![?] <dt_out_depth>: writing time step for 2D fields of water depth (h) and 
+!    specific flow rate components (q_x=u_m*h, q_y=v_m*h). It is influential 
+!    only "if (IC_source_type==2)"
+!-------------------------------------------------------------------------------
+![*] results time <dt_out>
+![*] restart time <dt_restart>
+![*] print partial <log_file_frequency>
+![*] control time <dt_out_mon>
+![*] level time <dt_out_FS> medium <fluid_ID>
+![*] depth dt_out <dt_out_depth>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+results time 5.
+restart time 100000.
+print partial 100 
+control time 0.02
+level time 0.02 medium 1
+depth dt_out 900.
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+##### end output regulation #####

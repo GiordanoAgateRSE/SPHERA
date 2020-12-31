@@ -183,7 +183,7 @@ enddo SECTION_LOOP
 ! To assign the kernel support 
 if (input_second_read.eqv..true.) then
    write(ulog,"(/,1x,a,//)") ">> END OF INPUT FILE"
-   Domain%h = Domain%dx * Domain%trunc
+   Domain%h = Domain%dx * input_any_t%trunc
    doubleh = two * Domain%h
    squareh = Domain%h * Domain%h
    square_doubleh = doubleh * doubleh

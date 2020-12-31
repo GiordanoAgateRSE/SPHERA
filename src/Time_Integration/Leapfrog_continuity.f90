@@ -47,14 +47,14 @@ integer(4) :: npi,ii
 ! Statements
 !------------------------
 !$omp parallel do default(none)                                                &
-!$omp shared(pg,dt,indarrayFlu,Array_Flu,Domain,Med)                           &
+!$omp shared(pg,dt,indarrayFlu,Array_Flu,Domain,Med,input_any_t)               &
 !$omp private(npi,ii)
 do ii=1,indarrayFlu
    npi = Array_Flu(ii)
    if ((pg(npi)%cella==0).or.(pg(npi)%vel_type/="std")) cycle
    if (Domain%tipo=="bsph") pg(npi)%dden = pg(npi)%dden / pg(npi)%uni
    if (Domain%tipo=="semi") pg(npi)%dens = pg(npi)%dens + dt * pg(npi)%dden
-   if (Domain%density_thresholds==1) then        
+   if (input_any_t%density_thresholds==1) then        
       if (pg(npi)%dens<(0.9d0*Med(pg(npi)%imed)%den0)) then
          pg(npi)%dens = 0.9d0*Med(pg(npi)%imed)%den0
       endif

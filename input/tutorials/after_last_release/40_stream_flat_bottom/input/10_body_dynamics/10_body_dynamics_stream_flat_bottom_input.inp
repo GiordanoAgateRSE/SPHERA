@@ -1,0 +1,206 @@
+!-------------------------------------------------------------------------------
+! Software name and copyright: stream_flat_bottom
+!    Copyright 2020 (RSE SpA, authored by Andrea Amicarelli)
+! File description: input file for SPHERA v.9.0.0 (RSE SpA).
+!   2D stream on a flat bottom 
+!   Reference: SPHERA repository on github.com
+!
+! This file is part of stream_flat_bottom.
+! stream_flat_bottom is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! stream_flat_bottom is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with stream_flat_bottom. If not, see <http://www.gnu.org/licenses/>.
+!-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+! File description: 10_body_dynamics_stream_flat_bottom_input.inp
+!                   The commented template of the main input file of SPHERA  
+!                   v.9.0.0 (RSE SpA) is integrated in this file, in compliance 
+!                   with the requirements of the licenses of both the software 
+!                   tools.
+!-------------------------------------------------------------------------------
+
+!-------------------------------------------------------------------------------
+! Legend:
+!    !    beginning of a comment line. Additional comment lines are permitted.
+!    ![?] beginning of a definition/guideline
+!    <>   the content within these brackets represents an input variable
+!    ![*] beginning of the structure of a line with the names of the input 
+!         variables
+!    ...  possible repetitions of the above/previous data
+!    !<<< beginning of a section to be filled with input data. The lines of 
+!         this section must be replaced with a "!" if they do not have to be 
+!         filled for the test case chosen (included the start line and the end 
+!         line of the unusable sections).
+!    ___  space to be replaced with an input value
+!    !>>> end of a section to be filled with input data
+!    =    start of a variable value
+!-------------------------------------------------------------------------------
+
+##### BODY DYNAMICS #####
+!-------------------------------------------------------------------------------
+![?] Input parameters for the scheme on body transport in fluid flows
+![?] Bodies with imposed kinematics are listed after all the bodies with 
+!    computed dynamics.
+![?] Body particles cannot exit the numerical domain.
+![?] <n_bodies>: number of transported solid bodies
+![?] <dx/dx_body>: ratio between fluid particle size and body particle size
+![?] <friction_angle>: in radians
+!    >=0. (friction angle for body-frontier interactions)
+!    <0. (sliding friction depends on the local slope angle instead of the 
+!         friction angle);
+![?] <time_max_no_gravity_force>
+!    >=0. (gravity force is deactivated until this time)
+!    <0. (no deactivation)
+![?] <time_max_no_body_frontier_impingements>
+!    >=0. (body-frontier impingements are deactivated until this time)
+!    <0. (no deactivation)
+![?] <body_minimum_pressure_limiter>
+!    =.true. (no negative pressure on the body surface)
+!    =.false. (no limiter)
+![?] <body_maximum_pressure_limiter>
+!    =.true. (maximum pressure on the body surface is limited by physical
+!             constraints)
+!    =.false. (no limiter);
+![?] <FSI_free_slip_conditions>
+!    =.true. (free-slip conditions for FSI)
+!    =.false. (no-slip conditions for FSI)
+!-------------------------------------------------------------------------------
+![*] <n_bodies> <dx/dx_body> <friction_angle> <time_max_no_gravity_force> 
+!    <time_max_no_body_frontier_impingements> <body_minimum_pressure_limiter> 
+!    <body_maximum_pressure_limiter> <FSI_free_slip_conditions>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+0 2 -999. 999. -999. .false. .false. .true.
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] if (n_bodies>0) then
+![?] <ID_first_body>
+!    =1
+![?] <n_elem>: number of elements of the body
+![?] <pos_CM>: position of the centre of mass (Initial Conditions)
+![?] <Ic_flag>
+!    =0 (mass moment of inertia is computed)
+!    =1 (mass moment of inertia is imposed)
+!-------------------------------------------------------------------------------
+![*] <ID_first_body> <n_elem>
+![*] <body_mass>
+![*] <pos_CM_x> <pos_CM_y> <pos_CM_z>
+![*] <Ic_flag>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!1   ___
+!___
+!___ ___ ___
+!___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] if (Ic_flag==1) then
+!-------------------------------------------------------------------------------
+![*] <Ic(1,1)> <Ic(1,2)> <Ic(1,3)>
+![*] <Ic(2,1)> <Ic(2,2)> <Ic(2,3)>
+![*] <Ic(3,1)> <Ic(3,2)> <Ic(3,3)>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___ ___ ___
+!___ ___ ___
+!___ ___ ___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] endif (Ic_flag==1)
+![?] Rotation of the body with respect to the reference system at "t=0". This 
+!    rotation is cumulative with respect to the element initial rotation. This 
+!    rotation is relevant only for IC and I/O purposes.
+![?] <n_R_IO>: rotation axis (unit vector)
+![?] <teta_R_IO>: rotation angle
+![?] <pos_rotC>: centre of rotation for the vector alfa just to configure the 
+!    initial orientation in the global reference system)
+![?] <vel_CM>: velocity of the centre of mass at "t=0"
+![?] <omega>: angular velocity of the body at "t=0"
+![?] <imposed_kinematics_flag>
+!    =0 (no imposed kinematics; dynamics is computed)
+!    =1 (kinematics is imposed)
+![?] <n_records>: number of records which describe the imposed kinematics
+!-------------------------------------------------------------------------------
+![*] <n_R_IO_x> <n_R_IO_y> <n_R_IO_z> <teta_R_IO>
+![*] <pos_rotC_x> <pos_rotC_y> <pos_rotC_z>
+![*] <vel_CM_x> <vel_CM_y> <vel_CM_z>
+![*] <omega_x> <omega_y> <omega_z>
+![*] <imposed_kinematics_flag> <n_records>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___ ___ ___ ___
+!___ ___ ___
+!___ ___ ___
+!___ ___ ___
+!___ ___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] NUMBER_OF_BODY_DYNAMICS_RECORDS: do i=1,n_records
+!-------------------------------------------------------------------------------
+![?] i-th record for the imposed kinematics of the body (the time of the last 
+!    record should be slightly higher than time at the end of the simulation) 
+!-------------------------------------------------------------------------------
+![*] <time_i> <velocity_x_i> <velocity_y_i> <velocity_z_i> <omega_x_i> 
+!    <omega_y_i> <omega_z_i>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___ ___ ___ ___ ___ ___ ___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] enddo NUMBER_OF_BODY_DYNAMICS_RECORDS
+!-------------------------------------------------------------------------------
+![?] NUMBER_OF_BODY_ELEMENTS: do i=1,n_body_elements
+!-------------------------------------------------------------------------------
+![?] <element_ID>: ID of the current element of the body
+![?] <L_x>,<L_y>,<L_z>: side lengths of the element
+![?] <pos_CM_elem>: position of the centre of mass of the element at "t=0"
+![?] Rotation of the body element with respect to the reference system at 
+!    "t=0". This rotation is cumulative with respect to the body IC rotation. 
+!    This rotation is relevant only for IC and I/O purposes.
+![?] <n_R_IO_elem>: rotation axis (unit vector)
+![?] <teta_R_IO_elem>: rotation angle
+![?] <face_zmin_flag>,<face_zmax_flag>,<face_ymin_flag>,<face_ymax_flag>, 
+!    <face_xmin_flag>,<face_xmax_flag>: integer flags to activate the normal 
+!    vectors of surface body particles only if "face_..._flag=1"; x/y/z_min/max 
+!    indicates the 6 faces of the element (parallelepiped)
+![?] <xmin>, <xmax>, <ymin>, <ymax>, <zmin>, <zmax>: spatial limits (in the 
+!    global reference system before the initial rotation) to deactivate 
+!    particle masses if ((x>=xmin).or.(x<=xmax).or.(y>=ymin).or.(y<=ymax).or.
+!    (z>=zmin).or(z<=zmax)) foor boolean operations on elements/body
+!-------------------------------------------------------------------------------
+![*] <element_ID>
+![*] <L_x> <L_y> <L_z>
+![*] <pos_CM_elem_x> <pos_CM_elem_y> <pos_CM_elem_z>
+![*] <n_R_IO_elem_x> <n_R_IO_elem_y> <n_R_IO_elem_z> <teta_R_IO_elem>
+![*] <face_zmin_flag> <face_zmax_flag> <face_ymin_flag> <face_ymax_flag> 
+!    <face_xmin_flag> <face_xmax_flag>
+![*] <xmin> <xmax> <ymin> <ymax> <zmin> <zmax>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___
+!___ ___ ___
+!___ ___ ___
+!___ ___ ___ ___
+!___ ___ ___ ___ ___ ___
+!___ ___ ___ ___ ___ ___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] enddo NUMBER_OF_BODY_ELEMENTS
+!-------------------------------------------------------------------------------
+![?] other body records
+!-------------------------------------------------------------------------------
+![*] ...
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!...
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+! endif (n_bodies>0)
+!-------------------------------------------------------------------------------
+##### end BODY DYNAMICS #####

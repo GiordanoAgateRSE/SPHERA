@@ -103,7 +103,7 @@ enddo
 ! Fluid particles: end.
 ! Semi-particles/wall elements (DB-SPH): start
 if ((DBSPH%n_w>0).and.((on_going_time_step == it_start).or.                    &
-   (Domain%body_part_reorder==1))) then
+   (input_any_t%body_part_reorder==1))) then
    Icont_w(:) = 0
    numpartincelgiaaposto(:) = 0
 ! 1st loop: to find the particle cell and to count the number of particles

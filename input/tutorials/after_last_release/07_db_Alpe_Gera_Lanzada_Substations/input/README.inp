@@ -1,0 +1,2 @@
+To reproduce the test variant of Amicarelli et al. (2020, IJCFD):
+impose free-slip conditions instead of the NSBL slip coefficient.

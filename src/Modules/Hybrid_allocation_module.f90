@@ -40,75 +40,37 @@ type TyGlobal
    integer(4) :: icpoi_fr
 ! Output frequency for free surface 
    integer(4) :: ipllb_fr
-! Reference fluid for free surface                      
-   integer(4) :: ipllb_md
 ! Initial time step ID
    integer(4) :: istart
 ! Printing code for log file                        
    integer(4) :: ioutopt
-! Maximum step number                       
-   integer(4) :: itmax
-! Flag for body particles reordering
-   integer(4) :: body_part_reorder
 #ifdef SPACE_3D
 ! Rough and slight overestimation of the number of fluid particles in the 
 ! reservoir (auxiliary parameter useful for extruded reservoir IC)  
    integer(4) :: nag_aux
-! Maximum number of neighbouring SA-SPH faces for a computational particle
-   integer(4) :: MAXCLOSEBOUNDFACES
-! Maximum number of convex edges
-   integer(4) :: MAXNUMCONVEXEDGES
 #endif
-! Density_thresholds flag (default=0; =1 for very low bulk modulus -preliminary 
-! simulations-)            
-   integer(4) :: density_thresholds
 ! Flag for Leapfrog scheme
    integer(4) :: time_split
 ! RK scheme (1,2,3,4) (time_split=0)                    
    integer(4) :: RKscheme
 ! Stage of RK schemes          
    integer(4) :: time_stage
-! Maximum physical time                                           
-   double precision :: tmax
 ! Particle size                           
    double precision :: dx
-! h/dx, h=dx*trunc                          
-   double precision :: trunc
 ! dx^D, D: domain dimensionality                       
    double precision :: PVolume                        
    double precision :: coefke  
    double precision :: coefkacl  
-   double precision :: CFL
-! Viscous stability criterion coefficient, default value: 0.05
-   double precision :: vsc_coeff
 ! Reference pressure
    double precision :: prif
-! Output frequency for log file                       
-   double precision :: plot_fr
-! Frequency for result saving                       
-   double precision :: memo_fr
-! Output frequency for restart files 
-   double precision :: rest_fr
-! Output frequency for monitoring points
-   double precision :: cpoi_fr
-! Output frequency for free surface
-   double precision :: pllb_fr 
-! Output time step for water depth
-   double precision :: depth_dt_out
 ! Last time step when water depth was printed (auxiliary variable)                         
    double precision :: depth_it_out_last
-! Partial smoothing parameter for pressure
-   double precision :: TetaP
-! Partial smoothing parameter for velocity                         
-   double precision :: TetaV
 ! Kernel support length scale                         
    double precision :: h
 ! Simulation start time                          
    double precision :: start
 ! Max number of fluid particles = nag * COEFNMAXPARTI                                  
    double precision :: COEFNMAXPARTI
-! maxb(maximum number of fluid neighbours) = COEFNMAXPARTJ * (4h/dx)^D  
-   double precision :: COEFNMAXPARTJ
 ! Time at the beginning of the simulation (origin: beginning of the year)                            
    double precision :: t0
 ! Time at the beginning of the iterations (origin: beginning of the year)
@@ -119,11 +81,54 @@ type TyGlobal
    double precision :: coord(3,2)
    character(4) :: tipo
    character(len=lencard) :: file
-   character(1) :: Psurf
 ! IC particle distribution noise. "r": slight white noise is added, otherwise 
 ! no noise.
    character(1) :: RandomPos
 end type TyGlobal
+
+type input_any_time_der_type
+! Maximum step number                       
+   integer(4) :: itmax
+! Reference fluid for free surface                      
+   integer(4) :: ipllb_md
+! Flag for body particles reordering
+   integer(4) :: body_part_reorder
+! Density_thresholds flag (default=0; =1 for very low bulk modulus -preliminary 
+! simulations-)
+   integer(4) :: density_thresholds
+#ifdef SPACE_3D
+! Maximum number of neighbouring SA-SPH faces for a computational particle
+   integer(4) :: MAXCLOSEBOUNDFACES
+! Maximum number of convex edges
+   integer(4) :: MAXNUMCONVEXEDGES
+#endif
+! h/dx, h=dx*trunc
+   double precision :: trunc
+! Maximum physical time                                           
+   double precision :: tmax
+   double precision :: CFL
+! Viscous stability criterion coefficient, default value: 0.05
+   double precision :: vsc_coeff
+! Partial smoothing parameter for pressure
+   double precision :: TetaP
+! Partial smoothing parameter for velocity                         
+   double precision :: TetaV
+! maxb(maximum number of fluid neighbours) = COEFNMAXPARTJ * (4h/dx)^D  
+   double precision :: COEFNMAXPARTJ
+! Output frequency for log file                       
+   double precision :: plot_fr
+! Output frequency for restart files 
+   double precision :: rest_fr
+! Frequency for result saving                       
+   double precision :: memo_fr
+! Output frequency for monitoring points
+   double precision :: cpoi_fr
+! Output frequency for free surface
+   double precision :: pllb_fr 
+! Output time step for water depth
+   double precision :: depth_dt_out
+   character(1) :: Psurf
+end type input_any_time_der_type
 
 ! Background positioning grid 
 type TyGriglia
@@ -897,6 +902,7 @@ end type
 
 ! Derived type declarations
 type(TyGlobal) :: Domain
+type(input_any_time_der_type) :: input_any_t
 type(TyGriglia) :: Grid
 type(TyParticle) :: PgZero
 type(Tytime_stage) :: ts_pgZero

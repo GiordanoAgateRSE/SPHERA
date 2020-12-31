@@ -45,6 +45,7 @@
 ##### output regulation #####
 !-------------------------------------------------------------------------------
 ![?] Post-processing parameters for .txt files
+![?] The whole section can be effectively modified at any restart time.
 ![?] <dt_out>: writing time step for the water front (output file ".fro")
 ![?] <dt_restart>: restart time frequency; default value: 
 !    2*"vtkconverter any"="2*dt_out_PV". The following constraint 
