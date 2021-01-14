@@ -22,7 +22,7 @@
 ! Program unit: Continuity_Equation
 ! Description: To accumulate contributions for the continuity equation.
 !              Computation of velocity gradients and the second invariant of the
-!              strain-rate tensor.        
+!              strain-rate tensor (with 2D renormalization).     
 !-------------------------------------------------------------------------------
 subroutine Continuity_Equation
 !------------------------

@@ -49,6 +49,12 @@
 !    =source(inlet section)
 !    =open (only removal of the particles crossing the open section, which 
 !          should beat least 2h far from the domain edges)
+!    =zmax (fluid-depth Dirichlet's BC: zone continuously filled with SPH 
+!           particles from the non-stationary free surface height to the given 
+!           input height "z_max", under hydrostatic or homogeneous pressure 
+!           conditions; only active in 3D; a boundary of type "zmax" has not 
+!           its own vertices and faces). The associated DEM-DTM or bottom has 
+!           to be locally a uniform and isotropic Cartesian grid.
 !    =tapis (not recommended)
 !    =leve (not recommended)
 !    =pool (not recommended)
@@ -315,4 +321,79 @@ ___
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
 ![?] endif (Boundary_type=="source")
+![?] if (3D) then
+![?] if (Boundary_type=="zmax") then
+![?] <BC_pressure_type>
+!    =pa (homogeneous pressure conditions)
+!    =qp (hydrostatic conditions with equivalent free surface level as input)
+![?] <BC_pressure_value>: uniform pressure value (BC_pressure_type=pa), 
+!    equivalent free surface level (BC_pressure_type=qp; it is influential only 
+!    if there is no other medium along the vertical above the current medium).
+![?] Each "zmax" zone needs at least 5 adjacent open sections in the input 
+!    files in order to set BCs on the fluid depth. However, a "zmax" zone can 
+!    be used for a more generic purpose. The associated DEM-DTM or bottom has 
+!    to be locally a uniform and isotropic Cartesian grid.
+![?] Mass penetration can occur at the edges of the "zmax" zone, where the 
+!    free surface grows with the distance from the zone. However, the open 
+!    sections associated to the "zmax" zone can properly avoid this possible 
+!    shortcoming in terms of input file configuration.
+!-------------------------------------------------------------------------------
+![*] <fluid_ID>
+![*] <BC_pressure_type> <BC_pressure_value>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+___
+___ ___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] <Car_top_zone>: boundary ID of the underlying topography. Here, this is 
+!    only used to fictitiously assign a different formal zone to the particles 
+!    of the current "zmax" zone to let them evolve as standard computational 
+!    particles after their initialization.
+!-------------------------------------------------------------------------------
+![*] <Car_top_zone>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] <dx_CartTopog>: spatial resolution of the Cartesian topography; 
+!    dx_CartTopog>=dx
+![?] <z_max>: maximum fluid height to be imposed
+![?] <ID_first_vertex>,<ID_last_vertex>: IDs of the first and and the last 
+!    vertices of the reference topography
+!-------------------------------------------------------------------------------
+![*] <dx_CartTopog> <z_max>
+![*] <ID_first_vertex>,<ID_last_vertex>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+___ ___
+___ ___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] <n_circum>: number of vertices circumscribing the horizontal projection of 
+!    the reservoir)=3,4
+![?] <circum_1_x>,<circum_1_y>: coordinates of the first point of the 2D figure 
+!    circumscribing the horizontal projection of the reservoir. Admitted 
+!    figures: triangles and convex non-degenerate quadrilateral (otherwise the 
+!    subroutine call for "point_inout_convex_non_degenerate_polygon" must be 
+!    replaced with other calls to subroutines such as 
+!    "point_inout_quadrilateral").
+![?] <circum_last_x>,<circum_last_y>: coordinates of the last point of the 2D 
+!    figure above
+!-------------------------------------------------------------------------------
+![*] <n_circum>
+![*] <circum_1_x> <circum_1_y>
+![*] ...
+![*] <circum_last_x> <circum_last_y>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+___
+___ ___
+...
+___ ___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] endif (Boundary_type=="zmax")
+![?] endif (3D)
 !-------------------------------------------------------------------------------

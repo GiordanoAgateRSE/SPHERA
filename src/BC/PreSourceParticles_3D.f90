@@ -24,7 +24,7 @@
 !              and quadrilateral inlet sections).  
 !-------------------------------------------------------------------------------
 #ifdef SPACE_3D
-subroutine PreSourceParticles_3D 
+subroutine PreSourceParticles_3D
 !------------------------
 ! Modules
 !------------------------
@@ -77,9 +77,9 @@ do isi=1,NumFacce
          LenR = zero
          LenS = zero
          do sd=1,SPACEDIM
-            LenR = LenR + (BoundaryFace(SourceFace)%Node(1)%GX(sd) -              &
+            LenR = LenR + (BoundaryFace(SourceFace)%Node(1)%GX(sd) -           &
                    BoundaryFace(SourceFace)%Node(nodes)%GX(sd)) ** 2
-            LenS = LenS + (BoundaryFace(SourceFace)%Node(3)%GX(sd) -              &
+            LenS = LenS + (BoundaryFace(SourceFace)%Node(3)%GX(sd) -           &
                    BoundaryFace(SourceFace)%Node(nodes)%GX(sd)) ** 2
          enddo
          LenR = dsqrt(LenR)
@@ -112,7 +112,8 @@ do isi=1,NumFacce
          enddo
          NumPartFace(i_source) = ip
          ParticleVolume = Domain%PVolume
-         RowPeriod = ParticleVolume * NumPartFace(i_source) / Tratto(nt)%FlowRate 
+         RowPeriod = ParticleVolume * NumPartFace(i_source) /                  &
+                     Tratto(nt)%FlowRate 
          RowVelocity(i_source) = Domain%dx / RowPeriod
          Tratto(nt)%NormVelocity = RowVelocity(i_source)
          pinttimeratio = -1

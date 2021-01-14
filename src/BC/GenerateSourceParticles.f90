@@ -96,10 +96,10 @@ if (inttimeratio>pinttimeratio) then
                NumPartperBound = NumPartperLine(i_source)
 #endif
          do ip=1,NumPartperBound
-! To generate a new particle row 
+! To generate a new particle row
             nag = nag + 1
             SpCount(mat) = SpCount(mat) + 1
-            if (nag>PARTICLEBUFFER) then         
+            if (nag>PARTICLEBUFFER) then  
                call diagnostic(arg1=6,arg2=1,arg3=nomsub)
 ! To insert message on overpassing the limit or to automatically reallocation 
 ! of the arrays pg, nPartintorno and associated arrays 
@@ -153,9 +153,9 @@ if (inttimeratio>pinttimeratio) then
             call defcolpartzero(inlet_zone,partz,pg(nag))
 ! To initialize "press" and "dens" (density computed from pressure)
             if (partz(inlet_zone)%pressure=="pa") then       
-! Pression value from input file
+! Pressure value from input file
                pg(nag)%pres = partz(inlet_zone)%valp + Domain%prif
-               elseif (partz(inlet_zone)%pressure=="qp") then   
+               elseif (partz(inlet_zone)%pressure=="qp") then
 ! Free surface level from input file 
                   pg(nag)%pres = Med(mat)%den0 * Domain%grav(3) *              &
                                  (pg(nag)%coord(3) - partz(inlet_zone)%valp) + &

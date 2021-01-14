@@ -56,7 +56,10 @@
 ![?] <dt_out>: writing time step for flow rates. Contrarily to the other output 
 !              timing quantities, this variable acts as a time filter because 
 !              the flow rate is a mean quantity between two following writing 
-!              time steps (the flow rate is not an instantaneous quantity).
+!              time steps (the flow rate is not an instantaneous quantity). It 
+!              should guarantee that no particle exits the domain before having 
+!              be counted as a particle having possibly crossed any monitoring 
+!              section.
 ![?] <n_fluid_types>: number of fluid types (the first fluid IDs are selected)
 ![?] Flow rates are averages between two following output time steps. They are 
 !    not instantaneous values.

@@ -38,7 +38,7 @@ integer(4),intent(in) :: it
 double precision,intent(in) :: dtvel
 character(6),intent(in) :: str
 integer(4),intent(inout) :: it_memo,it_rest
-integer(4) :: nrecords,restartcode,i
+integer(4) :: nrecords,restartcode,i,i_zone,size_aux
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -92,7 +92,40 @@ if (index(str,'inizio')/=0) then
    endif
 #endif
    if (NumTratti>0) write(nres) Tratto(1:NumTratti)
-   if (NPartZone>0) write(nres) Partz(1:NPartZone)
+   do i_zone=1,NPartZone
+      if (allocated(Partz(i_zone)%BC_zmax_vertices)) then
+         size_aux = size(Partz(i_zone)%BC_zmax_vertices,1)
+         else
+            size_aux = 0
+      endif
+      write(nres) size_aux
+      write(nres) Partz(i_zone)%DBSPH_fictitious_reservoir_flag,               &
+         Partz(i_zone)%ipool,Partz(i_zone)%npoints,Partz(i_zone)%icol,         &
+         Partz(i_zone)%Medium,Partz(i_zone)%npointv,                           &
+         Partz(i_zone)%IC_source_type,Partz(i_zone)%Car_top_zone,              &
+         Partz(i_zone)%slip_coefficient_mode,                                  &
+#ifdef SPACE_3D
+         Partz(i_zone)%plan_reservoir_points,Partz(i_zone)%ID_first_vertex,    &
+         Partz(i_zone)%ID_last_vertex,Partz(i_zone)%dam_zone_ID,               &
+         Partz(i_zone)%dam_zone_n_vertices,Partz(i_zone)%dx_CartTopog,         &
+         Partz(i_zone)%H_res,                                                  &
+#endif
+         Partz(i_zone)%BC_shear_stress_input,                                  &
+         Partz(i_zone)%avg_comp_slip_coeff,Partz(i_zone)%avg_ni_T_SASPH,       &
+         Partz(i_zone)%avg_tau_wall_f,Partz(i_zone)%pool,Partz(i_zone)%valp,   &
+         Partz(i_zone)%limit(1:2),Partz(i_zone)%vel(1:3),                      &
+         Partz(i_zone)%coordMM(1:3,1:2),                                       &
+         Partz(i_zone)%plan_reservoir_pos(1:4,1:2)
+#ifdef SPACE_3D
+      write(nres) Partz(i_zone)%dam_zone_vertices(1:4,1:2)
+      if (allocated(Partz(i_zone)%BC_zmax_vertices)) then
+         write(nres) Partz(i_zone)%BC_zmax_vertices(1:size_aux,1:3)
+      endif
+#endif
+      write(nres) Partz(i_zone)%vlaw(0:3,MAXPOINTSVLAW),Partz(i_zone)%shape,   &
+         Partz(i_zone)%bend,Partz(i_zone)%pressure,Partz(i_zone)%move,         &
+         Partz(i_zone)%tipo,Partz(i_zone)%label
+   enddo
    if (NumBVertices>0) write(nres) BoundaryVertex(1:NumBVertices)
 #ifdef SPACE_2D
    if (NumBSides>0) write(nres) BoundarySide(1:NumBSides)

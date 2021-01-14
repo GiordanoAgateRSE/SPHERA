@@ -20,7 +20,7 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: velocity_smoothing_SA_SPH_2D 
-! Description: To calculate a corrective term for velocity.    
+! Description: SASPH 2D contribution to the partial velocity smoothing    
 !-------------------------------------------------------------------------------
 #ifdef SPACE_2D
 subroutine velocity_smoothing_SA_SPH_2D(npi)

@@ -100,7 +100,11 @@ ___
 !    =.true. (fully saturated medium)
 !    =.false. (dry medium) 
 ![?] <viscosity_max>: threshold for the dynamic mixture viscosity to held 
-!    particles fixed in the elastic-plastic strain regime
+!    particles fixed in the elasto-plastic strain regime. In case 
+!    (viscosity_max>limiting_viscosity), then <viscosity_max> is still 
+!    assigned to the particles in the elasto-plastic strain regime, but it has 
+!    no influence on the assessment of the time step as no mobile particle has 
+!    a viscosity larger than <limiting_viscosity>.
 ![?] <limiting_viscosity>: limiting dynamic viscosity (Manenti et al., 2018)
 !-------------------------------------------------------------------------------
 ![*] <phi> <saturated_medium_flag>

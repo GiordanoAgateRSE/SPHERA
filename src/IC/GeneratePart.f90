@@ -42,14 +42,14 @@ use I_O_diagnostic_module
 !------------------------
 implicit none
 #ifdef SPACE_3D
+logical :: z_min_flag
 integer(4),intent(in) :: IC_loop
 #endif
 integer(4) :: Nz,Mate,IsopraS,NumParticles,i,NumPartPrima,test_z
 #ifdef SPACE_3D
-integer(4) :: aux_factor,i_vertex,j_vertex,test_xy,test_xy_2,test_face,test_dam
-integer(4) :: n_levels,nag_aux,alloc_stat,i_face,j,k,npi
-double precision :: z_min,distance_hor,aux_scal,rnd
-double precision :: aux_vec(3)
+integer(4) :: aux_factor,i_vertex,test_xy,test_dam
+integer(4) :: n_levels,nag_aux,alloc_stat,j,k,npi
+double precision :: max_rnd_eps
 #endif
 integer(4),dimension(SPACEDIM) :: Npps
 #ifdef SPACE_3D
@@ -85,6 +85,48 @@ interface
       double precision :: normal(2)
    end subroutine point_inout_convex_non_degenerate_polygon
 end interface
+interface
+   subroutine z_min_max_DEM_DTM_9p_stencil(min_flag,i_zone,i_vertex,z_aux)
+      implicit none
+      logical,intent(in) :: min_flag
+      integer(4),intent(in) :: i_zone,i_vertex
+      double precision,intent(inout) :: z_aux
+      integer(4) :: j_vertex
+      double precision :: distance_hor
+   end subroutine z_min_max_DEM_DTM_9p_stencil
+end interface
+interface
+   subroutine particle_position_extrusion(i_vertex,aux_factor,ii,jj,kk,        &
+      DEM_zone,zmax,test_z,pos)
+      implicit none
+      integer(4),intent(in) :: i_vertex,aux_factor,ii,jj,kk,DEM_zone
+      double precision,intent(in) :: zmax
+      integer(4),intent(inout) :: test_z
+      double precision,intent(inout) :: pos(3)
+      integer(4) :: test_face,i_face,test_xy
+      double precision :: aux_scal
+      double precision :: aux_vec(3)
+   end subroutine particle_position_extrusion
+end interface
+interface
+   subroutine particles_in_out_dams(fluid_zone,pos,test_dam)
+      implicit none
+      integer(4),intent(in) :: fluid_zone
+      double precision, intent(in) :: pos(3)
+      integer(4),intent(out) :: test_dam
+      integer(4) :: test_xy,test_face,i_face,test_xy_2
+      double precision :: aux_scal
+      double precision :: aux_vec(3)
+   end subroutine particles_in_out_dams
+end interface
+interface
+   subroutine pos_plus_white_noise(max_rnd_eps,pos)
+      implicit none
+      double precision,intent(in) :: max_rnd_eps
+      double precision,intent(inout) :: pos(3)
+      double precision :: rnd(3)
+   end subroutine pos_plus_white_noise
+end interface
 !------------------------
 ! Allocations
 !------------------------
@@ -92,10 +134,10 @@ allocate(Xmin(SPACEDIM,NPartZone),Xmax(SPACEDIM,NPartZone))
 !------------------------
 ! Initializations
 !------------------------
-call random_seed()
 NumParticles = 0
 test_z = 0
 #ifdef SPACE_3D
+z_min_flag = .true.
 if (IC_loop==2) then
    do Nz=1,NPartZone
       if (Partz(Nz)%IC_source_type==2) then
@@ -103,6 +145,7 @@ if (IC_loop==2) then
       endif
    enddo
 endif
+max_rnd_eps = 0.1d0
 #endif
 if (test_z==0) nag = 0
 #ifdef SPACE_3D
@@ -120,32 +163,11 @@ MinOfMin = max_positive_number
 !------------------------
 ! Statements
 !------------------------
-! Loop over the zones in order to set the initial minimum and maximum 
-! coordinates of each zone and of the numerical domain
-first_cycle: do Nz=1,NPartZone
-! To search for the maximum and minimum "partzone" coordinates
-   Partz(Nz)%coordMM(1:SPACEDIM,1) = max_positive_number
-   Partz(Nz)%coordMM(1:SPACEDIM,2) = max_negative_number
-   Xmin(1:SPACEDIM,Nz) = max_positive_number
-   Xmax(1:SPACEDIM,Nz) = max_negative_number
-! To search for the minimum and maximum coordinates of the current zone 
-#ifdef SPACE_3D
-      call FindFrame(Xmin,Xmax,Nz)
-#elif defined SPACE_2D
-         call FindLine(Xmin,Xmax,Nz)
-#endif
-! To evaluate the minimum and maximum coordinates of the zone
-   do i=1,SPACEDIM
-      if (Xmin(i,Nz)<Partz(Nz)%coordMM(i,1)) Partz(Nz)%coordMM(i,1) = Xmin(i,Nz)
-      if (Xmax(i,Nz)>Partz(Nz)%coordMM(i,2)) Partz(Nz)%coordMM(i,2) = Xmax(i,Nz)
-! To evaluate the overall minimum among the zones
-      MinOfMin(i) = min(MinOfMin(i),Xmin(i,Nz))
-   enddo
-enddo first_cycle
-! Loop over the zone in order to set the particle locations
-second_cycle: do Nz=1,NPartZone
-! To skip the boundaries not having types equal to "perimeter" or "pool"
-   if ((Partz(Nz)%tipo/="peri").and.(Partz(Nz)%tipo/="pool")) cycle second_cycle
+call domain_edges(MinOfMin,Xmin,Xmax)
+! Loop over the zone in order to set the particle positions
+do Nz=1,NPartZone
+! To skip the "boundaries" different from "perimeter" or "pool"
+   if ((Partz(Nz)%tipo/="peri").and.(Partz(Nz)%tipo/="pool")) cycle
 ! "perimeter" or "pool" conditions are set
    Mate = Partz(Nz)%Medium
    Partz(Nz)%limit(1) = NumParticles + 1
@@ -168,11 +190,6 @@ second_cycle: do Nz=1,NPartZone
                stop
             endif
          endif
-! Loops over Cartesian topography points
-         z_min = max_positive_number
-         do i_vertex=Partz(Nz)%ID_first_vertex,Partz(Nz)%ID_last_vertex
-            z_min = min(z_min,(Vertice(3,i_vertex)))
-         enddo
          nag_aux = Domain%nag_aux
 ! Allocation of the auxiliary array pg_aux
          if (.not.allocated(pg_aux)) then
@@ -196,152 +213,21 @@ second_cycle: do Nz=1,NPartZone
                Partz(Nz)%plan_reservoir_pos(4,1:2),                            &
                Partz(Nz)%plan_reservoir_pos(4,1:2),test_xy)
             if (test_xy==1) then
-! Set the minimum topography height among the closest 9 points
-               z_aux(i_vertex) = max_positive_number
-! Suggestion.
-! This loop could be optimized not to consider all the DTM points.
-               do j_vertex=1,Partz(Nz)%npoints
-                  distance_hor = dsqrt((Vertice(1,i_vertex) -                  &
-                                 Vertice(1,j_vertex)) ** 2 +                   &
-                                 (Vertice(2,i_vertex) -                        &
-                                 Vertice(2,j_vertex)) ** 2)
-                  if (distance_hor<=(1.5*Partz(Nz)%dx_CartTopog))              &
-                     z_aux(i_vertex) = min(z_aux(i_vertex),                    &
-                                           (Vertice(3,j_vertex)))
-               enddo
+            call z_min_max_DEM_DTM_9p_stencil(z_min_flag,Nz,i_vertex,          &
+               z_aux(i_vertex))
 ! Generating daughter points of the Cartesian topography, according to dx
 ! (maybe the function "ceiling" would be better than "int" here)
                n_levels = int((h_reservoir(Nz) - z_aux(i_vertex)) / Domain%dx)
                do i=1,aux_factor
                   do j=1,aux_factor
                      do k=1,n_levels
-! Setting coordinates                       
-! We avoid particles to be located on the very diagonals of topography 
-! (otherwise some particles could be not removed even if below the topography; 
-! it is unclear why this rare eventuality would happen, 
-! but no problem remains anymore)
-                        pg_aux(NumParticles)%coord(1) = Vertice(1,i_vertex)    &
-                                                        - aux_factor / 2.d0    &
-                                                        * Domain%dx + (i -     &
-                                                        1 + 0.501d0) *         &
-                                                        Domain%dx
-                        pg_aux(NumParticles)%coord(2) = Vertice(2,i_vertex)    &
-                                                        - aux_factor / 2.d0    &
-                                                        * Domain%dx + (j -     &
-                                                        1 + 0.5d0) *           &
-                                                        Domain%dx
-                        pg_aux(NumParticles)%coord(3) = (h_reservoir(Nz) -     &
-                                                        Domain%dx / 2.d0) -    &
-                                                        (k - 1) * Domain%dx
-! Test if the particle is below the reservoir
-! Loop over boundaries
-                        test_z = 0
-                        test_face = 0
-!$omp parallel do default(none)                                                &
-!$omp shared(NumFacce,Tratto,BoundaryFace,Partz,Nz,pg_aux,test_face,test_z)    &
-!$omp shared(NumParticles)                                                     &
-!$omp private(i_face,aux_vec,aux_scal,test_xy)                         
-                        do i_face=1,NumFacce
-                           if (test_face==1) cycle
-                           if (Tratto(BoundaryFace(i_face)%stretch)%zone==     &
-                              Partz(Nz)%Car_top_zone) then  
-! Test if the point lies inside the plan projection of the face     
-                              call point_inout_convex_non_degenerate_polygon(  &
-                                 pg_aux(NumParticles)%coord(1:2),              &
-                                 BoundaryFace(i_face)%nodes,                   &
-                                 BoundaryFace(i_face)%Node(1)%GX(1:2),         &
-                                 BoundaryFace(i_face)%Node(2)%GX(1:2),         &
-                                 BoundaryFace(i_face)%Node(3)%GX(1:2),         &
-                                 BoundaryFace(i_face)%Node(4)%GX(1:2),         &
-                                 BoundaryFace(i_face)%Node(4)%GX(1:2),         &
-                                 BoundaryFace(i_face)%Node(4)%GX(1:2),         &                                 
-                                 test_xy)
-                              if (test_xy==1) then
-! No need for a critical section to update test_face: only one face/process 
-! is interested (no conflict); in particular cases there could be a conflict, 
-! but no face has a preference and test_face cannot come back to zero 
-! (no actual problem)
-                                 test_face = 1
-! Test if the point is invisible (test_z=1, below the topography) or visible 
-! (test_z=0) to the face
-                                 aux_vec(:) = pg_aux(NumParticles)%coord(:)    &
-                                    - BoundaryFace(i_face)%Node(1)%GX(:)
-                                 aux_scal = dot_product                        &
-                                    (BoundaryFace(i_face)%T(:,3),aux_vec)
-! No need for a critical section to update test_z: in particular cases there 
-! could be a conflict, but the "if" condition would always provide the same 
-! result
-                                 if (aux_scal<=0.d0) test_z=1
-                              endif
-                           endif
-                        enddo
-!$omp end parallel do
-! Check the presence of a dam zone
-                        test_dam = 0
-                        if (Partz(Nz)%dam_zone_ID>0) then
-! Test if the point lies inside the plan projection of the dam zone
-                           call point_inout_convex_non_degenerate_polygon(     &
-                              pg_aux(NumParticles)%coord(1:2),                 &
-                              Partz(Nz)%dam_zone_n_vertices,                   &
-                              Partz(Nz)%dam_zone_vertices(1,1:2),              &
-                              Partz(Nz)%dam_zone_vertices(2,1:2),              &
-                              Partz(Nz)%dam_zone_vertices(3,1:2),              &
-                              Partz(Nz)%dam_zone_vertices(4,1:2),              &
-                              Partz(Nz)%dam_zone_vertices(4,1:2),              &
-                              Partz(Nz)%dam_zone_vertices(4,1:2),test_xy)
-                           if (test_xy==1) then
-                              test_face = 0
-! Loop on the faces of the dam in the dam zone
-!$omp parallel do default(none)                                                &
-!$omp shared(NumFacce,test_dam,Tratto,BoundaryFace,Partz,Nz,pg_aux)            &
-!$omp shared(NumParticles,test_face)                                           &
-!$omp private(i_face,aux_vec,aux_scal,test_xy_2)
-                              do i_face=1,NumFacce
-                                 if (test_face==1) cycle
-! Check if the face belongs to the dam_zone boundary and in particular to its 
-! top
-if ((Tratto(BoundaryFace(i_face)%stretch)%zone==Partz(Nz)%dam_zone_ID).and.    &
-                                       (BoundaryFace(i_face)%T(3,3)<0.)) then 
-! Test if the particle horizontal coordinates lie inside the horizontal 
-! projection of the face
- call point_inout_convex_non_degenerate_polygon(                               &
-                                       pg_aux(NumParticles)%coord(1:2),        &
-                                       BoundaryFace(i_face)%nodes,             &
-                                       BoundaryFace(i_face)%Node(1)%GX(1:2),   &
-                                       BoundaryFace(i_face)%Node(2)%GX(1:2),   &
-                                       BoundaryFace(i_face)%Node(3)%GX(1:2),   &
-                                       BoundaryFace(i_face)%Node(4)%GX(1:2),   &
-                                       BoundaryFace(i_face)%Node(4)%GX(1:2),   &
-                                       BoundaryFace(i_face)%Node(4)%GX(1:2),   &
-                                       test_xy_2)
-                                    if (test_xy_2==1) then
-! Test if the particle position is invisible (test_dam=1) or visible 
-! (test_dam=0) to the dam. Visibility to the dam means invisibility to the 
-! current dam top face. 
-                                       aux_vec(:) =                           &
-                                          pg_aux(NumParticles)%coord(:) -     &
-                                          BoundaryFace(i_face)%Node(1)%GX(:)
-                                       aux_scal = dot_product(                &
-                                          BoundaryFace(i_face)%T(:,3),aux_vec)
-! Note: even if a particle simultanously belongs to 2 faces test_dam will 
-! provide the same results: no matter the face order
-!$omp critical (GeneratePart_cs)
-                                       test_face = 1
-                                       if (aux_scal<0.d0) then 
-                                          test_dam=0
-                                          else
-                                             test_dam = 1
-                                       endif
-!$omp end critical (GeneratePart_cs)
-                                    endif   
-                                 endif
-                              enddo
-!$omp end parallel do                      
-                           endif   
-                        endif
-! Update fluid particle counter
-! Check if the fluid particle is visible both to the bottom reservoir and the 
-! eventual dam
+                        call particle_position_extrusion(i_vertex,aux_factor,i,&
+                           j,k,Partz(Nz)%Car_top_zone,h_reservoir(Nz),test_z,  &
+                           pg_aux(NumParticles)%coord(1:3))
+                        call particles_in_out_dams(Nz,                         &
+                           pg_aux(NumParticles)%coord(1:3),test_dam)
+! Update fluid particle counter. Check if the fluid particle is visible both to 
+! the bottom reservoir and the optional dam.
                         if ((test_z==0).and.(test_dam==0)) then
                            NumParticles = NumParticles + 1 
 ! Check the storage for the reached number of fluid particles
@@ -359,22 +245,14 @@ if ((Tratto(BoundaryFace(i_face)%stretch)%zone==Partz(Nz)%dam_zone_ID).and.    &
 ! Second IC loop
 ! Loops over fluid particles 
 !$omp parallel do default(none)                                                &
-!$omp shared(Domain,Nz,Mate,pg,Partz)                                          &
-!$omp private(npi,rnd)
+!$omp shared(Domain,Nz,Mate,pg,Partz,max_rnd_eps)                              &
+!$omp private(npi)
             do npi=Partz(Nz)%limit(1),Partz(Nz)%limit(2)
 ! To set particle parameters
                call SetParticleParameters(npi,Nz,Mate)
 ! To impose a white noise to particle positions
                if (Domain%RandomPos=='r') then
-                  call random_number(rnd)
-                  pg(npi)%coord(1) = pg(npi)%coord(1) + (2.d0 * rnd - 1.d0) *  &
-                                     0.1d0 * Domain%dx
-                  call random_number(rnd)
-                  pg(npi)%coord(2) = pg(npi)%coord(2) + (2.d0 * rnd - 1.d0) *  &
-                                     0.1d0 * Domain%dx
-                  call random_number(rnd)
-                  pg(npi)%coord(3) = pg(npi)%coord(3) + (2.d0 * rnd - 1.d0) *  &
-                                     0.1d0 * Domain%dx
+                  call pos_plus_white_noise(max_rnd_eps,pg(npi)%coord(1:3))
                endif
                pg(npi)%sect_old_pos(:) = pg(npi)%coord(:)
             enddo
@@ -392,7 +270,7 @@ if ((Tratto(BoundaryFace(i_face)%stretch)%zone==Partz(Nz)%dam_zone_ID).and.    &
             else
                do i=1,SPACEDIM
                   NumPartPrima = nint((Xmin(i,Nz) - MinOfMin(i)) / Domain%dx)
-                  Xminreset(i) = MinOfMIn(i) + NumPartPrima * Domain%dx
+                  Xminreset(i) = MinOfMin(i) + NumPartPrima * Domain%dx
                   Npps(i) = nint((Xmax(i,Nz) - XminReset(i)) / Domain%dx)
                enddo
          endif
@@ -418,7 +296,7 @@ if ((Tratto(BoundaryFace(i_face)%stretch)%zone==Partz(Nz)%dam_zone_ID).and.    &
 ! To set the upper pointer for the particles in the nz-th zone
          Partz(Nz)%limit(2) = NumParticles
    endif
-enddo second_cycle
+enddo
 #ifdef SPACE_3D
 if (allocated(pg_aux)) then
 ! Allocation of the fluid particle array in the presence of at least one  

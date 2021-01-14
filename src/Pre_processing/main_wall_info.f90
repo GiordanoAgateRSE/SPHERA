@@ -24,8 +24,8 @@
 !              the solid boundary used for extrusion of water bodies from 
 !              topography). In case of no extrusion, the first "fixed" (wall) 
 !              boundary/zone is selected and set up (with all its vertices) for 
-!              assessing the 2D synthetic quantities (e.g., maximum water 
-!              depth, maximum specific flow rate).
+!              assessing the 2D synthetic quantities (e.g., water depth, 
+!              specific flow rate).
 !-------------------------------------------------------------------------------
 #ifdef SPACE_3D
 subroutine main_wall_info(n_vertices_main_wall)
@@ -34,6 +34,7 @@ subroutine main_wall_info(n_vertices_main_wall)
 !------------------------
 use Static_allocation_module
 use Dynamic_allocation_module
+use I_O_file_module
 !------------------------
 ! Declarations
 !------------------------
@@ -67,6 +68,8 @@ do i_zone=1,NPartZone
 enddo
 if (aux_logical.eqv..false.) then
    do i_zone=1,NPartZone
+      write(ulog,'(2a,i4,a5)') 'Program unit "main_wall_info": i_zone, ',      &
+         'Partz(i_zone)%tipo: ',i_zone,Partz(i_zone)%tipo 
       if (Partz(i_zone)%tipo=="fixe") then
          Partz(i_zone)%ID_first_vertex = aux_integer + 1
          Partz(i_zone)%ID_last_vertex = Partz(i_zone)%ID_first_vertex +        &

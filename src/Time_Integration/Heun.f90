@@ -22,7 +22,11 @@
 ! Program unit: Heun                                           
 ! Description: Heun scheme: explicit RK2 time integration scheme.  
 !-------------------------------------------------------------------------------
-subroutine Heun  
+#ifdef SPACE_3D
+subroutine Heun(BC_zmax_flag)
+#elif defined SPACE_2D
+subroutine Heun
+#endif
 !------------------------
 ! Modules
 !------------------------
@@ -35,6 +39,9 @@ use I_O_diagnostic_module
 ! Declarations
 !------------------------
 implicit none
+#ifdef SPACE_3D
+logical,intent(in) :: BC_zmax_flag
+#endif
 integer(4) :: npi,ii
 double precision :: TetaV1
 !------------------------
@@ -75,7 +82,11 @@ enddo
 call start_and_stop(3,17)
 ! Velocity partial smoothing
 call start_and_stop(2,7)
+#ifdef SPACE_3D
+if (input_any_t%TetaV>0.d0) call velocity_smoothing(BC_zmax_flag)
+#elif defined SPACE_2D
 if (input_any_t%TetaV>0.d0) call velocity_smoothing
+#endif
 !$omp parallel do default(none)                                                &
 !$omp private(npi,ii,TetaV1)                                                   &
 !$omp shared(nag,Pg,Med,Domain,dt,indarrayFlu,Array_Flu,input_any_t)

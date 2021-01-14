@@ -19,25 +19,30 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: defcolpartzero                   
-! Description: on the particle colours for visualization purposes              
+! Program unit: z_min_max_DEM_DTM_9p_stencil
+! Description: To assess the minimum/maximum height at the 9 vertices of the 
+!              DEM-DTM (or any 3D solid bottom) around the given DEM-DTM vertex 
+!              (included). The minimum local bottom height is useful for the 
+!              fluid body extrusion from topography (IC). The maximum local 
+!              bottom height is useful for the BCs of the "zmax" zones 
+!              (where the fluid height is imposed). 
 !-------------------------------------------------------------------------------
-subroutine defcolpartzero(ir,partz,pg)
+#ifdef SPACE_3D
+subroutine z_min_max_DEM_DTM_9p_stencil(min_flag,i_zone,i_vertex,z_aux)
 !------------------------
 ! Modules
 !------------------------
 use Static_allocation_module
-use Hybrid_allocation_module
+use Dynamic_allocation_module
 !------------------------
 ! Declarations
 !------------------------
 implicit none
-integer(4),intent(in) :: ir
-type (TyZone),intent(in),dimension(NPartZone) :: partz
-type (TyParticle),intent(inout) :: pg
-integer(4) :: nbande, numbanda
-double precision :: aldx
-integer(4),dimension(5) :: iclnumb
+logical,intent(in) :: min_flag
+integer(4),intent(in) :: i_zone,i_vertex
+double precision,intent(inout) :: z_aux
+integer(4) :: j_vertex
+double precision :: distance_hor
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -47,31 +52,32 @@ integer(4),dimension(5) :: iclnumb
 !------------------------
 ! Initializations
 !------------------------
-iclnumb(1)=1
-iclnumb(2)=2
-iclnumb(3)=4
-iclnumb(4)=5
-iclnumb(5)=6
 !------------------------
 ! Statements
 !------------------------
-if (partz(ir)%bend=="u") then        
-! Uniform color
-   pg%icol = partz(ir)%icol
-   elseif (partz(ir)%bend=="o")then   
-! Colour based on external option 
-      pg%icol = partz(ir)%icol
-      elseif(partz(ir)%bend=="b") then
-! Vertical strips 
-         nbande = partz(ir)%icol
-         aldx = (partz(ir)%coordMM(1,2) - partz(ir)%coordMM(1,1)) / nbande
-         numbanda = int((pg%coord(1) - partz(ir)%coordMM(1,1)) / aldx) + 1
-         numbanda = min(nbande,numbanda)
-         numbanda = max(0,numbanda)
-         pg%icol = iclnumb(numbanda)
+if (min_flag.eqv..true.) then
+   z_aux = max_positive_number
+   else
+      z_aux = max_negative_number
 endif
+! Suggestion. This loop could be optimized not to consider all the DTM points.
+! The first index of this loop assumes that the bottom is the first "boundary"
+do j_vertex=1,Partz(Partz(i_zone)%Car_top_zone)%npoints
+   distance_hor = dsqrt((Vertice(1,i_vertex) -                                 &
+                  Partz(i_zone)%BC_zmax_vertices(j_vertex,1)) ** 2 +           &
+                  (Vertice(2,i_vertex) -                                       &
+                  Partz(i_zone)%BC_zmax_vertices(j_vertex,2)) ** 2)
+   if (distance_hor<=(1.5*Partz(i_zone)%dx_CartTopog)) then
+      if (min_flag.eqv..true.) then
+         z_aux = min(z_aux,Partz(i_zone)%BC_zmax_vertices(j_vertex,3))
+         else
+            z_aux = max(z_aux,Partz(i_zone)%BC_zmax_vertices(j_vertex,3))
+      endif
+   endif
+enddo
 !------------------------
 ! Deallocations
 !------------------------
 return
-end subroutine defcolpartzero
+end subroutine z_min_max_DEM_DTM_9p_stencil
+#endif

@@ -36,7 +36,13 @@ use I_O_diagnostic_module
 !------------------------
 implicit none
 logical :: done_flag,IC_removal_flag
+#ifdef SPACE_3D
+   logical :: BC_zmax_flag
+#endif
 integer(4) :: it,it_print,it_memo,it_rest,num_out
+#ifdef SPACE_3D
+   integer(4) :: i_zone
+#endif
 double precision :: dt_previous_step,dtvel
 integer(4),external :: CellNumber
 !------------------------
@@ -63,6 +69,9 @@ it_rest = it_start
 ! Initializing the time stage for time integration
 if (Domain%time_split==0) Domain%time_stage = 1
 IC_removal_flag = .false.
+#ifdef SPACE_3D
+   BC_zmax_flag = .false.
+#endif
 !------------------------
 ! Statements
 !------------------------
@@ -70,10 +79,11 @@ call liquid_particle_ID_array
 ! Introductory procedure for inlet conditions
 #ifdef SPACE_3D
    call PreSourceParticles_3D
+   if (Domain%tipo=="semi") call BC_zmax_t0
 #elif defined SPACE_2D
       call PreSourceParticles_2D
 #endif
-! SPH parameters 
+! SPH parameters
 call start_and_stop(2,10)
 if (Domain%tipo=="bsph") on_going_time_step = -2
 call CalcVarLength
@@ -174,7 +184,7 @@ TIME_STEP_DO: do while (it<=input_any_t%itmax)
       .and.(Domain%time_stage>1)))
       if (Domain%time_split==0) then
 ! Explicit RK schemes
-! SPH parameters 
+! SPH parameters
          call start_and_stop(2,10)
          if ((Domain%tipo=="semi").and.(Domain%time_stage<2)) call CalcVarLength
          call start_and_stop(3,10)
@@ -226,8 +236,13 @@ TIME_STEP_DO: do while (it<=input_any_t%itmax)
             endif
 ! Partial smoothing for velocity: start 
             call start_and_stop(2,7)
-            if (input_any_t%TetaV>1.d-9) call velocity_smoothing
-            call velocity_smoothing_2
+#ifdef SPACE_3D
+               if (input_any_t%TetaV>1.d-9) call velocity_smoothing(BC_zmax_flag)
+               call velocity_smoothing_2(BC_zmax_flag)
+#elif defined SPACE_2D
+                  if (input_any_t%TetaV>1.d-9) call velocity_smoothing
+                  call velocity_smoothing_2
+#endif
             call start_and_stop(3,7)
 ! Partial smoothing for velocity: end
 ! Update the particle positions
@@ -250,6 +265,10 @@ TIME_STEP_DO: do while (it<=input_any_t%itmax)
 #endif
                call GenerateSourceParticles
             endif
+#ifdef SPACE_3D
+! "zmax" BC zone
+            if (Domain%tipo=="semi") call BC_zmax_anyt
+#endif
 ! Particle reordering
             call OrdGrid1
             call start_and_stop(3,9)
@@ -259,11 +278,28 @@ TIME_STEP_DO: do while (it<=input_any_t%itmax)
             call start_and_stop(2,10)
             call CalcVarLength
             call start_and_stop(3,10)
+            if (Domain%tipo=="semi") then
+#ifdef SPACE_3D
+! Loop over the zones to assess "BC_zmax_flag" (true in the presence of at 
+! least one "zmax" zone)
+                  do i_zone=1,NPartZone
+                     if (Partz(i_zone)%tipo=="zmax") then
+                        BC_zmax_flag = .true.
+                        exit
+                     endif
+                  enddo
+                  if (BC_zmax_flag.eqv..true.) then
+! Velocity initialization of the new BC_zmax particles by means of a SPH 
+! interpolation (selective partial velocity smoothing)
+                     call velocity_smoothing(BC_zmax_flag)
+                     call velocity_smoothing_2(BC_zmax_flag)
+                  endif
+                  BC_zmax_flag = .false.
+#endif
 ! Assessing the close boundaries and the integrals
 ! for the current particle in every loop and storing them in the general 
 ! storage array.
 ! Computation and storage of the boundary integrals
-            if (Domain%tipo=="semi") then
                call start_and_stop(2,11)
 #ifdef SPACE_3D
                   call ComputeBoundaryDataTab_3D
@@ -273,7 +309,7 @@ TIME_STEP_DO: do while (it<=input_any_t%itmax)
                call start_and_stop(3,11)
             endif
       endif
-! Continuity equation 
+! Continuity equation
 ! Erosion criterion + continuity equation RHS 
       call start_and_stop(2,12)
       if (Granular_flows_options%KTGF_config>0) then  
@@ -312,8 +348,8 @@ TIME_STEP_DO: do while (it<=input_any_t%itmax)
                call start_and_stop(3,19)
             endif
       endif
-      if (Domain%time_split==0) call time_integration
 ! Explicit RK schemes
+      if (Domain%time_split==0) call time_integration
 ! Partial smoothing for pressure and density update
       if (input_any_t%TetaP>zero) then
          call start_and_stop(2,14)
@@ -338,11 +374,12 @@ TIME_STEP_DO: do while (it<=input_any_t%itmax)
       call start_and_stop(3,20)
       if (Domain%tipo=="semi") then
 ! Boundary Conditions: start
-! BC: checks for the particles gone out of the domain throughout the opened 
-! faces/sides
          if ((Domain%time_split==0).and.(Domain%time_stage==Domain%RKscheme))  &
             then
+! Explicit RK schemes
             call start_and_stop(2,9)
+! BC: checks for the particles gone out of the domain throughout the opened 
+! faces/sides
 #ifdef SPACE_3D
             if (NumOpenFaces>0) call CancelOutgoneParticles_3D
 #elif defined SPACE_2D
@@ -356,13 +393,38 @@ TIME_STEP_DO: do while (it<=input_any_t%itmax)
 #endif
                call GenerateSourceParticles
             endif
+#ifdef SPACE_3D
+! "zmax" BC zone
+            if (Domain%tipo=="semi") call BC_zmax_anyt
+#endif
 ! Particle reordering on the background positioning grid
             call OrdGrid1
             call start_and_stop(3,9)
 ! Set the parameters for the fixed particles 
             if (Domain%NormFix) call NormFix
+! The absence of the neigbouring search here might be an issue for both inlet 
+! and "zmax" particles (explicit RK time schemes)
             call liquid_particle_ID_array
-         endif
+#ifdef SPACE_3D
+            if (Domain%tipo=="semi") then
+! Loop over the zones to assess "BC_zmax_flag" (true in the presence of at 
+! least one "zmax" zone)
+               do i_zone=1,NPartZone
+                  if (Partz(i_zone)%tipo=="zmax") then
+                     BC_zmax_flag = .true.
+                     exit
+                  endif
+               enddo
+               if (BC_zmax_flag.eqv..true.) then
+! Velocity initialization of the new BC_zmax particles by means of a SPH 
+! interpolation (selective partial velocity smoothing)
+                  call velocity_smoothing(BC_zmax_flag)
+                  call velocity_smoothing_2(BC_zmax_flag)
+               endif
+               BC_zmax_flag = .false.
+            endif
+#endif
+         endif         
 ! Boundary Conditions: end
       endif
 ! Subroutine for wall BC treatment (DB-SPH)

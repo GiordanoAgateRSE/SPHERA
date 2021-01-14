@@ -266,7 +266,7 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
          pressu = "pa"
          valp = zero
 ! Boundary condition "peri"
-      case("peri")    
+      case("peri")
          NumberEntities(3) = NumberEntities(3) + 1
          call ReadInputParticlesData(NumberEntities,Medium,icolor,bends,move,  &
             slip,npointv,valuev,values3,pressu,valp,ainp,comment,nrighe,ier,   &
@@ -365,8 +365,62 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
                                         move,slip,npointv,valuev,values3,      &
                                         pressu,valp,ainp,comment,nrighe,ier,   &
                                         ninp,ulog)
-            if (ier/=0) return  
-#endif 
+            if (ier/=0) return
+! Boundary condition "zmax"
+      case("zmax")
+         NumberEntities(3) = NumberEntities(3) + 1
+         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+         read(ainp,*,iostat=ioerr) Medium
+         if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"MEDIUM INDEX",ninp,ulog))   &
+            return
+         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+         pressu = trim(GetToken(ainp,1,ioerr))
+         if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"ZMAX PRESSURE TYPE",ninp,   &
+            ulog)) return
+         if (pressu=="pa") then
+! uniform pressure ("pa") is assigned
+            token = lcase(GetToken(ainp,2,ioerr))
+            if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"PRESSURE VALUES",ninp,   &
+               ulog)) return
+            read(token,*,iostat=ioerr) valp
+            if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"PRESSURE VALUES",ninp,   &
+               ulog)) return
+               elseif (pressu=="qp") then
+! hydrostatic pressure based on a reference free surface height ("qp")
+                  token = lcase(GetToken(ainp,2,ioerr))
+                  if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                    &
+                     "INITIAL PIEZO LINE",ninp,ulog)) return
+                  read(token,*,iostat=ioerr) valp
+                  if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                    &
+                     "INITIAL PIEZO LINE",ninp,ulog)) return
+                  else
+                     if (ulog>0) write(ulog,*) "Unknown option: ",trim(ainp)
+                     stop
+         endif
+         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+         if (ioerr==0) read(ainp,*,iostat=ioerr) Car_top_zone
+         if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"Car_top_zone",ninp,ulog))   &
+            return
+         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+         if (ioerr==0) read(ainp,*,iostat=ioerr) dx_CartTopog,H_res
+         if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"dx_CartTopog,z_max",ninp,   &
+            ulog)) return
+         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+         if (ioerr==0) read(ainp,*,iostat=ioerr) ID_first_vertex,ID_last_vertex
+         if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                             &
+            "ID_first_vertex,ID_last_vertex",ninp,ulog)) return
+         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+         if (ioerr==0) read(ainp,*,iostat=ioerr) plan_reservoir_points
+         if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"plan_reservoir_points",ninp,&
+            ulog)) return
+         do i2=1,plan_reservoir_points
+            call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+            if (ioerr==0) read(ainp,*,iostat=ioerr) plan_reservoir_pos(i2,1),  &
+               plan_reservoir_pos(i2,2)
+            if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"plan_reservoir_vertices",&
+               ninp,ulog)) return
+         enddo
+#endif
       case default
          write(ulog,*) "Unrecognised BOUNDARY type: ",tipo
          ier = 101
@@ -381,13 +435,15 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
       Partz(zone_ID)%DBSPH_fictitious_reservoir_flag =                         &
          DBSPH_fictitious_reservoir_flag
 #ifdef SPACE_3D
-         if (IC_source_type==2) then
+         if ((IC_source_type==2).or.(tipo=="zmax")) then
             Partz(zone_ID)%dx_CartTopog = dx_CartTopog
             Partz(zone_ID)%H_res = H_res
             Partz(zone_ID)%ID_first_vertex = ID_first_vertex
             Partz(zone_ID)%ID_last_vertex = ID_last_vertex
             Partz(zone_ID)%plan_reservoir_points = plan_reservoir_points
             Partz(zone_ID)%plan_reservoir_pos = plan_reservoir_pos
+         endif
+         if (IC_source_type==2) then
             Partz(zone_ID)%dam_zone_ID = dam_zone_ID
             Partz(zone_ID)%dam_zone_n_vertices = dam_zone_n_vertices
             if (dam_zone_ID>0) Partz(zone_ID)%dam_zone_vertices =              &
@@ -553,7 +609,7 @@ BoundaryVertex(Tratto(zone_ID)%inivertex+Tratto(zone_ID)%numvertices-1)
                      Partz(zone_ID)%plan_reservoir_points
                   do i_point=1,plan_reservoir_points
                      write(ulog,"(1x,a,3(1pe12.4))") "plan_reservoir_pos   : ",&
-                        Partz(zone_ID)%plan_reservoir_pos(i_point,:)                  
+                        Partz(zone_ID)%plan_reservoir_pos(i_point,:)
                   enddo
                   write(ulog,"(1x,a,i12)") "dam_zone_ID          : ",          &
                      Partz(zone_ID)%dam_zone_ID
@@ -566,6 +622,29 @@ BoundaryVertex(Tratto(zone_ID)%inivertex+Tratto(zone_ID)%numvertices-1)
                      enddo
                   endif
                endif
+         case("zmax")
+            write(ulog,"(1x,a,i3)") "Medium Index    : ",                      &
+               Partz(zone_ID)%Medium
+            write(ulog,"(1x,a,2x,a)") "Pressure Type   : ",                    &
+               Partz(zone_ID)%pressure
+            write(ulog,"(1x,a,1pe12.4)") "Pressure Value  : ",                 &
+               Partz(zone_ID)%valp
+            write(ulog,"(1x,a,i12)") "Car_top_zone    : ",                     &
+               Partz(zone_ID)%Car_top_zone
+            write(ulog,"(1x,a,1pe12.4)") "dx_CartTopog    : ",                 &
+               Partz(zone_ID)%dx_CartTopog
+            write(ulog,"(1x,a,1pe12.4)") "z_max           : ",                 &
+               Partz(zone_ID)%H_res
+            write(ulog,"(1x,a,i12)") "ID_first_vertex : ",                     &
+               Partz(zone_ID)%ID_first_vertex
+            write(ulog,"(1x,a,i12)") "ID_last_vertex  : ",                     &
+               Partz(zone_ID)%ID_last_vertex
+            write(ulog,"(1x,a,i12)") "plan_zmax_zone_points: ",                &
+               Partz(zone_ID)%plan_reservoir_points
+            do i_point=1,plan_reservoir_points
+               write(ulog,"(1x,a,3(1pe12.4))") "plan_zmax_zone_pos   : ",      &
+                  Partz(zone_ID)%plan_reservoir_pos(i_point,:)
+            enddo
 #endif
          case("pool")
             Tratto(zone_ID)%ColorCode = icolor

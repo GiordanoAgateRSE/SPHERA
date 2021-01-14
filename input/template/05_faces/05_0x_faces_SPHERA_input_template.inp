@@ -51,13 +51,11 @@
 !    actual boundary faces.
 ![?] In case a fluid reservoir needs to be partitioned, then each partition 
 !    needs a dedicated "perimeter" item.
-![?] Vertex list clockwise (normal vector exiting the frontier/domain; view 
-!    from the semi-space of the normal vector): not the best convention.
 ![?] The last 1/2/3 vertex IDs are 0 in case of pentagonal / quadrilateral / 
 !    triangular faces.
 ![?] SA-SPH boundary normal vectors and reservoir face normal vectors point 
-!    inward the fluid domain (clockwise list of points if looking from outside 
-!    the fluid domain).
+!    inward the fluid domain: not the best convention (clockwise list of points 
+!    if looking from outside the fluid domain).
 ![?] For "perimeter" boundaries: the vertices have to be adjacent, but there is 
 !    no rule about the vertex order (better clockwise to keep coherence with 
 !    SA-SPH walls).

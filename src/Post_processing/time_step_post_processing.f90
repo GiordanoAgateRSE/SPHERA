@@ -56,7 +56,7 @@ if (allocated(Z_fluid_max)) then
    if ((int(simulation_time/input_any_t%depth_dt_out)>Domain%depth_it_out_last)&
       .or.(on_going_time_step==1)) then
       Domain%depth_it_out_last = int(simulation_time / input_any_t%depth_dt_out)
-      call Update_Zmax_at_grid_vert_columns(1) 
+      call Update_Zmax_at_grid_vert_columns(1)
       else
          call Update_Zmax_at_grid_vert_columns(0)
    endif

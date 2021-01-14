@@ -36,7 +36,7 @@ use Dynamic_allocation_module
 implicit none
 character(7),intent(in) :: option
 integer(4),intent(inout) :: ier,nrecords
-integer(4) :: restartcode,save_istart,ioerr,i,alloc_stat
+integer(4) :: restartcode,save_istart,ioerr,i,alloc_stat,size_aux,i_zone
 #ifdef SPACE_3D
 integer(4) :: n_vertices_main_wall
 #endif
@@ -162,10 +162,64 @@ if (trim(lcase(option))==trim(lcase("heading"))) then
          read(nsav,iostat=ioerr) Tratto(1:NumTratti)
          if (.not.ReadCheck(ioerr,ier,it_start,ainp,"Tratto",nsav,ulog)) return
       endif
-      if (NPartZone>0) then
-         read(nsav,iostat=ioerr) Partz(1:NPartZone)
-         if (.not.ReadCheck(ioerr,ier,it_start,ainp,"Partz",nsav,ulog)) return
-      endif
+      do i_zone=1,NPartZone
+         read(nsav,iostat=ioerr) size_aux
+         if (.not.ReadCheck(ioerr,ier,it_start,ainp,"Partz_1of5",nsav,ulog))   &
+            return
+         read(nsav,iostat=ioerr) Partz(i_zone)%DBSPH_fictitious_reservoir_flag,&
+            Partz(i_zone)%ipool,Partz(i_zone)%npoints,Partz(i_zone)%icol,      &
+            Partz(i_zone)%Medium,Partz(i_zone)%npointv,                        &
+            Partz(i_zone)%IC_source_type,Partz(i_zone)%Car_top_zone,           &
+            Partz(i_zone)%slip_coefficient_mode,                               &
+#ifdef SPACE_3D
+            Partz(i_zone)%plan_reservoir_points,Partz(i_zone)%ID_first_vertex, &
+            Partz(i_zone)%ID_last_vertex,Partz(i_zone)%dam_zone_ID,            &
+            Partz(i_zone)%dam_zone_n_vertices,Partz(i_zone)%dx_CartTopog,      &
+            Partz(i_zone)%H_res,                                               &
+#endif
+            Partz(i_zone)%BC_shear_stress_input,                               &
+            Partz(i_zone)%avg_comp_slip_coeff,Partz(i_zone)%avg_ni_T_SASPH,    &
+            Partz(i_zone)%avg_tau_wall_f,Partz(i_zone)%pool,Partz(i_zone)%valp,&
+            Partz(i_zone)%limit(1:2),Partz(i_zone)%vel(1:3),                   &
+            Partz(i_zone)%coordMM(1:3,1:2),                                    &
+            Partz(i_zone)%plan_reservoir_pos(1:4,1:2)
+         if (.not.ReadCheck(ioerr,ier,it_start,ainp,"Partz_2of5",nsav,ulog))   &
+            return
+#ifdef SPACE_3D
+         read(nsav,iostat=ioerr) Partz(i_zone)%dam_zone_vertices(1:4,1:2)
+         if (.not.ReadCheck(ioerr,ier,it_start,ainp,"Partz_3of5",nsav,ulog))   &
+            return
+         if (size_aux>0) then
+            if (.not.allocated(Partz(i_zone)%BC_zmax_vertices)) then
+               allocate(Partz(i_zone)%BC_zmax_vertices(size_aux,3),            &
+                  STAT=alloc_stat)
+               if (alloc_stat/=0) then
+                  write(ulog,'(2a,i4,3a)') 'The allocation of the array ',     &
+                     '"BC_zmax_vertices" for the zone ',i_zone,' in the ',     &
+                     'program unit "ReadRestartFile" failed; the program ',    &
+                     'stops here.'
+                  stop
+                  else
+                     write(ulog,'(2a,i4,3a)') 'The allocation of the array ',  &
+                        '"BC_zmax_vertices" for the zone ',i_zone,' in the ',  &
+                        'program unit "ReadRestartFile" has successfully ',    &
+                        'completed.'
+               endif
+            endif
+            if (allocated(Partz(i_zone)%BC_zmax_vertices)) then
+               read(nsav,iostat=ioerr)                                         &
+                  Partz(i_zone)%BC_zmax_vertices(1:size_aux,1:3)
+               if (.not.ReadCheck(ioerr,ier,it_start,ainp,"Partz_4of5",nsav,   &
+                  ulog)) return
+            endif
+         endif
+#endif
+         read(nsav,iostat=ioerr) Partz(i_zone)%vlaw(0:3,MAXPOINTSVLAW),        &
+            Partz(i_zone)%shape,Partz(i_zone)%bend,Partz(i_zone)%pressure,     &
+            Partz(i_zone)%move,Partz(i_zone)%tipo,Partz(i_zone)%label
+         if (.not.ReadCheck(ioerr,ier,it_start,ainp,"Partz_5of5",nsav,ulog))   &
+            return
+      enddo
       if (NumBVertices>0) then
         read(nsav,iostat=ioerr) BoundaryVertex(1:NumBVertices)
         if (.not.ReadCheck(ioerr,ier,it_start,ainp,"BoundaryVertex",nsav,ulog))&
@@ -193,6 +247,8 @@ if (trim(lcase(option))==trim(lcase("heading"))) then
       endif
 ! Allocation of the array of the maximum water depth
       call main_wall_info(n_vertices_main_wall)
+      write(ulog,'(a,i9)') 'The vertices of the main wall are ',               &
+         n_vertices_main_wall     
       if (n_vertices_main_wall>0) then
          if (.not.allocated(Z_fluid_max)) then
             allocate(Z_fluid_max(Grid%ncd(1)*Grid%ncd(2),2),STAT=alloc_stat)
@@ -260,7 +316,7 @@ if (trim(lcase(option))==trim(lcase("heading"))) then
       it_start = 0 
       if (save_istart>0) then
 ! It reads all the saved steps and overwrite the restart values until the
-! restart time is reached.      
+! restart time is reached.     
          do while (save_istart>it_start)
             read(nsav,iostat=ioerr) it_start,simulation_time,dt,nag,restartcode
             if (.not.ReadCheck(ioerr,ier,it_start,ainp,                        &
@@ -331,7 +387,7 @@ if (trim(lcase(option))==trim(lcase("heading"))) then
                      if (.not.ReadCheck(ioerr,ier,it_start,ainp,               &
                         "maximum_saturation_flag",nsav,ulog)) return
                   endif  
-               endif              
+               endif
                else
 ! Actual array reading for restart
                   if (restartcode==1) then
@@ -452,7 +508,7 @@ body_arr(i)%body_kinematics(1:body_arr(i)%n_records,1:7)
          write(uerr,'(a,i10,a)') "   Restart Step Number:",it_start,           &
             " has not been found"
          ier = 3
-! Restart positions are based on the step number
+! Restart positions are based on time (s)
          elseif (save_start>zero) then
             simulation_time = zero
             do while (save_start>simulation_time)

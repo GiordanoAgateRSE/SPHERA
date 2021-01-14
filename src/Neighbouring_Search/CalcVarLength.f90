@@ -136,7 +136,7 @@ loop_nag: do npi=1,nag
    endif
    nceli = pg(npi)%cella
    if (nceli==0) cycle
-   irestocell = CellIndices (nceli,igridi,jgridi,kgridi)
+   irestocell = CellIndices(nceli,igridi,jgridi,kgridi)
    contliq = 0
    pg(npi)%indneighliqsol = 0
    pg(npi)%ind_neigh_mix_bed = 0
@@ -151,11 +151,11 @@ loop_nag: do npi=1,nag
       loop_irang: do irang=igridi-1,igridi+1    
 ! Loop over the 9 cells in z-direction  
          loop_krang: do krang=kgridi-1,kgridi+1   
-            ncelj = CellNumber (irang,jrang,krang)
+            ncelj = CellNumber(irang,jrang,krang)
 ! Cell out of domain
             if (ncelj==0) cycle    
 ! Loop over the particles in the cell
-            loop_mm: do mm=Icont(ncelj),Icont(ncelj+1)-1 
+            loop_mm: do mm=Icont(ncelj),Icont(ncelj+1)-1
 ! Warning. A computational particle has reached the maximum number of   
 ! fluid particle neighbours allowed.                
                if (nPartIntorno(npi)>=NMAXPARTJ) then
@@ -729,7 +729,7 @@ if (Domain%tipo=="bsph") then
    enddo
    if (allocated(bounded)) deallocate(bounded)
    if (allocated(dShep_old)) deallocate(dShep_old)
-endif 
+endif
 ! SPH parameters for body transport in fluid flows
 if (n_bodies>0) then
 ! Loop over the body particles

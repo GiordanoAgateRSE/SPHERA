@@ -22,7 +22,11 @@
 ! Program unit: Euler                                           
 ! Description: Explicit RK1 time integration scheme (Euler scheme).  
 !-------------------------------------------------------------------------------
-subroutine Euler  
+#ifdef SPACE_3D
+subroutine Euler(BC_zmax_flag)
+#elif defined SPACE_2D
+subroutine Euler
+#endif
 !------------------------
 ! Modules
 !------------------------
@@ -35,6 +39,9 @@ use I_O_diagnostic_module
 ! Declarations
 !------------------------
 implicit none
+#ifdef SPACE_3D
+logical,intent(in) :: BC_zmax_flag
+#endif
 integer(4) :: npi,ii,i,j
 double precision :: TetaV1
 double precision,dimension(:),allocatable :: uni_old
@@ -74,7 +81,7 @@ do ii = 1,indarrayFlu
       if (Domain%tipo=="bsph") call DBSPH_inlet_outlet(npi)
 ! kodvel = 1: the particle has a critical flux condition. Vertical velocity is 
 ! assigned.
-      elseif (pg(npi)%kodvel==1) then 
+      elseif (pg(npi)%kodvel==1) then
          pg(npi)%vel(:) = pg(npi)%vel(:) + dt * pg(npi)%acc(:)      
          pg(npi)%vel(3) = pg(npi)%velass(3)           
 ! kodvel = 2: the particle has an assigned normal velocity (inlet section). 
@@ -87,7 +94,11 @@ enddo
 call start_and_stop(3,17)
 ! Velocity partial smoothing
 call start_and_stop(2,7)
+#ifdef SPACE_3D
+if (input_any_t%TetaV>0.d0) call velocity_smoothing(BC_zmax_flag)
+#elif defined SPACE_2D
 if (input_any_t%TetaV>0.d0) call velocity_smoothing
+#endif
 !$omp parallel do default(none)                                                &
 !$omp private(npi,ii,TetaV1)                                                   &
 !$omp shared(nag,Pg,Med,Domain,dt,indarrayFlu,Array_Flu,input_any_t)

@@ -19,25 +19,22 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: defcolpartzero                   
-! Description: on the particle colours for visualization purposes              
+! Program unit: domain_edges
+! Description: to find the domain edges (x, y and z maximum and minimum values).
 !-------------------------------------------------------------------------------
-subroutine defcolpartzero(ir,partz,pg)
+subroutine domain_edges(MinOfMin,Xmin,Xmax)
 !------------------------
 ! Modules
 !------------------------
 use Static_allocation_module
-use Hybrid_allocation_module
+use Dynamic_allocation_module
 !------------------------
 ! Declarations
 !------------------------
 implicit none
-integer(4),intent(in) :: ir
-type (TyZone),intent(in),dimension(NPartZone) :: partz
-type (TyParticle),intent(inout) :: pg
-integer(4) :: nbande, numbanda
-double precision :: aldx
-integer(4),dimension(5) :: iclnumb
+double precision,dimension(SPACEDIM),intent(inout) :: MinOfMin
+double precision,dimension(SPACEDIM,NPartZone),intent(inout) :: Xmin,Xmax
+integer(4) :: Nz,ii
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -47,31 +44,35 @@ integer(4),dimension(5) :: iclnumb
 !------------------------
 ! Initializations
 !------------------------
-iclnumb(1)=1
-iclnumb(2)=2
-iclnumb(3)=4
-iclnumb(4)=5
-iclnumb(5)=6
 !------------------------
 ! Statements
 !------------------------
-if (partz(ir)%bend=="u") then        
-! Uniform color
-   pg%icol = partz(ir)%icol
-   elseif (partz(ir)%bend=="o")then   
-! Colour based on external option 
-      pg%icol = partz(ir)%icol
-      elseif(partz(ir)%bend=="b") then
-! Vertical strips 
-         nbande = partz(ir)%icol
-         aldx = (partz(ir)%coordMM(1,2) - partz(ir)%coordMM(1,1)) / nbande
-         numbanda = int((pg%coord(1) - partz(ir)%coordMM(1,1)) / aldx) + 1
-         numbanda = min(nbande,numbanda)
-         numbanda = max(0,numbanda)
-         pg%icol = iclnumb(numbanda)
-endif
+! Loop over the zones in order to set the initial minimum and maximum 
+! coordinates of each zone and of the numerical domain
+do Nz=1,NPartZone
+! To search for the maximum and minimum "partzone" coordinates
+   Partz(Nz)%coordMM(1:SPACEDIM,1) = max_positive_number
+   Partz(Nz)%coordMM(1:SPACEDIM,2) = max_negative_number
+   Xmin(1:SPACEDIM,Nz) = max_positive_number
+   Xmax(1:SPACEDIM,Nz) = max_negative_number
+! To search for the minimum and maximum coordinates of the current zone 
+#ifdef SPACE_3D
+      call FindFrame(Xmin,Xmax,Nz)
+#elif defined SPACE_2D
+         call FindLine(Xmin,Xmax,Nz)
+#endif
+! To evaluate the minimum and maximum coordinates of the zone
+   do ii=1,SPACEDIM
+      if (Xmin(ii,Nz)<Partz(Nz)%coordMM(ii,1)) Partz(Nz)%coordMM(ii,1) =       &
+         Xmin(ii,Nz)
+      if (Xmax(ii,Nz)>Partz(Nz)%coordMM(ii,2)) Partz(Nz)%coordMM(ii,2) =       &
+         Xmax(ii,Nz)
+! To evaluate the overall minimum among the zones
+      MinOfMin(ii) = min(MinOfMin(ii),Xmin(ii,Nz))
+   enddo
+enddo
 !------------------------
 ! Deallocations
 !------------------------
 return
-end subroutine defcolpartzero
+end subroutine domain_edges

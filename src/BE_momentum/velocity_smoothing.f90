@@ -20,9 +20,14 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: velocity_smoothing 
-! Description: To calculate a corrective term for velocity.    
+! Description: Partial velocity smoothing (part 1). Full velocity smoothing 
+!              within the "zmax" zones (part 1).
 !-------------------------------------------------------------------------------
+#ifdef SPACE_3D
+subroutine velocity_smoothing(BC_zmax_flag)
+#elif defined SPACE_2D
 subroutine velocity_smoothing
+#endif
 !------------------------
 ! Modules
 !------------------------
@@ -33,6 +38,9 @@ use Dynamic_allocation_module
 ! Declarations
 !------------------------
 implicit none
+#ifdef SPACE_3D
+logical,intent(in) :: BC_zmax_flag
+#endif
 integer(4) :: npi,npj,contj,npartint,ii
 double precision :: rhoi,rhoj,amassj,pesoj,moddervel
 double precision,dimension(3) :: dervel 
@@ -53,7 +61,7 @@ endif
 !------------------------
 ! Statements
 !------------------------
-! Body particle contributions to pressure smoothing
+! Body particle contributions to velocity smoothing
 if (n_bodies>0) then
    call start_and_stop(3,7)
    call start_and_stop(2,19)
@@ -63,11 +71,20 @@ if (n_bodies>0) then
 endif
 !$omp parallel do default(none)                                                &
 !$omp shared(pg,Med,nPartIntorno,NMAXPARTJ,PartIntorno,PartKernel,indarrayFlu) &
+#ifdef SPACE_3D
+!$omp shared(Array_Flu,Domain,n_bodies,dervel_mat,Partz,BC_zmax_flag)          &
+#elif defined SPACE_2D
 !$omp shared(Array_Flu,Domain,n_bodies,dervel_mat)                             &
+#endif
 !$omp private(ii,npi,contj,npartint,npj,rhoi,rhoj,amassj,dervel,moddervel)     &
 !$omp private(pesoj)
 do ii=1,indarrayFlu
    npi = Array_Flu(ii)
+#ifdef SPACE_3D
+! Selective partial smoothing only for the new particles in the "zmax" zones 
+! each time step (BC condition)
+   if ((BC_zmax_flag.eqv..true.).and.(Partz(pg(npi)%izona)%tipo/="zmax")) cycle
+#endif
    pg(npi)%var = zero
 ! The mixture particles, which are temporarily affected by the frictional 
 ! viscosity threshold are fixed.
@@ -75,6 +92,11 @@ do ii=1,indarrayFlu
    do contj=1,nPartIntorno(npi)
       npartint = (npi - 1) * NMAXPARTJ + contj
       npj = PartIntorno(npartint)
+#ifdef SPACE_3D
+! The newly generated "zmax" particles are not considered as neighbours (in 
+! case of partial smoothing no "zmax" type should be active)
+      if (Partz(pg(npj)%izona)%tipo=="zmax") cycle
+#endif
       rhoi = pg(npi)%dens
       rhoj = pg(npj)%dens
       amassj = pg(npj)%mass

@@ -512,7 +512,7 @@ type TyZone
    double precision :: pool
 ! IC for pressure or free surface height 
    double precision :: valp
-! Indices of the first and last particle IDs in the zone  
+! Indices of the first and last particle IDs in the zone
    integer(4) :: limit(2)
 ! Initial velocity
    double precision :: vel(3)
@@ -525,6 +525,13 @@ type TyZone
 ! Horizontal coordinates of the points (3 or 4), which describe the dam zone, 
 ! if (dam_zone_ID>1)
    double precision :: dam_zone_vertices(4,2)
+! BC_zmax_vertices(n_selected_vertices,3)
+! Array of the vertices of the DEM-DTM (or any other solid bottom) associated 
+! with a "zmax" zone where the fluid depth is imposed as boundary condition.
+! The third coordinate is the minimum height "around" vertex height (as for 
+! fluid bodies extruded from topography). It will be influential only in the 
+! presence of dry bottom.
+   double precision,dimension(:,:),allocatable :: BC_zmax_vertices
 #endif
 ! Initial velocity
    double precision :: vlaw(0:3,MAXPOINTSVLAW)
@@ -535,7 +542,8 @@ type TyZone
    character(2) :: pressure
 ! Motion type: standard or fixed
    character(3) :: move
-! Type: "PERI", "SOUR", "OPEN"(, "FLOW", "VELO", "CRIT", "LEVE", "TAPI", "POOL") 
+! Type: "PERI", "SOUR", "OPEN", "ZMAX" (, "FLOW", "VELO", "CRIT", "LEVE", 
+! "TAPI", "POOL")
    character(4) :: tipo
 ! Name
    character(8) :: label

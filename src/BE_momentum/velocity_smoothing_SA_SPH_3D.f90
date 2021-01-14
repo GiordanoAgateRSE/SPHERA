@@ -20,7 +20,7 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: velocity_smoothing_SA_SPH_3D 
-! Description: To calculate a corrective term for velocity.    
+! Description: SASPH 3D contribution to the partial velocity smoothing    
 !-------------------------------------------------------------------------------
 #ifdef SPACE_3D
 subroutine velocity_smoothing_SA_SPH_3D(npi)
@@ -74,7 +74,7 @@ if (Ncbf>0) then
       enddo
       IntWdV = BoundaryDataTab(ibdp)%BoundaryIntegral(2)
       if ((strtype=='fixe').or.(strtype=='tapi')) then
-      if (Partz(Tratto(facestr)%zone)%slip_coefficient_mode==1) then
+         if (Partz(Tratto(facestr)%zone)%slip_coefficient_mode==1) then
 ! Slip coefficient from input
             slip_coefficient = Partz(Tratto(facestr)%zone)%BC_shear_stress_input
             elseif (Partz(Tratto(facestr)%zone)%slip_coefficient_mode==2) then

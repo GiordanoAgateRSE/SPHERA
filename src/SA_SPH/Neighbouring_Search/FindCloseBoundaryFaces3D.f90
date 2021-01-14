@@ -24,7 +24,7 @@
 !              a distance from the particle npi smaller than or equal to 2h. It 
 !              returns:
 !                 Ncbf: number of close boundary faces
-!                 Clobface(1 to Ncbf): list of close boundary faces
+!                 Clobface(1:Ncbf): list of close boundary faces
 !                 LocX(1:SPACEDIM,Ncbf): local coordinates of particle npi with 
 !                                        respect each boundary side
 !              The algorithm looks for the boundary faces intersected by the 

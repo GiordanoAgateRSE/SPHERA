@@ -19,25 +19,23 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: defcolpartzero                   
-! Description: on the particle colours for visualization purposes              
+! Program unit: pos_plus_white_noise
+! Description: Add a white noise to a particle position (initial conditions).
 !-------------------------------------------------------------------------------
-subroutine defcolpartzero(ir,partz,pg)
+subroutine pos_plus_white_noise(max_rnd_eps,pos)
 !------------------------
 ! Modules
 !------------------------
-use Static_allocation_module
 use Hybrid_allocation_module
 !------------------------
 ! Declarations
 !------------------------
 implicit none
-integer(4),intent(in) :: ir
-type (TyZone),intent(in),dimension(NPartZone) :: partz
-type (TyParticle),intent(inout) :: pg
-integer(4) :: nbande, numbanda
-double precision :: aldx
-integer(4),dimension(5) :: iclnumb
+! maximum random displacement (ratio with respect to dx)
+double precision,intent(in) :: max_rnd_eps
+double precision,intent(inout) :: pos(3)
+! random variable (uniform distribution between 0.d0 and 1.d0)
+double precision :: rnd(3)
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -47,31 +45,16 @@ integer(4),dimension(5) :: iclnumb
 !------------------------
 ! Initializations
 !------------------------
-iclnumb(1)=1
-iclnumb(2)=2
-iclnumb(3)=4
-iclnumb(4)=5
-iclnumb(5)=6
+call random_seed()
 !------------------------
 ! Statements
 !------------------------
-if (partz(ir)%bend=="u") then        
-! Uniform color
-   pg%icol = partz(ir)%icol
-   elseif (partz(ir)%bend=="o")then   
-! Colour based on external option 
-      pg%icol = partz(ir)%icol
-      elseif(partz(ir)%bend=="b") then
-! Vertical strips 
-         nbande = partz(ir)%icol
-         aldx = (partz(ir)%coordMM(1,2) - partz(ir)%coordMM(1,1)) / nbande
-         numbanda = int((pg%coord(1) - partz(ir)%coordMM(1,1)) / aldx) + 1
-         numbanda = min(nbande,numbanda)
-         numbanda = max(0,numbanda)
-         pg%icol = iclnumb(numbanda)
-endif
+call random_number(rnd(1))
+call random_number(rnd(2))
+call random_number(rnd(3))
+pos(:) = pos(:) + (2.d0 * rnd(:) - 1.d0) * max_rnd_eps * Domain%dx
 !------------------------
 ! Deallocations
 !------------------------
 return
-end subroutine defcolpartzero
+end subroutine pos_plus_white_noise
