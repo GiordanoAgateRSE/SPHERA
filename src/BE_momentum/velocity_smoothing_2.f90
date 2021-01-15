@@ -75,11 +75,9 @@ do ii=1,indarrayFlu
 ! Full smoothing for newly emitted particles in the "zmax" zones
       TetaV1 = 1.d0
 ! Change the new-particle zone from the current “zmax” zone to the associated 
-! boundary zone (“Car_top_zone”) and initialize the "vel_type" so that the 
-! newly-initialized particles will be treated as standard computational 
-! particles after initialization.
+! boundary zone (“Car_top_zone”) so that the newly-initialized particles will 
+! be treated as standard computational particles after initialization.
       pg(npi)%izona = Partz(pg(npi)%izona)%Car_top_zone
-      pg(npi)%vel_type = "std"
       write(ulog,'(2a,a5,i12)') 'Program unit "velocity_smoothing_2": ',       &
          'pg(npi)%vel_type, npi: ',pg(npi)%vel_type,npi
       else

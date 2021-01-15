@@ -145,6 +145,7 @@ do i_zone=1,NPartZone
 ! Formal null velocity initialization (it will follow a selective partial 
 ! velocity smoothing)
                pg(npi)%vel(:) = 0.d0
+               pg(npi)%vel_type = "std"
                pg(npi)%sect_old_pos(:) = pg(npi)%coord(:)
             enddo
          enddo
