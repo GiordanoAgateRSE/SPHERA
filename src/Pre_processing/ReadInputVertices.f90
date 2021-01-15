@@ -73,7 +73,7 @@ endif
 do while (trim(lcase(ainp))/="##### end vertices #####")
    select case (TRIM(Domain%tipo))
       case ("semi","bsph") 
-         read (ainp,*,iostat=ioerr) i, values1(1:ncord)
+         read (ainp,*,iostat=ioerr) i,values1(1:ncord)
          write(label,"(i8)") i
          if (.not.ReadCheck (ioerr,ier,nrighe,ainp,"VERTEX n."//label,ninp,    &
             ulog)) return

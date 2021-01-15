@@ -60,9 +60,9 @@ integer(4),external :: ParticleCellNumber
 ! Allocations
 !------------------------
 do i_zone=1,NPartZone
-   if (Partz(i_zone)%ID_first_vertex>0) then
-      aux_integer = Partz(i_zone)%ID_last_vertex -                             &
-                      Partz(i_zone)%ID_first_vertex + 1
+   if (Partz(i_zone)%ID_first_vertex_sel>0) then
+      aux_integer = Partz(i_zone)%ID_last_vertex_sel -                         &
+                      Partz(i_zone)%ID_first_vertex_sel + 1
       if (.not.allocated(h_step)) then
          allocate(h_step(aux_integer),STAT=alloc_stat)
          if (alloc_stat/=0) then
@@ -251,15 +251,15 @@ if (on_going_time_step==1) then
          open(ncpt,file=nomefile_h_step,status="unknown",form="formatted")
       endif
       do i_zone=1,NPartZone
-         if (Partz(i_zone)%ID_first_vertex>0) then
+         if (Partz(i_zone)%ID_first_vertex_sel>0) then
 !$omp parallel do default(none)                                                &
 !$omp shared(ncpt,Partz,Vertice,Grid,h_filt_step,h_step,Z_fluid_step,i_zone)   &
 !$omp shared(qx_step,qy_step,qx_step_grid,qy_step_grid,n_part_step,q_max)      &
 !$omp shared(print_flag)                                                       &
 !$omp private(i_vertex,GridColumn,pos,i_aux)
-            do i_vertex=Partz(i_zone)%ID_first_vertex,                         &
-               Partz(i_zone)%ID_last_vertex
-               i_aux = i_vertex - Partz(i_zone)%ID_first_vertex + 1 
+            do i_vertex=Partz(i_zone)%ID_first_vertex_sel,                     &
+               Partz(i_zone)%ID_last_vertex_sel
+               i_aux = i_vertex - Partz(i_zone)%ID_first_vertex_sel + 1 
                pos(1) = Vertice(1,i_vertex)
                pos(2) = Vertice(2,i_vertex)
                pos(3) = Grid%extr(3,1) + 1.d-7

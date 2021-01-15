@@ -25,7 +25,7 @@
 !              (included). The minimum local bottom height is useful for the 
 !              fluid body extrusion from topography (IC). The maximum local 
 !              bottom height is useful for the BCs of the "zmax" zones 
-!              (where the fluid height is imposed). 
+!              (where the fluid height is imposed).
 !-------------------------------------------------------------------------------
 #ifdef SPACE_3D
 subroutine z_min_max_DEM_DTM_9p_stencil(min_flag,i_zone,i_vertex,z_aux)
@@ -60,18 +60,15 @@ if (min_flag.eqv..true.) then
    else
       z_aux = max_negative_number
 endif
-! Suggestion. This loop could be optimized not to consider all the DTM points.
-! The first index of this loop assumes that the bottom is the first "boundary"
-do j_vertex=1,Partz(Partz(i_zone)%Car_top_zone)%npoints
-   distance_hor = dsqrt((Vertice(1,i_vertex) -                                 &
-                  Partz(i_zone)%BC_zmax_vertices(j_vertex,1)) ** 2 +           &
-                  (Vertice(2,i_vertex) -                                       &
-                  Partz(i_zone)%BC_zmax_vertices(j_vertex,2)) ** 2)
+! Loop over the sub-selection of vertices of the associated bottom
+do j_vertex=Partz(i_zone)%ID_first_vertex_sel,Partz(i_zone)%ID_last_vertex_sel
+   distance_hor = dsqrt((Vertice(1,i_vertex) - Vertice(1,j_vertex)) ** 2 +     &
+                  (Vertice(2,i_vertex) - Vertice(2,j_vertex)) ** 2)
    if (distance_hor<=(1.5*Partz(i_zone)%dx_CartTopog)) then
       if (min_flag.eqv..true.) then
-         z_aux = min(z_aux,Partz(i_zone)%BC_zmax_vertices(j_vertex,3))
+         z_aux = min(z_aux,Vertice(3,j_vertex))
          else
-            z_aux = max(z_aux,Partz(i_zone)%BC_zmax_vertices(j_vertex,3))
+            z_aux = max(z_aux,Vertice(3,j_vertex))
       endif
    endif
 enddo

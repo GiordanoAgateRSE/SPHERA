@@ -146,7 +146,7 @@ if (inttimeratio>pinttimeratio) then
                   pg(nag)%state = "sol"
             endif
 ! Movement/kinematics index
-            pg(nag)%vel_type = partz(inlet_zone)%move        
+            pg(nag)%vel_type = partz(inlet_zone)%move      
             if (partz(inlet_zone)%move/="std") pg(nag)%kin_visc = zero
             pg(nag)%cella = ParticleCellNumber(pg(nag)%coord)
 ! Particle colour 

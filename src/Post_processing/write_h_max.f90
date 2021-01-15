@@ -66,11 +66,11 @@ write(ncpt,'(8(a))') "           x(m)","           y(m)","      hu_max(m)",    &
    "   q_max(m^2/s)"
 flush(ncpt) 
 do i_zone=1,NPartZone
-   if (Partz(i_zone)%ID_first_vertex>0) then
+   if (Partz(i_zone)%ID_first_vertex_sel>0) then
 ! Allocating h_max
       if (.not.allocated(h_max)) then
-         aux_integer = Partz(i_zone)%ID_last_vertex -                          &
-                       Partz(i_zone)%ID_first_vertex + 1
+         aux_integer = Partz(i_zone)%ID_last_vertex_sel -                      &
+                       Partz(i_zone)%ID_first_vertex_sel + 1
          allocate(h_max(aux_integer,2),STAT=alloc_stat)
          if (alloc_stat/=0) then
             write(ulog,*) 'Subroutine "write_h_max". ',                        &
@@ -84,21 +84,23 @@ do i_zone=1,NPartZone
 !$omp parallel do default(none)                                                &
 !$omp shared(Partz,Vertice,Grid,h_max,Z_fluid_max,ncpt,i_zone,q_max)           &
 !$omp private(i_vertex,GridColumn,pos)
-      do i_vertex=Partz(i_zone)%ID_first_vertex,Partz(i_zone)%ID_last_vertex
+      do i_vertex=Partz(i_zone)%ID_first_vertex_sel,                           &
+         Partz(i_zone)%ID_last_vertex_sel
          pos(1) = Vertice(1,i_vertex)
          pos(2) = Vertice(2,i_vertex)
          pos(3) = Grid%extr(3,1) + 1.d-7
          GridColumn = ParticleCellNumber(pos)
-         h_max(i_vertex-Partz(i_zone)%ID_first_vertex+1,1) =                   &
+         h_max(i_vertex-Partz(i_zone)%ID_first_vertex_sel+1,1) =               &
             max((Z_fluid_max(GridColumn,1) - Vertice(3,i_vertex)),0.d0)
-         h_max(i_vertex-Partz(i_zone)%ID_first_vertex+1,2) =                   &
+         h_max(i_vertex-Partz(i_zone)%ID_first_vertex_sel+1,2) =               &
             max((Z_fluid_max(GridColumn,2) - Vertice(3,i_vertex)),0.d0)
 !$omp critical (omp_write_h_max)
          write(ncpt,'(8(f14.4,1x))')Vertice(1,i_vertex),Vertice(2,i_vertex),   &
-            h_max(i_vertex-Partz(i_zone)%ID_first_vertex+1,1),                 &
-            h_max(i_vertex-Partz(i_zone)%ID_first_vertex+1,2),                 &
+            h_max(i_vertex-Partz(i_zone)%ID_first_vertex_sel+1,1),             &
+            h_max(i_vertex-Partz(i_zone)%ID_first_vertex_sel+1,2),             &
             Z_fluid_max(GridColumn,1),Z_fluid_max(GridColumn,2),               &
-            Vertice(3,i_vertex),q_max(i_vertex-Partz(i_zone)%ID_first_vertex+1)        
+            Vertice(3,i_vertex),                                               &
+            q_max(i_vertex-Partz(i_zone)%ID_first_vertex_sel+1)        
 !$omp end critical (omp_write_h_max)
       enddo
 !$omp end parallel do

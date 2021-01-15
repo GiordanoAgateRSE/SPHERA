@@ -51,7 +51,7 @@ integer(4) :: n,numv,zone_ID,ipointer,Medium,icolor,icord
 integer(4) :: ioerr,npointv,IC_source_type,Car_top_zone
 #ifdef SPACE_3D
 integer(4) :: plan_reservoir_points,i_point,dam_zone_ID,dam_zone_n_vertices,i2
-integer(4) :: ID_first_vertex,ID_last_vertex
+integer(4) :: ID_first_vertex_sel,ID_last_vertex_sel
 #elif defined SPACE_2D
 integer(4) :: i2,i1
 #endif
@@ -135,8 +135,8 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
 #ifdef SPACE_3D
       dx_CartTopog = 0.d0
       H_res = 0.d0
-      ID_first_vertex = 0
-      ID_last_vertex = 0
+      ID_first_vertex_sel = 0
+      ID_last_vertex_sel = 0
       plan_reservoir_points = 0
       dam_zone_ID = 0
       dam_zone_n_vertices = 0
@@ -153,8 +153,8 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
          token_color(3:4) = token(3:4)
          token_color(5:6) = token(1:2) 
          read(token_color,'(Z6)',iostat=ioerr) icolor
-         if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"FIXED: RRGGBB COLOR",ninp,  &
-            ulog)) return
+         if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"RRGGBB COLOR",ninp,ulog))   &
+            return
 ! Boundary condition "fixe"
       case("fixe")    
          NumberEntities(3) = NumberEntities(3) + 1
@@ -181,6 +181,13 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
          read(token_color,'(Z6)',iostat=ioerr) icolor
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"FIXED: RRGGBB COLOR",ninp,  &
             ulog)) return
+#ifdef SPACE_3D
+         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+         if (ioerr==0) read(ainp,*,iostat=ioerr) ID_first_vertex_sel,          &
+            ID_last_vertex_sel
+         if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                             &
+            "ID_first_vertex_sel,ID_last_vertex_sel",ninp,ulog)) return
+#endif
 ! Boundary condition "sour"
       case("sour")    
          NumberEntities(3) = NumberEntities(3) + 1
@@ -286,9 +293,9 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
                   ninp,ulog)) return
                call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
                if (ioerr==0) read(ainp,*,iostat=ioerr)                         &
-                  ID_first_vertex,ID_last_vertex
+                  ID_first_vertex_sel,ID_last_vertex_sel
                if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                       &
-                  "ID_first_vertex,ID_last_vertex",ninp,ulog)) return
+                  "ID_first_vertex_sel,ID_last_vertex_sel",ninp,ulog)) return
                call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
                if (ioerr==0) read(ainp,*,iostat=ioerr) plan_reservoir_points
                if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                       &
@@ -406,9 +413,10 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"dx_CartTopog,z_max",ninp,   &
             ulog)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         if (ioerr==0) read(ainp,*,iostat=ioerr) ID_first_vertex,ID_last_vertex
+         if (ioerr==0) read(ainp,*,iostat=ioerr) ID_first_vertex_sel,          &
+            ID_last_vertex_sel
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                             &
-            "ID_first_vertex,ID_last_vertex",ninp,ulog)) return
+            "ID_first_vertex_sel,ID_last_vertex_sel",ninp,ulog)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          if (ioerr==0) read(ainp,*,iostat=ioerr) plan_reservoir_points
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"plan_reservoir_points",ninp,&
@@ -435,11 +443,11 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
       Partz(zone_ID)%DBSPH_fictitious_reservoir_flag =                         &
          DBSPH_fictitious_reservoir_flag
 #ifdef SPACE_3D
+         Partz(zone_ID)%ID_first_vertex_sel = ID_first_vertex_sel
+         Partz(zone_ID)%ID_last_vertex_sel = ID_last_vertex_sel
          if ((IC_source_type==2).or.(tipo=="zmax")) then
             Partz(zone_ID)%dx_CartTopog = dx_CartTopog
             Partz(zone_ID)%H_res = H_res
-            Partz(zone_ID)%ID_first_vertex = ID_first_vertex
-            Partz(zone_ID)%ID_last_vertex = ID_last_vertex
             Partz(zone_ID)%plan_reservoir_points = plan_reservoir_points
             Partz(zone_ID)%plan_reservoir_pos = plan_reservoir_pos
          endif
@@ -514,6 +522,10 @@ BoundaryVertex(Tratto(zone_ID)%inivertex:Tratto(zone_ID)%inivertex+Tratto(zone_I
                Tratto(zone_ID)%ColorCode = icolor
                if (ulog>0) write(ulog,"(1x,a,z8)") "Color           : ",       &
                   Tratto(zone_ID)%colorCode
+               write(ulog,"(1x,a,i12)") "ID_first_vertex_sel : ",              &
+                  Partz(zone_ID)%ID_first_vertex_sel
+               write(ulog,"(1x,a,i12)") "ID_last_vertex_sel  : ",              &
+                  Partz(zone_ID)%ID_last_vertex_sel
 #endif
                write(ulog,"(1x,a,i3)")   "Slip coeff. mode : ",                &
                   Partz(zone_ID)%slip_coefficient_mode
@@ -601,10 +613,10 @@ BoundaryVertex(Tratto(zone_ID)%inivertex+Tratto(zone_ID)%numvertices-1)
                      Partz(zone_ID)%dx_CartTopog
                   write(ulog,"(1x,a,1pe12.4)") "H_res           : ",           &
                      Partz(zone_ID)%H_res  
-                  write(ulog,"(1x,a,i12)") "ID_first_vertex : ",               &
-                     Partz(zone_ID)%ID_first_vertex
-                  write(ulog,"(1x,a,i12)") "ID_last_vertex  : ",               &
-                     Partz(zone_ID)%ID_last_vertex
+                  write(ulog,"(1x,a,i12)") "ID_first_vertex_sel : ",           &
+                     Partz(zone_ID)%ID_first_vertex_sel
+                  write(ulog,"(1x,a,i12)") "ID_last_vertex_sel  : ",           &
+                     Partz(zone_ID)%ID_last_vertex_sel
                   write(ulog,"(1x,a,i12)") "plan_reservoir_points: ",          &
                      Partz(zone_ID)%plan_reservoir_points
                   do i_point=1,plan_reservoir_points
@@ -635,10 +647,10 @@ BoundaryVertex(Tratto(zone_ID)%inivertex+Tratto(zone_ID)%numvertices-1)
                Partz(zone_ID)%dx_CartTopog
             write(ulog,"(1x,a,1pe12.4)") "z_max           : ",                 &
                Partz(zone_ID)%H_res
-            write(ulog,"(1x,a,i12)") "ID_first_vertex : ",                     &
-               Partz(zone_ID)%ID_first_vertex
-            write(ulog,"(1x,a,i12)") "ID_last_vertex  : ",                     &
-               Partz(zone_ID)%ID_last_vertex
+            write(ulog,"(1x,a,i12)") "ID_first_vertex_sel : ",                 &
+               Partz(zone_ID)%ID_first_vertex_sel
+            write(ulog,"(1x,a,i12)") "ID_last_vertex_sel  : ",                 &
+               Partz(zone_ID)%ID_last_vertex_sel
             write(ulog,"(1x,a,i12)") "plan_zmax_zone_points: ",                &
                Partz(zone_ID)%plan_reservoir_points
             do i_point=1,plan_reservoir_points

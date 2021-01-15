@@ -20,12 +20,8 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: main_wall_info
-! Description: To compute/recall the number of vertices of the main wall (i.e., 
-!              the solid boundary used for extrusion of water bodies from 
-!              topography). In case of no extrusion, the first "fixed" (wall) 
-!              boundary/zone is selected and set up (with all its vertices) for 
-!              assessing the 2D synthetic quantities (e.g., water depth, 
-!              specific flow rate).
+! Description: To count the number of vertices of the main wall (i.e., 
+!              the solid ("fixe") boundary with the minimum zone ID).
 !-------------------------------------------------------------------------------
 #ifdef SPACE_3D
 subroutine main_wall_info(n_vertices_main_wall)
@@ -40,8 +36,7 @@ use I_O_file_module
 !------------------------
 implicit none
 integer(4),intent(out) :: n_vertices_main_wall
-logical :: aux_logical
-integer(4) :: aux_integer,i_zone
+integer(4) :: i_zone
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -51,36 +46,20 @@ integer(4) :: aux_integer,i_zone
 !------------------------
 ! Initializations
 !------------------------
-aux_logical = .false.
-aux_integer = 0
 n_vertices_main_wall = 0
 !------------------------
 ! Statements
 !------------------------
 do i_zone=1,NPartZone
-   if (Partz(i_zone)%IC_source_type==2) then
-! A main wall had already been set up
-      aux_logical = .true.
-      n_vertices_main_wall = Partz(i_zone)%ID_last_vertex -                    &
-                             Partz(i_zone)%ID_first_vertex + 1
+   if (Partz(i_zone)%tipo=="fixe") then
+      n_vertices_main_wall = Partz(i_zone)%ID_last_vertex_sel -                &
+                             Partz(i_zone)%ID_first_vertex_sel + 1
+      write(ulog,'(2a,i4,a5,i11)') 'Program unit "main_wall_info": i_zone, ',  &
+         'Partz(i_zone)%tipo, n_vertices_main_wall: ',                         &
+         i_zone,Partz(i_zone)%tipo,n_vertices_main_wall
       exit
    endif
 enddo
-if (aux_logical.eqv..false.) then
-   do i_zone=1,NPartZone
-      write(ulog,'(2a,i4,a5)') 'Program unit "main_wall_info": i_zone, ',      &
-         'Partz(i_zone)%tipo: ',i_zone,Partz(i_zone)%tipo 
-      if (Partz(i_zone)%tipo=="fixe") then
-         Partz(i_zone)%ID_first_vertex = aux_integer + 1
-         Partz(i_zone)%ID_last_vertex = Partz(i_zone)%ID_first_vertex +        &
-                                        Tratto(i_zone)%numvertices - 1
-         n_vertices_main_wall = Tratto(i_zone)%numvertices
-         exit
-      endif
-! Temporary count of all the vertices of the previous zones
-      aux_integer = aux_integer + Tratto(i_zone)%numvertices
-   enddo
-endif
 !------------------------
 ! Deallocations
 !------------------------

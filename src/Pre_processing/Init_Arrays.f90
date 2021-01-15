@@ -66,7 +66,6 @@ do i=1,size(Partz)
    Partz(i)%pressure = "  "
    Partz(i)%move = "   "
    Partz(i)%ipool = 0
-   Partz(i)%npoints = 0
    Partz(i)%icol = 0
    Partz(i)%Medium = 0
    Partz(i)%npointv = 0
@@ -90,8 +89,8 @@ do i=1,size(Partz)
    Partz(i)%avg_ni_T_SASPH = 0.d0
    Partz(i)%avg_tau_wall_f = 0.d0
 #ifdef SPACE_3D
-   Partz(i)%ID_first_vertex = 0
-   Partz(i)%ID_last_vertex = 0
+   Partz(i)%ID_first_vertex_sel = 0
+   Partz(i)%ID_last_vertex_sel = 0
 #endif
 enddo
 do i=1,size(Control_Points)

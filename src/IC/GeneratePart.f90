@@ -47,7 +47,7 @@ integer(4),intent(in) :: IC_loop
 #endif
 integer(4) :: Nz,Mate,IsopraS,NumParticles,i,NumPartPrima,test_z
 #ifdef SPACE_3D
-integer(4) :: aux_factor,i_vertex,test_xy,test_dam
+integer(4) :: aux_factor,i_vertex,test_xy,test_dam,size_aux
 integer(4) :: n_levels,nag_aux,alloc_stat,j,k,npi
 double precision :: max_rnd_eps
 #endif
@@ -176,14 +176,14 @@ do Nz=1,NPartZone
 ! During the first IC loop
       if (IC_loop==1) then
 ! Update number of points/vertices of the zone
-         Partz(Nz)%npoints = Partz(Nz)%ID_last_vertex -                        &
-                             Partz(Nz)%ID_first_vertex + 1
+         size_aux = Partz(Nz)%ID_last_vertex_sel -                             &
+                    Partz(Nz)%ID_first_vertex_sel + 1
          aux_factor = nint(Partz(Nz)%dx_CartTopog / Domain%dx)
 ! Allocation of the auxiliary array z_aux
          if (.not.allocated(z_aux)) then
 ! The number of points is increased due to the eventual presence of the 
 ! fictitious vertex n.1
-            allocate(z_aux(Partz(Nz)%npoints+1),STAT=alloc_stat)
+            allocate(z_aux(size_aux+1),STAT=alloc_stat)
             if (alloc_stat/=0) then
                write(ulog,*) 'Allocation of the auxiliary array z_aux ',       &
                  'failed; the program stops here (subroutine GeneratePart). '
@@ -202,7 +202,7 @@ do Nz=1,NPartZone
          endif
          NumParticles = NumParticles + 1
 ! Loops over Cartesian topography points
-         do i_vertex=Partz(Nz)%ID_first_vertex,Partz(Nz)%ID_last_vertex
+         do i_vertex=Partz(Nz)%ID_first_vertex_sel,Partz(Nz)%ID_last_vertex_sel
 ! Check if the vertex is inside the plan_reservoir   
             call point_inout_convex_non_degenerate_polygon(                    &
                Vertice(1:2,i_vertex),Partz(Nz)%plan_reservoir_points,          &

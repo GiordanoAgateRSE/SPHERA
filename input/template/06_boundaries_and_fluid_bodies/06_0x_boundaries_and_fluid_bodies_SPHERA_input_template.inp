@@ -126,6 +126,21 @@ ___
 ___
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
+![?] if (3D) then
+![?] <ID_first_vertex>,<ID_last_vertex>: ! IDs of the first/last vertex of a 
+!    sub-selection of consecutive vertices used for fluid extrusions ("zmax" 
+!    BC zones or IC fluid bodies) and for the positioning grid of the 2D output 
+!    syntetic quantities. This vertex might be external to the zone faces.
+!    Contrarily to the faces, the vertices are not directly associated to the 
+!    zones.
+!-------------------------------------------------------------------------------
+![*] <ID_first_vertex>,<ID_last_vertex>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+___ ___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] endif (3D)
 ![?] endif (Boundary_type=="fixed")
 ![?] if (Boundary_type=="perimeter") then
 ![?] <colour_pattern>
@@ -219,8 +234,12 @@ ___ ___ ___
 ![?] <dx_CartTopog>: spatial resolution of the Cartesian topography; 
 !    dx_CartTopog>=dx
 ![?] <H_res>: height of the reservoir free surface
-![?] <ID_first_vertex>,<ID_last_vertex>: IDs of the first and and the last 
-!    vertices of the reference topography
+![?] <ID_first_vertex>,<ID_last_vertex>: ! IDs of the first/last vertex of a 
+!    sub-selection of consecutive vertices used for fluid extrusions ("zmax" 
+!    BC zones or IC fluid bodies) and for the positioning grid of the 2D output 
+!    syntetic quantities. This vertex might be external to the zone faces.
+!    Contrarily to the faces, the vertices are not directly associated to the 
+!    zones.
 !-------------------------------------------------------------------------------
 ![*] <dx_CartTopog> <H_res>
 ![*] <ID_first_vertex>,<ID_last_vertex>
@@ -360,8 +379,12 @@ ___
 ![?] <dx_CartTopog>: spatial resolution of the Cartesian topography; 
 !    dx_CartTopog>=dx
 ![?] <z_max>: maximum fluid height to be imposed
-![?] <ID_first_vertex>,<ID_last_vertex>: IDs of the first and and the last 
-!    vertices of the reference topography
+![?] <ID_first_vertex>,<ID_last_vertex>: ! IDs of the first/last vertex of a 
+!    sub-selection of consecutive vertices used for fluid extrusions ("zmax" 
+!    BC zones or IC fluid bodies) and for the positioning grid of the 2D output 
+!    syntetic quantities. This vertex might be external to the zone faces.
+!    Contrarily to the faces, the vertices are not directly associated to the 
+!    zones.
 !-------------------------------------------------------------------------------
 ![*] <dx_CartTopog> <z_max>
 ![*] <ID_first_vertex>,<ID_last_vertex>

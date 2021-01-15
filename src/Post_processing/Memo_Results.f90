@@ -100,13 +100,13 @@ if (index(str,'inizio')/=0) then
       endif
       write(nres) size_aux
       write(nres) Partz(i_zone)%DBSPH_fictitious_reservoir_flag,               &
-         Partz(i_zone)%ipool,Partz(i_zone)%npoints,Partz(i_zone)%icol,         &
+         Partz(i_zone)%ipool,Partz(i_zone)%icol,                               &
          Partz(i_zone)%Medium,Partz(i_zone)%npointv,                           &
          Partz(i_zone)%IC_source_type,Partz(i_zone)%Car_top_zone,              &
          Partz(i_zone)%slip_coefficient_mode,                                  &
 #ifdef SPACE_3D
-         Partz(i_zone)%plan_reservoir_points,Partz(i_zone)%ID_first_vertex,    &
-         Partz(i_zone)%ID_last_vertex,Partz(i_zone)%dam_zone_ID,               &
+         Partz(i_zone)%plan_reservoir_points,Partz(i_zone)%ID_first_vertex_sel,&
+         Partz(i_zone)%ID_last_vertex_sel,Partz(i_zone)%dam_zone_ID,           &
          Partz(i_zone)%dam_zone_n_vertices,Partz(i_zone)%dx_CartTopog,         &
          Partz(i_zone)%H_res,                                                  &
 #endif

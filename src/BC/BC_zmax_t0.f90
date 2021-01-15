@@ -93,7 +93,7 @@ do i_zone=1,NPartZone
       endif
    endif
 ! Loop over the vertices of the associated DEM-DTM or bottom
-   do i_vert=Partz(i_zone)%ID_first_vertex,Partz(i_zone)%ID_last_vertex
+   do i_vert=Partz(i_zone)%ID_first_vertex_sel,Partz(i_zone)%ID_last_vertex_sel
 ! Initialize the test variable
       test_xy = 0
 ! Check if the vertex lies inside the BC zone
@@ -182,7 +182,7 @@ do i_zone=1,NPartZone
                n_vert_selected,'.'
       endif
    endif
-! Loop over the selected vertices
+! Loop over the selected vertices (here "i_vert" is a relative vertex ID)
    do i_vert=1,n_vert_selected
 ! Copy the horizontal coordinates of the active elements of the array of 
 ! the selected vertices into the reference zone array

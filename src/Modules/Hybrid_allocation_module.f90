@@ -463,9 +463,6 @@ type TyZone
 ! kernel support at free surface to impose initial conditions
    logical :: DBSPH_fictitious_reservoir_flag
    integer(4) :: ipool
-! Number of topographic vertices used for extrusion (only for a fluid zone 
-! extruded from topography)
-   integer(4) :: npoints
 ! Particle colour or number of vertical strips
    integer(4) :: icol
 ! Fluid ID
@@ -482,12 +479,16 @@ type TyZone
 #ifdef SPACE_3D   
 ! Number of points describing the reservoir if (IC_source_type==2)
    integer(4) :: plan_reservoir_points
-! ID of the first vertex of topography (for a fluid zone extruded from 
-! topography)
-   integer(4) :: ID_first_vertex
-! ID of the last vertex of topography (for a fluid zone extruded from 
-! topography)
-   integer(4) :: ID_last_vertex
+! ID of the first vertex of a sub-selection of consecutive vertices used for 
+! fluid extrusions ("zmax" BC zones or IC fluid bodies) and for the positioning 
+! grid of the 2D output syntetic quantities. This vertex might be external to 
+! the zone faces.
+   integer(4) :: ID_first_vertex_sel
+! ID of the last vertex of a sub-selection of consecutive vertices used for 
+! fluid extrusions ("zmax" BC zones or IC fluid bodies) and for the positioning 
+! grid of the 2D output syntetic quantities. This vertex might be external to 
+! the zone faces.
+   integer(4) :: ID_last_vertex_sel
 ! ID of the dam zone, related to the eventual reservoir (dam_zone_ID=0 if no 
 ! dam is present), if(IC_source_type==2) 
    integer(4) :: dam_zone_ID
@@ -553,7 +554,9 @@ end type TyZone
 type TyBoundaryStretch
    logical :: laminar_no_slip_check
    integer(4) :: ColorCode
+! Number of faces/lines of the zone (the name is misleading)
    integer(4) :: numvertices
+! In 3D, this is not the first vertex of the zone
    integer(4) :: inivertex
 #ifdef SPACE_3D
    integer(4) :: iniface

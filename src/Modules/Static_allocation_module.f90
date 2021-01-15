@@ -90,7 +90,9 @@ integer(4) :: npointst,NPoints,NPointsl,NPointse,NLines
 #ifdef SPACE_3D
 integer(4) :: GCBFVecDim
 #endif
-integer(4) :: NumVertici,NumTratti,NumBVertices
+integer(4) :: NumVertici,NumBVertices
+! Number of zones
+integer(4) :: NumTratti
 #ifdef SPACE_3D
 integer(4) :: NumFacce
 #elif defined SPACE_2D

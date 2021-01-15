@@ -197,9 +197,9 @@ if (.not.allocated(substations%sub(1)%DEMvert)) then
 ! Association of the DEM points with the substations: start.
 ! Loop over the zones
    do i_zone=1,NPartZone
-      if (Partz(i_zone)%ID_first_vertex>0) then
-         DEM_points = Partz(i_zone)%ID_last_vertex -                           &
-                      Partz(i_zone)%ID_first_vertex + 1
+      if (Partz(i_zone)%ID_first_vertex_sel>0) then
+         DEM_points = Partz(i_zone)%ID_last_vertex_sel -                       &
+                      Partz(i_zone)%ID_first_vertex_sel + 1
 ! Allocation and initialization of the auxiliary array for the DEM points 
 ! associated with the substations.
          if (.not.allocated(aux_array)) then
@@ -219,7 +219,8 @@ if (.not.allocated(substations%sub(1)%DEMvert)) then
 !$omp parallel do default(none)                                                &
 !$omp shared(Partz,i_zone,Vertice,substations,uerr,aux_array)                  &
 !$omp private(i_vertex,pos,i_sub,test)
-         do i_vertex=Partz(i_zone)%ID_first_vertex,Partz(i_zone)%ID_last_vertex
+         do i_vertex=Partz(i_zone)%ID_first_vertex_sel,                        &
+            Partz(i_zone)%ID_last_vertex_sel
             pos(1,1) = Vertice(1,i_vertex)
             pos(1,2) = Vertice(2,i_vertex)
 ! Loop over the substations

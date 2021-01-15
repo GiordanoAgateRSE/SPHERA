@@ -55,7 +55,7 @@ do Nt=1,NumTratti
    do Nf=1,NumFacce
       if (BoundaryFace(Nf)%stretch==Nt) then
          Kf = Kf + 1
-         if (Tratto(Nt)%iniface==0) then 
+         if (Tratto(Nt)%iniface==0) then
 ! To store the initial face index
             Tratto(Nt)%iniface = Kf
          endif
