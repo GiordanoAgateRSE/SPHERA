@@ -78,8 +78,6 @@ do ii=1,indarrayFlu
 ! boundary zone (“Car_top_zone”) so that the newly-initialized particles will 
 ! be treated as standard computational particles after initialization.
       pg(npi)%izona = Partz(pg(npi)%izona)%Car_top_zone
-      write(ulog,'(2a,a5,i12)') 'Program unit "velocity_smoothing_2": ',       &
-         'pg(npi)%vel_type, npi: ',pg(npi)%vel_type,npi
       else
 #endif
          TetaV1 = input_any_t%TetaV
