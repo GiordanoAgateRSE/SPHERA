@@ -75,7 +75,7 @@ do while (trim(lcase(ainp))/="##### end vertices #####")
       case ("semi","bsph") 
          read (ainp,*,iostat=ioerr) i,values1(1:ncord)
          write(label,"(i8)") i
-         if (.not.ReadCheck (ioerr,ier,nrighe,ainp,"VERTEX n."//label,ninp,    &
+         if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"VERTEX n."//label,ninp,     &
             ulog)) return
          NumberEntities(7) = max(i,NumberEntities(7))
          if (input_second_read.eqv..true.) then
