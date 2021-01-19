@@ -84,7 +84,7 @@ slip_coeff_counter(:) = 0
 do ii = 1,indarrayFlu
    npi = Array_Flu(ii)
 ! The mixture particles in the elastic-plastic strain regime are held fixed
-   if (pg(npi)%mu>(Med(pg(npi)%imed)%mumx-1.d-12)) then
+   if (pg(npi)%mu>(Med(pg(npi)%imed)%mumx*(1.d0-1.d-9))) then
       pg(npi)%acc(:) = zero
       cycle
    endif

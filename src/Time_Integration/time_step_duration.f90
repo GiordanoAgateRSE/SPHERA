@@ -76,7 +76,7 @@ if (indarrayFlu==0) then
          if (Med(pg(npi)%imed)%tipo=="granular") then
 ! Redundant and safety check
             if ((pg(npi)%state=="sol").or.                                     &
-               (pg(npi)%mu>(Med(pg(npi)%imed)%mumx-1.d-12))) cycle
+               (pg(npi)%mu>Med(pg(npi)%imed)%mumx*(1.d0-1.d-9))) cycle
             if ((pg(npi)%coord(1)<Granular_flows_options%x_min_dt).or.         &
                (pg(npi)%coord(1)>Granular_flows_options%x_max_dt).or.          &
                (pg(npi)%coord(2)<Granular_flows_options%y_min_dt).or.          &
