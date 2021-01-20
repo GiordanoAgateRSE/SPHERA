@@ -1,6 +1,6 @@
 !-------------------------------------------------------------------------------
 ! File name and copyright: 2D_dyke_failure_Kagerplassen_2015.inp
-!    Copyright 2020 (RSE SpA, authored by Emanuela Abbate)
+!    Copyright 2020-2021 (RSE SpA, authored by Emanuela Abbate)
 ! File description: input file for SPHERA v.9.0.0 (RSE SpA).
 !   Two dimensional SPH simulation of a dyke failure in Kagerplassen (as 
 !   defined by Benchmark Theme C of ICOLD 2019). 

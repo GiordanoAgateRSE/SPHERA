@@ -1,6 +1,6 @@
 !-------------------------------------------------------------------------------
 ! Software name and copyright: dam_break_2D_demo
-!    Copyright 2015-2020 (RSE SpA, authored by Andrea Amicarelli)
+!    Copyright 2005-2021 (RSE SpA, authored by Andrea Amicarelli)
 ! Software description: input file for SPHERA v.9.0.0 (RSE SpA).
 !    Simple and demonstrative test case on a 2D dam break (rough resolution).
 !    Reference: Amicarelli (2020, SPHERA github repository).
