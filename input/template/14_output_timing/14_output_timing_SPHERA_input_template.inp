@@ -48,9 +48,7 @@
 ![?] The whole section can be effectively modified at any restart time.
 ![?] <dt_out>: writing time step for the water front (output file ".fro")
 ![?] <dt_restart>: restart time frequency; default value: 
-!    2*"vtkconverter any"="2*dt_out_PV". The following constraint 
-!    "restart_time_value>=dt_out_PV" is highly suggested because it permits 
-!    easier post-processing. 
+!    <dt_restart>=<dt_out_PV>
 ![?] <log_file_frequency>: log file writing time step in terms of time step 
 !    number
 ![?] <dt_out_mon>: writing time step for monitoring elements
