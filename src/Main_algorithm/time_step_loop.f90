@@ -321,6 +321,11 @@ TIME_STEP_DO: do while (it<=input_any_t%itmax)
          pg(:)%koddens = 0
       endif
       if (Domain%tipo=="semi") call SASPH_continuity
+      call start_and_stop(3,12)
+      call start_and_stop(2,19)
+      if (n_bodies>0) call body_particles_to_continuity
+      call start_and_stop(3,19)
+      call start_and_stop(2,12)      
       if (Domain%time_split==0) then   
 ! Explicit RK schemes
          call start_and_stop(3,12)

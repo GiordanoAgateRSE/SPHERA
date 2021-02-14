@@ -189,11 +189,6 @@ do npi=1,nag
    endif
 enddo
 !$omp end parallel do
-call start_and_stop(3,12)
-call start_and_stop(2,19)
-if (n_bodies>0) call body_particles_to_continuity
-call start_and_stop(3,19)
-call start_and_stop(2,12)
 !------------------------
 ! Deallocations
 !------------------------
