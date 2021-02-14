@@ -115,7 +115,7 @@ do i=1,n_bodies
                endif
                exit
             endif
-         enddo   
+         enddo
    endif
 ! Non-staggered parameters     
    body_arr(i)%x_CM(:) = body_arr(i)%x_CM(:) + body_arr(i)%u_CM(:) * dt 

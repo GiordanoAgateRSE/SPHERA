@@ -70,7 +70,7 @@ if (nres>0) then
 endif
 ! Computing variables at the monitoring points
 call CalcVarp
-if (Domain%icpoi_fr>0) then 
+if (Domain%icpoi_fr>0) then
    if ((mod(it,Domain%icpoi_fr)==0).and.npointst>0) then
       call Memo_Ctl
    endif

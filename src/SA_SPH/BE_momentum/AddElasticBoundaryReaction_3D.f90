@@ -81,7 +81,7 @@ do icbf=1,Ncbf
       PXLoc(:) = BoundaryDataTab(ibdp)%LocXYZ(:)
       zi = PXLoc(3)
       if (zi<zimin) then
-         call LocalNormalCoordinates (PXLoc, csi, iface)
+         call LocalNormalCoordinates(PXLoc,csi,iface)
          fkod = BoundaryFace(iface)%nodes - 2
          if (IsPointInternal(fkod,csi)) then 
 ! The projection of the particle position, which is normal to the plane of the 

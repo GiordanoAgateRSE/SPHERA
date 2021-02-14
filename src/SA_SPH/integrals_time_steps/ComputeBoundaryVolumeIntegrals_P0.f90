@@ -95,7 +95,7 @@ do ipk=1,BITrows
       tsegnato = LocPi(3) / (LocPi(3) - LocPj(3))
       PXLoc(:) = LocPi(:) + (LocPj(:) - LocPi(:)) * tsegnato
       PXLoc(3) = zero
-      call LocalNormalCoordinates (PXLoc, csi, iface)
+      call LocalNormalCoordinates(PXLoc,csi,iface)
       fkod = BoundaryFace(iface)%nodes - 2
       if (IsPointInternal(fkod,csi)) then    
 ! "PX" belongs to the face. Thus, Pj contributes to the boundary integral
@@ -142,7 +142,7 @@ IntGWrRdV(3,2) = IntGWrRdV(2,3)
 if (LocPi(3)==zpmin) then
    PXLoc(:) = LocPi(:)
    PXLoc(3) = zero
-   call LocalNormalCoordinates (PXLoc, csi, iface)
+   call LocalNormalCoordinates(PXLoc,csi,iface)
    fkod = BoundaryFace(iface)%nodes - 2
    if (IsPointInternal(fkod,csi)) then    
 ! The particle projection belongs to the face

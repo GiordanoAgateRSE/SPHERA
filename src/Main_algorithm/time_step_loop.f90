@@ -311,24 +311,12 @@ TIME_STEP_DO: do while (it<=input_any_t%itmax)
                call start_and_stop(3,11)
             endif
       endif
-! Continuity equation
-! Erosion criterion + continuity equation RHS 
       call start_and_stop(2,12)
       if (Granular_flows_options%KTGF_config>0) then  
-         if (Domain%time_split==1) then
-            call KTGF_update
-            call liquid_particle_ID_array
-         endif
-! To compute the second invariant of the strain-rate tensor and density 
-! derivatives
-         call Continuity_Equation
-         else 
-! No erosion criterion  
-! To compute the second invariant of the strain-rate tensor and density 
-! derivatives
-            call Continuity_Equation
-            if (Domain%time_split==1) call liquid_particle_ID_array
+         if (Domain%time_split==1) call KTGF_update
       endif
+      if (Domain%time_split==1) call liquid_particle_ID_array
+      call Continuity_Equation
       if ((Domain%time_stage==1).or.(Domain%time_split==1)) then
          pg(:)%koddens = 0
       endif
