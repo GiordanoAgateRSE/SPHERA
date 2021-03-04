@@ -356,7 +356,8 @@ if (nag>0) then
                              Domain%t_pre_iter) * 1.d0) / (3600.0d0)  
       if (time_elapsed_tot_est<0.d0) time_elapsed_tot_est =                    &
          time_elapsed_tot_est + 366.d0 * 24.d0 * 60.d0 * 60.d0   
-      write(ulog,'(a,g12.5,a,g12.5,a)') "Elapsed time: ",time_elapsed_tot_est, &
+      write(ulog,'(a,3(ES15.6,a))') "Elapsed time: ",                          &
+         time_elapsed_tot_est*3600.d0," s = ",time_elapsed_tot_est,            &
          " hours = ",time_elapsed_tot_est/24.d0," days."
       time_elapsed_tot_est = ((Domain%t_pre_iter-Domain%t0) +                  &
                              (machine_Julian_day * 24 * 60 * 60 + machine_hour &
