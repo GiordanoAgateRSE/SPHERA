@@ -29,6 +29,7 @@ subroutine Gest_Input
 use I_O_file_module
 use Static_allocation_module
 use Dynamic_allocation_module
+use Hybrid_allocation_module
 use I_O_diagnostic_module
 !------------------------
 ! Declarations
@@ -490,7 +491,7 @@ if (.not.restart) then
          endif
       endif
       if (Domain%RKscheme>1) then
-         if (Domain%tipo=="semi") then   
+         if (Domain%tipo=="semi") then
            allocate(ts0_pg(PARTICLEBUFFER),stat=ier)  
            else
               call diagnostic(arg1=10,arg2=5,arg3=nomsub)

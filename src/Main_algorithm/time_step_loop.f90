@@ -39,11 +39,12 @@ logical :: done_flag,IC_removal_flag
 #ifdef SPACE_3D
    logical :: BC_zmax_flag
 #endif
-integer(4) :: it,it_print,it_memo,it_rest,num_out
+integer(4) :: it,it_print,it_memo,it_rest,num_out,npi
 #ifdef SPACE_3D
-   integer(4) :: i_zone
+   integer(4) :: i_zone,Ncbf_Max
 #endif
 double precision :: dt_previous_step,dtvel
+character(len=lencard) :: nomsub = "time_step_loop"
 integer(4),external :: CellNumber
 !------------------------
 ! Explicit interfaces
@@ -316,11 +317,37 @@ TIME_STEP_DO: do while (it<=input_any_t%itmax)
          if (Domain%time_split==1) call KTGF_update
       endif
       if (Domain%time_split==1) call liquid_particle_ID_array
-      call Continuity_Equation
-      if ((Domain%time_stage==1).or.(Domain%time_split==1)) then
-         pg(:)%koddens = 0
-      endif
-      if (Domain%tipo=="semi") call SASPH_continuity
+#ifdef SPACE_3D
+      Ncbf_Max = 0
+#endif
+! Loop over all the active particles
+!$omp parallel do default(none)                                                &
+!$omp shared(nag,pg,Domain)                                                    &
+#ifdef SPACE_3D
+!$omp shared(Ncbf_Max)                                                         &
+#endif
+!$omp private(npi)
+      do npi=1,nag
+         call Continuity_Equation(npi)
+         if ((Domain%time_stage==1).or.(Domain%time_split==1)) then
+            pg(npi)%koddens = 0
+         endif
+         if ((pg(npi)%state=="flu").and.(Domain%tipo=="semi")) then
+            call SASPH_continuity(npi                                          &
+#ifdef SPACE_3D
+                  ,Ncbf_Max                                                    &
+#endif
+               )
+         endif
+      enddo
+!$omp end parallel do
+#ifdef SPACE_3D
+         if (Ncbf_Max>input_any_t%MAXCLOSEBOUNDFACES) then
+            write(ulog,"(2a,i5,a,i5)") "Increase parameter MAXCLOSEBOUNDFACES",&
+               " from ",input_any_t%MAXCLOSEBOUNDFACES," to ",Ncbf_Max
+            call diagnostic(arg1=9,arg2=4,arg3=nomsub)
+         endif
+#endif
       call start_and_stop(3,12)
       call start_and_stop(2,19)
       if (n_bodies>0) call body_particles_to_continuity
