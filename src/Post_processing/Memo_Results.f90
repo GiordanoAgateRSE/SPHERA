@@ -93,11 +93,12 @@ if (index(str,'inizio')/=0) then
 #endif
    if (NumTratti>0) write(nres) Tratto(1:NumTratti)
    do i_zone=1,NPartZone
+      size_aux = 0
+#ifdef SPACE_3D
       if (allocated(Partz(i_zone)%BC_zmax_vertices)) then
          size_aux = size(Partz(i_zone)%BC_zmax_vertices,1)
-         else
-            size_aux = 0
       endif
+#endif
       write(nres) size_aux
       write(nres) Partz(i_zone)%DBSPH_fictitious_reservoir_flag,               &
          Partz(i_zone)%ipool,Partz(i_zone)%icol,                               &
