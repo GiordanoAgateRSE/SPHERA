@@ -214,6 +214,7 @@ if ((it_rest==it).or.(index(str,'inizio')/=0).or.(index(str,'fine')/=0)) then
          " time: ",simulation_time
       write(ulog,'(a)')                                                        &
       " --------------------------------------------------------------------"
+      call system("cp -p *.ris restart_tjob_0.ris0")
    endif
    elseif (it_memo==it) then
 ! If restartcode=0, then to save "pg" only for visualizations
@@ -231,6 +232,7 @@ if ((it_rest==it).or.(index(str,'inizio')/=0).or.(index(str,'fine')/=0)) then
             simulation_time
          write(ulog,'(a)')                                                     &
             " --------------------------------------------------------"
+         call system("cp -p *.ris restart_tjob_0.ris0")
       endif
 endif
 !------------------------
