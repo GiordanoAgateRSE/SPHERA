@@ -44,6 +44,8 @@ double precision :: coeff,secinv,nupa,nu,modderveln,moddervelt,moddervel
 double precision :: dvtdn,denorm,rij_su_h,ke_coef,kacl_coef,rij_su_h_quad
 double precision :: rijtemp,rijtemp2,numx
 double precision :: gradmod,gradmodwacl,wu,denom,absv_pres_grav_inner
+double precision, dimension(3,3) :: Binv
+double precision :: gac_gradk(3), gac_gradk_n(3)
 double precision :: absv_Morris_inner,Morris_inner_weigth,kernel_der
 double precision :: dervel(3),dervelmorr(3),appopres(3),appodiss(3),rvw(3)
 double precision :: rvwalfa(3),rvwbeta(3),ragtemp(3),rvw_sum(3),rvw_semi_part(3)
@@ -82,6 +84,7 @@ rvw_sum(:) = zero
 DBSPH_wall_she_vis_term(:) = 0.d0
 t_visc_semi_part(:) = 0.d0
 Morris_inner_weigth = 0.d0
+Binv(:,:)=zero
 !------------------------
 ! Statements
 !------------------------
@@ -96,6 +99,10 @@ if (Domain%Slip) then
                * pg(npj)%zer(2) + rag(3,npartint) * pg(npj)%zer(3)))
       deltan = min(deltan,denorm)
    enddo
+endif
+! Kernel renormalization procedure
+if (input_any_t%ren == 1) then
+   call renorm_k(npi,Binv)
 endif
 do contj=1,nPartIntorno(npi)
    npartint = (npi - 1) * NMAXPARTJ + contj
@@ -198,9 +205,17 @@ do contj=1,nPartIntorno(npi)
    endif
    if (Domain%tipo=="semi") then
       if (Granular_flows_options%KTGF_config/=1) then
-         appopres(:) = ( - amassj * alpha * rag(:,npartint) *                  &
-                       PartKernel(3,npartint) )
+         if (input_any_t%ren == 1 ) then
+            gac_gradk(:) = zero
+            gac_gradk_n(:) = zero
+            gac_gradk(:)=-PartKernel(3,npartint)*rag(:,npartint)
+            call MatrixProduct(Binv(:,:),gac_gradk(:),gac_gradk_n(:),3,3,1) 
+            appopres(:) = ( amassj * alpha * gac_gradk_n(:) )
          else
+            appopres(:) = ( - amassj * alpha * rag(:,npartint) *               &
+                       PartKernel(3,npartint) )
+         endif 
+      else
             appopres(:) = ( - amassj / rhoj * alpha * rag(:,npartint) *        &
                           PartKernel(3,npartint) )
       endif

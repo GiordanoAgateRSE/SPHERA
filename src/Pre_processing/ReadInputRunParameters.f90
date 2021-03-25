@@ -37,7 +37,8 @@ character(1) :: comment
 character(len=lencard) :: ainp
 integer(4) :: itmax
 double precision :: tmax,CFL,TetaP,TetaV,COEFNMAXPARTJ,COEFNMAXPARTI,vsc_coeff
-integer(4) :: ioerr,time_split,RKscheme,body_part_reorder
+integer(4) :: ioerr,time_split,RKscheme,body_part_reorder,ren
+double precision :: Btol
 #ifdef SPACE_3D
 integer(4) :: MAXCLOSEBOUNDFACES,MAXNUMCONVEXEDGES,GCBFVecDim_loc,nag_aux
 #endif
@@ -103,6 +104,10 @@ do while (trim(lcase(ainp))/="##### end run parameters #####")
    read (ainp,*,iostat=ioerr) COEFNMAXPARTI,COEFNMAXPARTJ,body_part_reorder
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"COEFNMAXPARTI and COEFNMAXPARTJ ",&
       ninp,ulog)) return
+!read renormalization parameters
+   call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+   read (ainp,*,iostat=ioerr) ren,Btol
+   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"ren and Btol ",ninp,ulog)) return
 #ifdef SPACE_3D
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
       read (ainp,*,iostat=ioerr) nag_aux,MAXCLOSEBOUNDFACES,MAXNUMCONVEXEDGES, &
@@ -126,6 +131,8 @@ if (input_second_read.eqv..true.) then
    input_any_t%CFL = CFL
    input_any_t%vsc_coeff = vsc_coeff
    Domain%time_split = time_split
+   input_any_t%ren = ren
+   input_any_t%Btol = Btol
    if (time_split==1) then
       Domain%RKscheme = 1
       else
@@ -185,6 +192,10 @@ if (input_second_read.eqv..true.) then
          input_any_t%COEFNMAXPARTJ
       write(ulog,"(1x,a,1p,i1)")    "body_part_reorder          : ",           &
          input_any_t%body_part_reorder
+      write(ulog,"(1x,a,1p,i1)")    "ren                        : ",           &
+         input_any_t%ren
+      write(ulog,"(1x,a,1p,e12.4)") "Btol                       : ",           &
+         input_any_t%Btol
 #ifdef SPACE_3D
       write(ulog,"(1x,a,1p,i12)")   "NAG_AUX                    : ",           &
          Domain%nag_aux

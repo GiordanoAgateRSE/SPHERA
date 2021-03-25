@@ -102,6 +102,8 @@ type input_any_time_der_type
 ! Maximum number of convex edges
    integer(4) :: MAXNUMCONVEXEDGES
 #endif
+! renormalization flag
+   integer(4) :: ren
 ! h/dx, h=dx*trunc
    double precision :: trunc
 ! Maximum physical time                                           
@@ -128,6 +130,8 @@ type input_any_time_der_type
 ! Output time step for water depth
    double precision :: depth_dt_out
    character(1) :: Psurf
+!renormalization tollerance
+   double precision :: Btol
 end type input_any_time_der_type
 
 ! Background positioning grid 

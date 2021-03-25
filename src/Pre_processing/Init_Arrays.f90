@@ -233,6 +233,8 @@ input_any_t%memo_fr = zero
 input_any_t%cpoi_fr = zero
 input_any_t%pllb_fr = zero
 input_any_t%Psurf = " "
+input_any_t%ren = zero
+input_any_t%Btol = zero
 !------------------------
 ! Statements
 !------------------------
