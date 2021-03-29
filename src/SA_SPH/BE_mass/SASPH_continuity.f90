@@ -25,8 +25,8 @@
 subroutine SASPH_continuity(npi                                                &
 #ifdef SPACE_3D
                                ,Ncbf_Max                                       &
-                            )
 #endif
+                            )
 !------------------------
 ! Modules
 !------------------------
