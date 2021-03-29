@@ -44,7 +44,9 @@ integer(4) :: it,it_print,it_memo,it_rest,num_out,npi
    integer(4) :: i_zone,Ncbf_Max
 #endif
 double precision :: dt_previous_step,dtvel
-character(len=lencard) :: nomsub = "time_step_loop"
+#ifdef SPACE_3D
+   character(len=lencard) :: nomsub = "time_step_loop"
+#endif
 integer(4),external :: CellNumber
 !------------------------
 ! Explicit interfaces
