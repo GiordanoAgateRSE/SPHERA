@@ -47,8 +47,6 @@
 !    parallelepiped domain as a "contour" and the "fictitious air reservoirs" 
 ![?] The SA-SPH boundary treatment scheme requires the vertices of the wall 
 !    frontiers
-![?] In the absence of a declared origin, the first vertex is fictitious, and 
-!    does not belong to any boundary (only useful for Paraview)
 ![?] At least one SA-SPH frontier is requested to define the edges of the 
 !    numerical domain. This frontier is possibly fictitious and does not 
 !    interact with the SPH particles.
