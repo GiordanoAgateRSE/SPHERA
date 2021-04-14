@@ -120,7 +120,7 @@ ___ ___ ___
 !    of faces times the number of the positioning grid cells, further, reducing 
 !    "GCBFVecDim" does not imply any appreciable variation in the computational
 !    time). The positioning grid is made of cubes whose side length is 2h. Its 
-!    input value is read and then updated during the Iniitial Condition setting.
+!    input value is read and then updated during the Initial Condition setting.
 !    In case of restart, this quantity has to be read from the restart file.
 !-------------------------------------------------------------------------------
 ![*] <nag_aux> <MAXCLOSEBOUNDFACES> <MAXNUMCONVEXEDGES> <GCBFVecDim>
