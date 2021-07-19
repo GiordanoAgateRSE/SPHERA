@@ -1,0 +1,10 @@
+name = "sphera"
+version = "9.0.0"
+license = "GPL-3.0"
+author = "AndreaAmicarelliRSE"
+copyright = "Copyright (c) 2016-2021, sphera contributors"
+
+[[executable]]
+name = "sphera"
+source-dir = "src/Main_algorithm"
+main = "sphera.f90"
