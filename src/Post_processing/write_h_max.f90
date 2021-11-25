@@ -25,7 +25,7 @@
 !              as input data (only in 3D; two variants -hu, hf- based either on 
 !              the unfiltered -Zu- or filtered -Zf- free surface height). Same  
 !              task for the 2D field of the maximum (over time) specific flow 
-!              rates.              
+!              rates.
 !-------------------------------------------------------------------------------
 #ifdef SPACE_3D
 subroutine write_h_max
@@ -60,9 +60,8 @@ integer(4),external :: ParticleCellNumber
 ! h_max .txt files: creation and headings 
 write(nomefile_h_max,"(a,a)") nomecaso(1:len_trim(nomecaso)),"_h_max_q_max.txt"
 open(ncpt,file=nomefile_h_max,status="unknown",form="formatted")
-write(ncpt,*) "Maximum water depth (m) and specific flow rate (m^2/s)"
 write(ncpt,'(8(a))') "           x(m)","           y(m)","      hu_max(m)",    &
-   "      hf_max(m)","Zu_fluid_max(m)","Zf_fluid_max(m)","     z_topog(m)",    &
+   "      hf_max(m)","Zu_flu_max(m)","Zf_flu_max(m)","     z_topog(m)",        &
    "   q_max(m^2/s)"
 flush(ncpt) 
 do i_zone=1,NPartZone
