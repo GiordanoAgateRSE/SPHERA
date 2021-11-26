@@ -68,7 +68,8 @@ endif
 if (nres>0) then
    call Memo_Results(it_eff,it_memo,it_rest,dtvel,'loop__')
 endif
-! Computing variables at the monitoring points
+! Post-processing time series for: monitoring points, monitoring lines (but the 
+! free surface), body dynamics, DB-SPH elements.
 call CalcVarp
 if (Domain%icpoi_fr>0) then
    if ((mod(it,Domain%icpoi_fr)==0).and.npointst>0) then
@@ -101,6 +102,7 @@ if (Domain%icpoi_fr>0) then
 !$omp end parallel do
       endif
 endif
+! Post-processing for the time series of the free-surface
 if (Domain%ipllb_fr>0) then
    if ((mod(it,Domain%ipllb_fr)==0).and.nlines>0) then
       call calc_pelo

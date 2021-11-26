@@ -51,8 +51,11 @@
 !    <dt_restart>=<dt_out_PV>
 ![?] <log_file_frequency>: log file writing time step in terms of time step 
 !    number
-![?] <dt_out_mon>: writing time step for monitoring elements
-![?] <dt_out_FS>: writing time step for free surface post-processing
+![?] <dt_out_mon>: writing time step for the time series of: monitoring points, 
+!    monitoring lines (but the free surface height), body dynamics, DB-SPH 
+!    elements
+![?] <dt_out_FS>: writing time step for the time series of the free surface 
+!    height
 ![?] <dt_out_depth>: writing time step for 2D fields of water depth (h) and 
 !    specific flow rate components (q_x=u_m*h, q_y=v_m*h).
 !-------------------------------------------------------------------------------
