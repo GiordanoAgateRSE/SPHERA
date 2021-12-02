@@ -191,6 +191,7 @@ if ((it_rest==it).or.(index(str,'inizio')/=0).or.(index(str,'fine')/=0)) then
       if (allocated(Z_fluid_max)) write(nres)                                  &
          Z_fluid_max(1:Grid%ncd(1)*Grid%ncd(2),1:2)
       if (allocated(q_max)) write(nres) q_max(1:size(q_max))
+      if (allocated(U_max)) write(nres) U_max(1:size(U_max))
    if (allocated(substations%sub)) then
       write(nres) substations%sub(1:substations%n_sub)%POS_fsum(1),            &
          substations%sub(1:substations%n_sub)%POS_fsum(2)

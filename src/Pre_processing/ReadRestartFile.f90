@@ -277,6 +277,20 @@ Partz(i_zone)%plan_reservoir_points,Partz(i_zone)%ID_first_vertex_sel,         &
                      'completed.'
             endif
          endif
+! Allocation of the array of the maximum depth-averaged speed
+         if (.not.allocated(U_max)) then
+            allocate(U_max(n_vertices_main_wall),STAT=alloc_stat)
+            if (alloc_stat/=0) then
+               write(ulog,*)                                                   &
+               'Allocation of U_max in ReadRestartFile failed;',               &
+               ' the program terminates here.'
+               stop
+               else
+                  write(ulog,*)                                                &
+                     'Allocation of U_max in ReadRestartFile successfully ',   &
+                     'completed.'
+            endif
+         endif
       endif
 #endif
 ! Allocation of the 2D array of the minimum saturation flag (bed-load transport)
@@ -363,6 +377,11 @@ Partz(i_zone)%plan_reservoir_points,Partz(i_zone)%ID_first_vertex_sel,         &
                         if (.not.ReadCheck(ioerr,ier,it_start,ainp,"q_max",    &
                            nsav,ulog)) return
                      endif
+                     if (allocated(U_max)) then
+                        read(nsav,iostat=ioerr)
+                        if (.not.ReadCheck(ioerr,ier,it_start,ainp,"U_max",    &
+                           nsav,ulog)) return
+                     endif
                   if (allocated(substations%sub)) then
                      read(nsav,iostat=ioerr)
                      if (.not.ReadCheck(ioerr,ier,it_start,ainp,               &
@@ -441,6 +460,11 @@ body_arr(i)%body_kinematics(1:body_arr(i)%n_records,1:7)
                         if (allocated(q_max)) then
                            read(nsav,iostat=ioerr) q_max(1:size(q_max))
                            if (.not.ReadCheck(ioerr,ier,it_start,ainp,"q_max", &
+                              nsav,ulog)) return
+                        endif
+                        if (allocated(U_max)) then
+                           read(nsav,iostat=ioerr) U_max(1:size(U_max))
+                           if (.not.ReadCheck(ioerr,ier,it_start,ainp,"U_max", &
                               nsav,ulog)) return
                         endif
                      if (allocated(substations%sub)) then
@@ -559,6 +583,11 @@ body_arr(i)%body_kinematics(1:body_arr(i)%n_records,1:7)
                            if (.not.ReadCheck(ioerr,ier,it_start,ainp,"q_max", &
                               nsav,ulog)) return
                         endif
+                        if (allocated(U_max)) then
+                           read(nsav,iostat=ioerr)
+                           if (.not.ReadCheck(ioerr,ier,it_start,ainp,"U_max", &
+                              nsav,ulog)) return
+                        endif
                      if (allocated(substations%sub)) then
                         read(nsav,iostat=ioerr)
                         if (.not.ReadCheck(ioerr,ier,it_start,ainp,            &
@@ -640,6 +669,11 @@ body_arr(i)%body_kinematics(1:body_arr(i)%n_records,1:7)
                               if (.not.ReadCheck(ioerr,ier,it_start,ainp,      &
                                  "q_max",nsav,ulog)) return
                            endif
+                           if (allocated(U_max)) then
+                              read(nsav,iostat=ioerr) U_max(1:size(U_max))
+                              if (.not.ReadCheck(ioerr,ier,it_start,ainp,      &
+                                 "U_max",nsav,ulog)) return
+                           endif
                         if (allocated(substations%sub)) then
                            read(nsav,iostat=ioerr)                             &
                               substations%sub(1:substations%n_sub)%POS_fsum(1),&
@@ -700,7 +734,7 @@ if (allocated(Granular_flows_options%minimum_saturation_flag)) then
                            write(uerr,'(a)') " The program is terminated."
                            flush(uerr)
                            stop
-                  endif 
+                  endif
                   return
                endif
             enddo

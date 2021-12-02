@@ -174,6 +174,9 @@ integer(4),dimension(:,:,:),allocatable :: ind_interfaces
 ! Only in 3D: the 2D array of the maximum values of the specific flow rate (at 
 ! the nodes of the topographic grid columns)
 real(kind=kind(1.d0)),dimension(:),allocatable :: q_max
+! Only in 3D: the 2D array of the maximum values of the depth-averaged speed 
+! (at the nodes of the topographic grid columns)
+real(kind=kind(1.d0)),dimension(:),allocatable :: U_max
 ! Only in 3D: the 2D array of the maximum values of the fluid particle heights
 ! (at the nodes of the positioning grid columns). The first element (second 
 ! dimension) is the raw height, the second element (second dimension) is the 

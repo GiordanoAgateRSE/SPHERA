@@ -46,6 +46,7 @@ logical :: fluid_below_flag
 integer(4),intent(in) :: print_flag
 integer(4) :: npi,GridColumn,i_zone,i_vertex,i_aux,i_grid,j_grid,aux_integer
 integer(4) :: alloc_stat,dealloc_stat,i_cell
+double precision :: q_step,U_step,eps
 double precision :: pos(3)
 logical,allocatable,dimension(:) :: compact_fluid
 double precision,allocatable,dimension(:) :: h_filt_step,h_step,qx_step
@@ -141,13 +142,14 @@ endif
 !------------------------
 ! Initializations
 !------------------------
+eps = 1.d-3
 Z_fluid_step(:,:) = -999.d0
 h_filt_step(:) = 0.d0
 h_step(:) = 0.d0
 qx_step(:) = 0.d0
 qy_step(:) = 0.d0
 qx_step_grid(:) = 0.d0
-qy_step_grid(:) = 0.d0 
+qy_step_grid(:) = 0.d0
 n_part_step(:) = 0
 compact_fluid(:) = .false.
 !------------------------
@@ -204,10 +206,10 @@ do npi=1,nag
                                       (pg(npi)%coord(3) + 0.5d0 * Domain%dx))
       Z_fluid_max(GridColumn,2) = max(Z_fluid_max(GridColumn,2),               &
                                   (pg(npi)%coord(3) + 0.5d0 * Domain%dx))
+      qx_step_grid(GridColumn) = qx_step_grid(GridColumn) + pg(npi)%vel(1)
+      qy_step_grid(GridColumn) = qy_step_grid(GridColumn) + pg(npi)%vel(2)
+      n_part_step(GridColumn) = n_part_step(GridColumn) + 1
    endif
-   qx_step_grid(GridColumn) = qx_step_grid(GridColumn) + pg(npi)%vel(1)
-   qy_step_grid(GridColumn) = qy_step_grid(GridColumn) + pg(npi)%vel(2)
-   n_part_step(GridColumn) = n_part_step(GridColumn) + 1
 enddo
 !$omp end parallel do
 !$omp parallel do default(none)                                                &
@@ -215,7 +217,8 @@ enddo
 !$omp private(GridColumn,pos,i_grid,j_grid)
 do i_grid=1,Grid%ncd(1)
    do j_grid=1,Grid%ncd(2)
-! To compute "qx_step_grid" and "qy_step_grid"
+! To compute "qx_step_grid" and "qy_step_grid" (at this stage they are 
+! depth-averaged velocity components)
       pos(1) = (i_grid - 0.5) * Grid%dcd(1) + Grid%extr(1,1)
       pos(2) = (j_grid - 0.5) * Grid%dcd(2) + Grid%extr(2,1)
       pos(3) = Grid%extr(3,1) + 1.d-7
@@ -254,9 +257,9 @@ if (on_going_time_step==1) then
          if (Partz(i_zone)%ID_first_vertex_sel>0) then
 !$omp parallel do default(none)                                                &
 !$omp shared(ncpt,Partz,Vertice,Grid,h_filt_step,h_step,Z_fluid_step,i_zone)   &
-!$omp shared(qx_step,qy_step,qx_step_grid,qy_step_grid,n_part_step,q_max)      &
-!$omp shared(print_flag)                                                       &
-!$omp private(i_vertex,GridColumn,pos,i_aux)
+!$omp shared(qx_step,qy_step,qx_step_grid,qy_step_grid,q_max,U_max)            &
+!$omp shared(print_flag,eps)                                                   &
+!$omp private(i_vertex,GridColumn,pos,i_aux,q_step,U_step)
             do i_vertex=Partz(i_zone)%ID_first_vertex_sel,                     &
                Partz(i_zone)%ID_last_vertex_sel
                i_aux = i_vertex - Partz(i_zone)%ID_first_vertex_sel + 1 
@@ -270,11 +273,20 @@ if (on_going_time_step==1) then
                                Vertice(3,i_vertex)),0.d0)
                qx_step(i_aux) = qx_step_grid(GridColumn)
                qy_step(i_aux) = qy_step_grid(GridColumn)
-               if (qx_step_grid(GridColumn)/=-999.d0) then
-                  qx_step(i_aux) = qx_step_grid(GridColumn) * h_step(i_aux)
-                  qy_step(i_aux) = qy_step_grid(GridColumn) * h_step(i_aux)
-                  q_max(i_aux) = max(q_max(i_aux),dsqrt(qx_step(i_aux) ** 2 +  &
-                                 qy_step(i_aux) ** 2))
+               if (h_filt_step(i_aux)>=eps) then
+! The column is wet above the topographic surface
+! Here "qx_step" and "qy_step" become specific flow rate components
+                  qx_step(i_aux) = qx_step_grid(GridColumn) * h_filt_step(i_aux)
+                  qy_step(i_aux) = qy_step_grid(GridColumn) * h_filt_step(i_aux)
+                  q_step = dsqrt(qx_step(i_aux) ** 2 + qy_step(i_aux) ** 2)
+                  q_max(i_aux) = max(q_max(i_aux),q_step)
+                  U_step = q_step / h_filt_step(i_aux)
+                  U_max(i_aux) = max(U_max(i_aux),U_step)
+                  else
+! To zero the current components of the specific flow rate in case the column 
+! is wet only below the topographic surface
+                     qx_step(i_aux) = 0.d0
+                     qy_step(i_aux) = 0.d0
                endif
                if (print_flag==1) then
 !$omp critical (omp_write_h_step)
