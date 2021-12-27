@@ -52,7 +52,7 @@ double precision :: GradNpsuro,IntWd1s0,IntWd1s2,IntWd3s0,DvelN,viscN
 double precision :: GravN,PressB,distpi,distpimin,pressib,pressibmin
 double precision :: QiiIntWdS,level,pressj,Qsi,Qsj,velix,veliz,veliq,hcrit
 double precision :: hcritmin,zbottom,FlowRate1,Lb,L,minquotanode,maxquotanode
-double precision :: SomQsiQsj,DiffQsiQsj
+double precision :: SomQsiQsj,DiffQsiQsj,d_50
 integer(4),dimension(1:PLANEDIM) :: acix
 double precision,dimension(1:PLANEDIM) :: RHS,RG,ss,nnlocal,gradbPsuro
 double precision,dimension(1:PLANEDIM) :: ViscoMon,ViscoShear,sidevel,TT,Dvel
@@ -62,6 +62,14 @@ character(4):: strtype
 !------------------------
 ! Explicit interfaces
 !------------------------
+interface
+   subroutine wall_function_for_SASPH(u_t_0,d_50,r_0w,slip_coefficient_0w,     &
+      ni_T_0w)
+      implicit none
+         double precision,intent(in) :: u_t_0,d_50,r_0w
+         double precision,intent(out) :: slip_coefficient_0w,ni_T_0w
+   end subroutine wall_function_for_SASPH
+end interface
 !------------------------
 ! Allocations
 !------------------------
@@ -276,8 +284,8 @@ do icbs=1,IntNcbs
 ! Particle tangential (relative) velocity (absolute value)
                u_t_0 = dsqrt(dot_product(u_t_0_vector(:),u_t_0_vector(:)))
 ! To assess the slip coefficient and the turbulent viscosity
-               call wall_function_for_SASPH(u_t_0,                             &
-                  Partz(Tratto(sidestr)%zone)%BC_shear_stress_input,           &
+               d_50 = Partz(Tratto(sidestr)%zone)%BC_shear_stress_input * 10.d0
+               call wall_function_for_SASPH(u_t_0,d_50,                        &
                   BoundaryDataTab(ibdp)%LocXYZ(2),slip_coefficient,cinvisci)
                if (slip_coefficient>1.d-12) then
 !$omp critical (avg_slip_coefficient_2D)         

@@ -60,7 +60,7 @@ call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"Substations DATA",ninp,ulog)) return
 do while (trim(lcase(ainp))/="##### end substations #####")
 ! Reading the number of substations and their writing time step
-   read (ainp,*,iostat=ioerr) n_sub,dt_out
+   read(ainp,*,iostat=ioerr) n_sub,dt_out
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"Substations GENERAL INPUT",ninp,  &
       ulog)) return
 ! Writing the number of substations and the writing time step on the log file
@@ -100,35 +100,35 @@ do while (trim(lcase(ainp))/="##### end substations #####")
    do i=1,n_sub
 ! Reading the substation variables
       call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-      read (ainp,*,iostat=ioerr) substation_ID
+      read(ainp,*,iostat=ioerr) substation_ID
       if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"substation_ID",ninp,ulog))     &
          return
       call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-      read (ainp,*,iostat=ioerr) type_ID,n_vertices
+      read(ainp,*,iostat=ioerr) type_ID,n_vertices
       if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"type_ID,n_vertices",ninp,ulog))&
          return
       call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-      read (ainp,*,iostat=ioerr) vertex(1,1),vertex(1,2)
+      read(ainp,*,iostat=ioerr) vertex(1,1),vertex(1,2)
       if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"vertex_1",ninp,ulog)) return
       call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-      read (ainp,*,iostat=ioerr) vertex(2,1),vertex(2,2)
+      read(ainp,*,iostat=ioerr) vertex(2,1),vertex(2,2)
       if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"vertex_2",ninp,ulog)) return
       call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-      read (ainp,*,iostat=ioerr) vertex(3,1),vertex(3,2)
+      read(ainp,*,iostat=ioerr) vertex(3,1),vertex(3,2)
       if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"vertex_3",ninp,ulog)) return
       if (n_vertices>3) then
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         read (ainp,*,iostat=ioerr) vertex(4,1),vertex(4,2)
+         read(ainp,*,iostat=ioerr) vertex(4,1),vertex(4,2)
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"vertex_4",ninp,ulog)) return           
       endif
       if (n_vertices>4) then
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         read (ainp,*,iostat=ioerr) vertex(5,1),vertex(5,2)
+         read(ainp,*,iostat=ioerr) vertex(5,1),vertex(5,2)
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"vertex_5",ninp,ulog)) return           
       endif
       if (n_vertices>5) then
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         read (ainp,*,iostat=ioerr) vertex(6,1),vertex(6,2)
+         read(ainp,*,iostat=ioerr) vertex(6,1),vertex(6,2)
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"vertex_6",ninp,ulog)) return           
       endif
 ! Assignation to the substation variables

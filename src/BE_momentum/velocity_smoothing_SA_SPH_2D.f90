@@ -36,7 +36,7 @@ use Dynamic_allocation_module
 implicit none
 integer(4),intent(in) :: npi
 integer(4) :: i,icbs,Ncbs,IntNcbs,ibdt,ibdp,iside,sidestr
-double precision :: IntWdV,u_t_0,slip_coefficient,aux_scalar
+double precision :: IntWdV,u_t_0,slip_coefficient,aux_scalar,d_50
 integer(4),dimension(1:PLANEDIM) :: acix
 double precision,dimension(1:PLANEDIM) :: sss,nnn,DVLoc,DVGlo,BCLoc,BCGlo
 double precision,dimension(1:SPACEDIM) :: u_t_0_vector
@@ -44,6 +44,14 @@ character(4) :: strtype
 !------------------------
 ! Explicit interfaces
 !------------------------
+interface
+   subroutine wall_function_for_SASPH(u_t_0,d_50,r_0w,slip_coefficient_0w,     &
+      ni_T_0w)
+      implicit none
+         double precision,intent(in) :: u_t_0,d_50,r_0w
+         double precision,intent(out) :: slip_coefficient_0w,ni_T_0w
+   end subroutine wall_function_for_SASPH
+end interface
 !------------------------
 ! Allocations
 !------------------------
@@ -92,8 +100,8 @@ if (IntNcbs>0) then
 ! Particle tangential (relative) velocity (absolute value)
                u_t_0 = dsqrt(dot_product(u_t_0_vector(:),u_t_0_vector(:)))
 ! To assess the slip coefficient
-               call wall_function_for_SASPH(u_t_0,                             &
-                  Partz(Tratto(sidestr)%zone)%BC_shear_stress_input,           &
+               d_50 = Partz(Tratto(sidestr)%zone)%BC_shear_stress_input * 10.d0
+               call wall_function_for_SASPH(u_t_0,d_50,                        &
                   BoundaryDataTab(ibdp)%LocXYZ(2),slip_coefficient,aux_scalar)
          endif
          BCLoc(1) = DVLoc(1) * IntWdV * slip_coefficient

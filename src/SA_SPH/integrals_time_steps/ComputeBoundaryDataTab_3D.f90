@@ -32,7 +32,7 @@ subroutine ComputeBoundaryDataTab_3D
 use Static_allocation_module
 use Hybrid_allocation_module
 use Dynamic_allocation_module
-use I_O_diagnostic_module
+use Memory_I_O_module
 !------------------------
 ! Declarations
 !------------------------

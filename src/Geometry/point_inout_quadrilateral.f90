@@ -75,16 +75,15 @@ call point_inout_convex_non_degenerate_polygon(point,3,point_pol_1,            &
                                                point_pol_3,point_pol_3,        &
                                                point_pol_3,test1)
 test = test1
-if (test/=1) then                                               
+if (test/=1) then
    call point_inout_convex_non_degenerate_polygon(point,3,point_pol_1,         &
                                                   point_pol_3,point_pol_4,     &
                                                   point_pol_4,point_pol_4,     &
                                                   point_pol_4,test2)
-test = test2
+   test = test2
 endif
 !------------------------
 ! Deallocations
 !------------------------
 return
 end subroutine point_inout_quadrilateral
-

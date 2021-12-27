@@ -81,7 +81,7 @@ do while (trim(lcase(ainp))/="##### end domain #####")
    endselect
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
    if (ioerr==0) read(ainp,*,iostat=ioerr) dx,trunc
-   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"DD & TRUNC",ninp,ulog)) return
+   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"dx, h/dx",ninp,ulog)) return
    Domain%dx = dx
    input_any_t%trunc = trunc
    token = lcase(GetToken(ainp,3,ioerr))
@@ -90,10 +90,19 @@ do while (trim(lcase(ainp))/="##### end domain #####")
       else
          Domain%RandomPos = 'n'
    endif
+#ifdef SPACE_3D
+   call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+   if (ioerr==0) read(ainp,*,iostat=ioerr) CLC_flag
+   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"CLC_flag",ninp,ulog))    &
+      return
+#endif
    if ((input_second_read.eqv..true.).and.(ulog>0)) then
       write(ulog,"(1x,a,1pe12.4)") "dx                     : ",dx
       write(ulog,"(1x,a,1pe12.4)") "Trunc                  : ",trunc
-      write(ulog,"(1x,a,1x,a)") "Random Initial Position: ",Domain%RandomPos
+      write(ulog,"(1x,a,1x,a)")    "Random Initial Position: ",Domain%RandomPos
+#ifdef SPACE_3D
+      write(ulog,"(1x,a,l12)")     "CLC_flag               : ",CLC_flag
+#endif
       write(ulog,"(1x,a)")  " "
    endif
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)

@@ -30,7 +30,7 @@ use I_O_file_module
 use Static_allocation_module
 use Dynamic_allocation_module
 use Hybrid_allocation_module
-use I_O_diagnostic_module
+use Memory_I_O_module
 !------------------------
 ! Declarations
 !------------------------
@@ -61,7 +61,7 @@ character(100), external :: lcase
 !------------------------
 write(ulog,'(1x,a)') ">> Input data management starts... "
 ! Array deallocation
-call Gest_Dealloc(nomsub)
+call deallocation_sequence
 ! This line seems redundant, but it is useful to distinguish between the first 
 ! and the second execution of the reading program units. "dx" is the first 
 ! variable to be read from the main input file (beyond the strings).
@@ -373,6 +373,13 @@ if (.not.restart) then
       endif
 ! The background positioning grid is generated
       call CreaGrid
+#ifdef SPACE_3D
+! z0 (CLC class)
+      if (CLC_flag.eqv..true.) then
+         call CLC_pre_processing
+         call z0_CLC
+      endif
+#endif
 ! Particles are created and initialized
 #ifdef SPACE_3D
       IC_loop = 2

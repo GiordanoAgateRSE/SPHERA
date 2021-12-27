@@ -19,52 +19,65 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: open_close_file
-! Description: File opening or closing.
+! Program unit: allocate_de_BouConEdg_r1
+! Description: Allocation/Deallocation of a generic allocatable array of 
+!              derived type TyBoundaryConvexEdge and range (number of 
+!              dimensions) 1
 !-------------------------------------------------------------------------------
-!-------------------------------------------------------------------------------
-! Further Copyright acknowledgments
-! On the SPHERA git commit associated with the first appearance of this file in 
-! SPHERA (RSE SpA): this file is copied and pasted from Grid Interpolator v.2.0 
-! (RSE SpA); the distribution of this file under the GNU-GPL license is 
-! authorized by the Copyright owner of Grid Interpolator (RSE SpA).
-!-------------------------------------------------------------------------------
-subroutine open_close_file(open_flag,file_unit,file_name,uerr)
+#ifdef SPACE_3D
+subroutine allocate_de_BouConEdg_r1(allocation_flag,array,extent_1,array_name)
 !------------------------
 ! Modules
 !------------------------
+use I_O_file_module
+use Hybrid_allocation_module
 !------------------------
 ! Declarations
 !------------------------
 implicit none
-character(100),intent(inout) :: file_name
-logical,intent(in) :: open_flag
-integer(4),intent(in) :: file_unit,uerr
-integer(4) :: open_stat
+type (TyBoundaryConvexEdge),dimension(:),allocatable,intent(inout) :: array
+logical,intent(in) :: allocation_flag
+integer(4),intent(in),optional :: extent_1
+character(100),intent(in) :: array_name
+integer(4) :: alloc_stat
 !------------------------
 ! Explicit interfaces
 !------------------------
 !------------------------
 ! Allocations
 !------------------------
+if (allocation_flag.eqv..true.) then
+   if(.not.allocated(array)) then
+      allocate(array(extent_1),STAT=alloc_stat)
+      if (alloc_stat/=0) then
+         write(uerr,*) "Allocation of ",trim(array_name),                      &
+            " failed; the execution stops here."
+         stop
+         else
+            write(ulog,*) "Allocation of ",trim(array_name),"completed."
+      endif
+   endif
 !------------------------
 ! Initializations
 !------------------------
 !------------------------
 ! Statements
 !------------------------
-if (open_flag.eqv..true.) then
-   open(file_unit,file=trim(file_name),IOSTAT=open_stat)
-   if (open_stat/=0) then
-      write(uerr,*) "Error in opening the file ",trim(file_name),              &
-         ". The program stops."
-      stop
-   endif
-   else
-      close(file_unit)
-endif
 !------------------------
 ! Deallocations
 !------------------------
+   else
+      if(allocated(array)) then
+         deallocate(array,STAT=alloc_stat)
+         if (alloc_stat/=0) then
+            write(uerr,*) "Deallocation of ",trim(array_name),                 &
+               " failed; the execution stops here."
+            stop
+            else
+               write(ulog,*) "Dellocation of ",trim(array_name),"completed."
+         endif
+      endif
+endif
 return
-end subroutine open_close_file
+end subroutine allocate_de_BouConEdg_r1
+#endif

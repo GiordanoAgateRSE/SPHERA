@@ -20,7 +20,7 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: I_O_file_module            
-! Description: Module for I/O.                     
+! Description: Module for I/O units: 11-max_file_unit_booked
 !-------------------------------------------------------------------------------
 module I_O_file_module
 ! Error unit
@@ -29,9 +29,9 @@ integer(4) :: uerr = 0
 integer(4) :: ninp = 11
 ! Log unit
 integer(4) :: ulog = 12
-! Results
+! Time-dependent restart file to write
 integer(4) :: nres = 21
-! Restart file  
+! Time-dependent restart file to read
 integer(4) :: nsav = 22
 ! Free surface
 integer(4) :: nplb = 23
@@ -41,12 +41,30 @@ integer(4) :: nfro = 24
 integer(4) :: ncpt = 25
 ! Lower fluid top height
 integer(4) :: uzlft = 26
+#ifdef SPACE_3D
+! 2D output fields
+integer(4) :: u2DO = 27
+! Monitoring sections (output)
+integer(4) :: uQse = 28
+#endif
 ! Paraview
 integer(4) :: unitvtk = 29
+! Post-processing of interfaces
+integer(4) :: uint = 30
 ! Input external file 
 integer(4) :: ninp2 = 31
 ! Dummy file
 integer(4) :: ndum = 32
+! Body dynamics time series
+integer(4) :: ubod = 33
+#ifdef SPACE_3D
+! 2D output file of CLC class and z0
+integer(4) :: uCLC = 34
+! Time-independent restart file for z0 to read
+integer(4) :: urz0 = 35
+! Time-independent restart file for z0 to write
+integer(4) :: usz0 = 36
+#endif
 ! Killer file
 integer(4) :: unitkill = 51
 ! Elapsed time
@@ -70,5 +88,7 @@ integer(4) :: unit_dbsph_se_reg = 60
 ! Substation post-processing
 integer(4) :: unit_substations = 61
 #endif
+! Do not use in this module unit file numbers larger than max_file_unit_booked: 
+! they might be assigned locally to temporary files.
 character(255), dimension(0:7) :: nomefile
 end module

@@ -502,7 +502,7 @@ type TyZone
 #endif
 ! Input variable for the boundary shear stress: 
 !    slip coefficient (if slip_coefficient_mode==1)
-!    mean diameter of the wall roughness elements (if slip_coefficient_mode==2) 
+!    wall z0 (if slip_coefficient_mode==2) 
    double precision :: BC_shear_stress_input
 ! Average computed slip coefficient
    double precision :: avg_comp_slip_coeff
@@ -856,7 +856,7 @@ type DBSPH_surf_mesh_der_type
    type(face_der_type),allocatable,dimension(:) :: faces                    
 end type 
 
-! Derived type for DB-SPH bundary treatment scheme
+! Derived type for DB-SPH boundary treatment scheme
 type DBSPH_der_type
 ! Flag to activate (or not) boundary terms for MUSCL reconstruction
    logical :: MUSCL_boundary_flag
@@ -909,7 +909,31 @@ type DBSPH_der_type
    double precision,dimension(:,:),allocatable :: outlet_sections
 ! DB-SPH surface mesh: vertices and faces  
    type(DBSPH_surf_mesh_der_type) :: surf_mesh                                                                                      
-end type 
+end type
+
+#ifdef SPACE_3D
+! Derived type for the array of the CLC polygons
+type CLC_polygon_der_type
+   integer(4) :: ID,n_vertices,n_faces,CLC_class
+! indices of the cells of the background grid along x/y direction for the 
+! lower-left and the upper-right corners of the rectangle circumscribing the 
+! CLC polygon 
+   integer(4) :: iy_cel_ll,iy_cel_ur,ix_cel_ll,ix_cel_ur
+   integer(4),dimension(:,:),allocatable :: faces
+   double precision,dimension(:,:),allocatable :: vertices
+end type
+
+! Derived type for the CLC (CORINE Land Cover) data
+type CLC_der_type
+   integer(4) :: n_polygons
+! CLC polygons
+   type(CLC_polygon_der_type),dimension(:),allocatable :: polygons
+! 2D field of the CLC class
+   integer(4),dimension(:,:),allocatable :: class_2D
+! 2D field of z0 as function of the CLC class
+   double precision,dimension(:,:),allocatable :: z0
+end type
+#endif
 
 ! Derived type declarations
 type(TyGlobal) :: Domain
@@ -920,6 +944,7 @@ type(Tytime_stage) :: ts_pgZero
 #ifdef SPACE_3D
 type(TyQ_section) :: Q_sections
 type(type_substations) :: substations
+type(CLC_der_type) :: CLC
 #endif
 type(TyGranular_flows_options) :: Granular_flows_options
 type(DBSPH_der_type) :: DBSPH

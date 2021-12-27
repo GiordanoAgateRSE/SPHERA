@@ -56,6 +56,7 @@ integer(4) :: ID_first_vertex_sel,ID_last_vertex_sel
 integer(4) :: i2,i1
 #endif
 double precision :: pool_value,velocity,valp,flowrate,BC_shear_stress_input
+double precision :: eps_sigma_z,H_sgr
 #ifdef SPACE_3D
 double precision :: dx_CartTopog,H_res
 #endif
@@ -164,14 +165,25 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                             &
             "FIXED: SLIP COEFFICIENT MODE, LAMINAR NO-SLIP CHECK",ninp,ulog))  &
             return
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         if (ioerr==0) read(ainp,*,iostat=ioerr) BC_shear_stress_input
          if (slip_coefficient_mode==1) then
-            if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"SLIP COEFFICIENT",ninp,  &
-               ulog)) return
+            call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+            if (ioerr==0) read(ainp,*,iostat=ioerr) BC_shear_stress_input
+            if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"slip_coeff_inp",ninp,    &
+                  ulog)) return
             elseif (slip_coefficient_mode==2) then
-               if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"WALL MEAN ROUGHNESS", &
-                  ninp,ulog)) return
+#ifdef SPACE_3D
+               if (.not.CLC_flag) then
+#endif
+                  call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+                  if (ioerr==0) read(ainp,*,iostat=ioerr) eps_sigma_z,H_sgr
+                  if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"eps_sigma_z,H_sgr",&
+                     ninp,ulog)) return
+! Formula for z0 based on the surface precision and sub-grid roughness
+                  BC_shear_stress_input = 2.d0 * eps_sigma_z / 5.d0 + H_sgr /  &
+                                          5.d0
+#ifdef SPACE_3D
+               endif
+#endif
          endif
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          token = GetToken(ainp,1,ioerr)
@@ -530,11 +542,17 @@ BoundaryVertex(Tratto(zone_ID)%inivertex:Tratto(zone_ID)%inivertex+Tratto(zone_I
                write(ulog,"(1x,a,i3)")   "Slip coeff. mode : ",                &
                   Partz(zone_ID)%slip_coefficient_mode
                if (slip_coefficient_mode==1) then
-                  write(ulog,"(1x,a,1pe12.4)") "Slip coeff.    : ",            &
+                  write(ulog,"(1x,a,1pe12.4)")    "Slip coeff.    : ",         &
                      Partz(zone_ID)%BC_shear_stress_input
                   elseif (slip_coefficient_mode==2) then
-                     write(ulog,"(1x,a,1pe12.4)") "Wall mean roughness:",      &
-                        Partz(zone_ID)%BC_shear_stress_input
+#ifdef SPACE_3D
+                  if (.not.CLC_flag) then
+#endif
+                        write(ulog,"(1x,a,1pe12.4)") "Wall z0        : ",      &
+                           Partz(zone_ID)%BC_shear_stress_input
+#ifdef SPACE_3D                 
+                  endif
+#endif                
                endif
          case("tapi")
 #ifdef SPACE_3D

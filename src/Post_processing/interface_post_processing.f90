@@ -56,8 +56,8 @@ write(nomefile_blt_interfaces,"(a,a,i8.8,a)") nomecaso(1:len_trim(nomecaso)),  &
 open(ncpt,file=nomefile_blt_interfaces,status="unknown",form="formatted")
 if (on_going_time_step==1) then
 ! First step
-   write(ncpt,*) "Bed load transport interfaces "
-   write(ncpt,'((7x,a),(5x,a),(5x,a),(7x,a),(7x,a),(6x,a),(6x,a),(2x,a))')    &
+   write(uint,*) "Bed load transport interfaces "
+   write(uint,'((7x,a),(5x,a),(5x,a),(7x,a),(7x,a),(6x,a),(6x,a),(2x,a))')     &
       " Time(s)"," x_grid(m)"," y_grid(m)"," z_FS(m)"," z_fm(m)"," z_bed(m)",  &
       " z_bot(m)"," z_sat_top(m)"
    flush(ncpt)

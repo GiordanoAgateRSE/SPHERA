@@ -72,9 +72,9 @@ select case (iset)
                 " at "//ct(1:2)//":"//ct(3:4)//":"//ct(5:10)//" "//zone//" GMT"
       case_data(1:12) = date_exec(1:12)
       case_hour(1:8) = date_exec(17:24)
-      read (ct(1:2),'(i2)') itime_struct%ihr
-      read (ct(3:4),'(i2)') itime_struct%imin
-      read (ct(5:6),'(i2)') itime_struct%isec
+      read(ct(1:2),'(i2)') itime_struct%ihr
+      read(ct(3:4),'(i2)') itime_struct%imin
+      read(ct(5:6),'(i2)') itime_struct%isec
 ! Reading the name of SPHERA executable file
       call getarg(0,exe_name)
       exe_name = adjustl(exe_name)

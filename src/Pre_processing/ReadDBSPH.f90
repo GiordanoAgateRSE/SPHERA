@@ -29,7 +29,7 @@ subroutine ReadDBSPH(ainp,comment,nrighe,ier,ninp,ulog)
 !------------------------
 use Static_allocation_module
 use Dynamic_allocation_module
-use I_O_diagnostic_module
+use Memory_I_O_module
 !------------------------
 ! Declarations
 !------------------------

@@ -35,7 +35,7 @@ subroutine ComputeVolumeIntegral_WdV2D(icbs,Ncbslocal,Cloboside,LocXY,         &
 use I_O_file_module
 use Static_allocation_module
 use Hybrid_allocation_module
-use I_O_diagnostic_module
+use Memory_I_O_module
 !------------------------
 ! Declarations
 !------------------------

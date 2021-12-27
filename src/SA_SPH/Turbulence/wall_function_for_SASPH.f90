@@ -48,7 +48,7 @@ double precision,intent(out) :: slip_coefficient_0w
 ! interaction
 double precision,intent(out) :: ni_T_0w
 ! Roughness length
-double precision :: z_0
+double precision :: z0
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -67,15 +67,15 @@ ni_T_0w = 1.d-15
 !------------------------
 if (r_0w<=(0.5d0*Domain%dx)) then
 ! Only the particle layer close to the boundary is selected
-   z_0 = d_50 / 10.d0
-   if (r_0w<(z_0*Nepero_number)) then
+   z0 = d_50 / 10.d0
+   if (r_0w<(z0*Nepero_number)) then
 ! Formulation with underestimation of the wall shear stress, but keeping the 
 ! slip coefficient non-larger than the unity.
       slip_coefficient_0w = 1.d0
-      ni_T_0w = (k_v ** 2) * u_t_0 * z_0 * Nepero_number
+      ni_T_0w = (k_v ** 2) * u_t_0 * z0 * Nepero_number
       else
-         slip_coefficient_0w = 1.d0 / log(r_0w / z_0)
-         ni_T_0w = (k_v ** 2) * u_t_0 * r_0w / log(r_0w / z_0)
+         slip_coefficient_0w = 1.d0 / log(r_0w / z0)
+         ni_T_0w = (k_v ** 2) * u_t_0 * r_0w / log(r_0w / z0)
    endif
 endif
 !------------------------

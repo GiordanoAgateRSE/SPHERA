@@ -61,7 +61,7 @@ do while (trim(lcase(ainp))/="##### end draw options #####")
          select case (token)
             case("any")
                token = lcase(GetToken(ainp,(3),ioerr))
-               read (token,*,iostat=ioerr) freq_time
+               read(token,*,iostat=ioerr) freq_time
                if ((input_second_read.eqv..true.).and.(ulog>0)) then
                   write(ulog,"(1x,a,1pe12.4,a)")                               &
                      "VTKConversion any :",freq_time," seconds."
@@ -69,7 +69,7 @@ do while (trim(lcase(ainp))/="##### end draw options #####")
                val_time  = zero  
             case("at")
                token = lcase(GetToken(ainp,(3),ioerr))
-               read (token,*,iostat=ioerr) freq_time
+               read(token,*,iostat=ioerr) freq_time
                if ((input_second_read.eqv..true.).and.(ulog>0)) then
                   write(ulog,"(1x,a,1pe12.4,a)")                               &
                      "VTKConversion at :",freq_time," second."
@@ -78,7 +78,7 @@ do while (trim(lcase(ainp))/="##### end draw options #####")
                   freq_time = -freq_time
             case("all")
                token = lcase(GetToken(ainp,(3),ioerr))
-               read (token,*,iostat=ioerr) steptime
+               read(token,*,iostat=ioerr) steptime
                if (steptime=='time') then
                   freq_time = input_any_t%memo_fr
                   val_time = zero  

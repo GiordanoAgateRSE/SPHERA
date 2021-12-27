@@ -80,7 +80,7 @@ select case (ierr)
    case (1)
 ! Errors in arguments
       write(uerr,*) "-----------------------------------"
-      write(uerr,*) "ERROR in command line argument !!!."
+      write(uerr,*) "ERROR in command line argument !   "
       write(uerr,*) "-----------------------------------"
       write(uerr,*)                                                            &
 " Correct command sequence-> <executablename> <casename> [euristic]|[original]"

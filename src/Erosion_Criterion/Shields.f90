@@ -40,7 +40,7 @@ use I_O_file_module
 use Static_allocation_module
 use Hybrid_allocation_module
 use Dynamic_allocation_module
-use I_O_diagnostic_module
+use Memory_I_O_module
 !------------------------
 ! Declarations
 !------------------------
@@ -366,7 +366,7 @@ iter_ustar: do while ((flagz0).and.                                            &
 ! Rough boundary regime
       Z0 = 0.033d0 * Ks
       flagz0 = .false.
-      if (DistZmin > Z0) Ustar = vKconst * Velocity / Dlog(DistZmin / Z0)
+      if (DistZmin>Z0) Ustar = vKconst * Velocity / Dlog(DistZmin / Z0)
       exit iter_ustar
    endif
    nu_ustar = pg(intliq_id)%mu / (Med(pg(intliq_id)%imed)%den0 * Ustar)

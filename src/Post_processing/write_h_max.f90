@@ -61,7 +61,7 @@ integer(4),external :: ParticleCellNumber
 write(nomefile_h_max,"(a,a)") nomecaso(1:len_trim(nomecaso)),                  &
    "_hmax_qmax_Umax.txt"
 open(ncpt,file=nomefile_h_max,status="unknown",form="formatted")
-write(ncpt,'(9(a))') "           x(m)","           y(m)","      hu_max(m)",    &
+write(u2DO,'(9(a))') "           x(m)","           y(m)","      hu_max(m)",    &
    "      hf_max(m)","  Zu_flu_max(m)","  Zf_flu_max(m)","     z_topog(m)",    &
    "   q_max(m^2/s)","     U_max(m/s)"
 flush(ncpt) 
@@ -82,7 +82,7 @@ do i_zone=1,NPartZone
 ! Initializing h_max
       h_max(:,:) = 0.d0
 !$omp parallel do default(none)                                                &
-!$omp shared(Partz,Vertice,Grid,h_max,Z_fluid_max,ncpt,i_zone,q_max,U_max)     &
+!$omp shared(Partz,Vertice,Grid,h_max,Z_fluid_max,ncpt,i_zone,q_max,U_max,u2DO)&
 !$omp private(i_vertex,GridColumn,pos)
       do i_vertex=Partz(i_zone)%ID_first_vertex_sel,                           &
          Partz(i_zone)%ID_last_vertex_sel
@@ -95,7 +95,7 @@ do i_zone=1,NPartZone
          h_max(i_vertex-Partz(i_zone)%ID_first_vertex_sel+1,2) =               &
             max((Z_fluid_max(GridColumn,2) - Vertice(3,i_vertex)),0.d0)
 !$omp critical (omp_write_h_max)
-         write(ncpt,'(9(f14.4,1x))')Vertice(1,i_vertex),Vertice(2,i_vertex),   &
+         write(u2DO,'(9(f14.4,1x))')Vertice(1,i_vertex),Vertice(2,i_vertex),   &
             h_max(i_vertex-Partz(i_zone)%ID_first_vertex_sel+1,1),             &
             h_max(i_vertex-Partz(i_zone)%ID_first_vertex_sel+1,2),             &
             Z_fluid_max(GridColumn,1),Z_fluid_max(GridColumn,2),               &

@@ -70,7 +70,7 @@ integer(4),dimension(:),allocatable :: BFaceList
 ! nPartIntorno(PARTICLEBUFFER): array of the number of the neighbouring 
 ! particles
 integer(4),dimension(:),allocatable :: nPartIntorno
-! PartIntorno(NMAXPARTJ*PARTICLEBUFFER): array of the indeces of the 
+! PartIntorno(NMAXPARTJ*PARTICLEBUFFER): array of the indices of the 
 ! neighbouring particles
 integer(4),dimension(:),allocatable :: PartIntorno
 ! PartKernel(4,NMAXPARTJ*PARTICLEBUFFER):
@@ -89,9 +89,9 @@ double precision,dimension(:,:),allocatable :: PartKernel
 ! r_0b (vector distance between the computational particle and the neighbour)
 double precision,dimension(:,:),allocatable :: rag  
 ! nPartIntorno_fw(PARTICLEBUFFER): array of the number of the neighbouring 
-! wall particles 
+! wall particles
 integer(4),dimension(:),allocatable :: nPartIntorno_fw
-! PartIntorno_fw(NMAXPARTJ*PARTICLEBUFFER): array of the indeces of the 
+! PartIntorno_fw(NMAXPARTJ*PARTICLEBUFFER): array of the indices of the 
 ! neighbouring wall particles 
 integer(4),dimension(:),allocatable :: PartIntorno_fw   
 ! Kernel parameter neighbouring array: kernel_fw(2,NMAXPARTJ*PARTICLEBUFFER),
@@ -114,7 +114,7 @@ double precision,dimension(:,:),allocatable :: grad_vel_VSL_fw
 ! nPartIntorno_bp_f(n_body_particles): array of the number of the neighbouring
 ! fluid particles to each body particle
 integer(4),dimension(:),allocatable :: nPartIntorno_bp_f
-! PartIntorno_bp_f(NMAXPARTJ*n_body_particles): array of the indeces of 
+! PartIntorno_bp_f(NMAXPARTJ*n_body_particles): array of the indices of 
 ! the neighbouring fluid particles to each body particle
 integer(4),dimension(:),allocatable :: PartIntorno_bp_f   
 ! Kernel derivative neighbouring array (fluid neighbours), 
@@ -135,15 +135,23 @@ integer(4),dimension(:),allocatable :: surf_body_part
 ! nPartIntorno_bp_bp(n_surf_body_part): array of the number of the neighbouring
 ! body particles, belonging to another body
 integer(4),dimension(:),allocatable :: nPartIntorno_bp_bp
-! PartIntorno_bp_bp(n_surf_body_part*NMAXPARTJ): array of the indeces of the 
+! PartIntorno_bp_bp(n_surf_body_part*NMAXPARTJ): array of the indices of the 
 ! neighbouring body particles (of another body) 
-integer(4),dimension(:),allocatable :: PartIntorno_bp_bp   
+integer(4),dimension(:),allocatable :: PartIntorno_bp_bp
+#ifdef SPACE_3D   
+! n_neigh_hcell_CLCpol(n_hcells): array of the number of the neighbouring 
+! CLC polygons with respect to each horizontal background-grid cell
+integer(4),dimension(:),allocatable :: n_neigh_hcell_CLCpol
+! neigh_hcell_CLCpol(NMAXPARTJ*n_hcells): array of the neighbouring list 
+! linking the horizontal background-grid cells with the CLC polygons
+integer(4),dimension(:),allocatable :: neigh_hcell_CLCpol
+#endif
 ! relative distances from body particles (belonging to another body): -r_bp_bp;
 ! rag_bp_bp(3,NMAXPARTJ*n_surf_body_part)
 double precision,dimension(:,:),allocatable :: rag_bp_bp  
 ! array of velocity impacts for body dynamics 
 ! impact_vel(n_surf_body_part x (n_bodies+n_boundaries))
-double precision,dimension(:,:),allocatable :: impact_vel  
+double precision,dimension(:,:),allocatable :: impact_vel
 ! Arrays to compute the table of integrals (SA-SPH)
 integer(4),dimension(:,:),allocatable :: BoundaryDataPointer
 type(TyBoundaryData),dimension(:),allocatable :: BoundaryDataTab

@@ -21,7 +21,6 @@
 !-------------------------------------------------------------------------------
 ! Program unit: ParticleCellNumber              
 ! Description: To return the ID of the grid cell where particle np is located.
-!              If particle is outside of the grid, it returns -1 .      
 !-------------------------------------------------------------------------------
 integer(4) function ParticleCellNumber(coord)
 !------------------------
@@ -35,8 +34,8 @@ use Dynamic_allocation_module
 !------------------------
 implicit none
 double precision,intent(in) :: coord(3)
-integer(4) :: i, j, k
-double precision :: xp, yp, zp
+integer(4) :: i,j,k
+double precision :: xp,yp,zp
 integer(4),external :: CellNumber
 !------------------------
 ! Explicit interfaces

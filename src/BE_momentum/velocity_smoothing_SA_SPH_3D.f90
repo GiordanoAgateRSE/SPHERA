@@ -35,14 +35,23 @@ use Dynamic_allocation_module
 !------------------------
 implicit none
 integer(4),intent(in) :: npi
-integer(4) :: i,j,ibdt,ibdp,Ncbf,icbf,iface,facestr
-double precision :: IntWdV,u_t_0,aux_scalar,slip_coefficient
+integer(4) :: i,j,ibdt,ibdp,Ncbf,icbf,iface,facestr,ix,iy,aux_int,aux_int_2
+double precision :: IntWdV,u_t_0,aux_scalar,slip_coefficient,aux_scalar_2
 double precision,dimension(1:SPACEDIM) :: DVLoc,DVGlo,BCLoc,BCGlo,LocX
 double precision,dimension(1:SPACEDIM) :: u_t_0_vector
 character(4) :: strtype
+integer(4),external :: CellIndices
 !------------------------
 ! Explicit interfaces
 !------------------------
+interface
+   subroutine wall_function_for_SASPH(u_t_0,d_50,r_0w,slip_coefficient_0w,     &
+      ni_T_0w)
+      implicit none
+         double precision,intent(in) :: u_t_0,d_50,r_0w
+         double precision,intent(out) :: slip_coefficient_0w,ni_T_0w
+   end subroutine wall_function_for_SASPH
+end interface
 !------------------------
 ! Allocations
 !------------------------
@@ -85,10 +94,19 @@ if (Ncbf>0) then
                                  BoundaryFace(iface)%T(:,3))
 ! Particle tangential (relative) velocity (absolute value)
                u_t_0 = dsqrt(dot_product(u_t_0_vector(:),u_t_0_vector(:)))
-! To assess the slip coefficient
-               call wall_function_for_SASPH(u_t_0,                             &
-                  Partz(Tratto(facestr)%zone)%BC_shear_stress_input,           &
-                  LocX(3),slip_coefficient,aux_scalar)
+! To assess the slip coefficient and the turbulent viscosity
+               if (CLC_flag.eqv..true.) then
+                  aux_int_2 = CellIndices(pg(npi)%cella,ix,iy,aux_int)
+                  aux_scalar_2 = CLC%z0(ix,iy) * 10.d0
+                  call wall_function_for_SASPH(u_t_0,aux_scalar_2,LocX(3),     &
+                     slip_coefficient,aux_scalar)
+                  else
+                     aux_scalar_2 =                                            &
+                        Partz(Tratto(facestr)%zone)%BC_shear_stress_input *    &
+                        10.d0
+                     call wall_function_for_SASPH(u_t_0,aux_scalar_2,LocX(3),  &
+                        slip_coefficient,aux_scalar)
+               endif
          endif
          BCLoc(1:2) = DVLoc(1:2) * IntWdV * slip_coefficient
          BCLoc(3) = DVLoc(3) * IntWdV

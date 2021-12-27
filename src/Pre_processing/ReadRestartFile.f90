@@ -30,6 +30,7 @@ use I_O_file_module
 use Static_allocation_module
 use Hybrid_allocation_module
 use Dynamic_allocation_module
+use Memory_I_O_module
 !------------------------
 ! Declarations
 !------------------------
@@ -43,11 +44,22 @@ integer(4) :: n_vertices_main_wall
 double precision :: save_start
 character(12) :: ainp = "Restart File"
 character(len=8) :: versionerest
+#ifdef SPACE_3D
+character(100) :: array_name,file_name
+#endif
 logical,external :: ReadCheck
 character(100),external :: lcase
 !------------------------
 ! Explicit interfaces
 !------------------------
+interface
+#ifdef SPACE_3D
+   subroutine main_wall_info(n_vertices_main_wall,ID_main_wall)
+      integer(4),intent(out) :: n_vertices_main_wall
+      integer(4),intent(out),optional :: ID_main_wall
+   end subroutine main_wall_info
+#endif
+end interface
 !------------------------
 ! Allocations
 !------------------------
@@ -250,46 +262,26 @@ Partz(i_zone)%plan_reservoir_points,Partz(i_zone)%ID_first_vertex_sel,         &
       write(ulog,'(a,i9)') 'The vertices of the main wall are ',               &
          n_vertices_main_wall     
       if (n_vertices_main_wall>0) then
-         if (.not.allocated(Z_fluid_max)) then
-            allocate(Z_fluid_max(Grid%ncd(1)*Grid%ncd(2),2),STAT=alloc_stat)
-            if (alloc_stat/=0) then
-               write(ulog,*)                                                   &
-               'Allocation of Z_fluid_max in ReadRestartFile failed;',         &
-               ' the program terminates here.'
-               stop
-               else
-                  write(ulog,*)                                                &
-                     'Allocation of Z_fluid_max in ReadRestartFile ',          &
-                     'successfully completed.'
-            endif
-         endif
-! Allocation of the array of the maximum specific flow rate
-         if (.not.allocated(q_max)) then
-            allocate(q_max(n_vertices_main_wall),STAT=alloc_stat)
-            if (alloc_stat/=0) then
-               write(ulog,*)                                                   &
-               'Allocation of q_max in ReadRestartFile failed;',               &
-               ' the program terminates here.'
-               stop
-               else
-                  write(ulog,*)                                                &
-                     'Allocation of q_max in ReadRestartFile successfully ',   &
-                     'completed.'
-            endif
-         endif
-! Allocation of the array of the maximum depth-averaged speed
-         if (.not.allocated(U_max)) then
-            allocate(U_max(n_vertices_main_wall),STAT=alloc_stat)
-            if (alloc_stat/=0) then
-               write(ulog,*)                                                   &
-               'Allocation of U_max in ReadRestartFile failed;',               &
-               ' the program terminates here.'
-               stop
-               else
-                  write(ulog,*)                                                &
-                     'Allocation of U_max in ReadRestartFile successfully ',   &
-                     'completed.'
-            endif
+         array_name = "Z_fluid_max"
+         call allocate_de_dp_r2(.true.,Z_fluid_max,Grid%ncd(1)*Grid%ncd(2),2,  &
+            array_name)
+         array_name = "q_max"
+         call allocate_de_dp_r1(.true.,q_max,n_vertices_main_wall,array_name)
+         array_name = "U_max"
+         call allocate_de_dp_r1(.true.,U_max,n_vertices_main_wall,array_name)
+         if (CLC_flag.eqv..true.) then
+! z0 allocation
+            array_name = "CLC%z0"
+            call allocate_de_dp_r2(.true.,CLC%z0,Grid%ncd(1),Grid%ncd(2),      &
+               array_name)
+! z0 reading from a dedicated time-independent restart file
+            file_name = "./input/20_CLC/z0.res"
+            call open_close_file(.true.,urz0,file_name)
+            read(urz0,*,iostat=ioerr) CLC%z0
+            if (.not.ReadCheck(ioerr,ier,1,"./input/20_CLC/z0.res",            &
+               "z0_restart_read",urz0,ulog)) return
+            file_name = "z0.res"
+            call open_close_file(.false.,urz0,file_name)
          endif
       endif
 #endif

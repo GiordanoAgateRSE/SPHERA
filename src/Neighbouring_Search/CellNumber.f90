@@ -20,7 +20,8 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: CellNumber             
-! Description: To return the ID of the cell of indices (i,j,k).  
+! Description: To return the ID of the cell of indices (i,j,k). If particle is 
+!              outside of the grid, it returns 0 . 
 !-------------------------------------------------------------------------------
 integer(4) function CellNumber(i,j,k)
 !------------------------
@@ -55,7 +56,7 @@ if ((i<1).or.(i>ni).or.(j<1).or.(j>nj).or.(k<1).or.(k>nk)) then
    else
 ! Return the cell number
       CellNumber = ((k - 1) * nj + (j - 1)) * ni + i
-end if
+endif
 !------------------------
 ! Deallocations
 !------------------------

@@ -81,10 +81,14 @@ logical :: dt_alfa_Mon
 ! Flag to pinpoint the second read of the input files
 logical :: input_second_read
 #ifdef SPACE_3D
+! Flag on the presence of CLC input data
+logical :: CLC_flag
 integer(4),public,parameter :: ncord = 3
 #elif defined SPACE_2D
 integer(4),public,parameter :: ncord = 2 
 #endif
+! Maximum file unit booked in the modules
+integer(4) :: max_file_unit_booked = 100
 integer(4) :: NMedium,NPartZone
 integer(4) :: npointst,NPoints,NPointsl,NPointse,NLines
 #ifdef SPACE_3D

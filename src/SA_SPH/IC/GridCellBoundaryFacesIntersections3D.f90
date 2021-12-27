@@ -47,7 +47,7 @@ subroutine GridCellBoundaryFacesIntersections3D(NumCellmax)
 use Static_allocation_module
 use Hybrid_allocation_module
 use Dynamic_allocation_module
-use I_O_diagnostic_module
+use Memory_I_O_module
 use I_O_file_module
 !------------------------
 ! Declarations

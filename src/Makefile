@@ -208,7 +208,7 @@ SOURCES = \
 ./Modules/Static_allocation_module.f90 \
 ./Modules/Hybrid_allocation_module.f90 \
 ./Modules/Dynamic_allocation_module.f90 \
-./Modules/I_O_diagnostic_module.f90 \
+./Modules/Memory_I_O_module.f90 \
 ./Modules/I_O_file_module.f90 \
 ./Modules/SA_SPH_module.f90 \
 ./Modules/Time_module.f90 \
@@ -216,14 +216,15 @@ $(wildcard ./BC/*.f90) \
 $(wildcard ./BE_mass/*.f90) \
 $(wildcard ./BE_momentum/*.f90) \
 $(wildcard ./Body_Transport/*.f90) \
+$(wildcard ./CLC/*.f90) \
 $(wildcard ./DB_SPH/*.f90) \
 $(wildcard ./Erosion_Criterion/*.f90) \
 $(wildcard ./Geometry/*.f90) \
 $(wildcard ./IC/*.f90) \
 $(wildcard ./KTGF_tools/*.f90) \
-./Main_algorithm/Gest_Dealloc.f90 \
 ./Main_algorithm/Gest_Trans.f90 \
 ./Main_algorithm/time_step_loop.f90 \
+$(wildcard ./Memory_I_O/*.f90) \
 $(wildcard ./Neighbouring_Search/*.f90) \
 $(wildcard ./Post_processing/*.f90) \
 $(wildcard ./Pre_processing/*.f90) \

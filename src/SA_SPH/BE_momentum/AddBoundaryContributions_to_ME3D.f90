@@ -43,17 +43,27 @@ implicit none
 integer(4),intent(in) :: npi,Ncbf
 double precision,intent(inout),dimension(1:SPACEDIM) :: tpres,tdiss,tvisc
 double precision,intent(inout),dimension(1:size(Partz)) :: slip_coeff_counter
-integer(4) :: sd,icbf,iface,ibdp,sdj,i,j,mati,stretch
+integer(4) :: sd,icbf,iface,ibdp,sdj,i,j,mati,stretch,ix,iy,aux_int,aux_int_2
 double precision :: IntdWrm1dV,cinvisci,Monvisc,cinviscmult,pressi,dvn
 double precision :: FlowRate1,Lb,L,minquotanode,maxquotanode,u_t_0
 double precision :: Qii,roi,celeri,alfaMon,Mmult,IntGWZrm1dV,slip_coefficient
+double precision :: aux_scal
 double precision,dimension(1:SPACEDIM) :: vb,vi,dvij,RHS,nnlocal,Grav_Loc 
 double precision,dimension(1:SPACEDIM) :: ViscoMon,ViscoShear,LocPi,Gpsurob_Loc
 double precision,dimension(1:SPACEDIM) :: Gpsurob_Glo,u_t_0_vector
 character(4) :: stretchtype
+integer(4),external :: CellIndices
 !------------------------
 ! Explicit interfaces
 !------------------------
+interface
+   subroutine wall_function_for_SASPH(u_t_0,d_50,r_0w,slip_coefficient_0w,     &
+      ni_T_0w)
+      implicit none
+         double precision,intent(in) :: u_t_0,d_50,r_0w
+         double precision,intent(out) :: slip_coefficient_0w,ni_T_0w
+   end subroutine wall_function_for_SASPH
+end interface
 !------------------------
 ! Allocations
 !------------------------
@@ -144,9 +154,18 @@ face_loop: do icbf=1,Ncbf
 ! Particle tangential (relative) velocity (absolute value)
                u_t_0 = dsqrt(dot_product(u_t_0_vector(:),u_t_0_vector(:)))
 ! To assess the slip coefficient and the turbulent viscosity
-               call wall_function_for_SASPH(u_t_0,                             &
-                  Partz(Tratto(stretch)%zone)%BC_shear_stress_input,           &
-                  LocPi(3),slip_coefficient,cinvisci)
+               if (CLC_flag.eqv..true.) then
+                  aux_int_2 = CellIndices(pg(npi)%cella,ix,iy,aux_int)
+                  aux_scal = CLC%z0(ix,iy) * 10.d0
+                  call wall_function_for_SASPH(u_t_0,aux_scal,LocPi(3),        &
+                     slip_coefficient,cinvisci)
+                  else
+                     aux_scal =                                                &
+                        Partz(Tratto(stretch)%zone)%BC_shear_stress_input *    &
+                        10.d0 
+                     call wall_function_for_SASPH(u_t_0,aux_scal,LocPi(3),     &
+                        slip_coefficient,cinvisci)
+               endif
                if (slip_coefficient>1.d-12) then
 !$omp critical (avg_slip_coefficient_3D)
 ! Update of the incremental sum for the slip coefficient

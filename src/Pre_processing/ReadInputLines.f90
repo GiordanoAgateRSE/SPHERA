@@ -68,7 +68,7 @@ do while (trim(lcase(ainp))/="##### end lines #####")
 ! Reading the line index  
          numv_line = 1
          token = GetToken(ainp,numv_line,ioerr)
-         if (ioerr==0) read (token,*,iostat=ioerr) index
+         if (ioerr==0) read(token,*,iostat=ioerr) index
 ! "NumTratti"
          NumberEntities(8) = max(NumberEntities(8),index)  
          VERTEX_LOOP: do while (ioerr==0)
@@ -91,7 +91,7 @@ do while (trim(lcase(ainp))/="##### end lines #####")
             endif
 ! Counter of the boundary vertices
             NumberEntities(9) = NumberEntities(9) + 1  
-            read (token,*,iostat=ioerr) i
+            read(token,*,iostat=ioerr) i
             write(txt,"(i5)") i
             if (numv==1) i1 = i
             if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"VERTEX n."//txt,ninp,ulog&

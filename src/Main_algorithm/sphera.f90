@@ -29,7 +29,7 @@ program SPHERA
 use I_O_file_module
 use Static_allocation_module
 use Dynamic_allocation_module
-use I_O_diagnostic_module
+use Memory_I_O_module
 !------------------------
 ! Declarations
 !------------------------
@@ -37,7 +37,6 @@ implicit none
 integer(4) :: ier,i,n,narg
 double precision :: starttime,endtime
 character(len=255) :: nomearg
-character(len=lencard) :: nomsub = "SPHERA"
 character(100),external :: lcase
 double precision,external :: omp_get_wtime
 !------------------------
@@ -279,7 +278,7 @@ call start_and_stop(3,3)
 !------------------------
 ! Deallocations
 !------------------------
-call Gest_Dealloc(nomsub)
+call deallocation_sequence
 endtime = zero
 if (endtime/=zero) then
    write(ulog,*)

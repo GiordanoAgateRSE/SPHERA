@@ -21,7 +21,7 @@
 !-------------------------------------------------------------------------------
 ! Program unit: CellIndices            
 ! Description: To return the indices (i,j,k) of the cell (nc) in a 3D domain
-!              with ni*nj*nk cells.
+!              with ni*nj*nk cells and the cell index in the 2D horizontal grid.
 !-------------------------------------------------------------------------------
 integer(4) function CellIndices(nc,i,j,k)
 !------------------------
@@ -58,6 +58,8 @@ ncij = nc - nucellsij * (k - 1)
 j = int((ncij - 1) / ni) + 1
 ! Grid index in the x-direction
 i = ncij - ni * (j - 1)
+! Cell index in the horizontal projection of the background grid (2D 
+! horizontal grid)
 CellIndices = ncij
 !------------------------
 ! Deallocations

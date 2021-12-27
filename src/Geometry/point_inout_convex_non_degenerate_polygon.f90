@@ -45,8 +45,8 @@ subroutine point_inout_convex_non_degenerate_polygon(point,n_sides,point_pol_1,&
 implicit none
 integer(4),intent(in) :: n_sides
 double precision,intent(in) :: point(2),point_pol_1(2),point_pol_2(2)
-double precision,intent(in) :: point_pol_3(2),point_pol_4(2),point_pol_5(2)
-double precision,intent(in) :: point_pol_6(2)
+double precision,intent(in) :: point_pol_3(2),point_pol_4(2)
+double precision,intent(in) :: point_pol_5(2),point_pol_6(2)
 integer(4),intent(inout) :: test
 double precision :: dis1,dis2
 double precision :: normal(2)

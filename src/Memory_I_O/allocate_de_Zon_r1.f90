@@ -19,32 +19,24 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: allocate_de_dp_r2
-! Description: Allocation/deallocation of a generic allocatable array of type 
-!              "double precision" and range (number of dimensions) 2
+! Program unit: allocate_de_Zon_r1
+! Description: Allocation/Deallocation of a generic allocatable array of 
+!              derived type TyZone and range (number of 
+!              dimensions) 1
 !-------------------------------------------------------------------------------
-!-------------------------------------------------------------------------------
-! Further Copyright acknowledgments
-! On the SPHERA git commit associated with the first appearance of this file in 
-! SPHERA (RSE SpA): this file is copied and pasted from Grid Interpolator v.2.0 
-! (RSE SpA); the distribution of this file under the GNU-GPL license is 
-! authorized by the Copyright owner of Grid Interpolator (RSE SpA).
-!-------------------------------------------------------------------------------
-subroutine allocate_de_dp_r2(allocate_flag,array,extent_1,extent_2,uerr,       &
-                          array_name)
+subroutine allocate_de_Zon_r1(allocation_flag,array,extent_1,array_name)
 !------------------------
 ! Modules
 !------------------------
+use I_O_file_module
+use Hybrid_allocation_module
 !------------------------
 ! Declarations
 !------------------------
 implicit none
-double precision,dimension(:,:),allocatable,intent(inout) :: array
-logical,intent(in) :: allocate_flag
-integer(4),intent(in) :: extent_1
-integer(4),intent(in) :: extent_2
-! error unit
-integer(4),intent(in) :: uerr
+type (TyZone),dimension(:),allocatable,intent(inout) :: array
+logical,intent(in) :: allocation_flag
+integer(4),intent(in),optional :: extent_1
 character(100),intent(in) :: array_name
 integer(4) :: alloc_stat
 !------------------------
@@ -53,14 +45,17 @@ integer(4) :: alloc_stat
 !------------------------
 ! Allocations
 !------------------------
-if((allocate_flag.eqv..true.).and.(.not.allocated(array))) then
-   allocate(array(extent_1,extent_2),STAT=alloc_stat)
-   if (alloc_stat/=0) then
-      write(uerr,*) "Allocation of ",trim(array_name),                         &
-         " failed; the execution stops here."
-      stop
+if (allocation_flag.eqv..true.) then
+   if(.not.allocated(array)) then
+      allocate(array(extent_1),STAT=alloc_stat)
+      if (alloc_stat/=0) then
+         write(uerr,*) "Allocation of ",trim(array_name),                      &
+            " failed; the execution stops here."
+         stop
+         else
+            write(ulog,*) "Allocation of ",trim(array_name),"completed."
+      endif
    endif
-endif
 !------------------------
 ! Initializations
 !------------------------
@@ -70,13 +65,17 @@ endif
 !------------------------
 ! Deallocations
 !------------------------
-if((allocate_flag.eqv..false.).and.(allocated(array))) then
-   deallocate(array,STAT=alloc_stat)
-   if (alloc_stat/=0) then
-      write(uerr,*) "Deallocation of ",trim(array_name),                       &
-         " failed; the execution stops here."
-      stop
-   endif
+   else
+      if(allocated(array)) then
+         deallocate(array,STAT=alloc_stat)
+         if (alloc_stat/=0) then
+            write(uerr,*) "Deallocation of ",trim(array_name),                 &
+               " failed; the execution stops here."
+            stop
+            else
+               write(ulog,*) "Dellocation of ",trim(array_name),"completed."
+         endif
+      endif
 endif
 return
-end subroutine allocate_de_dp_r2
+end subroutine allocate_de_Zon_r1

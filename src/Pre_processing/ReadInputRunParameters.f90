@@ -62,20 +62,20 @@ call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"RUN PARAMETERS DATA",ninp,ulog))     &
    return
 do while (trim(lcase(ainp))/="##### end run parameters #####")
-   read (ainp,*,iostat=ioerr) tmax
+   read(ainp,*,iostat=ioerr) tmax
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"MAX. TRANSIENT TIME & ITERATIONS",&
       ninp,ulog)) return
    if (ioerr==0) then
       token = GetToken(ainp,2,ioerr)
       if (ioerr==0) then
-         read (token,*,iostat=ioerr) itmax
+         read(token,*,iostat=ioerr) itmax
          else
             itmax = 1000000000
             ioerr = 0
       endif
    endif
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-   read (ainp,*,iostat=ioerr) CFL,vsc_coeff,time_split,RKscheme,pesodt,        &
+   read(ainp,*,iostat=ioerr) CFL,vsc_coeff,time_split,RKscheme,pesodt,         &
       dt_alfa_Mon
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"TIME INTEGRATION",ninp,ulog))     &
       return
@@ -84,7 +84,7 @@ do while (trim(lcase(ainp))/="##### end run parameters #####")
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"TETAP & TETAV",ninp,ulog)) return
    token = GetToken(ainp,3,ioerr)
    if (ioerr==0) then
-      read (token,*,iostat=ioerr) Psurf
+      read(token,*,iostat=ioerr) Psurf
       Psurf = trim(lcase(Psurf))
       if ((Psurf/='o').and.(Psurf/='s').and.(Psurf/='a')) then
          write(uerr,"(1x,a)")                                                  &
@@ -100,19 +100,19 @@ do while (trim(lcase(ainp))/="##### end run parameters #####")
          stop
    endif
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-   read (ainp,*,iostat=ioerr) COEFNMAXPARTI,COEFNMAXPARTJ,body_part_reorder
+   read(ainp,*,iostat=ioerr) COEFNMAXPARTI,COEFNMAXPARTJ,body_part_reorder
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"COEFNMAXPARTI and COEFNMAXPARTJ ",&
       ninp,ulog)) return
 #ifdef SPACE_3D
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-      read (ainp,*,iostat=ioerr) nag_aux,MAXCLOSEBOUNDFACES,MAXNUMCONVEXEDGES, &
+      read(ainp,*,iostat=ioerr) nag_aux,MAXCLOSEBOUNDFACES,MAXNUMCONVEXEDGES,  &
          GCBFVecDim_loc
       if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                                &
          "NAG_AUX, MAXCLOSEBOUNDFACES, MAXNUMCONVEXEDGES, GCBFVECDIM_LOC ",    &
          ninp,ulog)) return
 #endif
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-   read (ainp,*,iostat=ioerr) density_thresholds
+   read(ainp,*,iostat=ioerr) density_thresholds
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"DENSITY_THRESHOLDS ",ninp,ulog))  &
       return
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)

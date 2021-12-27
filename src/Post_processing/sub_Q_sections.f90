@@ -87,8 +87,8 @@ write(nomefile_Q_sections,"(a,a,i8.8,a)") nomecaso(1:len_trim(nomecaso)),      &
 open(ncpt,file=nomefile_Q_sections,status="unknown",form="formatted")
 if (.not.(allocated(Q_sections%section(1)%flow_rate))) then
 ! First step in any case (standard or restart execution)
-   write(ncpt,*) "Flow rate values(m^3/s) "
-   write(ncpt,'((7x,a),(4x,a),(5x,a),(6x,a),(5x,a),(3x,a),(5x,a),6(5x,a))')    &
+   write(uQse,*) "Flow rate values(m^3/s) "
+   write(uQse,'((7x,a),(4x,a),(5x,a),(6x,a),(5x,a),(3x,a),(5x,a),6(5x,a))')    &
       " Time(s)"," ID_section","fluid_type"," Q(m^3/s)"," Area(m^2)",          &
       " n_particles"," dt_out(s)"," norm_x(m)"," norm_y(m)"," norm_z(m)",      &
       " x1_sec(m)"," y1_sec(m)"," z1_sec(m)"
@@ -203,7 +203,7 @@ if (.not.(allocated(Q_sections%section(1)%flow_rate))) then
             Q_sections%section(i_sect)%flow_rate(j) =                          &
                Q_sections%section(i_sect)%flow_rate(j) / Q_sections%dt_out
 ! Writing the flow rate on a ".txt" file    
-            write(ncpt,'((f14.6,1x),2(i14,1x),2(f14.6,1x),(i14,1x),7(f14.6,1x))'&
+            write(uQse,'((f14.6,1x),2(i14,1x),2(f14.6,1x),(i14,1x),7(f14.6,1x))'&
                )simulation_time,i_sect,j,                                      &
                Q_sections%section(i_sect)%flow_rate(j),                        &
                Q_sections%section(i_sect)%area,n_particles(i_sect),            &
@@ -218,7 +218,7 @@ if (.not.(allocated(Q_sections%section(1)%flow_rate))) then
          enddo
 ! Writing the global flow rate on a ".txt" file  
          j = Q_sections%n_fluid_types + 1
-         write(ncpt,'((f14.6,1x),2(i14,1x),2(f14.6,1x),(i14,1x),7(f14.6,1x))') &
+         write(uQse,'((f14.6,1x),2(i14,1x),2(f14.6,1x),(i14,1x),7(f14.6,1x))') &
             simulation_time,i_sect,j,Q_sections%section(i_sect)%flow_rate(j),  &
             Q_sections%section(i_sect)%area,n_particles(i_sect),               &
             Q_sections%dt_out,Q_sections%section(i_sect)%normal(:),            &

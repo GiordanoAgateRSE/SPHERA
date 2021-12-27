@@ -30,6 +30,7 @@ use I_O_file_module
 use Static_allocation_module
 use Hybrid_allocation_module
 use Dynamic_allocation_module
+use Memory_I_O_module
 !------------------------
 ! Declarations
 !------------------------
@@ -39,6 +40,10 @@ double precision,intent(in) :: dtvel
 character(6),intent(in) :: str
 integer(4),intent(inout) :: it_memo,it_rest
 integer(4) :: nrecords,restartcode,i,i_zone,size_aux
+#ifdef SPACE_3D
+integer(4) :: io_stat
+character(100) :: file_name
+#endif
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -52,8 +57,18 @@ restartcode = 0
 !------------------------
 ! Statements
 !------------------------
-! Post-processing for first (and last) step
 if (index(str,'inizio')/=0) then
+! Post-processing at the first step
+#ifdef SPACE_3D
+! Write the z0 2D field
+   if (CLC_flag.eqv..true.) then
+! z0 writing on a dedicated time-independent restart file
+file_name = "z0.ris"
+      call open_close_file(.true.,usz0,file_name)
+      write(usz0,*,iostat=io_stat) CLC%z0
+      call open_close_file(.false.,usz0,file_name)
+   endif
+#endif
    nrecords = 5
    if (NumVertici>0) nrecords = nrecords + 1
 #ifdef SPACE_3D
@@ -168,6 +183,7 @@ if (Domain%imemo_fr>0) then
 endif
 if ((it_rest==it).or.(index(str,'inizio')/=0).or.(index(str,'fine')/=0)) then
 ! If restartcode=1, then to save the whole arrays "pg","pg_w"
+! Only for the first and last steps
    restartcode = 1
    write(nres) it,simulation_time,dt,nag,restartcode
    write(nres) pg(1:nag)

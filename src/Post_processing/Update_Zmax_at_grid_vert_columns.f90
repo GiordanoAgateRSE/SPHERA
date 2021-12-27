@@ -240,9 +240,9 @@ if (on_going_time_step==1) then
    write(nomefile_h_step,"(a,a)") nomecaso(1:len_trim(nomecaso)),              &
       "_hu_hf_qx_qy_step.txt"
    open(ncpt,file=nomefile_h_step,status="unknown",form="formatted")
-   write(ncpt,*) "Unfiltered water depth (hu), Filtered water depth (hf), ",   &
+   write(u2DO,*) "Unfiltered water depth (hu), Filtered water depth (hf), ",   &
       "Specific flow rate components (q_x,q_y)"
-   write(ncpt,'(9(a))') "          x(m)","          y(m)","    hu_step(m)",    &
+   write(u2DO,'(9(a))') "          x(m)","          y(m)","    hu_step(m)",    &
                         "    hf_step(m)"," Zu_max_stp(m)"," Zf_max_stp(m)",    &
                         "    z_topog(m)","    q_x(m^2/s)","    q_y(m^2/s)"
    flush(ncpt)
@@ -256,7 +256,7 @@ if (on_going_time_step==1) then
       do i_zone=1,NPartZone
          if (Partz(i_zone)%ID_first_vertex_sel>0) then
 !$omp parallel do default(none)                                                &
-!$omp shared(ncpt,Partz,Vertice,Grid,h_filt_step,h_step,Z_fluid_step,i_zone)   &
+!$omp shared(u2DO,Partz,Vertice,Grid,h_filt_step,h_step,Z_fluid_step,i_zone)   &
 !$omp shared(qx_step,qy_step,qx_step_grid,qy_step_grid,q_max,U_max)            &
 !$omp shared(print_flag,eps)                                                   &
 !$omp private(i_vertex,GridColumn,pos,i_aux,q_step,U_step)
@@ -290,7 +290,7 @@ if (on_going_time_step==1) then
                endif
                if (print_flag==1) then
 !$omp critical (omp_write_h_step)
-                  write(ncpt,'(9(f14.4,1x))') Vertice(1,i_vertex),             &
+                  write(u2DO,'(9(f14.4,1x))') Vertice(1,i_vertex),             &
                      Vertice(2,i_vertex),h_step(i_aux),h_filt_step(i_aux),     &
                      Z_fluid_step(GridColumn,1),Z_fluid_step(GridColumn,2),    &
                      Vertice(3,i_vertex),qx_step(i_aux),qy_step(i_aux)

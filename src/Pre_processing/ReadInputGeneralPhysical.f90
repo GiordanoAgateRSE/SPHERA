@@ -56,11 +56,11 @@ call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
 if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"GENERAL PHYSICAL PROPERTIES DATA",   &
    ninp,ulog)) return
 do while (trim(lcase(ainp))/="##### end general physical properties #####")
-   read (ainp,*,iostat=ioerr) values1(1:ncord)
+   read(ainp,*,iostat=ioerr) values1(1:ncord)
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"GRAVITAL ACCELERATION VECTOR",ninp&
       ,ulog)) return
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-   read (ainp,*,iostat=ioerr) prif
+   read(ainp,*,iostat=ioerr) prif
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"REFERENCE PRESSURE",ninp,ulog))   &
       return
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)

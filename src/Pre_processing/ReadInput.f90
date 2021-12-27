@@ -20,7 +20,7 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: ReadInput                    
-! Description: Reading input data.                    
+! Description: Reading input data                    
 !-------------------------------------------------------------------------------
 #ifdef SPACE_3D
 subroutine ReadInput(NumberEntities,OnlyTriangle,ier,ainp)

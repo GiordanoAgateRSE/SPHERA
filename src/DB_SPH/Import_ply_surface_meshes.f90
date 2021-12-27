@@ -36,7 +36,7 @@ use I_O_file_module
 use Static_allocation_module
 use Hybrid_allocation_module
 use Dynamic_allocation_module
-use I_O_diagnostic_module
+use Memory_I_O_module
 !------------------------
 ! Declarations
 !------------------------
@@ -45,7 +45,7 @@ integer(4) :: file_stat,n_vertices,old_size_vert,old_size_face,new_size_vert
 integer(4) :: new_size_face,dealloc_stat,alloc_stat,n_faces,face_vert_num,j,k
 integer(4) :: surface_mesh_file_ID
 integer(4) :: aux_face_vert(6)
-character(100) :: file_name,aux_char_1,aux_char_2
+character(100) :: file_name
 integer(4),dimension(:),allocatable :: aux_surface_mesh_file_ID
 type(vertex_der_type),dimension(:),allocatable :: aux_der_type_vert
 type(face_der_type),dimension(:),allocatable :: aux_der_type_faces
@@ -55,10 +55,16 @@ type(face_der_type),dimension(:),allocatable :: aux_der_type_faces
 interface
    subroutine area_triangle(P1,P2,P3,area,normal)
       implicit none
-      double precision,intent(IN)    :: P1(3),P2(3),P3(3)
-      double precision,intent(OUT)   :: area
-      double precision,intent(OUT)   :: normal(3)
+      double precision,intent(in)    :: P1(3),P2(3),P3(3)
+      double precision,intent(out)   :: area
+      double precision,intent(out)   :: normal(3)
    end subroutine area_triangle
+   subroutine ply_headings(I_O_unit,file_name,n_vertices,n_faces)
+      implicit none
+      integer(4),intent(in) :: I_O_unit
+      character(100),intent(in) :: file_name
+      integer(4),intent(out) :: n_vertices,n_faces
+   end subroutine ply_headings
 end interface
 !------------------------
 ! Allocations
@@ -88,49 +94,12 @@ do
 ! To increment the file_number
    surface_mesh_file_ID = surface_mesh_file_ID + 1
 ! Read the file name    
-   read (unit_file_list,'(a)',IOSTAT=file_stat) file_name
+   read(unit_file_list,'(a)',IOSTAT=file_stat) file_name
 ! Exit the cicle at the end of file
    if (file_stat/=0) exit 
    file_name = trim(file_name)
-! Open the on-going mesh file
-   open(unit_DBSPH_mesh,file=file_name,IOSTAT=file_stat)
-   if (file_stat/=0) then
-      write(uerr,*) 'Error in opening a surface mesh file in ',                &
-         'Import_pl_surface_meshes; the program stops here'
-      stop
-   endif   
-   read(unit_DBSPH_mesh,"(3/)",IOSTAT=file_stat)
-   if (file_stat/=0) then
-      write(uerr,*) 'Error in reading a surface mesh file in ',                &
-         'Import_pl_surface_meshes; the program stops here'
-      stop
-   endif   
-! Read the number of vertices in the file    
-   read(unit_DBSPH_mesh,*,IOSTAT=file_stat) aux_char_1,aux_char_2,n_vertices
-   if (file_stat/=0) then
-      write(uerr,*) 'Error in reading a surface mesh file in ',                &
-         'Import_pl_surface_meshes; the program stops here'
-      stop
-   endif
-   read(unit_DBSPH_mesh,"(2/)",IOSTAT=file_stat)
-   if (file_stat/=0) then
-      write(uerr,*) 'Error in reading a surface mesh file in ',                &
-         'Import_pl_surface_meshes; the program stops here'
-      stop
-   endif
-! Read the number of faces in the file
-   read(unit_DBSPH_mesh,*,IOSTAT=file_stat) aux_char_1,aux_char_2,n_faces
-   if (file_stat/=0) then
-      write(uerr,*) 'Error in reading a surface mesh file in ',                &
-         'Import_pl_surface_meshes; the program stops here'
-      stop
-   endif   
-   read(unit_DBSPH_mesh,"(1/)",IOSTAT=file_stat)
-   if (file_stat/=0) then
-      write(uerr,*) 'Error in reading a surface mesh file in ',                &
-         'Import_pl_surface_meshes; the program stops here.'
-      stop
-   endif   
+! Read the headings of the on-going mesh file
+   call ply_headings(unit_DBSPH_mesh,file_name,n_vertices,n_faces)
    if (.not.allocated(DBSPH%surf_mesh%vertices)) then
       allocate(DBSPH%surf_mesh%vertices(n_vertices),STAT=alloc_stat)
       if (alloc_stat/=0) then
@@ -181,7 +150,7 @@ do
    endif
 ! Read the vertex coordinates: start      
    do j=(old_size_vert+1),(old_size_vert+n_vertices)
-      read (unit_DBSPH_mesh,*) DBSPH%surf_mesh%vertices(j)%pos(:)
+      read(unit_DBSPH_mesh,*) DBSPH%surf_mesh%vertices(j)%pos(:)
    enddo
 ! To allocate or resize DBSPH%surf_mesh%faces on the maximum number of faces
 ! (worst case with all hexagonal faces). To allocate                           &

@@ -78,7 +78,7 @@ if (ind_interfaces(i_grid,j_grid,6)>0) then
    else
       z_sat_top = z_soil_bottom
 endif
-write(ncpt,'(8(g14.6,1x))') simulation_time,pos_aux(1),pos_aux(2),             &
+write(uint,'(8(g14.6,1x))') simulation_time,pos_aux(1),pos_aux(2),             &
                             z_free_surface,z_BedLoad_PureFluid,z_bed,          &
                             z_soil_bottom,z_sat_top
 !------------------------

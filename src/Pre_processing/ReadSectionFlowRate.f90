@@ -63,7 +63,7 @@ if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"Section_flow_rate DATA",ninp,ulog))  &
 do while (trim(lcase(ainp))/="##### end section flow rate #####")
 ! Reading the number of monitoring sections for the flow rate and their writing 
 ! time step
-   read (ainp,*,iostat=ioerr) n_sect,dt_out,n_fluid_types
+   read(ainp,*,iostat=ioerr) n_sect,dt_out,n_fluid_types
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"Section_flow_rate GENERAL INPUT", &
       ninp,ulog)) return
 ! Writing the number of sections and the writing time step on the log file
@@ -97,23 +97,23 @@ do while (trim(lcase(ainp))/="##### end section flow rate #####")
    do i=1,n_sect
 ! Reading the section variables
       call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-      read (ainp,*,iostat=ioerr) section_ID
+      read(ainp,*,iostat=ioerr) section_ID
       if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"section_ID",ninp,ulog)) return
       call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-      read (ainp,*,iostat=ioerr) n_vertices
+      read(ainp,*,iostat=ioerr) n_vertices
       if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"n_vertices",ninp,ulog)) return
       call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-      read (ainp,*,iostat=ioerr) vertex(1,1),vertex(1,2),vertex(1,3)
+      read(ainp,*,iostat=ioerr) vertex(1,1),vertex(1,2),vertex(1,3)
       if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"vertex_1",ninp,ulog)) return
       call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-      read (ainp,*,iostat=ioerr) vertex(2,1),vertex(2,2),vertex(2,3)
+      read(ainp,*,iostat=ioerr) vertex(2,1),vertex(2,2),vertex(2,3)
       if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"vertex_2",ninp,ulog)) return
       call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-      read (ainp,*,iostat=ioerr) vertex(3,1),vertex(3,2),vertex(3,3)
+      read(ainp,*,iostat=ioerr) vertex(3,1),vertex(3,2),vertex(3,3)
       if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"vertex_3",ninp,ulog)) return
       if (n_vertices==4) then
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         read (ainp,*,iostat=ioerr) vertex(4,1),vertex(4,2),vertex(4,3)
+         read(ainp,*,iostat=ioerr) vertex(4,1),vertex(4,2),vertex(4,3)
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"vertex_4",ninp,ulog)) return           
       endif
 ! Assignation to the section variables 

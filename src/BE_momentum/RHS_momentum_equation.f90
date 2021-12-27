@@ -31,7 +31,7 @@ use Dynamic_allocation_module
 use Hybrid_allocation_module
 #ifdef SPACE_3D
 use I_O_file_module
-use I_O_diagnostic_module
+use Memory_I_O_module
 #endif
 !------------------------
 ! Declarations
