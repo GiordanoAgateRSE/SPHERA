@@ -120,7 +120,6 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
    ipointer = 0
    move = "   "
    Medium = 0
-   icolor = Z'FF0000'  
    values1 = zero
    values3 = zero
    pool_plane = " "
