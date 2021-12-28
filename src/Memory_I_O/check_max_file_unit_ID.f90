@@ -62,7 +62,11 @@ file_name_2 = "ulimit_n.txt"
 call open_close_file(.true.,max_file_unit_booked+1,file_name_2)
 read(max_file_unit_booked+1,*,iostat=io_stat) max_file_unit_ID
 if (.not.ReadCheck(io_stat,ier,1,"ulimit_n.txt","max_file_unit_ID",            &
-   max_file_unit_booked+1,ulog)) return
+   max_file_unit_booked+1,ulog)) then
+   write(uerr,*) "Error in reading the file ",file_name,". The execution ",    &
+      "stops here."
+   stop
+endif
 write(ulog,*) "Machine/OS-dependent maximum number of file units: ",           &
    max_file_unit_ID
 if (max_file_unit_ID<file_unit_requested) then

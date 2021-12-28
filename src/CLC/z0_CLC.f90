@@ -90,8 +90,12 @@ CLC%class_2D(:,:) = 0
 file_name = "./input/20_CLC/z0_default.txt"
 call open_close_file(.true.,max_file_unit_booked+1,file_name)
 read(max_file_unit_booked+1,*,iostat=io_stat) z0_default
-if (.not.ReadCheck(io_stat,ier,1,"./input/20_CLC/z0_default.txt","z0_default", &
-   max_file_unit_booked+1,ulog)) return
+if (.not.ReadCheck(io_stat,ier,1,file_name,"z0_default",max_file_unit_booked+1,&
+   ulog)) then
+   write(uerr,*) "Error in reading the file ",file_name,". The execution ",    &
+      "stops here."
+   stop
+endif
 file_name = "./input/20_CLC/z0_default.txt"
 call open_close_file(.false.,max_file_unit_booked+1,file_name)
 CLC%z0(:,:) = z0_default
@@ -173,11 +177,11 @@ array_name = "neigh_hcell_CLCpol"
 call allocate_de_int4_r1(.false.,neigh_hcell_CLCpol,array_name=array_name)
 do i_pol=1,CLC%n_polygons
    write(array_name,*) i_pol
-   array_name = "CLC%polygons(" // trim(array_name) // ")%vertices"
+   array_name = "CLC%polygons(" // trim(adjustl(array_name)) // ")%vertices"
    call allocate_de_dp_r2(.false.,CLC%polygons(i_pol)%vertices,                &
       array_name=array_name)
    write(array_name,*) i_pol
-   array_name = "CLC%polygons(" // trim(array_name) // ")%faces"
+   array_name = "CLC%polygons(" // trim(adjustl(array_name)) // ")%faces"
    call allocate_de_int4_r2(.false.,CLC%polygons(i_pol)%faces,                 &
       array_name=array_name)
 enddo

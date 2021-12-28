@@ -54,9 +54,9 @@ integer(4) :: open_stat
 ! Statements
 !------------------------
 if (open_flag.eqv..true.) then
-   open(I_O_unit,file=trim(file_name),IOSTAT=open_stat)
+   open(I_O_unit,file=trim(adjustl(file_name)),IOSTAT=open_stat)
    if (open_stat/=0) then
-      write(uerr,*) "Error in opening the file ",trim(file_name),              &
+      write(uerr,*) "Error in opening the file ",trim(adjustl(file_name)),     &
          ". The program stops."
       stop
    endif

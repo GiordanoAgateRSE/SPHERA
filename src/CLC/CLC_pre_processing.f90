@@ -38,7 +38,7 @@ use Memory_I_O_module
 implicit none
 integer(4) :: io_stat,ier,i_rec,i_vert,i_face,n_sides,file_line,I_O_unit,i_pol
 integer(4) :: n_hcells
-character(100) :: file_name,array_name
+character(100) :: file_name,array_name,aux_char,aux_char_2
 logical,external :: ReadCheck
 !------------------------
 ! Explicit interfaces
@@ -67,8 +67,12 @@ call system ("find CLC_*ply/* | wc -l > test_CLC.txt")
 file_name = "test_CLC.txt"
 call open_close_file(.true.,max_file_unit_booked+1,file_name)
 read(max_file_unit_booked+1,*,iostat=io_stat) CLC%n_polygons
-if (.not.ReadCheck(io_stat,ier,1,"test_CLC.txt","CLC%n_polygons",              &
-   max_file_unit_booked+1,ulog)) return
+if (.not.ReadCheck(io_stat,ier,1,file_name,"CLC%n_polygons",                   &
+   max_file_unit_booked+1,ulog)) then
+   write(uerr,*) "Error in reading the file ",file_name,". The execution ",    &
+      "stops here."
+   stop
+endif
 call open_close_file(.false.,max_file_unit_booked+1,file_name)
 call system ("rm -f test_CLC.txt")
 if (CLC%n_polygons==0) then
@@ -97,18 +101,39 @@ neigh_hcell_CLCpol(:) = 0
 ! Allocate the derived-type allocatable array of the CLC polygons
 array_name = "CLC_polygons"
 call allocate_de_CLCp_r1(.true.,CLC%polygons,CLC%n_polygons,array_name)
-! Reading the CLC-polygon IDs from the «CLC*.txt» file into the associated 
-! fields of the CLC derived-type array
-file_name = "./input/20_CLC/CLC_*.txt"
+! Reading the CLC-polygon IDs from the "CLC*.txt" file into the associated 
+! fields of the CLC derived-type array, starting from the detection of the 
+! exact file name
+call system("ls input/20_CLC/CLC*.txt > CLC_txt_test.txt")
+file_name = "CLC_txt_test.txt"
+call open_close_file(.true.,max_file_unit_booked+1,file_name)
+read(max_file_unit_booked+1,'(a13,a)',iostat=io_stat) aux_char,aux_char_2
+if (.not.ReadCheck(io_stat,ier,1,file_name,file_name,                          &
+   max_file_unit_booked+1,ulog)) then
+   write(uerr,*) "Error in reading the file ",file_name,". The execution ",    &
+      "stops here."
+   stop
+endif
+call open_close_file(.false.,max_file_unit_booked+1,file_name)
+call system("rm -f CLC_txt_test.txt")
+file_name = "input/20_CLC/" // trim(adjustl(aux_char_2))
 call open_close_file(.true.,max_file_unit_booked+1,file_name)
 read(max_file_unit_booked+1,*,iostat=io_stat)
 if (.not.ReadCheck(io_stat,ier,1,file_name,"file label",                       &
-   max_file_unit_booked+1,ulog)) return
+   max_file_unit_booked+1,ulog)) then
+   write(uerr,*) "Error in reading the file ",file_name,". The execution ",    &
+      "stops here."
+   stop
+endif
 i_rec = 1
 read(max_file_unit_booked+1,*,iostat=io_stat) CLC%polygons(i_rec)%ID,          &
    CLC%polygons(i_rec)%CLC_class
 if (.not.ReadCheck(io_stat,ier,i_rec+1,file_name,"CLC classes",                &
-   max_file_unit_booked+1,ulog)) return
+   max_file_unit_booked+1,ulog)) then
+   write(uerr,*) "Error in reading the file ",file_name,". The execution ",    &
+      "stops here."
+   stop
+endif
 i_rec = 2
 do
 ! If the rest of the input file only contains doubles, the "do" construct is 
@@ -119,8 +144,12 @@ do
       CLC%polygons(i_rec)%CLC_class
 ! End-of-file condition
    if (io_stat<0) exit
-   if (.not.ReadCheck(io_stat,ier,i_rec,"CLC.txt","CLC classes",               &
-      max_file_unit_booked+1,ulog)) return
+   if (.not.ReadCheck(io_stat,ier,i_rec,file_name,"CLC classes",               &
+      max_file_unit_booked+1,ulog)) then
+      write(uerr,*) "Error in reading the file ",file_name,". The execution ", &
+         "stops here."
+      stop
+   endif
    if (CLC%polygons(i_rec)%ID/=CLC%polygons(i_rec-1)%ID) i_rec = i_rec + 1
 enddo
 call open_close_file(.false.,max_file_unit_booked+1,file_name)
@@ -133,14 +162,14 @@ do i_pol=1,CLC%n_polygons
 ! Reading the generic «.ply » CLC file into the associated fields of the CLC 
 ! derived-type array element
    write(file_name,*) CLC%polygons(i_pol)%ID
-   file_name = "./CLC_*ply/" // trim(file_name) // ".ply"
+   file_name = "./CLC_*ply/" // trim(adjustl(file_name)) // ".ply"
 ! Read the headings of the on-going ".ply" file
    I_O_unit = max_file_unit_booked + i_pol
    call ply_headings(I_O_unit,file_name,CLC%polygons(i_pol)%n_vertices,        &
       CLC%polygons(i_pol)%n_faces)
 ! Allocation of the vertices of the CLC polygon
    write(array_name,*) i_pol
-   array_name = "CLC%polygons(" // trim(array_name) // ")%vertices"
+   array_name = "CLC%polygons(" // trim(adjustl(array_name)) // ")%vertices"
    call allocate_de_dp_r2(.true.,CLC%polygons(i_pol)%vertices,                 &
       CLC%polygons(i_pol)%n_vertices,2,array_name)
 ! Re-open the ".ply" file
@@ -151,11 +180,15 @@ do i_pol=1,CLC%n_polygons
 ! No need for a critical section with "ulog" as it is used only in case of 
 ! errors
       if (.not.ReadCheck(io_stat,ier,11+i_vert,file_name,array_name,I_O_unit,  &
-         ulog)) exit
+         ulog)) then
+         write(uerr,*) "Error in reading the file ",file_name,                 &
+            ". The execution stops here."
+         stop
+      endif
    enddo
 ! Allocation of the faces of the CLC polygon
    write(array_name,*) i_pol
-   array_name = "CLC%polygons(" // trim(array_name) // ")%faces"
+   array_name = "CLC%polygons(" // trim(adjustl(array_name)) // ")%faces"
    call allocate_de_int4_r2(.true.,CLC%polygons(i_pol)%faces,                  &
       CLC%polygons(i_pol)%n_faces,3,array_name)
 ! Read the faces of the current CLC polygon
@@ -166,7 +199,11 @@ do i_pol=1,CLC%n_polygons
 ! No need for a critical section with "ulog" as it is used only in case of 
 ! errors
       if (.not.ReadCheck(io_stat,ier,file_line,file_name,array_name,I_O_unit,  &
-         ulog)) exit
+         ulog)) then
+         write(uerr,*) "Error in reading the file ",file_name,                 &
+            ". The execution stops here."
+         stop
+      endif
 ! Check update: the generic CLC polygon has to be partitioned in triangles only
       if (n_sides>3) then
          write(uerr,*) "The CLC polygon ",CLC%polygons(i_pol)%ID,              &

@@ -124,10 +124,6 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph"))  then
          endif
 #endif
 endif
-NMAXPARTJ = int(input_any_t%COEFNMAXPARTJ * (Domain%h * four / Domain%dx) **   &
-            ncord) + 1
-write(ulog,'(2a,i15)') "     Maximum number of neighbouring particles: ",      &
-   "NMAXPARTJ = ",NMAXPARTJ
 allocate(Array_Flu(1:PARTICLEBUFFER),stat=ier)
 if (ier/=0) then
    write(ulog,'(1x,a,i2)') "   Array Array_Flu not allocated. Error code: ",   &

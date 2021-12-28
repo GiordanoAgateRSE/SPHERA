@@ -54,11 +54,12 @@ if (allocation_flag.eqv..true.) then
    if(.not.allocated(array)) then
       allocate(array(extent_1,extent_2),STAT=alloc_stat)
       if (alloc_stat/=0) then
-         write(uerr,*) "Allocation of ",trim(array_name),                      &
+         write(uerr,*) "Allocation of ",trim(adjustl(array_name)),             &
             " failed; the execution stops here."
          stop
          else
-            write(ulog,*) "Allocation of ",trim(array_name),"completed."
+            write(ulog,*) "Allocation of ",trim(adjustl(array_name)),          &
+               "completed."
       endif
    endif
 !------------------------
@@ -74,11 +75,12 @@ if (allocation_flag.eqv..true.) then
       if(allocated(array)) then
          deallocate(array,STAT=alloc_stat)
          if (alloc_stat/=0) then
-            write(uerr,*) "Deallocation of ",trim(array_name),                 &
+            write(uerr,*) "Deallocation of ",trim(adjustl(array_name)),        &
                " failed; the execution stops here."
             stop
             else
-               write(ulog,*) "Dellocation of ",trim(array_name),"completed."
+               write(ulog,*) "Dellocation of ",trim(adjustl(array_name)),      &
+                  "completed."
          endif
       endif
 endif

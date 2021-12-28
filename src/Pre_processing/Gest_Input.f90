@@ -260,6 +260,10 @@ if (.not.restart) then
 #elif defined SPACE_2D
    call ReadInput(NumberEntities,InputErr,ainp)
 #endif
+   NMAXPARTJ = int(input_any_t%COEFNMAXPARTJ * (Domain%h * four / Domain%dx) **&
+               ncord) + 1
+   write(ulog,'(2a,i15)') "     Maximum number of neighbouring particles: ",   &
+      "NMAXPARTJ = ",NMAXPARTJ
    msg_err = trim("readinput")
    if (InputErr/=0) then
       InputErr = InputErr + 300
@@ -397,6 +401,10 @@ if (.not.restart) then
 #elif defined SPACE_2D
       call ReadInput(NumberEntities,InputErr,ainp)
 #endif
+      NMAXPARTJ = int(input_any_t%COEFNMAXPARTJ * (Domain%h * four / Domain%dx)&
+                  ** ncord) + 1
+      write(ulog,'(2a,i15)') "     Maximum number of neighbouring particles: ",&
+         "NMAXPARTJ = ",NMAXPARTJ
       msg_err = trim("restart reading?")
       if (InputErr/=0) then
          InputErr = InputErr + 300

@@ -97,7 +97,7 @@ do
    read(unit_file_list,'(a)',IOSTAT=file_stat) file_name
 ! Exit the cicle at the end of file
    if (file_stat/=0) exit 
-   file_name = trim(file_name)
+   file_name = trim(adjustl(file_name))
 ! Read the headings of the on-going mesh file
    call ply_headings(unit_DBSPH_mesh,file_name,n_vertices,n_faces)
    if (.not.allocated(DBSPH%surf_mesh%vertices)) then

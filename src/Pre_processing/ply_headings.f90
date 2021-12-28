@@ -54,19 +54,39 @@ logical,external :: ReadCheck
 call open_close_file(.true.,I_O_unit,file_name)
 read(I_O_unit,"(3/)",IOSTAT=io_stat)
 if (.not.ReadCheck(io_stat,ier,1,file_name,'".ply" headings',I_O_unit,ulog))   &
-   return
+   then
+   write(uerr,*) "Error in reading the file ",file_name,". The execution ",    &
+      "stops here."
+   stop
+endif
 read(I_O_unit,*,IOSTAT=io_stat) aux_char,aux_char_2,n_vertices
 if (.not.ReadCheck(io_stat,ier,5,file_name,'".ply" headings',I_O_unit,ulog))   &
-   return
+   then
+   write(uerr,*) "Error in reading the file ",file_name,". The execution ",    &
+      "stops here."
+   stop
+endif
 read(I_O_unit,"(2/)",IOSTAT=io_stat)
 if (.not.ReadCheck(io_stat,ier,6,file_name,'".ply" headings',I_O_unit,ulog))   &
-   return
+   then
+   write(uerr,*) "Error in reading the file ",file_name,". The execution ",    &
+      "stops here."
+   stop
+endif
 read(I_O_unit,*,IOSTAT=io_stat) aux_char,aux_char_2,n_faces
 if (.not.ReadCheck(io_stat,ier,9,file_name,'".ply" headings',I_O_unit,ulog))   &
-   return
+   then
+   write(uerr,*) "Error in reading the file ",file_name,". The execution ",    &
+      "stops here."
+   stop
+endif
 read(I_O_unit,"(1/)",IOSTAT=io_stat)
 if (.not.ReadCheck(io_stat,ier,10,file_name,'".ply" headings',I_O_unit,ulog))  &
-   return
+   then
+   write(uerr,*) "Error in reading the file ",file_name,". The execution ",    &
+      "stops here."
+   stop
+endif
 call open_close_file(.false.,I_O_unit,file_name)
 !------------------------
 ! Deallocations
