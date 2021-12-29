@@ -42,6 +42,7 @@ use Neighbouring_Search_interface_module
 !------------------------
 implicit none
 integer(4) :: i_face,ix,iy,i_hcel,i_pol,CLC_active_cells,io_stat,ier,test
+integer(4) :: i_pol_nei,aux_int
 double precision :: CLC_filling,z0_default
 double precision :: pos_cell(3)
 character(100) :: array_name,file_name
@@ -101,7 +102,8 @@ write(uCLC,'(3(a10),(a8))') "x(m)","y(m)","CLC_class","z0(m)"
 ! Loop over the horizontal background-grid cells
 !$omp parallel do default(none)                                                &
 !$omp shared (Grid,n_neigh_hcell_CLCpol,CLC,CLC_active_cells,uCLC)             &
-!$omp private(iy,ix,i_hcel,pos_cell,i_pol,i_face,test)
+!$omp shared (neigh_hcell_CLCpol,NMAXPARTJ)                                    &
+!$omp private(iy,ix,i_hcel,pos_cell,i_pol,i_pol_nei,i_face,test,aux_int)
 do iy=1,Grid%ncd(2)
    do ix=1,Grid%ncd(1)
 ! Index of the horizontal grid cell
@@ -109,7 +111,10 @@ do iy=1,Grid%ncd(2)
 ! Coordinates of the cell barycentre
       call cell_indices2pos(ix,iy,1,pos_cell(1:3))
 ! Loop over the neighbouring CLC polygons
-      do_i_pol: do i_pol=1,n_neigh_hcell_CLCpol(i_hcel)
+      do_i_pol_nei: do i_pol_nei=1,n_neigh_hcell_CLCpol(i_hcel)
+! Element index of the neighbouring CLC polygon
+         aux_int = (i_hcel - 1) * NMAXPARTJ + i_pol_nei
+         i_pol = neigh_hcell_CLCpol(aux_int)
 ! Loop over the triangles of the CLC polygon
          do i_face=1,CLC%polygons(i_pol)%n_faces
 ! Test if the cell barycentre lies within the current triangle
@@ -130,10 +135,10 @@ do iy=1,Grid%ncd(2)
 ! Update the count of CLC active cells
                CLC_active_cells = CLC_active_cells + 1
 !$omp end critical (omp_CLC_active_cells)
-               exit do_i_pol
+               exit do_i_pol_nei
             endif
          enddo
-      enddo do_i_pol
+      enddo do_i_pol_nei
 !$omp critical (omp_CLC_output)
 ! Update the 2D output file
       write(uCLC,'(2(f10.3),(i10),(f8.4))') pos_cell(1:2),CLC%class_2D(ix,iy), &

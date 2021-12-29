@@ -70,7 +70,7 @@ endif
 write(ulog,*) "Machine/OS-dependent maximum number of file units: ",           &
    max_file_unit_ID
 if (max_file_unit_ID<file_unit_requested) then
-   write(uerr,*) "The file unit requested for ",file_name,"is ",               &
+   write(uerr,'(5a)') "The file unit requested for ",file_name,"is ",          &
       "larger than the machine/OS-dependent maximum number of file units: ",   &
       "the execution stops here."
    stop

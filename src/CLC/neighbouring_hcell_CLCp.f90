@@ -123,8 +123,8 @@ do iy=CLC%polygons(i_pol)%iy_cel_ll,CLC%polygons(i_pol)%iy_cel_ur
 !$omp critical (omp_CLC_neighbouring)
       n_neigh_hcell_CLCpol(i_hcel) = n_neigh_hcell_CLCpol(i_hcel) + 1
       aux_int = (i_hcel - 1) * NMAXPARTJ + n_neigh_hcell_CLCpol(i_hcel)
-      neigh_hcell_CLCpol(aux_int) = CLC%polygons(i_pol)%ID
-!$omp end critical (omp_CLC_neighbouring)   
+      neigh_hcell_CLCpol(aux_int) = i_pol
+!$omp end critical (omp_CLC_neighbouring)
    enddo
 enddo
 !------------------------
