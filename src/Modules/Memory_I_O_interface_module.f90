@@ -228,8 +228,10 @@ interface
       integer(4),intent(in),optional :: extent_1
       character(100),intent(in) :: array_name
    end subroutine allocate_de_Zon_r1
-   subroutine check_max_file_unit_ID(file_unit_requested,file_name)
+   subroutine check_max_file_unit_ID(max_file_unit_ID,file_unit_requested,     &
+      file_name)
       implicit none
+      integer(4),intent(inout) :: max_file_unit_ID
       integer(4),intent(in) :: file_unit_requested
       character(100),intent(in) :: file_name
    end subroutine check_max_file_unit_ID

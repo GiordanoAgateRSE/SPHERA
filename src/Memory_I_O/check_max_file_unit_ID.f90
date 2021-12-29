@@ -22,7 +22,8 @@
 ! Program unit: check_max_file_unit_ID
 ! Description: Check on the machine/OS-dependent number of existing file units
 !-------------------------------------------------------------------------------
-subroutine check_max_file_unit_ID(file_unit_requested,file_name)
+subroutine check_max_file_unit_ID(max_file_unit_ID,file_unit_requested,        &
+   file_name)
 !------------------------
 ! Modules
 !------------------------
@@ -32,9 +33,10 @@ use Static_allocation_module
 ! Declarations
 !------------------------
 implicit none
+integer(4),intent(inout) :: max_file_unit_ID
 integer(4),intent(in) :: file_unit_requested
 character(100),intent(in) :: file_name
-integer(4) :: io_stat,ier,max_file_unit_ID
+integer(4) :: io_stat,ier
 character(100) :: file_name_2
 logical,external :: ReadCheck
 !------------------------
@@ -57,26 +59,27 @@ end interface
 !------------------------
 ! Statements
 !------------------------
+write(ulog,'(a,i9)') "File unit or maximum file unit requested: ",             &
+   file_unit_requested
 call system ("ulimit -n > ulimit_n.txt")
 file_name_2 = "ulimit_n.txt"
 call open_close_file(.true.,max_file_unit_booked+1,file_name_2)
 read(max_file_unit_booked+1,*,iostat=io_stat) max_file_unit_ID
 if (.not.ReadCheck(io_stat,ier,1,"ulimit_n.txt","max_file_unit_ID",            &
    max_file_unit_booked+1,ulog)) then
-   write(uerr,*) "Error in reading the file ",file_name,". The execution ",    &
+   write(uerr,*) "Error in reading the file ",file_name_2,". The execution ",  &
       "stops here."
-   stop
-endif
-write(ulog,*) "Machine/OS-dependent maximum number of file units: ",           &
-   max_file_unit_ID
-if (max_file_unit_ID<file_unit_requested) then
-   write(uerr,'(5a)') "The file unit requested for ",file_name,"is ",          &
-      "larger than the machine/OS-dependent maximum number of file units: ",   &
-      "the execution stops here."
    stop
 endif
 call open_close_file(.false.,max_file_unit_booked+1,file_name_2)
 call system ("rm -f ulimit_n.txt")
+write(ulog,'(a,i9)') "Machine/OS-dependent maximum number of file units: ",    &
+   max_file_unit_ID
+if (max_file_unit_ID<file_unit_requested) then
+   write(ulog,'(4a)') "The file unit requested for ",trim(adjustl(file_name)), &
+      "is larger than the machine/OS-dependent maximum number of file units: ",&
+      "a further check is mandatory."
+endif
 !------------------------
 ! Deallocations
 !------------------------

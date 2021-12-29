@@ -58,8 +58,10 @@ if (allocation_flag.eqv..true.) then
             " failed; the execution stops here."
          stop
          else
+!$omp critical (omp_Memory_I_O_ulog)
             write(ulog,*) "Allocation of ",trim(adjustl(array_name)),          &
                " completed."
+!$omp end critical (omp_Memory_I_O_ulog)
       endif
    endif
 !------------------------
@@ -79,8 +81,10 @@ if (allocation_flag.eqv..true.) then
                " failed; the execution stops here."
             stop
             else
+!$omp critical (omp_Memory_I_O_ulog)
                write(ulog,*) "Dellocation of ",trim(adjustl(array_name)),      &
                   " completed."
+!$omp end critical (omp_Memory_I_O_ulog)
          endif
       endif
 endif

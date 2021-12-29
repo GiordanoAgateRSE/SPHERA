@@ -37,7 +37,7 @@ use Memory_I_O_interface_module
 !------------------------
 implicit none
 integer(4) :: io_stat,ier,i_rec,i_vert,i_face,n_sides,file_line,I_O_unit,i_pol
-integer(4) :: n_hcells
+integer(4) :: n_hcells,max_file_unit_ID,thread_id,n_threads
 character(100) :: file_name,array_name,aux_char,aux_char_2
 logical,external :: ReadCheck
 !------------------------
@@ -50,6 +50,12 @@ interface
       character(100),intent(in) :: file_name
       integer(4),intent(out) :: n_vertices,n_faces
    end subroutine ply_headings
+   function OMP_get_num_threads()
+      integer(4) :: OMP_get_num_threads
+   end function OMP_get_num_threads
+   function OMP_get_thread_num()
+      integer(4) :: OMP_get_thread_num
+   end function OMP_get_thread_num
 end interface
 !------------------------
 ! Allocations
@@ -57,6 +63,8 @@ end interface
 !------------------------
 ! Initializations
 !------------------------
+thread_id = 1
+n_threads = 1
 !------------------------
 ! Statements
 !------------------------
@@ -84,8 +92,6 @@ endif
 write(ulog,*) "----------------------------------------------------------------"
 write(ulog,*) "CLC polygons"
 write(ulog,*) "Number of CLC polygons: ",CLC%n_polygons
-file_name = "CLC polygons"
-call check_max_file_unit_ID(CLC%n_polygons+max_file_unit_booked,file_name)
 ! Allocate and initialize the array of the number of the neighbouring CLC 
 ! polygons with respect to the reference backgorund-grid cell
 n_hcells = Grid%ncd(1) * Grid%ncd(2)
@@ -153,12 +159,23 @@ do
    if (CLC%polygons(i_rec)%ID/=CLC%polygons(i_rec-1)%ID) i_rec = i_rec + 1
 enddo
 call open_close_file(.false.,max_file_unit_booked+1,file_name)
+! Check on the maximum file unit (part 1 of 2)
+file_name = "CLC polygons"
+call check_max_file_unit_ID(max_file_unit_ID,max_file_unit_booked+1,file_name)
 ! Loop over the CLC polygons
 !$omp parallel do default(none)                                                &
-!$omp shared(CLC,ulog,max_file_unit_booked,uerr)                               &
+!$omp shared(CLC,ulog,max_file_unit_booked,uerr,n_threads)                     &
 !$omp private(i_pol,file_name,I_O_unit,array_name,i_vert,io_stat,ier,i_face)   &
-!$omp private(n_sides,file_line)
+!$omp private(n_sides,file_line,thread_id)
 do i_pol=1,CLC%n_polygons
+! Check on the maximum file unit (part 2 of 2)
+if (i_pol==1) then
+! Reading the number of threads
+!$ n_threads = OMP_GET_NUM_THREADS()
+   write(ulog,'(3a,i9)') "On the check for the file units of the CLC ",        &
+      "polygons. The local number of OMP threads and of the file units ",      &
+      "requested is: ",n_threads
+endif
 ! Reading the generic «.ply » CLC file into the associated fields of the CLC 
 ! derived-type array element
 ! First correct the CLC polygon ID, which was assigned as a Paraview block 
@@ -167,7 +184,10 @@ do i_pol=1,CLC%n_polygons
    write(file_name,*) CLC%polygons(i_pol)%ID
    file_name = "./CLC_polygons_ply/CLC_" // trim(adjustl(file_name)) // ".ply"
 ! Read the headings of the on-going ".ply" file
-   I_O_unit = max_file_unit_booked + i_pol
+! Read the OMP thread ID
+!$ thread_id = OMP_GET_THREAD_NUM()
+! Assign the file unit
+   I_O_unit = max_file_unit_booked + thread_id
    call ply_headings(I_O_unit,file_name,CLC%polygons(i_pol)%n_vertices,        &
       CLC%polygons(i_pol)%n_faces)
 ! Allocation of the vertices of the CLC polygon
