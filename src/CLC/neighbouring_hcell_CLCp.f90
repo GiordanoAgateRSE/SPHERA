@@ -33,15 +33,15 @@ use Static_allocation_module
 use Hybrid_allocation_module
 use Dynamic_allocation_module
 use I_O_file_module
+use Neighbouring_Search_interface_module
 !------------------------
 ! Declarations
 !------------------------
 implicit none
-integer(4),intent(in) :: i_pol 
-integer(4) :: i_vert,i_hcel_ll,i_hcel_ur,aux_int,aux_int_2,ix,iy,i_hcel
-integer(4) :: n_hcells
+integer(4),intent(in) :: i_pol
+integer(4) :: i_vert,i_hcel,aux_int,aux_int_2,ix,iy
 double precision :: x_min,x_max,y_min,y_max,z_1
-integer(4),external :: ParticleCellNumber,CellIndices,CellNumber
+double precision :: pos(3)
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -51,7 +51,6 @@ integer(4),external :: ParticleCellNumber,CellIndices,CellNumber
 !------------------------
 ! Initializations
 !------------------------
-n_hcells = Grid%ncd(1) * Grid%ncd(2)
 !------------------------
 ! Statements
 !------------------------
@@ -68,27 +67,54 @@ do i_vert=1,CLC%polygons(i_pol)%n_vertices
    y_min=min(y_min,CLC%polygons(i_pol)%vertices(i_vert,2))
    y_max=max(y_max,CLC%polygons(i_pol)%vertices(i_vert,2))
 enddo
-! Horizontal cell number of the lower-left corner of the circumscribing 
-! rectangle
-z_1 = Grid%extr(3,1) + Grid%dcd(3) / 2.d0
-i_hcel_ll = ParticleCellNumber(x_min,y_min,z_1)
-! In case the cell lies outside the numerical domain, it is replaced by the 
-! lower-left corner of the horizontal domain
-if (i_hcel_ll==0) i_hcel_ll = 1
 ! Horizontal cell indices of the lower-left corner of the circumscribing 
 ! rectangle
-aux_int = CellIndices(i_hcel_ll,CLC%polygons(i_pol)%ix_cel_ll,                 &
-          CLC%polygons(i_pol)%iy_cel_ll,aux_int_2)
-! Horizontal cell number of the upper-right corner of the circumscribing 
+z_1 = Grid%extr(3,1) + Grid%dcd(3) / 2.d0
+pos(1) = x_min
+pos(2) = y_min
+pos(3) = z_1
+i_hcel = ParticleCellNumber(pos)
+! Horizontal cell indices of the lower-left corner of the circumscribing 
 ! rectangle
-i_hcel_ur = ParticleCellNumber(x_max,y_max,z_1)
-! In case the cell lies outside the numerical domain, it is replaced by the 
-! upper-right corner of the horizontal domain
-if (i_hcel_ur==0) i_hcel_ur = n_hcells
+aux_int = CellIndices(i_hcel,CLC%polygons(i_pol)%ix_cel_ll,                    &
+          CLC%polygons(i_pol)%iy_cel_ll,aux_int_2)
 ! Horizontal cell indices of the upper-right corner of the circumscribing 
 ! rectangle
-aux_int = CellIndices(i_hcel_ur,CLC%polygons(i_pol)%ix_cel_ur,                 &
+pos(1) = x_max
+pos(2) = y_max
+pos(3) = z_1
+i_hcel = ParticleCellNumber(pos)
+! Horizontal cell indices of the upper-right corner of the circumscribing 
+! rectangle
+aux_int = CellIndices(i_hcel,CLC%polygons(i_pol)%ix_cel_ur,                    &
           CLC%polygons(i_pol)%iy_cel_ur,aux_int_2)
+! In case a cell index lies outside the numerical domain, either it is replaced 
+! by the associated edge domain index or the rectangle is discarded as it 
+! completely lies outside the domain.
+if (CLC%polygons(i_pol)%ix_cel_ll<1) then
+   CLC%polygons(i_pol)%ix_cel_ll = 1
+   else
+      if (CLC%polygons(i_pol)%ix_cel_ll>Grid%ncd(1)) return
+endif
+if (CLC%polygons(i_pol)%iy_cel_ll<1) then
+   CLC%polygons(i_pol)%iy_cel_ll = 1
+   else
+      if (CLC%polygons(i_pol)%iy_cel_ll>Grid%ncd(2)) return
+endif
+if (CLC%polygons(i_pol)%ix_cel_ur<1) then
+   return
+   else
+      if (CLC%polygons(i_pol)%ix_cel_ur>Grid%ncd(1)) then
+         CLC%polygons(i_pol)%ix_cel_ur = Grid%ncd(1)
+      endif
+endif
+if (CLC%polygons(i_pol)%iy_cel_ur<1) then
+   return
+   else
+      if (CLC%polygons(i_pol)%iy_cel_ur>Grid%ncd(2)) then
+         CLC%polygons(i_pol)%iy_cel_ur = Grid%ncd(2)
+      endif
+endif
 ! Assign the CLC polygon ID to the neighbouring CLC-polygon list of all the 
 ! background-grid cells occupied by the circumscribing rectangle
 do iy=CLC%polygons(i_pol)%iy_cel_ll,CLC%polygons(i_pol)%iy_cel_ur

@@ -31,7 +31,7 @@ use I_O_file_module
 use Hybrid_allocation_module
 use Static_allocation_module                            
 use Dynamic_allocation_module
-use Memory_I_O_module
+use Memory_I_O_interface_module
 !------------------------
 ! Declarations
 !------------------------
@@ -61,9 +61,9 @@ end interface
 ! Statements
 !------------------------
 ! Extracting the archive of the «.ply» CLC files
-call system ("tar zxvf ./input/20_CLC/CLC_*ply.tar.gz")
+call system ("tar zxvf ./input/20_CLC/CLC_polygons_ply.tar.gz")
 ! Counting of the number of «.ply» CLC files
-call system ("find CLC_*ply/* | wc -l > test_CLC.txt")
+call system ("find CLC_polygons_ply/* | wc -l > test_CLC.txt")
 file_name = "test_CLC.txt"
 call open_close_file(.true.,max_file_unit_booked+1,file_name)
 read(max_file_unit_booked+1,*,iostat=io_stat) CLC%n_polygons
@@ -101,9 +101,9 @@ neigh_hcell_CLCpol(:) = 0
 ! Allocate the derived-type allocatable array of the CLC polygons
 array_name = "CLC_polygons"
 call allocate_de_CLCp_r1(.true.,CLC%polygons,CLC%n_polygons,array_name)
-! Reading the CLC-polygon IDs from the "CLC*.txt" file into the associated 
-! fields of the CLC derived-type array, starting from the detection of the 
-! exact file name
+! Reading the CLC-polygon block numbers from the "CLC*.txt" file into the 
+! associated fields of the CLC derived-type array, starting from the detection 
+! of the exact file name
 call system("ls input/20_CLC/CLC*.txt > CLC_txt_test.txt")
 file_name = "CLC_txt_test.txt"
 call open_close_file(.true.,max_file_unit_booked+1,file_name)
@@ -138,7 +138,7 @@ i_rec = 2
 do
 ! If the rest of the input file only contains doubles, the "do" construct is 
 ! interrupted to prevent a memory error (array-element index larger of 1 than 
-! the maximum element ID)
+! the number of elements)
    if (i_rec>CLC%n_polygons) exit
    read(max_file_unit_booked+1,*,iostat=io_stat) CLC%polygons(i_rec)%ID,       &
       CLC%polygons(i_rec)%CLC_class
@@ -161,8 +161,11 @@ call open_close_file(.false.,max_file_unit_booked+1,file_name)
 do i_pol=1,CLC%n_polygons
 ! Reading the generic «.ply » CLC file into the associated fields of the CLC 
 ! derived-type array element
+! First correct the CLC polygon ID, which was assigned as a Paraview block 
+! number
+   CLC%polygons(i_pol)%ID = CLC%polygons(i_pol)%ID - 1
    write(file_name,*) CLC%polygons(i_pol)%ID
-   file_name = "./CLC_*ply/" // trim(adjustl(file_name)) // ".ply"
+   file_name = "./CLC_polygons_ply/CLC_" // trim(adjustl(file_name)) // ".ply"
 ! Read the headings of the on-going ".ply" file
    I_O_unit = max_file_unit_booked + i_pol
    call ply_headings(I_O_unit,file_name,CLC%polygons(i_pol)%n_vertices,        &
@@ -174,8 +177,16 @@ do i_pol=1,CLC%n_polygons
       CLC%polygons(i_pol)%n_vertices,2,array_name)
 ! Re-open the ".ply" file
    call open_close_file(.true.,I_O_unit,file_name)
+! Skip the headings
+   read(I_O_unit,'(10/)',iostat=io_stat)
 ! Read the vertices of the current CLC polygon
    do i_vert=1,CLC%polygons(i_pol)%n_vertices
+      if (.not.ReadCheck(io_stat,ier,11+i_vert,file_name,array_name,I_O_unit,  &
+         ulog)) then
+         write(uerr,*) "Error in reading the file ",file_name,                 &
+            ". The execution stops here."
+         stop
+      endif
       read(I_O_unit,*,iostat=io_stat) CLC%polygons(i_pol)%vertices(i_vert,1:2)
 ! No need for a critical section with "ulog" as it is used only in case of 
 ! errors
@@ -195,6 +206,9 @@ do i_pol=1,CLC%n_polygons
    do i_face=1,CLC%polygons(i_pol)%n_faces
       read(I_O_unit,*,iostat=io_stat) n_sides,                                 &
          CLC%polygons(i_pol)%faces(i_face,1:3)
+! ".ply" files count vertex ID starting from zero: "1" has to be added
+      CLC%polygons(i_pol)%faces(i_face,1:3) =                                  &
+         CLC%polygons(i_pol)%faces(i_face,1:3) + 1
       file_line = 11 + CLC%polygons(i_pol)%n_vertices + i_face
 ! No need for a critical section with "ulog" as it is used only in case of 
 ! errors

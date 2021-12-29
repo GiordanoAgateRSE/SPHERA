@@ -35,7 +35,8 @@ use Static_allocation_module
 use Hybrid_allocation_module
 use Dynamic_allocation_module
 use I_O_file_module
-use Memory_I_O_module
+use Memory_I_O_interface_module
+use Neighbouring_Search_interface_module
 !------------------------
 ! Declarations
 !------------------------
@@ -45,7 +46,6 @@ double precision :: CLC_filling,z0_default
 double precision :: pos_cell(3)
 character(100) :: array_name,file_name
 logical,external :: ReadCheck
-integer(4),external :: CellNumber
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -60,11 +60,6 @@ interface
       double precision,intent(in) :: point_pol_5(2),point_pol_6(2)
       integer(4),intent(inout) :: test
    end subroutine point_inout_convex_non_degenerate_polygon
-   subroutine cell_indices2pos(ix,iy,iz,pos)
-      implicit none
-      integer(4),intent(in) :: ix,iy,iz
-      double precision,intent(out) :: pos(3)
-   end subroutine cell_indices2pos
 end interface
 !------------------------
 ! Allocations
@@ -96,7 +91,6 @@ if (.not.ReadCheck(io_stat,ier,1,file_name,"z0_default",max_file_unit_booked+1,&
       "stops here."
    stop
 endif
-file_name = "./input/20_CLC/z0_default.txt"
 call open_close_file(.false.,max_file_unit_booked+1,file_name)
 CLC%z0(:,:) = z0_default
 ! Open the 2D output file
@@ -106,16 +100,16 @@ call open_close_file(.true.,uCLC,file_name)
 write(uCLC,'(3(a10),(a8))') "x(m)","y(m)","CLC_class","z0(m)" 
 ! Loop over the horizontal background-grid cells
 !$omp parallel do default(none)                                                &
-!$omp shared (Grid,n_neigh_hcell_CLCpol,CLC,CLC_active_cells)                  &
+!$omp shared (Grid,n_neigh_hcell_CLCpol,CLC,CLC_active_cells,uCLC)             &
 !$omp private(iy,ix,i_hcel,pos_cell,i_pol,i_face,test)
 do iy=1,Grid%ncd(2)
-   do_ix: do ix=1,Grid%ncd(1)
+   do ix=1,Grid%ncd(1)
 ! Index of the horizontal grid cell
       i_hcel = CellNumber(ix,iy,1)
 ! Coordinates of the cell barycentre
       call cell_indices2pos(ix,iy,1,pos_cell(1:3))
 ! Loop over the neighbouring CLC polygons
-      do i_pol=1,n_neigh_hcell_CLCpol(i_hcel)
+      do_i_pol: do i_pol=1,n_neigh_hcell_CLCpol(i_hcel)
 ! Loop over the triangles of the CLC polygon
          do i_face=1,CLC%polygons(i_pol)%n_faces
 ! Test if the cell barycentre lies within the current triangle
@@ -136,21 +130,18 @@ do iy=1,Grid%ncd(2)
 ! Update the count of CLC active cells
                CLC_active_cells = CLC_active_cells + 1
 !$omp end critical (omp_CLC_active_cells)
-               cycle do_ix
+               exit do_i_pol
             endif
          enddo
-      enddo
-   enddo do_ix
-enddo
-!$omp end parallel do
+      enddo do_i_pol
+!$omp critical (omp_CLC_output)
 ! Update the 2D output file
-! Loop over the horizontal background-grid cells
-do iy=1,Grid%ncd(2)
-   do ix=1,Grid%ncd(1)
       write(uCLC,'(2(f10.3),(i10),(f8.4))') pos_cell(1:2),CLC%class_2D(ix,iy), &
          CLC%z0(ix,iy)
+!$omp end critical (omp_CLC_output)
    enddo
 enddo
+!$omp end parallel do
 ! Close the 2D output file
 call open_close_file(.false.,uCLC,file_name)
 ! Based on the number of cells with null CLC, write the percentage of the total 

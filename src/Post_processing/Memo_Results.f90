@@ -30,7 +30,7 @@ use I_O_file_module
 use Static_allocation_module
 use Hybrid_allocation_module
 use Dynamic_allocation_module
-use Memory_I_O_module
+use Memory_I_O_interface_module
 !------------------------
 ! Declarations
 !------------------------
@@ -63,7 +63,7 @@ if (index(str,'inizio')/=0) then
 ! Write the z0 2D field
    if (CLC_flag.eqv..true.) then
 ! z0 writing on a dedicated time-independent restart file
-file_name = "z0.ris"
+      file_name = "z0.ris"
       call open_close_file(.true.,usz0,file_name)
       write(usz0,*,iostat=io_stat) CLC%z0
       call open_close_file(.false.,usz0,file_name)

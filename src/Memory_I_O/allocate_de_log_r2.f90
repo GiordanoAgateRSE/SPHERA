@@ -59,7 +59,7 @@ if (allocation_flag.eqv..true.) then
          stop
          else
             write(ulog,*) "Allocation of ",trim(adjustl(array_name)),          &
-               "completed."
+               " completed."
       endif
    endif
 !------------------------
@@ -80,7 +80,7 @@ if (allocation_flag.eqv..true.) then
             stop
             else
                write(ulog,*) "Dellocation of ",trim(adjustl(array_name)),      &
-                  "completed."
+                  " completed."
          endif
       endif
 endif

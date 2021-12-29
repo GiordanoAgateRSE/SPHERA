@@ -34,7 +34,7 @@ subroutine AddBoundaryContribution_to_CE2D(npi,IntNcbs,BCrodivV)
 use Static_allocation_module
 use Hybrid_allocation_module
 use Dynamic_allocation_module
-use Memory_I_O_module
+use Memory_I_O_interface_module
 use SA_SPH_module
 !------------------------
 ! Declarations

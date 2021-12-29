@@ -34,10 +34,10 @@ use Dynamic_allocation_module
 !------------------------
 implicit none
 ! Local maximum number of particles within the kernel support 
-integer(4),parameter :: local_d = 500
 integer(4),intent(in) :: npi
 double precision,intent(inout) :: unity
 double precision,intent(inout),dimension(3) :: appo
+integer(4),parameter :: local_d = 500
 integer(4) :: npj,contj,npartint   
 double precision :: rhoj,amassj,pesoj
 double precision,dimension(3) :: pesogradj

@@ -30,6 +30,7 @@ subroutine velocity_smoothing_SA_SPH_3D(npi)
 use Static_allocation_module
 use Hybrid_allocation_module
 use Dynamic_allocation_module
+use Neighbouring_Search_interface_module
 !------------------------
 ! Declarations
 !------------------------
@@ -40,7 +41,6 @@ double precision :: IntWdV,u_t_0,aux_scalar,slip_coefficient,aux_scalar_2
 double precision,dimension(1:SPACEDIM) :: DVLoc,DVGlo,BCLoc,BCGlo,LocX
 double precision,dimension(1:SPACEDIM) :: u_t_0_vector
 character(4) :: strtype
-integer(4),external :: CellIndices
 !------------------------
 ! Explicit interfaces
 !------------------------

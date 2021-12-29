@@ -36,6 +36,7 @@ use Static_allocation_module
 use Hybrid_allocation_module
 use Dynamic_allocation_module
 use I_O_file_module
+use Neighbouring_Search_interface_module
 !------------------------
 ! Declarations
 !------------------------
@@ -52,7 +53,6 @@ double precision,dimension(1:SPACEDIM) :: vb,vi,dvij,RHS,nnlocal,Grav_Loc
 double precision,dimension(1:SPACEDIM) :: ViscoMon,ViscoShear,LocPi,Gpsurob_Loc
 double precision,dimension(1:SPACEDIM) :: Gpsurob_Glo,u_t_0_vector
 character(4) :: stretchtype
-integer(4),external :: CellIndices
 !------------------------
 ! Explicit interfaces
 !------------------------

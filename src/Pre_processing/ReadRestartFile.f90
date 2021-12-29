@@ -30,7 +30,7 @@ use I_O_file_module
 use Static_allocation_module
 use Hybrid_allocation_module
 use Dynamic_allocation_module
-use Memory_I_O_module
+use Memory_I_O_interface_module
 !------------------------
 ! Declarations
 !------------------------
@@ -280,7 +280,6 @@ Partz(i_zone)%plan_reservoir_points,Partz(i_zone)%ID_first_vertex_sel,         &
             read(urz0,*,iostat=ioerr) CLC%z0
             if (.not.ReadCheck(ioerr,ier,1,"./input/20_CLC/z0.res",            &
                "z0_restart_read",urz0,ulog)) return
-            file_name = "z0.res"
             call open_close_file(.false.,urz0,file_name)
          endif
       endif

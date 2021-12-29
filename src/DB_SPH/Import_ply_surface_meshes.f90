@@ -36,7 +36,7 @@ use I_O_file_module
 use Static_allocation_module
 use Hybrid_allocation_module
 use Dynamic_allocation_module
-use Memory_I_O_module
+use Memory_I_O_interface_module
 !------------------------
 ! Declarations
 !------------------------
@@ -287,6 +287,7 @@ do
             case(3)
 ! To import vertices of the triangular face
 ! Face 1: vertices 1,2,3
+! ".ply" files count vertex ID starting from zero: "1" has to be added
                DBSPH%surf_mesh%faces(k)%vert_list(1:3) = old_size_vert +       &
                                                          aux_face_vert(1:3) + 1
                DBSPH%surf_mesh%faces(k)%vert_list(4) = 0

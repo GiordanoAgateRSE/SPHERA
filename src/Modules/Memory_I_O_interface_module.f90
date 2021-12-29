@@ -19,10 +19,10 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: Memory_I_O_module            
-! Description: Interfaces to the program units of the folder Memory_IO                     
+! Program unit: Memory_I_O_interface_module
+! Description: Interfaces to the program units of the folder Memory_IO
 !-------------------------------------------------------------------------------
-module Memory_I_O_module
+module Memory_I_O_interface_module
 interface
    subroutine allocate_de_BodPar_r1(allocation_flag,array,extent_1,array_name)
       use Hybrid_allocation_module
@@ -246,4 +246,4 @@ interface
       character(100),intent(in) :: file_name
    end subroutine open_close_file
 end interface 
-end module Memory_I_O_module
+end module Memory_I_O_interface_module

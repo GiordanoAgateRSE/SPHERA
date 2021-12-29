@@ -30,7 +30,7 @@ subroutine stoptime(partzlocal,tstop)
 !------------------------
 use Static_allocation_module
 use Hybrid_allocation_module
-use Memory_I_O_module
+use Memory_I_O_interface_module
 !------------------------
 ! Declarations
 !------------------------
