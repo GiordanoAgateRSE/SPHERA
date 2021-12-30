@@ -60,11 +60,11 @@ integer(4),external :: ParticleCellNumber
 ! h_max .txt files: creation and headings 
 write(nomefile_h_max,"(a,a)") nomecaso(1:len_trim(nomecaso)),                  &
    "_hmax_qmax_Umax.txt"
-open(ncpt,file=nomefile_h_max,status="unknown",form="formatted")
+open(u2DO,file=nomefile_h_max,status="unknown",form="formatted")
 write(u2DO,'(9(a))') "           x(m)","           y(m)","      hu_max(m)",    &
    "      hf_max(m)","  Zu_flu_max(m)","  Zf_flu_max(m)","     z_topog(m)",    &
    "   q_max(m^2/s)","     U_max(m/s)"
-flush(ncpt) 
+flush(u2DO) 
 do i_zone=1,NPartZone
    if (Partz(i_zone)%ID_first_vertex_sel>0) then
 ! Allocating h_max
@@ -82,7 +82,7 @@ do i_zone=1,NPartZone
 ! Initializing h_max
       h_max(:,:) = 0.d0
 !$omp parallel do default(none)                                                &
-!$omp shared(Partz,Vertice,Grid,h_max,Z_fluid_max,ncpt,i_zone,q_max,U_max,u2DO)&
+!$omp shared(Partz,Vertice,Grid,h_max,Z_fluid_max,u2DO,i_zone,q_max,U_max)     &
 !$omp private(i_vertex,GridColumn,pos)
       do i_vertex=Partz(i_zone)%ID_first_vertex_sel,                           &
          Partz(i_zone)%ID_last_vertex_sel
@@ -109,7 +109,7 @@ do i_zone=1,NPartZone
    endif
 enddo
 ! h_max .txt file: closing
-close (ncpt)
+close(u2DO)
 if (allocated(h_max)) then
    deallocate(h_max,STAT=dealloc_stat)
    if (dealloc_stat/=0) then

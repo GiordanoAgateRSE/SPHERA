@@ -84,7 +84,7 @@ n_particles = 0
 ! .txt file creation and headings (only at the beginning of the simulation)
 write(nomefile_Q_sections,"(a,a,i8.8,a)") nomecaso(1:len_trim(nomecaso)),      &
    '_Q_sections_',on_going_time_step,".txt"
-open(ncpt,file=nomefile_Q_sections,status="unknown",form="formatted")
+open(uQse,file=nomefile_Q_sections,status="unknown",form="formatted")
 if (.not.(allocated(Q_sections%section(1)%flow_rate))) then
 ! First step in any case (standard or restart execution)
    write(uQse,*) "Flow rate values(m^3/s) "
@@ -92,7 +92,7 @@ if (.not.(allocated(Q_sections%section(1)%flow_rate))) then
       " Time(s)"," ID_section","fluid_type"," Q(m^3/s)"," Area(m^2)",          &
       " n_particles"," dt_out(s)"," norm_x(m)"," norm_y(m)"," norm_z(m)",      &
       " x1_sec(m)"," y1_sec(m)"," z1_sec(m)"
-   flush(ncpt)
+   flush(uQse)
 ! Initializing fluid particle old coordinates 
 !$omp parallel do default(none) shared(nag,Q_sections,pg) private(npi)
    do npi=1,nag
@@ -227,7 +227,7 @@ if (.not.(allocated(Q_sections%section(1)%flow_rate))) then
          Q_sections%section(i_sect)%flow_rate(Q_sections%n_fluid_types+1) = 0.d0    
       enddo
 endif 
-close(ncpt)
+close(uQse)
 !------------------------
 ! Deallocations
 !------------------------

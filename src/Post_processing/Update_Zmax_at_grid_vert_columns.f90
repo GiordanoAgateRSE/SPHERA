@@ -239,19 +239,17 @@ enddo
 if (on_going_time_step==1) then
    write(nomefile_h_step,"(a,a)") nomecaso(1:len_trim(nomecaso)),              &
       "_hu_hf_qx_qy_step.txt"
-   open(ncpt,file=nomefile_h_step,status="unknown",form="formatted")
-   write(u2DO,*) "Unfiltered water depth (hu), Filtered water depth (hf), ",   &
-      "Specific flow rate components (q_x,q_y)"
-   write(u2DO,'(9(a))') "          x(m)","          y(m)","    hu_step(m)",    &
-                        "    hf_step(m)"," Zu_max_stp(m)"," Zf_max_stp(m)",    &
-                        "    z_topog(m)","    q_x(m^2/s)","    q_y(m^2/s)"
-   flush(ncpt)
+   open(u2DO,file=nomefile_h_step,status="unknown",form="formatted")
+   write(u2DO,'(9(a))') "           x(m)","           y(m)","     hu_step(m)", &
+                        "     hf_step(m)","  Zu_max_stp(m)","  Zf_max_stp(m)", &
+                        "     z_topog(m)","     q_x(m^2/s)","     q_y(m^2/s)"
+   flush(u2DO)
    else 
 ! Writing the 2D free surface field at the current time step
       if (print_flag==1) then
          write(nomefile_h_step,"(a,a,i8.8,a)") nomecaso(1:len_trim(nomecaso)), &
             '_hu_hf_qx_qy_step',on_going_time_step,".txt"
-         open(ncpt,file=nomefile_h_step,status="unknown",form="formatted")
+         open(u2DO,file=nomefile_h_step,status="unknown",form="formatted")
       endif
       do i_zone=1,NPartZone
          if (Partz(i_zone)%ID_first_vertex_sel>0) then
@@ -303,7 +301,7 @@ if (on_going_time_step==1) then
       enddo
 endif
 ! Closing the file
-if (print_flag==1) close(ncpt)
+if (print_flag==1) close(u2DO)
 !------------------------
 ! Deallocations
 !------------------------
