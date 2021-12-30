@@ -165,12 +165,13 @@ endif
 !------------------------
 array_name = "CLC%class_2D"
 call allocate_de_int4_r2(.false.,CLC%class_2D,array_name=array_name)
-array_name = "CLC%z0"
-call allocate_de_dp_r2(.false.,CLC%z0,array_name=array_name)
 array_name = "n_neigh_hcell_CLCpol"
 call allocate_de_int4_r1(.false.,n_neigh_hcell_CLCpol,array_name=array_name)
 array_name = "neigh_hcell_CLCpol"
 call allocate_de_int4_r1(.false.,neigh_hcell_CLCpol,array_name=array_name)
+!$omp parallel do default(none)                                                &
+!$omp shared(CLC)                                                              &
+!$omp private(i_pol,array_name)
 do i_pol=1,CLC%n_polygons
    write(array_name,*) i_pol
    array_name = "CLC%polygons(" // trim(adjustl(array_name)) // ")%vertices"
@@ -181,6 +182,7 @@ do i_pol=1,CLC%n_polygons
    call allocate_de_int4_r2(.false.,CLC%polygons(i_pol)%faces,                 &
       array_name=array_name)
 enddo
+!$omp end parallel do
 array_name = "CLC%polygons"
 call allocate_de_CLCp_r1(.false.,CLC%polygons,array_name=array_name)
 return

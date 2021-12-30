@@ -207,5 +207,7 @@ array_name = "DBSPH%inlet_sections"
 call allocate_de_dp_r2(.false.,DBSPH%inlet_sections,array_name=array_name)
 array_name = "DBSPH%outlet_sections"
 call allocate_de_dp_r2(.false.,DBSPH%outlet_sections,array_name=array_name)
+array_name = "CLC%z0"
+call allocate_de_dp_r2(.false.,CLC%z0,array_name=array_name)
 return
 end subroutine deallocation_sequence

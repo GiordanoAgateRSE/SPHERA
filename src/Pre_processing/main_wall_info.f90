@@ -55,7 +55,7 @@ do i_zone=1,NPartZone
    if (Partz(i_zone)%tipo=="fixe") then
       n_vertices_main_wall = Partz(i_zone)%ID_last_vertex_sel -                &
                              Partz(i_zone)%ID_first_vertex_sel + 1
-      ID_main_wall = i_zone
+      if (present(ID_main_wall)) ID_main_wall = i_zone
       write(ulog,'(2a,i4,a5,i11)') 'Program unit "main_wall_info": i_zone, ',  &
          'Partz(i_zone)%tipo, n_vertices_main_wall: ',                         &
          i_zone,Partz(i_zone)%tipo,n_vertices_main_wall
