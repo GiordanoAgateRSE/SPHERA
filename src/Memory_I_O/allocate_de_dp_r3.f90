@@ -77,12 +77,12 @@ if (allocation_flag.eqv..true.) then
       if(allocated(array)) then
          deallocate(array,STAT=alloc_stat)
          if (alloc_stat/=0) then
-            write(uerr,*) "Deallocation of ",trim(adjustl(array_name)),         &
+            write(uerr,*) "Deallocation of ",trim(adjustl(array_name)),        &
                " failed; the execution stops here."
             stop
             else
 !$omp critical (omp_Memory_I_O_ulog)
-               write(ulog,*) "Dellocation of ",trim(adjustl(array_name)),      &
+               write(ulog,*) "Deallocation of ",trim(adjustl(array_name)),     &
                   " completed."
 !$omp end critical (omp_Memory_I_O_ulog)
          endif

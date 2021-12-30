@@ -164,8 +164,8 @@ array_name = "GCBFPointers"
 call allocate_de_int4_r2(.false.,GCBFPointers,array_name=array_name)
 if(allocated(Q_sections%section)) then
    do i=1,Q_sections%n_sect
-      write(ulog,'(a,i6)') "Deallocation of the flow-rate monitoring section ",&
-         "n. ",i
+      write(ulog,'(2a,i6)') "Deallocation of the flow-rate monitoring ",       &
+         "section n. ",i
       array_name = "Q_sections%section(i)%flow_rate"
       call allocate_de_dp_r1(.false.,Q_sections%section(i)%flow_rate,          &
          array_name=array_name)
