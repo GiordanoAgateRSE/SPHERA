@@ -324,11 +324,13 @@ ___
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
 ![?] endif (Boundary_type=="open")
+!-------------------------------------------------------------------------------
 ![?] if (Boundary_type=="source") then
-![?] <time_flag>: .true. (time series for inlet flow rate and fluid 
-!    depth have to be provided; the axes of the inlet section have to be 
-!    aligned with the reference system axes); .false. (constant inlet section; 
-!    any orientation of the section sides)
+![?] <time_flag>
+!    =.true. (time series for inlet flow rate and fluid 
+!       depth have to be provided; the axes of the inlet section have to be 
+!       aligned with the reference system axes);
+!    =.false. (constant inlet section; any orientation of the section sides)
 ![?] <BC_pressure_type>
 !    =pa (homogeneous conditions)
 !    =qp (hydrostatic conditions with equivalent free surface level as input)
@@ -353,11 +355,16 @@ ___
 !    only to simplify the neighbouring search and the assessment of the SASPH 
 !    boundary integrals (procedures executed before the time step loop).
 ![?] <n_time_records>: number of time records (>=2).
+![?] <weir_flag>
+!    =.true. (the fluid depth is computed as a LRRA Least-Relative-Error 
+!    Average approximation of the Swamee -1988, JHE- formula for the discharge 
+!    coefficient of sharp-crested Bazin weirs with upstream velocity)
+!    =.false. (fluid depth from input time series)
 !-------------------------------------------------------------------------------
-![*] <n_time_records>
+![*] <n_time_records> <weir_flag>
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
-___
+___ ___
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
 ![?] INLET_TIME_SERIES: do i=1,n_time_records
@@ -365,7 +372,8 @@ ___
 ![?] <time_i>: i-th time record for the inlet section (the time of the last 
 !    record should be slightly higher than time at the end of the simulation)
 ![?] <flow_rate>: inlet speed * inlet area
-![?] <depth>: fluid/water depth.
+![?] <depth>: fluid/water depth. If (weir_flag.eqv..true.), this quantity is 
+!    not influential
 !-------------------------------------------------------------------------------
 ![*] <time_i> <flow_rate> <depth>
 !-------------------------------------------------------------------------------

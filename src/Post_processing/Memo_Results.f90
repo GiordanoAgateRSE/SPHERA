@@ -113,7 +113,8 @@ if (index(str,'inizio')/=0) then
       endif
       write(nres) size_aux
       write(nres) Tratto(i_t)%laminar_no_slip_check,Tratto(i_t)%time_flag,     &
-         Tratto(i_t)%ColorCode,Tratto(i_t)%n_time_records,                     &
+         Tratto(i_t)%weir_flag,Tratto(i_t)%ColorCode,                          &
+         Tratto(i_t)%n_time_records,                                           &
          Tratto(i_t)%numvertices,Tratto(i_t)%inivertex,                        &
 #ifdef SPACE_3D
          Tratto(i_t)%iniface,                                                  &

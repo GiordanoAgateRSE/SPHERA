@@ -39,6 +39,7 @@ use Memory_I_O_interface_module
 !------------------------
 implicit none
 logical :: DBSPH_fictitious_reservoir_flag,laminar_no_slip_check,time_flag
+logical :: weir_flag
 integer(4) :: nrighe,ier,ninp,ulog,slip_coefficient_mode,n_time_records,i_rec
 integer(4),dimension(20) :: NumberEntities
 #ifdef SPACE_2D
@@ -91,6 +92,7 @@ valp = zero
 slip_coefficient_mode = 0
 BC_shear_stress_input = -9.99d9
 time_flag = .false.
+weir_flag = .false.
 n_time_records = 0
 !------------------------
 ! Statements
@@ -243,18 +245,29 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
          move = "std"
          if (time_flag.eqv..true.) then
             call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-            read(ainp,*,iostat=ioerr) n_time_records
+            read(ainp,*,iostat=ioerr) n_time_records,weir_flag
             if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                          &
-               "SOURCE: NUMBER OF TIME RECORDS",ninp,ulog)) return
-            array_name = "SASPH boundary time records"
-            call allocate_de_dp_r2(.true.,Tratto(zone_ID)%time_records,        &
-               n_time_records,3,array_name)
-            do i_rec=1,n_time_records
-               call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-               read(ainp,*,iostat=ioerr) Tratto(zone_ID)%time_records(i_rec,1:3)
-               if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                       &
-                  "SOURCE: INLET TIME RECORDS",ninp,ulog)) return
-            enddo
+               "SOURCE: NUMBER OF TIME RECORDS AND WEIR FLAG",ninp,ulog)) return
+            if (input_second_read.eqv..true.) then
+               array_name = "SASPH boundary time records"
+               call allocate_de_dp_r2(.true.,Tratto(zone_ID)%time_records,     &
+                  n_time_records,3,array_name)
+               do i_rec=1,n_time_records
+                  call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+                  read(ainp,*,iostat=ioerr)                                    &
+                     Tratto(zone_ID)%time_records(i_rec,1:3)
+                  if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                    &
+                     "SOURCE: INLET TIME RECORDS - second read",ninp,ulog))    &
+                     return
+               enddo
+               else
+                  do i_rec=1,n_time_records
+                     call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+                     if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                 &
+                        "SOURCE: INLET TIME RECORDS - first read",ninp,ulog))  &
+                        return
+                  enddo
+            endif
             else
                call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
                read(ainp,*,iostat=ioerr) flowrate
@@ -512,6 +525,7 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
       Tratto(zone_ID)%NormVelocity = velocity
       Tratto(zone_ID)%FlowRate = flowrate
       Tratto(zone_ID)%time_flag = time_flag
+      Tratto(zone_ID)%weir_flag = weir_flag
       Tratto(zone_ID)%n_time_records = n_time_records
       Tratto(zone_ID)%zone = zone_ID
       Tratto(zone_ID)%ColorCode = icolor
@@ -628,7 +642,7 @@ BoundaryVertex(Tratto(zone_ID)%inivertex+Tratto(zone_ID)%numvertices-1)
                      Partz(zone_ID)%pressure
                   write(ulog,"(1x,a,1pe12.4)") "Pressure Value  : ",           &
                      Partz(zone_ID)%valp
-               endif       
+               endif      
 #elif defined SPACE_3D
                   Tratto(zone_ID)%ColorCode = icolor
                   if (ulog>0) write(ulog,"(1x,a,z8)") "Color           : ",    &
@@ -705,6 +719,7 @@ BoundaryVertex(Tratto(zone_ID)%inivertex+Tratto(zone_ID)%numvertices-1)
             if (Tratto(zone_ID)%time_flag.eqv..true.) then
                write(ulog,"(1x,a,i3)") "Number of time records: ",             &
                   Tratto(zone_ID)%n_time_records
+               write(ulog,"(1x,a,l12)") "Weir flag: ",Tratto(zone_ID)%weir_flag
                write(ulog,"(3a)") "Time(s)          ","Flow_rate(m^3/s) ",     &
                   "Fluid_depth(m)   "
                do i_rec=1,Tratto(zone_ID)%n_time_records

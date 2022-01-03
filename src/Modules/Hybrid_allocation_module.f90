@@ -552,7 +552,11 @@ end type TyZone
 
 ! Having removed sub-zones/tratti, this derived type can be integrated in TyZone
 type TyBoundaryStretch
-   logical :: laminar_no_slip_check,time_flag
+   logical :: laminar_no_slip_check
+! Option for time dependence
+   logical :: time_flag
+! Option for weir inlet sections
+   logical :: weir_flag
    integer(4) :: colorcode,n_time_records
 ! Number of faces/lines of the zone (the name is misleading)
    integer(4) :: numvertices

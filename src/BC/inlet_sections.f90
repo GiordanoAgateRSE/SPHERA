@@ -19,10 +19,10 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: PreSourceParticles
+! Program unit: inlet_sections
 ! Description: Elaboration of the quantities of the inlet sections 
 !-------------------------------------------------------------------------------
-subroutine PreSourceParticles
+subroutine inlet_sections
 !------------------------
 ! Modules
 !------------------------
@@ -40,7 +40,7 @@ integer(4) :: i,j,NumPartR,NumPartS,nodes
 #elif defined SPACE_2D
 integer(4) :: nA
 #endif
-double precision :: deltapart,fluid_depth
+double precision :: deltapart,fluid_depth,weir_length
 #ifdef SPACE_3D
 double precision :: etalocal,eps,deltaR,deltaS,LenR,LenS,distR,distS,csi
 #elif defined SPACE_2D
@@ -96,32 +96,6 @@ do isi=1,NumBSides
          nn(sd) = BoundarySide(SourceSide)%T(sd,3)
       enddo
 #endif
-! Linear time interpolation for the inlet fluid depth: start
-         if (Tratto(nt)%time_flag.eqv..true.) then
-            do i_rec=1,Tratto(nt)%n_time_records
-               if (Tratto(nt)%time_records(i_rec,1)>=simulation_time) then
-                  if (Tratto(nt)%time_records(i_rec,1)==simulation_time) then
-                     fluid_depth = Tratto(nt)%time_records(i_rec,3)
-                     else
-                        fluid_depth = Tratto(nt)%time_records(i_rec-1,3)       &
-                           + (Tratto(nt)%time_records(i_rec,3) -               &
-                           Tratto(nt)%time_records(i_rec-1,3)) /               &
-                           (Tratto(nt)%time_records(i_rec,1) -                 &
-                           Tratto(nt)%time_records(i_rec-1,1)) *               &
-                           (simulation_time -                                  &
-                           Tratto(nt)%time_records(i_rec-1,1))
-                  endif
-                  exit
-               endif
-            enddo
-#ifdef SPACE_3D
-            BoundaryFace(SourceFace)%Node(1:2)%GX(3) =                         &
-               BoundaryFace(SourceFace)%Node(3)%GX(3) + fluid_depth
-#elif defined SPACE_2D
-         BoundarySide(SourceSide)%length = fluid_depth
-#endif
-         endif
-! Linear time interpolation for the inlet fluid depth: end
          deltapart = Domain%dx
 #ifdef SPACE_3D
 ! LenR and LenS are the length scales of the inlet section: they are computed
@@ -141,6 +115,65 @@ do isi=1,NumBSides
          enddo
          LenR = dsqrt(LenR)
          LenS = dsqrt(LenS)
+#endif
+         if (Tratto(nt)%time_flag.eqv..true.) then
+! Linear time interpolation for the inlet flow rate: start
+            do i_rec=1,Tratto(nt)%n_time_records
+               if (Tratto(nt)%time_records(i_rec,1)>=simulation_time) then
+                  if (Tratto(nt)%time_records(i_rec,1)==simulation_time) then
+                     Tratto(nt)%FlowRate = Tratto(nt)%time_records(i_rec,2)
+                     else
+                        Tratto(nt)%FlowRate =                                  &
+                           Tratto(nt)%time_records(i_rec-1,2)                  &
+                           + (Tratto(nt)%time_records(i_rec,2) -               &
+                           Tratto(nt)%time_records(i_rec-1,2)) /               &
+                           (Tratto(nt)%time_records(i_rec,1) -                 &
+                           Tratto(nt)%time_records(i_rec-1,1)) *               &
+                           (simulation_time -                                  &
+                           Tratto(nt)%time_records(i_rec-1,1))
+                  endif
+                  exit
+               endif
+            enddo
+! Linear time interpolation for the inlet flow rate: end
+! Linear time interpolation for the inlet fluid depth: start
+            if (Tratto(nt)%weir_flag.eqv..false.) then
+               do i_rec=1,Tratto(nt)%n_time_records
+                  if (Tratto(nt)%time_records(i_rec,1)>=simulation_time) then
+                     if (Tratto(nt)%time_records(i_rec,1)==simulation_time) then
+                        fluid_depth = Tratto(nt)%time_records(i_rec,3)
+                        else
+                           fluid_depth = Tratto(nt)%time_records(i_rec-1,3)    &
+                              + (Tratto(nt)%time_records(i_rec,3) -            &
+                              Tratto(nt)%time_records(i_rec-1,3)) /            &
+                              (Tratto(nt)%time_records(i_rec,1) -              &
+                              Tratto(nt)%time_records(i_rec-1,1)) *            &
+                              (simulation_time -                               &
+                              Tratto(nt)%time_records(i_rec-1,1))
+                     endif
+                     exit
+                  endif
+               enddo
+               else            
+! LRRA approximation of Swamee (1988, JHE) formula for Bazin weirs with 
+! upstream velocity
+#ifdef SPACE_3D
+                  weir_length = LenS
+#elif defined SPACE_2D
+               weir_length = 1.d0
+#endif
+                  fluid_depth = 3.d0 * ((Tratto(nt)%FlowRate / weir_length) ** &
+                     (2.d0/3.d0)) / (9.806d0 ** (1.d0/3.d0))
+            endif
+#ifdef SPACE_3D
+            BoundaryFace(SourceFace)%Node(1:2)%GX(3) =                         &
+               BoundaryFace(SourceFace)%Node(3)%GX(3) + fluid_depth
+#elif defined SPACE_2D
+         BoundarySide(SourceSide)%length = fluid_depth
+#endif
+! Linear time interpolation for the inlet fluid depth: end
+         endif      
+#ifdef SPACE_3D   
          NumPartR = int(LenR / deltapart + 0.01d0)
          NumPartS = int(LenS / deltapart + 0.01d0)
          deltaR = LenR / NumPartR 
@@ -182,27 +215,6 @@ do isi=1,NumBSides
       enddo
 #endif
          ParticleVolume = Domain%PVolume
-! Linear time interpolation for the inlet flow rate: start
-         if (Tratto(nt)%time_flag.eqv..true.) then
-            do i_rec=1,Tratto(nt)%n_time_records
-               if (Tratto(nt)%time_records(i_rec,1)>=simulation_time) then
-                  if (Tratto(nt)%time_records(i_rec,1)==simulation_time) then
-                     Tratto(nt)%FlowRate = Tratto(nt)%time_records(i_rec,2)
-                     else
-                        Tratto(nt)%FlowRate =                                  &
-                           Tratto(nt)%time_records(i_rec-1,2)                  &
-                           + (Tratto(nt)%time_records(i_rec,2) -               &
-                           Tratto(nt)%time_records(i_rec-1,2)) /               &
-                           (Tratto(nt)%time_records(i_rec,1) -                 &
-                           Tratto(nt)%time_records(i_rec-1,1)) *               &
-                           (simulation_time -                                  &
-                           Tratto(nt)%time_records(i_rec-1,1))
-                  endif
-                  exit
-               endif
-            enddo
-         endif
-! Linear time interpolation for the inlet flow rate: end
 #ifdef SPACE_3D
          RowPeriod = ParticleVolume * NumPartFace(i_source) /                  &
                      Tratto(nt)%FlowRate
@@ -227,4 +239,4 @@ enddo
 ! Deallocations
 !------------------------
 return
-end subroutine PreSourceParticles
+end subroutine inlet_sections

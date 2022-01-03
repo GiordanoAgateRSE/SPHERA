@@ -80,7 +80,7 @@ IC_removal_flag = .false.
 !------------------------
 call liquid_particle_ID_array
 ! Introductory procedure for inlet conditions
-call PreSourceParticles
+call inlet_sections
 #ifdef SPACE_3D
 if (Domain%tipo=="semi") call BC_zmax_t0
 #endif
@@ -264,7 +264,7 @@ TIME_STEP_DO: do while (it<=input_any_t%itmax)
 #elif defined SPACE_2D
             if (SourceSide/=0) then
 #endif
-               call PreSourceParticles
+               call inlet_sections
                call GenerateSourceParticles
             endif
 #ifdef SPACE_3D
@@ -414,7 +414,7 @@ TIME_STEP_DO: do while (it<=input_any_t%itmax)
 #elif defined SPACE_2D
             if (SourceSide/=0) then
 #endif
-               call PreSourceParticles
+               call inlet_sections
                call GenerateSourceParticles
             endif
 #ifdef SPACE_3D
