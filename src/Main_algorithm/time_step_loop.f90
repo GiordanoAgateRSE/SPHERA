@@ -80,11 +80,9 @@ IC_removal_flag = .false.
 !------------------------
 call liquid_particle_ID_array
 ! Introductory procedure for inlet conditions
+call PreSourceParticles
 #ifdef SPACE_3D
-   call PreSourceParticles_3D
-   if (Domain%tipo=="semi") call BC_zmax_t0
-#elif defined SPACE_2D
-      call PreSourceParticles_2D
+if (Domain%tipo=="semi") call BC_zmax_t0
 #endif
 ! SPH parameters
 call start_and_stop(2,10)
@@ -112,7 +110,7 @@ if (IC_removal_flag.eqv..true.) then
    call start_and_stop(3,9)
    call start_and_stop(2,10)
 ! This fictitious value avoid CalcVarlength computing Gamma, sigma and density 
-! for this very call     
+! for this very call
    on_going_time_step = - 1
    call CalcVarLength
 ! The correct value of "on_going_time_step" is restored
@@ -266,6 +264,7 @@ TIME_STEP_DO: do while (it<=input_any_t%itmax)
 #elif defined SPACE_2D
             if (SourceSide/=0) then
 #endif
+               call PreSourceParticles
                call GenerateSourceParticles
             endif
 #ifdef SPACE_3D
@@ -415,6 +414,7 @@ TIME_STEP_DO: do while (it<=input_any_t%itmax)
 #elif defined SPACE_2D
             if (SourceSide/=0) then
 #endif
+               call PreSourceParticles
                call GenerateSourceParticles
             endif
 #ifdef SPACE_3D

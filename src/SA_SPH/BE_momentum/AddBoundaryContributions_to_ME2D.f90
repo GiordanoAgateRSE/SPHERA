@@ -215,7 +215,7 @@ do icbs=1,IntNcbs
                      endif
                      return
                   endif
-! Critical flow 
+! Critical flow
                   elseif (strtype=="crit") then     
 ! Non-stationary critical flow
                      Qsi = pressi / roi                          

@@ -89,7 +89,7 @@ do nt=1,NumTratti
          case ("velo","flow")
             PsiS = zero
             PsiN = zero
-            FiS = zero        
+            FiS = zero
             FiN = zero
          case ("crit")
             PsiS = zero
@@ -106,7 +106,7 @@ do nt=1,NumTratti
             PsiN = zero
             FiS = zero
             FiN = zero
-      endselect                                   
+      endselect
       call BoundaryReflectionMatrix2D(TT,RR,PsiS,PsiN)
       call BoundaryMassForceMatrix2D(FiS,FiN,TT,RRN) 
       BoundarySide(NumBS)%R = RR

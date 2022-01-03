@@ -20,8 +20,7 @@
 !--------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: GenerateSourceParticles
-! Description: To generate new source particles at the inlet sections (which 
-!              are quadrilaterals in case of 3D simulations). 
+! Description: Time-dependent generation of new particles at the inlet sections 
 !-------------------------------------------------------------------------------
 subroutine GenerateSourceParticles
 !------------------------

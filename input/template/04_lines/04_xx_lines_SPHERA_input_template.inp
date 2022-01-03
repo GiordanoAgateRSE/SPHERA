@@ -58,6 +58,8 @@
 ![?] <line_1_vertex_1>,...,<line_1_vertex_last>: first line vertices
 ![?] <line_last_ID>,<line_last_vertex_1>,...,<line_last_vertex_last>: last line 
 !    data
+![?] The first vertex of an inlet section is the highest one: its height is 
+!    time-dependent in run-time.
 !-------------------------------------------------------------------------------
 ![*] <line_first_ID> <line_first_vertex_1> ... <line_first_vertex_last>
 ![*] ...

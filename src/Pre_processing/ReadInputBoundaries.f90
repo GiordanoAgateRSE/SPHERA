@@ -33,12 +33,13 @@ subroutine ReadInputBoundaries(NumberEntities,Partz,Tratto,                    &
 !------------------------
 use Static_allocation_module
 use Hybrid_allocation_module
+use Memory_I_O_interface_module
 !------------------------
 ! Declarations
 !------------------------
 implicit none
-logical :: DBSPH_fictitious_reservoir_flag,laminar_no_slip_check
-integer(4) :: nrighe,ier,ninp,ulog,slip_coefficient_mode
+logical :: DBSPH_fictitious_reservoir_flag,laminar_no_slip_check,time_flag
+integer(4) :: nrighe,ier,ninp,ulog,slip_coefficient_mode,n_time_records,i_rec
 integer(4),dimension(20) :: NumberEntities
 #ifdef SPACE_2D
 integer(4),dimension(NumBVertices) :: BoundaryVertex
@@ -71,7 +72,7 @@ character(3) :: move
 character(4) :: tipo
 character(6) :: token_color
 character(8) :: label
-character(100) :: token
+character(100) :: token,array_name
 logical,external :: ReadCheck
 integer(4),external :: ptcolorrgb
 character(100), external :: lcase,GetToken
@@ -89,6 +90,8 @@ values3 = zero
 valp = zero
 slip_coefficient_mode = 0
 BC_shear_stress_input = -9.99d9
+time_flag = .false.
+n_time_records = 0
 !------------------------
 ! Statements
 !------------------------
@@ -203,18 +206,9 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
       case("sour")    
          NumberEntities(3) = NumberEntities(3) + 1
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         if (ioerr==0) read(ainp,*,iostat=ioerr) Medium
-         if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"SOURCE: MEDIUM INDEX",ninp, &
-            ulog)) return
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"SOURCE: FLOW RATE ",ninp,   &
-            ulog)) return
-         token = GetToken(ainp,1,ioerr)
-         if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"SOURCE: FLOW RATE",ninp,    &
-            ulog)) return
-         read(token,*,iostat=ioerr) flowrate
-         if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"SOURCE: FLOW RATE",ninp,    &
-            ulog)) return
+         if (ioerr==0) read(ainp,*,iostat=ioerr) Medium,time_flag
+         if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                             &
+            "SOURCE: MEDIUM INDEX, TIME FLAG",ninp,ulog)) return
          call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
          pressu = trim(GetToken(ainp,1,ioerr))
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"SOURCE PRESSURE TYPE",ninp, &
@@ -247,6 +241,26 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"FIXED: RRGGBB COLOR",ninp,  &
             ulog)) return
          move = "std"
+         if (time_flag.eqv..true.) then
+            call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+            read(ainp,*,iostat=ioerr) n_time_records
+            if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                          &
+               "SOURCE: NUMBER OF TIME RECORDS",ninp,ulog)) return
+            array_name = "SASPH boundary time records"
+            call allocate_de_dp_r2(.true.,Tratto(zone_ID)%time_records,        &
+               n_time_records,3,array_name)
+            do i_rec=1,n_time_records
+               call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+               read(ainp,*,iostat=ioerr) Tratto(zone_ID)%time_records(i_rec,1:3)
+               if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                       &
+                  "SOURCE: INLET TIME RECORDS",ninp,ulog)) return
+            enddo
+            else
+               call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+               read(ainp,*,iostat=ioerr) flowrate
+               if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                       &
+                  "SOURCE: FLOW RATE",ninp,ulog)) return
+         endif
 ! Boundary condition "velo"
       case("velo")
          NumberEntities(3) = NumberEntities(3) + 1
@@ -497,6 +511,8 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
       Tratto(zone_ID)%velocity = values1
       Tratto(zone_ID)%NormVelocity = velocity
       Tratto(zone_ID)%FlowRate = flowrate
+      Tratto(zone_ID)%time_flag = time_flag
+      Tratto(zone_ID)%n_time_records = n_time_records
       Tratto(zone_ID)%zone = zone_ID
       Tratto(zone_ID)%ColorCode = icolor
       if (ulog>0) then
@@ -676,9 +692,29 @@ BoundaryVertex(Tratto(zone_ID)%inivertex+Tratto(zone_ID)%numvertices-1)
             enddo
 #endif
          case("pool")
-            Tratto(zone_ID)%ColorCode = icolor
-            if (ulog>0) write(ulog,"(1x,a,z8)") "Color           : ",          &
-               Tratto(zone_ID)%colorCode
+            Tratto(zone_ID)%colorcode = icolor
+            write(ulog,"(1x,a,z8)") "Color           : ",                      &
+               Tratto(zone_ID)%colorcode
+         case("sour")
+            write(ulog,"(1x,a,i3)") "Medium Index: ",Tratto(zone_ID)%Medium
+            write(ulog,"(1x,a,l12)") "Time flag: ",Tratto(zone_ID)%time_flag
+            write(ulog,"(1x,a,2x,a)") "Pressure Type: ",Partz(zone_ID)%pressure
+            write(ulog,"(1x,a,1pe12.4)") "Pressure Value (Pa): ",              &
+               Partz(zone_ID)%valp
+            write(ulog,"(1x,a,z8)") "Color: ",Tratto(zone_ID)%colorcode
+            if (Tratto(zone_ID)%time_flag.eqv..true.) then
+               write(ulog,"(1x,a,i3)") "Number of time records: ",             &
+                  Tratto(zone_ID)%n_time_records
+               write(ulog,"(3a)") "Time(s)          ","Flow_rate(m^3/s) ",     &
+                  "Fluid_depth(m)   "
+               do i_rec=1,Tratto(zone_ID)%n_time_records
+                  write(ulog,'(3(ES17.3))')                                    &
+                     Tratto(zone_ID)%time_records(i_rec,1:3)
+               enddo
+               else
+                  write(ulog,"(1x,a,1pe12.4)") "Constant flow rate (m^3/s): ", &
+                     Tratto(zone_ID)%flowrate
+            endif
       endselect
    endif
    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)

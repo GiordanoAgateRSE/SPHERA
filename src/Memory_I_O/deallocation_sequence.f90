@@ -34,7 +34,7 @@ use Memory_I_O_interface_module
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: i
+integer(4) :: i,i_zone
 character(100) :: array_name
 !------------------------
 ! Explicit interfaces
@@ -60,6 +60,8 @@ array_name = "BoundaryFace"
 call allocate_de_BouFac_r1(.false.,BoundaryFace,array_name=array_name)
 array_name = "BFaceList"
 call allocate_de_int4_r1(.false.,BFaceList,array_name=array_name)
+array_name = "CLC%z0"
+call allocate_de_dp_r2(.false.,CLC%z0,array_name=array_name)
 #endif
 array_name = "BoundaryVertex"
 call allocate_de_int4_r1(.false.,BoundaryVertex,array_name=array_name)
@@ -207,7 +209,10 @@ array_name = "DBSPH%inlet_sections"
 call allocate_de_dp_r2(.false.,DBSPH%inlet_sections,array_name=array_name)
 array_name = "DBSPH%outlet_sections"
 call allocate_de_dp_r2(.false.,DBSPH%outlet_sections,array_name=array_name)
-array_name = "CLC%z0"
-call allocate_de_dp_r2(.false.,CLC%z0,array_name=array_name)
+array_name = "time records"
+do i_zone=1,NPartZone
+   call allocate_de_dp_r2(.false.,Tratto(i_zone)%time_records,                 &
+      array_name=array_name)
+enddo
 return
 end subroutine deallocation_sequence

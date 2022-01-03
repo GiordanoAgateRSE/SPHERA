@@ -27,7 +27,7 @@
 !                 in the second column: the pointer to CFBFVector, where the 
 !                                       list of intercepted faces begins 
 !              Searching is based on a principle of exclusion and is carried out
-!              in two phases: 
+!              in two phases:
 !                 First phase: for every cell, it excludes (as possibly 
 !                              intercepted) the faces, whose vertices all lie in
 !                              one of the semispaces (defined by the planes 
@@ -119,7 +119,6 @@ do nc=1,Grid%nmax
 ! Loop over all the boundary faces 
    do kf=1,NumFacce                                    
       nf = BFaceList(kf)
-! To skip in case of boundary type equal to "perimeter" or "pool"
       if ((Tratto(BoundaryFace(nf)%stretch)%tipo/="peri").and.                 &
          (Tratto(BoundaryFace(nf)%stretch)%tipo/="pool")) then
          nodes = BoundaryFace(nf)%nodes

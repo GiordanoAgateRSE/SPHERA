@@ -52,7 +52,7 @@
 !    interact with the SPH particles.
 ![?] No gaps on vertex IDs are permitted
 ![?] <Vertex_x>,<Vertex_y>,<Vertex_z>: first vertex coordinates starting from 
-!    the possible topography from which reservoirs are extruded
+!    the possible topography from which reservoirs are possibly extruded
 ![?] <Last_vertex_ID>,<Last_vertex_x>,<Last_vertex_y>,<Last_vertex_z>: last 
 !    vertex data
 ![?] The numerical inlet section is the physical inlet section moved upstream 

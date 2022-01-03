@@ -55,7 +55,7 @@ do Kf=1,NumFacce,1
    Nf = BFaceList(Kf)
    if (Nf==0) cycle
    Nt = BoundaryFace(Nf)%stretch
-   call DefineLocalSystemVersors (Nf)
+   call DefineLocalSystemVersors(Nf)
    TT(1:SPACEDIM,1:SPACEDIM) = BoundaryFace(nf)%T(1:SPACEDIM,1:SPACEDIM)
    RGP = zero
    RMF = zero

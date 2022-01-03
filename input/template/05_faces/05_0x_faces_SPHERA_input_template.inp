@@ -68,6 +68,8 @@
 !    and 6th vertices of a quadrilateral).
 ![?] <face_last_ID>,<face_last_vertex_1>,...,<face_last_vertex_6>,
 !    <face_last_zone_ID>: last face data
+![?] The first two vertices of an inlet section are the highest ones: their 
+!    height is time-dependent in run-time. 
 !-------------------------------------------------------------------------------
 ![*] 1 <face_first_vertex_1> ... <face_1_vertex_6> <face_1_zone_ID>
 ![*] ...

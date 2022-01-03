@@ -37,15 +37,16 @@ use Memory_I_O_interface_module
 implicit none
 character(7),intent(in) :: option
 integer(4),intent(inout) :: ier,nrecords
-integer(4) :: restartcode,save_istart,ioerr,i,alloc_stat,size_aux,i_zone
+integer(4) :: restartcode,save_istart,ioerr,i,alloc_stat,size_aux,i_zone,i_t
 #ifdef SPACE_3D
 integer(4) :: n_vertices_main_wall
 #endif
 double precision :: save_start
 character(12) :: ainp = "Restart File"
 character(len=8) :: versionerest
+character(100) :: array_name
 #ifdef SPACE_3D
-character(100) :: array_name,file_name
+character(100) :: file_name
 #endif
 logical,external :: ReadCheck
 character(100),external :: lcase
@@ -170,10 +171,34 @@ if (trim(lcase(option))==trim(lcase("heading"))) then
             return
       endif
 #endif
-      if (NumTratti>0) then
-         read(nsav,iostat=ioerr) Tratto(1:NumTratti)
-         if (.not.ReadCheck(ioerr,ier,it_start,ainp,"Tratto",nsav,ulog)) return
-      endif
+      do i_t=1,NumTratti
+         read(nsav,iostat=ioerr) size_aux
+         if (.not.ReadCheck(ioerr,ier,it_start,ainp,                           &
+            "Tratto - restart read - 1 of 3",nsav,ulog)) return
+         read(nsav,iostat=ioerr) Tratto(i_t)%laminar_no_slip_check,            &
+            Tratto(i_t)%time_flag,Tratto(i_t)%ColorCode,                       &
+            Tratto(i_t)%n_time_records,                                        &
+            Tratto(i_t)%numvertices,Tratto(i_t)%inivertex,                     &
+#ifdef SPACE_3D
+            Tratto(i_t)%iniface,                                               &
+#elif defined SPACE_2D
+            Tratto(i_t)%iniside,                                               &
+#endif
+            Tratto(i_t)%medium,Tratto(i_t)%zone,Tratto(i_t)%NormVelocity,      &
+            Tratto(i_t)%FlowRate,Tratto(i_t)%tipo,                             &
+            Tratto(i_t)%velocity(1:SPACEDIM),                                  &
+            Tratto(i_t)%PsiCoeff(1:SPACEDIM),Tratto(i_t)%FiCoeff(1:SPACEDIM)
+         if (.not.ReadCheck(ioerr,ier,it_start,ainp,                           &
+            "Tratto - restart read - 2 of 3",nsav,ulog)) return
+         if (size_aux>0) then
+            array_name = "SASPH boundary time records"
+            call allocate_de_dp_r2(.true.,Tratto(i_t)%time_records,size_aux,3, &
+               array_name)
+            read(nsav,iostat=ioerr) Tratto(i_t)%time_records(1:size_aux,1:3)
+            if (.not.ReadCheck(ioerr,ier,it_start,ainp,                        &
+               "Tratto - restart read - 3 of 3",nsav,ulog)) return
+         endif
+      enddo
       do i_zone=1,NPartZone
          read(nsav,iostat=ioerr) size_aux
          if (.not.ReadCheck(ioerr,ier,it_start,ainp,"Partz_1of5",nsav,ulog))   &

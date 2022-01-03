@@ -19,8 +19,8 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: ComputeBoundaryVolumeIntegrals_P0                                   
-! Description: (only in 3D) (Di Monaco et al., 2011, EACFM)                   
+! Program unit: ComputeBoundaryVolumeIntegrals_P0
+! Description: (only in 3D) (Di Monaco et al., 2011, EACFM)
 !-------------------------------------------------------------------------------
 #ifdef SPACE_3D
 subroutine ComputeBoundaryVolumeIntegrals_P0(icbf,Clobface,LocX,IntWdV,        &

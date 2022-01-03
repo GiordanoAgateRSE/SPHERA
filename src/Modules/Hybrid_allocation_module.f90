@@ -552,8 +552,8 @@ end type TyZone
 
 ! Having removed sub-zones/tratti, this derived type can be integrated in TyZone
 type TyBoundaryStretch
-   logical :: laminar_no_slip_check
-   integer(4) :: ColorCode
+   logical :: laminar_no_slip_check,time_flag
+   integer(4) :: colorcode,n_time_records
 ! Number of faces/lines of the zone (the name is misleading)
    integer(4) :: numvertices
 ! In 3D, this is not the first vertex of the zone
@@ -569,12 +569,15 @@ type TyBoundaryStretch
    double precision :: NormVelocity
 ! Flow rate exiting the faces
    double precision :: FlowRate
+! Type: "PERI", "SOUR", "OPEN"(, "FLOW", "VELO", "CRIT", "LEVE", "TAPI", "POOL")
+   character(4) :: tipo
 ! Velocity for "TAPI" zones
    double precision :: velocity(1:SPACEDIM)
    double precision :: PsiCoeff(1:SPACEDIM)
    double precision :: FiCoeff(1:SPACEDIM)
-! Type: "PERI", "SOUR", "OPEN"(, "FLOW", "VELO", "CRIT", "LEVE", "TAPI", "POOL")
-   character(4) :: tipo
+! Array of the time records (n_time_records,3): time (s), flow rate (m^3/s), 
+! fluid depth (m)
+   double precision,dimension(:,:),allocatable :: time_records
 end type TyBoundaryStretch
 
 ! Fluid

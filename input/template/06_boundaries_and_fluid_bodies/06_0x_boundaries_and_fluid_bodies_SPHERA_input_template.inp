@@ -46,7 +46,7 @@
 ![?] <Boundary_type>
 !    =fixed (wall frontier)
 !    =perimeter (fluid reservoir)
-!    =source(inlet section)
+!    =source(inlet section: a quadrilateral in 3D, a segment in 2D)
 !    =open (only removal of the particles crossing the open section, which 
 !          should beat least 2h far from the domain edges)
 !    =zmax (fluid-depth Dirichlet's BC: zone continuously filled with SPH 
@@ -325,7 +325,10 @@ ___
 !-------------------------------------------------------------------------------
 ![?] endif (Boundary_type=="open")
 ![?] if (Boundary_type=="source") then
-![?] <flowrate>: inlet velocity * inlet area
+![?] <time_flag>: .true. (time series for inlet flow rate and fluid 
+!    depth have to be provided; the axes of the inlet section have to be 
+!    aligned with the reference system axes); .false. (constant inlet section; 
+!    any orientation of the section sides)
 ![?] <BC_pressure_type>
 !    =pa (homogeneous conditions)
 !    =qp (hydrostatic conditions with equivalent free surface level as input)
@@ -333,19 +336,57 @@ ___
 !    equivalent free surface level (BC_pressure_type=qp; it is influential only 
 !    if there is no other medium along the vertical above the current medium)
 !-------------------------------------------------------------------------------
-![*] <fluid_ID>
-![*] <flowrate>
+![*] <fluid_ID> <time_flag>
 ![*] <BC_pressure_type> <BC_pressure_value>
 ![*] <RGBColor>
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
-___
-___
+___ ___
 ___ ___
 ___
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
+![?] if (time_flag) then
+![?] Inlet flow rate and inlet water depth are time-dependent input quantities. 
+!    However a rough and overestimated approximation of the inlet maximum water 
+!    depth is also provided in input, via the position of the inlet vertices, 
+!    only to simplify the neighbouring search and the assessment of the SASPH 
+!    boundary integrals (procedures executed before the time step loop).
+![?] <n_time_records>: number of time records (>=2).
+!-------------------------------------------------------------------------------
+![*] <n_time_records>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] INLET_TIME_SERIES: do i=1,n_time_records
+!-------------------------------------------------------------------------------
+![?] <time_i>: i-th time record for the inlet section (the time of the last 
+!    record should be slightly higher than time at the end of the simulation)
+![?] <flow_rate>: inlet speed * inlet area
+![?] <depth>: fluid/water depth.
+!-------------------------------------------------------------------------------
+![*] <time_i> <flow_rate> <depth>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+___ ___ ___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] enddo INLET_TIME_SERIES
+!-------------------------------------------------------------------------------
+![?] else (time_flag)
+![?] <flow_rate>: constant flow rate
+!-------------------------------------------------------------------------------
+![*] <flow_rate>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] endif (time_flag)
 ![?] endif (Boundary_type=="source")
+!-------------------------------------------------------------------------------
 ![?] if (3D) then
 ![?] if (Boundary_type=="zmax") then
 ![?] <BC_pressure_type>

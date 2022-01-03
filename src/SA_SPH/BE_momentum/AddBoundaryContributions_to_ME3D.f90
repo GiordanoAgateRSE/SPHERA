@@ -91,7 +91,7 @@ face_loop: do icbf=1,Ncbf
    stretch = BoundaryFace(iface)%stretch
    stretchtype = Tratto(stretch)%tipo
    nnlocal(:) = BoundaryFace(iface)%T(:,3)
-! Nothing to execute for open boundaries 
+! Nothing to execute for open boundaries
    if (stretchtype=="open") cycle face_loop
    if (stretchtype=="fixe".or.stretchtype=="tapi") then
 ! Local coordinates for particle Pi   

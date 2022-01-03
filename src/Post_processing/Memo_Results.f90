@@ -39,7 +39,7 @@ integer(4),intent(in) :: it
 double precision,intent(in) :: dtvel
 character(6),intent(in) :: str
 integer(4),intent(inout) :: it_memo,it_rest
-integer(4) :: nrecords,restartcode,i,i_zone,size_aux
+integer(4) :: nrecords,restartcode,i,i_zone,size_aux,i_t
 #ifdef SPACE_3D
 integer(4) :: io_stat
 character(100) :: file_name
@@ -106,7 +106,28 @@ if (index(str,'inizio')/=0) then
       write(nres) BFaceList(1:NumFacce)
    endif
 #endif
-   if (NumTratti>0) write(nres) Tratto(1:NumTratti)
+   do i_t=1,NumTratti
+      size_aux = 0
+      if (allocated(Tratto(i_t)%time_records)) then
+         size_aux = size(Tratto(i_t)%time_records,1)
+      endif
+      write(nres) size_aux
+      write(nres) Tratto(i_t)%laminar_no_slip_check,Tratto(i_t)%time_flag,     &
+         Tratto(i_t)%ColorCode,Tratto(i_t)%n_time_records,                     &
+         Tratto(i_t)%numvertices,Tratto(i_t)%inivertex,                        &
+#ifdef SPACE_3D
+         Tratto(i_t)%iniface,                                                  &
+#elif defined SPACE_2D
+         Tratto(i_t)%iniside,                                                  &
+#endif
+         Tratto(i_t)%medium,Tratto(i_t)%zone,Tratto(i_t)%NormVelocity,         &
+         Tratto(i_t)%FlowRate,Tratto(i_t)%tipo,                                &
+         Tratto(i_t)%velocity(1:SPACEDIM),                                     &
+         Tratto(i_t)%PsiCoeff(1:SPACEDIM),Tratto(i_t)%FiCoeff(1:SPACEDIM)
+      if (allocated(Tratto(i_t)%time_records)) then
+         write(nres) Tratto(i_t)%time_records(1:size_aux,1:3)
+      endif
+   enddo
    do i_zone=1,NPartZone
       size_aux = 0
 #ifdef SPACE_3D
