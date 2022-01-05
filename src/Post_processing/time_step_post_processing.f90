@@ -79,17 +79,16 @@ if (Domain%icpoi_fr>0) then
       if (mod(it,Domain%icpoi_fr)==0)  call Body_dynamics_output      
    endif
    elseif (input_any_t%cpoi_fr>zero) then
-      if ((mod(simulation_time,input_any_t%cpoi_fr)<=dtvel).and.npointst>0) then
+      if ((dmod(simulation_time,input_any_t%cpoi_fr)<=dtvel).and.npointst>0)   &
          call Memo_Ctl
-      endif
       if (n_bodies>0) then
-         if (mod(simulation_time,input_any_t%cpoi_fr)<=dtvel) then
+         if (dmod(simulation_time,input_any_t%cpoi_fr)<=dtvel) then
             call Body_dynamics_output
          endif         
       endif
 ! DB-SPH post-processing and update of the variable "wet" in the array "pg"
-      if ((Domain%tipo=="bsph").and.(mod(simulation_time,input_any_t%cpoi_fr)<=&
-         dtvel)) then
+      if ((Domain%tipo=="bsph").and.                                           &
+         (dmod(simulation_time,input_any_t%cpoi_fr)<=dtvel)) then
          if ((DBSPH%n_monitor_points>0).or.(DBSPH%n_monitor_regions==1)) then
             call wall_elements_pp
          endif
@@ -108,7 +107,7 @@ if (Domain%ipllb_fr>0) then
       call calc_pelo
    endif
    elseif (input_any_t%pllb_fr>zero) then
-      if ((mod(simulation_time,input_any_t%pllb_fr)<=dtvel).and.nlines>0) then
+      if ((dmod(simulation_time,input_any_t%pllb_fr)<=dtvel).and.nlines>0) then
          call calc_pelo
       endif
 endif
@@ -159,7 +158,7 @@ if (Domain%imemo_fr>0) then
 #endif
    endif
    elseif (input_any_t%memo_fr>zero) then
-      if (it>1.and.mod(simulation_time,input_any_t%memo_fr)<=dtvel) then
+      if (it>1.and.dmod(simulation_time,input_any_t%memo_fr)<=dtvel) then
          xmax = - 1.d30
          ymax = - 1.d30
          zmax = - 1.d30

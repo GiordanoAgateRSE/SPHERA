@@ -20,7 +20,13 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: inlet_sections
-! Description: Elaboration of the quantities of the inlet sections 
+! Description: Elaboration of the quantities of the inlet sections. The first 
+!              call to this program unit is mainly relevant for the SASPH 
+!              boundary integrals and the neighbouring search algorithm. They 
+!              are not time-dependent and refer to the maximum inlet fluid  
+!              depth, depending on the initial vertex positions, not on the 
+!              inlet time series. The following calls are time-dependent and 
+!              relevant to the SPH inlet particles.
 !-------------------------------------------------------------------------------
 subroutine inlet_sections
 !------------------------
@@ -40,11 +46,11 @@ integer(4) :: i,j,NumPartR,NumPartS,nodes
 #elif defined SPACE_2D
 integer(4) :: nA
 #endif
-double precision :: deltapart,fluid_depth,weir_length
+double precision :: fluid_depth,weir_length,NumPartperItem,Q_limiter
 #ifdef SPACE_3D
-double precision :: etalocal,eps,deltaR,deltaS,LenR,LenS,distR,distS,csi
+double precision :: etalocal,deltaR,deltaS,LenR,LenS,distR,distS,csi
 #elif defined SPACE_2D
-double precision :: linedist,sidelen,eps
+double precision :: linedist,sidelen
 double precision,dimension(1:SPACEDIM) :: A,ss
 #endif
 !------------------------
@@ -56,14 +62,19 @@ double precision,dimension(1:SPACEDIM) :: A,ss
 !------------------------
 ! Initializations
 !------------------------
-! searching the ID of the source side
-#ifdef SPACE_3D
-SourceFace = 0
-#elif defined SPACE_2D
-SourceSide = 0
-#endif
-SpCount = 0
 i_source=0
+Q_limiter = 1.d-6
+if (inlet_IC_flag.eqv..true.) then
+   emission_time = 0.d0
+#ifdef SPACE_3D
+   SourceFace = 0
+   zfila = -half * Domain%dx
+#elif defined SPACE_2D
+   SourceSide = 0
+   yfila = -half * Domain%dx
+#endif
+   SpCount = 0
+endif
 !------------------------
 ! Statements
 !------------------------
@@ -96,7 +107,6 @@ do isi=1,NumBSides
          nn(sd) = BoundarySide(SourceSide)%T(sd,3)
       enddo
 #endif
-         deltapart = Domain%dx
 #ifdef SPACE_3D
 ! LenR and LenS are the length scales of the inlet section: they are computed
 ! as the distance between the first and the last inlet vertices and the third
@@ -104,17 +114,18 @@ do isi=1,NumBSides
 ! and Plast-P3, where P1 the first boundary vertex, ..., Plast being the last 
 ! boundary vertex. In case of a triangular inlet, we have particles aligned 
 ! with one direction: P3-P1. In case of a quadrilateral inlet, we have particles 
-! distributed along two directions: P4-P1 and P4-P3.
-         LenR = zero
+! distributed along two directions: P4-P1 and P4-P3. The assessment of LenR 
+! is possibly time-dependent. The assessment of LenS is not time-dependent, but 
+! it is not saved. LenS might influence the fluid depth, which in turn affects 
+! LenR.
          LenS = zero
          do sd=1,SPACEDIM
-            LenR = LenR + (BoundaryFace(SourceFace)%Node(1)%GX(sd) -           &
-                   BoundaryFace(SourceFace)%Node(nodes)%GX(sd)) ** 2
             LenS = LenS + (BoundaryFace(SourceFace)%Node(3)%GX(sd) -           &
                    BoundaryFace(SourceFace)%Node(nodes)%GX(sd)) ** 2
          enddo
-         LenR = dsqrt(LenR)
          LenS = dsqrt(LenS)
+         NumPartS = int(LenS / Domain%dx + 0.01d0)
+         deltaS = LenS / NumPartS
 #endif
          if (Tratto(nt)%time_flag.eqv..true.) then
 ! Linear time interpolation for the inlet flow rate: start
@@ -136,50 +147,61 @@ do isi=1,NumBSides
                endif
             enddo
 ! Linear time interpolation for the inlet flow rate: end
+! Flow rate limiter
+            Tratto(nt)%FlowRate = max(Tratto(nt)%FlowRate,Q_limiter)
+            if (inlet_IC_flag.eqv..false.) then
 ! Linear time interpolation for the inlet fluid depth: start
-            if (Tratto(nt)%weir_flag.eqv..false.) then
-               do i_rec=1,Tratto(nt)%n_time_records
-                  if (Tratto(nt)%time_records(i_rec,1)>=simulation_time) then
-                     if (Tratto(nt)%time_records(i_rec,1)==simulation_time) then
-                        fluid_depth = Tratto(nt)%time_records(i_rec,3)
-                        else
-                           fluid_depth = Tratto(nt)%time_records(i_rec-1,3)    &
-                              + (Tratto(nt)%time_records(i_rec,3) -            &
-                              Tratto(nt)%time_records(i_rec-1,3)) /            &
-                              (Tratto(nt)%time_records(i_rec,1) -              &
-                              Tratto(nt)%time_records(i_rec-1,1)) *            &
-                              (simulation_time -                               &
-                              Tratto(nt)%time_records(i_rec-1,1))
+               if (Tratto(nt)%weir_flag.eqv..false.) then
+                  do i_rec=1,Tratto(nt)%n_time_records
+                     if (Tratto(nt)%time_records(i_rec,1)>=simulation_time)    &
+                        then
+                        if (Tratto(nt)%time_records(i_rec,1)==simulation_time) &
+                           then
+                           fluid_depth = Tratto(nt)%time_records(i_rec,3)
+                           else
+                              fluid_depth = Tratto(nt)%time_records(i_rec-1,3) &
+                                 + (Tratto(nt)%time_records(i_rec,3) -         &
+                                 Tratto(nt)%time_records(i_rec-1,3)) /         &
+                                 (Tratto(nt)%time_records(i_rec,1) -           &
+                                 Tratto(nt)%time_records(i_rec-1,1)) *         &
+                                 (simulation_time -                            &
+                                 Tratto(nt)%time_records(i_rec-1,1))
+                        endif
+                        exit
                      endif
-                     exit
-                  endif
-               enddo
-               else            
-! LRRA approximation of Swamee (1988, JHE) formula for Bazin weirs with 
+                  enddo
+                  else
+! LRRA approximation to Swamee (1988, JHE) formula for Bazin weirs with 
 ! upstream velocity
 #ifdef SPACE_3D
-                  weir_length = LenS
+                     weir_length = LenS
 #elif defined SPACE_2D
-               weir_length = 1.d0
+                  weir_length = 1.d0
 #endif
-                  fluid_depth = 3.d0 * ((Tratto(nt)%FlowRate / weir_length) ** &
-                     (2.d0/3.d0)) / (9.806d0 ** (1.d0/3.d0))
-            endif
+                     fluid_depth = 2.99d0 * ((Tratto(nt)%FlowRate /            &
+                                   weir_length) ** (2.d0/3.d0)) / (9.806d0 **  &
+                                   (1.d0/3.d0))
+               endif
+! Fluid depth limiter
+               fluid_depth = max(fluid_depth,Domain%dx)
 #ifdef SPACE_3D
-            BoundaryFace(SourceFace)%Node(1:2)%GX(3) =                         &
-               BoundaryFace(SourceFace)%Node(3)%GX(3) + fluid_depth
+               BoundaryFace(SourceFace)%Node(1:2)%GX(3) =                      &
+                  BoundaryFace(SourceFace)%Node(3)%GX(3) + fluid_depth
 #elif defined SPACE_2D
-         BoundarySide(SourceSide)%length = fluid_depth
+            BoundarySide(SourceSide)%length = fluid_depth
 #endif
 ! Linear time interpolation for the inlet fluid depth: end
-         endif      
-#ifdef SPACE_3D   
-         NumPartR = int(LenR / deltapart + 0.01d0)
-         NumPartS = int(LenS / deltapart + 0.01d0)
-         deltaR = LenR / NumPartR 
-         deltaS = LenS / NumPartS 
-         eps = -half
-         zfila = eps * deltapart
+            endif
+         endif
+#ifdef SPACE_3D
+         LenR = zero
+         do sd=1,SPACEDIM
+            LenR = LenR + (BoundaryFace(SourceFace)%Node(1)%GX(sd) -           &
+                   BoundaryFace(SourceFace)%Node(nodes)%GX(sd)) ** 2
+         enddo
+         LenR = dsqrt(LenR)
+         NumPartR = int(LenR / Domain%dx + 0.01d0)
+         deltaR = LenR / NumPartR
          distR = -half * deltaR
          ip = 0
          do i=1,NumPartR
@@ -201,40 +223,42 @@ do isi=1,NumBSides
             enddo
          enddo
          NumPartFace(i_source) = ip
+         NumPartperItem = NumPartFace(i_source)
 #elif defined SPACE_2D
       sidelen = BoundarySide(SourceSide)%length
-      NumPartperLine(i_source) = int(sidelen / deltapart + 0.01d0)
-      eps = -half
-      yfila = eps * deltapart
-      linedist = -half * deltapart
+      NumPartperLine(i_source) = int(sidelen / Domain%dx + 0.01d0)
+      linedist = -half * Domain%dx
       do ip=1,NumPartperLine(i_source)
-         linedist = linedist + deltapart
+         linedist = linedist + Domain%dx
          do sd=1,SPACEDIM
             PartLine(i_source,ip,sd) = A(sd) + linedist * ss(sd)
          enddo
       enddo
+      NumPartperItem = NumPartperLine(i_source)
 #endif
-         ParticleVolume = Domain%PVolume
-#ifdef SPACE_3D
-         RowPeriod = ParticleVolume * NumPartFace(i_source) /                  &
-                     Tratto(nt)%FlowRate
-#elif defined SPACE_2D
-      RowPeriod = ParticleVolume * NumPartperLine(i_source) /                  &
-                  Tratto(nt)%FlowRate 
-#endif
+         if (Tratto(nt)%FlowRate>(0.99d0*Q_limiter)) then
+            RowPeriod = Domain%PVolume * NumPartperItem / Tratto(nt)%FlowRate
+            else
+               write(uerr,'(3a)') 'The flow rate is smaller than its ',        &
+                  'limiter in the program unit "inlet_sections". The ',        &
+                  'execution stops here.'
+               stop
+         endif
+! The particle inlet velocity is affected by a complicated discretization error 
+! due to the fact the the particle size is not a sub-multiple of the inlet 
+! section lengths
          RowVelocity(i_source) = Domain%dx / RowPeriod
          Tratto(nt)%NormVelocity = RowVelocity(i_source)
 #ifdef SPACE_2D
       partz(irz)%vel(1) = RowVelocity(i_source) * nn(1)
       partz(irz)%vel(2) = RowVelocity(i_source) * nn(2)
       partz(irz)%vel(3) = RowVelocity(i_source) * nn(3)
-#endif
-         pinttimeratio = -1
-#ifdef SPACE_3D
+#elif defined SPACE_3D
       endif
 #endif
    endif
 enddo
+if (inlet_IC_flag.eqv..true.) inlet_IC_flag = .false. 
 !------------------------
 ! Deallocations
 !------------------------

@@ -109,14 +109,22 @@ integer(4) :: it_start,on_going_time_step,it_eff,indarraySol
 double precision :: simulation_time,dt,pesodt,dt_average,DTminBER
 ! Global variables: end
 ! Global variables for inlet sections: start
+! Flag to detect the initial conditions for the inlet sections
+logical :: inlet_IC_flag = .true.
 integer(4) :: mat,irz,izone
 #ifdef SPACE_3D
-integer(4) :: NumOpenFaces,SourceFace
+! Number of outlet sections (open sections)
+integer(4) :: NumOpenFaces
+! ID of the current inlet section or number of inlet sections, depending on 
+! the program unit
+integer(4) :: SourceFace
 #elif defined SPACE_2D
 integer(4) :: NumOpenSides,SourceSide
 #endif
-integer(4) :: pinttimeratio,itime_jet
-double precision :: RowPeriod,yfila,ParticleVolume,zfila
+integer(4) :: itime_jet
+double precision :: RowPeriod,yfila,zfila
+! Following emission time for inlet particles
+double precision :: emission_time
 #ifdef SPACE_3D
 integer(4),dimension(1:MAXOPENFACES) :: OpenFace
 integer(4),dimension(1:MAXOPENSIDES) :: NumPartFace

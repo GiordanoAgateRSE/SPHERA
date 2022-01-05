@@ -20,7 +20,13 @@
 !--------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: GenerateSourceParticles
-! Description: Time-dependent generation of new particles at the inlet sections 
+! Description: Time-dependent generation of new particles at the inlet 
+!              sections. The actual position of the generated particles depends 
+!              on the ratio between the residual time since the last emission 
+!              step and the particle size (for null residual time the particle 
+!              barycentre is located upstream the inlet section of dx/2; the 
+!              maximum residual is associated with particle barycentres located  
+!              dx/2 downstream the inlet section).  
 !-------------------------------------------------------------------------------
 subroutine GenerateSourceParticles
 !------------------------
@@ -35,9 +41,8 @@ use Memory_I_O_interface_module
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: nt,sd,ip,inttimeratio,isi,i_source,boundary_number,NumPartperBound
-integer(4) :: inlet_zone
-double precision :: Time,SourceTime,TimeFrac,DisplFrac
+integer(4) :: nt,sd,ip,isi,i_source,boundary_number,NumPartperBound,inlet_zone
+double precision :: TimeFrac,DisplFrac
 character(4) :: boundary_type
 character(len=lencard) :: nomsub = "GenerateSourceParticles"
 integer(4),external :: ParticleCellNumber
@@ -50,7 +55,6 @@ integer(4),external :: ParticleCellNumber
 !------------------------
 ! Initializations
 !------------------------
-Time = simulation_time
 #ifdef SPACE_3D
    inlet_zone = izone
 #elif defined SPACE_2D
@@ -64,11 +68,10 @@ Time = simulation_time
 #elif defined SPACE_2D
       if (SourceSide==0) return
 #endif
-inttimeratio = int(Time / RowPeriod)
-if (inttimeratio>pinttimeratio) then
-   itime_jet = itime_jet + 1
-   SourceTime = inttimeratio * RowPeriod
-   TimeFrac = Time - SourceTime
+if (simulation_time>=emission_time) then
+! "itime_jet" only influences DBSPH under constant inlet sections.
+   itime_jet = int(simulation_time / RowPeriod) + 1
+   TimeFrac = simulation_time - emission_time
    i_source=0
 #ifdef SPACE_3D
       boundary_number = NumFacce
@@ -135,7 +138,7 @@ if (inttimeratio>pinttimeratio) then
             endif
 ! Particle zone
             pg(nag)%izona = inlet_zone
-            pg(nag)%mass = ParticleVolume * Med(Mat)%den0
+            pg(nag)%mass = Domain%PVolume * Med(Mat)%den0
             pg(nag)%imed = mat  
             pg(nag)%kin_visc = Med(mat)%kin_visc
             pg(nag)%mu = Med(mat)%kin_visc * Med(Mat)%den0
@@ -165,7 +168,7 @@ if (inttimeratio>pinttimeratio) then
          enddo
       endif 
    enddo
-   pinttimeratio = inttimeratio
+   emission_time = emission_time + RowPeriod
 endif
 !------------------------
 ! Deallocations

@@ -57,6 +57,7 @@ integer(4),external :: CellNumber
 !------------------------
 ! Initializations
 !------------------------
+dtvel = 0.d0
 on_going_time_step = -999
 EpOrdGrid = 0
 num_out = 0
@@ -79,7 +80,6 @@ IC_removal_flag = .false.
 ! Statements
 !------------------------
 call liquid_particle_ID_array
-! Introductory procedure for inlet conditions
 call inlet_sections
 #ifdef SPACE_3D
 if (Domain%tipo=="semi") call BC_zmax_t0

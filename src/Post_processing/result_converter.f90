@@ -62,7 +62,7 @@ if ((curtime<val_time).and.(index(str,'fine')==0)) return
 ! To concatenate the ".txt" output files and remove the original ones
 call cat_post_proc
 ! Rounding current physical time for Paraview .vtu files
-curtime = simulation_time - MOD(simulation_time,abs(freq_time))  
+curtime = simulation_time - dmod(simulation_time,dabs(freq_time))  
 if (nag>0) then
    block = block + 1
    nblocchi = nblocchi + 1

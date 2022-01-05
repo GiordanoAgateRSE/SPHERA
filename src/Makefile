@@ -178,7 +178,7 @@ endif
 COMPILATION_FLAGS = -O2
 ifeq ($(EXECUTION), debug)
    ifeq ($(COMPILER), gfortran)
-      COMPILATION_FLAGS = -g -O0 -fbacktrace -C -Wall -fbounds-check
+      COMPILATION_FLAGS = -g -O0 -fbacktrace -C -Wall -fbounds-check -ffpe-trap=zero,overflow,underflow,invalid,denormal
       else ifeq ($(COMPILER), ifort)
          COMPILATION_FLAGS = -g -O0 -traceback -C -check bounds -check noarg_temp_created -debug all -fpe0
    endif

@@ -57,7 +57,6 @@ icoordp(0,2) = 0
 icoordp(1,2) = 1
 icoordp(2,2) = 2
 icoordp(3,2) = 3
-pinttimeratio = 0
 #ifdef SPACE_3D
    NumOpenFaces = 0
    SourceFace = 0
@@ -80,7 +79,6 @@ enddo
 RowPeriod = zero
 yfila = zero
 zfila = zero
-ParticleVolume = zero
 kill_flag = .false.
 PgZero%vel_type = "   "
 PgZero%slip = " "

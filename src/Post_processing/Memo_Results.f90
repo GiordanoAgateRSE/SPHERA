@@ -188,9 +188,9 @@ if (Domain%irest_fr>0) then
    if (mod(it,Domain%irest_fr)==0) then
       it_rest = it
    endif
-! Case with restart  
+! Case with restart
    elseif (input_any_t%rest_fr>zero) then
-      if ((it>1).and.(mod(simulation_time,input_any_t%rest_fr)<=dtvel)) then
+     if ((it>1).and.(dmod(simulation_time,input_any_t%rest_fr)<=dtvel)) then
          it_rest = it
      endif
 endif
@@ -199,7 +199,7 @@ if (Domain%imemo_fr>0) then
         it_memo = it
    endif
    elseif (input_any_t%memo_fr>zero) then
-      if ((it>1).and.(mod(simulation_time,input_any_t%memo_fr)<=dtvel)) then
+      if ((it>1).and.(dmod(simulation_time,input_any_t%memo_fr)<=dtvel)) then
          it_memo = it
       endif
 endif

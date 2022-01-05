@@ -53,6 +53,11 @@ character(100) :: array_name
 !------------------------
 array_name = "Vertice"
 call allocate_de_dp_r2(.false.,Vertice,array_name=array_name)
+array_name = "time records"
+do i_zone=1,NumTratti
+   call allocate_de_dp_r2(.false.,Tratto(i_zone)%time_records,                 &
+      array_name=array_name)
+enddo
 array_name = "Tratto"
 call allocate_de_BouStr_r1(.false.,Tratto,array_name=array_name)
 #ifdef SPACE_3D
@@ -209,10 +214,5 @@ array_name = "DBSPH%inlet_sections"
 call allocate_de_dp_r2(.false.,DBSPH%inlet_sections,array_name=array_name)
 array_name = "DBSPH%outlet_sections"
 call allocate_de_dp_r2(.false.,DBSPH%outlet_sections,array_name=array_name)
-array_name = "time records"
-do i_zone=1,NPartZone
-   call allocate_de_dp_r2(.false.,Tratto(i_zone)%time_records,                 &
-      array_name=array_name)
-enddo
 return
 end subroutine deallocation_sequence
