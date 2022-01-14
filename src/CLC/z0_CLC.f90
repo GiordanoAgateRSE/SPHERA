@@ -41,8 +41,9 @@ use Neighbouring_Search_interface_module
 ! Declarations
 !------------------------
 implicit none
+logical :: activation_flag
 integer(4) :: i_face,ix,iy,i_hcel,i_pol,CLC_active_cells,io_stat,ier,test
-integer(4) :: i_pol_nei,aux_int
+integer(4) :: i_pol_nei,aux_int,F_VUC
 double precision :: CLC_filling,z0_default
 double precision :: pos_cell(3)
 character(100) :: array_name,file_name
@@ -103,13 +104,17 @@ write(uCLC,'(3(a10),(a8))') "x(m)","y(m)","CLC_class","z0(m)"
 !$omp parallel do default(none)                                                &
 !$omp shared (Grid,n_neigh_hcell_CLCpol,CLC,CLC_active_cells,uCLC)             &
 !$omp shared (neigh_hcell_CLCpol,NMAXPARTJ)                                    &
-!$omp private(iy,ix,i_hcel,pos_cell,i_pol,i_pol_nei,i_face,test,aux_int)
+!$omp private(iy,ix,i_hcel,pos_cell,i_pol,i_pol_nei,i_face,test,aux_int,F_VUC) &
+!$omp private(activation_flag)
 do iy=1,Grid%ncd(2)
    do ix=1,Grid%ncd(1)
 ! Index of the horizontal grid cell
       i_hcel = CellNumber(ix,iy,1)
 ! Coordinates of the cell barycentre
       call cell_indices2pos(ix,iy,1,pos_cell(1:3))
+! Initializions for the cell
+      F_VUC = 1000000000
+      activation_flag = .false.
 ! Loop over the neighbouring CLC polygons
       do_i_pol_nei: do i_pol_nei=1,n_neigh_hcell_CLCpol(i_hcel)
 ! Element index of the neighbouring CLC polygon
@@ -126,16 +131,23 @@ do iy=1,Grid%ncd(2)
    CLC%polygons(i_pol)%vertices(CLC%polygons(i_pol)%faces(i_face,3),1:2),      &
    CLC%polygons(i_pol)%vertices(CLC%polygons(i_pol)%faces(i_face,3),1:2),test)
             if (test==1) then
+               if (CLC%polygons(i_pol)%faces(i_face,4)<F_VUC) then
+! So far, the current face is the only one selected or has the smallest vertex 
+! usage code (in case of overlapping faces)
+                  F_VUC = CLC%polygons(i_pol)%faces(i_face,4)
 ! Assign the class of the CLC polygon to the current element of the 
 ! CLC%class_2D array
-               CLC%class_2D(ix,iy) = CLC%polygons(i_pol)%CLC_class
+                  CLC%class_2D(ix,iy) = CLC%polygons(i_pol)%CLC_class
 ! Assign z0
-               call z0_CLC_table(ix,iy)
+                  call z0_CLC_table(ix,iy)
+                  if (activation_flag.eqv..false.) then
+                     activation_flag = .true. 
 !$omp critical (omp_CLC_active_cells)
 ! Update the count of CLC active cells
-               CLC_active_cells = CLC_active_cells + 1
+                     CLC_active_cells = CLC_active_cells + 1
 !$omp end critical (omp_CLC_active_cells)
-               exit do_i_pol_nei
+                  endif
+               endif
             endif
          enddo
       enddo do_i_pol_nei
@@ -180,6 +192,9 @@ do i_pol=1,CLC%n_polygons
    write(array_name,*) i_pol
    array_name = "CLC%polygons(" // trim(adjustl(array_name)) // ")%faces"
    call allocate_de_int4_r2(.false.,CLC%polygons(i_pol)%faces,                 &
+      array_name=array_name)
+   array_name = "CLC%polygons(" // trim(adjustl(array_name)) // ")%v_occurrence"
+   call allocate_de_int4_r1(.false.,CLC%polygons(i_pol)%v_occurrence,          &
       array_name=array_name)
 enddo
 !$omp end parallel do

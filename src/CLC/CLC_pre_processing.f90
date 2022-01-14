@@ -37,7 +37,7 @@ use Memory_I_O_interface_module
 !------------------------
 implicit none
 integer(4) :: io_stat,ier,i_rec,i_vert,i_face,n_sides,file_line,I_O_unit,i_pol
-integer(4) :: n_hcells,max_file_unit_ID,thread_id,n_threads
+integer(4) :: n_hcells,max_file_unit_ID,thread_id,n_threads,i_aux
 character(100) :: file_name,array_name,aux_char,aux_char_2
 logical,external :: ReadCheck
 !------------------------
@@ -50,6 +50,11 @@ interface
       character(100),intent(in) :: file_name
       integer(4),intent(out) :: n_vertices,n_faces
    end subroutine ply_headings
+   subroutine vertex_usage_code(V_0_1,V_0_2,V_0_3,F_VUC)
+      implicit none
+      integer(4),intent(in) :: V_0_1,V_0_2,V_0_3
+      integer(4),intent(out) :: F_VUC
+   end subroutine vertex_usage_code
    function OMP_get_num_threads()
       integer(4) :: OMP_get_num_threads
    end function OMP_get_num_threads
@@ -169,13 +174,13 @@ call check_max_file_unit_ID(max_file_unit_ID,max_file_unit_booked+1,file_name)
 !$omp private(n_sides,file_line,thread_id)
 do i_pol=1,CLC%n_polygons
 ! Check on the maximum file unit (part 2 of 2)
-if (i_pol==1) then
+   if (i_pol==1) then
 ! Reading the number of threads
 !$ n_threads = OMP_GET_NUM_THREADS()
-   write(ulog,'(3a,i9)') "On the check for the file units of the CLC ",        &
-      "polygons. The local number of OMP threads and of the file units ",      &
-      "requested is: ",n_threads
-endif
+      write(ulog,'(3a,i9)') "On the check for the file units of the CLC ",     &
+         "polygons. The local number of OMP threads and of the file units ",   &
+         "requested is: ",n_threads
+   endif
 ! Reading the generic «.ply » CLC file into the associated fields of the CLC 
 ! derived-type array element
 ! First correct the CLC polygon ID, which was assigned as a Paraview block 
@@ -217,11 +222,16 @@ endif
          stop
       endif
    enddo
+! Allocation and initialization of the array of the vertex occurrence
+   array_name = "CLC%polygons(" // trim(adjustl(array_name)) // ")%v_occurrence"
+   call allocate_de_int4_r1(.true.,CLC%polygons(i_pol)%v_occurrence,           &
+      CLC%polygons(i_pol)%n_vertices,array_name)
+   CLC%polygons(i_pol)%v_occurrence(:) = 0
 ! Allocation of the faces of the CLC polygon
    write(array_name,*) i_pol
    array_name = "CLC%polygons(" // trim(adjustl(array_name)) // ")%faces"
    call allocate_de_int4_r2(.true.,CLC%polygons(i_pol)%faces,                  &
-      CLC%polygons(i_pol)%n_faces,3,array_name)
+      CLC%polygons(i_pol)%n_faces,4,array_name)
 ! Read the faces of the current CLC polygon
    do i_face=1,CLC%polygons(i_pol)%n_faces
       read(I_O_unit,*,iostat=io_stat) n_sides,                                 &
@@ -245,9 +255,24 @@ endif
             ". The execution stops here."
          stop
       endif
+! Update the array of the vertex occurrence
+      do i_aux=1,3
+   CLC%polygons(i_pol)%v_occurrence(CLC%polygons(i_pol)%faces(i_face,i_aux)) = &
+      CLC%polygons(i_pol)%v_occurrence(CLC%polygons(i_pol)%faces(i_face,i_aux))&
+      + 1
+      enddo
    enddo
 ! Re-close the ".ply" file
    call open_close_file(.false.,I_O_unit,file_name)
+! Compute the "vertex usage code" of all the faces of the current CLC 
+! triangulated polygon
+   do i_face=1,CLC%polygons(i_pol)%n_faces
+      call vertex_usage_code(                                                  &
+         CLC%polygons(i_pol)%v_occurrence(CLC%polygons(i_pol)%faces(i_face,1)),&
+         CLC%polygons(i_pol)%v_occurrence(CLC%polygons(i_pol)%faces(i_face,2)),&
+         CLC%polygons(i_pol)%v_occurrence(CLC%polygons(i_pol)%faces(i_face,3)),&
+         CLC%polygons(i_pol)%faces(i_face,4))
+   enddo
 ! Contribution to the neighbouring search
    call neighbouring_hcell_CLCp(i_pol)
 enddo
@@ -259,18 +284,21 @@ do i_pol=1,CLC%n_polygons
    write(ulog,'(4(i12))') CLC%polygons(i_pol)%ID,                              &
       CLC%polygons(i_pol)%CLC_class,CLC%polygons(i_pol)%n_vertices,            &
       CLC%polygons(i_pol)%n_faces
-   write(ulog,'(3(a10))') "ID_vertex","x(m)","y(m)"
+   write(ulog,'(4(a10))') "ID_vertex","x(m)","y(m)","V_o"
    do i_vert=1,CLC%polygons(i_pol)%n_vertices
-      write(ulog,'(i10,2(f10.3))') i_vert,                                     &
+      write(ulog,'(i10,2(f10.3),i10)') i_vert,                                 &
          CLC%polygons(i_pol)%vertices(i_vert,1),                               &
-         CLC%polygons(i_pol)%vertices(i_vert,2)
+         CLC%polygons(i_pol)%vertices(i_vert,2),                               &
+         CLC%polygons(i_pol)%v_occurrence(i_vert)
    enddo
-   write(ulog,'(4(a12))') "ID_face","ID_vertex_1","ID_vertex_2","ID_vertex_3"
+   write(ulog,'(5(a12))') "ID_face","ID_vertex_1","ID_vertex_2","ID_vertex_3", &
+      "F_VUC"
    do i_face=1,CLC%polygons(i_pol)%n_faces
-      write(ulog,'(4(i12))') i_face,                                           &
+      write(ulog,'(5(i12))') i_face,                                           &
          CLC%polygons(i_pol)%faces(i_face,1),                                  &
          CLC%polygons(i_pol)%faces(i_face,2),                                  &
-         CLC%polygons(i_pol)%faces(i_face,3)
+         CLC%polygons(i_pol)%faces(i_face,3),                                  &
+         CLC%polygons(i_pol)%faces(i_face,4)
    enddo
 enddo
 write(ulog,*) "----------------------------------------------------------------"

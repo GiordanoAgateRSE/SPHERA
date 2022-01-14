@@ -929,7 +929,12 @@ type CLC_polygon_der_type
 ! lower-left and the upper-right corners of the rectangle circumscribing the 
 ! CLC polygon 
    integer(4) :: iy_cel_ll,iy_cel_ur,ix_cel_ll,ix_cel_ur
+! Vertex occurrence (1:n_vertices)
+   integer(4),dimension(:),allocatable :: v_occurrence
+! faces(1:n_faces,1:4). It contains the three vertex IDs and the vertex usage 
+! code of the face within the triangulated CLC polygon
    integer(4),dimension(:,:),allocatable :: faces
+! vertices(1:n_faces,1:2)
    double precision,dimension(:,:),allocatable :: vertices
 end type
 
