@@ -20,7 +20,7 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: ReadRestartFile
-! Description: To read the restart file.                       
+! Description: To read the restart file
 !-------------------------------------------------------------------------------
 subroutine ReadRestartFile(option,ier,nrecords)
 !------------------------
@@ -93,7 +93,7 @@ if (trim(lcase(option))==trim(lcase("heading"))) then
       stop
    endif
    read(nsav,iostat=ioerr) nag,NPartZone,NumVertici,                           &
-#ifdef SPACE_3D  
+#ifdef SPACE_3D
       NumFacce,NumTratti,NumBVertices,GCBFVecDim,Grid%nmax,npointst,NPoints,   &
 #elif defined SPACE_2D
       NumTratti,NumBVertices,NumBSides,Grid%nmax,npointst,NPoints,             &
@@ -112,7 +112,7 @@ if (trim(lcase(option))==trim(lcase("heading"))) then
             "ReadRestartFile failed. "
          else
             write(ulog,'(1x,2a)') "Allocation of GCBFVector in ",              &
-            "ReadRestartFile successully completed. "
+            "ReadRestartFile successfully completed. "
       endif
    endif
 #endif
@@ -300,11 +300,12 @@ Partz(i_zone)%plan_reservoir_points,Partz(i_zone)%ID_first_vertex_sel,         &
             call allocate_de_dp_r2(.true.,CLC%z0,Grid%ncd(1),Grid%ncd(2),      &
                array_name)
 ! z0 reading from a dedicated time-independent restart file
-            file_name = "./input/20_CLC/z0.res"
+            file_name = trim(adjustl(Domain%restart_path)) //                  &
+               "/input/20_CLC/z0.res"
             call open_close_file(.true.,urz0,file_name)
             read(urz0,*,iostat=ioerr) CLC%z0
-            if (.not.ReadCheck(ioerr,ier,1,"./input/20_CLC/z0.res",            &
-               "z0_restart_read",urz0,ulog)) return
+            if (.not.ReadCheck(ioerr,ier,1,file_name,"z0_restart_read",urz0,   &
+               ulog)) return
             call open_close_file(.false.,urz0,file_name)
          endif
       endif

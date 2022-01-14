@@ -48,7 +48,8 @@
 !    =perimeter (fluid reservoir)
 !    =source(inlet section: a quadrilateral in 3D, a segment in 2D)
 !    =open (only removal of the particles crossing the open section, which 
-!          should beat least 2h far from the domain edges)
+!          should be located within the domain at least 2h far from the domain 
+!          edges)
 !    =zmax (fluid-depth Dirichlet's BC: zone continuously filled with SPH 
 !           particles from the non-stationary free surface height to the given 
 !           input height "z_max", under hydrostatic or homogeneous pressure 

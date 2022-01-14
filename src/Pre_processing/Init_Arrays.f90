@@ -216,6 +216,7 @@ Domain%prif = zero
 Domain%prif = zero
 Domain%h = zero
 Domain%start = zero
+Domain%restart_path = "."
 Domain%NormFix = .false.
 Domain%Slip = .false.
 ! input_any_t

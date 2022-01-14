@@ -46,7 +46,8 @@
 ![?] The CLC input folder is relevant only in the absence of DEM and contains:
 ![?] the «CLC_*.txt» file with: CLC block number of CLC polygons (assigned by 
 ![?] Paraview), CLC class of CLC polygons. The CLC block number is the ID of  
-![?] the CLC polygon (assigned by Paraview in the ".tar." archive) plus 1;
+![?] the CLC polygon (assigned by Paraview in the ".tar." archive) plus 1 
+![?] (at least two records are requested, records can be repeated);
 ![?] the «CLC_polygons_ply.tar» archive containing the folder 
 ![?] «CLC_polygons_ply» with the files "CLC_<ID>.ply" of the CLC polygons;
 ![?] the "z0_default.txt" file with only a default z0 value to be applied 

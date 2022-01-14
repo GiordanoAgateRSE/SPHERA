@@ -47,6 +47,7 @@ integer(4) :: npi,ier,i,n,nrecords,InputErr,alloc_stat
 integer(4) :: machine_Julian_day,machine_hour,machine_minute,machine_second
 integer(4),dimension(20) :: NumberEntities 
 double precision :: eps_f
+character(100) :: file_name
 character(len=lencard) :: nomsub = "GEST_INPUT"
 character(len=lencard) :: ainp,msg_err
 character(100), external :: lcase
@@ -67,8 +68,9 @@ call deallocation_sequence
 ! variable to be read from the main input file (beyond the strings).
 Domain%dx = zero
 NumberEntities = 0
-Domain%istart = 0    
-Domain%start = zero            
+Domain%istart = 0
+Domain%start = zero
+Domain%restart_path = "."
 Domain%file = " " 
 Domain%NormFix = .false.         
 Domain%Slip = .false.
@@ -177,14 +179,15 @@ endif
 if ((Domain%istart>0).or.(Domain%start>zero)) then
    restart = .true.
 ! To open the restart file from which restart data will be restored
-   open(unit=nsav,file=trim(Domain%file),form="unformatted",status="old",      &
-      iostat=ier)
+   file_name = trim(adjustl(Domain%restart_path)) // "/" //                    &
+      trim(adjustl(Domain%file))
+   open(unit=nsav,file=file_name,form="unformatted",status="old",iostat=ier)
    if (ier/=0) then
-      ainp = Domain%file
-      call diagnostic(arg1=5,arg2=201,arg3=trim(ainp))
+      ainp = file_name
+      call diagnostic(arg1=5,arg2=201,arg3=ainp)
       else
-         write(ulog,'(1x,a)')                                                  &
-">Data are read from the restart file "//trim(Domain%file)//" in the routine ReadRestartFile"
+         write(ulog,'(1x,a)') ">Data are read from the restart file " //       &
+            trim(adjustl(file_name)) // " in the routine ReadRestartFile"
    endif
 ! To restore data from the restart file
 ! During the first reading of the restart file, only few parameters are read

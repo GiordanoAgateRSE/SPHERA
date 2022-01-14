@@ -717,7 +717,7 @@ BoundaryVertex(Tratto(zone_ID)%inivertex+Tratto(zone_ID)%numvertices-1)
                Partz(zone_ID)%valp
             write(ulog,"(1x,a,z8)") "Color: ",Tratto(zone_ID)%colorcode
             if (Tratto(zone_ID)%time_flag.eqv..true.) then
-               write(ulog,"(1x,a,i3)") "Number of time records: ",             &
+               write(ulog,"(1x,a,i8)") "Number of time records: ",             &
                   Tratto(zone_ID)%n_time_records
                write(ulog,"(1x,a,l12)") "Weir flag: ",Tratto(zone_ID)%weir_flag
                write(ulog,"(3a)") "Time(s)          ","Flow_rate(m^3/s) ",     &

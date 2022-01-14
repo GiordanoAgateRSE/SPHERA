@@ -40,10 +40,8 @@ double precision,intent(in) :: dtvel
 character(6),intent(in) :: str
 integer(4),intent(inout) :: it_memo,it_rest
 integer(4) :: nrecords,restartcode,i,i_zone,size_aux,i_t
-#ifdef SPACE_3D
 integer(4) :: io_stat
 character(100) :: file_name
-#endif
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -206,6 +204,16 @@ endif
 if ((it_rest==it).or.(index(str,'inizio')/=0).or.(index(str,'fine')/=0)) then
 ! If restartcode=1, then to save the whole arrays "pg","pg_w"
 ! Only for the first and last steps
+   file_name = "restart_last_time.rist"
+   if (index(str,'inizio')==0) then
+      call system("mv "//trim(adjustl(file_name))//" "//                       &
+         trim(adjustl(file_name))//".bck")
+   endif
+   call open_close_file(.true.,max_file_unit_booked+1,file_name)
+   write(max_file_unit_booked+1,*,iostat=io_stat) simulation_time
+   call open_close_file(.false.,max_file_unit_booked+1,file_name)
+   if (index(str,'inizio')==0) call system("rm -f "//trim(adjustl(file_name))  &
+      //".bck")
    restartcode = 1
    write(nres) it,simulation_time,dt,nag,restartcode
    write(nres) pg(1:nag)

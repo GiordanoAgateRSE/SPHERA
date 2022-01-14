@@ -80,6 +80,9 @@ type TyGlobal
 ! Coordinates of 2 vertices of a diagonal of the parallelepiped domain                                            
    double precision :: coord(3,2)
    character(4) :: tipo
+! Restart information path (influential only in case of authomatic reading of 
+! the last restart time)
+   character(100) :: restart_path   
    character(len=lencard) :: file
 ! IC particle distribution noise. "r": slight white noise is added, otherwise 
 ! no noise.
