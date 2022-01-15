@@ -300,8 +300,7 @@ Partz(i_zone)%plan_reservoir_points,Partz(i_zone)%ID_first_vertex_sel,         &
             call allocate_de_dp_r2(.true.,CLC%z0,Grid%ncd(1),Grid%ncd(2),      &
                array_name)
 ! z0 reading from a dedicated time-independent restart file
-            file_name = trim(adjustl(Domain%restart_path)) //                  &
-               "/input/20_CLC/z0.res"
+            file_name = trim(adjustl(input_any_t%restart_path)) // "/z0.ris"
             call open_close_file(.true.,urz0,file_name)
             read(urz0,*,iostat=ioerr) CLC%z0
             if (.not.ReadCheck(ioerr,ier,1,file_name,"z0_restart_read",urz0,   &

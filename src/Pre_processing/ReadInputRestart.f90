@@ -100,25 +100,25 @@ do while (trim(lcase(ainp))/="##### end restart #####")
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"RESTART PATH ",ninp,ulog))  &
             return
          token = GetToken(ainp,1,ioerr)
-         read(token,*,iostat=ioerr) Domain%restart_path
+         read(token,*,iostat=ioerr) input_any_t%restart_path
          if (.not.ReadCheck (ioerr,ier,nrighe,ainp,"Restart path ",ninp,ulog)) &
             return
 ! Replace "*" with "/"
          do i_tok=1,100
-            if (iachar(Domain%restart_path(i_tok:i_tok))==iachar("*")) then
-               Domain%restart_path(i_tok:i_tok) = "/"
+            if (iachar(input_any_t%restart_path(i_tok:i_tok))==iachar("*")) then
+               input_any_t%restart_path(i_tok:i_tok) = "/"
             endif
          enddo
 ! Read the last restart time
-         file_name = trim(adjustl(Domain%restart_path)) //                     &
+         file_name = trim(adjustl(input_any_t%restart_path)) //                &
                      "/restart_last_time.rist"
          call open_close_file(.true.,max_file_unit_booked+1,file_name)
          read(max_file_unit_booked+1,*,iostat=ioerr) Domain%start
 ! Restart input time has to be smaller than the actual restart time 
          Domain%start = Domain%start * (1.d0 - 1.d-9)
          if (.not.ReadCheck(ioerr,ier,1,file_name,                             &
-            "Domain%start from Domain%restart_path",max_file_unit_booked+1,    &
-            ulog)) then
+            "Domain%start from input_any_t%restart_path",                      &
+            max_file_unit_booked+1,ulog)) then
             write(uerr,*) "Error in reading the file ",file_name,              &
                ". The execution stops here."
             stop
@@ -137,7 +137,7 @@ do while (trim(lcase(ainp))/="##### end restart #####")
       case default
 ! Input line for the restart file name
          Domain%file = ainp
-         file_name = trim(adjustl(Domain%restart_path)) // "/" //              &
+         file_name = trim(adjustl(input_any_t%restart_path)) // "/" //         &
             trim(adjustl(Domain%file))
          if ((input_second_read.eqv..true.).and.(ulog>0)) then
             inquire(file=file_name,exist=restartOK)

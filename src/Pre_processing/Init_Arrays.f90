@@ -216,7 +216,6 @@ Domain%prif = zero
 Domain%prif = zero
 Domain%h = zero
 Domain%start = zero
-Domain%restart_path = "."
 Domain%NormFix = .false.
 Domain%Slip = .false.
 ! input_any_t
@@ -234,6 +233,7 @@ input_any_t%memo_fr = zero
 input_any_t%cpoi_fr = zero
 input_any_t%pllb_fr = zero
 input_any_t%Psurf = " "
+input_any_t%restart_path = "."
 !------------------------
 ! Statements
 !------------------------

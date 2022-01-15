@@ -193,6 +193,7 @@ do i_pol=1,CLC%n_polygons
    array_name = "CLC%polygons(" // trim(adjustl(array_name)) // ")%faces"
    call allocate_de_int4_r2(.false.,CLC%polygons(i_pol)%faces,                 &
       array_name=array_name)
+   write(array_name,*) i_pol
    array_name = "CLC%polygons(" // trim(adjustl(array_name)) // ")%v_occurrence"
    call allocate_de_int4_r1(.false.,CLC%polygons(i_pol)%v_occurrence,          &
       array_name=array_name)

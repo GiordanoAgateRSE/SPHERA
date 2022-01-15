@@ -70,7 +70,7 @@ Domain%dx = zero
 NumberEntities = 0
 Domain%istart = 0
 Domain%start = zero
-Domain%restart_path = "."
+input_any_t%restart_path = "."
 Domain%file = " " 
 Domain%NormFix = .false.         
 Domain%Slip = .false.
@@ -179,7 +179,7 @@ endif
 if ((Domain%istart>0).or.(Domain%start>zero)) then
    restart = .true.
 ! To open the restart file from which restart data will be restored
-   file_name = trim(adjustl(Domain%restart_path)) // "/" //                    &
+   file_name = trim(adjustl(input_any_t%restart_path)) // "/" //               &
       trim(adjustl(Domain%file))
    open(unit=nsav,file=file_name,form="unformatted",status="old",iostat=ier)
    if (ier/=0) then
