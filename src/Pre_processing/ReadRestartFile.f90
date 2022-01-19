@@ -50,6 +50,7 @@ character(100) :: file_name
 #endif
 logical,external :: ReadCheck
 character(100),external :: lcase
+character(len=lencard) :: nomsub
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -424,6 +425,26 @@ Partz(i_zone)%plan_reservoir_points,Partz(i_zone)%ID_first_vertex_sel,         &
                   endif  
                endif
                else
+! Allocation of the SPH-particle array
+                  PARTICLEBUFFER = int(INIPARTICLEBUFFER *                     &
+                                   Domain%COEFNMAXPARTI) + 1
+                  if (nag>PARTICLEBUFFER) then
+                        PARTICLEBUFFER = int(nag * Domain%COEFNMAXPARTI) + 1
+                  endif
+                  if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
+                     allocate(pg(PARTICLEBUFFER),stat=ier)  
+                     else
+                        call diagnostic(arg1=10,arg2=5,arg3=nomsub)
+                  endif
+                  if (ier/=0) then
+                     write(ulog,'(1x,2a,i2)') "    Array PG not allocated. ",  &
+                        "Error code: ",ier
+                     call diagnostic(arg1=4,arg3=nomsub)
+                     else
+                        write(ulog,'(1x,2a)') "    Array PG successfully ",    &
+                           "allocated "
+                        Pg(:) = PgZero
+                  endif
 ! Actual array reading for restart
                   if (restartcode==1) then
                      read(nsav,iostat=ioerr) pg(1:nag)
@@ -630,6 +651,26 @@ body_arr(i)%body_kinematics(1:body_arr(i)%n_records,1:7)
                      endif
                   endif 
                   else
+! Allocation of the SPH-particle array
+                     PARTICLEBUFFER = int(INIPARTICLEBUFFER *                  &
+                                      Domain%COEFNMAXPARTI) + 1
+                     if (nag>PARTICLEBUFFER) then
+                           PARTICLEBUFFER = int(nag * Domain%COEFNMAXPARTI) + 1
+                     endif
+                     if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
+                        allocate(pg(PARTICLEBUFFER),stat=ier)  
+                        else
+                           call diagnostic(arg1=10,arg2=5,arg3=nomsub)
+                     endif
+                     if (ier/=0) then
+                        write(ulog,'(1x,2a,i2)') "    Array PG not allocated.",&
+                           " Error code: ",ier
+                        call diagnostic(arg1=4,arg3=nomsub)
+                        else
+                           write(ulog,'(1x,2a)') "    Array PG successfully ", &
+                              "allocated "
+                           Pg(:) = PgZero
+                     endif
 ! Actual array reading for restart
                      if (restartcode==1) then
                         read(nsav,iostat=ioerr) pg(1:nag)

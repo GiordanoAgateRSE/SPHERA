@@ -413,24 +413,6 @@ if (.not.restart) then
          InputErr = InputErr + 300
          call diagnostic(arg1=5,arg2=InputErr,arg3=msg_err)
       endif
-      if (nag<100) then
-! Initial domain is empty (inlet section)
-         PARTICLEBUFFER = int(INIPARTICLEBUFFER * Domain%COEFNMAXPARTI) + 1
-         else
-            PARTICLEBUFFER = int(nag * Domain%COEFNMAXPARTI) + 1
-      endif
-      if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
-         allocate(pg(PARTICLEBUFFER),stat=ier)  
-         else
-            call diagnostic(arg1=10,arg2=5,arg3=nomsub)
-      endif   
-      if (ier/=0) then
-         write(ulog,'(1x,a,i2)') "    Array PG not allocated. Error code: ",ier
-         call diagnostic(arg1=4,arg3=nomsub)
-         else
-            write(ulog,'(1x,a)') "    Array PG successfully allocated "
-            Pg(:) = PgZero
-      endif
       if (Domain%tipo=="bsph") then
 ! DB-SPH pre-processing
          call Import_ply_surface_meshes
@@ -508,21 +490,6 @@ if (.not.restart) then
             endif
          endif
       endif
-      if (Domain%RKscheme>1) then
-         if (Domain%tipo=="semi") then
-           allocate(ts0_pg(PARTICLEBUFFER),stat=ier)  
-           else
-              call diagnostic(arg1=10,arg2=5,arg3=nomsub)
-         endif
-         if (ier/=0) then
-            write(ulog,'(1x,a,i2)')                                            &
-               "    Array ts0_pg not allocated. Error code: ",ier
-            call diagnostic(arg1=4,arg3=nomsub)
-            else
-               write(ulog,'(1x,a)') "    Array ts0_pg successfully allocated "
-               ts0_pg(:) = ts_pgZero
-         endif
-      endif
 #ifdef SPACE_3D
       allocate(BFaceList(NumFacce),stat=ier)
       if (ier/=0) then
@@ -543,6 +510,21 @@ if (.not.restart) then
 ! To save current time for "result_converter"
       val_time = simulation_time
       close(ninp)
+      if (Domain%RKscheme>1) then
+         if (Domain%tipo=="semi") then
+           allocate(ts0_pg(PARTICLEBUFFER),stat=ier)  
+           else
+              call diagnostic(arg1=10,arg2=5,arg3=nomsub)
+         endif
+         if (ier/=0) then
+            write(ulog,'(1x,a,i2)')                                            &
+               "    Array ts0_pg not allocated. Error code: ",ier
+            call diagnostic(arg1=4,arg3=nomsub)
+            else
+               write(ulog,'(1x,a)') "    Array ts0_pg successfully allocated "
+               ts0_pg(:) = ts_pgZero
+         endif
+      endif
 endif
 ! Writing on the log file 
 if (Domain%ioutopt<0) then
