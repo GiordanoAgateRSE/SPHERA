@@ -121,7 +121,7 @@ if (trim(lcase(option))==trim(lcase("heading"))) then
       write(ulog,'(a)')                                                        &
          "---------------------------------------------------------------------"
       write(ulog,"(1x,a)")                                                     &
-         ">> Restart reading:  step         time      interval    num.particles"
+">> Restart reading:  step         time      interval    num.particles emission_time"
       save_istart = Domain%istart
       save_start = Domain%start
 ! Since here, Domain%istart and Domain%start are zeroed, until next reading of 
@@ -349,11 +349,13 @@ Partz(i_zone)%plan_reservoir_points,Partz(i_zone)%ID_first_vertex_sel,         &
 ! It reads all the saved steps and overwrite the restart values until the
 ! restart time is reached.     
          do while (save_istart>it_start)
-            read(nsav,iostat=ioerr) it_start,simulation_time,dt,nag,restartcode
+            read(nsav,iostat=ioerr) it_start,simulation_time,dt,nag,           &
+               restartcode,emission_time
             if (.not.ReadCheck(ioerr,ier,it_start,ainp,                        &
-               "it_start,simulation_time,dt,nag,restartcode",nsav,ulog)) return
-            write(ulog,"(16x,i10,2(2x,g12.5),7x,i10)") it_start,               &
-               simulation_time,dt,nag
+               "it_start,simulation_time,dt,nag,restartcode,emission_time",    &
+               nsav,ulog)) return
+            write(ulog,"(16x,i10,2(2x,g12.5),7x,i10,2x,g12.5)") it_start,      &
+               simulation_time,dt,nag,emission_time
             flush(ulog)
             if (it_start<save_istart) then
                read(nsav,iostat=ioerr) 
@@ -574,12 +576,12 @@ body_arr(i)%body_kinematics(1:body_arr(i)%n_records,1:7)
             simulation_time = zero
             do while (save_start>simulation_time)
                read(nsav,iostat=ioerr) it_start,simulation_time,dt,nag,        &
-                  restartcode
+                  restartcode,emission_time
                if (.not.ReadCheck(ioerr,ier,it_start,ainp,                     &
-                  "it_start,simulation_time,dt,nag,restartcode",nsav,ulog))    &
-                     return
-               write(ulog,"(16x,i10,2(2x,g12.5),7x,i10)") it_start,            &
-                  simulation_time,dt,nag
+                  "it_start,simulation_time,dt,nag,restartcode,emission_time", &
+                  nsav,ulog)) return
+               write(ulog,"(16x,i10,2(2x,g12.5),7x,i10,2x,g12.5)") it_start,   &
+                  simulation_time,dt,nag,emission_time
                flush(ulog)
                if (simulation_time<save_start) then
                   read(nsav,iostat=ioerr)

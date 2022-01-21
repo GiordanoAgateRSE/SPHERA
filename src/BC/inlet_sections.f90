@@ -64,8 +64,8 @@ double precision,dimension(1:SPACEDIM) :: A,ss
 !------------------------
 i_source=0
 Q_limiter = 1.d-6
-if (inlet_IC_flag.eqv..true.) then
-   emission_time = 0.d0
+if (inlet_job_start_flag.eqv..true.) then
+   if (.not.restart) emission_time = 0.d0
 #ifdef SPACE_3D
    SourceFace = 0
    zfila = -half * Domain%dx
@@ -149,7 +149,7 @@ do isi=1,NumBSides
 ! Linear time interpolation for the inlet flow rate: end
 ! Flow rate limiter
             Tratto(nt)%FlowRate = max(Tratto(nt)%FlowRate,Q_limiter)
-            if (inlet_IC_flag.eqv..false.) then
+            if (inlet_job_start_flag.eqv..false.) then
 ! Linear time interpolation for the inlet fluid depth: start
                if (Tratto(nt)%weir_flag.eqv..false.) then
                   do i_rec=1,Tratto(nt)%n_time_records
@@ -258,7 +258,7 @@ do isi=1,NumBSides
 #endif
    endif
 enddo
-if (inlet_IC_flag.eqv..true.) inlet_IC_flag = .false. 
+if (inlet_job_start_flag.eqv..true.) inlet_job_start_flag = .false. 
 !------------------------
 ! Deallocations
 !------------------------

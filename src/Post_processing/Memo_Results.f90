@@ -215,7 +215,7 @@ if ((it_rest==it).or.(index(str,'inizio')/=0).or.(index(str,'fine')/=0)) then
    if (index(str,'inizio')==0) call system("rm -f "//trim(adjustl(file_name))  &
       //".bck")
    restartcode = 1
-   write(nres) it,simulation_time,dt,nag,restartcode
+   write(nres) it,simulation_time,dt,nag,restartcode,emission_time
    write(nres) pg(1:nag)
    if (allocated(pg_w)) write(nres)                                            &
       pg_w(1:DBSPH%n_w+DBSPH%n_inlet+DBSPH%n_outlet)
@@ -266,7 +266,7 @@ if ((it_rest==it).or.(index(str,'inizio')/=0).or.(index(str,'fine')/=0)) then
    elseif (it_memo==it) then
 ! If restartcode=0, then to save "pg" only for visualizations
       restartcode = 0
-      write(nres) it,simulation_time,dt,nag,restartcode
+      write(nres) it,simulation_time,dt,nag,restartcode,emission_time
       write(nres) pg(1:nag)%coord(1),pg(1:nag)%coord(2),pg(1:nag)%coord(3),    &
          pg(1:nag)%vel(1),pg(1:nag)%vel(2),pg(1:nag)%vel(3),pg(1:nag)%pres,    &
          pg(1:nag)%dens,pg(1:nag)%mass,pg(1:nag)%kin_visc,pg(1:nag)%imed,      &
