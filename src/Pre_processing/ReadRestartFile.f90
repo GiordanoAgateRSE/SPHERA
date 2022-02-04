@@ -295,6 +295,9 @@ Partz(i_zone)%plan_reservoir_points,Partz(i_zone)%ID_first_vertex_sel,         &
          call allocate_de_dp_r1(.true.,q_max,n_vertices_main_wall,array_name)
          array_name = "U_max"
          call allocate_de_dp_r1(.true.,U_max,n_vertices_main_wall,array_name)
+         array_name = "z_topog_max"
+         call allocate_de_dp_r1(.true.,z_topog_max,Grid%ncd(1)*Grid%ncd(2),    &
+            array_name)
          if (CLC_flag.eqv..true.) then
 ! z0 allocation
             array_name = "CLC%z0"
@@ -401,6 +404,11 @@ Partz(i_zone)%plan_reservoir_points,Partz(i_zone)%ID_first_vertex_sel,         &
                         if (.not.ReadCheck(ioerr,ier,it_start,ainp,"U_max",    &
                            nsav,ulog)) return
                      endif
+                     if (allocated(z_topog_max)) then
+                        read(nsav,iostat=ioerr)
+                        if (.not.ReadCheck(ioerr,ier,it_start,ainp,            &
+                           "z_topog_max",nsav,ulog)) return
+                     endif
                   if (allocated(substations%sub)) then
                      read(nsav,iostat=ioerr)
                      if (.not.ReadCheck(ioerr,ier,it_start,ainp,               &
@@ -505,6 +513,12 @@ body_arr(i)%body_kinematics(1:body_arr(i)%n_records,1:7)
                            read(nsav,iostat=ioerr) U_max(1:size(U_max))
                            if (.not.ReadCheck(ioerr,ier,it_start,ainp,"U_max", &
                               nsav,ulog)) return
+                        endif
+                        if (allocated(z_topog_max)) then
+                           read(nsav,iostat=ioerr)                             &
+                              z_topog_max(1:size(z_topog_max))
+                           if (.not.ReadCheck(ioerr,ier,it_start,ainp,         &
+                              "z_topog_max",nsav,ulog)) return
                         endif
                      if (allocated(substations%sub)) then
                         read(nsav,iostat=ioerr)                                &
@@ -627,6 +641,11 @@ body_arr(i)%body_kinematics(1:body_arr(i)%n_records,1:7)
                            if (.not.ReadCheck(ioerr,ier,it_start,ainp,"U_max", &
                               nsav,ulog)) return
                         endif
+                        if (allocated(z_topog_max)) then
+                           read(nsav,iostat=ioerr)
+                           if (.not.ReadCheck(ioerr,ier,it_start,ainp,         &
+                              "z_topog_max",nsav,ulog)) return
+                        endif
                      if (allocated(substations%sub)) then
                         read(nsav,iostat=ioerr)
                         if (.not.ReadCheck(ioerr,ier,it_start,ainp,            &
@@ -732,6 +751,12 @@ body_arr(i)%body_kinematics(1:body_arr(i)%n_records,1:7)
                               read(nsav,iostat=ioerr) U_max(1:size(U_max))
                               if (.not.ReadCheck(ioerr,ier,it_start,ainp,      &
                                  "U_max",nsav,ulog)) return
+                           endif
+                           if (allocated(z_topog_max)) then
+                              read(nsav,iostat=ioerr)                          &
+                                 z_topog_max(1:size(z_topog_max))
+                              if (.not.ReadCheck(ioerr,ier,it_start,ainp,      &
+                                 "z_topog_max",nsav,ulog)) return
                            endif
                         if (allocated(substations%sub)) then
                            read(nsav,iostat=ioerr)                             &

@@ -195,5 +195,9 @@ real(kind=kind(1.d0)),dimension(:,:),allocatable :: Z_fluid_max
 ! dimension) is the raw height, the second element (second dimension) is the 
 ! filtered height.
 real(kind=kind(1.d0)),dimension(:,:),allocatable :: Z_fluid_step
+! Only in 3D: the 2D array of the maximum height of the topographic surface per 
+! column of the background positioning grid. This only influences the filter on 
+! the liquid detachment from the topographic surface.
+double precision,dimension(:),allocatable :: z_topog_max
 #endif
 end module

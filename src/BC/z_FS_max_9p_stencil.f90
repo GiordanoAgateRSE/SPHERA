@@ -21,7 +21,7 @@
 !-------------------------------------------------------------------------------
 ! Program unit: z_FS_max_9p_stencil
 ! Description: To assess the maximum free surface height in the 9-point stencil 
-! around the current vertex around which the extrusion takes place. 
+!              around the current vertex around which the extrusion takes place. 
 !-------------------------------------------------------------------------------
 #ifdef SPACE_3D
 subroutine z_FS_max_9p_stencil(i_zone,i_vertex,z_FS_max)

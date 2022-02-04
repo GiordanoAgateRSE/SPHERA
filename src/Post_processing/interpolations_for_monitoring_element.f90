@@ -77,7 +77,7 @@ do jrang = jgridi-1,jgridi+1
 ! Contributions from fluid particles
          if (Icont(ncel+1)>Icont(ncel)) then
 ! Loop over the cell particles
-            do mm=Icont(ncel),Icont(ncel+1)-1  
+            do mm=Icont(ncel),Icont(ncel+1)-1
                npj = NPartOrd(mm)
                if (pg(npj)%vel_type=="fix") cycle
                raglocal(:) = pglocal%coord(:) - pg(npj)%coord(:)

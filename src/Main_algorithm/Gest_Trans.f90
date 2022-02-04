@@ -40,6 +40,7 @@ integer(4),parameter :: ner0 = 0
 integer(4) :: npi,i,ier,k,k1,k2,nlinee,nvalori,alloc_stat
 #ifdef SPACE_3D
 integer(4) :: n_vertices_main_wall,NumCellmax,kk
+character(100) :: array_name
 #endif
 character(len=lencard) :: nomsub = "GEST_TRANS"
 character(len=lencard) :: filename,stringa,prefix,filevtk
@@ -652,7 +653,7 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
 ! Computation of the boundary contributions for the continuity equation (SA-SPH)
             call ComputeKernelTable
          endif
-! Allocation and initialization of the arrays: Z_fluid_max, Z_fluid_step,      &
+! Allocation and initialization of the arrays: Z_fluid_max, Z_fluid_step, 
 ! q_max, U_max
          call main_wall_info(n_vertices_main_wall)
          if (n_vertices_main_wall>0) then
@@ -713,6 +714,9 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
                endif
                U_max(:) = 0.d0
             endif
+            array_name = "z_topog_max"
+            call allocate_de_dp_r1(.true.,z_topog_max,Grid%ncd(1)*Grid%ncd(2), &
+               array_name)
          endif
          call start_and_stop(2,5)
 ! Main loop
@@ -743,6 +747,8 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
                      'the array "Z_fluid_step" is successfully completed.'
             endif
          endif
+         array_name = "z_topog_max"
+         call allocate_de_dp_r1(.false.,z_topog_max,array_name=array_name)
 #endif
    else
       call diagnostic(arg1=10,arg2=5,arg3=nomsub)

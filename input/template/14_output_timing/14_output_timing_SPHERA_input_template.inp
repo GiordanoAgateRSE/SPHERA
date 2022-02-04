@@ -56,8 +56,13 @@
 !    elements
 ![?] <dt_out_FS>: writing time step for the time series of the free surface 
 !    height
-![?] <dt_out_depth>: writing time step for 2D fields of water depth (h) and 
-!    specific flow rate components (q_x=u_m*h, q_y=v_m*h).
+![?] <dt_out_depth>: writing time step for 2D synthetic fields of the 
+!    free-surface height (filtered and unfiltered), the water depth (filtered 
+!    and unfiltered), the specific flow rate components (filtered) and the 
+!    height-averaged velocity (filtered), only in 3D. The filter zeroes the 
+!    effects associated with the presence of multiple fluid depths along the 
+!    same vertical (atomization, breaking) and the liquid detachment from the 
+!    topographic surface.
 !-------------------------------------------------------------------------------
 ![*] results time <dt_out>
 ![*] restart time <dt_restart>
