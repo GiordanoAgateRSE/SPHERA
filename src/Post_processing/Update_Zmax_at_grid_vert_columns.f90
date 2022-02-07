@@ -272,6 +272,7 @@ do i_zone=1,NPartZone
          h_step = max((Z_fluid_step(GridColumn,1) - Vertice(3,i_vertex)),0.d0)
          qx_step = qx_step_grid(GridColumn)
          qy_step = qy_step_grid(GridColumn)
+         U_step = 0.d0
          if (h_filt_step>=eps) then
 ! The topographic surface in the column is wet.
 ! Here "qx_step" and "qy_step" become specific flow rate components.
