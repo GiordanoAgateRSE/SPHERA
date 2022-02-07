@@ -716,7 +716,7 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
             endif
             array_name = "z_topog_max"
             call allocate_de_dp_r1(.true.,z_topog_max,Grid%ncd(1)*Grid%ncd(2), &
-               array_name)
+               array_name,ulog_flag=.true.)
          endif
          call start_and_stop(2,5)
 ! Main loop
@@ -748,7 +748,8 @@ if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
             endif
          endif
          array_name = "z_topog_max"
-         call allocate_de_dp_r1(.false.,z_topog_max,array_name=array_name)
+         call allocate_de_dp_r1(.false.,z_topog_max,array_name=array_name,     &
+            ulog_flag=.true.)
 #endif
    else
       call diagnostic(arg1=10,arg2=5,arg3=nomsub)

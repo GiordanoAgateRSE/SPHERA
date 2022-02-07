@@ -24,207 +24,225 @@
 !-------------------------------------------------------------------------------
 module Memory_I_O_interface_module
 interface
-   subroutine allocate_de_BodPar_r1(allocation_flag,array,extent_1,array_name)
+   subroutine allocate_de_BodPar_r1(allocation_flag,array,extent_1,array_name, &
+      ulog_flag)
       use Hybrid_allocation_module
       implicit none
       type (body_particle),dimension(:),allocatable,intent(inout) :: array
-      logical,intent(in) :: allocation_flag
+      logical,intent(in) :: allocation_flag,ulog_flag
       integer(4),intent(in),optional :: extent_1
       character(100),intent(in) :: array_name
    end subroutine allocate_de_BodPar_r1
-   subroutine allocate_de_Bod_r1(allocation_flag,array,extent_1,array_name)
+   subroutine allocate_de_Bod_r1(allocation_flag,array,extent_1,array_name,    &
+      ulog_flag)
       use Hybrid_allocation_module
       implicit none
       type (body),dimension(:),allocatable,intent(inout) :: array
-      logical,intent(in) :: allocation_flag
+      logical,intent(in) :: allocation_flag,ulog_flag
       integer(4),intent(in),optional :: extent_1
       character(100),intent(in) :: array_name
    end subroutine allocate_de_Bod_r1
 #ifdef SPACE_3D
    subroutine allocate_de_BouConEdg_r1(allocation_flag,array,extent_1,         &
-      array_name)
+      array_name,ulog_flag)
       use Hybrid_allocation_module
       implicit none
       type (TyBoundaryConvexEdge),dimension(:),allocatable,intent(inout) ::    &
          array
-      logical,intent(in) :: allocation_flag
+      logical,intent(in) :: allocation_flag,ulog_flag
       integer(4),intent(in),optional :: extent_1
       character(100),intent(in) :: array_name
    end subroutine allocate_de_BouConEdg_r1
 #endif
-   subroutine allocate_de_BouDat_r1(allocation_flag,array,extent_1,array_name)
+   subroutine allocate_de_BouDat_r1(allocation_flag,array,extent_1,array_name, &
+      ulog_flag)
       use Hybrid_allocation_module
       implicit none
       type (TyBoundaryData),dimension(:),allocatable,intent(inout) :: array
-      logical,intent(in) :: allocation_flag
+      logical,intent(in) :: allocation_flag,ulog_flag
       integer(4),intent(in),optional :: extent_1
       character(100),intent(in) :: array_name
    end subroutine allocate_de_BouDat_r1
 #ifdef SPACE_3D
-   subroutine allocate_de_BouFac_r1(allocation_flag,array,extent_1,array_name)
+   subroutine allocate_de_BouFac_r1(allocation_flag,array,extent_1,array_name, &
+      ulog_flag)
       use Hybrid_allocation_module
       implicit none
       type (TyBoundaryFace),dimension(:),allocatable,intent(inout) :: array
-      logical,intent(in) :: allocation_flag
+      logical,intent(in) :: allocation_flag,ulog_flag
       integer(4),intent(in),optional :: extent_1
       character(100),intent(in) :: array_name
    end subroutine allocate_de_BouFac_r1
 #endif
 #ifdef SPACE_2D
-   subroutine allocate_de_BouSid_r1(allocation_flag,array,extent_1,array_name)
+   subroutine allocate_de_BouSid_r1(allocation_flag,array,extent_1,array_name, &
+      ulog_flag)
       use Hybrid_allocation_module
       implicit none
       type (TyBoundarySide),dimension(:),allocatable,intent(inout) :: array
-      logical,intent(in) :: allocation_flag
+      logical,intent(in) :: allocation_flag,ulog_flag
       integer(4),intent(in),optional :: extent_1
       character(100),intent(in) :: array_name
    end subroutine allocate_de_BouSid_r1
 #endif
-   subroutine allocate_de_BouStr_r1(allocation_flag,array,extent_1,array_name)
+   subroutine allocate_de_BouStr_r1(allocation_flag,array,extent_1,array_name, &
+      ulog_flag)
       use Hybrid_allocation_module
       implicit none
       type (TyBoundaryStretch),dimension(:),allocatable,intent(inout) :: array
-      logical,intent(in) :: allocation_flag
+      logical,intent(in) :: allocation_flag,ulog_flag
       integer(4),intent(in),optional :: extent_1
       character(100),intent(in) :: array_name
    end subroutine allocate_de_BouStr_r1
-   subroutine allocate_de_ch100_r1(allocation_flag,array,extent_1,array_name)
+   subroutine allocate_de_ch100_r1(allocation_flag,array,extent_1,array_name,  &
+      ulog_flag)
       implicit none
       character(100),dimension(:),allocatable,intent(inout) :: array
-      logical,intent(in) :: allocation_flag
+      logical,intent(in) :: allocation_flag,ulog_flag
       integer(4),intent(in),optional :: extent_1
       character(100),intent(in) :: array_name
    end subroutine allocate_de_ch100_r1
 #ifdef SPACE_3D
-   subroutine allocate_de_CLCp_r1(allocation_flag,array,extent_1,array_name)
+   subroutine allocate_de_CLCp_r1(allocation_flag,array,extent_1,array_name,   &
+      ulog_flag)
       use Hybrid_allocation_module
       implicit none
       type (CLC_polygon_der_type),dimension(:),allocatable,intent(inout) ::    &
          array
-      logical,intent(in) :: allocation_flag
+      logical,intent(in) :: allocation_flag,ulog_flag
       integer(4),intent(in),optional :: extent_1
       character(100),intent(in) :: array_name
    end subroutine allocate_de_CLCp_r1
 #endif
-   subroutine allocate_de_CtlLin_r1(allocation_flag,array,extent_1,array_name)
+   subroutine allocate_de_CtlLin_r1(allocation_flag,array,extent_1,array_name, &
+      ulog_flag)
       use Hybrid_allocation_module
       implicit none
       type (TyCtlLine),dimension(:),allocatable,intent(inout) :: array
-      logical,intent(in) :: allocation_flag
+      logical,intent(in) :: allocation_flag,ulog_flag
       integer(4),intent(in),optional :: extent_1
       character(100),intent(in) :: array_name
    end subroutine allocate_de_CtlLin_r1
-   subroutine allocate_de_CtlPoi_r1(allocation_flag,array,extent_1,array_name)
+   subroutine allocate_de_CtlPoi_r1(allocation_flag,array,extent_1,array_name, &
+      ulog_flag)
       use Hybrid_allocation_module
       implicit none
       type (TyCtlPoint),dimension(:),allocatable,intent(inout) :: array
-      logical,intent(in) :: allocation_flag
+      logical,intent(in) :: allocation_flag,ulog_flag
       integer(4),intent(in),optional :: extent_1
       character(100),intent(in) :: array_name
    end subroutine allocate_de_CtlPoi_r1
-   subroutine allocate_de_dp_r1(allocation_flag,array,extent_1,array_name)
+   subroutine allocate_de_dp_r1(allocation_flag,array,extent_1,array_name,     &
+      ulog_flag)
       implicit none
       double precision,dimension(:),allocatable,intent(inout) :: array
-      logical,intent(in) :: allocation_flag
+      logical,intent(in) :: allocation_flag,ulog_flag
       integer(4),intent(in),optional :: extent_1
       character(100),intent(in) :: array_name
    end subroutine allocate_de_dp_r1
    subroutine allocate_de_dp_r2(allocation_flag,array,extent_1,extent_2,       &
-      array_name)
+      array_name,ulog_flag)
       implicit none
       double precision,dimension(:,:),allocatable,intent(inout) :: array
-      logical,intent(in) :: allocation_flag
+      logical,intent(in) :: allocation_flag,ulog_flag
       integer(4),intent(in),optional :: extent_1,extent_2
       character(100),intent(in) :: array_name
    end subroutine allocate_de_dp_r2
    subroutine allocate_de_dp_r3(allocation_flag,array,extent_1,extent_2,       &
-      extent_3,array_name)
+      extent_3,array_name,ulog_flag)
       implicit none
       double precision,dimension(:,:,:),allocatable,intent(inout) :: array
-      logical,intent(in) :: allocation_flag
+      logical,intent(in) :: allocation_flag,ulog_flag
       integer(4),intent(in),optional :: extent_1,extent_2,extent_3
       character(100),intent(in) :: array_name
    end subroutine allocate_de_dp_r3
    subroutine allocate_de_dp_r4(allocation_flag,array,extent_1,extent_2,       &
-      extent_3,extent_4,array_name)
+      extent_3,extent_4,array_name,ulog_flag)
       implicit none
       double precision,dimension(:,:,:),allocatable,intent(inout) :: array
-      logical,intent(in) :: allocation_flag
+      logical,intent(in) :: allocation_flag,ulog_flag
       integer(4),intent(in),optional :: extent_1,extent_2,extent_3,extent_4
       character(100),intent(in) :: array_name
    end subroutine allocate_de_dp_r4
-   subroutine allocate_de_int4_r1(allocation_flag,array,extent_1,array_name)
+   subroutine allocate_de_int4_r1(allocation_flag,array,extent_1,array_name,   &
+      ulog_flag)
       implicit none
       integer(4),dimension(:),allocatable,intent(inout) :: array
-      logical,intent(in) :: allocation_flag
+      logical,intent(in) :: allocation_flag,ulog_flag
       integer(4),intent(in),optional :: extent_1
       character(100),intent(in) :: array_name
    end subroutine allocate_de_int4_r1
    subroutine allocate_de_int4_r2(allocation_flag,array,extent_1,extent_2,     &
-      array_name)
+      array_name,ulog_flag)
       implicit none
       integer(4),dimension(:,:),allocatable,intent(inout) :: array
-      logical,intent(in) :: allocation_flag
+      logical,intent(in) :: allocation_flag,ulog_flag
       integer(4),intent(in),optional :: extent_1,extent_2
       character(100),intent(in) :: array_name
    end subroutine allocate_de_int4_r2
    subroutine allocate_de_log_r2(allocation_flag,array,extent_1,extent_2,      &
-      array_name)
+      array_name,ulog_flag)
       implicit none
       logical,dimension(:,:),allocatable,intent(inout) :: array
-      logical,intent(in) :: allocation_flag
+      logical,intent(in) :: allocation_flag,ulog_flag
       integer(4),intent(in),optional :: extent_1,extent_2
       character(100),intent(in) :: array_name
    end subroutine allocate_de_log_r2
-   subroutine allocate_de_Med_r1(allocation_flag,array,extent_1,array_name)
+   subroutine allocate_de_Med_r1(allocation_flag,array,extent_1,array_name,    &
+      ulog_flag)
       use Hybrid_allocation_module
       implicit none
       type (TyMedium),dimension(:),allocatable,intent(inout) :: array
-      logical,intent(in) :: allocation_flag
+      logical,intent(in) :: allocation_flag,ulog_flag
       integer(4),intent(in),optional :: extent_1
       character(100),intent(in) :: array_name
    end subroutine allocate_de_Med_r1   
-   subroutine allocate_de_Par_r1(allocation_flag,array,extent_1,array_name)
+   subroutine allocate_de_Par_r1(allocation_flag,array,extent_1,array_name,    &
+      ulog_flag)
       use Hybrid_allocation_module
       implicit none
       type (TyParticle),dimension(:),allocatable,intent(inout) :: array
-      logical,intent(in) :: allocation_flag
+      logical,intent(in) :: allocation_flag,ulog_flag
       integer(4),intent(in),optional :: extent_1
       character(100),intent(in) :: array_name
    end subroutine allocate_de_Par_r1
 #ifdef SPACE_3D
-   subroutine allocate_de_QSec_r1(allocation_flag,array,extent_1,array_name)
+   subroutine allocate_de_QSec_r1(allocation_flag,array,extent_1,array_name,   &
+      ulog_flag)
       use Hybrid_allocation_module
       implicit none
       type (tyQ_section_array),dimension(:),allocatable,intent(inout) :: array
-      logical,intent(in) :: allocation_flag
+      logical,intent(in) :: allocation_flag,ulog_flag
       integer(4),intent(in),optional :: extent_1
       character(100),intent(in) :: array_name
    end subroutine allocate_de_QSec_r1
 #endif
 #ifdef SPACE_3D
-   subroutine allocate_de_Sub_r1(allocation_flag,array,extent_1,array_name)
+   subroutine allocate_de_Sub_r1(allocation_flag,array,extent_1,array_name,    &
+      ulog_flag)
       use Hybrid_allocation_module
       implicit none
       type (type_substation),dimension(:),allocatable,intent(inout) :: array
-      logical,intent(in) :: allocation_flag
+      logical,intent(in) :: allocation_flag,ulog_flag
       integer(4),intent(in),optional :: extent_1
       character(100),intent(in) :: array_name
    end subroutine allocate_de_Sub_r1
 #endif      
-   subroutine allocate_de_TimSta_r1(allocation_flag,array,extent_1,array_name)
+   subroutine allocate_de_TimSta_r1(allocation_flag,array,extent_1,array_name, &
+      ulog_flag)
       use Hybrid_allocation_module
       implicit none
       type (Tytime_stage),dimension(:),allocatable,intent(inout) :: array
-      logical,intent(in) :: allocation_flag
+      logical,intent(in) :: allocation_flag,ulog_flag
       integer(4),intent(in),optional :: extent_1
       character(100),intent(in) :: array_name
    end subroutine allocate_de_TimSta_r1
-   subroutine allocate_de_Zon_r1(allocation_flag,array,extent_1,array_name)
+   subroutine allocate_de_Zon_r1(allocation_flag,array,extent_1,array_name,    &
+      ulog_flag)
       use Hybrid_allocation_module
       implicit none
       type (TyZone),dimension(:),allocatable,intent(inout) :: array
-      logical,intent(in) :: allocation_flag
+      logical,intent(in) :: allocation_flag,ulog_flag
       integer(4),intent(in),optional :: extent_1
       character(100),intent(in) :: array_name
    end subroutine allocate_de_Zon_r1

@@ -251,7 +251,7 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
             if (input_second_read.eqv..true.) then
                array_name = "SASPH boundary time records"
                call allocate_de_dp_r2(.true.,Tratto(zone_ID)%time_records,     &
-                  n_time_records,3,array_name)
+                  n_time_records,3,array_name,ulog_flag=.true.)
                do i_rec=1,n_time_records
                   call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
                   read(ainp,*,iostat=ioerr)                                    &

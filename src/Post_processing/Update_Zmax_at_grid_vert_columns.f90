@@ -102,7 +102,7 @@ if (.not.allocated(compact_fluid)) then
 endif
 array_name = "Z_fluid_step_min"
 call allocate_de_dp_r1(.true.,Z_fluid_step_min,Grid%ncd(1)*Grid%ncd(2),        &
-   array_name)
+   array_name,.true.)
 !------------------------
 ! Initializations
 !------------------------
@@ -343,7 +343,8 @@ if (allocated(compact_fluid)) then
    endif
 endif
 array_name = "Z_fluid_step_min"
-call allocate_de_dp_r1(.false.,Z_fluid_step_min,array_name=array_name)
+call allocate_de_dp_r1(.false.,Z_fluid_step_min,array_name=array_name,         &
+   ulog_flag=.true.)
 return
 end subroutine Update_Zmax_at_grid_vert_columns
 #endif

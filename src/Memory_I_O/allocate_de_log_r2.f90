@@ -30,7 +30,7 @@
 ! the git log file for further details.
 !-------------------------------------------------------------------------------
 subroutine allocate_de_log_r2(allocation_flag,array,extent_1,extent_2,         &
-   array_name)
+   array_name,ulog_flag)
 !------------------------
 ! Modules
 !------------------------
@@ -40,7 +40,7 @@ use I_O_file_module
 !------------------------
 implicit none
 logical,dimension(:,:),allocatable,intent(inout) :: array
-logical,intent(in) :: allocation_flag
+logical,intent(in) :: allocation_flag,ulog_flag
 integer(4),intent(in),optional :: extent_1,extent_2
 character(100),intent(in) :: array_name
 integer(4) :: alloc_stat
@@ -58,10 +58,12 @@ if (allocation_flag.eqv..true.) then
             " failed; the execution stops here."
          stop
          else
+            if (ulog_flag.eqv..true.) then
 !$omp critical (omp_Memory_I_O_ulog)
-            write(ulog,*) "Allocation of ",trim(adjustl(array_name)),          &
-               " completed."
+               write(ulog,*) "Allocation of ",trim(adjustl(array_name)),       &
+                  " completed."
 !$omp end critical (omp_Memory_I_O_ulog)
+            endif
       endif
    endif
 !------------------------
@@ -81,10 +83,12 @@ if (allocation_flag.eqv..true.) then
                " failed; the execution stops here."
             stop
             else
+               if (ulog_flag.eqv..true.) then
 !$omp critical (omp_Memory_I_O_ulog)
-               write(ulog,*) "Deallocation of ",trim(adjustl(array_name)),     &
-                  " completed."
+                  write(ulog,*) "Deallocation of ",trim(adjustl(array_name)),  &
+                     " completed."
 !$omp end critical (omp_Memory_I_O_ulog)
+               endif
          endif
       endif
 endif

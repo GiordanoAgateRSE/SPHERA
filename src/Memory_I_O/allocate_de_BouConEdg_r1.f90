@@ -25,7 +25,8 @@
 !              dimensions) 1
 !-------------------------------------------------------------------------------
 #ifdef SPACE_3D
-subroutine allocate_de_BouConEdg_r1(allocation_flag,array,extent_1,array_name)
+subroutine allocate_de_BouConEdg_r1(allocation_flag,array,extent_1,array_name, &
+   ulog_flag)
 !------------------------
 ! Modules
 !------------------------
@@ -36,7 +37,7 @@ use Hybrid_allocation_module
 !------------------------
 implicit none
 type (TyBoundaryConvexEdge),dimension(:),allocatable,intent(inout) :: array
-logical,intent(in) :: allocation_flag
+logical,intent(in) :: allocation_flag,ulog_flag
 integer(4),intent(in),optional :: extent_1
 character(100),intent(in) :: array_name
 integer(4) :: alloc_stat
@@ -54,10 +55,12 @@ if (allocation_flag.eqv..true.) then
             " failed; the execution stops here."
          stop
          else
+            if (ulog_flag.eqv..true.) then
 !$omp critical (omp_Memory_I_O_ulog)
-            write(ulog,*) "Allocation of ",trim(adjustl(array_name)),          &
-               " completed."
+               write(ulog,*) "Allocation of ",trim(adjustl(array_name)),       &
+                  " completed."
 !$omp end critical (omp_Memory_I_O_ulog)
+            endif
       endif
    endif
 !------------------------
@@ -77,10 +80,12 @@ if (allocation_flag.eqv..true.) then
                " failed; the execution stops here."
             stop
             else
+               if (ulog_flag.eqv..true.) then
 !$omp critical (omp_Memory_I_O_ulog)
-               write(ulog,*) "Deallocation of ",trim(adjustl(array_name)),     &
-                  " completed."
+                  write(ulog,*) "Deallocation of ",trim(adjustl(array_name)),  &
+                     " completed."
 !$omp end critical (omp_Memory_I_O_ulog)
+               endif
          endif
       endif
 endif

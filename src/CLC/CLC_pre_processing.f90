@@ -101,17 +101,19 @@ write(ulog,*) "Number of CLC polygons: ",CLC%n_polygons
 ! polygons with respect to the reference backgorund-grid cell
 n_hcells = Grid%ncd(1) * Grid%ncd(2)
 array_name = "n_neigh_hcell_CLCpol"
-call allocate_de_int4_r1(.true.,n_neigh_hcell_CLCpol,n_hcells,array_name)
+call allocate_de_int4_r1(.true.,n_neigh_hcell_CLCpol,n_hcells,array_name,      &
+   ulog_flag=.true.)
 n_neigh_hcell_CLCpol(:) = 0
 ! Allocate and initialize the neighbouring list linking the horizontal 
 ! background-grid cells with the CLC polygons
 array_name = "neigh_hcell_CLCpol"
 call allocate_de_int4_r1(.true.,neigh_hcell_CLCpol,n_hcells*NMAXPARTJ,         &
-   array_name)
+   array_name,ulog_flag=.true.)
 neigh_hcell_CLCpol(:) = 0
 ! Allocate the derived-type allocatable array of the CLC polygons
 array_name = "CLC_polygons"
-call allocate_de_CLCp_r1(.true.,CLC%polygons,CLC%n_polygons,array_name)
+call allocate_de_CLCp_r1(.true.,CLC%polygons,CLC%n_polygons,array_name,        &
+   ulog_flag=.true.)
 ! Reading the CLC-polygon block numbers from the "CLC*.txt" file into the 
 ! associated fields of the CLC derived-type array, starting from the detection 
 ! of the exact file name
@@ -199,7 +201,7 @@ do i_pol=1,CLC%n_polygons
    write(array_name,*) i_pol
    array_name = "CLC%polygons(" // trim(adjustl(array_name)) // ")%vertices"
    call allocate_de_dp_r2(.true.,CLC%polygons(i_pol)%vertices,                 &
-      CLC%polygons(i_pol)%n_vertices,2,array_name)
+      CLC%polygons(i_pol)%n_vertices,2,array_name,ulog_flag=.true.)
 ! Re-open the ".ply" file
    call open_close_file(.true.,I_O_unit,file_name)
 ! Skip the headings
@@ -225,13 +227,13 @@ do i_pol=1,CLC%n_polygons
 ! Allocation and initialization of the array of the vertex occurrence
    array_name = "CLC%polygons(" // trim(adjustl(array_name)) // ")%v_occurrence"
    call allocate_de_int4_r1(.true.,CLC%polygons(i_pol)%v_occurrence,           &
-      CLC%polygons(i_pol)%n_vertices,array_name)
+      CLC%polygons(i_pol)%n_vertices,array_name,ulog_flag=.true.)
    CLC%polygons(i_pol)%v_occurrence(:) = 0
 ! Allocation of the faces of the CLC polygon
    write(array_name,*) i_pol
    array_name = "CLC%polygons(" // trim(adjustl(array_name)) // ")%faces"
    call allocate_de_int4_r2(.true.,CLC%polygons(i_pol)%faces,                  &
-      CLC%polygons(i_pol)%n_faces,4,array_name)
+      CLC%polygons(i_pol)%n_faces,4,array_name,ulog_flag=.true.)
 ! Read the faces of the current CLC polygon
    do i_face=1,CLC%polygons(i_pol)%n_faces
       read(I_O_unit,*,iostat=io_stat) n_sides,                                 &

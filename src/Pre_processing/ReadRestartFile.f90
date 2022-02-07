@@ -194,7 +194,7 @@ if (trim(lcase(option))==trim(lcase("heading"))) then
          if (size_aux>0) then
             array_name = "SASPH boundary time records"
             call allocate_de_dp_r2(.true.,Tratto(i_t)%time_records,size_aux,3, &
-               array_name)
+               array_name,ulog_flag=.true.)
             read(nsav,iostat=ioerr) Tratto(i_t)%time_records(1:size_aux,1:3)
             if (.not.ReadCheck(ioerr,ier,it_start,ainp,                        &
                "Tratto - restart read - 3 of 3",nsav,ulog)) return
@@ -290,19 +290,21 @@ Partz(i_zone)%plan_reservoir_points,Partz(i_zone)%ID_first_vertex_sel,         &
       if (n_vertices_main_wall>0) then
          array_name = "Z_fluid_max"
          call allocate_de_dp_r2(.true.,Z_fluid_max,Grid%ncd(1)*Grid%ncd(2),2,  &
-            array_name)
+            array_name,ulog_flag=.true.)
          array_name = "q_max"
-         call allocate_de_dp_r1(.true.,q_max,n_vertices_main_wall,array_name)
+         call allocate_de_dp_r1(.true.,q_max,n_vertices_main_wall,array_name,  &
+            ulog_flag=.true.)
          array_name = "U_max"
-         call allocate_de_dp_r1(.true.,U_max,n_vertices_main_wall,array_name)
+         call allocate_de_dp_r1(.true.,U_max,n_vertices_main_wall,array_name,  &
+            ulog_flag=.true.)
          array_name = "z_topog_max"
          call allocate_de_dp_r1(.true.,z_topog_max,Grid%ncd(1)*Grid%ncd(2),    &
-            array_name)
+            array_name,ulog_flag=.true.)
          if (CLC_flag.eqv..true.) then
 ! z0 allocation
             array_name = "CLC%z0"
             call allocate_de_dp_r2(.true.,CLC%z0,Grid%ncd(1),Grid%ncd(2),      &
-               array_name)
+               array_name,ulog_flag=.true.)
 ! z0 reading from a dedicated time-independent restart file
             file_name = trim(adjustl(input_any_t%restart_path)) // "/z0.ris"
             call open_close_file(.true.,urz0,file_name)
