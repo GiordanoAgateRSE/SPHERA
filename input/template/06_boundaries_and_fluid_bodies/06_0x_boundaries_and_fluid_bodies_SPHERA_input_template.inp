@@ -373,9 +373,9 @@ ___ ___
 ![?] <time_i>: i-th time record for the inlet section (the time of the last 
 !    record should be slightly higher than time at the end of the simulation)
 ![?] <flow_rate>: inlet speed * inlet area. A lower-bound limiter of 1.e-6m^3/s 
-!    is imposed. NOtice that velocity is filtered by SPHERA in the inner region 
+!    is imposed. Velocity is filtered by SPHERA in the inner region 
 !    (of depth 2h) where velocity is uniform and imposed by the last particles 
-!    emitted. 
+!    emitted.
 ![?] <depth>: fluid/water depth. If (weir_flag.eqv..true.), this quantity is 
 !    not influential. A lower-bound limiter of dx is imposed.
 !-------------------------------------------------------------------------------
