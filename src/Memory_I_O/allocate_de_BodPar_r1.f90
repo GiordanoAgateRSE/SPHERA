@@ -24,6 +24,7 @@
 !              derived type body_particle and range (number of 
 !              dimensions) 1
 !-------------------------------------------------------------------------------
+#ifdef SOLID_BODIES
 subroutine allocate_de_BodPar_r1(allocation_flag,array,extent_1,array_name,    &
    ulog_flag)
 !------------------------
@@ -90,3 +91,4 @@ if (allocation_flag.eqv..true.) then
 endif
 return
 end subroutine allocate_de_BodPar_r1
+#endif

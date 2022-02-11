@@ -22,6 +22,7 @@
 ! Program unit: body_pressure_postpro
 ! Description: Post-processing for body particle pressure.   
 !-------------------------------------------------------------------------------
+#ifdef SOLID_BODIES
 subroutine body_pressure_postpro
 !------------------------
 ! Modules
@@ -105,3 +106,4 @@ deallocate(aux_pres)
 deallocate(wet)
 return
 end subroutine body_pressure_postpro
+#endif

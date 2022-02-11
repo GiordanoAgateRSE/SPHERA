@@ -22,6 +22,7 @@
 ! Program unit: distance_point_line_3D  
 ! Description: Computation of the distance between a point and a line in 3D.      
 !-------------------------------------------------------------------------------
+#ifdef SOLID_BODIES
 subroutine distance_point_line_3D(P0,P1_line,P2_line,dis)
 !------------------------
 ! Modules
@@ -94,3 +95,4 @@ dis = sqrt(dot_product(aux_vec,aux_vec))
 !------------------------
 return
 end subroutine distance_point_line_3D
+#endif

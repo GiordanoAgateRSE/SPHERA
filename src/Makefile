@@ -57,7 +57,7 @@ PARALLELIZATION = OMP
 #                " -DSPACE_3D"
 #             2D
 #                " -DSPACE_2D"
-PD_SPACE = -DSPACE_2D
+PD_SPACE = -DSPACE_3D
 
 #       VERBOSITY
 #          Suggested values:

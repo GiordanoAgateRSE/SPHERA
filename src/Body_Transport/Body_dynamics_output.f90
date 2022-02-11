@@ -22,6 +22,7 @@
 ! Program unit: Body_dynamics_output
 ! Description: .txt output files for body transport in fluid flows. 
 !-------------------------------------------------------------------------------
+#ifdef SOLID_BODIES
 subroutine Body_dynamics_output
 !------------------------
 ! Modules
@@ -145,3 +146,4 @@ deallocate(pmax_R)
 deallocate(pmax_L) 
 return
 end subroutine Body_dynamics_output
+#endif

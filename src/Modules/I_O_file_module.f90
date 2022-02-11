@@ -55,8 +55,10 @@ integer(4) :: uint = 30
 integer(4) :: ninp2 = 31
 ! Dummy file
 integer(4) :: ndum = 32
+#ifdef SOLID_BODIES
 ! Body dynamics time series
 integer(4) :: ubod = 33
+#endif
 #ifdef SPACE_3D
 ! 2D output file of CLC class and z0
 integer(4) :: uCLC = 34

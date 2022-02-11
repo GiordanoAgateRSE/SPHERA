@@ -22,6 +22,7 @@
 ! Program unit: Input_Body_Dynamics
 ! Description: Input management for body transport in fluid flows.      
 !-------------------------------------------------------------------------------
+#ifdef SOLID_BODIES
 subroutine Input_Body_Dynamics
 !------------------------
 ! Modules
@@ -371,3 +372,4 @@ enddo
 deallocate(aux_mass)
 return
 end subroutine Input_Body_Dynamics
+#endif

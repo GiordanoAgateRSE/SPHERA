@@ -157,7 +157,7 @@ do while (trim(lcase(ainp)) /= "##### end bed load transport #####")
          write(ulog,"(1x,a)")  " "
       endif
    endif
-! Assignment to the body parameters (first part)
+! Assignment to the KTGF variables (first part)
    Granular_flows_options%KTGF_config = KTGF_config
    if (KTGF_config>0) then      
       Granular_flows_options%ID_main_fluid = ID_main_fluid

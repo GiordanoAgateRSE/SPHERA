@@ -46,7 +46,7 @@ implicit none
 !------------------------
 ! Statements
 !------------------------
-if (n_bodies>0) then
+#ifdef SOLID_BODIES
    call system("touch Body_dynamics.txt draft_Body_dynamics_draft.txt")
    call system("cat Body_dynamics.txt *Body_dynamics_* > Body-dynamics.txt")
    call system("rm -f *Body_dynamics*")
@@ -55,7 +55,7 @@ if (n_bodies>0) then
    call system("cat Body_particles.txt *Body_particles_* > Body-particles.txt")
    call system("rm -f *Body_particles*")
    call system("mv Body-particles.txt Body_particles.txt")
-endif
+#endif
 #ifdef SPACE_3D
 if (Q_sections%n_sect>0) then
    call system("touch Q_sections.txt draft_Q_sections_draft.txt")

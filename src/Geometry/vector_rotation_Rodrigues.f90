@@ -24,6 +24,7 @@
 !              the rotation angle, based on Rodrigues formula. It is also 
 !              called in 2D.         
 !-------------------------------------------------------------------------------
+#ifdef SOLID_BODIES
 subroutine vector_rotation_Rodrigues(n_R,teta_R,vector)
 !------------------------
 ! Modules
@@ -73,3 +74,4 @@ vector(3) = dot_product(R_Rodrigues(3,:),aux_vector)
 !------------------------
 return
 end subroutine vector_rotation_Rodrigues
+#endif

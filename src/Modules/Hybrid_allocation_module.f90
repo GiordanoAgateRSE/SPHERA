@@ -91,7 +91,7 @@ type input_any_time_der_type
    integer(4) :: itmax
 ! Reference fluid for free surface                      
    integer(4) :: ipllb_md
-! Flag for body particles reordering
+! Flag for body particles reordering (DB-SPH)
    integer(4) :: body_part_reorder
 ! Density_thresholds flag (default=0; =1 for very low bulk modulus -preliminary 
 ! simulations-)
@@ -363,6 +363,7 @@ type TyParticle_w
    double precision :: grad_vel_VSL_times_mu(3)
 end type TyParticle_w
 
+#ifdef SOLID_BODIES
 ! Body elements
 type body_element
 ! Number of body particles
@@ -459,6 +460,7 @@ type body_particle
 ! Normal
    double precision :: normal(3)
 end type body_particle
+#endif
 
 ! Zone
 type TyZone

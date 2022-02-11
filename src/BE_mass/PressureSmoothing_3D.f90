@@ -43,7 +43,9 @@ double precision, parameter :: MinTotUnit = 0.95d0
 character(10), parameter :: SmoothingNormalisation = "complete  "          
 integer(4) :: npi,npj,nsp,icbf,Ncbf,ibdt,ibdp,ii,j,npartint
 double precision :: p0i,pi,sompW,pesoj,DiffP,TetaP1,Appunity,IntWdV
-double precision,dimension(:),allocatable :: sompW_vec,AppUnity_vec    
+#ifdef SOLID_BODIES
+double precision,dimension(:),allocatable :: sompW_vec,AppUnity_vec 
+#endif   
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -53,27 +55,29 @@ double precision,dimension(:),allocatable :: sompW_vec,AppUnity_vec
 !------------------------
 ! Initializations
 !------------------------
-if (n_bodies>0) then  
+#ifdef SOLID_BODIES
    allocate(sompW_vec(nag))
    allocate(AppUnity_vec(nag))
    sompW_vec = zero
    AppUnity_vec = zero
-endif
+#endif
 !------------------------
 ! Statements
 !------------------------
+#ifdef SOLID_BODIES
 ! Body particle contributions to pressure smoothing
-if (n_bodies>0) then
    call start_and_stop(2,19)
    call body_to_smoothing_pres(sompW_vec,AppUnity_vec)
    call start_and_stop(3,19)
-endif
+#endif
 !$omp parallel do default(none)                                                &
 !$omp private(npi,ii,Nsp,DiffP,p0i,pi,sompW,Appunity)                          &
 !$omp private(j,npartint,npj,pesoj,Ncbf,ibdt,icbf,ibdp,intWdV)                 &
 !$omp shared(pg,Domain,nPartIntorno,PartIntorno,NMAXPARTJ,PartKernel)          &
-!$omp shared(BoundaryDataPointer,BoundaryDataTab,indarrayFlu,Array_Flu)        &
-!$omp shared(sompW_vec,AppUnity_vec,n_bodies)
+#ifdef SOLID_BODIES
+!$omp shared(sompW_vec,AppUnity_vec,n_bodies)                                  &
+#endif
+!$omp shared(BoundaryDataPointer,BoundaryDataTab,indarrayFlu,Array_Flu)
 do ii=1,indarrayFlu
    npi = Array_Flu(ii)
 ! Excluding particles close to the face with conditions "flow", "velo" and "sour"
@@ -92,10 +96,10 @@ do ii=1,indarrayFlu
             Appunity = Appunity + pesoj
             sompW = sompW + (pg(npj)%pres - pi) * pesoj
          enddo
-         if (n_bodies>0) then
+#ifdef SOLID_BODIES
             sompW = sompW + sompW_vec(npi)
             AppUnity = AppUnity + AppUnity_vec(npi)
-         endif
+#endif
          if (Domain%tipo=="bsph") then
 ! DB-SPH contributions to pressure smoothing
             pg(npi)%vpres = sompW / AppUnity
@@ -147,10 +151,10 @@ enddo
 !------------------------
 ! Deallocations
 !------------------------
-if (n_bodies>0) then
+#ifdef SOLID_BODIES
    deallocate(sompW_vec)
    deallocate(AppUnity_vec)
-endif
+#endif
 return
 end subroutine PressureSmoothing_3D
 #endif

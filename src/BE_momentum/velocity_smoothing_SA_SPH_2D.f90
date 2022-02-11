@@ -75,7 +75,7 @@ if (IntNcbs>0) then
       if ((strtype=='sour').or.(strtype=='velo').or.(strtype=='flow'))&
          then
          pg(npi)%var(:) = zero   
-         exit  
+         exit
       endif
       do i=1,PLANEDIM
          sss(i) = BoundarySide(iside)%T(acix(i),1)

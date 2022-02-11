@@ -22,6 +22,7 @@
 ! Program unit: body_particles_to_continuity
 ! Description: Contributions of the body particles to the continuity equation.  
 !-------------------------------------------------------------------------------
+#ifdef SOLID_BODIES
 subroutine body_particles_to_continuity
 !------------------------
 ! Modules
@@ -169,3 +170,4 @@ enddo
 !------------------------
 return
 end subroutine body_particles_to_continuity
+#endif

@@ -23,6 +23,7 @@
 ! Description: 3D rotation of a given vector, provided the vector of Euler's 
 !              angles (3D). It is als ocalled in 2D.
 !-------------------------------------------------------------------------------
+#ifdef SOLID_BODIES
 subroutine vector_rotation_Euler_angles(vector,angle)
 !------------------------
 ! Modules
@@ -86,3 +87,4 @@ vector(3) = dot_product(cos_dir(3,:),vec_temp)
 !------------------------
 return
 end subroutine vector_rotation_Euler_angles
+#endif

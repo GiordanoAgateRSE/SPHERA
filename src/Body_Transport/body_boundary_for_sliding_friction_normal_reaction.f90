@@ -24,6 +24,7 @@
 !              sliding friction force and the normal reaction force under 
 !              sliding. Generic "body particle - frontier" interaction. 
 !-------------------------------------------------------------------------------
+#ifdef SOLID_BODIES
 subroutine body_boundary_for_sliding_friction_normal_reaction(i_bp,            &
    bp_bound_interactions,normal_plane,bp_pos,interface_sliding_vel_max,        &
    mean_bound_normal,sliding_app_point,sliding_dir,aux_gravity)
@@ -96,3 +97,4 @@ endif
 !------------------------
 return
 end subroutine body_boundary_for_sliding_friction_normal_reaction
+#endif

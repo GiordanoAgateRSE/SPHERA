@@ -37,26 +37,30 @@ implicit none
 integer(4),intent(in) :: it
 character(6),intent(in) :: str
 integer(4),intent(inout) :: it_print
-integer(4) :: npi,i,codice,dummy,OpCountot,SpCountot,minlocvelo,maxlocvelo,nbi
+integer(4) :: npi,i,codice,dummy,OpCountot,SpCountot,minlocvelo,maxlocvelo
 integer(4) :: minlocvelx,maxlocvelx,minlocvely,maxlocvely,minlocvelz,maxlocvelz
 integer(4) :: minlocpres,maxlocpres,minlocdens,maxlocdens,minlocvisc,maxlocvisc
 integer(4) :: blt_laminar_flag_count
 integer(4) :: minlocvelo_w,maxlocvelo_w,minlocpres_w,maxlocpres_w
+#ifdef SOLID_BODIES
 integer(4) :: minlocvelo_bp,maxlocvelo_bp,minlocpres_bp,maxlocpres_bp
 integer(4) :: minlocvelo_body,maxlocvelo_body,minlocomega_body,maxlocomega_body
+integer(4) :: minlocacc_bp,maxlocacc_bp,nbi
+#endif
 integer(4) :: minloctau_tauc,maxloctau_tauc,minlock_BetaGamma,maxlock_BetaGamma
 integer(4) :: minlocu_star,maxlocu_star,laminar_flag_count,mixture_count
 integer(4) :: machine_Julian_day,machine_hour,machine_minute,machine_second
-integer(4) :: minlocacc_bp,maxlocacc_bp
 double precision :: minvelx,maxvelx,minvely,maxvely,minvelz,maxvelz,minpres
 double precision :: maxpres,mindens,maxdens,minvisc,maxvisc
-double precision :: modvel,minvelo_w,maxvelo_w,minpres_w
-double precision :: maxpres_w,minvelo_bp,maxvelo_bp,minpres_bp,maxpres_bp
+double precision :: modvel,minvelo_w,maxvelo_w,minpres_w,maxpres_w
+#ifdef SOLID_BODIES
+double precision :: minvelo_bp,maxvelo_bp,minpres_bp,maxpres_bp
 double precision :: minvelo_body,maxvelo_body,minomega_body,maxomega_body
-double precision :: modomega,mintau_tauc,maxtau_tauc,mink_BetaGamma
+double precision :: minacc_bp,maxacc_bp,modacc,modomega
+#endif
+double precision :: mintau_tauc,maxtau_tauc,mink_BetaGamma
 double precision :: maxk_BetaGamma,minu_star,maxu_star,time_elapsed_tot_est
 double precision :: minvelo,maxvelo,laminar_flag_perc,blt_laminar_flag_perc
-double precision :: modacc,minacc_bp,maxacc_bp
 integer(4),dimension(1) :: pos
 character(len=42) :: fmt100="(a,i10,a,e18.9,a,e18.9,a,i  ,a,i  ,a,i  )"
 character(len=47) :: fmt101="(a,2(1x,f11.4,1x,a,1x,i8,1x,a,3(1x,f8.2,1x,a)))"
@@ -115,7 +119,7 @@ if (nag>0) then
       minvelo_w = max_positive_number
       maxvelo_w = max_negative_number
    endif
-   if (n_bodies>0) then
+#ifdef SOLID_BODIES
       minvelo_bp = max_positive_number
       maxvelo_bp = max_negative_number
       minacc_bp = max_positive_number
@@ -124,7 +128,7 @@ if (nag>0) then
       maxvelo_body = max_negative_number
       minomega_body = max_positive_number
       maxomega_body = max_negative_number
-   endif
+#endif
    if ((Granular_flows_options%erosion_flag.ne.1).and.                         &
       (Granular_flows_options%KTGF_config==1)) then
       mintau_tauc = max_positive_number
@@ -233,8 +237,8 @@ if (nag>0) then
       minvelo_w = dsqrt(minvelo_w)
       maxvelo_w = dsqrt(maxvelo_w)
    endif
+#ifdef SOLID_BODIES
 ! Limits for body particles and bodies: start
-   if (n_bodies>0) then
 ! Pressure (body particles)
       minpres_bp = minval                                                      &
          (bp_arr(1:n_body_part)%pres,mask=bp_arr(1:n_body_part)%cell/=0)
@@ -304,7 +308,7 @@ if (nag>0) then
             maxlocomega_body = nbi
          endif
       enddo
-   endif
+#endif
 ! Limits for supplementary bed-load transport parameters 
    if ((Granular_flows_options%erosion_flag.ne.1).and.                         &
       (Granular_flows_options%KTGF_config==1)) then
@@ -427,7 +431,7 @@ if (nag>0) then
          maxpres_w,"|",maxlocpres_w,"|",pg_w(maxlocpres_w)%coord(1),"|",       &
          pg_w(maxlocpres_w)%coord(2),"|",pg_w(maxlocpres_w)%coord(3),"|"
    endif
-   if (n_bodies>0) then
+#ifdef SOLID_BODIES
       write(ulog,fmt101)  "Body part. veloc.|u_s_|(m/s) |",minvelo_bp,"|",     &
          minlocvelo_bp,"|",bp_arr(minlocvelo_bp)%pos(1),"|",                   &
          bp_arr(minlocvelo_bp)%pos(2),"|",bp_arr(minlocvelo_bp)%pos(3),"||",   &
@@ -457,7 +461,7 @@ if (nag>0) then
          maxlocomega_body,"|",body_arr(maxlocomega_body)%x_CM(1),"|",          &
          body_arr(maxlocomega_body)%x_CM(2),"|",                               &
          body_arr(maxlocomega_body)%x_CM(3),"|"
-   endif
+#endif
    if ((Granular_flows_options%erosion_flag.ne.1).and.                         &
       (Granular_flows_options%KTGF_config==1)) then
       write(ulog,fmt101)  "Shear stress ratio tau/tauc |",mintau_tauc,"|",     &

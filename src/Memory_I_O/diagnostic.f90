@@ -154,8 +154,10 @@ select case (ierr)
 '  312 - Ascii input '//stringa(1:la)//' fails at the record for erosion Shields Van Rijn Seminara module'
          case (320); write(ulog,'(1x,a)')                                      &
 '  320 - Ascii input '//stringa(1:la)//' fails at the record for temporal scheme module'
+#ifdef SOLID_BODIES
          case (330); write(ulog,'(1x,a)')                                      &
 '  330 - Ascii input '//stringa(1:la)//' fails at the record for body dynamics module'
+#endif
          case (340); write(ulog,'(1x,a)')                                      &
 '  340 - Ascii input '//stringa(1:la)//' fails at the record for DB-SPH module'
          case default; write(ulog,'(1x,a)') '  ??? - Unknown error type'

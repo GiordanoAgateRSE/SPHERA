@@ -43,8 +43,10 @@ logical,intent(in) :: BC_zmax_flag
 #endif
 integer(4) :: npi,npj,contj,npartint,ii
 double precision :: rhoi,rhoj,amassj,pesoj,moddervel
-double precision,dimension(3) :: dervel 
+double precision,dimension(3) :: dervel
+#ifdef SOLID_BODIES
 double precision,dimension(:,:),allocatable :: dervel_mat
+#endif
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -54,27 +56,29 @@ double precision,dimension(:,:),allocatable :: dervel_mat
 !------------------------
 ! Initializations
 !------------------------
-if (n_bodies>0) then  
+#ifdef SOLID_BODIES
    allocate(dervel_mat(nag,3))
    dervel_mat(:,:) = 0.d0
-endif
+#endif
 !------------------------
 ! Statements
 !------------------------
+#ifdef SOLID_BODIES
 ! Body particle contributions to velocity smoothing
-if (n_bodies>0) then
    call start_and_stop(3,7)
    call start_and_stop(2,19)
    call body_to_smoothing_vel(dervel_mat)
    call start_and_stop(3,19)
    call start_and_stop(2,7)
-endif
+#endif
 !$omp parallel do default(none)                                                &
 !$omp shared(pg,Med,nPartIntorno,NMAXPARTJ,PartIntorno,PartKernel,indarrayFlu) &
+!$omp shared(Array_Flu,Domain)                                                 &
 #ifdef SPACE_3D
-!$omp shared(Array_Flu,Domain,n_bodies,dervel_mat,Partz,BC_zmax_flag)          &
-#elif defined SPACE_2D
-!$omp shared(Array_Flu,Domain,n_bodies,dervel_mat)                             &
+!$omp shared(Partz,BC_zmax_flag)                                               &
+#endif
+#ifdef SOLID_BODIES
+!$omp shared(n_bodies,dervel_mat)                                              &
 #endif
 !$omp private(ii,npi,contj,npartint,npj,rhoi,rhoj,amassj,dervel,moddervel)     &
 !$omp private(pesoj)
@@ -112,9 +116,9 @@ do ii=1,indarrayFlu
       pesoj = amassj * PartKernel(4,npartint) / rhoj
       pg(npi)%var(:) = pg(npi)%var(:) + dervel(:) * pesoj
    enddo
-   if (n_bodies>0) then
+#ifdef SOLID_BODIES
       pg(npi)%var(:) = pg(npi)%var(:) + dervel_mat(npi,:)
-   endif
+#endif
 ! Impose boundary conditions at inlet and outlet sections (DB-SPH)
    if (Domain%tipo=="bsph") then
       call DBSPH_inlet_outlet(npi)
@@ -130,6 +134,8 @@ enddo
 !------------------------
 ! Deallocations
 !------------------------
-if (n_bodies>0) deallocate(dervel_mat)
+#ifdef SOLID_BODIES
+deallocate(dervel_mat)
+#endif
 return
 end subroutine velocity_smoothing

@@ -176,9 +176,11 @@ logical :: restart
 ! Flag to kill the execution
 logical :: kill_flag
 logical :: current_version
+#ifdef SOLID_BODIES
 ! Flags to activate/deactivate pressure limiters on the body surfaces (input)
 logical :: body_minimum_pressure_limiter
 logical :: body_maximum_pressure_limiter
+#endif
 ! Slip conditions for FSI (input)
 logical :: FSI_free_slip_conditions
 ! Max number of neighbouring particles
@@ -190,12 +192,14 @@ integer(4) :: MaxNcbf
 ! Max number of close boundary sides for the current particle
 integer(4) :: MaxNcbs
 #endif
+#ifdef SOLID_BODIES
 ! Total number of body particles
 integer(4) :: n_body_part
 ! Total number of surface body particles
 integer(4) :: n_surf_body_part
 ! Total number of bodies 
 integer(4) :: n_bodies
+#endif
 #ifdef SPACE_3D
 ! Number of convex edges
 integer(4) :: NumBEdges
@@ -216,11 +220,13 @@ double precision :: square_doubleh
 double precision :: unosuh
 ! 1./(Domain%h*Domain%h)
 double precision :: unosusquareh
+#ifdef SOLID_BODIES
 ! Ratio between fluid particle and body particle size
 double precision :: dx_dxbodies
 ! Numerical times for body dynamics (input)
 double precision :: time_max_no_body_gravity_force
 double precision :: time_max_no_body_frontier_impingements
+#endif
 ! Indices of cells that must be considered around the current one in the 
 ! program unit "CalcVarLength"
 integer(4),dimension(14,3) :: indicecelle

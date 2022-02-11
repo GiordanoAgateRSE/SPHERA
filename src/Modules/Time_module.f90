@@ -67,7 +67,9 @@ data tot_routines(13) / "     State equation                     " /
 data tot_routines(14) / "     Pressure smoothing                 " /
 data tot_routines(17) / "     RK time integration                " /
 data tot_routines(18) / "     Wall parameter update              " /
+#ifdef SOLID_BODIES
 data tot_routines(19) / "     Rigid body transport               " /
+#endif
 data tot_routines(20) / "     Mixture viscosity                  " /
 data tot_routines(numb_subr) / "Totale                                  " /
 end module Time_module

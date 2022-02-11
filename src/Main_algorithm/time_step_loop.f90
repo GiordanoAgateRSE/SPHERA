@@ -97,12 +97,12 @@ if ((on_going_time_step==it_start).and.(Domain%tipo=="bsph")) then
    IC_removal_flag = .true.
    call start_and_stop(3,9)
 endif
-if (n_bodies>0) then
+#ifdef SOLID_BODIES
    call start_and_stop(2,19)
    call initial_fluid_removal_in_solid_bodies
    IC_removal_flag = .true.
    call start_and_stop(3,19)
-endif
+#endif
 if (IC_removal_flag.eqv..true.) then
    call start_and_stop(2,9)
    call OrdGrid1
@@ -126,13 +126,13 @@ if ((Domain%tipo=="bsph").and.(nag>0).and.(DBSPH%n_w>0)) then
    call BC_wall_elements
 endif
 call start_and_stop(3,18)
+#ifdef SOLID_BODIES
 ! Pressure initialization for body particles
-if (n_bodies>0) then
    call start_and_stop(2,19)
    call body_pressure_mirror
    call body_pressure_postpro
    call start_and_stop(3,19)
-endif
+#endif
 ! To evaluate the close boundaries and integrals for the current particle in 
 ! every loop and storing them in the general storage array. Computation and 
 ! storage of the intersections between the kernel support and the frontier and 
@@ -213,14 +213,14 @@ TIME_STEP_DO: do while (it<=input_any_t%itmax)
 ! Momentum equation 
       call start_and_stop(2,6)
       call RHS_momentum_equation
+#ifdef SOLID_BODIES
 ! Balance equations RHS for body dynamics
-      if (n_bodies>0) then
          call start_and_stop(3,6)
          call start_and_stop(2,19)
          call RHS_body_dynamics(dtvel)
          call start_and_stop(3,19)
          call start_and_stop(2,6)
-      endif
+#endif
 ! Time integration scheme for momentum equations 
       if (Domain%time_split==0) then   
 ! Explicit RK schemes
@@ -229,12 +229,12 @@ TIME_STEP_DO: do while (it<=input_any_t%itmax)
          elseif (Domain%time_split==1) then
             call Leapfrog_momentum(dt_previous_step,dtvel)
             call start_and_stop(3,6)
+#ifdef SOLID_BODIES
 ! Time integration for body dynamics
-            if (n_bodies>0) then
                call start_and_stop(2,19)
                call time_integration_body_dynamics(dtvel)
                call start_and_stop(3,19)
-            endif
+#endif
 ! Partial smoothing for velocity: start 
             call start_and_stop(2,7)
 #ifdef SPACE_3D
@@ -350,9 +350,11 @@ TIME_STEP_DO: do while (it<=input_any_t%itmax)
          endif
 #endif
       call start_and_stop(3,12)
+#ifdef SOLID_BODIES
       call start_and_stop(2,19)
-      if (n_bodies>0) call body_particles_to_continuity
+      call body_particles_to_continuity
       call start_and_stop(3,19)
+#endif
       call start_and_stop(2,12)      
       if (Domain%time_split==0) then   
 ! Explicit RK schemes
@@ -364,12 +366,12 @@ TIME_STEP_DO: do while (it<=input_any_t%itmax)
             call start_and_stop(2,13)
             call CalcPre
             call start_and_stop(3,13)
+#ifdef SOLID_BODIES
 ! Continuity equation: end
-            if (n_bodies>0) then
                call start_and_stop(2,19)
                call body_pressure_mirror
                call start_and_stop(3,19)
-            endif
+#endif
       endif
 ! Explicit RK schemes
       if (Domain%time_split==0) call time_integration
@@ -387,11 +389,11 @@ TIME_STEP_DO: do while (it<=input_any_t%itmax)
          endif
          call start_and_stop(3,14)
       endif
-      if (n_bodies>0) then
+#ifdef SOLID_BODIES
          call start_and_stop(2,19)
          call body_pressure_postpro
          call start_and_stop(3,19)
-      endif
+#endif
       call start_and_stop(2,20)
       if (Granular_flows_options%KTGF_config==1) call mixture_viscosity 
       call start_and_stop(3,20)

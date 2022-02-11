@@ -19,7 +19,7 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: CalcVarLength            
+! Program unit: CalcVarLength
 ! Description: Neighbouring search (pre-conditioned dynamic vector), relative 
 !              positions, kernel functions/derivatives, Shepard's coefficient, 
 !              position of the fluid-sediment interfaces along each background 
@@ -40,7 +40,10 @@ use Memory_I_O_interface_module
 implicit none
 integer(4) :: nceli,igridi,kgridi,jgridi,irang,krang,jrang,ncelj,jgrid1
 integer(4) :: jgrid2,contliq,mm,npi,npj,npartint,index_rij_su_h
-integer(4) :: irestocell,celleloop,fw,i_grid,j_grid,bp,bp_f,aux2,i
+integer(4) :: irestocell,celleloop,fw,i_grid,j_grid
+#ifdef SOLID_BODIES
+integer(4) :: aux2,ibp,bp_f,bp
+#endif
 double precision :: rij_su_h,ke_coef,kacl_coef,rij_su_h_quad,rijtemp,rijtemp2
 double precision :: gradmod,gradmodwacl,wu,denom,normal_int_abs,abs_vel
 double precision :: min_sigma_Gamma,dis_fp_dbsph_inoutlet
@@ -77,11 +80,11 @@ if ((Domain%tipo=="bsph").and.(nag>0)) then
    pg_w(:)%grad_vel_VSL_times_mu(2) = 0.d0
    pg_w(:)%grad_vel_VSL_times_mu(3) = 0.d0
 endif
-if (n_bodies>0) then 
+#ifdef SOLID_BODIES
    nPartIntorno_bp_f = 0
    nPartIntorno_bp_bp = 0
    aux2 = 0
-endif
+#endif
 !------------------------
 ! Statements
 !------------------------
@@ -730,14 +733,14 @@ if (Domain%tipo=="bsph") then
    if (allocated(bounded)) deallocate(bounded)
    if (allocated(dShep_old)) deallocate(dShep_old)
 endif
+#ifdef SOLID_BODIES
 ! SPH parameters for body transport in fluid flows
-if (n_bodies>0) then
 ! Loop over the body particles
 !$omp parallel do default(none)                                                &
 !$omp private(npi,nceli,irestocell,igridi,jgridi,kgridi,jgrid1,jgrid2,irang)   &
 !$omp private(jrang,krang,bp_f,npj,npartint,ncelj,ragtemp,rijtemp,rijtemp2)    &
 !$omp private(rij_su_h,rij_su_h_quad,denom,index_rij_su_h,gradmod,bp)          &
-!$omp private(gradmodwacl,i,aux2)                                              &
+!$omp private(gradmodwacl,ibp,aux2)                                            &
 !$omp shared(NMAXPARTJ,ke_coef,kacl_coef,square_doubleh,squareh,Domain)        &
 !$omp shared(Icont_bp,NPartOrd_bp,bp_arr,nPartIntorno_bp_bp,PartIntorno_bp_bp) &
 !$omp shared(rag_bp_bp,n_body_part,Icont,n_bodies,nPartIntorno_bp_f)           &
@@ -745,11 +748,11 @@ if (n_bodies>0) then
 !$omp shared(NPartOrd,eta,pg)
    do npi=1,n_body_part
 ! Computation of the ID of the surface body particles
-      i = 0
+      ibp = 0
       aux2 = 0
-      do while (i<npi) 
-         i = i+1 
-         if (bp_arr(i)%area>1.d-15) aux2 = aux2 + 1
+      do while (ibp<npi) 
+         ibp = ibp + 1
+         if (bp_arr(ibp)%area>1.d-15) aux2 = aux2 + 1
       enddo
       nceli = bp_arr(npi)%cell
       if (nceli==0) cycle
@@ -836,7 +839,7 @@ if (n_bodies>0) then
 ! End Loop over the neighbouring body particles in the cell       
    enddo
 !$omp end parallel do    
-endif
+#endif
 !------------------------
 ! Deallocations
 !------------------------

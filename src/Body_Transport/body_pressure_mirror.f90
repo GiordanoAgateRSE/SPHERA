@@ -23,6 +23,7 @@
 ! Description: Computation of the body particle pressure (Amicarelli et al.,
 !              2015, CAF).   
 !-------------------------------------------------------------------------------
+#ifdef SOLID_BODIES
 subroutine body_pressure_mirror
 !------------------------
 ! Modules
@@ -126,3 +127,4 @@ enddo
 !------------------------
 return
 end subroutine body_pressure_mirror
+#endif

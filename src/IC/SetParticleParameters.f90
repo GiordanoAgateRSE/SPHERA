@@ -35,7 +35,7 @@ use Memory_I_O_interface_module
 ! Declarations
 !------------------------
 implicit none
-integer(4),intent(IN) :: npi,Nz,Mate
+integer(4),intent(in) :: npi,Nz,Mate
 double precision :: tstop
 integer(4), external :: ParticleCellNumber
 !------------------------

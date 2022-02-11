@@ -34,8 +34,11 @@ use Dynamic_allocation_module
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: nceli,ncel,igridi,kgridi,jgridi,irang,krang,jrang,fw,sb
+integer(4) :: nceli,ncel,igridi,kgridi,jgridi,irang,krang,jrang,fw
 integer(4) :: mm,npj,irestocell,ID_closest_fb,number_SASPH_neighbours
+#ifdef SOLID_BODIES
+integer(4) :: sb
+#endif
 double precision :: rijlocal,uni, pesoj,plocal,rho,dis_closest_fb
 double precision,dimension(3) :: raglocal,vel
 type (TyCtlPoint) :: pglocal
@@ -119,8 +122,8 @@ do jrang = jgridi-1,jgridi+1
                enddo
             endif
          endif
+#ifdef SOLID_BODIES
 ! Contributions from body particles
-         if (n_bodies>0) then
             if (Icont_bp(ncel+1)>Icont_bp(ncel)) then
 ! Loop over the neighbouring solid particles in the cell
                do sb=Icont_bp(ncel),Icont_bp(ncel+1)-1
@@ -140,7 +143,7 @@ do jrang = jgridi-1,jgridi+1
 ! Fluid density cannot be interpolated from solid body particles
                enddo
             endif
-         endif
+#endif
       enddo
    enddo
 enddo

@@ -23,6 +23,7 @@
 ! Description: Reading input data for body transport in fluid flows (Amicarelli
 !              et al., 2015, CAF).                  
 !-------------------------------------------------------------------------------
+#ifdef SOLID_BODIES
 subroutine ReadBodyDynamics(ainp,comment,nrighe,ier,ninp,ulog)
 !------------------------
 ! Modules
@@ -297,3 +298,4 @@ enddo
 !------------------------
 return
 end subroutine ReadBodyDynamics
+#endif

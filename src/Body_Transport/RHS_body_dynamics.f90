@@ -23,6 +23,7 @@
 ! Description:  To estimate the RHS of the body dynamics equations (Amicarelli 
 !               et al.,2015,CAF).     
 !-------------------------------------------------------------------------------
+#ifdef SOLID_BODIES
 subroutine RHS_body_dynamics(dtvel)
 !------------------------
 ! Modules
@@ -872,3 +873,4 @@ if(allocated(interface_sliding_vel_max)) then
 endif
 return
 end subroutine RHS_body_dynamics
+#endif

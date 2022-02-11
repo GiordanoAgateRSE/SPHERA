@@ -23,6 +23,7 @@
 ! Description: Interpolative function defined by Monaghan (2005) for boundary
 !              force particles (Amicarelli et al.,2015,CAF).     
 !-------------------------------------------------------------------------------
+#ifdef SOLID_BODIES
 double precision function Gamma_boun(rr,hh)
 !------------------------
 ! Modules
@@ -60,3 +61,4 @@ Gamma_boun = dabs(Gamma_boun)
 !------------------------
 return
 end function Gamma_boun
+#endif

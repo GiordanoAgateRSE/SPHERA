@@ -207,7 +207,7 @@ if (Domain%tipo=="bsph") then
          write(ulog,'(1x,a)') "   Array RAG_fw successfully allocated "
    endif
 endif
-if (n_bodies>0) then
+#ifdef SOLID_BODIES
    allocate(nPartIntorno_bp_f(n_body_part),stat=ier)
    if (ier/=0) then
       write(ulog,'(1x,a,i2)')                                                  &
@@ -291,7 +291,7 @@ if (n_bodies>0) then
          write(ulog,'(1x,a)') "   Array impact_vel successfully allocated "
    endif
    impact_vel(:,:) = 0.d0
-endif
+#endif
 write(ulog,'(1x,a)') "..."
 write(ulog,'(a,i15)') " Max number of particles  : PARTICLEBUFFER = ",         &
    PARTICLEBUFFER
@@ -324,7 +324,7 @@ if ((Domain%tipo=="bsph").and.(DBSPH%n_w>0)) then
    write(ulog,*) " Size # of elements in array grad_vel_VSL_fw     : ",        &
       size(grad_vel_VSL_fw)
 endif
-if (n_bodies>0) then
+#ifdef SOLID_BODIES
    write(ulog,*) " Size # of elements in array nPartIntorno_bp_f   : ",        &
       size(nPartIntorno_bp_f)
    write(ulog,*) " Size # of elements in array PartIntorno_bp_f    : ",        &
@@ -343,7 +343,7 @@ if (n_bodies>0) then
       size(PartIntorno_bp_bp)
    write(ulog,*) " Size # of elements in array rag_bp_bp           : ",        &
       size(rag_bp_bp)
-endif
+#endif
 write(ulog,'(1x,a)') "..."
 write(ulog,*) " Size in bytes of array pg                       : ",sizeof(pg)
 write(ulog,*) " Size in bytes of array BoundaryDataTab          : ",           &
@@ -373,7 +373,7 @@ if ((Domain%tipo=="bsph").and.(DBSPH%n_w>0)) then
    write(ulog,*) " Size in bytes of array grad_vel_VSL_fw          : ",        &
       sizeof(grad_vel_VSL_fw)      
 endif
-if (n_bodies>0) then
+#ifdef SOLID_BODIES
    write(ulog,*) " Size in bytes of array nPartIntorno_bp_f        : ",        &
       sizeof(nPartIntorno_bp_f)
    write(ulog,*) " Size in bytes of array PartIntorno_bp_f         : ",        &
@@ -392,7 +392,7 @@ if (n_bodies>0) then
       sizeof(PartIntorno_bp_bp)
    write(ulog,*) " Size in bytes of array rag_bp_bp                : ",        &
       sizeof(rag_bp_bp)
-endif
+#endif
 write(ulog,'(1x,a)') "..."
 write(ulog,'(1x,a)') " "
 write(ulog,'(1x,a)') "   end allocation step. "
@@ -819,7 +819,7 @@ stringa(1:len_trim(stringa))//cargo(1:len_trim(cargo))//'" file="'//filename(1:l
       close (unitvtk)
    endif
 endif
-if (n_bodies>0) then
+#ifdef SOLID_BODIES
 ! Creation of the .pvd file for body particles (Body Transport)
    if (vtkconv) then
       filevtk = "VTKConverter_body-part_"//prefix(1:len_trim(prefix))//".pvd"
@@ -882,7 +882,7 @@ stringa(1:len_trim(stringa))//cargo(1:len_trim(cargo))//'" file="'//filename(1:l
       flush(unitvtk)
       close (unitvtk)
    endif
-endif
+#endif
 !------------------------
 ! Deallocations
 !------------------------

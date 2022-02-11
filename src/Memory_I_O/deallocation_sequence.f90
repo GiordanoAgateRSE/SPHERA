@@ -34,7 +34,10 @@ use Memory_I_O_interface_module
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: i,i_zone
+integer(4) :: i_zone,i_sub,isQ
+#ifdef SOLID_BODIES
+integer(4) :: ib
+#endif
 character(100) :: array_name
 !------------------------
 ! Explicit interfaces
@@ -150,10 +153,11 @@ if (Domain%tipo=="bsph") then
    array_name = "rag_fw"
    call allocate_de_dp_r2(.false.,rag_fw,array_name=array_name,ulog_flag=.true.)
 endif
-do i=1,n_bodies
-   write(ulog,'(a,i6)') "Deallocation of the body n. ",i
-   array_name = "body_arr(i)%body_kinematics"
-   call allocate_de_dp_r2(.false.,body_arr(i)%body_kinematics,                 &
+#ifdef SOLID_BODIES
+do ib=1,n_bodies
+   write(ulog,'(a,i6)') "Deallocation of the body n. ",ib
+   array_name = "body_arr(ib)%body_kinematics"
+   call allocate_de_dp_r2(.false.,body_arr(ib)%body_kinematics,                &
       array_name=array_name,ulog_flag=.true.)
 enddo
 array_name = "body_arr"
@@ -195,6 +199,7 @@ call allocate_de_dp_r2(.false.,rag_bp_bp,array_name=array_name,ulog_flag=.true.)
 array_name = "impact_vel"
 call allocate_de_dp_r2(.false.,impact_vel,array_name=array_name,               &
    ulog_flag=.true.)
+#endif
 #ifdef SPACE_3D
 array_name = "BoundaryConvexEdge"
 call allocate_de_BouConEdg_r1(.false.,BoundaryConvexEdge,array_name=array_name,&
@@ -206,21 +211,21 @@ array_name = "GCBFPointers"
 call allocate_de_int4_r2(.false.,GCBFPointers,array_name=array_name,           &
    ulog_flag=.true.)
 if(allocated(Q_sections%section)) then
-   do i=1,Q_sections%n_sect
+   do isQ=1,Q_sections%n_sect
       write(ulog,'(2a,i6)') "Deallocation of the flow-rate monitoring ",       &
-         "section n. ",i
-      array_name = "Q_sections%section(i)%flow_rate"
-      call allocate_de_dp_r1(.false.,Q_sections%section(i)%flow_rate,          &
+         "section n. ",isQ
+      array_name = "Q_sections%section(isQ)%flow_rate"
+      call allocate_de_dp_r1(.false.,Q_sections%section(isQ)%flow_rate,        &
          array_name=array_name,ulog_flag=.true.)
    enddo
    array_name = "Q_sections%section"
    call allocate_de_QSec_r1(.false.,Q_sections%section,array_name=array_name,  &
       ulog_flag=.true.)
 endif
-do i=1,substations%n_sub
-   write(ulog,'(a,i6)') "Deallocation of the substation n. ",i
-   array_name = "substations%sub(i)%DEMvert"
-   call allocate_de_int4_r1(.false.,substations%sub(i)%DEMvert,                &
+do i_sub=1,substations%n_sub
+   write(ulog,'(a,i6)') "Deallocation of the substation n. ",i_sub
+   array_name = "substations%sub(i_sub)%DEMvert"
+   call allocate_de_int4_r1(.false.,substations%sub(i_sub)%DEMvert,            &
       array_name=array_name,ulog_flag=.true.)
 enddo
 array_name = "substations%sub"

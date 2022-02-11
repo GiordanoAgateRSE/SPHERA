@@ -24,6 +24,7 @@
 !-------------------------------------------------------------------------------
 module Memory_I_O_interface_module
 interface
+#ifdef SOLID_BODIES
    subroutine allocate_de_BodPar_r1(allocation_flag,array,extent_1,array_name, &
       ulog_flag)
       use Hybrid_allocation_module
@@ -42,6 +43,7 @@ interface
       integer(4),intent(in),optional :: extent_1
       character(100),intent(in) :: array_name
    end subroutine allocate_de_Bod_r1
+#endif
 #ifdef SPACE_3D
    subroutine allocate_de_BouConEdg_r1(allocation_flag,array,extent_1,         &
       array_name,ulog_flag)

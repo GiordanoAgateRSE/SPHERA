@@ -46,7 +46,9 @@ double precision :: Appunity,smoothpi,IntWdV
 integer(4),dimension(1:PLANEDIM) :: acix
 double precision,dimension(1:2) :: IntDpWdV
 double precision,dimension(1:PLANEDIM) :: IntLocXY,sss,nnn,massforce
+#ifdef SOLID_BODIES
 double precision,dimension(:),allocatable :: sompW_vec,AppUnity_vec
+#endif
 !="a"(SPHERA),"b"(FreeSurf),"c"
 character(1),parameter :: SmoothVersion = "b"
 character(4) :: strtype
@@ -59,28 +61,30 @@ character(4) :: strtype
 !------------------------
 ! Initializations
 !------------------------
-if (n_bodies>0) then  
+#ifdef SOLID_BODIES
    allocate(sompW_vec(nag))
    allocate(AppUnity_vec(nag))
    sompW_vec = zero
    AppUnity_vec = zero
-endif
+#endif
 acix(1) = 1
 acix(2) = 3
 !------------------------
 ! Statements
 !------------------------
+#ifdef SOLID_BODIES
 ! Body particle contributions to pressure smoothing
-if (n_bodies>0) then
    call start_and_stop(2,19)
    call body_to_smoothing_pres(sompW_vec,AppUnity_vec)
    call start_and_stop(3,19)
-endif
+#endif
 !$omp parallel do default(none)                                                &
 !$omp shared(nag,Pg,Med,Tratto,Partz,Domain,nPartIntorno,PartIntorno,NMAXPARTJ)&
 !$omp shared(PartKernel,kernel_fw,BoundarySide,BoundaryDataPointer)            &
-!$omp shared(BoundaryDataTab,acix,dt,indarrayFlu,Array_Flu,sompW_vec,n_bodies) &
-!$omp shared(AppUnity_vec,input_any_t)                                         &
+!$omp shared(BoundaryDataTab,acix,dt,indarrayFlu,Array_Flu,input_any_t)        &
+#ifdef SOLID_BODIES
+!$omp shared(n_bodies,sompW_vec,AppUnity_vec)                                  &
+#endif
 !$omp private(npi,ii,Appunity,TetaP1,Ncbs,IntNcbs,ibdt,icbs,ibdp,iside)        &
 !$omp private(sidestr,Nsp,mati,ro0i,p0i,pi,SompW,j,npartint,npj,pesoj,smoothpi)&
 !$omp private(VIntWdV_FT,VIntWdV_SO,VIntWdV_OSB,VIntWdV_OSP,press_so,press_osb)&
@@ -105,10 +109,10 @@ do ii=1,indarrayFlu
             Appunity = Appunity + pesoj
             sompW = sompW + (pg(npj)%pres - pi) * pesoj
          enddo
-         if (n_bodies>0) then
+#ifdef SOLID_BODIES
             sompW = sompW + sompW_vec(npi)
             AppUnity = AppUnity + AppUnity_vec(npi)
-         endif
+#endif
          if (Domain%tipo=="bsph") then
             TetaP1 = input_any_t%TetaP * Med(pg(npi)%imed)%Celerita * dt /     &
                      Domain%h
@@ -216,10 +220,10 @@ enddo
 !------------------------
 ! Deallocations
 !------------------------
-if (n_bodies>0) then
+#ifdef SOLID_BODIES
    deallocate(sompW_vec)
    deallocate(AppUnity_vec)
-endif
+#endif
 return
 end subroutine PressureSmoothing_2D
 #endif

@@ -39,8 +39,10 @@ integer(4),intent(in) :: it
 double precision,intent(in) :: dtvel
 character(6),intent(in) :: str
 integer(4),intent(inout) :: it_memo,it_rest
-integer(4) :: nrecords,restartcode,i,i_zone,size_aux,i_t
-integer(4) :: io_stat
+integer(4) :: nrecords,restartcode,i_zone,size_aux,i_t,io_stat
+#ifdef SOLID_BODIES
+integer(4) :: ib
+#endif
 character(100) :: file_name
 !------------------------
 ! Explicit interfaces
@@ -219,20 +221,22 @@ if ((it_rest==it).or.(index(str,'inizio')/=0).or.(index(str,'fine')/=0)) then
    write(nres) pg(1:nag)
    if (allocated(pg_w)) write(nres)                                            &
       pg_w(1:DBSPH%n_w+DBSPH%n_inlet+DBSPH%n_outlet)
-   do i=1,n_bodies
-      write(nres) body_arr(i)%npart,body_arr(i)%Ic_imposed,                    &
-         body_arr(i)%imposed_kinematics,body_arr(i)%n_records,body_arr%mass,   &
-         body_arr(i)%umax,body_arr(i)%pmax,body_arr(i)%x_CM(1:3),              &
-         body_arr(i)%alfa(1:3),body_arr(i)%u_CM(1:3),body_arr(i)%omega(1:3),   &
-         body_arr(i)%Force(1:3),body_arr(i)%Moment(1:3),                       &
-         body_arr(i)%Ic(1:3,1:3),body_arr(i)%Ic_inv(1:3,1:3)
-      if ((allocated(body_arr(i)%body_kinematics)).and.                        &
-         (body_arr(i)%n_records>0)) then
-         write(nres) body_arr(i)%body_kinematics(1:body_arr(i)%n_records,1:7)
+#ifdef SOLID_BODIES
+   do ib=1,n_bodies
+      write(nres) body_arr(ib)%npart,body_arr(ib)%Ic_imposed,                  &
+         body_arr(ib)%imposed_kinematics,body_arr(ib)%n_records,body_arr%mass, &
+         body_arr(ib)%umax,body_arr(ib)%pmax,body_arr(ib)%x_CM(1:3),           &
+         body_arr(ib)%alfa(1:3),body_arr(ib)%u_CM(1:3),body_arr(ib)%omega(1:3),&
+         body_arr(ib)%Force(1:3),body_arr(ib)%Moment(1:3),                     &
+         body_arr(ib)%Ic(1:3,1:3),body_arr(ib)%Ic_inv(1:3,1:3)
+      if ((allocated(body_arr(ib)%body_kinematics)).and.                       &
+         (body_arr(ib)%n_records>0)) then
+         write(nres) body_arr(ib)%body_kinematics(1:body_arr(ib)%n_records,1:7)
       endif
    enddo
    if (allocated(bp_arr)) write(nres) bp_arr(1:n_body_part)
    if (allocated(surf_body_part)) write(nres) surf_body_part(1:n_surf_body_part)
+#endif
 #ifdef SPACE_3D
       if (allocated(Z_fluid_max)) write(nres)                                  &
          Z_fluid_max(1:Grid%ncd(1)*Grid%ncd(2),1:2)

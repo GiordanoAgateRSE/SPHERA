@@ -446,8 +446,8 @@ if (.not.restart) then
             endif
          endif
       endif
+#ifdef SOLID_BODIES
 ! Allocation of the array of the bodies
-      if (n_bodies>0) then
          if (.not.allocated(body_arr)) then
             allocate(body_arr(n_bodies),STAT=alloc_stat)
             if (alloc_stat/=0) then
@@ -489,7 +489,7 @@ if (.not.restart) then
                      ' successfully completed.'
             endif
          endif
-      endif
+#endif
 #ifdef SPACE_3D
       allocate(BFaceList(NumFacce),stat=ier)
       if (ier/=0) then
@@ -538,8 +538,10 @@ if (Domain%ioutopt<0) then
       enddo
    enddo
 endif
+#ifdef SOLID_BODIES
 ! Management of body dynamics input
-if ((n_bodies>0).and.(.not.restart)) call Input_Body_Dynamics
+if (.not.restart) call Input_Body_Dynamics
+#endif
 ! Memory allocation for the particle ordering arrays
 if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then
    allocate(NPartOrd(PARTICLEBUFFER),Icont(grid%nmax+1),stat=ier) 
@@ -555,7 +557,7 @@ if (ier/=0) then
       NPartOrd(:) = 0
       Icont(:) = 0
 endif
-if (n_bodies>0) then
+#ifdef SOLID_BODIES
    allocate(NPartOrd_bp(n_body_part),Icont_bp(grid%nmax+1),stat=ier) 
    if (ier/=0) then
       write(ulog,'(1x,a,i2)')                                                  &
@@ -567,7 +569,7 @@ if (n_bodies>0) then
          NPartOrd_bp(:) = 0
          Icont_bp(:) = 0
    endif
-endif
+#endif
 if ((Domain%tipo=="bsph").and.(.not.restart)) then
    call Import_ply_surface_meshes
    call DBSPH_IC_surface_elements

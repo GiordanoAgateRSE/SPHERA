@@ -25,6 +25,7 @@
 !              (initial conditions for fluid particle positions in case of 
 !              Fluid - Structure interactions).
 !-------------------------------------------------------------------------------
+#ifdef SOLID_BODIES
 subroutine initial_fluid_removal_in_solid_bodies
 !------------------------
 ! Modules
@@ -84,3 +85,4 @@ enddo
 !------------------------
 return
 end subroutine initial_fluid_removal_in_solid_bodies
+#endif

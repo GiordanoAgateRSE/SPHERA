@@ -37,9 +37,12 @@ use Memory_I_O_interface_module
 implicit none
 character(7),intent(in) :: option
 integer(4),intent(inout) :: ier,nrecords
-integer(4) :: restartcode,save_istart,ioerr,i,alloc_stat,size_aux,i_zone,i_t
+integer(4) :: restartcode,save_istart,ioerr,alloc_stat,size_aux,i_zone,i_t
 #ifdef SPACE_3D
 integer(4) :: n_vertices_main_wall
+#endif
+#ifdef SOLID_BODIES
+integer(4) :: ib
 #endif
 double precision :: save_start
 character(12) :: ainp = "Restart File"
@@ -372,16 +375,16 @@ Partz(i_zone)%plan_reservoir_points,Partz(i_zone)%ID_first_vertex_sel,         &
                      if (.not.ReadCheck(ioerr,ier,it_start,ainp,"pg_w",        &
                         nsav,ulog)) return
                   endif
-                  if (n_bodies>0) then
-                     do i=1,n_bodies
+#ifdef SOLID_BODIES
+                     do ib=1,n_bodies
                         read(nsav,iostat=ioerr)
                         if (.not.ReadCheck(ioerr,ier,it_start,ainp,            &
                            "body_arr_1_of_2",nsav,ulog)) return
-                        if (body_arr(i)%n_records>0) then
+                        if (body_arr(ib)%n_records>0) then
                            read(nsav,iostat=ioerr)
                            if (.not.ReadCheck(ioerr,ier,it_start,ainp,         &
                               "body_arr_2_of_2",nsav,ulog)) return
-                        endif                  
+                        endif        
                      enddo
                      read(nsav,iostat=ioerr) 
                      if (.not.ReadCheck(ioerr,ier,it_start,ainp,"bp_arr",      &
@@ -389,7 +392,7 @@ Partz(i_zone)%plan_reservoir_points,Partz(i_zone)%ID_first_vertex_sel,         &
                      read(nsav,iostat=ioerr) 
                      if (.not.ReadCheck(ioerr,ier,it_start,ainp,               &
                               "surf_body_part",nsav,ulog)) return
-                  endif
+#endif
 #ifdef SPACE_3D
                      if (allocated(Z_fluid_max)) then
                         read(nsav,iostat=ioerr)
@@ -468,25 +471,25 @@ Partz(i_zone)%plan_reservoir_points,Partz(i_zone)%ID_first_vertex_sel,         &
                         if (.not.ReadCheck(ioerr,ier,it_start,ainp,"pg_w",nsav,&
                            ulog)) return
                      endif
-                     if (n_bodies>0) then
-                        do i=1,n_bodies
-                           read(nsav,iostat=ioerr) body_arr(i)%npart,          &
-                              body_arr(i)%Ic_imposed,                          &
-                              body_arr(i)%imposed_kinematics,                  &
-                              body_arr(i)%n_records,body_arr%mass,             &
-                              body_arr(i)%umax,body_arr(i)%pmax,               &
-                              body_arr(i)%x_CM(1:3),body_arr(i)%alfa(1:3),     &
-                              body_arr(i)%u_CM(1:3),body_arr(i)%omega(1:3),    &
-                              body_arr(i)%Force(1:3),body_arr(i)%Moment(1:3),  &
-                              body_arr(i)%Ic(1:3,1:3),                         &
-                              body_arr(i)%Ic_inv(1:3,1:3)
+#ifdef SOLID_BODIES
+                        do ib=1,n_bodies
+                           read(nsav,iostat=ioerr) body_arr(ib)%npart,         &
+                              body_arr(ib)%Ic_imposed,                         &
+                              body_arr(ib)%imposed_kinematics,                 &
+                              body_arr(ib)%n_records,body_arr%mass,            &
+                              body_arr(ib)%umax,body_arr(ib)%pmax,             &
+                              body_arr(ib)%x_CM(1:3),body_arr(ib)%alfa(1:3),   &
+                              body_arr(ib)%u_CM(1:3),body_arr(ib)%omega(1:3),  &
+                              body_arr(ib)%Force(1:3),body_arr(ib)%Moment(1:3),&
+                              body_arr(ib)%Ic(1:3,1:3),                         &
+                              body_arr(ib)%Ic_inv(1:3,1:3)
                            if (.not.ReadCheck(ioerr,ier,it_start,ainp,         &
                               "body_arr_1_of_2",nsav,ulog)) return                              
-                           if (body_arr(i)%n_records>0) then
-                              if (.not.allocated(body_arr(i)%body_kinematics)) &
-allocate(body_arr(i)%body_kinematics(body_arr(i)%n_records,7))
+                           if (body_arr(ib)%n_records>0) then
+                              if (.not.allocated(body_arr(ib)%body_kinematics))&
+allocate(body_arr(ib)%body_kinematics(body_arr(ib)%n_records,7))
                               read(nsav,iostat=ioerr)                          &
-body_arr(i)%body_kinematics(1:body_arr(i)%n_records,1:7)
+body_arr(ib)%body_kinematics(1:body_arr(ib)%n_records,1:7)
                               if (.not.ReadCheck(ioerr,ier,it_start,ainp,      &
                                  "body_arr_2_of_2",nsav,ulog)) return
                            endif
@@ -498,7 +501,7 @@ body_arr(i)%body_kinematics(1:body_arr(i)%n_records,1:7)
                            n_surf_body_part)
                         if (.not.ReadCheck(ioerr,ier,it_start,ainp,            &
                           "surf_body_part",nsav,ulog)) return
-                     endif
+#endif
 #ifdef SPACE_3D
                         if (allocated(Z_fluid_max)) then
                            read(nsav,iostat=ioerr)                             &
@@ -609,12 +612,12 @@ body_arr(i)%body_kinematics(1:body_arr(i)%n_records,1:7)
                         if (.not.ReadCheck(ioerr,ier,it_start,ainp,"pg_w",     &
                            nsav,ulog)) return
                      endif
-                     if (n_bodies>0) then
-                        do i=1,n_bodies
+#ifdef SOLID_BODIES
+                        do ib=1,n_bodies
                            read(nsav,iostat=ioerr)
                            if (.not.ReadCheck(ioerr,ier,it_start,ainp,         &
                               "body_arr_1_of_2",nsav,ulog)) return
-                           if (body_arr(i)%n_records>0) then   
+                           if (body_arr(ib)%n_records>0) then   
                               read(nsav,iostat=ioerr)
                               if (.not.ReadCheck(ioerr,ier,it_start,ainp,      &
                                  "body_arr_2_of_2",nsav,ulog)) return
@@ -626,7 +629,7 @@ body_arr(i)%body_kinematics(1:body_arr(i)%n_records,1:7)
                         read(nsav,iostat=ioerr)
                         if (.not.ReadCheck(ioerr,ier,it_start,ainp,            &
                                  "surf_body_part",nsav,ulog)) return
-                     endif
+#endif
 #ifdef SPACE_3D
                         if (allocated(Z_fluid_max)) then
                            read(nsav,iostat=ioerr)
@@ -705,26 +708,27 @@ body_arr(i)%body_kinematics(1:body_arr(i)%n_records,1:7)
                            if (.not.ReadCheck(ioerr,ier,it_start,ainp,"pg_w",  &
                               nsav,ulog)) return
                         endif
-                        if (n_bodies>0) then
-                           do i=1,n_bodies
-                              read(nsav,iostat=ioerr) body_arr(i)%npart,       &
-                                 body_arr(i)%Ic_imposed,                       &
-                                 body_arr(i)%imposed_kinematics,               &
-                                 body_arr(i)%n_records,body_arr%mass,          &
-                                 body_arr(i)%umax,body_arr(i)%pmax,            &
-                                 body_arr(i)%x_CM(1:3),body_arr(i)%alfa(1:3),  &
-                                 body_arr(i)%u_CM(1:3),body_arr(i)%omega(1:3), &
-                                 body_arr(i)%Force(1:3),                       &
-                                 body_arr(i)%Moment(1:3),                      &
-                                 body_arr(i)%Ic(1:3,1:3),                      &
-                                 body_arr(i)%Ic_inv(1:3,1:3)
+#ifdef SOLID_BODIES
+                           do ib=1,n_bodies
+                              read(nsav,iostat=ioerr) body_arr(ib)%npart,      &
+                                 body_arr(ib)%Ic_imposed,                      &
+                                 body_arr(ib)%imposed_kinematics,              &
+                                 body_arr(ib)%n_records,body_arr%mass,         &
+                                 body_arr(ib)%umax,body_arr(ib)%pmax,          &
+                                 body_arr(ib)%x_CM(1:3),body_arr(ib)%alfa(1:3),&
+                                 body_arr(ib)%u_CM(1:3),                       &
+                                 body_arr(ib)%omega(1:3),                      &
+                                 body_arr(ib)%Force(1:3),                      &
+                                 body_arr(ib)%Moment(1:3),                     &
+                                 body_arr(ib)%Ic(1:3,1:3),                     &
+                                 body_arr(ib)%Ic_inv(1:3,1:3)
                               if (.not.ReadCheck(ioerr,ier,it_start,ainp,      &
                                  "body_arr_1_of_2",nsav,ulog)) return
-                              if (body_arr(i)%n_records>0) then
-                               if (.not.allocated(body_arr(i)%body_kinematics))&
-allocate(body_arr(i)%body_kinematics(body_arr(i)%n_records,7))
+                              if (body_arr(ib)%n_records>0) then
+                               if (.not.allocated(body_arr(ib)%body_kinematics))&
+allocate(body_arr(ib)%body_kinematics(body_arr(ib)%n_records,7))
                                  read(nsav,iostat=ioerr)                       &
-body_arr(i)%body_kinematics(1:body_arr(i)%n_records,1:7)
+body_arr(ib)%body_kinematics(1:body_arr(ib)%n_records,1:7)
                                  if (.not.ReadCheck(ioerr,ier,it_start,ainp,   &
                                  "body_arr_2_of_2",nsav,ulog)) return
                               endif
@@ -736,7 +740,7 @@ body_arr(i)%body_kinematics(1:body_arr(i)%n_records,1:7)
                               n_surf_body_part)
                            if (.not.ReadCheck(ioerr,ier,it_start,ainp,         &
                               "surf_body_part",nsav,ulog)) return
-                        endif
+#endif
 #ifdef SPACE_3D
                            if (allocated(Z_fluid_max)) then
                               read(nsav,iostat=ioerr)                          &

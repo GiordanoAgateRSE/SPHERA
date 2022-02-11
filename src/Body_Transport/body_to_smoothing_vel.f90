@@ -23,6 +23,7 @@
 ! Description: Contributions of body particles to velocity partial smoothing
 !              (Amicarelli et al., 2015, CAF).    
 !-------------------------------------------------------------------------------
+#ifdef SOLID_BODIES
 subroutine body_to_smoothing_vel(dervel_mat)
 !------------------------
 ! Modules
@@ -68,3 +69,4 @@ enddo
 !------------------------
 return
 end subroutine body_to_smoothing_vel
+#endif

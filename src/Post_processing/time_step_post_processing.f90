@@ -75,17 +75,17 @@ if (Domain%icpoi_fr>0) then
    if ((mod(it,Domain%icpoi_fr)==0).and.npointst>0) then
       call Memo_Ctl
    endif
-   if (n_bodies>0) then
+#ifdef SOLID_BODIES
       if (mod(it,Domain%icpoi_fr)==0)  call Body_dynamics_output      
-   endif
+#endif
    elseif (input_any_t%cpoi_fr>zero) then
       if ((dmod(simulation_time,input_any_t%cpoi_fr)<=dtvel).and.npointst>0)   &
          call Memo_Ctl
-      if (n_bodies>0) then
+#ifdef SOLID_BODIES
          if (dmod(simulation_time,input_any_t%cpoi_fr)<=dtvel) then
             call Body_dynamics_output
          endif         
-      endif
+#endif
 ! DB-SPH post-processing and update of the variable "wet" in the array "pg"
       if ((Domain%tipo=="bsph").and.                                           &
          (dmod(simulation_time,input_any_t%cpoi_fr)<=dtvel)) then

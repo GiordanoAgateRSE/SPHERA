@@ -25,6 +25,7 @@
 !              aligned with the first vector to the unit vector aligned with 
 !              the second vector.
 !-------------------------------------------------------------------------------
+#ifdef SOLID_BODIES
 subroutine vector_rotation_axis_angle(vector1,vector2,n_R,teta_R)
 !------------------------
 ! Modules
@@ -88,3 +89,4 @@ endif
 !------------------------
 return
 end subroutine vector_rotation_axis_angle
+#endif

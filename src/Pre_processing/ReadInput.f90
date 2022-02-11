@@ -134,8 +134,10 @@ SECTION_LOOP: do while (ioerr==0)
       case("##### medium #####")
          call ReadInputMedium(NumberEntities,Med,ainp,comment,nrighe,ier,ninp, &
             ulog)
+#ifdef SOLID_BODIES
       case("##### body dynamics #####")
          call ReadBodyDynamics(ainp,comment,nrighe,ier,ninp,ulog)
+#endif
 ! Lower case letters are required
       case("##### dbsph #####") 
          call ReadDBSPH(ainp,comment,nrighe,ier,ninp,ulog)

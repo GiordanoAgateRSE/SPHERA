@@ -57,12 +57,14 @@ integer(4),dimension(:),allocatable :: GCBFVector
 type(TyParticle_w),dimension(:),allocatable :: pg_w
 ! Arrays for ordering wall elements, according to the underliying mesh
 integer(4),dimension(:),allocatable :: Icont_w,NPartOrd_w
+#ifdef SOLID_BODIES
 ! Array of the transported rigid solid bodies
 type(body),dimension(:),allocatable :: body_arr
 ! Array of the body particles
 type(body_particle),dimension(:),allocatable :: bp_arr
 ! Arrays for ordering body particles, according to the background mesh
 integer(4),dimension(:),allocatable :: Icont_bp,NPartOrd_bp
+#endif
 #ifdef SPACE_3D
 integer(4),dimension(:,:),allocatable :: GCBFPointers
 integer(4),dimension(:),allocatable :: BFaceList
@@ -107,6 +109,7 @@ double precision,dimension(:,:),allocatable :: rag_fw
 ! Velocity gradient in VSL, projected along the wall element normal (DB-SPH)
 ! grad_vel_VSL_fw(components,NMAXPARTJ*PARTICLEBUFFER)
 double precision,dimension(:,:),allocatable :: grad_vel_VSL_fw
+#ifdef SOLID_BODIES
 ! neighbouring arrays for body dynamics
 ! neighbouring arrays of the body particles 
 ! (body particle - fluid particle interactions; 
@@ -138,6 +141,7 @@ integer(4),dimension(:),allocatable :: nPartIntorno_bp_bp
 ! PartIntorno_bp_bp(n_surf_body_part*NMAXPARTJ): array of the indices of the 
 ! neighbouring body particles (of another body) 
 integer(4),dimension(:),allocatable :: PartIntorno_bp_bp
+#endif
 #ifdef SPACE_3D   
 ! n_neigh_hcell_CLCpol(n_hcells): array of the number of the neighbouring 
 ! CLC polygons with respect to each horizontal background-grid cell
@@ -146,12 +150,14 @@ integer(4),dimension(:),allocatable :: n_neigh_hcell_CLCpol
 ! linking the horizontal background-grid cells with the CLC polygons
 integer(4),dimension(:),allocatable :: neigh_hcell_CLCpol
 #endif
+#ifdef SOLID_BODIES
 ! relative distances from body particles (belonging to another body): -r_bp_bp;
 ! rag_bp_bp(3,NMAXPARTJ*n_surf_body_part)
 double precision,dimension(:,:),allocatable :: rag_bp_bp  
 ! array of velocity impacts for body dynamics 
 ! impact_vel(n_surf_body_part x (n_bodies+n_boundaries))
 double precision,dimension(:,:),allocatable :: impact_vel
+#endif
 ! Arrays to compute the table of integrals (SA-SPH)
 integer(4),dimension(:,:),allocatable :: BoundaryDataPointer
 type(TyBoundaryData),dimension(:),allocatable :: BoundaryDataTab

@@ -22,6 +22,7 @@
 ! Program unit: time_integration_body_dynamics                                           
 ! Description: Euler time integration for body transport in fluid flows.  
 !-------------------------------------------------------------------------------
+#ifdef SOLID_BODIES
 subroutine time_integration_body_dynamics(dtvel) 
 !------------------------
 ! Modules
@@ -169,3 +170,4 @@ enddo
 deallocate(teta)
 return
 end subroutine time_integration_body_dynamics
+#endif

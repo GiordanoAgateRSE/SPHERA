@@ -770,7 +770,7 @@ if (nag>0) then
       close (unitvtk)
       deallocate(finger)
    endif
-   if (n_bodies>0) then
+#ifdef SOLID_BODIES
 ! Body Transport post-processing for .vtu files: start
 ! Body particles
 ! Open the .vtu unstructured grid formatted file 
@@ -1124,7 +1124,7 @@ if (nag>0) then
       flush(unitvtk)
       close (unitvtk)
       deallocate(finger)
-   endif
+#endif
 endif
 ! Updating the last output time for .vtu files 
 if (freq_time>zero) then

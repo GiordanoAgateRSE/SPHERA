@@ -23,6 +23,7 @@
 ! Description: Contributions of body particles to pressure partial smoothing
 !              (Amicarelli et al., 2015, CAF).    
 !-------------------------------------------------------------------------------
+#ifdef SOLID_BODIES
 subroutine body_to_smoothing_pres(sompW_vec,AppUnity_vec)
 !------------------------
 ! Modules
@@ -69,3 +70,4 @@ enddo
 !------------------------
 return
 end subroutine body_to_smoothing_pres
+#endif
