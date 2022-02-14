@@ -59,23 +59,13 @@ PARALLELIZATION = OMP
 #                " -DSPACE_2D"
 PD_SPACE = -DSPACE_3D
 
-#       VERBOSITY
-#          Suggested values:
-#             Synthetic output
-#                " "
-#             Verbose output
-#                " -DVERBOSITY"
-PD_VERBOSITY = -DVERBOSITY
-
 #       KTGF
 #          Suggested values:
-#             KTGF scheme with possible 2-interface 3D erosion criterion
-#                " -DKTGF_FULL"
+#             KTGF scheme
+#                " -DKTGF"
 #             no KTGF scheme
-#                " -DKTGF_NO"
-#             KTGF scheme with possible 1-interface 2D erosion criterion
-#                " -DKTGF_EC2D"
-PD_KTGF = -DKTGF_FULL
+#                " "
+PD_KTGF = -DKTGF
 
 #       SOLID_BODIES
 #          Suggested values:
@@ -85,24 +75,6 @@ PD_KTGF = -DKTGF_FULL
 #                " "          
 PD_SOLID_BODIES = -DSOLID_BODIES
 
-#       BOUNDARY_TREATMENT METHOD
-#          Suggested values:
-#             SASPH
-#                " -DBTM_SASPH"
-#             DBSPH
-#                " -DBTM_DBSPH"
-PD_BTM = -DBTM_SASPH
-
-#       TIME_INTEGRATION SCHEME
-#          Suggested values:
-#             Leapfrog scheme
-#                " -DTIS_LEAPFROG"
-#             Euler scheme
-#                " -DTIS_EULER"
-#             Heun scheme
-#                " -DTIS_HEUN"
-PD_TIS = -DTIS_LEAPFROG
-
 #    Preprocessor Directives (PD): end
 
 # Variables to be modified: end
@@ -111,17 +83,9 @@ PD_TIS = -DTIS_LEAPFROG
 # COMPILATION_FLAGS for some program units
 COMPILATION_FLAGS_ISSUES =  
 
-# Code scheme incompatibilities (PD)
-ifneq ($(PD_KTGF), -DKTGF_NO)
-   PD_BTM = -DBTM_SASPH
-endif
-ifeq ($(PD_SOLID_BODIES), -DSOLID_BODIES)
-   PD_BTM = -DBTM_SASPH
-   PD_TIS = -DTIS_LEAPFROG
-endif
-ifeq ($(PD_BTM), -DBTM_DBSPH)
-   PD_TIS = -DTIS_EULER
-endif
+# Possible incompatibilities among the functionalities under pre-processor 
+# directives
+# None
 
 # IDs of the above choices reported in the name of the executable code
 ifeq ($(COMPILER), ifort)
@@ -144,34 +108,15 @@ ifeq ($(PD_SPACE), -DSPACE_3D)
    else ifeq ($(PD_SPACE), -DSPACE_2D)
       ID_PD_SPACE = 2
 endif
-ifeq ($(PD_VERBOSITY), -DVERBOSITY)
-   ID_PD_VERBOSITY = 1
-   else
-      ID_PD_VERBOSITY = 0
-endif
-ifeq ($(PD_KTGF), -DKTGF_FULL)
+ifeq ($(PD_KTGF), -DKTGF)
    ID_PD_KTGF = 1
-   else ifeq ($(PD_KTGF), -DKTGF_NO)
+   else
       ID_PD_KTGF = 0
-      else ifeq ($(PD_KTGF), -DKTGF_EC2D)
-         ID_PD_KTGF = 2
 endif
 ifeq ($(PD_SOLID_BODIES), -DSOLID_BODIES)
    ID_PD_SOLID_BODIES = 1
    else
       ID_PD_SOLID_BODIES = 0
-endif
-ifeq ($(PD_BTM), -DBTM_SASPH)
-   ID_PD_BTM = 1
-   else ifeq ($(PD_BTM), -DBTM_DBSPH)
-      ID_PD_BTM = 2
-endif
-ifeq ($(PD_TIS), -DTIS_EULER)
-   ID_PD_TIS = 1
-   else ifeq ($(PD_TIS), -DTIS_HEUN)
-      ID_PD_TIS = 2
-      else ifeq ($(PD_TIS), -DTIS_LEAPFROG)
-         ID_PD_TIS = 3
 endif
 
 # COMPILATION_FLAGS
@@ -249,7 +194,7 @@ SOURCES_issues_b =
 MAIN_FILE_ROOT = ./Main_algorithm/sphera
 
 EXE_CODE = \
-$(EXE_DIR)SPHERA_$(VERSION)_$(ID_COMPILER)$(ID_EXECUTION)$(ID_PARALLELIZATION)$(ID_PD_SPACE)$(ID_PD_VERBOSITY)$(ID_PD_KTGF)$(ID_PD_SOLID_BODIES)$(ID_PD_BTM)$(ID_PD_TIS)
+$(EXE_DIR)SPHERA_$(VERSION)_$(ID_COMPILER)$(ID_EXECUTION)$(ID_PARALLELIZATION)$(ID_PD_SPACE)$(ID_PD_KTGF)$(ID_PD_SOLID_BODIES)
 
 OBJECTS = \
 $(patsubst %.f90,%.o,$(SOURCES)$(SOURCES_issues)$(SOURCES_b)$(SOURCES_issues_b))
@@ -265,18 +210,18 @@ compile: $(SOURCES)
 compile_b: $(SOURCES_b)
 
 $(SOURCES) $(SOURCES_b): %.f90: %.o
-	$(COMPILER) $@ -o $< $(OMP_FLAG) $(COMPILATION_FLAGS) $(COMPILATION_FLAG_IPO) -c -cpp $(PD_SPACE) $(PD_VERBOSITY) $(PD_KTGF) $(PD_SOLID_BODIES) $(PD_BTM) $(PD_TIS)
+	$(COMPILER) $@ -o $< $(OMP_FLAG) $(COMPILATION_FLAGS) $(COMPILATION_FLAG_IPO) -c -cpp $(PD_SPACE) $(PD_KTGF) $(PD_SOLID_BODIES)
 
 compile_issues: $(SOURCES_issues)
 
 compile_issues_b: $(SOURCES_issues_b)
 
 $(SOURCES_issues) $(SOURCES_issues_b): %.f90: %.o
-	$(COMPILER) $@ -o $< $(OMP_FLAG) $(COMPILATION_FLAGS_ISSUES) -c -cpp $(PD_SPACE) $(PD_VERBOSITY) $(PD_KTGF) $(PD_SOLID_BODIES) $(PD_BTM) $(PD_TIS)
+	$(COMPILER) $@ -o $< $(OMP_FLAG) $(COMPILATION_FLAGS_ISSUES) -c -cpp $(PD_SPACE) $(PD_KTGF) $(PD_SOLID_BODIES)
 
 link: $(OBJECTS)
 	touch $(EXE_CODE).x
-	$(COMPILER) $(MAIN_FILE_ROOT).f90 $^ -o $(EXE_CODE).x $(OMP_FLAG) $(COMPILATION_FLAGS) -cpp $(PD_SPACE) $(PD_VERBOSITY) $(PD_KTGF) $(PD_SOLID_BODIES) $(PD_BTM) $(PD_TIS)
+	$(COMPILER) $(MAIN_FILE_ROOT).f90 $^ -o $(EXE_CODE).x $(OMP_FLAG) $(COMPILATION_FLAGS) -cpp $(PD_SPACE) $(PD_KTGF) $(PD_SOLID_BODIES)
 	rm -f $(MAIN_FILE_ROOT).o
 
 clean: $(OBJECTS)
