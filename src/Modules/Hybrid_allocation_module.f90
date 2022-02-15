@@ -920,7 +920,7 @@ type DBSPH_der_type
 ! positions, normal, length,
    double precision,dimension(:,:),allocatable :: outlet_sections
 ! DB-SPH surface mesh: vertices and faces  
-   type(DBSPH_surf_mesh_der_type) :: surf_mesh                                                                                      
+   type(DBSPH_surf_mesh_der_type) :: surf_mesh
 end type
 
 #ifdef SPACE_3D

@@ -98,7 +98,7 @@ write(ulog,*) "----------------------------------------------------------------"
 write(ulog,*) "CLC polygons"
 write(ulog,*) "Number of CLC polygons: ",CLC%n_polygons
 ! Allocate and initialize the array of the number of the neighbouring CLC 
-! polygons with respect to the reference backgorund-grid cell
+! polygons with respect to the reference background-grid cell
 n_hcells = Grid%ncd(1) * Grid%ncd(2)
 array_name = "n_neigh_hcell_CLCpol"
 call allocate_de_int4_r1(.true.,n_neigh_hcell_CLCpol,n_hcells,array_name,      &

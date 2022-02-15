@@ -166,6 +166,15 @@ interface
       integer(4),intent(in),optional :: extent_1,extent_2,extent_3,extent_4
       character(100),intent(in) :: array_name
    end subroutine allocate_de_dp_r4
+   subroutine allocate_de_face_r1(allocation_flag,array,extent_1,array_name,   &
+      ulog_flag)
+      use Hybrid_allocation_module
+      implicit none
+      type (face_der_type),dimension(:),allocatable,intent(inout) :: array
+      logical,intent(in) :: allocation_flag,ulog_flag
+      integer(4),intent(in),optional :: extent_1
+      character(100),intent(in) :: array_name
+   end subroutine allocate_de_face_r1
    subroutine allocate_de_int4_r1(allocation_flag,array,extent_1,array_name,   &
       ulog_flag)
       implicit none
@@ -239,6 +248,15 @@ interface
       integer(4),intent(in),optional :: extent_1
       character(100),intent(in) :: array_name
    end subroutine allocate_de_TimSta_r1
+   subroutine allocate_de_vertex_r1(allocation_flag,array,extent_1,array_name, &
+      ulog_flag)
+      use Hybrid_allocation_module
+      implicit none
+      type (vertex_der_type),dimension(:),allocatable,intent(inout) :: array
+      logical,intent(in) :: allocation_flag,ulog_flag
+      integer(4),intent(in),optional :: extent_1
+      character(100),intent(in) :: array_name
+   end subroutine allocate_de_vertex_r1
    subroutine allocate_de_Zon_r1(allocation_flag,array,extent_1,array_name,    &
       ulog_flag)
       use Hybrid_allocation_module
