@@ -78,7 +78,7 @@ surface_mesh_file_ID = 0
 ! Statements
 !------------------------
 ! Open the file name list
-file_name = "surface_mesh_list.inp"
+file_name = "input/07_DBSPH/surface_mesh_list.inp"
 call open_close_file(.true.,unit_file_list,file_name)
 read(unit_file_list,*,IOSTAT=file_stat)
 if (file_stat/=0) then
@@ -379,7 +379,7 @@ DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(k-1)%vert_list(1))%pos          &
       array_name = "DBSPH%surf_mesh%surface_mesh_file_ID"
       call allocate_de_int4_r1(.false.,DBSPH%surf_mesh%surface_mesh_file_ID,   &
          array_name=array_name,ulog_flag=.true.)
-      call allocate_de_int4_r1(.true.,DBSPH%surf_mesh%surface_mesh_file_ID, &
+      call allocate_de_int4_r1(.true.,DBSPH%surf_mesh%surface_mesh_file_ID,    &
          new_size_face,array_name,ulog_flag=.true.)
       DBSPH%surf_mesh%surface_mesh_file_ID(:) =                                &
          aux_surface_mesh_file_ID(1:new_size_face)
@@ -390,7 +390,7 @@ DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(k-1)%vert_list(1))%pos          &
          array_name,ulog_flag=.true.)
    endif
 enddo
-file_name = "surface_mesh_list.inp"
+file_name = "input/07_DBSPH/surface_mesh_list.inp"
 call open_close_file(.false.,unit_file_list,file_name)
 ! Initializing the number of surface elements
 DBSPH%n_w = new_size_face 

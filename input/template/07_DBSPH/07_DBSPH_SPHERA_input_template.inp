@@ -63,6 +63,11 @@
 ![?] <n_monitor_regions>
 !    =0
 !    =1 (to estimate the Force along x-direction)
+![?] This folder also contains the file "surface_mesh_list.inp" with the 
+!    following structure: first line: string "surface_mesh_list.inp"; 
+!    following lines: list of of the file names of the surface meshes (one file 
+!    name per line). The file mentioned above is mandatory only when the DB-SPH 
+!    scheme is activated.
 !-------------------------------------------------------------------------------
 ![*] <dx_f/dx_w> <MUSCL_boundary_flag> <k_w> <slip_ID> <Gamma_limiter_flag>
 ![*] <negative_wall_p_allowed> <FS_allowed>
