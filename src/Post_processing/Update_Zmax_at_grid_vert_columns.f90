@@ -193,6 +193,7 @@ do npi=1,nag
    pos(2) = pg(npi)%coord(2)
    pos(3) = Grid%extr(3,1) + 1.d-7
    GridColumn = ParticleCellNumber(pos)
+!$omp critical (omp_update_2D_max)
    Z_fluid_step(GridColumn,1) = max(Z_fluid_step(GridColumn,1),                &
                                 (pg(npi)%coord(3) + 0.5d0 * Domain%dx))
    Z_fluid_max(GridColumn,1) = max(Z_fluid_max(GridColumn,1),(pg(npi)%coord(3) &
@@ -216,6 +217,7 @@ do npi=1,nag
       qy_step_grid(GridColumn) = qy_step_grid(GridColumn) + pg(npi)%vel(2)
       n_part_step(GridColumn) = n_part_step(GridColumn) + 1
    endif
+!$omp end critical (omp_update_2D_max)
 enddo
 !$omp end parallel do
 !$omp parallel do default(none)                                                &
