@@ -151,7 +151,7 @@ pglocal%uni = uni
 if (uni>=1.d-1) then
 ! In case the dicrete Shepard coefficient is smaller than 0.1 the monitor 
 ! element assumes null pressure, velocity and density.
-   if (ID_closest_fb>0) then
+   if ((ID_closest_fb>0).and.(Domain%tipo=="semi")) then
 #ifdef SPACE_3D
          number_SASPH_neighbours = BoundaryDataPointer(1,ID_closest_fb)
 #elif defined SPACE_2D
@@ -171,7 +171,7 @@ if (uni>=1.d-1) then
       pglocal%vel(:) = pg(ID_closest_fb)%vel(:)
       else
 ! SPH interpolations at the position of the monitoring element from the values 
-! of the nieghbounring fluid particles, wall elements and body particles.
+! of the neighbouring fluid particles, wall elements and body particles.
          pglocal%pres = plocal/uni
          pglocal%dens = rho/uni
          pglocal%vel(:) = vel(:)/uni
