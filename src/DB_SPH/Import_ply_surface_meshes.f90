@@ -78,25 +78,28 @@ surface_mesh_file_ID = 0
 ! Statements
 !------------------------
 ! Open the file name list
-file_name = "input/07_DBSPH/surface_mesh_list.inp"
+file_name = "input/07_DBSPH/surface_mesh_list.txt"
 call open_close_file(.true.,unit_file_list,file_name)
 read(unit_file_list,*,IOSTAT=file_stat)
 if (file_stat/=0) then
-   write(uerr,*) 'Error in reading surface_mesh_list.inp in ',                 &
+   write(uerr,*) 'Error in reading surface_mesh_list.txt in ',                 &
       'Import_pl_surface_meshes; the program stops here'
    stop
 endif
 do
 ! To increment the file_number
    surface_mesh_file_ID = surface_mesh_file_ID + 1
-! Read the file name    
+! Read the file name
    read(unit_file_list,'(a)',IOSTAT=file_stat) file_name
 ! Exit the cicle at the end of file
-   if (file_stat/=0) exit 
-   file_name = trim(adjustl(file_name))
+   if (file_stat/=0) exit
+   file_name = "input/07_DBSPH/" // trim(adjustl(file_name))
 ! Read the headings of the on-going mesh file
    call ply_headings(unit_DBSPH_mesh,file_name,n_vertices,n_faces)
+! Re-open the ".ply" file
    call open_close_file(.true.,unit_DBSPH_mesh,file_name)
+! Skip the headings
+   read(unit_DBSPH_mesh,'(10/)',iostat=file_stat)
    if (.not.allocated(DBSPH%surf_mesh%vertices)) then
       array_name = "DBSPH%surf_mesh%vertices"
       call allocate_de_vertex_r1(.true.,DBSPH%surf_mesh%vertices,n_vertices,   &
@@ -351,7 +354,7 @@ DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(k-1)%vert_list(1))%pos          &
 #endif
    enddo
    call open_close_file(.false.,unit_DBSPH_mesh,file_name)
-! Read the face vertices: end   
+! Read the face vertices: end
 ! Resize DBSPH%surf_mesh%faces on the actual number of faces
 ! new_size_face = estimated_new_size_face - local overestimation
 #ifdef SPACE_3D
@@ -390,7 +393,7 @@ DBSPH%surf_mesh%vertices(DBSPH%surf_mesh%faces(k-1)%vert_list(1))%pos          &
          array_name,ulog_flag=.true.)
    endif
 enddo
-file_name = "input/07_DBSPH/surface_mesh_list.inp"
+file_name = "input/07_DBSPH/surface_mesh_list.txt"
 call open_close_file(.false.,unit_file_list,file_name)
 ! Initializing the number of surface elements
 DBSPH%n_w = new_size_face 
