@@ -173,7 +173,11 @@ $(wildcard ./KTGF_tools/*.f90) \
 $(wildcard ./Memory_I_O/*.f90) \
 $(wildcard ./Neighbouring_Search/*.f90) \
 $(wildcard ./Post_processing/*.f90) \
+$(wildcard ./Post_processing/2D_fields/*.f90) \
+$(wildcard ./Post_processing/elapsed_time/*.f90) \
+$(wildcard ./Post_processing/monitors/*.f90) \
 $(wildcard ./Pre_processing/*.f90) \
+$(wildcard ./Pre_processing/reading_inp/*.f90) \
 $(wildcard ./SA_SPH/BE_mass/*.f90) \
 $(wildcard ./SA_SPH/BE_momentum/*.f90) \
 $(wildcard ./SA_SPH/IC/*.f90) \
