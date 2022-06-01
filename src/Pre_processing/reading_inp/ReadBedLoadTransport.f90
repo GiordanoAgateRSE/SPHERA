@@ -50,6 +50,16 @@ logical,external :: ReadCheck
 !------------------------
 ! Explicit interfaces
 !------------------------
+interface
+   subroutine ReadRiga(ninp,ainp,io_err,comment_sym,lines_treated)
+      implicit none
+      integer(4),intent(in) :: ninp
+      character(*),intent(inout) :: ainp
+      integer(4),intent(out) :: io_err
+      character(1),intent(in),optional :: comment_sym
+      integer(4),intent(inout),optional :: lines_treated
+   end subroutine ReadRiga
+end interface
 !------------------------
 ! Allocations
 !------------------------
@@ -59,7 +69,7 @@ logical,external :: ReadCheck
 !------------------------
 ! Statements
 !------------------------
-call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
 if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"BED LOAD TRANSPORT DATA",ninp,ulog)) &
    return
 do while (trim(lcase(ainp)) /= "##### end bed load transport #####")
@@ -67,17 +77,17 @@ do while (trim(lcase(ainp)) /= "##### end bed load transport #####")
    read(ainp,*,iostat=ioerr) KTGF_config,ID_main_fluid
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"BED-LOAD TRANSPORT INPUT LINE 1", &
       ninp,ulog)) return
-   call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+   call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
    read(ainp,*,iostat=ioerr) saturation_scheme,time_minimum_saturation,        &
       time_maximum_saturation
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"BED-LOAD TRANSPORT INPUT LINE 2", &
       ninp,ulog)) return
    if (KTGF_config>0) then
-      call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+      call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
       read(ainp,*,iostat=ioerr) velocity_fixed_bed,erosion_flag
       if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                                &
          "VELOCITY FIXED BED, EROSION FLAG",ninp,ulog)) return
-      call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+      call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
 #ifdef SPACE_3D
          read(ainp,*,iostat=ioerr) deposition_at_frontiers,Gamma_slope_flag
 #elif defined SPACE_2D
@@ -85,24 +95,24 @@ do while (trim(lcase(ainp)) /= "##### end bed load transport #####")
 #endif
       if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"OTHER EROSION PARAMETERS",ninp,&
          ulog)) return
-      call ReadRiga(ainp,comment,nrighe,ioerr,ninp)   
+      call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)   
       read(ainp,*,iostat=ioerr) monitoring_lines,dt_out,conv_crit_erosion,     &
          n_max_iterations
       if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                                &
          "BED LOAD TRANSPORT MONITORING LINES",ninp,ulog)) return
-      call ReadRiga(ainp,comment,nrighe,ioerr,ninp)   
+      call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)   
       read(ainp,*,iostat=ioerr) x_min_dt,x_max_dt
       if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"X_MIN_DT,X_MAX_DT",ninp,ulog)) &
          return      
-      call ReadRiga(ainp,comment,nrighe,ioerr,ninp)   
+      call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)   
       read(ainp,*,iostat=ioerr) y_min_dt,y_max_dt
       if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"Y_MIN_DT,Y_MAX_DT",ninp,ulog)) &
          return 
-      call ReadRiga(ainp,comment,nrighe,ioerr,ninp)   
+      call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)   
       read(ainp,*,iostat=ioerr) z_min_dt,z_max_dt
       if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"Z_MIN_DT,Z_MAX_DT",ninp,ulog)) &
          return
-      call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+      call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
       read(ainp,*,iostat=ioerr) t_q0,t_liq
       if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"t_q0,t_liq",ninp,ulog)) return          
    endif
@@ -200,11 +210,11 @@ do while (trim(lcase(ainp)) /= "##### end bed load transport #####")
       endif
 ! Loop over the monitoring lines
       do i=1,monitoring_lines
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+         call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
          read(ainp,*,iostat=ioerr) line_ID
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                             &
             "BED LOAD TRANSPORT MONITORING LINES",ninp,ulog)) return      
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+         call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
          read(ainp,*,iostat=ioerr) x_fixed,y_fixed
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                             &
             "BED LOAD TRANSPORT MONITORING LINES",ninp,ulog)) return
@@ -222,7 +232,7 @@ do while (trim(lcase(ainp)) /= "##### end bed load transport #####")
       enddo  
    endif   
 ! Reading the last line 
-   call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+   call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"BED LOAD TRANSPORT DATA",ninp,ulog&
       )) return
 enddo

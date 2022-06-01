@@ -334,10 +334,10 @@ if (nag>0) then
          minlock_BetaGamma = pos(1)
          pos = maxloc(pg(1:nag)%k_BetaGamma,mask=pg(1:nag)%cella/=0)
          maxlock_BetaGamma = pos(1)      
-      endif   
+      endif
    endif
 ! Elapsed time
-   if (exetype=="linux") then
+   if (exetype==trim(adjustl("linux"))) then
       if (input_any_t%tmax>0.d0) then
          call system("date +%j%H%M%S>date_now.txt")
          open(unit_time_elapsed,file='date_now.txt',status="unknown",          &
@@ -353,23 +353,30 @@ if (nag>0) then
    write(ulog,fmt100) " Print at:                   | step: ",it," | time:  ", &
       simulation_time," | dt:  ",dt,"s| Particles: inside ",dummy," gone out ",&
       OpCountot," gone in ",SpCountot
-   if (exetype=="linux") then
+   if (exetype==trim(adjustl("linux"))) then
       time_elapsed_tot_est = ((Domain%t_pre_iter-Domain%t0) +                  &
                              (machine_Julian_day * 24 * 60 * 60 + machine_hour &
                              * 60 * 60 + machine_minute * 60 + machine_second -&
-                             Domain%t_pre_iter) * 1.d0) / (3600.0d0)  
+                             Domain%t_pre_iter) * 1.d0) / (3600.d0)  
       if (time_elapsed_tot_est<0.d0) time_elapsed_tot_est =                    &
          time_elapsed_tot_est + 366.d0 * 24.d0 * 60.d0 * 60.d0   
       write(ulog,'(a,3(ES15.6,a))') "Elapsed time: ",                          &
          time_elapsed_tot_est*3600.d0," s = ",time_elapsed_tot_est,            &
          " hours = ",time_elapsed_tot_est/24.d0," days."
-      time_elapsed_tot_est = ((Domain%t_pre_iter-Domain%t0) +                  &
-                             (machine_Julian_day * 24 * 60 * 60 + machine_hour &
-                             * 60 * 60 + machine_minute * 60 + machine_second -&
-                             Domain%t_pre_iter) * (input_any_t%tmax /          &
-                             simulation_time)) / (3600.0d0)  
-      if (time_elapsed_tot_est<0.d0) time_elapsed_tot_est =                    &
-         time_elapsed_tot_est + 366.d0 * 24.d0 * 60.d0 * 60.d0  
+      if (simulation_time>1.d-9) then
+         time_elapsed_tot_est = ((Domain%t_pre_iter-Domain%t0) +               &
+                                (machine_Julian_day * 24 * 60 * 60 +           &
+                                machine_hour * 60 * 60 + machine_minute * 60 + &
+                                machine_second - Domain%t_pre_iter) *          &
+                                (input_any_t%tmax / simulation_time)) /        &
+                                3600.d0
+         else
+         time_elapsed_tot_est = 366.d0 * 24.d0 * 60.d0 * 60.d0
+      endif
+      if (time_elapsed_tot_est<0.d0) then
+         time_elapsed_tot_est = time_elapsed_tot_est + 366.d0 * 24.d0 * 60.d0  &
+                                * 60.d0
+      endif
       write(ulog,'(a,g12.5,a,g12.5,a)')                                        &
          "Elapsed time (at the end of the simulation, real time estimation): ",&
          time_elapsed_tot_est," hours = ",time_elapsed_tot_est/24.d0," days."

@@ -161,7 +161,12 @@ SOURCES = \
 $(wildcard ./BC/*.f90) \
 $(wildcard ./BE_mass/*.f90) \
 $(wildcard ./BE_momentum/*.f90) \
-$(wildcard ./Body_Transport/*.f90) \
+$(wildcard ./Body_Transport/BE_body_momentum/*.f90) \
+$(wildcard ./Body_Transport/BE_mass/*.f90) \
+$(wildcard ./Body_Transport/BE_momentum/*.f90) \
+$(wildcard ./Body_Transport/IC/*.f90) \
+$(wildcard ./Body_Transport/Post_processing/*.f90) \
+$(wildcard ./Body_Transport/Time_Integration/*.f90) \
 $(wildcard ./CLC/*.f90) \
 $(wildcard ./DB_SPH/*.f90) \
 $(wildcard ./Erosion_Criterion/*.f90) \
@@ -171,6 +176,9 @@ $(wildcard ./KTGF_tools/*.f90) \
 ./Main_algorithm/Gest_Trans.f90 \
 ./Main_algorithm/time_step_loop.f90 \
 $(wildcard ./Memory_I_O/*.f90) \
+$(wildcard ./Memory_I_O/allocate_de_derived_types_a/*.f90) \
+$(wildcard ./Memory_I_O/allocate_de_derived_types_b/*.f90) \
+$(wildcard ./Memory_I_O/allocate_de_preset_types/*.f90) \
 $(wildcard ./Neighbouring_Search/*.f90) \
 $(wildcard ./Post_processing/*.f90) \
 $(wildcard ./Post_processing/2D_fields/*.f90) \

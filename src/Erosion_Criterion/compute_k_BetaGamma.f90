@@ -130,7 +130,7 @@ if (pg(npi)%Beta_slope>=Med(pg(npi)%imed)%Phi) then
                         pg(npi)%C_D = 24.d0 / Re + (2.6d0 * Re / 5.d0) /       &
                                       (1.d0 + (Re / 5.d0) ** 1.52d0) +         &
                                       (0.411d0 * (Re / 2.63e5) ** ( - 7.94d0)) &
-                                      / (1.d0 + (Re / 2.63e5) ** ( - 8.d0))    &
+                                      / (1.d0 + (Re / 2.63e5) ** ( - 8))       &
                                       + (Re ** 0.8d0) / 4.61e5
                   endif
             endif    
@@ -142,8 +142,7 @@ if (pg(npi)%Beta_slope>=Med(pg(npi)%imed)%Phi) then
                   if (Re>=17.5e3) then
                      pg(npi)%C_L = 0.5d0
                      else
-                        pg(npi)%C_L = (9.d0 * (10.d0 ** (-5.d0))) * (Re **     &
-                                      0.882d0)
+                        pg(npi)%C_L = (9.d0 * (10.d0 ** (-5))) * (Re ** 0.882d0)
                   endif
             endif    
 ! To compute DELTA_Seminara
@@ -155,20 +154,20 @@ if (pg(npi)%Beta_slope>=Med(pg(npi)%imed)%Phi) then
             if (pg(npi)%Beta_slope==0.d0) then
 ! Compute k_BetaGamma=k_0Gamma
                pg(npi)%k_BetaGamma = dcos(pg(npi)%Gamma_slope) * (dsqrt(1.d0 - &
-                                     ((1.d0 - DELTA_Seminara) ** 2.d0) *       &
+                                     ((1.d0 - DELTA_Seminara) ** 2) *          &
                                      (dtan(pg(npi)%Gamma_slope) /              &
-                                     dtan(Med(pg(npi)%imed)%Phi)) ** 2.d0) -   &
+                                     dtan(Med(pg(npi)%imed)%Phi)) ** 2) -      &
                                      DELTA_Seminara) / (1 - DELTA_Seminara)
                else
 ! To compute the coefficients ("aa","bb","cc") of the quadratic equation for 
 ! "k_BetaGamma" and solve it.
-                  aux_var = (dtan(pg(npi)%Beta_slope)) ** 2.d0 +               &
-                            (dtan(pg(npi)%Gamma_slope)) ** 2.d0
+                  aux_var = (dtan(pg(npi)%Beta_slope)) ** 2 +                  &
+                            (dtan(pg(npi)%Gamma_slope)) ** 2
                   aa = (1.d0 - DELTA_Seminara)
                   bb = 2.d0 * ( DELTA_Seminara / dsqrt(1.d0 + aux_var) +       &
                       dsin(pg(npi)%Beta_slope) / dtan(Med(pg(npi)%imed)%Phi))
                   cc = (1.d0 + DELTA_Seminara) / (1.d0 + aux_var) * ( - 1.d0   &
-                      + aux_var / (dtan(Med(pg(npi)%imed)%Phi)) ** 2.d0)                   
+                      + aux_var / (dtan(Med(pg(npi)%imed)%Phi)) ** 2)
                   call quadratic_equation(aa,bb,cc,n_roots,root1,root2)
                   if ((root1<=k_Beta0).and.(root1>=0.d0)) test_root1 = 1
                   if ((root2<=k_Beta0).and.(root2>=0.d0)) test_root2 = 1

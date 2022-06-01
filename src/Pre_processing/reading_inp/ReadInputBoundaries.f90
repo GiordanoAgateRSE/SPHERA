@@ -76,10 +76,26 @@ character(8) :: label
 character(100) :: token,array_name
 logical,external :: ReadCheck
 integer(4),external :: ptcolorrgb
-character(100), external :: lcase,GetToken
+character(100), external :: lcase
 !------------------------
 ! Explicit interfaces
 !------------------------
+interface
+   subroutine ReadRiga(ninp,ainp,io_err,comment_sym,lines_treated)
+      implicit none
+      integer(4),intent(in) :: ninp
+      character(*),intent(inout) :: ainp
+      integer(4),intent(out) :: io_err
+      character(1),intent(in),optional :: comment_sym
+      integer(4),intent(inout),optional :: lines_treated
+   end subroutine ReadRiga
+   character(100) function GetToken(itok,ainp,io_err)
+      implicit none
+      integer(4),intent(in) :: itok
+      character(*),intent(in) :: ainp
+      integer(4),intent(out) :: io_err
+   end function GetToken
+end interface
 !------------------------
 ! Allocations
 !------------------------
@@ -100,25 +116,25 @@ n_time_records = 0
 ! In case of restart, input data are not read
 if (restart) then
    do while (trim(lcase(ainp))/="##### end boundaries #####")
-      call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+      call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
       if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"BOUNDARIES DATA",ninp,ulog))   &
          return
    enddo
    return
 endif
-call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
 if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"BOUNDARIES DATA",ninp,ulog)) return
 ! Reading input data
 do while (trim(lcase(ainp))/="##### end boundaries #####")
    label = ainp(1:8)
-   call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+   call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"BOUNDARIES INDEX",ninp,ulog))     &
       return
-   token = GetToken(ainp,1,ioerr)
+   token = GetToken(1,ainp,ioerr)
    read(token,*,iostat=ioerr) zone_ID
    NumberEntities(8) = max(zone_ID,NumberEntities(8))
 ! Boundary type
-   call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+   call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"BOUNDARY TYPE",ninp,ulog)) return
    tipo = trim(lcase(ainp(1:4)))
    numv = 0
@@ -152,8 +168,8 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
 ! Boundary condition "leve", "crit" or "open"
       case("leve","crit","open")
          NumberEntities(3) = NumberEntities(3) + 1
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         token = GetToken(ainp,1,ioerr)
+         call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
+         token = GetToken(1,ainp,ioerr)
          token_color(1:2) = token(5:6)
          token_color(3:4) = token(3:4)
          token_color(5:6) = token(1:2) 
@@ -163,14 +179,15 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
 ! Boundary condition "fixe"
       case("fixe")    
          NumberEntities(3) = NumberEntities(3) + 1
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+         call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
          if (ioerr==0) read(ainp,*,iostat=ioerr) slip_coefficient_mode,        &
             laminar_no_slip_check
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                             &
             "FIXED: SLIP COEFFICIENT MODE, LAMINAR NO-SLIP CHECK",ninp,ulog))  &
             return
          if (slip_coefficient_mode==1) then
-            call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+            call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,                 &
+               lines_treated=nrighe)
             if (ioerr==0) read(ainp,*,iostat=ioerr) BC_shear_stress_input
             if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"slip_coeff_inp",ninp,    &
                   ulog)) return
@@ -178,7 +195,8 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
 #ifdef SPACE_3D
                if (.not.CLC_flag) then
 #endif
-                  call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+                  call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,           &
+                     lines_treated=nrighe)
                   if (ioerr==0) read(ainp,*,iostat=ioerr) eps_sigma_z,H_sgr
                   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"eps_sigma_z,H_sgr",&
                      ninp,ulog)) return
@@ -189,8 +207,8 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
                endif
 #endif
          endif
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         token = GetToken(ainp,1,ioerr)
+         call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
+         token = GetToken(1,ainp,ioerr)
          token_color(1:2) = token(5:6)
          token_color(3:4) = token(3:4)
          token_color(5:6) = token(1:2) 
@@ -198,7 +216,7 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"FIXED: RRGGBB COLOR",ninp,  &
             ulog)) return
 #ifdef SPACE_3D
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+         call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
          if (ioerr==0) read(ainp,*,iostat=ioerr) ID_first_vertex_sel,          &
             ID_last_vertex_sel
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                             &
@@ -207,23 +225,23 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
 ! Boundary condition "sour"
       case("sour")    
          NumberEntities(3) = NumberEntities(3) + 1
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+         call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
          if (ioerr==0) read(ainp,*,iostat=ioerr) Medium,time_flag
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                             &
             "SOURCE: MEDIUM INDEX, TIME FLAG",ninp,ulog)) return
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         pressu = trim(GetToken(ainp,1,ioerr))
+         call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
+         pressu = trim(GetToken(1,ainp,ioerr))
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"SOURCE PRESSURE TYPE",ninp, &
             ulog)) return
          if (pressu=="pa") then  
-            token = GetToken(ainp,2,ioerr)
+            token = GetToken(2,ainp,ioerr)
             if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"SOURCE PRESSURE VALUES", &
                ninp,ulog)) return
             read(token,*,iostat=ioerr) valp
             if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"SOURCE PRESSURE VALUES", &
                ninp,ulog)) return
             elseif (pressu=="qp") then
-               token = GetToken(ainp,2,ioerr)
+               token = GetToken(2,ainp,ioerr)
                if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"SOURCE PIEZO LINE",   &
                   ninp,ulog)) return
                read(token,*,iostat=ioerr) valp
@@ -234,8 +252,8 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
                      " in source boundary."
                   stop
          endif
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         token = GetToken(ainp,1,ioerr)
+         call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
+         token = GetToken(1,ainp,ioerr)
          token_color(1:2) = token(5:6)
          token_color(3:4) = token(3:4)
          token_color(5:6) = token(1:2) 
@@ -244,7 +262,8 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
             ulog)) return
          move = "std"
          if (time_flag.eqv..true.) then
-            call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+            call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,                 &
+               lines_treated=nrighe)
             read(ainp,*,iostat=ioerr) n_time_records,weir_flag
             if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                          &
                "SOURCE: NUMBER OF TIME RECORDS AND WEIR FLAG",ninp,ulog)) return
@@ -253,7 +272,8 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
                call allocate_de_dp_r2(.true.,Tratto(zone_ID)%time_records,     &
                   n_time_records,3,array_name,ulog_flag=.true.)
                do i_rec=1,n_time_records
-                  call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+                  call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,           &
+                     lines_treated=nrighe)
                   read(ainp,*,iostat=ioerr)                                    &
                      Tratto(zone_ID)%time_records(i_rec,1:3)
                   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                    &
@@ -262,14 +282,16 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
                enddo
                else
                   do i_rec=1,n_time_records
-                     call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+                     call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,        &
+                        lines_treated=nrighe)
                      if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                 &
                         "SOURCE: INLET TIME RECORDS - first read",ninp,ulog))  &
                         return
                   enddo
             endif
             else
-               call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+               call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,              &
+                  lines_treated=nrighe)
                read(ainp,*,iostat=ioerr) flowrate
                if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                       &
                   "SOURCE: FLOW RATE",ninp,ulog)) return
@@ -277,12 +299,12 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
 ! Boundary condition "velo"
       case("velo")
          NumberEntities(3) = NumberEntities(3) + 1
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+         call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
          if (ioerr==0) read(ainp,*,iostat=ioerr) velocity
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"VELO: NORMAL VELOCITY",ninp,&
             ulog)) return
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         token = GetToken(ainp,1,ioerr)
+         call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
+         token = GetToken(1,ainp,ioerr)
          token_color(1:2) = token(5:6)
          token_color(3:4) = token(3:4)
          token_color(5:6) = token(1:2) 
@@ -295,12 +317,12 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
 ! Boundary condition "flow"
       case("flow")    
          NumberEntities(3) = NumberEntities(3) + 1
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+         call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
          if (ioerr==0) read(ainp,*,iostat=ioerr) flowrate
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"VELO: FLOW RATE",ninp,ulog))&
             return
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         token = GetToken(ainp,1,ioerr)
+         call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
+         token = GetToken(1,ainp,ioerr)
          token_color(1:2) = token(5:6)
          token_color(3:4) = token(3:4)
          token_color(5:6) = token(1:2) 
@@ -317,7 +339,7 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
             slip,npointv,valuev,values3,pressu,valp,ainp,comment,nrighe,ier,   &
             ninp,ulog)
          if (ier/=0) return
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+         call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
          if (ioerr==0) read(ainp,*,iostat=ioerr) IC_source_type,Car_top_zone,  &
             DBSPH_fictitious_reservoir_flag
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                             &
@@ -325,34 +347,40 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
             ninp,ulog)) return
 #ifdef SPACE_3D
             if (IC_source_type==2) then
-               call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+               call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,              &
+                  lines_treated=nrighe)
                if (ioerr==0) read(ainp,*,iostat=ioerr) dx_CartTopog,H_res
                if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"dx_CartTopog,H_res",  &
                   ninp,ulog)) return
-               call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+               call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,              &
+                  lines_treated=nrighe)
                if (ioerr==0) read(ainp,*,iostat=ioerr)                         &
                   ID_first_vertex_sel,ID_last_vertex_sel
                if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                       &
                   "ID_first_vertex_sel,ID_last_vertex_sel",ninp,ulog)) return
-               call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+               call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,              &
+                  lines_treated=nrighe)
                if (ioerr==0) read(ainp,*,iostat=ioerr) plan_reservoir_points
                if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                       &
                   "plan_reservoir_points",ninp,ulog)) return
                do i2=1,plan_reservoir_points
-                  call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+                  call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,           &
+                     lines_treated=nrighe)
                   if (ioerr==0) read(ainp,*,iostat=ioerr)                      &
                      plan_reservoir_pos(i2,1),plan_reservoir_pos(i2,2)
                   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                    &
                      "plan_reservoir_vertices",ninp,ulog)) return
                enddo
-               call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+               call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,              &
+                  lines_treated=nrighe)
                if (ioerr==0) read(ainp,*,iostat=ioerr) dam_zone_ID,            &
                   dam_zone_n_vertices
                if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                       &
                   "dam_zone_ID and dam_zone_vertices",ninp,ulog)) return
                if (dam_zone_ID>0) then
                   do i2=1,dam_zone_n_vertices
-                     call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+                     call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,        &
+                        lines_treated=nrighe)
                      if (ioerr==0) read(ainp,*,iostat=ioerr)                   &
                         dam_zone_vertices(i2,1),dam_zone_vertices(i2,2)
                      if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                 &
@@ -372,22 +400,22 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
                return
             endif
 #endif
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+         call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
          if (ioerr==0) read(ainp,*,iostat=ioerr) BC_shear_stress_input
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                             &
             "TAPIS: SLIP COEFFICIENT",ninp,ulog)) return
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+         call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"TAPIS: VELOCITY COMPONENTS",&
             ninp,ulog)) return
          do n=1,ncord
             icord = icoordp(n,ncord-1)
-            token = GetToken(ainp,n,ioerr)
+            token = GetToken(n,ainp,ioerr)
             if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                          &
                xyzlabel(icord)//" VELOCITY COMPONENT (TAPIS)",ninp,ulog)) return
             read(token,*,iostat=ioerr) values1(icord)
          enddo
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         token = GetToken(ainp,1,ioerr)
+         call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
+         token = GetToken(1,ainp,ioerr)
          token_color(1:2) = token(5:6)
          token_color(3:4) = token(3:4)
          token_color(5:6) = token(1:2) 
@@ -398,11 +426,12 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
       case("pool")
 #ifdef SPACE_3D
             NumberEntities(3) = NumberEntities(3) + 1
-            call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-            pool_plane = trim(GetToken(ainp,1,ioerr))
+            call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,                 &
+               lines_treated=nrighe)
+            pool_plane = trim(GetToken(1,ainp,ioerr))
             if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"POOL: X/Y/Z/ PLANE LABEL"&
                ,ninp,ulog)) return
-            token = GetToken(ainp,2,ioerr)
+            token = GetToken(2,ainp,ioerr)
             if (ioerr==0) read(token,*,iostat=ioerr) pool_value
             if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"POOL: PLANE VALUE",ninp, &
                ulog)) return
@@ -414,17 +443,17 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
 ! Boundary condition "zmax"
       case("zmax")
          NumberEntities(3) = NumberEntities(3) + 1
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+         call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
          read(ainp,*,iostat=ioerr) Medium
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"MEDIUM INDEX",ninp,ulog))   &
             return
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-         pressu = trim(GetToken(ainp,1,ioerr))
+         call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
+         pressu = trim(GetToken(1,ainp,ioerr))
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"ZMAX PRESSURE TYPE",ninp,   &
             ulog)) return
          if (pressu=="pa") then
 ! uniform pressure ("pa") is assigned
-            token = lcase(GetToken(ainp,2,ioerr))
+            token = lcase(GetToken(2,ainp,ioerr))
             if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"PRESSURE VALUES",ninp,   &
                ulog)) return
             read(token,*,iostat=ioerr) valp
@@ -432,7 +461,7 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
                ulog)) return
                elseif (pressu=="qp") then
 ! hydrostatic pressure based on a reference free surface height ("qp")
-                  token = lcase(GetToken(ainp,2,ioerr))
+                  token = lcase(GetToken(2,ainp,ioerr))
                   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                    &
                      "INITIAL PIEZO LINE",ninp,ulog)) return
                   read(token,*,iostat=ioerr) valp
@@ -442,25 +471,26 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
                      if (ulog>0) write(ulog,*) "Unknown option: ",trim(ainp)
                      stop
          endif
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+         call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
          if (ioerr==0) read(ainp,*,iostat=ioerr) Car_top_zone
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"Car_top_zone",ninp,ulog))   &
             return
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+         call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
          if (ioerr==0) read(ainp,*,iostat=ioerr) dx_CartTopog,H_res
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"dx_CartTopog,z_max",ninp,   &
             ulog)) return
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+         call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
          if (ioerr==0) read(ainp,*,iostat=ioerr) ID_first_vertex_sel,          &
             ID_last_vertex_sel
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                             &
             "ID_first_vertex_sel,ID_last_vertex_sel",ninp,ulog)) return
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+         call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
          if (ioerr==0) read(ainp,*,iostat=ioerr) plan_reservoir_points
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"plan_reservoir_points",ninp,&
             ulog)) return
          do i2=1,plan_reservoir_points
-            call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+            call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,                 &
+               lines_treated=nrighe)
             if (ioerr==0) read(ainp,*,iostat=ioerr) plan_reservoir_pos(i2,1),  &
                plan_reservoir_pos(i2,2)
             if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"plan_reservoir_vertices",&
@@ -732,7 +762,7 @@ BoundaryVertex(Tratto(zone_ID)%inivertex+Tratto(zone_ID)%numvertices-1)
             endif
       endselect
    endif
-   call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+   call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
 enddo
 !------------------------
 ! Deallocations

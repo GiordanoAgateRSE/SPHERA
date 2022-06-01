@@ -43,10 +43,20 @@ integer(4) :: n,i,icord,ioerr
 double precision,dimension(3) :: values1
 character(8) :: label
 logical,external :: ReadCheck
-character(100),external :: lcase, GetToken
+character(100),external :: lcase
 !------------------------
 ! Explicit interfaces
 !------------------------
+interface
+   subroutine ReadRiga(ninp,ainp,io_err,comment_sym,lines_treated)
+      implicit none
+      integer(4),intent(in) :: ninp
+      character(*),intent(inout) :: ainp
+      integer(4),intent(out) :: io_err
+      character(1),intent(in),optional :: comment_sym
+      integer(4),intent(inout),optional :: lines_treated
+   end subroutine ReadRiga
+end interface
 !------------------------
 ! Allocations
 !------------------------
@@ -59,13 +69,13 @@ character(100),external :: lcase, GetToken
 ! In case of restart, input data are not read
 if (restart) then
    do while (trim(lcase(ainp))/="##### end vertices #####")
-      call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
+      call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
       if (.not.ReadCheck (ioerr,ier,nrighe,ainp,"VERTICES DATA",ninp,ulog))    &
          return
    enddo
   return
 endif
-call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
+call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
 if (.not.ReadCheck (ioerr,ier,nrighe,ainp,"VERTICES DATA",ninp,ulog)) return
 if ((input_second_read.eqv..true.).and.(ulog>0).and.(prtopt)) then
    write(ulog,"(1x,a)") "List of vertices:"
@@ -101,7 +111,7 @@ do while (trim(lcase(ainp))/="##### end vertices #####")
       write(ulog,"(i6,1p,3(2x,a,e12.4))") i,(xyzlabel(icoordp(n,ncord-1)),     &
          Vertice(icoordp(n,ncord-1),i),n=1,ncord)
    endif
-   call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
+   call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
    if (.not.ReadCheck (ioerr,ier,nrighe,ainp,"VERTICES DATA",ninp,ulog)) return
 enddo
 if ((input_second_read.eqv..true.).and.(ulog>0)) then

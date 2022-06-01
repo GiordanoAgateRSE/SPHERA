@@ -20,7 +20,7 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: Gest_Input                   
-! Description: Input check and management.                 
+! Description: Input check and management
 !-------------------------------------------------------------------------------
 subroutine Gest_Input
 !------------------------
@@ -84,7 +84,7 @@ it_start = 0
 !------------------------
 ! Statements
 !------------------------
-if (exetype=="linux") then
+if (exetype==trim(adjustl("linux"))) then
    call system("date +%j%H%M%S>date_0.txt")
    open(unit_time_elapsed,file='date_0.txt',status="unknown",form="formatted")
    read(unit_time_elapsed,'(i3,i2,i2,i2)') machine_Julian_day,machine_hour,    &
@@ -461,7 +461,7 @@ if (.not.restart) then
             endif
          endif
 ! Management of body dynamics input
-         call Input_Body_Dynamics
+         call IC_solid_bodies
 ! Allocation of the array of the body particles
          if (.not.allocated(bp_arr)) then
             allocate(bp_arr(n_body_part),STAT=alloc_stat)
@@ -540,7 +540,7 @@ if (Domain%ioutopt<0) then
 endif
 #ifdef SOLID_BODIES
 ! Management of body dynamics input
-if (.not.restart) call Input_Body_Dynamics
+if (.not.restart) call IC_solid_bodies
 #endif
 ! Memory allocation for the particle ordering arrays
 if ((Domain%tipo=="semi").or.(Domain%tipo=="bsph")) then

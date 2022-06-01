@@ -195,10 +195,18 @@ integer(4) :: MaxNcbs
 #ifdef SOLID_BODIES
 ! Total number of body particles
 integer(4) :: n_body_part
+#ifdef SPACE_3D
+! Number of CAE-made body particles
+integer(4) :: n_body_part_CAE
+#endif
 ! Total number of surface body particles
 integer(4) :: n_surf_body_part
 ! Total number of bodies 
 integer(4) :: n_bodies
+#ifdef SPACE_3D
+! Number of CAE-made solid bodies
+integer(4) :: n_bodies_CAE
+#endif
 #endif
 #ifdef SPACE_3D
 ! Number of convex edges
@@ -221,7 +229,8 @@ double precision :: unosuh
 ! 1./(Domain%h*Domain%h)
 double precision :: unosusquareh
 #ifdef SOLID_BODIES
-! Ratio between fluid particle and body particle size
+! Ratio between fluid particle and body particle size (only for ICs of 
+! handmade bodies)
 double precision :: dx_dxbodies
 ! Numerical times for body dynamics (input)
 double precision :: time_max_no_body_gravity_force

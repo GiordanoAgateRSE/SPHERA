@@ -43,6 +43,15 @@ interface
       integer(4),intent(in),optional :: extent_1
       character(100),intent(in) :: array_name
    end subroutine allocate_de_Bod_r1
+   subroutine allocate_de_Bod_elem_r1(allocation_flag,array,extent_1,          &
+      array_name,ulog_flag)
+      use Hybrid_allocation_module
+      implicit none
+      type(body_element),dimension(:),allocatable,intent(inout) :: array
+      logical,intent(in) :: allocation_flag,ulog_flag
+      integer(4),intent(in),optional :: extent_1
+      character(100),intent(in) :: array_name
+   end subroutine allocate_de_Bod_elem_r1
 #endif
 #ifdef SPACE_3D
    subroutine allocate_de_BouConEdg_r1(allocation_flag,array,extent_1,         &
@@ -191,6 +200,14 @@ interface
       integer(4),intent(in),optional :: extent_1,extent_2
       character(100),intent(in) :: array_name
    end subroutine allocate_de_int4_r2
+   subroutine allocate_de_log_r1(allocation_flag,array,extent_1,array_name,    &
+      ulog_flag)
+      implicit none
+      logical,dimension(:),allocatable,intent(inout) :: array
+      logical,intent(in) :: allocation_flag,ulog_flag
+      integer(4),intent(in),optional :: extent_1
+      character(100),intent(in) :: array_name
+   end subroutine allocate_de_log_r1
    subroutine allocate_de_log_r2(allocation_flag,array,extent_1,extent_2,      &
       array_name,ulog_flag)
       implicit none
@@ -257,6 +274,17 @@ interface
       integer(4),intent(in),optional :: extent_1
       character(100),intent(in) :: array_name
    end subroutine allocate_de_vertex_r1
+#if (defined SOLID_BODIES) && (defined SPACE_3D)
+   subroutine allocate_de_vtu_grid_r1(allocation_flag,array,extent_1,          &
+      array_name,ulog_flag)
+      use Hybrid_allocation_module
+      implicit none
+      type (vtu_grid_der_type),dimension(:),allocatable,intent(inout) :: array
+      logical,intent(in) :: allocation_flag,ulog_flag
+      integer(4),intent(in),optional :: extent_1
+      character(100),intent(in) :: array_name
+   end subroutine allocate_de_vtu_grid_r1
+#endif
    subroutine allocate_de_Zon_r1(allocation_flag,array,extent_1,array_name,    &
       ulog_flag)
       use Hybrid_allocation_module

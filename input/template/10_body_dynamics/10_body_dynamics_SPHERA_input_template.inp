@@ -47,12 +47,16 @@
 !-------------------------------------------------------------------------------
 ##### BODY DYNAMICS #####
 !-------------------------------------------------------------------------------
-![?] Input parameters for the scheme on body transport in fluid flows
+![?] Input parameters for the scheme on body transport in fluid flows. 
 ![?] Bodies with imposed kinematics are listed after all the bodies with 
 !    computed dynamics.
 ![?] Body particles cannot exit the numerical domain.
-![?] <n_bodies>: number of transported solid bodies
-![?] <dx/dx_body>: ratio between fluid particle size and body particle size
+![?] <n_bodies>: number of transported solid bodies (both meshed and handmade 
+!                bodies)
+![?] <dx/dx_body>: ratio between fluid particle size and body particle size 
+!                  (for CAE-made bodies it is an "average" value depending on 
+!                  the input spatial resolution requested to the mesh 
+!                  generator)
 ![?] <friction_angle>: in radians
 !    >=0. (friction angle for body-frontier interactions)
 !    <0. (sliding friction depends on the local slope angle instead of the 
@@ -85,18 +89,28 @@ ___ ___ ___ ___ ___ ___ ___ ___
 ![?] <ID_first_body>
 !    =1
 ![?] <n_elem>: number of elements of the body
+!    =0 (for CAE-made bodies)
+![?] <CAE>
+!    =.true. (CAE-made body read from a ".vtu" file)
+!    =.false. (handmade body whose body elements are declared in this file)
+!    CAE-made bodies IDs follow the handmade bodies (if any) at the end of the 
+!    list. CAE-made body IDs follow the alphabetic order of the ".vtu" files in 
+!    the "vtu" folder.
+![*] <body_mass>: in case of imposed kinematics, the body mass is not 
+!    influential
 ![?] <pos_CM>: position of the centre of mass (Initial Conditions)
 ![?] <Ic_flag>
 !    =0 (mass moment of inertia is computed)
-!    =1 (mass moment of inertia is imposed)
+!    =1 (mass moment of inertia is imposed; in case of imposed kinematics, "Ic" 
+!       values are not influential)
 !-------------------------------------------------------------------------------
-![*] <ID_first_body> <n_elem>
+![*] <ID_first_body> <n_elem> <CAE>
 ![*] <body_mass>
 ![*] <pos_CM_x> <pos_CM_y> <pos_CM_z>
 ![*] <Ic_flag>
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
-1   ___
+1   ___ ___
 ___
 ___ ___ ___
 ___
@@ -121,7 +135,7 @@ ___ ___ ___
 ![?] <n_R_IO>: rotation axis (unit vector)
 ![?] <teta_R_IO>: rotation angle
 ![?] <pos_rotC>: centre of rotation for the vector alfa just to configure the 
-!    initial orientation in the global reference system)
+!    initial orientation in the global reference system
 ![?] <vel_CM>: velocity of the centre of mass at "t=0"
 ![?] <omega>: angular velocity of the body at "t=0"
 ![?] <imposed_kinematics_flag>
@@ -143,7 +157,7 @@ ___ ___ ___
 ___ ___
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
-![?] NUMBER_OF_BODY_DYNAMICS_RECORDS: do i=1,n_records
+![?] NUMBER_OF_BODY_DYNAMICS_KINEMATICS_RECORDS: do i=1,n_records
 !-------------------------------------------------------------------------------
 ![?] i-th record for the imposed kinematics of the body (the time of the last 
 !    record should be slightly higher than time at the end of the simulation) 
@@ -155,7 +169,7 @@ ___ ___
 ___ ___ ___ ___ ___ ___ ___
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
-![?] enddo NUMBER_OF_BODY_DYNAMICS_RECORDS
+![?] enddo NUMBER_OF_BODY_DYNAMICS_KINEMATICS_RECORDS
 !-------------------------------------------------------------------------------
 ![?] NUMBER_OF_BODY_ELEMENTS: do i=1,n_body_elements
 !-------------------------------------------------------------------------------
@@ -167,6 +181,7 @@ ___ ___ ___ ___ ___ ___ ___
 !    This rotation is relevant only for IC and I/O purposes.
 ![?] <n_R_IO_elem>: rotation axis (unit vector)
 ![?] <teta_R_IO_elem>: rotation angle
+!    =0 (for CAE-made body particles) 
 ![?] <face_zmin_flag>,<face_zmax_flag>,<face_ymin_flag>,<face_ymax_flag>, 
 !    <face_xmin_flag>,<face_xmax_flag>: integer flags to activate the normal 
 !    vectors of surface body particles only if "face_..._flag=1"; x/y/z_min/max 
@@ -202,6 +217,21 @@ ___ ___ ___ ___ ___ ___
 !<<<****************************************************************************
 ...
 !>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] CAE-made solid bodies can be managed for 3D simulations. 
+![?] The "input/10_body_dynamics/vtu" folder hosts the possible 
+![?] tetrahedral meshes for the 
+![?] initial conditions of the CAE-made SPH body particles. Each volume mesh is 
+![?] associated with a solid body. The IDs of the CAE-made solid bodies 
+![?] follow the IDs of the handmade bodies defined above, if any. For 
+![?] the CAE-made bodies, the ".vtu" file replaces the above sub-section on 
+![?] the body elements. Each CAE-made solid body is 
+![?] represented by no body element by definition. 
+![?] Each “.vtu” file has to contain the following variables: "types" 
+![?] (“CellData”, ".vtu" cell type); "connectivity" (“CellData”): vertex ID 
+![?] belonging to the ".vtu" cell; "Points" ("PointData"): ".vtu" point 
+![?] position; "nSurfaceLayers" ("PointData"): ".vtu" flag for surface points.
+!-------------------------------------------------------------------------------
 ##### end BODY DYNAMICS #####
 !-------------------------------------------------------------------------------
 ! endif (n_bodies>0)

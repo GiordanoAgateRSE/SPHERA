@@ -135,7 +135,6 @@ NPartOrd_w(Icont_w(pg_w(npi)%cella)+numpartincelgiaaposto(pg_w(npi)%cella))    &
 endif
 ! Semi-particles/wall elements (DB-SPH): end
 #ifdef SOLID_BODIES
-! Body particles (Body Transport): start
    Icont_bp(:) = 0
    numpartincelgiaaposto(:) = 0
 ! 1st loop: to find the particle cell and to count the number of particles
@@ -164,7 +163,6 @@ NPartOrd_bp(Icont_bp(bp_arr(npi)%cell)+numpartincelgiaaposto(bp_arr(npi)%cell))&
       numpartincelgiaaposto(bp_arr(npi)%cell) =                                &
          numpartincelgiaaposto(bp_arr(npi)%cell) + 1
    enddo
-! Body particles (Body Transport): end
 #endif
 !------------------------
 ! Deallocations

@@ -136,7 +136,7 @@ do jrang = jgridi-1,jgridi+1
                   rijlocal = dsqrt(rijlocal)
 ! "Inner" and surface body particles are both useful
                   pesoj = w(rijlocal,Domain%h,Domain%coefke) *                 &
-                          ((Domain%dx / dx_dxbodies) ** ncord)
+                          bp_arr(npj)%volume
                   uni = uni + pesoj
                   plocal = plocal  + bp_arr(npj)%pres * pesoj
                   vel(:) = vel(:) + bp_arr(npj)%vel_mir(:) * pesoj

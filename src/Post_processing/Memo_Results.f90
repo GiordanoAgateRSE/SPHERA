@@ -176,6 +176,12 @@ if (index(str,'inizio')/=0) then
             GCBFPointers(1:Grid%nmax,1:2)
       endif
 #endif
+#if (defined SPACE_3D) && (defined SOLID_BODIES)
+! Time independent information on solid bodies
+   if (n_bodies>0) then
+      write(nres) n_bodies_CAE,n_body_part_CAE
+   endif
+#endif
    flush(nres)
    write(ulog,'(a)')                                                           &
 " ----------------------------------------------------------------------------"
@@ -223,8 +229,9 @@ if ((it_rest==it).or.(index(str,'inizio')/=0).or.(index(str,'fine')/=0)) then
       pg_w(1:DBSPH%n_w+DBSPH%n_inlet+DBSPH%n_outlet)
 #ifdef SOLID_BODIES
    do ib=1,n_bodies
-      write(nres) body_arr(ib)%npart,body_arr(ib)%Ic_imposed,                  &
+      write(nres) body_arr(ib)%CAE,body_arr(ib)%npart,body_arr(ib)%Ic_imposed, &
          body_arr(ib)%imposed_kinematics,body_arr(ib)%n_records,body_arr%mass, &
+         body_arr%volume,                                                      &
          body_arr(ib)%umax,body_arr(ib)%pmax,body_arr(ib)%x_CM(1:3),           &
          body_arr(ib)%alfa(1:3),body_arr(ib)%u_CM(1:3),body_arr(ib)%omega(1:3),&
          body_arr(ib)%Force(1:3),body_arr(ib)%Moment(1:3),                     &

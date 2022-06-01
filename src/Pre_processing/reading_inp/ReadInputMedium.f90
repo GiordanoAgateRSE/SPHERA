@@ -46,11 +46,21 @@ double precision :: Rough,d50,d_90
 double precision :: limiting_viscosity
 double precision :: porosity
 character(8) :: tipo
-character(100),external :: GetToken,lcase
+character(100),external :: lcase
 logical,external :: ReadCheck
 !------------------------
 ! Explicit interfaces
 !------------------------
+interface
+   subroutine ReadRiga(ninp,ainp,io_err,comment_sym,lines_treated)
+      implicit none
+      integer(4),intent(in) :: ninp
+      character(*),intent(inout) :: ainp
+      integer(4),intent(out) :: io_err
+      character(1),intent(in),optional :: comment_sym
+      integer(4),intent(inout),optional :: lines_treated
+   end subroutine ReadRiga
+end interface
 !------------------------
 ! Allocations
 !------------------------
@@ -60,12 +70,12 @@ logical,external :: ReadCheck
 !------------------------
 ! Statements
 !------------------------
-call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
 if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"MEDIUM DATA",ninp,ulog)) return
 do while (trim(lcase(ainp))/="##### end medium #####")
    read(ainp,*,iostat=ioerr) tipo
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"MEDIUM TYPE",ninp,ulog)) return
-   call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+   call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
    read(ainp,*,iostat=ioerr) index
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"MEDIUM INDEX",ninp,ulog)) return
    NumberEntities(2) = max(NumberEntities(2),index)
@@ -86,47 +96,50 @@ do while (trim(lcase(ainp))/="##### end medium #####")
    tipo = trim(lcase(tipo))
    select case (tipo)
       case ("liquid  ")
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+         call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
          read(ainp,*,iostat=ioerr) den0,eps
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                             &
             "WATER DENSITY & COMPRIMIBILITY",ninp,ulog)) return
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+         call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
          read(ainp,*,iostat=ioerr) alfaMon,betaMon
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"ALPHA e BETA MONAGHAN",     &
             ninp,ulog)) return
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+         call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
          read(ainp,*,iostat=ioerr) visc
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"DYNAMIC VISCOSITY",ninp,    & 
             ulog)) return
 ! Non-Newtonian fluids with apparent viscosity 
       case ("granular")
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+         call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
          read(ainp,*,iostat=ioerr) den0,eps
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                             &
             "WATER DENSITY & COMPRIMIBILITY",ninp,ulog)) return
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+         call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
          read(ainp,*,iostat=ioerr) alfaMon,betaMon
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"ALPHA e BETA MONAGHAN",     &
             ninp,ulog)) return
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+         call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
          read(ainp,*,iostat=ioerr) phi,saturated_medium_flag
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"PHI, SATURATED_MEDIUM_FLAG",&
             ninp,ulog)) return
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+         call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
          read(ainp,*,iostat=ioerr) viscmx,limiting_viscosity
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                             &
             "THRESHOLD VISCOSITY & LIMITING VISCOSITY",ninp,ulog)) return            
          if (Granular_flows_options%KTGF_config==1) then
-            call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+            call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,                 &
+               lines_treated=nrighe)
             read(ainp,*,iostat=ioerr) porosity,d50,d_90
             if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                          &
                "POROSITY, d50 and D_90",ninp,ulog)) return
             else
-               call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+               call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,              &
+                  lines_treated=nrighe)
                read(ainp,*,iostat=ioerr) Rough,d50
                if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                       &
                   "ROUGH COEFFICIENT, d50",ninp,ulog)) return
-               call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+               call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,              &
+                  lines_treated=nrighe)
                read(ainp,*,iostat=ioerr) nitersol
                if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                       &
                   "N° ITERATION SOLID",ninp,ulog)) return
@@ -198,7 +211,7 @@ do while (trim(lcase(ainp))/="##### end medium #####")
 ! From degrees to radians
       Med(index)%phi = Med(index)%phi * PIGRECO / 180.  
    endif
-   call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+   call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"MEDIUM DATA",ninp,ulog)) return
 enddo
 !------------------------

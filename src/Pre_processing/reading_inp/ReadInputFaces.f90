@@ -44,10 +44,20 @@ integer(4) :: n,i,ioerr,stretch
 integer(4) :: ivalues(MAXFACENODES)
 character(8) :: label
 logical,external :: ReadCheck
-character(100),external :: lcase,GetToken
+character(100),external :: lcase
 !------------------------
 ! Explicit interfaces
 !------------------------
+interface
+   subroutine ReadRiga(ninp,ainp,io_err,comment_sym,lines_treated)
+      implicit none
+      integer(4),intent(in) :: ninp
+      character(*),intent(inout) :: ainp
+      integer(4),intent(out) :: io_err
+      character(1),intent(in),optional :: comment_sym
+      integer(4),intent(inout),optional :: lines_treated
+   end subroutine ReadRiga
+end interface
 !------------------------
 ! Allocations
 !------------------------
@@ -60,12 +70,12 @@ character(100),external :: lcase,GetToken
 ! In case of restart, input data are not read
 if (restart) then
    do while (trim(lcase(ainp))/="##### end faces #####")
-      call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+      call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
       if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"FACES DATA",ninp,ulog)) return
    enddo
    return
 endif
-call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
 if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"FACES DATA",ninp,ulog)) return
 do while (trim(lcase(ainp))/="##### end faces #####")
    select case (TRIM(Domain%tipo))
@@ -101,7 +111,7 @@ do while (trim(lcase(ainp))/="##### end faces #####")
          ier = 2
          return
    endselect
-   call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+   call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"FACES DATA",ninp,ulog)) return
 enddo
 if ((input_second_read.eqv..true.).and.(ulog>0).and.(prtopt)) then

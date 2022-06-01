@@ -154,7 +154,7 @@ integer(4),dimension(:),allocatable :: neigh_hcell_CLCpol
 ! relative distances from body particles (belonging to another body): -r_bp_bp;
 ! rag_bp_bp(3,NMAXPARTJ*n_surf_body_part)
 double precision,dimension(:,:),allocatable :: rag_bp_bp  
-! array of velocity impacts for body dynamics 
+! array of velocity impacts for body dynamics
 ! impact_vel(n_surf_body_part x (n_bodies+n_boundaries))
 double precision,dimension(:,:),allocatable :: impact_vel
 #endif

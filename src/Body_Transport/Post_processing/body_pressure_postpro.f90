@@ -79,13 +79,10 @@ do npi=1,n_body_part
             if ((bp_arr(npi)%body==bp_arr(npj)%body).and.(mod_normal>0.d0)) then
 ! The neighbouring body particle is a surface body particle and belongs to the 
 ! same body of the computational body particle
-! Here mass replaces volume because particle density is uniform within the same 
-! body and mass is estimated exaclty as ICs (whilst body particle volume is 
-! approximately assumed uniform -no discretization errors- all over the domain 
-! when computing the particle volume by means of dx and dx/dx_s).
-               W_vol = w(dis,Domain%h,Domain%coefke) * bp_arr(npj)%mass
+! For handmade solid bodies, the volume of the body particles is approximated
+               W_vol = w(dis,Domain%h,Domain%coefke) * bp_arr(npj)%volume
                aux_pres(npi) = aux_pres(npi) + bp_arr(npj)%pres * W_vol
-               Sum_W_vol = Sum_W_vol + W_vol 
+               Sum_W_vol = Sum_W_vol + W_vol
             endif
          endif
       enddo

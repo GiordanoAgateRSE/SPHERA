@@ -149,6 +149,8 @@ endif
 ! To evaluate the properties that must be attributed to the fixed particles
 if (Domain%NormFix) call NormFix
 if (uerr>0) write(uerr,"(a,1x,a)") " Running case:",trim(nomecas2)
+! To assess the elapsed time for IC
+call time_elapsed_IC
 ! To initialize the output files
 if (ulog>0) then
    it_print = it_eff
@@ -165,7 +167,6 @@ endif
 ! To assess the initial time step
 if (it_start==0) call time_step_duration
 it = it_start
-call time_elapsed_IC
 TIME_STEP_DO: do while (it<=input_any_t%itmax)
    done_flag = .false.
 ! Set the time step ID

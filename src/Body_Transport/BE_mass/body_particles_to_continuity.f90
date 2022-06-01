@@ -37,7 +37,7 @@ use I_O_file_module
 implicit none
 integer(4) :: npi,j,npartint,npj,k
 double precision :: temp_dden,aux,dis,dis_min,mod_normal,W_vol,sum_W_vol
-double precision :: dis_fb_sb,dis_s0_sb,dis_fb_s0
+double precision :: dis_fb_sb,dis_s0_sb,dis_fb_s0,dx_dxbp
 double precision :: dvar(3),aux_vec(3),aux_nor(3)
 double precision,external :: w  
 !------------------------
@@ -55,11 +55,12 @@ double precision,external :: w
 ! Loop over the body particles 
 !$omp parallel do default(none)                                                &
 !$omp shared(n_body_part,bp_arr,nPartIntorno_bp_f,NMAXPARTJ,PartIntorno_bp_f)  &
-!$omp shared(KerDer_bp_f_cub_spl,rag_bp_f,pg,Domain,dx_dxbodies)               &
+!$omp shared(KerDer_bp_f_cub_spl,rag_bp_f,pg,Domain)                           &
 !$omp shared(FSI_free_slip_conditions,ulog,on_going_time_step,n_surf_body_part)&
 !$omp shared(surf_body_part)                                                   &
 !$omp private(npi,sum_W_vol,W_vol,j,npartint,npj,k,temp_dden,aux,dis,dis_min)  &
-!$omp private(mod_normal,dvar,aux_vec,aux_nor,dis_s0_sb,dis_fb_s0,dis_fb_sb)
+!$omp private(mod_normal,dvar,aux_vec,aux_nor,dis_s0_sb,dis_fb_s0,dis_fb_sb)   &
+!$omp private(dx_dxbp)
 do npi=1,n_body_part
    bp_arr(npi)%vel_mir(:) = 0.d0
    sum_W_vol = 0.d0
@@ -153,7 +154,12 @@ do npi=1,n_body_part
                                pg(npj)%vel(:)) * W_vol
       sum_W_vol = sum_W_vol + W_vol
 ! Contributions to the continuity equation
-      temp_dden = pg(npj)%mass / (dx_dxbodies ** ncord) *                      &
+#ifdef SPACE_3D
+      dx_dxbp = Domain%dx / (bp_arr(npi)%volume ** (1.d0/3.d0))
+#elif defined SPACE_2D
+      dx_dxbp = Domain%dx / (bp_arr(npi)%volume ** (1.d0/2.d0))
+#endif
+      temp_dden = pg(npj)%mass / (dx_dxbp ** ncord) *                          &
                   KerDer_bp_f_cub_spl(npartint) * (dvar(1) * ( -               &
                   rag_bp_f(1,npartint)) + dvar(2) * ( - rag_bp_f(2,npartint))  &
                   + dvar(3) * ( - rag_bp_f(3,npartint)))

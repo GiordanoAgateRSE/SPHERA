@@ -42,7 +42,7 @@ integer(4) :: n_interactions,aux2,aux3,test,aux_scal_test
 #ifdef SPACE_3D
 integer(4) :: aux_int
 #endif
-double precision :: k_masses,r_per,r_par,alfa_boun
+double precision :: k_masses,r_per,r_par,alfa_boun,dx_dxbp,dxbp
 double precision :: aux_impact_vel,aux4,aux_scalar,aux_scalar_2
 double precision :: friction_limiter
 #ifdef SPACE_2D
@@ -271,12 +271,17 @@ do npi=1,n_body_part
 ! Contribution to the pressure gradient term
       aux_scalar = (pg(npj)%pres + bp_arr(npi)%pres) / (pg(npj)%dens *         &
                    pg(npj)%dens)
-      pg(npj)%acc(:) = pg(npj)%acc(:) + ( - pg(npj)%mass / (dx_dxbodies **     &
+#ifdef SPACE_3D
+      dx_dxbp = Domain%dx / (bp_arr(npi)%volume ** (1.d0/3.d0))
+#elif defined SPACE_2D
+      dx_dxbp = Domain%dx / (bp_arr(npi)%volume ** (1.d0/2.d0))
+#endif
+      pg(npj)%acc(:) = pg(npj)%acc(:) + ( - pg(npj)%mass / (dx_dxbp **         &
                        ncord) * aux_scalar * ( - rag_bp_f(:,npartint)) *       &
                        KerDer_bp_f_Gal(npartint))
       if (FSI_free_slip_conditions.eqv..false.) then
 ! Body particle volume
-         aux_scalar = pg(npj)%mass / Med(pg(npj)%imed)%den0 / (dx_dxbodies **  &
+         aux_scalar = pg(npj)%mass / Med(pg(npj)%imed)%den0 / (dx_dxbp **      &
                       ncord)
 ! Contribution to the shear stress gradient term
          pg(npj)%acc(:) = pg(npj)%acc(:) - 2.d0 * pg(npj)%kin_visc *           &
@@ -309,7 +314,7 @@ enddo
 do npi=1,n_body_part
    if (body_arr(bp_arr(npi)%body)%imposed_kinematics==0) then
 ! Only body particles at the body surface     
-      if (bp_arr(npi)%area>0.d0) then  
+      if (bp_arr(npi)%surface) then  
 ! Computation of the ID of the surface body particles
          aux2 = aux2 + 1
 ! Fluid pressure forces
@@ -332,7 +337,12 @@ do npi=1,n_body_part
                            bp_arr(npj)%normal(:)  
             r_par = dsqrt(r_par_vec(1) * r_par_vec(1) + r_par_vec(2) *         &
                     r_par_vec(2) + r_par_vec(3) * r_par_vec(3))
-            if ((r_per>0.d0).and.((r_par/(Domain%dx/dx_dxbodies))<=1.d0)) then
+#ifdef SPACE_3D
+            dxbp = bp_arr(npi)%volume ** (1.d0/3.d0)
+#elif defined SPACE_2D
+            dxbp = bp_arr(npi)%volume ** (1.d0/2.d0)
+#endif
+            if ((r_per>0.d0).and.((r_par/dxbp)<=1.d0)) then
                u_rel(:) = bp_arr(npi)%vel(:) - bp_arr(npj)%vel(:) 
                x_rel(:) = - rag_bp_bp(:,npartint) /                            &
                  dsqrt(dot_product(rag_bp_bp(:,npartint),rag_bp_bp(:,npartint)))
@@ -363,9 +373,8 @@ do npi=1,n_body_part
                                     (impact_vel(aux2,bp_arr(npj)%body) ** 2) / &
                                     r_per) * k_masses *                        &
                                     Gamma_boun(r_per,Domain%h) * (1 - r_par /  &
-                                    (Domain%dx / dx_dxbodies)) *               &
-                                    bp_arr(npj)%normal(:)
-                  if (r_per<((Domain%dx/dx_dxbodies)/10.d0)) then   
+                                    dxbp) * bp_arr(npj)%normal(:)
+                  if (r_per<(dxbp/10.d0)) then   
                      write(file_name_test,"(a,a,i8.8,a,i8.8,a,i8.8,a)")        &
                         nomecaso(1:len_trim(nomecaso)),'_close_impact_',       &
                         on_going_time_step,'_',npi,'_',npj,".txt"
@@ -402,7 +411,7 @@ do npi=1,n_body_part
                   alfa_denom(bp_arr(npi)%body,bp_arr(npj)%body) =              &
                      alfa_denom(bp_arr(npi)%body,bp_arr(npj)%body) +           &
                      (1.d0 / r_per) * k_masses * Gamma_boun(r_per,Domain%h) *  &
-                     (1.d0 - r_par / (Domain%dx / dx_dxbodies))
+                     (1.d0 - r_par / dxbp)
                   r_per_min(bp_arr(npi)%body,bp_arr(npj)%body) =               &
                      min(r_per,r_per_min(bp_arr(npi)%body,bp_arr(npj)%body)) 
                endif

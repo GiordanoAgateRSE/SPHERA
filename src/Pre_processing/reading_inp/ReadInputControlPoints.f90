@@ -45,6 +45,16 @@ character(100),external :: lcase
 !------------------------
 ! Explicit interfaces
 !------------------------
+interface
+   subroutine ReadRiga(ninp,ainp,io_err,comment_sym,lines_treated)
+      implicit none
+      integer(4),intent(in) :: ninp
+      character(*),intent(inout) :: ainp
+      integer(4),intent(out) :: io_err
+      character(1),intent(in),optional :: comment_sym
+      integer(4),intent(inout),optional :: lines_treated
+   end subroutine ReadRiga
+end interface
 !------------------------
 ! Allocations
 !------------------------
@@ -54,7 +64,7 @@ character(100),external :: lcase
 !------------------------
 ! Statements
 !------------------------
-call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
 if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"CONTROL POINTS DATA",ninp,ulog))     &
    return
 do while (trim(lcase(ainp))/="##### end control points #####" )
@@ -76,7 +86,7 @@ do while (trim(lcase(ainp))/="##### end control points #####" )
             Control_Points(i)%coord(icoordp(n,ncord-1)),n=1,ncord)
        endif
     endif
-    call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+    call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
     if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"CONTROL POINTS DATA",ninp,ulog)) &
        return
 enddo

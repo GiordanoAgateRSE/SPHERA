@@ -20,10 +20,9 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: GetToken                                           
-! Description: To extract the "itok"-th substring (without blank spaces) from 
-!              the input string "ainp" (with blank spaces)
+! Description: To extract the "itok"-th token from the input string "ainp"
 !-------------------------------------------------------------------------------
-character(100) function GetToken(ainp,itok,ioerr)
+character(100) function GetToken(itok,ainp,io_err)
 !------------------------
 ! Modules
 !------------------------
@@ -31,8 +30,9 @@ character(100) function GetToken(ainp,itok,ioerr)
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: itok,ioerr
-character(*) :: ainp
+integer(4),intent(in) :: itok
+character(*),intent(in) :: ainp
+integer(4),intent(out) :: io_err
 logical :: blank
 integer(4) :: n,number_token
 integer(4),dimension(2,820) :: index_token
@@ -60,14 +60,14 @@ do n=1,len_trim(ainp)
       elseif ((.not.blank).and.(ainp(n:n)/=" ")) then
          index_token(2,number_token) = n
          elseif (ainp(n:n)==" ") then 
-         blank = .true.
+            blank = .true.
    endif
 enddo
 if (itok<=number_token) then
-   ioerr = 0
+   io_err = 0
    GetToken = ainp(index_token(1,itok):index_token(2,itok))
    else
-      ioerr = itok
+      io_err = itok
       GetToken = ""
 endif
 !------------------------

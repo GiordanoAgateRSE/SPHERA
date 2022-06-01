@@ -45,10 +45,26 @@ integer(4) :: density_thresholds
 character(1) :: Psurf
 character(100) :: token
 logical,external :: ReadCheck
-character(100),external :: lcase,GetToken
+character(100),external :: lcase
 !------------------------
 ! Explicit interfaces
 !------------------------
+interface
+   subroutine ReadRiga(ninp,ainp,io_err,comment_sym,lines_treated)
+      implicit none
+      integer(4),intent(in) :: ninp
+      character(*),intent(inout) :: ainp
+      integer(4),intent(out) :: io_err
+      character(1),intent(in),optional :: comment_sym
+      integer(4),intent(inout),optional :: lines_treated
+   end subroutine ReadRiga
+   character(100) function GetToken(itok,ainp,io_err)
+      implicit none
+      integer(4),intent(in) :: itok
+      character(*),intent(in) :: ainp
+      integer(4),intent(out) :: io_err
+   end function GetToken
+end interface
 !------------------------
 ! Allocations
 !------------------------
@@ -58,7 +74,7 @@ character(100),external :: lcase,GetToken
 !------------------------
 ! Statements
 !------------------------
-call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
 if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"RUN PARAMETERS DATA",ninp,ulog))     &
    return
 do while (trim(lcase(ainp))/="##### end run parameters #####")
@@ -66,7 +82,7 @@ do while (trim(lcase(ainp))/="##### end run parameters #####")
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"MAX. TRANSIENT TIME & ITERATIONS",&
       ninp,ulog)) return
    if (ioerr==0) then
-      token = GetToken(ainp,2,ioerr)
+      token = GetToken(2,ainp,ioerr)
       if (ioerr==0) then
          read(token,*,iostat=ioerr) itmax
          else
@@ -74,15 +90,15 @@ do while (trim(lcase(ainp))/="##### end run parameters #####")
             ioerr = 0
       endif
    endif
-   call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+   call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
    read(ainp,*,iostat=ioerr) CFL,vsc_coeff,time_split,RKscheme,pesodt,         &
       dt_alfa_Mon
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"TIME INTEGRATION",ninp,ulog))     &
       return
-   call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+   call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
    read(ainp,*,iostat=ioerr) TetaP,TetaV
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"TETAP & TETAV",ninp,ulog)) return
-   token = GetToken(ainp,3,ioerr)
+   token = GetToken(3,ainp,ioerr)
    if (ioerr==0) then
       read(token,*,iostat=ioerr) Psurf
       Psurf = trim(lcase(Psurf))
@@ -99,23 +115,23 @@ do while (trim(lcase(ainp))/="##### end run parameters #####")
          write(uerr,*) "Unknown option: ",trim(ainp)," in run parameters."
          stop
    endif
-   call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+   call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
    read(ainp,*,iostat=ioerr) COEFNMAXPARTI,COEFNMAXPARTJ,body_part_reorder
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"COEFNMAXPARTI and COEFNMAXPARTJ ",&
       ninp,ulog)) return
 #ifdef SPACE_3D
-   call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+   call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
       read(ainp,*,iostat=ioerr) nag_aux,MAXCLOSEBOUNDFACES,MAXNUMCONVEXEDGES,  &
          GCBFVecDim_loc
       if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                                &
          "NAG_AUX, MAXCLOSEBOUNDFACES, MAXNUMCONVEXEDGES, GCBFVECDIM_LOC ",    &
          ninp,ulog)) return
 #endif
-   call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+   call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
    read(ainp,*,iostat=ioerr) density_thresholds
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"DENSITY_THRESHOLDS ",ninp,ulog))  &
       return
-   call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+   call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"RUN PARAMETERS DATA",ninp,ulog))  &
       return
 enddo

@@ -47,10 +47,26 @@ integer(4) :: ioerr,i,n,icord
 character(100) :: token
 character(6) :: token_color
 logical,external :: ReadCheck
-character(100),external :: lcase,GetToken
+character(100),external :: lcase
 !------------------------
 ! Explicit interfaces
 !------------------------
+interface
+   subroutine ReadRiga(ninp,ainp,io_err,comment_sym,lines_treated)
+      implicit none
+      integer(4),intent(in) :: ninp
+      character(*),intent(inout) :: ainp
+      integer(4),intent(out) :: io_err
+      character(1),intent(in),optional :: comment_sym
+      integer(4),intent(inout),optional :: lines_treated
+   end subroutine ReadRiga
+   character(100) function GetToken(itok,ainp,io_err)
+      implicit none
+      integer(4),intent(in) :: itok
+      character(*),intent(in) :: ainp
+      integer(4),intent(out) :: io_err
+   end function GetToken
+end interface
 !------------------------
 ! Allocations
 !------------------------
@@ -60,22 +76,22 @@ character(100),external :: lcase,GetToken
 !------------------------
 ! Statements
 !------------------------
-call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
 read(ainp,*,iostat=ioerr) Medium
 if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"MEDIUM INDEX",ninp,ulog)) return
-call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-token = GetToken(ainp,1,ioerr)
+call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
+token = GetToken(1,ainp,ioerr)
 if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"COLOURING TYPE",ninp,ulog)) return
 bends = trim(lcase(token(1:1)))
-token = GetToken(ainp,2,ioerr)
+token = GetToken(2,ainp,ioerr)
 ! Saving colours 
 token_color(1:2) = token(5:6)
 token_color(3:4) = token(3:4)
 token_color(5:6) = token(1:2) 
 read(token_color,'(Z6)',iostat=ioerr) icolor
 if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"COLOUR",ninp,ulog)) return
-call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-move = trim(GetToken(ainp,1,ioerr))
+call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
+move = trim(GetToken(1,ainp,ioerr))
 if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"INITIAL MOVE STATUS TYPE",ninp,ulog))&
    return
 values3(:) = zero
@@ -85,7 +101,7 @@ select case (lcase(move))
    case ("std")
       npointv = 0
       do n=1,3
-         token = GetToken(ainp,(n+1),ioerr)
+         token = GetToken((n+1),ainp,ioerr)
          read(token,*,iostat=ioerr) values3(n)
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"INITIAL VELOCITY",ninp,ulog)&
             ) return
@@ -94,13 +110,13 @@ select case (lcase(move))
       npointv = 1
       valuev = zero
       do n=1,ncord
-         token = GetToken(ainp,(n+1),ioerr)
+         token = GetToken((n+1),ainp,ioerr)
          read(token,*,iostat=ioerr) values3(n)
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"INITIAL VELOCITY",ninp,ulog &
             )) return
       enddo
 ! No-slip / free-slip
-      token = GetToken(ainp,(ncord+2),ioerr)
+      token = GetToken((ncord+2),ainp,ioerr)
       if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"NO_SLIP/FREE_SLIP",ninp,ulog)) &
          return
       if (lcase(token(1:7))=="no_slip") then
@@ -120,19 +136,19 @@ select case (lcase(move))
       ioerr   = 0
       npointv = 0
       valuev  = zero  
-      token = GetToken(ainp,2,ioerr)
+      token = GetToken(2,ainp,ioerr)
       read(token,*,iostat=ioerr) npointv
       if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"POINTS OF VELOCITY LAW",ninp,  &
          ulog)) return
       slip = "n"
       do i=1,npointv
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+         call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"VALUES OF VELOCITY LAW",    &
             ninp,ulog)) return
          if ((ioerr/=0).or.(input_second_read.eqv..false.)) cycle
          do n=0,ncord
             icord = icoordp(n,ncord-1)
-            token = GetToken(ainp,(n+1),ioerr)
+            token = GetToken((n+1),ainp,ioerr)
             if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"VALUES OF VELOCITY LAW", &
                ninp,ulog)) return
             read(token,*,iostat=ioerr) valuev(n,i)
@@ -143,19 +159,19 @@ select case (lcase(move))
       if (ulog>0) write(ulog,*) "Unknown option: ",trim(ainp)
       stop
 endselect
-call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-pressu = trim(GetToken(ainp,1,ioerr))
+call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
+pressu = trim(GetToken(1,ainp,ioerr))
 if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"INITIAL PRESSURE TYPE",ninp,ulog))   &
    return
 ! IC uniform pressure ("pa") is assigned 
 if (pressu=="pa") then  
-   token = lcase(GetToken(ainp,2,ioerr))
+   token = lcase(GetToken(2,ainp,ioerr))
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"PRESSURE VALUES",ninp,ulog)) return
    read(token,*,iostat=ioerr) valp
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"PRESSURE VALUES",ninp,ulog)) return
 ! IC hydrostatic pressure based on a reference free surface height ("qp")
    elseif (pressu=="qp") then 
-      token = lcase(GetToken(ainp,2,ioerr))
+      token = lcase(GetToken(2,ainp,ioerr))
       if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"INITIAL PIEZO LINE",ninp,ulog))&
          return
       read(token,*,iostat=ioerr) valp
@@ -164,7 +180,7 @@ if (pressu=="pa") then
 ! IC hydrostatic pressure based on the maximum level ("pl") of
 ! an assigned fluid 
          elseif (pressu=="pl") then
-            token = lcase(GetToken(ainp,2,ioerr))
+            token = lcase(GetToken(2,ainp,ioerr))
             if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"FREE LEVEL LINE",ninp,   &
                ulog)) return
             read(token,*,iostat=ioerr) valp

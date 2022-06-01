@@ -38,11 +38,27 @@ character(len=lencard) :: ainp
 character(4) :: steptime
 integer(4) :: ioerr
 character(100) :: token
-character(100),external :: lcase, GetToken
+character(100),external :: lcase
 logical,external :: ReadCheck
 !------------------------
 ! Explicit interfaces
 !------------------------
+interface
+   subroutine ReadRiga(ninp,ainp,io_err,comment_sym,lines_treated)
+      implicit none
+      integer(4),intent(in) :: ninp
+      character(*),intent(inout) :: ainp
+      integer(4),intent(out) :: io_err
+      character(1),intent(in),optional :: comment_sym
+      integer(4),intent(inout),optional :: lines_treated
+   end subroutine ReadRiga
+   character(100) function GetToken(itok,ainp,io_err)
+      implicit none
+      integer(4),intent(in) :: itok
+      character(*),intent(in) :: ainp
+      integer(4),intent(out) :: io_err
+   end function GetToken
+end interface
 !------------------------
 ! Allocations
 !------------------------
@@ -52,15 +68,15 @@ logical,external :: ReadCheck
 !------------------------
 ! Statements
 !------------------------
-call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
 if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"DRAW OPTIONS DATA",ninp,ulog)) return
 do while (trim(lcase(ainp))/="##### end draw options #####")
-   select case (lcase(GetToken(ainp,1,ioerr)))
+   select case (lcase(GetToken(1,ainp,ioerr)))
       case("vtkconverter")
-         token = lcase(GetToken(ainp,(2),ioerr))
+         token = lcase(GetToken(2,ainp,ioerr))
          select case (token)
             case("any")
-               token = lcase(GetToken(ainp,(3),ioerr))
+               token = lcase(GetToken(3,ainp,ioerr))
                read(token,*,iostat=ioerr) freq_time
                if ((input_second_read.eqv..true.).and.(ulog>0)) then
                   write(ulog,"(1x,a,1pe12.4,a)")                               &
@@ -68,7 +84,7 @@ do while (trim(lcase(ainp))/="##### end draw options #####")
                endif
                val_time  = zero  
             case("at")
-               token = lcase(GetToken(ainp,(3),ioerr))
+               token = lcase(GetToken(3,ainp,ioerr))
                read(token,*,iostat=ioerr) freq_time
                if ((input_second_read.eqv..true.).and.(ulog>0)) then
                   write(ulog,"(1x,a,1pe12.4,a)")                               &
@@ -77,7 +93,7 @@ do while (trim(lcase(ainp))/="##### end draw options #####")
                   val_time  = freq_time
                   freq_time = -freq_time
             case("all")
-               token = lcase(GetToken(ainp,(3),ioerr))
+               token = lcase(GetToken(3,ainp,ioerr))
                read(token,*,iostat=ioerr) steptime
                if (steptime=='time') then
                   freq_time = input_any_t%memo_fr
@@ -115,7 +131,7 @@ do while (trim(lcase(ainp))/="##### end draw options #####")
          ier = 4
          return
    endselect
-   call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+   call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"DRAW OPTIONS DATA",ninp,ulog))    &
       return
 enddo

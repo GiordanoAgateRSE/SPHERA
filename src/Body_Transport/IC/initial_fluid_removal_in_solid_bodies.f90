@@ -19,38 +19,29 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: ReadInputTitle                             
-! Description:                        
+! Program unit: initial_fluid_removal_in_solid_bodies
+! Description: Initial removal of possible SPH fluid particles within solid 
+!              bodies (due to design) at the beginning of the simulation 
+!              (initial conditions for fluid particle positions in case of 
+!              Fluid - Structure interactions).
 !-------------------------------------------------------------------------------
-subroutine ReadInputTitle(ainp,comment,nrighe,ier,ninp,ulog)
+#ifdef SOLID_BODIES
+subroutine initial_fluid_removal_in_solid_bodies
 !------------------------
 ! Modules
 !------------------------
 use Static_allocation_module
 use Hybrid_allocation_module
+use Dynamic_allocation_module
 !------------------------
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: nrighe,ier,ninp,ulog
-character(1) :: comment
-character(len=lencard) :: ainp
-integer(4) :: n,ioerr
-character(100),external :: lcase
-logical,external :: ReadCheck
+integer(4) :: npi,j,npartint,npj
+double precision :: dis_ref,dis_bp_f
 !------------------------
 ! Explicit interfaces
 !------------------------
-interface
-   subroutine ReadRiga(ninp,ainp,io_err,comment_sym,lines_treated)
-      implicit none
-      integer(4),intent(in) :: ninp
-      character(*),intent(inout) :: ainp
-      integer(4),intent(out) :: io_err
-      character(1),intent(in),optional :: comment_sym
-      integer(4),intent(inout),optional :: lines_treated
-   end subroutine ReadRiga
-end interface
 !------------------------
 ! Allocations
 !------------------------
@@ -60,23 +51,38 @@ end interface
 !------------------------
 ! Statements
 !------------------------
-call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
-if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"TITLE DATA",ninp,ulog)) return 
-n = 0
-do while (trim(lcase(ainp))/="##### end title #####" )
-   n = n + 1
-   if (n<=maxtit) then
-      title(n) = ainp
-      if ((input_second_read.eqv..true.).and.(ulog>0)) then
-         write(ulog,"(1x,a)") title(n)
+! Loop over the body particles 
+!$omp parallel do default(none)                                                &
+!$omp shared(n_body_part,nPartIntorno_bp_f,NMAXPARTJ,PartIntorno_bp_f,pg)      &
+!$omp shared(rag_bp_f,OpCount,dis_ref,bp_arr)                                  &
+!$omp private(npi,j,npartint,npj,dis_bp_f)
+! Loop over solid particles
+do npi=1,n_body_part
+! Loop over the neighbouring fluid particles
+   do j=1,nPartIntorno_bp_f(npi)
+      npartint = (npi - 1) * NMAXPARTJ + j
+      npj = PartIntorno_bp_f(npartint)
+      dis_bp_f = dsqrt(dot_product(rag_bp_f(1:3,npartint),                     &
+                 rag_bp_f(1:3,npartint)))
+#ifdef SPACE_3D
+      dis_ref = dsqrt(3.d0) * (bp_arr(npi)%volume ** (1.d0/3.d0)) / 2.d0
+#elif defined SPACE_2D
+      dis_ref = dsqrt(2.d0) * (bp_arr(npi)%volume ** (1.d0/2.d0)) / 2.d0
+#endif
+      if (dis_bp_f<=dis_ref) then
+!$omp critical (omp_initial_fluid_removal_in_solid_bodies)
+         if (pg(npj)%cella>-1) then
+            pg(npj)%cella = -1
+            OpCount(pg(npj)%imed) = OpCount(pg(npj)%imed) + 1
+         endif
+!$omp end critical (omp_initial_fluid_removal_in_solid_bodies)
       endif
-   endif
-   call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
-   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"TITLE DATA",ninp,ulog)) return 
+   enddo
 enddo
-if ((input_second_read.eqv..true.).and.(ulog>0)) write(ulog,"(1x,a)") " "
+!$omp end parallel do
 !------------------------
 ! Deallocations
 !------------------------
 return
-end subroutine ReadInputTitle
+end subroutine initial_fluid_removal_in_solid_bodies
+#endif

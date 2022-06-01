@@ -35,6 +35,7 @@ use Dynamic_allocation_module
 ! Declarations
 !------------------------
 implicit none
+logical :: CAE
 integer(4) :: nrighe,ier,ninp,ulog,ioerr,i,Id_body,n_elem,j,Id_elem,alloc_stat
 integer(4) :: imposed_kinematics,n_records,Ic_imposed 
 double precision :: mass,teta_R_IO
@@ -49,6 +50,16 @@ logical,external :: ReadCheck
 !------------------------
 ! Explicit interfaces
 !------------------------
+interface
+   subroutine ReadRiga(ninp,ainp,io_err,comment_sym,lines_treated)
+      implicit none
+      integer(4),intent(in) :: ninp
+      character(*),intent(inout) :: ainp
+      integer(4),intent(out) :: io_err
+      character(1),intent(in),optional :: comment_sym
+      integer(4),intent(inout),optional :: lines_treated
+   end subroutine ReadRiga
+end interface
 !------------------------
 ! Allocations
 !------------------------
@@ -58,7 +69,7 @@ logical,external :: ReadCheck
 !------------------------
 ! Statements
 !------------------------
-call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
+call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
 if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"BODY DYNAMICS DATA",ninp,ulog))      &
    return
 do while (trim(lcase(ainp)) /= "##### end body dynamics #####")
@@ -108,51 +119,52 @@ do while (trim(lcase(ainp)) /= "##### end body dynamics #####")
 ! Loop over the transported bodies
    do i=1,n_bodies
 ! Reading the body parameters
-      call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
-      read(ainp,*,iostat=ioerr) Id_body,n_elem
-      if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"ID_BODY-N_ELEM",ninp,ulog))    &  
-         return
-      call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
+      call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
+      read(ainp,*,iostat=ioerr) Id_body,n_elem,CAE
+      if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"ID_BODY-N_ELEM-CAE",ninp,      &
+         ulog)) return
+      call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
       read(ainp,*,iostat=ioerr) mass
       if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"MASS",ninp,ulog)) return
-      call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
+      call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
       read(ainp,*,iostat=ioerr) x_CM(1),x_CM(2),x_CM(3)
       if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"X_CM",ninp,ulog)) return
-      call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
+      call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
       read(ainp,*,iostat=ioerr) Ic_imposed
       if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"IC_IMPOSED",ninp,ulog)) return
       if (Ic_imposed==1) then
-         call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
+         call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
          read(ainp,*,iostat=ioerr) Ic(1,1),Ic(1,2),Ic(1,3)
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"IC(1,1-3)",ninp,ulog))      &
             return
-         call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
+         call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
          read(ainp,*,iostat=ioerr) Ic(2,1),Ic(2,2),Ic(2,3)
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"IC(2,1-3)",ninp,ulog))      &
             return
-         call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
+         call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
          read(ainp,*,iostat=ioerr) Ic(3,1),Ic(3,2),Ic(3,3)
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"IC(3,1-3)",ninp,ulog))      &
             return
       endif
-      call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
+      call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
       read(ainp,*,iostat=ioerr) n_R_IO(1),n_R_IO(2),n_R_IO(3),teta_R_IO
       if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                                &
          'BODY ROTATION AXIS AND ANGLE FOR IC',ninp,ulog)) return
-      call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
+      call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
       read(ainp,*,iostat=ioerr) x_rotC(1),x_rotC(2),x_rotC(3)
       if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"X_ROTC",ninp,ulog)) return
-      call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
+      call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
       read(ainp,*,iostat=ioerr) u_CM(1),u_CM(2),u_CM(3)
       if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"U_CM",ninp,ulog)) return
-      call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
+      call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
       read(ainp,*,iostat=ioerr) omega(1),omega(2),omega(3)
       if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"OMEGA",ninp,ulog)) return
-      call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
+      call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
       read(ainp,*,iostat=ioerr) imposed_kinematics,n_records
       if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"BODY_KINEMATICS",ninp,ulog))   &
          return       
 ! Assignment of the body parameters 
+      body_arr(Id_body)%CAE = CAE
       body_arr(Id_body)%n_elem = n_elem
       body_arr(Id_body)%mass = mass
       body_arr(Id_body)%x_CM = x_CM
@@ -174,6 +186,7 @@ do while (trim(lcase(ainp)) /= "##### end body dynamics #####")
 ! Writing on the log file
       if ((input_second_read.eqv..true.).and.(ulog>0)) then
          write(ulog,"(1x,a,1p,i12)") "body:.......................",Id_body
+         write(ulog,"(1x,a,1p,l12)") "CAE:........................",CAE
          write(ulog,"(1x,a,1p,e12.4)") "mass:.......................",mass
          write(ulog,"(1x,a,1p,3e12.4)") "x_CM:.......................",x_CM
          write(ulog,"(1x,a,1p,i12)") "IC_imposed:.................",           &
@@ -202,7 +215,7 @@ do while (trim(lcase(ainp)) /= "##### end body dynamics #####")
 ! Allocating body elements
       if (input_second_read.eqv..true.) then
          else
-            if (.not.allocated(body_arr(Id_body)%elem)) then
+            if ((.not.CAE).and.(.not.allocated(body_arr(Id_body)%elem))) then
                allocate(body_arr(Id_body)%elem(body_arr(Id_body)%n_elem),      &
                   STAT=alloc_stat)
                if (alloc_stat/=0) then
@@ -232,35 +245,42 @@ do while (trim(lcase(ainp)) /= "##### end body dynamics #####")
       endif
 ! Reading the eventual imposed kinematics
       do j=1,n_records
-         call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
+         call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
          read(ainp,*,iostat=ioerr) body_arr(Id_body)%body_kinematics(j,:) 
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"BODY_KINEMATICS_RECORDS",   &
             ninp,ulog)) return            
-      enddo       
-! Reading element parameters                     
+      enddo
+! Reading element parameters
       do j=1,n_elem
-         call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
+         call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,                    &
+            lines_treated=nrighe)
          read(ainp,*,iostat=ioerr) Id_elem
-         if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"ID_ELEM",ninp,ulog)) return
-         call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
+         if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"ID_ELEM",ninp,ulog))        &
+            return
+         call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,                    &
+            lines_treated=nrighe)
          read(ainp,*,iostat=ioerr) L_geom(1),L_geom(2),L_geom(3)
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"L_GEOM",ninp,ulog)) return
-         call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
+         call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,                    &
+            lines_treated=nrighe)
          read(ainp,*,iostat=ioerr) x_CM(1),x_CM(2),x_CM(3)
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"X_CM_ELEM",ninp,ulog))      &
             return
-         call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
+         call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,                    &
+            lines_treated=nrighe)
          read(ainp,*,iostat=ioerr) n_R_IO(1),n_R_IO(2),n_R_IO(3),teta_R_IO
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                             &
             "ELEMENT ROTATION AXIS AND ANGLE FOR IC",ninp,ulog)) return         
-         call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
-         read(ainp,*,iostat=ioerr) normal_act(1),normal_act(2),normal_act(3),  &
-            normal_act(4),normal_act(5),normal_act(6)
+         call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,                    &
+            lines_treated=nrighe)
+         read(ainp,*,iostat=ioerr) normal_act(1),normal_act(2),                &
+            normal_act(3),normal_act(4),normal_act(5),normal_act(6)
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"NORMAL_ACT",ninp,ulog))     &
             return
-         call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
-         read(ainp,*,iostat=ioerr) mass_deact(1),mass_deact(2),mass_deact(3),  &
-            mass_deact(4),mass_deact(5),mass_deact(6)
+         call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,                    &
+            lines_treated=nrighe)
+         read(ainp,*,iostat=ioerr) mass_deact(1),mass_deact(2),                &
+            mass_deact(3),mass_deact(4),mass_deact(5),mass_deact(6)
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"MASS_DEACT",ninp,ulog))     &
             return
 ! Assignment of the element parameters
@@ -272,7 +292,8 @@ do while (trim(lcase(ainp)) /= "##### end body dynamics #####")
          body_arr(Id_body)%elem(Id_elem)%mass_deact = mass_deact
 ! Writing on the log file
          if ((input_second_read.eqv..true.).and.(ulog>0)) then
-            write(ulog,"(1x,a,1p,i12)") "element:....................",Id_elem
+            write(ulog,"(1x,a,1p,i12)") "element:....................",        &
+               Id_elem
             write(ulog,"(1x,a,1p,3e12.4)") "L_geom:.....................",     &
                L_geom
             write(ulog,"(1x,a,1p,3e12.4)") "x_CM_elem:..................",     &
@@ -286,10 +307,10 @@ do while (trim(lcase(ainp)) /= "##### end body dynamics #####")
             write(ulog,"(1x,a,1p,6e12.4)") "mass_deact:.................",     &
                mass_deact
             write(ulog,"(1x,a)")  " "
-         endif 
+         endif
       enddo
-   enddo         
-   call ReadRiga (ainp,comment,nrighe,ioerr,ninp)
+   enddo
+   call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"BODY DYNAMICS DATA",ninp,ulog))   &
       return
 enddo

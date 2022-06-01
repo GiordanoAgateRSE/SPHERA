@@ -39,10 +39,26 @@ integer(4) :: ioerr
 double precision :: dx, trunc
 character(100) :: token
 logical,external :: ReadCheck
-character(100),external :: lcase,GetToken
+character(100),external :: lcase
 !------------------------
 ! Explicit interfaces
 !------------------------
+interface
+   subroutine ReadRiga(ninp,ainp,io_err,comment_sym,lines_treated)
+      implicit none
+      integer(4),intent(in) :: ninp
+      character(*),intent(inout) :: ainp
+      integer(4),intent(out) :: io_err
+      character(1),intent(in),optional :: comment_sym
+      integer(4),intent(inout),optional :: lines_treated
+   end subroutine ReadRiga
+   character(100) function GetToken(itok,ainp,io_err)
+      implicit none
+      integer(4),intent(in) :: itok
+      character(*),intent(in) :: ainp
+      integer(4),intent(out) :: io_err
+   end function GetToken
+end interface
 !------------------------
 ! Allocations
 !------------------------
@@ -57,16 +73,16 @@ character(100),external :: lcase,GetToken
 ! file, even for restarted simulations.
 if (restart) then
    do while (trim(lcase(ainp))/="##### end domain #####")
-      call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+      call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
       if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"DOMAIN DATA",ninp,ulog))       &
          return
    enddo
    return
 endif
-call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
 if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"DOMAIN DATA",ninp,ulog)) return
 do while (trim(lcase(ainp))/="##### end domain #####")
-   token = lcase(GetToken(ainp,1,ioerr))
+   token = lcase(GetToken(1,ainp,ioerr))
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"DOMAIN TYPE",ninp,ulog)) return 
    select case (token(1:4))
       case ("bsph","semi") 
@@ -79,19 +95,19 @@ do while (trim(lcase(ainp))/="##### end domain #####")
          ier = 3
          return
    endselect
-   call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+   call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
    if (ioerr==0) read(ainp,*,iostat=ioerr) dx,trunc
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"dx, h/dx",ninp,ulog)) return
    Domain%dx = dx
    input_any_t%trunc = trunc
-   token = lcase(GetToken(ainp,3,ioerr))
+   token = lcase(GetToken(3,ainp,ioerr))
    if (token(1:1)=='r') then
       Domain%RandomPos = 'r'
       else
          Domain%RandomPos = 'n'
    endif
 #ifdef SPACE_3D
-   call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+   call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
    if (ioerr==0) read(ainp,*,iostat=ioerr) CLC_flag
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"CLC_flag",ninp,ulog))    &
       return
@@ -105,7 +121,7 @@ do while (trim(lcase(ainp))/="##### end domain #####")
 #endif
       write(ulog,"(1x,a)")  " "
    endif
-   call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+   call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"DOMAIN DATA",ninp,ulog)) return
 enddo
 !------------------------

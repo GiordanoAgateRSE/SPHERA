@@ -77,7 +77,7 @@ enddo
 !$omp end parallel do
 ! Loop over body particles to estimate the 2 auxiliary parameters 
 do npi=1,n_body_part
-   if (bp_arr(npi)%area>0.d0) then
+   if (bp_arr(npi)%surface) then
       body_arr(bp_arr(npi)%body)%pmax =                                        &
          max(body_arr(bp_arr(npi)%body)%pmax,bp_arr(npi)%pres)
       if (bp_arr(npi)%normal(3)>0.) then
@@ -94,18 +94,19 @@ enddo
 ! File creation and heading
 write(nomefilectl_Body_dynamics,"(a,a,i8.8,a)") nomecaso(1:len_trim(nomecaso)),&
    '_Body_dynamics_',on_going_time_step,".txt"
-open(ncpt,file=nomefilectl_Body_dynamics,status="unknown",form="formatted")
+open(ubod,file=nomefilectl_Body_dynamics,status="unknown",form="formatted")
 if (on_going_time_step==1) then
    write(ubod,*) "Body dynamics values "
    write(ubod,                                                                &
- '(5(7x,a),3(5x,a),3(9x,a),3(6x,a),(a),3(1x,a),3(8x,a),(9x,a),2(7x,a),(1x,a))')&
+ '(5(7x,a),3(5x,a),3(9x,a),3(6x,a),(a),3(1x,a),3(8x,a),(9x,a),2(7x,a),(1x,a),(4x,a),(6x,a),3(1x,a))')&
       " Time(s)"," Body_ID"," x_CM(m)"," y_CM(m)"," z_CM(m)"," u_CM(m/s)",     &
       " v_CM(m/s)"," w_CM(m/s)"," Fx(N)"," Fy(N)"," Fz(N)"," n_R_IO_x",        &
       " n_R_IO_y"," n_R_IO_z"," teta_R_IO(rad)","omega_x(rad/s)",              &
       "omega_y(rad/s)","omega_z(rad/s)","Mx(N*m)","My(N*m)","Mz(N*m)",         &
-      "pmax(Pa)","pmax_R(Pa)","pmax_L(Pa)","pmax_limit(Pa)"
+      "pmax(Pa)","pmax_R(Pa)","pmax_L(Pa)","pmax_limit(Pa)","volume(m^3)",     &
+      "area(m^2)","int_ndA_x(m^2)","int_ndA_y(m^2)","int_ndA_z(m^2)"
 endif
-flush(ncpt)
+flush(ubod)
 ! Loop over the bodies
 do nbi=1,n_bodies
 ! To compute the the rotation axis n_R_IO and the rotation angle teta_R_IO from 
@@ -114,16 +115,17 @@ do nbi=1,n_bodies
    call vector_rotation_axis_angle(body_arr(nbi)%rel_pos_part1_t0(:),          &
       bp_arr(aux_integer+1)%rel_pos(:),n_R_IO(:),teta_R_IO)
    aux_integer = aux_integer + body_arr(nbi)%npart
-   write(ubod,'(g14.7,1x,i14,1x,23(g14.7,1x))') simulation_time,nbi,          &
+   write(ubod,'(g14.7,1x,i14,1x,28(g14.7,1x))') simulation_time,nbi,           &
       body_arr(nbi)%x_CM(:),body_arr(nbi)%u_CM(:),body_arr(nbi)%Force(:),      &
       n_R_IO(:),teta_R_IO,body_arr(nbi)%omega(:),body_arr(nbi)%Moment(:),      &
-      body_arr(nbi)%pmax,pmax_R(nbi),pmax_L(nbi),body_arr(nbi)%p_max_limiter
+      body_arr(nbi)%pmax,pmax_R(nbi),pmax_L(nbi),body_arr(nbi)%p_max_limiter,  &
+      body_arr(nbi)%volume,body_arr(nbi)%area,body_arr(nbi)%int_ndA(1:3)
 enddo
-close(ncpt)
+close(ubod)
 ! Monitoring the surface body particles
 write(nomefilectl_Body_particles,"(a,a,i8.8,a)")                               &
    nomecaso(1:len_trim(nomecaso)),'_Body_particles_',on_going_time_step,".txt"
-open(ncpt,file=nomefilectl_Body_particles,status="unknown",form="formatted")
+open(ubod,file=nomefilectl_Body_particles,status="unknown",form="formatted")
 if (on_going_time_step==1) then
    write(ubod,*) " Body particle parameters"
    write(ubod,'((7x,a),(3x,a),(7x,a),3(10x,a),3(8x,a),(6x,a),4(1x,a))')       &
@@ -131,7 +133,7 @@ if (on_going_time_step==1) then
       " v(m/s)"," w(m/s)"," p(N/m^2)"," impact_vel_body1(m/s)",                &
       " impact_vel_body2(m/s)"," impact_vel_body3(m/s)"," impact_vel_body4(m/s)"
 endif
-flush(ncpt)
+flush(ubod)
 do nsi=1,n_surf_body_part
    npi=surf_body_part(nsi)
    write(ubod,'(g14.7,1x,2(i14,1x),11(g14.7,1x))') simulation_time,npi,       &

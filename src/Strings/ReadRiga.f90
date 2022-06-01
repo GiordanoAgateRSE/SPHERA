@@ -20,17 +20,27 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: ReadRiga                               
-! Description:                         
+! Description: This program unit reads the first non-commented non-empty line 
+!              of the I/O unit "ninp" and assign it to the character variable 
+!              "ainp". The comment symbol is "comment_sym". The 
+!              "Tab" symbols are replaced with blank spaces. All the symbols 
+!              after a comment symbol (included) are replaced with blank spaces.
+!              The number of lines treated is "lines_treated", which is 
+!              equal to one (the only line read) plus the number of lines 
+!              skipped. The comment symbol and the number of lines treated are 
+!              optional arguments.
 !-------------------------------------------------------------------------------
-subroutine ReadRiga(ainp,comment,nrighe,ier,ninp)
+subroutine ReadRiga(ninp,ainp,io_err,comment_sym,lines_treated)
 !------------------------
 ! Modules
 !------------------------
 implicit none
-integer(4) :: ier,ninp,nrighe
-character(1) :: comment
-character(*) :: ainp
-integer(4) :: ioerr,n,l
+integer(4),intent(in) :: ninp
+character(*),intent(inout) :: ainp
+integer(4),intent(out) :: io_err
+character(1),intent(in),optional :: comment_sym
+integer(4),intent(inout),optional :: lines_treated
+integer(4) :: n,l
 !------------------------
 ! Declarations
 !------------------------
@@ -43,30 +53,33 @@ integer(4) :: ioerr,n,l
 !------------------------
 ! Initializations
 !------------------------
-ioerr = 0
-READ_LOOP: do while (ioerr==0)
-   read(ninp,"(a)",iostat=ioerr) ainp
-   nrighe = nrighe + 1
-   if ((ioerr==0).and.(trim(ainp)/="")) then
-! Replacing tabs with blank spaces 
-      if (ainp(1:1)/=comment ) then
-         do n=1,len(trim(ainp))
-            if (iachar(ainp(n:n))==9) ainp(n:n) = " "
-         enddo
-         l = index(ainp,comment)
-         if (l>0) then
-            do n=l,len(trim(ainp))
-               ainp(n:n)=" "
-            enddo
-         endif
-         exit READ_LOOP 
-      endif
-   endif
-enddo  READ_LOOP
-ier = ioerr
+io_err = 0
 !------------------------
 ! Statements
 !------------------------
+do while (io_err==0)
+   read(ninp,"(a)",iostat=io_err) ainp
+   if (present(lines_treated)) lines_treated = lines_treated + 1
+   if ((io_err==0).and.(trim(ainp)/="")) then
+      if (present(comment_sym)) then
+! Skip a comment line
+         if (ainp(1:1)==comment_sym) cycle
+! Line with a comment after the source-code tokens: all the symbols after a 
+! comment symbol (included) are replaced with blank spaces
+         l = index(ainp,comment_sym)
+         if (l>0) then
+            do n=l,len(trim(ainp))
+               ainp(n:n) = " "
+            enddo
+         endif
+      endif
+! Replacing tabs with blank spaces
+      do n=1,len(trim(ainp))
+         if (iachar(ainp(n:n))==9) ainp(n:n) = " "
+      enddo
+      exit
+   endif
+enddo
 !------------------------
 ! Deallocations
 !------------------------

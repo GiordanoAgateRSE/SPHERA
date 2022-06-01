@@ -19,55 +19,76 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: body_to_smoothing_pres 
-! Description: Contributions of body particles to pressure partial smoothing
-!              (Amicarelli et al., 2015, CAF).    
+! Program unit: allocate_de_Bod_elem_r1
+! Description: Allocation/Deallocation of a generic allocatable array of 
+!              derived type "body_element" and range (number of 
+!              dimensions) 1
 !-------------------------------------------------------------------------------
 #ifdef SOLID_BODIES
-subroutine body_to_smoothing_pres(sompW_vec,AppUnity_vec)
+subroutine allocate_de_Bod_elem_r1(allocation_flag,array,extent_1,array_name,  &
+   ulog_flag)
 !------------------------
 ! Modules
 !------------------------
-use Static_allocation_module
+use I_O_file_module
 use Hybrid_allocation_module
-use Dynamic_allocation_module
 !------------------------
 ! Declarations
 !------------------------
 implicit none
-double precision,dimension(nag),intent(inout) :: sompW_vec,AppUnity_vec
-integer(4) :: npi,j,npartint,npj
-double precision :: W_vol,dis
-double precision, external :: w
+type(body_element),dimension(:),allocatable,intent(inout) :: array
+logical,intent(in) :: allocation_flag,ulog_flag
+integer(4),intent(in),optional :: extent_1
+character(100),intent(in) :: array_name
+integer(4) :: alloc_stat
 !------------------------
 ! Explicit interfaces
 !------------------------
 !------------------------
 ! Allocations
 !------------------------
+if (allocation_flag.eqv..true.) then
+   if(.not.allocated(array)) then
+      allocate(array(extent_1),STAT=alloc_stat)
+      if (alloc_stat/=0) then
+         write(uerr,*) "Allocation of ",trim(adjustl(array_name)),             &
+            " failed; the execution stops here."
+         stop
+         else
+            if (ulog_flag.eqv..true.) then
+!$omp critical (omp_Memory_I_O_ulog)
+               write(ulog,*) "Allocation of ",trim(adjustl(array_name)),       &
+                  " completed."
+!$omp end critical (omp_Memory_I_O_ulog)
+            endif
+      endif
+   endif
 !------------------------
 ! Initializations
 !------------------------
 !------------------------
 ! Statements
 !------------------------
-! Loop over body particles (neighbours: fluid particles)
-do npi=1,n_body_part
-! Loop over the neighbouring fluid particles 
-   do j=1,nPartIntorno_bp_f(npi)
-      npartint = (npi - 1) * NMAXPARTJ + j
-      npj = PartIntorno_bp_f(npartint)
-      dis = dsqrt(dot_product(rag_bp_f(:,npartint),rag_bp_f(:,npartint)))
-      W_vol = w(dis,Domain%h,Domain%coefke) * ((Domain%dx / dx_dxbodies) **    &
-              ncord)
-      AppUnity_vec(npj) = AppUnity_vec(npj) + W_vol
-      sompW_vec(npj) = sompW_vec(npj) + (bp_arr(npi)%pres - pg(npj)%pres) *    &
-                       W_vol
-   enddo
-enddo
 !------------------------
 ! Deallocations
 !------------------------
+   else
+      if(allocated(array)) then
+         deallocate(array,STAT=alloc_stat)
+         if (alloc_stat/=0) then
+            write(uerr,*) "Deallocation of ",trim(adjustl(array_name)),        &
+               " failed; the execution stops here."
+            stop
+            else
+               if (ulog_flag.eqv..true.) then
+!$omp critical (omp_Memory_I_O_ulog)
+                  write(ulog,*) "Deallocation of ",trim(adjustl(array_name)),  &
+                     " completed."
+!$omp end critical (omp_Memory_I_O_ulog)
+               endif
+         endif
+      endif
+endif
 return
-end subroutine body_to_smoothing_pres
+end subroutine allocate_de_Bod_elem_r1
 #endif

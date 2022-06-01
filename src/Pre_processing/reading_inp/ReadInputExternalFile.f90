@@ -48,10 +48,20 @@ logical :: OnlyTriangle
 #endif
 integer(4) :: ioerr
 logical,external :: ReadCheck
-character(100),external :: lcase,GetToken
+character(100),external :: lcase
 !------------------------
 ! Explicit interfaces
 !------------------------
+interface
+   subroutine ReadRiga(ninp,ainp,io_err,comment_sym,lines_treated)
+      implicit none
+      integer(4),intent(in) :: ninp
+      character(*),intent(inout) :: ainp
+      integer(4),intent(out) :: io_err
+      character(1),intent(in),optional :: comment_sym
+      integer(4),intent(inout),optional :: lines_treated
+   end subroutine ReadRiga
+end interface
 !------------------------
 ! Allocations
 !------------------------
@@ -61,7 +71,7 @@ character(100),external :: lcase,GetToken
 !------------------------
 ! Statements
 !------------------------
-call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
 if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"GEOMETRY FILE",ninp,ulog)) return
 #ifdef SPACE_3D
 OnlyTriangle = .true.
@@ -77,7 +87,7 @@ do while (trim(lcase(ainp))/="##### end geometry file #####")
       endif
    endif
 ! To read the first line of the file
-   call ReadRiga(ainp,comment,nrighe,ioerr,ninp2)
+   call ReadRiga(ninp2,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"GEOMETRY FILE",ninp2,ulog)) return
    SECTION_LOOP: do while (ioerr==0)
       select case (trim(lcase(trim(ainp))))
@@ -95,7 +105,7 @@ do while (trim(lcase(ainp))/="##### end geometry file #####")
 #endif
          case default
       endselect
-      call ReadRiga(ainp,comment,nrighe,ioerr,ninp2)
+      call ReadRiga(ninp2,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
 ! In case of EOF, then it exits, otherwise it checks the error 
       if (ioerr==-1) cycle SECTION_LOOP
       if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"GEOMETRY FILE",ninp,ulog))     &
@@ -105,7 +115,7 @@ do while (trim(lcase(ainp))/="##### end geometry file #####")
    if (ulog>0) then
       write(ulog,"(1x,3a)") "End Reading Geometry File"
    endif
-   call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+   call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"GEOMETRY FILE",ninp,ulog)) return
 enddo
 !------------------------

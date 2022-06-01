@@ -29,7 +29,7 @@ subroutine CLC_pre_processing
 !------------------------
 use I_O_file_module
 use Hybrid_allocation_module
-use Static_allocation_module                            
+use Static_allocation_module
 use Dynamic_allocation_module
 use Memory_I_O_interface_module
 !------------------------
@@ -120,6 +120,7 @@ call allocate_de_CLCp_r1(.true.,CLC%polygons,CLC%n_polygons,array_name,        &
 call system("ls input/20_CLC/CLC*.txt > CLC_txt_test.txt")
 file_name = "CLC_txt_test.txt"
 call open_close_file(.true.,max_file_unit_booked+1,file_name)
+! "a13" is the substring associated with the file path
 read(max_file_unit_booked+1,'(a13,a)',iostat=io_stat) aux_char,aux_char_2
 if (.not.ReadCheck(io_stat,ier,1,file_name,file_name,                          &
    max_file_unit_booked+1,ulog)) then

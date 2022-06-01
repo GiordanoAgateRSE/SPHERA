@@ -49,11 +49,21 @@ integer(4) :: ioerr,nrighe,ioutpo2,iplot_fr,imemo_fr,irest_fr,icpoi_fr,ipllb_fr
 integer(4) :: ipllb_md,ioutopt
 double precision :: plot_fr,memo_fr,rest_fr,cpoi_fr,pllb_fr
 character(1) :: comment = "!"
-character(100),external :: lcase,GetToken
+character(100),external :: lcase
 logical,external :: ReadCheck
 !------------------------
 ! Explicit interfaces
 !------------------------
+interface
+   subroutine ReadRiga(ninp,ainp,io_err,comment_sym,lines_treated)
+      implicit none
+      integer(4),intent(in) :: ninp
+      character(*),intent(inout) :: ainp
+      integer(4),intent(out) :: io_err
+      character(1),intent(in),optional :: comment_sym
+      integer(4),intent(inout),optional :: lines_treated
+   end subroutine ReadRiga
+end interface
 !------------------------
 ! Allocations
 !------------------------
@@ -87,7 +97,7 @@ current_version = .true.
 !------------------------
 ! Statements
 !------------------------
-call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
 if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"INPUT VERSION",ninp,ulog)) return
 if (trim(ainp)/=trim(version)) then
    ier = 2
@@ -96,7 +106,7 @@ if (trim(ainp)/=trim(version)) then
 endif
 ! Loop over "input sections" 
 SECTION_LOOP: do while (ioerr==0)
-   call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+   call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
 ! If EOF is reached, then exit, otherwise to check the error code
    if (ioerr==-1) cycle SECTION_LOOP
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"INPUT FILE SECTIONS",ninp,ulog))  &

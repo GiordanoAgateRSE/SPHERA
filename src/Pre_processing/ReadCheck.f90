@@ -19,8 +19,8 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: ReadCheck                    
-! Description:                   
+! Program unit: ReadCheck
+! Description: Check on a generic reading (oldest checks)             
 !-------------------------------------------------------------------------------
 logical function ReadCheck(IoErr,Ier,Nrighe,ainp,listadati,ninp,ulog)
 !------------------------

@@ -41,10 +41,26 @@ logical :: restartOK
 integer(4) :: ioerr,i_tok
 character(100) :: token,file_name
 logical,external :: ReadCheck
-character(100),external :: lcase,GetToken
+character(100),external :: lcase
 !------------------------
 ! Explicit interfaces
 !------------------------
+interface
+   subroutine ReadRiga(ninp,ainp,io_err,comment_sym,lines_treated)
+      implicit none
+      integer(4),intent(in) :: ninp
+      character(*),intent(inout) :: ainp
+      integer(4),intent(out) :: io_err
+      character(1),intent(in),optional :: comment_sym
+      integer(4),intent(inout),optional :: lines_treated
+   end subroutine ReadRiga
+   character(100) function GetToken(itok,ainp,io_err)
+      implicit none
+      integer(4),intent(in) :: itok
+      character(*),intent(in) :: ainp
+      integer(4),intent(out) :: io_err
+   end function GetToken
+end interface
 !------------------------
 ! Allocations
 !------------------------
@@ -54,15 +70,15 @@ character(100),external :: lcase,GetToken
 !------------------------
 ! Statements
 !------------------------
-call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
 if (.not.ReadCheck (ioerr,ier,nrighe,ainp,"RESTART DATA",ninp,ulog)) return
 do while (trim(lcase(ainp))/="##### end restart #####")
-   select case (trim(lcase(GetToken(ainp,1,ioerr))))
+   select case (trim(lcase(GetToken(1,ainp,ioerr))))
       case ("step")
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+         call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"RESTART STEP ",ninp,ulog))  &
             return
-         token = lcase(GetToken(ainp,1,ioerr))
+         token = lcase(GetToken(1,ainp,ioerr))
          read(token,*,iostat=ioerr) Domain%istart
          if (.not.ReadCheck (ioerr,ier,nrighe,ainp,"Restart step",             &
             ninp,ulog)) return
@@ -77,10 +93,10 @@ do while (trim(lcase(ainp))/="##### end restart #####")
             endif
          endif
       case ("time")
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+         call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"RESTART TIME ",ninp,ulog))  &
             return
-         token = lcase(GetToken(ainp,1,ioerr))
+         token = lcase(GetToken(1,ainp,ioerr))
          read(token,*,iostat=ioerr) Domain%start
          if (.not.ReadCheck (ioerr,ier,nrighe,ainp,"Restart time ",ninp,ulog)) &
             return
@@ -96,10 +112,10 @@ do while (trim(lcase(ainp))/="##### end restart #####")
             endif
          endif
       case ("last_time")
-         call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+         call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"RESTART PATH ",ninp,ulog))  &
             return
-         token = GetToken(ainp,1,ioerr)
+         token = GetToken(1,ainp,ioerr)
          read(token,*,iostat=ioerr) input_any_t%restart_path
          if (.not.ReadCheck (ioerr,ier,nrighe,ainp,"Restart path ",ninp,ulog)) &
             return
@@ -149,7 +165,7 @@ do while (trim(lcase(ainp))/="##### end restart #####")
             endif
          endif
    endselect
-   call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+   call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"RESTART DATA",ninp,ulog)) return
 enddo
 !------------------------

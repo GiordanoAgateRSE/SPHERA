@@ -286,6 +286,14 @@ Partz(i_zone)%plan_reservoir_points,Partz(i_zone)%ID_first_vertex_sel,         &
                ulog)) return
          endif
       endif
+#ifdef SOLID_BODIES
+! Time independent information on solid bodies
+      if (n_bodies>0) then
+         read(nsav,iostat=ioerr) n_bodies_CAE,n_body_part_CAE
+         if (.not.ReadCheck(ioerr,ier,it_start,ainp,                           &
+            "n_bodies_CAE,n_body_part_CAE",nsav,ulog)) return
+      endif
+#endif
 ! Allocation of the array of the maximum water depth
       call main_wall_info(n_vertices_main_wall)
       write(ulog,'(a,i9)') 'The vertices of the main wall are ',               &
@@ -473,15 +481,17 @@ Partz(i_zone)%plan_reservoir_points,Partz(i_zone)%ID_first_vertex_sel,         &
                      endif
 #ifdef SOLID_BODIES
                         do ib=1,n_bodies
-                           read(nsav,iostat=ioerr) body_arr(ib)%npart,         &
+                           read(nsav,iostat=ioerr) body_arr(ib)%CAE,           &
+                              body_arr(ib)%npart,                              &
                               body_arr(ib)%Ic_imposed,                         &
                               body_arr(ib)%imposed_kinematics,                 &
-                              body_arr(ib)%n_records,body_arr%mass,            &
+                              body_arr(ib)%n_records,body_arr(ib)%mass,        &
+                              body_arr(ib)%volume,                             &
                               body_arr(ib)%umax,body_arr(ib)%pmax,             &
                               body_arr(ib)%x_CM(1:3),body_arr(ib)%alfa(1:3),   &
                               body_arr(ib)%u_CM(1:3),body_arr(ib)%omega(1:3),  &
                               body_arr(ib)%Force(1:3),body_arr(ib)%Moment(1:3),&
-                              body_arr(ib)%Ic(1:3,1:3),                         &
+                              body_arr(ib)%Ic(1:3,1:3),                        &
                               body_arr(ib)%Ic_inv(1:3,1:3)
                            if (.not.ReadCheck(ioerr,ier,it_start,ainp,         &
                               "body_arr_1_of_2",nsav,ulog)) return                              
@@ -710,10 +720,12 @@ body_arr(ib)%body_kinematics(1:body_arr(ib)%n_records,1:7)
                         endif
 #ifdef SOLID_BODIES
                            do ib=1,n_bodies
-                              read(nsav,iostat=ioerr) body_arr(ib)%npart,      &
+                              read(nsav,iostat=ioerr) body_arr(ib)%CAE,        &
+                                 body_arr(ib)%npart,                           &
                                  body_arr(ib)%Ic_imposed,                      &
                                  body_arr(ib)%imposed_kinematics,              &
-                                 body_arr(ib)%n_records,body_arr%mass,         &
+                                 body_arr(ib)%n_records,body_arr(ib)%mass,     &
+                                 body_arr(ib)%volume,                          &
                                  body_arr(ib)%umax,body_arr(ib)%pmax,          &
                                  body_arr(ib)%x_CM(1:3),body_arr(ib)%alfa(1:3),&
                                  body_arr(ib)%u_CM(1:3),                       &

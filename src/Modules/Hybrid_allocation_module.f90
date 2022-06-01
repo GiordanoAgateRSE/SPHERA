@@ -372,7 +372,7 @@ type body_element
    double precision :: teta_R_IO
 ! Element (parallelepiped) dimensions (Lx,Ly,Lz)
    double precision :: L_geom(3)
-! Body particle spacing
+! Body particle spacing (only for IC of handmade solid bodies)
    double precision :: dx(3)
 ! Position of the centre of mass
    double precision :: x_CM(3)
@@ -386,6 +386,8 @@ end type body_element
 
 ! Rigid solid body
 type body
+! A solid body can be CAE-made or handmade
+   logical :: CAE
 ! Number of body particles
    integer(4) :: npart
 ! Flag to impose Ic in input
@@ -396,9 +398,13 @@ type body
    integer(4) :: imposed_kinematics
 ! Number of records for imposed body kinematics      
    integer(4) :: n_records
+! Area of the external surface (used just for check)
+   double precision :: area
 ! Mass
    double precision :: mass
-! Maximum among the absolute values of the particle velocities
+! Volume
+   double precision :: volume   
+! Maximum among the absolute values of the body-particle velocities
    double precision :: umax
 ! Maximum value of pressure
    double precision :: pmax
@@ -425,6 +431,8 @@ type body
 ! Relative position of the first particle of the body at the beginning of the 
 ! simulation
    double precision :: rel_pos_part1_t0(3)
+! Integral of the normal over the external body surface (used just for check)
+   double precision :: int_ndA(3)
 ! Moment of inertia
    double precision :: Ic(3,3)
 ! Inverse of the moment of inertia
@@ -432,11 +440,13 @@ type body
 ! Array for the imposed body kinematics (n_records*7) 
    double precision,dimension(:,:),allocatable :: body_kinematics 
 ! Array of the elements of the body 
-   type(body_element),dimension(:),allocatable :: elem            
+   type(body_element),dimension(:),allocatable :: elem
 end type body
 
 ! Body particle
 type body_particle
+! Flag to detect surface body particles
+   logical :: surface
 ! Body ID
    integer(4) :: body
 ! Cell ID
@@ -445,6 +455,8 @@ type body_particle
    double precision :: pres
 ! Mass
    double precision :: mass
+! Volume ("inner area" in 2D)
+   double precision :: volume
 ! Area (length in 2D) for surface body particles
    double precision :: area
 ! Relative position (with respect to the body barycentre)
@@ -863,7 +875,7 @@ type DBSPH_surf_mesh_der_type
 ! ID of the surface mesh file
    integer(4),allocatable,dimension(:) :: surface_mesh_file_ID
 ! List of vertices of the surface mesh
-   type(vertex_der_type),allocatable,dimension(:) :: vertices  
+   type(vertex_der_type),allocatable,dimension(:) :: vertices
 ! List of faces (both 3D and 2D)
    type(face_der_type),allocatable,dimension(:) :: faces                    
 end type 
@@ -950,6 +962,41 @@ type CLC_der_type
 ! 2D field of z0 as function of the CLC class
    double precision,dimension(:,:),allocatable :: z0
 end type
+
+#ifdef SOLID_BODIES
+! Derived type for the ".vtu" cells
+type vtu_cell_der_type
+! Element type (".vtu" "types")
+   integer(4),dimension(:),allocatable :: type_
+! Flag for surface faces vs. inner ".vtu" faces
+! Face 1: points 1-2-3 (anti-clock-wise order, seen from outside the fluid)
+! Face 2: points 4-2-1 (anti-clock-wise order, seen from outside the fluid)
+! Face 3: points 1-3-4 (anti-clock-wise order, seen from outside the fluid)
+! Face 4: points 4-3-2 (anti-clock-wise order, seen from outside the fluid)
+! surface(1:n_vtu_cells,1:4)
+   logical,allocatable,dimension(:,:) :: surface
+! IDs of the points/nodes of the element (".vtu" "connectivity")
+! points_IDs(1:n_vtu_cells,1:4)
+   integer(4),dimension(:,:),allocatable :: points_IDs
+end type vtu_cell_der_type
+
+! Derived type for the ".vtu" points
+type vtu_point_der_type
+! Flag for surface vs. inner ".vtu" points
+   logical,allocatable,dimension(:) :: surface
+! Positions of the ".vtu" points
+! vertex(1:n_vtu_points)%pos(1:3)
+   type(vertex_der_type),allocatable,dimension(:) :: vertex
+end type vtu_point_der_type
+
+! Derived type for a ".vtu" grid
+type vtu_grid_der_type
+! ".vtu" cells
+   type (vtu_cell_der_type) :: cells
+! ".vtu" points
+   type (vtu_point_der_type) :: points
+end type vtu_grid_der_type
+#endif
 #endif
 
 ! Derived type declarations
@@ -965,5 +1012,7 @@ type(CLC_der_type) :: CLC
 #endif
 type(TyGranular_flows_options) :: Granular_flows_options
 type(DBSPH_der_type) :: DBSPH
-
+#if (defined SOLID_BODIES) && (defined SPACE_3D)
+type(vtu_grid_der_type),dimension(:),allocatable :: vtu_grids
+#endif
 end module Hybrid_allocation_module

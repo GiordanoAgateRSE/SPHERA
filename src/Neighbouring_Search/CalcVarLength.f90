@@ -752,7 +752,7 @@ endif
       aux2 = 0
       do while (ibp<npi) 
          ibp = ibp + 1
-         if (bp_arr(ibp)%area>1.d-15) aux2 = aux2 + 1
+         if (bp_arr(ibp)%surface) aux2 = aux2 + 1
       enddo
       nceli = bp_arr(npi)%cell
       if (nceli==0) cycle
@@ -806,14 +806,14 @@ endif
                   gradmodwacl = - 12.d0 - 3.d0 * rij_su_h_quad + 12.d0 *       &
                                 rij_su_h 
                   gradmodwacl = gradmodwacl * kacl_coef
-                  KerDer_bp_f_Gal(npartint) = gradmodwacl * denom 
+                  KerDer_bp_f_Gal(npartint) = gradmodwacl * denom
                enddo loop_bp_f
 ! End Loop over the neighbouring body particles in the cell
 ! Loop over the neighbouring body particles in the cell
                loop_bp: do bp=Icont_bp(ncelj),Icont_bp(ncelj+1)-1
                   npj = NPartOrd_bp(bp)
 ! Only neighbours belonging to a surface of another body
-                  if ((bp_arr(npi)%area>1.d-15).and.(bp_arr(npj)%area>1.d-15)  &
+                  if ((bp_arr(npi)%surface).and.(bp_arr(npj)%surface)          &
                      .and.(bp_arr(npi)%body/=bp_arr(npj)%body)) then
 ! Relative positions and distances
                      ragtemp(1:3) = bp_arr(npi)%pos(1:3) - bp_arr(npj)%pos(1:3)  

@@ -45,10 +45,26 @@ integer(4) :: n,i,ioerr,i1,index,numv,numv_line,ipointer
 character(5) :: txt
 character(100) :: token
 logical,external :: ReadCheck
-character(100),external :: lcase,GetToken
+character(100),external :: lcase
 !------------------------
 ! Explicit interfaces
 !------------------------
+interface
+   subroutine ReadRiga(ninp,ainp,io_err,comment_sym,lines_treated)
+      implicit none
+      integer(4),intent(in) :: ninp
+      character(*),intent(inout) :: ainp
+      integer(4),intent(out) :: io_err
+      character(1),intent(in),optional :: comment_sym
+      integer(4),intent(inout),optional :: lines_treated
+   end subroutine ReadRiga
+   character(100) function GetToken(itok,ainp,io_err)
+      implicit none
+      integer(4),intent(in) :: itok
+      character(*),intent(in) :: ainp
+      integer(4),intent(out) :: io_err
+   end function GetToken
+end interface
 !------------------------
 ! Allocations
 !------------------------
@@ -58,7 +74,7 @@ character(100),external :: lcase,GetToken
 !------------------------
 ! Statements
 !------------------------
-call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
 if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"LINES DATA",ninp,ulog)) return
 do while (trim(lcase(ainp))/="##### end lines #####")
    select case (trim(Domain%tipo))
@@ -67,19 +83,20 @@ do while (trim(lcase(ainp))/="##### end lines #####")
          numv = 0
 ! Reading the line index  
          numv_line = 1
-         token = GetToken(ainp,numv_line,ioerr)
+         token = GetToken(numv_line,ainp,ioerr)
          if (ioerr==0) read(token,*,iostat=ioerr) index
 ! "NumTratti"
          NumberEntities(8) = max(NumberEntities(8),index)  
          VERTEX_LOOP: do while (ioerr==0)
             numv_line = numv_line + 1
-            token = GetToken(ainp,numv_line,ioerr)
+            token = GetToken(numv_line,ainp,ioerr)
 ! It exits when either it finds a comment beginning, or the EOR 
 ! (no more data on the input line)
             if ((ioerr/=0).or.(trim(token)=="").or.(ichar(trim(token(1:1)))==9)&
                .or.(token(1:1)=="!")) exit VERTEX_LOOP
             if ((token(1:1)=="&").or.(token(1:1)==">")) then
-               call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+               call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,              &
+                  lines_treated=nrighe)
                if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                       &
                   "VERTICES LIST (continue...)",ninp,ulog)) return
                numv_line = 0
@@ -113,7 +130,7 @@ do while (trim(lcase(ainp))/="##### end lines #####")
          ier = 2
          return
    endselect
-   call ReadRiga(ainp,comment,nrighe,ioerr,ninp)
+   call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"LINES DATA",ninp,ulog)) return
 enddo
 if ((input_second_read.eqv..true.).and.(ulog>0)) then

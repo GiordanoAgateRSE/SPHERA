@@ -19,64 +19,75 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: ReadInputTitle                             
-! Description:                        
+! Program unit: allocate_de_vtu_grid_r1
+! Description: Allocation/Deallocation of a generic allocatable array of type 
+!              "vtu_grid_derived_type" and range (number of dimensions) 1
 !-------------------------------------------------------------------------------
-subroutine ReadInputTitle(ainp,comment,nrighe,ier,ninp,ulog)
+#if (defined SPACE_3D) && (defined SOLID_BODIES)
+subroutine allocate_de_vtu_grid_r1(allocation_flag,array,extent_1,array_name,  &
+   ulog_flag)
 !------------------------
 ! Modules
 !------------------------
-use Static_allocation_module
+use I_O_file_module
 use Hybrid_allocation_module
 !------------------------
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: nrighe,ier,ninp,ulog
-character(1) :: comment
-character(len=lencard) :: ainp
-integer(4) :: n,ioerr
-character(100),external :: lcase
-logical,external :: ReadCheck
+type (vtu_grid_der_type),dimension(:),allocatable,intent(inout) :: array
+logical,intent(in) :: allocation_flag,ulog_flag
+integer(4),intent(in),optional :: extent_1
+character(100),intent(in) :: array_name
+integer(4) :: alloc_stat
 !------------------------
 ! Explicit interfaces
 !------------------------
-interface
-   subroutine ReadRiga(ninp,ainp,io_err,comment_sym,lines_treated)
-      implicit none
-      integer(4),intent(in) :: ninp
-      character(*),intent(inout) :: ainp
-      integer(4),intent(out) :: io_err
-      character(1),intent(in),optional :: comment_sym
-      integer(4),intent(inout),optional :: lines_treated
-   end subroutine ReadRiga
-end interface
 !------------------------
 ! Allocations
 !------------------------
+if (allocation_flag.eqv..true.) then
+   if(.not.allocated(array)) then
+      allocate(array(extent_1),STAT=alloc_stat)
+      if (alloc_stat/=0) then
+         write(uerr,*) "Allocation of ",trim(adjustl(array_name)),             &
+            " failed; the execution stops here."
+         stop
+         else
+            if (ulog_flag.eqv..true.) then
+!$omp critical (omp_Memory_I_O_ulog)
+               write(ulog,*) "Allocation of ",trim(adjustl(array_name)),       &
+                  " completed."
+!$omp end critical (omp_Memory_I_O_ulog)
+            endif
+      endif
+   endif
 !------------------------
 ! Initializations
 !------------------------
 !------------------------
 ! Statements
 !------------------------
-call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
-if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"TITLE DATA",ninp,ulog)) return 
-n = 0
-do while (trim(lcase(ainp))/="##### end title #####" )
-   n = n + 1
-   if (n<=maxtit) then
-      title(n) = ainp
-      if ((input_second_read.eqv..true.).and.(ulog>0)) then
-         write(ulog,"(1x,a)") title(n)
-      endif
-   endif
-   call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
-   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"TITLE DATA",ninp,ulog)) return 
-enddo
-if ((input_second_read.eqv..true.).and.(ulog>0)) write(ulog,"(1x,a)") " "
 !------------------------
 ! Deallocations
 !------------------------
+   else
+      if(allocated(array)) then
+         deallocate(array,STAT=alloc_stat)
+         if (alloc_stat/=0) then
+            write(uerr,*) "Deallocation of ",trim(adjustl(array_name)),        &
+               " failed; the execution stops here."
+            stop
+            else
+               if (ulog_flag.eqv..true.) then
+!$omp critical (omp_Memory_I_O_ulog)
+                  write(ulog,*) "Deallocation of ",trim(adjustl(array_name)),  &
+                     " completed."
+!$omp end critical (omp_Memory_I_O_ulog)
+               endif
+         endif
+      endif
+endif
 return
-end subroutine ReadInputTitle
+end subroutine allocate_de_vtu_grid_r1
+#endif

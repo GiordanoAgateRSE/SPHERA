@@ -29,6 +29,10 @@ integer(4) :: uerr = 0
 integer(4) :: ninp = 11
 ! Log unit
 integer(4) :: ulog = 12
+#if (defined SOLID_BODIES) && (defined SPACE_3D)
+! ".vtu" file
+integer(4) :: uvtu = 13
+#endif
 ! Time-dependent restart file to write
 integer(4) :: nres = 21
 ! Time-dependent restart file to read

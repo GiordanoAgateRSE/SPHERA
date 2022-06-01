@@ -19,12 +19,12 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: body_to_smoothing_vel 
-! Description: Contributions of body particles to velocity partial smoothing
+! Program unit: body_to_smoothing_pres 
+! Description: Contributions of body particles to pressure partial smoothing
 !              (Amicarelli et al., 2015, CAF).    
 !-------------------------------------------------------------------------------
 #ifdef SOLID_BODIES
-subroutine body_to_smoothing_vel(dervel_mat)
+subroutine body_to_smoothing_pres(sompW_vec,AppUnity_vec)
 !------------------------
 ! Modules
 !------------------------
@@ -35,7 +35,7 @@ use Dynamic_allocation_module
 ! Declarations
 !------------------------
 implicit none
-double precision,dimension(nag,3),intent(inout) :: dervel_mat
+double precision,dimension(nag),intent(inout) :: sompW_vec,AppUnity_vec
 integer(4) :: npi,j,npartint,npj
 double precision :: W_vol,dis
 double precision, external :: w
@@ -55,18 +55,18 @@ double precision, external :: w
 do npi=1,n_body_part
 ! Loop over the neighbouring fluid particles 
    do j=1,nPartIntorno_bp_f(npi)
-       npartint = (npi - 1) * NMAXPARTJ + j
-       npj = PartIntorno_bp_f(npartint)
-       dis = dsqrt(dot_product(rag_bp_f(:,npartint),rag_bp_f(:,npartint)))
-       W_vol = w(dis,Domain%h,Domain%coefke) * ((Domain%dx / dx_dxbodies) **   &
-               ncord)
-       dervel_mat(npj,:) = dervel_mat(npj,:) +                                 &
-                           (bp_arr(npi)%vel_mir(:)-pg(npj)%vel(:)) * W_vol
+      npartint = (npi - 1) * NMAXPARTJ + j
+      npj = PartIntorno_bp_f(npartint)
+      dis = dsqrt(dot_product(rag_bp_f(:,npartint),rag_bp_f(:,npartint)))
+      W_vol = w(dis,Domain%h,Domain%coefke) * bp_arr(npi)%volume
+      AppUnity_vec(npj) = AppUnity_vec(npj) + W_vol
+      sompW_vec(npj) = sompW_vec(npj) + (bp_arr(npi)%pres - pg(npj)%pres) *    &
+                       W_vol
    enddo
 enddo
 !------------------------
 ! Deallocations
 !------------------------
 return
-end subroutine body_to_smoothing_vel
+end subroutine body_to_smoothing_pres
 #endif
