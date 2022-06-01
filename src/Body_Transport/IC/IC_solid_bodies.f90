@@ -117,7 +117,7 @@ do ib=1,n_bodies
    body_arr(ib)%volume = 0.d0
    body_arr(ib)%area = 0.d0
    body_arr(ib)%int_ndA(1:3) = 0.d0
-   body_arr(ib)%alfa = 0.d0
+   body_arr(ib)%alfa(1:3) = 0.d0
    body_arr(ib)%Force(1:3) = 0.d0
    body_arr(ib)%Moment(1:3) = 0.d0
 enddo

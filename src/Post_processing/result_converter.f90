@@ -754,7 +754,7 @@ if (nag>0) then
          k1 = i
          k2 = k1 + 23
          if (k2>numpoints) k2 = numpoints
-         write(unitvtk,'(8x,24(1x,i6))') (finger(k),k=k1,k2)
+         write(unitvtk,'(8x,24(1x,i8))') (finger(k),k=k1,k2)
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
       write(unitvtk,'(a)') '    </PointData>'
@@ -917,7 +917,7 @@ if (nag>0) then
          k1 = i
          k2 = k1 + 23
          if (k2>numpoints) k2 = numpoints
-         write(unitvtk,'(8x,24(1x,i6))') (finger(k),k=k1,k2)
+         write(unitvtk,'(8x,24(1x,i8))') (finger(k),k=k1,k2)
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
 ! Body ID  
