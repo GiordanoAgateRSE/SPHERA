@@ -20,9 +20,10 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: SubCalcPreIdro      
-! Description: Hydrostatic pressure profiles (in case they are imposed as 
-!              initial conditions). It is formally correct only in case of 
-!              maximum 2 media along the vertical.            
+! Description: To initialize pressure and density fields. Hydrostatic pressure 
+!              profiles or unifrom pressure as initial conditions. Hydrostatic 
+!              profiles are formally correct only in the presence of maximum 2 
+!              fluid media along the vertical.            
 !-------------------------------------------------------------------------------
 subroutine SubCalcPreIdro
 !------------------------

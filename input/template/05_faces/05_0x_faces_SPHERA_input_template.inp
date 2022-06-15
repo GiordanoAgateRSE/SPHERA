@@ -60,8 +60,8 @@
 !    no rule about the vertex order (better clockwise to keep coherence with 
 !    SA-SPH walls).
 ![?] Faces can only be triangles or rectangles (generic quadrilaterals are not 
-!    permitted), but only "perimeter" faces can also be generic quadrilaterals 
-!    (not only rectangles), pentagons and hexagons.
+!    permitted). As an exception, "perimeter" faces can also be planar 
+!    (i.e., non-skew) quadrilaterals, planar pentagons and planar hexagons.
 ![?] No gaps on face IDs are permitted
 ![?] <face_1_vertex_1>,...,<face_1_vertex_6>,<face_1_zone_ID>: first face 
 !    data. The value "-1" is mandatory for meaningless vertex IDs (e.g., 5th 

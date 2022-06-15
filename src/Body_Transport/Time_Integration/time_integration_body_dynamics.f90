@@ -87,7 +87,7 @@ do i=1,n_bodies
       domega_dt(3) = dot_product(body_arr(i)%Ic_inv(3,:),vec2_temp)
       body_arr(i)%omega(:) = body_arr(i)%omega(:) + domega_dt(:) * dtvel
 #ifdef SPACE_2D
-         body_arr(i)%x_CM(2) = zero 
+         body_arr(i)%x_CM(2) = zero
          body_arr(i)%u_CM(2) = zero
          body_arr(i)%omega(1) = zero
          body_arr(i)%omega(3) = zero

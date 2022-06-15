@@ -23,7 +23,7 @@
 ! Description:  To define the directional cosines of the local reference system 
 !               (Di Monaco et al., 2011, EACFM). Further modifications take into
 !               account pentagon and hexagon faces (only for complex "perimeter"
-!               zones / fluid reseroirs, not for SASPH frontiers).                       
+!               zones / fluid reservoirs, not for SASPH frontiers).                       
 !-------------------------------------------------------------------------------
 #ifdef SPACE_3D
 subroutine DefineLocalSystemVersors(Nf)
