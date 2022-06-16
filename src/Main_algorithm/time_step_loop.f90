@@ -357,12 +357,13 @@ TIME_STEP_DO: do while (it<=input_any_t%itmax)
 #endif
       call start_and_stop(2,12)      
       if (Domain%time_split==0) then   
-! Explicit RK schemes
+! For explicit RK schemes: nothing to do
          call start_and_stop(3,12)
          elseif (Domain%time_split==1) then
+! Leapfrog scheme for the continuity equation
             call Leapfrog_continuity
             call start_and_stop(3,12)
-! Equation of state 
+! Equation of State
             call start_and_stop(2,13)
             call CalcPre
             call start_and_stop(3,13)
