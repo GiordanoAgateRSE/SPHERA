@@ -171,6 +171,7 @@ particle_loop: do npi=1,nag
          endif
    endif
 ! Density
+! This EOS inversion is not exact, even if the errors should be negligible
    pg(npi)%dens = (one + (pg(npi)%pres - Domain%prif) / med(pg(npi)%imed)%eps)*&
                   med(pg(npi)%imed)%den0
    pg(npi)%dden = zero

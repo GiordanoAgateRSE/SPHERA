@@ -20,7 +20,7 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: CalcPre 
-! Description:  Particle pressure estimation      
+! Description: Barotropic linear Equation of State (EoS): pressure estimation      
 !-------------------------------------------------------------------------------
 subroutine CalcPre
 !------------------------
@@ -56,11 +56,9 @@ if (on_going_time_step>0) then
 ! Skip the outgone particles and the particles with velocity type different 
 ! from "std"
       if ((pg(npi)%cella==0).or.(pg(npi)%vel_type/="std")) cycle
-! Update of the particle pressure 
       rhorif = Med(pg(npi)%imed)%den0
       c2 = Med(pg(npi)%imed)%eps / rhorif
-      if ((pg(npi)%dens-rhorif)/=0.d0) pg(npi)%pres = c2 * (pg(npi)%dens -     &
-         rhorif) + Domain%prif
+      pg(npi)%pres = c2 * (pg(npi)%dens - rhorif) + Domain%prif
    enddo
 !$omp end parallel do
 endif

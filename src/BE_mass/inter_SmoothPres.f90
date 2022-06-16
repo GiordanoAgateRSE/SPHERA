@@ -20,7 +20,8 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: inter_SmoothPres
-! Description: To calculate a corrective term for pressure. 
+! Description: Non-recommended alternative version of the pressure partial 
+!              smoothing. This obsolete program unit is never used.
 !-------------------------------------------------------------------------------
 subroutine inter_SmoothPres
 !------------------------

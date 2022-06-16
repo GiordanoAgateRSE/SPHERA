@@ -212,6 +212,7 @@ do ii=1,indarrayFlu
 ! "sour"
    if (pg(npi)%koddens==0) then 
       pg(npi)%pres = pg(npi)%vpres
+! This EOS inversion is not exact, even if the errors should be negligible
       pg(npi)%dens = Med(pg(npi)%imed)%den0 * (one + (pg(npi)%vpres -          &
                      Domain%Prif) / Med(pg(npi)%imed)%eps)
    endif

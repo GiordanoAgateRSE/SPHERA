@@ -39,8 +39,6 @@ use Dynamic_allocation_module
 !------------------------
 implicit none
 double precision, parameter :: MinTotUnit = 0.95d0
-! You may consider "complete" or = "incomplete"
-character(10), parameter :: SmoothingNormalisation = "complete  "          
 integer(4) :: npi,npj,nsp,icbf,Ncbf,ibdt,ibdp,ii,j,npartint
 double precision :: p0i,pi,sompW,pesoj,DiffP,TetaP1,Appunity,IntWdV
 #ifdef SOLID_BODIES
@@ -104,7 +102,8 @@ do ii=1,indarrayFlu
 ! DB-SPH contributions to pressure smoothing
             pg(npi)%vpres = sompW / AppUnity
             else
-! SA-SPH contributions to pressure smoothing
+! SA-SPH contributions to pressure smoothing (it only changes Shepard's 
+! coefficient)
                Ncbf = BoundaryDataPointer(1,npi)
                ibdt = BoundaryDataPointer(3,npi)
                if (Ncbf>0) then
@@ -116,14 +115,9 @@ do ii=1,indarrayFlu
                      endif
                   enddo
                endif
-               if (SmoothingNormalisation=="complete  ") then
-                  if (AppUnity<MinTotUnit) then
-! in case of non-null reference pressure
-                     DiffP = sompW + (p0i - pi) * (one - AppUnity)  
-                     else
-                     DiffP = sompW / AppUnity
-                  endif
-                  elseif (SmoothingNormalisation=="incomplete") then
+               if (AppUnity<MinTotUnit) then
+                  DiffP = sompW + (p0i - pi) * (one - AppUnity)  
+                  else
                      DiffP = sompW / AppUnity
                endif
          endif
@@ -143,6 +137,7 @@ do ii=1,indarrayFlu
 ! Computing TetaP depending on the time step
       TetaP1 = input_any_t%TetaP * Med(pg(npi)%imed)%Celerita * dt / Domain%h
       pg(npi)%pres = pg(npi)%pres + TetaP1 * pg(npi)%vpres
+! This EOS inversion is not exact, even if the errors should be negligible
       pg(npi)%dens = Med(pg(npi)%imed)%den0 * (one + (pg(npi)%pres -           &
                      Domain%Prif) / Med(pg(npi)%imed)%eps)
    endif

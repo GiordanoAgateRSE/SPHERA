@@ -127,6 +127,7 @@ type input_any_time_der_type
    double precision :: pllb_fr 
 ! Output time step for water depth
    double precision :: depth_dt_out
+! Type of pressure partial smoothing
    character(1) :: Psurf
 ! Restart information path (influential only in case of authomatic reading of 
 ! the last restart time)
