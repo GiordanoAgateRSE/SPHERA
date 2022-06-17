@@ -232,7 +232,6 @@ input_any_t%rest_fr = zero
 input_any_t%memo_fr = zero
 input_any_t%cpoi_fr = zero
 input_any_t%pllb_fr = zero
-input_any_t%Psurf = " "
 input_any_t%restart_path = "."
 !------------------------
 ! Statements

@@ -379,15 +379,11 @@ TIME_STEP_DO: do while (it<=input_any_t%itmax)
 ! Partial smoothing for pressure and density update
       if (input_any_t%TetaP>zero) then
          call start_and_stop(2,14)
-         if (input_any_t%Psurf=='s') then
-            call inter_SmoothPres
-            elseif (input_any_t%Psurf=='a') then
 #ifdef SPACE_3D
-                  call PressureSmoothing_3D
+         call PressureSmoothing_3D
 #elif defined SPACE_2D
-                     call PressureSmoothing_2D
+         call PressureSmoothing_2D
 #endif
-         endif
          call start_and_stop(3,14)
       endif
 #ifdef SOLID_BODIES

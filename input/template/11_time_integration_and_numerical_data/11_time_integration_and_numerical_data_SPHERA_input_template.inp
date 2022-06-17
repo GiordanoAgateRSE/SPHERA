@@ -69,8 +69,6 @@
 ![?] <teta_p>, <teta_u>: coefficients for partial smoothing of pressure and 
 !    velocity); their values can be effectively modified at any restart time.
 !    <teta_p>=0.3+-0.1; <teta_u>=0
-![?] <var>; its value can be effectively modified at any restart time.
-!    =A (recommended value)
 ![?] <COEFNMAXPARTI>: max number of fluid particles max0 = COEFNMAXPARTI * 
 !    nag; COEFNMAXPARTI considers that the number of particles inside the 
 !    domain can be higher than the first assessment of the number of SPH 
@@ -93,13 +91,13 @@
 !-------------------------------------------------------------------------------
 ![*] <final_time> <final_time_step>
 ![*] <CFL> <vsc_coeff> <Leapfrog_flag> <scheme_order> <factor> <dt_alfa_Mon>
-![*] <teta_p> <teta_u> <var> 
+![*] <teta_p> <teta_u>
 ![*] <COEFNMAXPARTI> <COEFNMAXPARTJ> <body_part_reorder>
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
 ___ ___
 ___ ___ ___ ___ ___ ___
-___ ___ ___
+___ ___
 ___ ___ ___
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------

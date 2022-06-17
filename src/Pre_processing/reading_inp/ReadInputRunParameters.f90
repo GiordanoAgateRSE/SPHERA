@@ -42,7 +42,6 @@ integer(4) :: ioerr,time_split,RKscheme,body_part_reorder
 integer(4) :: MAXCLOSEBOUNDFACES,MAXNUMCONVEXEDGES,GCBFVecDim_loc,nag_aux
 #endif
 integer(4) :: density_thresholds
-character(1) :: Psurf
 character(100) :: token
 logical,external :: ReadCheck
 character(100),external :: lcase
@@ -98,23 +97,6 @@ do while (trim(lcase(ainp))/="##### end run parameters #####")
    call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
    read(ainp,*,iostat=ioerr) TetaP,TetaV
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"TETAP & TETAV",ninp,ulog)) return
-   token = GetToken(3,ainp,ioerr)
-   if (ioerr==0) then
-      read(token,*,iostat=ioerr) Psurf
-      Psurf = trim(lcase(Psurf))
-      if ((Psurf/='o').and.(Psurf/='s').and.(Psurf/='a')) then
-         write(uerr,"(1x,a)")                                                  &
-            "Error setting run parameters. SMOOTHING Pressure Surface not set."
-         write(ulog,"(1x,a)")                                                  &
-            "Error setting run parameters. SMOOTHING Pressure Surface not set."
-         stop
-      endif
-      else
-         if (ulog>0) write(ulog,*) "Unknown option: ",trim(ainp),              &
-            " in run parameters."
-         write(uerr,*) "Unknown option: ",trim(ainp)," in run parameters."
-         stop
-   endif
    call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
    read(ainp,*,iostat=ioerr) COEFNMAXPARTI,COEFNMAXPARTJ,body_part_reorder
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"COEFNMAXPARTI and COEFNMAXPARTJ ",&
@@ -158,7 +140,6 @@ if (input_second_read.eqv..true.) then
    endif
    input_any_t%TetaP = TetaP
    input_any_t%TetaV = TetaV
-   input_any_t%Psurf = Psurf
    Domain%COEFNMAXPARTI = COEFNMAXPARTI
    input_any_t%COEFNMAXPARTJ = COEFNMAXPARTJ
    input_any_t%body_part_reorder = body_part_reorder
@@ -186,15 +167,6 @@ if (input_second_read.eqv..true.) then
          input_any_t%TetaP
       write(ulog,"(1x,a,1p,e12.4)") "SMOOTHING VEL              : ",           &
          input_any_t%TetaV
-      if (input_any_t%Psurf=='o') then
-         write(ulog,"(1x,a,a)") "SMOOTHING Pressure Surface : ","Original"
-         elseif (input_any_t%Psurf=='s') then
-            write(ulog,"(1x,a,a)")                                             &
-"SMOOTHING Pressure Surface : ","Delta Pressure from hydrostatic"
-            elseif (input_any_t%Psurf=='a') then
-               write(ulog,"(1x,a,a)")                                          &
-"SMOOTHING Pressure Surface : ","Weight calculation with atmospheric pressure"
-      endif
       write(ulog,"(1x,a,1p,e12.4)") "COEFNMAXPARTI              : ",           &
          Domain%COEFNMAXPARTI
       write(ulog,"(1x,a,1p,e12.4)") "COEFNMAXPARTJ              : ",           &
