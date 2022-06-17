@@ -19,10 +19,10 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: CalcPre 
+! Program unit: EoS_barotropic_linear 
 ! Description: Barotropic linear Equation of State (EoS): pressure estimation      
 !-------------------------------------------------------------------------------
-subroutine CalcPre
+subroutine EoS_barotropic_linear
 !------------------------
 ! Modules
 !------------------------
@@ -66,4 +66,4 @@ endif
 ! Deallocations
 !------------------------
 return
-end subroutine CalcPre
+end subroutine EoS_barotropic_linear
