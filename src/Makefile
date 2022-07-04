@@ -169,6 +169,7 @@ $(wildcard ./Body_Transport/Post_processing/*.f90) \
 $(wildcard ./Body_Transport/Time_Integration/*.f90) \
 $(wildcard ./CLC/*.f90) \
 $(wildcard ./DB_SPH/*.f90) \
+$(wildcard ./EoS/*.f90) \
 $(wildcard ./Erosion_Criterion/*.f90) \
 $(wildcard ./Geometry/*.f90) \
 $(wildcard ./IC/*.f90) \
