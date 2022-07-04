@@ -365,7 +365,7 @@ TIME_STEP_DO: do while (it<=input_any_t%itmax)
             call start_and_stop(3,12)
 ! Equation of State
             call start_and_stop(2,13)
-            call EoS_barotropic_linear
+            call EoS_fluid_loop
             call start_and_stop(3,13)
 #ifdef SOLID_BODIES
 ! Continuity equation: end

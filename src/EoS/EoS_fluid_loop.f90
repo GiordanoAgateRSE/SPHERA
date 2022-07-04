@@ -19,23 +19,34 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: EoS_barotropic_linear 
-! Description: Barotropic linear Equation of State (EoS): pressure estimation      
+! Program unit: EoS_fluid_loop 
+! Description: Loop over the fluid particles to apply the Equation of State 
+!              (EoS) to assess pressure
 !-------------------------------------------------------------------------------
-subroutine EoS_barotropic_linear(k_bulk,rho_ref,p_ref,rho_in,p_in,rho_out,p_out)
+subroutine EoS_fluid_loop
 !------------------------
 ! Modules
 !------------------------
+use Static_allocation_module
+use Hybrid_allocation_module
+use Dynamic_allocation_module
 !------------------------
 ! Declarations
 !------------------------
 implicit none
-double precision,intent(in) :: k_bulk,rho_ref,p_ref
-double precision,intent(in),optional :: rho_in,p_in
-double precision,intent(out),optional :: rho_out,p_out
+integer(4) :: npi
 !------------------------
 ! Explicit interfaces
 !------------------------
+interface
+   subroutine EoS_barotropic_linear(k_bulk,rho_ref,p_ref,rho_in,p_in,rho_out,  &
+      p_out)
+      implicit none
+      double precision,intent(in) :: k_bulk,rho_ref,p_ref
+      double precision,intent(in),optional :: rho_in,p_in
+      double precision,intent(out),optional :: rho_out,p_out
+   end subroutine EoS_barotropic_linear
+end interface
 !------------------------
 ! Allocations
 !------------------------
@@ -45,15 +56,20 @@ double precision,intent(out),optional :: rho_out,p_out
 !------------------------
 ! Statements
 !------------------------
-if (present(rho_in)) then
-! EoS
-   p_out = k_bulk / rho_in * (rho_in - rho_ref) + p_ref
-   elseif (present(p_in)) then
-! inverse of EoS
-      rho_out = rho_ref / (1.d0 - (p_in - p_ref) / k_bulk)
+if (on_going_time_step>0) then  
+! Loop over all the particles
+!$omp parallel do default(none) shared(nag,pg,Domain,Med) private(npi)
+   do npi=1,nag
+! Skip the outgone particles and the particles with velocity type different 
+! from "std"
+      if ((pg(npi)%cella==0).or.(pg(npi)%vel_type/="std")) cycle
+      call EoS_barotropic_linear(Med(pg(npi)%imed)%eps,Med(pg(npi)%imed)%den0, &
+         Domain%prif,rho_in=pg(npi)%dens,p_out=pg(npi)%pres)
+   enddo
+!$omp end parallel do
 endif
 !------------------------
 ! Deallocations
 !------------------------
 return
-end subroutine EoS_barotropic_linear
+end subroutine EoS_fluid_loop

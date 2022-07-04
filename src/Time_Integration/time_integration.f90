@@ -62,7 +62,7 @@ endselect
 call start_and_stop(3,17)
 ! Equation of State 
 call start_and_stop(2,13)
-call EoS_barotropic_linear  
+call EoS_fluid_loop  
 call start_and_stop(3,13)
 !------------------------
 ! Deallocations
