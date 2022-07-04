@@ -106,7 +106,7 @@ integer(4) :: nag,nagpg,PARTICLEBUFFER
 ! Variable to count the particles, which are not "sol"
 integer(4) :: indarrayFlu
 integer(4) :: it_start,on_going_time_step,it_eff,indarraySol
-double precision :: simulation_time,dt,pesodt,dt_average,DTminBER
+double precision :: simulation_time,elapsed_time,dt,pesodt,dt_average,DTminBER
 ! Global variables: end
 ! Global variables for inlet sections: start
 ! Flag to detect the job-start conditions for the inlet sections

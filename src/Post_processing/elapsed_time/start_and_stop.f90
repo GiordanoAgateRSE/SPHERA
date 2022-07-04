@@ -26,6 +26,7 @@ subroutine start_and_stop(iset,itot)
 !------------------------
 ! Modules
 !------------------------
+use Static_allocation_module
 use Time_module
 use I_O_file_module
 !------------------------
@@ -92,14 +93,10 @@ select case (iset)
       write(ulog,'(a,a)') " >>> Case identifier :",TRIM(nomecaso)
 ! Detection of the current time
    case (1)
-! End the execution by assessing the computational time and the 
-! physical/elapsed time statistics.
+! Assessment of the elapsed times at the end of the execution
       call system_clock(count=count_i,count_rate=counts_per_second,            &
          count_max=count_maximum)
-      tot_times(numb_subr,2) = dfloat(count_i) - tot_times(numb_subr,1)
-      if (tot_times(numb_subr,2)<0.d0) tot_times(numb_subr,2) =                &
-         tot_times(numb_subr,2) + dfloat(count_maximum)   
-      tot_times(numb_subr,2) = tot_times(numb_subr,2)/dfloat(counts_per_second)
+      tot_times(numb_subr,2) = elapsed_time
       call DATE_AND_TIME(dat,ct,zone,dat_array)
       date_exec = mesi(dat_array(2))//" "//dat(7:8)//", "//dat(1:4)//          &
                 " at "//ct(1:2)//":"//ct(3:4)//":"//ct(5:10)//" "//zone//" GMT"

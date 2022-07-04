@@ -58,8 +58,8 @@ double precision :: minvelo_bp,maxvelo_bp,minpres_bp,maxpres_bp
 double precision :: minvelo_body,maxvelo_body,minomega_body,maxomega_body
 double precision :: minacc_bp,maxacc_bp,modacc,modomega
 #endif
-double precision :: mintau_tauc,maxtau_tauc,mink_BetaGamma
-double precision :: maxk_BetaGamma,minu_star,maxu_star,time_elapsed_tot_est
+double precision :: mintau_tauc,maxtau_tauc,mink_BetaGamma,aux_scal,aux_scal_2
+double precision :: maxk_BetaGamma,minu_star,maxu_star,elapsed_time_tot_est
 double precision :: minvelo,maxvelo,laminar_flag_perc,blt_laminar_flag_perc
 integer(4),dimension(1) :: pos
 character(len=42) :: fmt100="(a,i10,a,e18.9,a,e18.9,a,i  ,a,i  ,a,i  )"
@@ -354,32 +354,34 @@ if (nag>0) then
       simulation_time," | dt:  ",dt,"s| Particles: inside ",dummy," gone out ",&
       OpCountot," gone in ",SpCountot
    if (exetype==trim(adjustl("linux"))) then
-      time_elapsed_tot_est = ((Domain%t_pre_iter-Domain%t0) +                  &
-                             (machine_Julian_day * 24 * 60 * 60 + machine_hour &
-                             * 60 * 60 + machine_minute * 60 + machine_second -&
-                             Domain%t_pre_iter) * 1.d0) / (3600.d0)  
-      if (time_elapsed_tot_est<0.d0) time_elapsed_tot_est =                    &
-         time_elapsed_tot_est + 366.d0 * 24.d0 * 60.d0 * 60.d0   
+      elapsed_time = (Domain%t_pre_iter-Domain%t0) +                           &
+                     (machine_Julian_day * 24 * 60 * 60 + machine_hour         &
+                     * 60 * 60 + machine_minute * 60 + machine_second -        &
+                     Domain%t_pre_iter) * 1.d0
+      if (elapsed_time<0.d0) elapsed_time =                                    &
+         elapsed_time + 366.d0 * 24.d0 * 60.d0 * 60.d0
+      aux_scal = int(elapsed_time / 3600.d0)
+      aux_scal_2 = int(aux_scal / 24.d0)
       write(ulog,'(a,3(ES15.6,a))') "Elapsed time: ",                          &
-         time_elapsed_tot_est*3600.d0," s = ",time_elapsed_tot_est,            &
-         " hours = ",time_elapsed_tot_est/24.d0," days."
+         elapsed_time," s = ",aux_scal,                                        &
+         " hours = ",aux_scal_2," days."
       if (simulation_time>1.d-9) then
-         time_elapsed_tot_est = ((Domain%t_pre_iter-Domain%t0) +               &
+         elapsed_time_tot_est = ((Domain%t_pre_iter-Domain%t0) +               &
                                 (machine_Julian_day * 24 * 60 * 60 +           &
                                 machine_hour * 60 * 60 + machine_minute * 60 + &
                                 machine_second - Domain%t_pre_iter) *          &
                                 (input_any_t%tmax / simulation_time)) /        &
                                 3600.d0
          else
-         time_elapsed_tot_est = 366.d0 * 24.d0 * 60.d0 * 60.d0
+         elapsed_time_tot_est = 366.d0 * 24.d0 * 60.d0 * 60.d0
       endif
-      if (time_elapsed_tot_est<0.d0) then
-         time_elapsed_tot_est = time_elapsed_tot_est + 366.d0 * 24.d0 * 60.d0  &
+      if (elapsed_time_tot_est<0.d0) then
+         elapsed_time_tot_est = elapsed_time_tot_est + 366.d0 * 24.d0 * 60.d0  &
                                 * 60.d0
       endif
       write(ulog,'(a,g12.5,a,g12.5,a)')                                        &
          "Elapsed time (at the end of the simulation, real time estimation): ",&
-         time_elapsed_tot_est," hours = ",time_elapsed_tot_est/24.d0," days."
+         elapsed_time_tot_est," hours = ",elapsed_time_tot_est/24.d0," days."
    endif
    write(ulog,'(a,a,a)')                                                       &
       ".............................|  Min. val.  |  Min.loc.| X coord. | ",   &
