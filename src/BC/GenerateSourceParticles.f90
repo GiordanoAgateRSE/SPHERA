@@ -49,6 +49,15 @@ integer(4),external :: ParticleCellNumber
 !------------------------
 ! Explicit interfaces
 !------------------------
+interface
+   subroutine EoS_barotropic_linear(k_bulk,rho_ref,p_ref,rho_in,p_in,rho_out,  &
+      p_out)
+      implicit none
+      double precision,intent(in) :: k_bulk,rho_ref,p_ref
+      double precision,intent(in),optional :: rho_in,p_in
+      double precision,intent(out),optional :: rho_out,p_out
+   end subroutine EoS_barotropic_linear
+end interface
 !------------------------
 ! Allocations
 !------------------------
@@ -163,8 +172,9 @@ if (simulation_time>=emission_time) then
                                  (pg(nag)%coord(3) - partz(inlet_zone)%valp) + &
                                  Domain%prif
             endif
-            pg(nag)%dens = Med(mat)%den0 * (one + (pg(nag)%pres - Domain%prif) &
-                           / Med(mat)%eps)
+! EoS inverse
+            call EoS_barotropic_linear(Med(mat)%eps,Med(mat)%den0,Domain%prif, &
+               p_in=pg(nag)%pres,rho_out=pg(nag)%dens)
          enddo
       endif 
    enddo

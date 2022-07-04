@@ -38,7 +38,7 @@ use Dynamic_allocation_module
 !------------------------
 implicit none
 integer(4) :: contj,npartint,npi,npj
-double precision :: rhoL,uL,uR,cL,rhostar,rhorif,c2,pstar,Ww_Shep
+double precision :: rhoL,uL,uR,cL,rhostar,pstar,Ww_Shep
 double precision :: uCartL(3)
 ! Array to detect wall elements with fluid neighbours
 integer(4), dimension(:), allocatable :: neigh_w
@@ -46,6 +46,15 @@ double precision,dimension(:), allocatable :: den
 !------------------------
 ! Explicit interfaces
 !------------------------
+interface
+   subroutine EoS_barotropic_linear(k_bulk,rho_ref,p_ref,rho_in,p_in,rho_out,  &
+      p_out)
+      implicit none
+      double precision,intent(in) :: k_bulk,rho_ref,p_ref
+      double precision,intent(in),optional :: rho_in,p_in
+      double precision,intent(out),optional :: rho_out,p_out
+   end subroutine EoS_barotropic_linear
+end interface
 !------------------------
 ! Allocations
 !------------------------
@@ -121,10 +130,9 @@ do npi=1,nag
       if (rhostar<10.d0) then
          rhostar = 10.d0
       endif
-! equation of state 
-      rhorif = Med(pg(npi)%imed)%den0
-      c2 = Med(pg(npi)%imed)%eps / rhorif
-      pstar = c2 * (rhostar-rhorif) + Domain%prif
+! EoS
+      call EoS_barotropic_linear(Med(pg(npi)%imed)%eps,Med(pg(npi)%imed)%den0, &
+         Domain%prif,rho_in=rhostar,p_out=pstar)
       if (pstar<-99.d3) then
          pstar = -99.d3
       endif

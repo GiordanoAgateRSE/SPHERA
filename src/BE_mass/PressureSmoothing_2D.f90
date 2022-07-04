@@ -55,6 +55,15 @@ character(4) :: strtype
 !------------------------
 ! Explicit interfaces
 !------------------------
+interface
+   subroutine EoS_barotropic_linear(k_bulk,rho_ref,p_ref,rho_in,p_in,rho_out,  &
+      p_out)
+      implicit none
+      double precision,intent(in) :: k_bulk,rho_ref,p_ref
+      double precision,intent(in),optional :: rho_in,p_in
+      double precision,intent(out),optional :: rho_out,p_out
+   end subroutine EoS_barotropic_linear
+end interface
 !------------------------
 ! Allocations
 !------------------------
@@ -212,9 +221,9 @@ do ii=1,indarrayFlu
 ! "sour"
    if (pg(npi)%koddens==0) then 
       pg(npi)%pres = pg(npi)%vpres
-! This EOS inversion is not exact, even if the errors should be negligible
-      pg(npi)%dens = Med(pg(npi)%imed)%den0 * (one + (pg(npi)%vpres -          &
-                     Domain%Prif) / Med(pg(npi)%imed)%eps)
+! EoS inverse
+      call EoS_barotropic_linear(Med(pg(npi)%imed)%eps,Med(pg(npi)%imed)%den0, &
+         Domain%prif,p_in=pg(npi)%vpres,rho_out=pg(npi)%dens)
    endif
 enddo
 !$omp end parallel do

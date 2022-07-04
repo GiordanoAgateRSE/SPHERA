@@ -51,6 +51,15 @@ integer(4),external :: ParticleCellNumber
 !------------------------
 ! Explicit interfaces
 !------------------------
+interface
+   subroutine EoS_barotropic_linear(k_bulk,rho_ref,p_ref,rho_in,p_in,rho_out,  &
+      p_out)
+      implicit none
+      double precision,intent(in) :: k_bulk,rho_ref,p_ref
+      double precision,intent(in),optional :: rho_in,p_in
+      double precision,intent(out),optional :: rho_out,p_out
+   end subroutine EoS_barotropic_linear
+end interface
 !------------------------
 ! Allocations
 !------------------------
@@ -139,9 +148,10 @@ do i_zone=1,NPartZone
                                     Domain%grav(3) * (pg(npi)%coord(3) -       &
                                     Partz(i_zone)%valp) + Domain%prif
                endif
-               pg(npi)%dens = Med(Partz(i_zone)%Medium)%den0 * (one +          &
-                              (pg(npi)%pres - Domain%prif) /                   &
-                              Med(Partz(i_zone)%Medium)%eps)
+! EoS inverse
+            call EoS_barotropic_linear(Med(Partz(i_zone)%Medium)%eps,          &
+               Med(Partz(i_zone)%Medium)%den0,Domain%prif,p_in=pg(npi)%pres,   &
+               rho_out=pg(npi)%dens)
 ! Formal null velocity initialization (it will follow a selective partial 
 ! velocity smoothing)
                pg(npi)%vel(:) = 0.d0

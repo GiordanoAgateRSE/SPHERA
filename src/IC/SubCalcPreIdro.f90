@@ -47,6 +47,15 @@ integer(4),external :: CellNumber,ParticleCellNumber,CellIndices
 !------------------------
 ! Explicit interfaces
 !------------------------
+interface
+   subroutine EoS_barotropic_linear(k_bulk,rho_ref,p_ref,rho_in,p_in,rho_out,  &
+      p_out)
+      implicit none
+      double precision,intent(in) :: k_bulk,rho_ref,p_ref
+      double precision,intent(in),optional :: rho_in,p_in
+      double precision,intent(out),optional :: rho_out,p_out
+   end subroutine EoS_barotropic_linear
+end interface
 !------------------------
 ! Allocations
 !------------------------
@@ -170,10 +179,9 @@ particle_loop: do npi=1,nag
                               Domain%prif
          endif
    endif
-! Density
-! This EOS inversion is not exact, even if the errors should be negligible
-   pg(npi)%dens = (one + (pg(npi)%pres - Domain%prif) / med(pg(npi)%imed)%eps)*&
-                  med(pg(npi)%imed)%den0
+! EoS inverse
+   call EoS_barotropic_linear(Med(pg(npi)%imed)%eps,Med(pg(npi)%imed)%den0,    &
+      Domain%prif,p_in=pg(npi)%pres,rho_out=pg(npi)%dens)
    pg(npi)%dden = zero
 enddo particle_loop
 !------------------------
