@@ -231,6 +231,12 @@ ___ ___ ___ ___ ___ ___
 ![?] (“CellData”, ".vtu" cell type); "connectivity" (“CellData”): vertex ID 
 ![?] belonging to the ".vtu" cell; "Points" ("PointData"): ".vtu" point 
 ![?] position; "nSurfaceLayers" ("PointData"): ".vtu" flag for surface points.
+![?] The CAE-made meshes for solid bodies are produced by SnappyHexMesh 
+![?] (OpenFOAM, OpenCFD Ltd) and processed by Paraview (Kitware). The normals 
+![?] of the resulting ".vtu" input files to SPHERA point outward the solid 
+![?] bodies. SPHERA will invert the normal direction for the SPH solid 
+![?] particles starting from the vertex order of the face vertices, not 
+![?] directly from the original face normals (the normals are recomputed).
 !-------------------------------------------------------------------------------
 ##### end BODY DYNAMICS #####
 !-------------------------------------------------------------------------------

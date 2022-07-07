@@ -20,7 +20,8 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: EoS_barotropic_linear 
-! Description: Barotropic linear Equation of State (EoS): pressure estimation      
+! Description: Barotropic linear Equation of State (EoS) for pressure 
+!              estimation and its inverse for density estimation
 !-------------------------------------------------------------------------------
 subroutine EoS_barotropic_linear(k_bulk,rho_ref,p_ref,rho_in,p_in,rho_out,p_out)
 !------------------------
