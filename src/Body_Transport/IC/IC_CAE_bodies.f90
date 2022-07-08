@@ -20,7 +20,7 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: IC_CAE_bodies
-! Description: Initial Conditions for the CAE-made solid bodies      
+! Description: Initial Conditions for the CAE-made solid bodies
 !-------------------------------------------------------------------------------
 #if (defined SPACE_3D) && (defined SOLID_BODIES)
 subroutine IC_CAE_bodies
@@ -152,10 +152,6 @@ do i_vtu_grid=1,n_vtu_grids
 ! Deallocation of the array of the ".vtu" point positions
    array_name = "vtu_points_vertices"
    call allocate_de_vertex_r1(.false.,vtu_grids(i_vtu_grid)%points%vertex,     &
-      array_name=array_name,ulog_flag=.true.)
-! Deallocation of the array of the ".vtu" point "surface"
-   array_name = "vtu_points_surface"
-   call allocate_de_log_r1(.false.,vtu_grids(i_vtu_grid)%points%surface,       &
       array_name=array_name,ulog_flag=.true.)
 enddo
 ! Deallocation of the ".vtu" grids

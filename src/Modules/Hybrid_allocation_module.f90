@@ -983,8 +983,6 @@ end type vtu_cell_der_type
 
 ! Derived type for the ".vtu" points
 type vtu_point_der_type
-! Flag for surface vs. inner ".vtu" points
-   logical,allocatable,dimension(:) :: surface
 ! Positions of the ".vtu" points
 ! vertex(1:n_vtu_points)%pos(1:3)
    type(vertex_der_type),allocatable,dimension(:) :: vertex

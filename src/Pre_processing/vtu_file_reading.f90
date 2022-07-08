@@ -153,17 +153,17 @@ vtu_grids(i_vtu_grid)%cells%points_IDs(1:n_vtu_cells,1:4) = 0
 array_name = "vtu_cells_surface"
 call allocate_de_log_r2(.true.,vtu_grids(i_vtu_grid)%cells%surface,            &
    n_vtu_cells,4,array_name,ulog_flag=.true.)
+
 vtu_grids(i_vtu_grid)%cells%surface(1:n_vtu_cells,1:4) = .true.
+   
+vtu_grids(i_vtu_grid)%cells%surface(1:n_vtu_cells,1:4) = .false.
+
 array_name = "vtu_points_vertices"
 call allocate_de_vertex_r1(.true.,vtu_grids(i_vtu_grid)%points%vertex,         &
    n_vtu_points,array_name,ulog_flag=.true.)
 do ii=1,3
    vtu_grids(i_vtu_grid)%points%vertex(1:n_vtu_points)%pos(ii) = 0.d0
 enddo
-array_name = "vtu_points_surface"
-call allocate_de_log_r1(.true.,vtu_grids(i_vtu_grid)%points%surface,           &
-   n_vtu_points,array_name,ulog_flag=.true.)
-vtu_grids(i_vtu_grid)%points%surface(1:n_vtu_points) = .false.
 ! Read the remaining lines of the file until the end of the file or the end of 
 ! reading of the useful variables. Lines containing "/" are not relevant: no 
 ! issue due to the the fact that anything after "/" on the same line is 
@@ -245,8 +245,7 @@ do
          backspace(uvtu)
 ! Read or skip the variable values depending on the variable name
          select case(trim(adjustl(var_name)))
-            case("Points","nSurfaceLayers")
-! The variable "nSurfaceLayers" can also be a cell-centred attribute
+            case("Points")
                if (n_nodes==n_vtu_points) then
                   call vtu_variable_reading(i_vtu_grid,n_nodes,n_components,   &
                      n_lines_var,n_tokens_line,var_name)
