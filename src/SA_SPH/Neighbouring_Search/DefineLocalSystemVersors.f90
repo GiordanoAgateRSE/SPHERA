@@ -33,6 +33,7 @@ subroutine DefineLocalSystemVersors(Nf)
 use Static_allocation_module
 use Hybrid_allocation_module
 use Dynamic_allocation_module
+use I_O_file_module
 !------------------------
 ! Declarations
 !------------------------
@@ -68,7 +69,7 @@ BoundaryFace(Nf)%nodes = nnodes
 ! sidek=1 (for triangles), sidek=2 (for quadrilaterals), sidek=3 (for pentagons)
 ! sidek=4 (for hexagons)
 sidek = nnodes - 2                   
-do n=1,nnodes                     
+do n=1,nnodes
     nod = BoundaryFace(nf)%Node(n)%name
     do i=1,SPACEDIM
        BoundaryFace(nf)%Node(n)%GX(i) = Vertice(i,nod)
@@ -91,8 +92,18 @@ W12len = dsqrt(W12(1) * W12(1) + W12(2) * W12(2) + W12(3) * W12(3))
 ! The estimation of pentagon and hexagon face areas is not mandatory as they are
 ! only considered for "perimeter" zones, not for SASPH frontiers.
 if (nnodes<=4) BoundaryFace(Nf)%Area = W12len / float(3 - sidek)
-! Directional cosines of the normal to the face "nf"     
-nnlocal(1:SPACEDIM) = W12(1:SPACEDIM) / W12len
+! Directional cosines of the normal to the face "nf"
+if (W12len>1.d-9) then
+   nnlocal(1:SPACEDIM) = W12(1:SPACEDIM) / W12len
+   else
+      write(uerr,*) 'Program unit "DefineLocalSystemVersors": "W12len" is ',   &
+         'null. "sidek": ',sidek,", P1 : ",                                    &
+         BoundaryFace(Nf)%Node(nindex(sidek,1))%GX(1:SPACEDIM)," P2 : ",       &
+         BoundaryFace(Nf)%Node(nindex(sidek,2))%GX(1:SPACEDIM)," P3 : ",       &
+         BoundaryFace(Nf)%Node(nindex(sidek,3))%GX(1:SPACEDIM),". The program",&
+         " stops here."
+         stop
+endif
 ! Vector product ss=rrxnn; ss is the unity vector of the third local axis      
 call Vector_Product(nnlocal,RR,ss,SPACEDIM)   
 ! Directional cosine matrix of face "nf"
