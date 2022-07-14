@@ -41,6 +41,9 @@ integer(4) :: imposed_kinematics,n_records,Ic_imposed
 double precision :: mass,teta_R_IO
 integer(4) :: normal_act(6)
 double precision :: L_geom(3),x_CM(3),n_R_IO(3),u_CM(3),omega(3),x_rotC(3)
+#ifdef SPACE_3D
+double precision :: vec_bp_CAE_trans(3)
+#endif
 double precision :: mass_deact(6)
 double precision :: Ic(3,3)
 character(1) :: comment
@@ -66,6 +69,9 @@ end interface
 !------------------------
 ! Initializations
 !------------------------
+#ifdef SPACE_3D
+vec_bp_CAE_trans(1:3) = 0.d0
+#endif
 !------------------------
 ! Statements
 !------------------------
@@ -123,6 +129,14 @@ do while (trim(lcase(ainp)) /= "##### end body dynamics #####")
       read(ainp,*,iostat=ioerr) Id_body,n_elem,CAE
       if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"ID_BODY-N_ELEM-CAE",ninp,      &
          ulog)) return
+#ifdef SPACE_3D
+      if (CAE) then
+         call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
+         read(ainp,*,iostat=ioerr) vec_bp_CAE_trans(1:3)
+         if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"vec_bp_CAE_trans",ninp,ulog)&
+            ) return
+      endif 
+#endif
       call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
       read(ainp,*,iostat=ioerr) mass
       if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"MASS",ninp,ulog)) return
@@ -162,11 +176,14 @@ do while (trim(lcase(ainp)) /= "##### end body dynamics #####")
       call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
       read(ainp,*,iostat=ioerr) imposed_kinematics,n_records
       if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"BODY_KINEMATICS",ninp,ulog))   &
-         return       
+         return
 ! Assignment of the body parameters 
       body_arr(Id_body)%CAE = CAE
       body_arr(Id_body)%n_elem = n_elem
       body_arr(Id_body)%mass = mass
+#ifdef SPACE_3D
+      body_arr(Id_body)%vec_bp_CAE_trans(1:3) = vec_bp_CAE_trans(1:3)
+#endif
       body_arr(Id_body)%x_CM = x_CM
       body_arr(Id_body)%Ic_imposed = Ic_imposed
       if (Ic_imposed==1) then
@@ -188,6 +205,12 @@ do while (trim(lcase(ainp)) /= "##### end body dynamics #####")
          write(ulog,"(1x,a,1p,i12)") "body:.......................",Id_body
          write(ulog,"(1x,a,1p,l12)") "CAE:........................",CAE
          write(ulog,"(1x,a,1p,e12.4)") "mass:.......................",mass
+#ifdef SPACE_3D
+         if (CAE) then
+            write(ulog,"(1x,a,1p,3e12.4)") "vec_bp_CAE_trans(1:3):......",     &
+               vec_bp_CAE_trans(1:3)
+         endif
+#endif
          write(ulog,"(1x,a,1p,3e12.4)") "x_CM:.......................",x_CM
          write(ulog,"(1x,a,1p,i12)") "IC_imposed:.................",           &
             Ic_imposed

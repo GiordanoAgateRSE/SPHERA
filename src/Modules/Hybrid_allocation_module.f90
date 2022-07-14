@@ -434,6 +434,11 @@ type body
    double precision :: rel_pos_part1_t0(3)
 ! Integral of the normal over the external body surface (used just for check)
    double precision :: int_ndA(3)
+#ifdef SPACE_3D
+! Vector added to the positions of the body particles, in case of CAE-made 
+! solid body   
+   double precision :: vec_bp_CAE_trans(3)
+#endif
 ! Moment of inertia
    double precision :: Ic(3,3)
 ! Inverse of the moment of inertia

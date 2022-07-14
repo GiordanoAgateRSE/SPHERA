@@ -54,9 +54,7 @@
 ![?] <n_bodies>: number of transported solid bodies (both meshed and handmade 
 !                bodies)
 ![?] <dx/dx_body>: ratio between fluid particle size and body particle size 
-!                  (for CAE-made bodies it is an "average" value depending on 
-!                  the input spatial resolution requested to the mesh 
-!                  generator)
+!                  for hand-made solid bodies
 ![?] <friction_angle>: in radians
 !    >=0. (friction angle for body-frontier interactions)
 !    <0. (sliding friction depends on the local slope angle instead of the 
@@ -86,8 +84,8 @@
 ___ ___ ___ ___ ___ ___ ___ ___
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
-![?] <ID_first_body>
-!    =1
+![?] <ID_body>: body ID
+!    =1,2,...,n (without missing values between the first and last IDs)
 ![?] <n_elem>: number of elements of the body
 !    =0 (for CAE-made bodies)
 ![?] <CAE>
@@ -96,6 +94,28 @@ ___ ___ ___ ___ ___ ___ ___ ___
 !    CAE-made bodies IDs follow the handmade bodies (if any) at the end of the 
 !    list. CAE-made body IDs follow the alphabetic order of the ".vtu" files in 
 !    the "vtu" folder.
+!-------------------------------------------------------------------------------
+![*] <ID_body> <n_elem> <CAE>
+!-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+___ ___ ___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] if (CAE.and.3D) then
+![?] <vec_bp_CAE_trans(1:3)>: vector (x,y,z) added to the positions of the body 
+!    particles of the current CAE-made solid body. Instead, the centre of mass 
+!    of the body has to be translated via the vector 
+!    (<pos_CM_x>, <pos_CM_y>, <pos_CM_z>). The input positions 
+!    <vec_bp_CAE_trans(1:3)> and 
+!    (<pos_CM_x>, <pos_CM_y>, <pos_CM_z>) have to be consistent.
+!-------------------------------------------------------------------------------
+![*] <vec_bp_CAE_trans(1:3)>
+!-------------------------------------------------------------------------------
+___ ___ ___
+!-------------------------------------------------------------------------------
+![?] endif (CAE.and.3D)
+!-------------------------------------------------------------------------------
 ![*] <body_mass>: in case of imposed kinematics, the body mass is not 
 !    influential
 ![?] <pos_CM>: position of the centre of mass (Initial Conditions)
@@ -104,13 +124,11 @@ ___ ___ ___ ___ ___ ___ ___ ___
 !    =1 (mass moment of inertia is imposed; in case of imposed kinematics, "Ic" 
 !       values are not influential)
 !-------------------------------------------------------------------------------
-![*] <ID_first_body> <n_elem> <CAE>
 ![*] <body_mass>
 ![*] <pos_CM_x> <pos_CM_y> <pos_CM_z>
 ![*] <Ic_flag>
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
-1   ___ ___
 ___
 ___ ___ ___
 ___

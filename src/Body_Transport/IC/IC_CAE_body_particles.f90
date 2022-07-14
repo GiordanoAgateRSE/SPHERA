@@ -167,6 +167,11 @@ test_surface_faces(1:body_arr(ib)%npart,1:4) = .true.
 ! Body particle position (barycentre of the input tetrahedron before possible 
 ! rotation)
       bp_arr(i_bp)%pos(1:3) = bp_arr(i_bp)%pos(1:3) / 4.d0
+#ifdef SPACE_3D
+! Translation applied to the body particles of the current body
+      bp_arr(i_bp)%pos(1:3) = bp_arr(i_bp)%pos(1:3) +                          &
+         body_arr(ib)%vec_bp_CAE_trans(1:3)
+#endif 
 ! Rotation around the centre of rotation provided in input: position
       bp_arr(i_bp)%rel_pos(1:3) = bp_arr(i_bp)%pos(1:3) -                      &
                                   body_arr(ib)%x_rotC(1:3)
