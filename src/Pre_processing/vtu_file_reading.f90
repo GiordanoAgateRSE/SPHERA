@@ -30,7 +30,7 @@
 ! file for further details.
 !-------------------------------------------------------------------------------
 #if (defined SPACE_3D) && (defined SOLID_BODIES)
-subroutine vtu_file_reading(i_vtu_grid,file_name,n_vtu_cells)
+subroutine vtu_file_reading(i_vtu_grid,surface_detection,file_name,n_vtu_cells)
 !------------------------
 ! Modules
 !------------------------
@@ -42,7 +42,7 @@ use I_O_file_module
 ! Declarations
 !------------------------
 implicit none
-integer(4),intent(in) :: i_vtu_grid
+integer(4),intent(in) :: i_vtu_grid,surface_detection
 character(100),intent(in) :: file_name
 integer(4),intent(inout) :: n_vtu_cells
 integer(4) :: n_vtu_points,n_nodes,n_components,n_var_read,i_cell,i_tok,io_err
@@ -153,17 +153,23 @@ vtu_grids(i_vtu_grid)%cells%points_IDs(1:n_vtu_cells,1:4) = 0
 array_name = "vtu_cells_surface"
 call allocate_de_log_r2(.true.,vtu_grids(i_vtu_grid)%cells%surface,            &
    n_vtu_cells,4,array_name,ulog_flag=.true.)
-
-vtu_grids(i_vtu_grid)%cells%surface(1:n_vtu_cells,1:4) = .true.
-   
-vtu_grids(i_vtu_grid)%cells%surface(1:n_vtu_cells,1:4) = .false.
-
+if (surface_detection==1) then
+   vtu_grids(i_vtu_grid)%cells%surface(1:n_vtu_cells,1:4) = .false.
+   elseif (surface_detection==2) then
+      vtu_grids(i_vtu_grid)%cells%surface(1:n_vtu_cells,1:4) = .true.
+endif
 array_name = "vtu_points_vertices"
 call allocate_de_vertex_r1(.true.,vtu_grids(i_vtu_grid)%points%vertex,         &
    n_vtu_points,array_name,ulog_flag=.true.)
 do ii=1,3
    vtu_grids(i_vtu_grid)%points%vertex(1:n_vtu_points)%pos(ii) = 0.d0
 enddo
+if (surface_detection>1) then
+   array_name = "vtu_points_surface"
+   call allocate_de_log_r1(.true.,vtu_grids(i_vtu_grid)%points%surface,        &
+      n_vtu_points,array_name,ulog_flag=.true.)
+   vtu_grids(i_vtu_grid)%points%surface(1:n_vtu_points) = .false.
+endif
 ! Read the remaining lines of the file until the end of the file or the end of 
 ! reading of the useful variables. Lines containing "/" are not relevant: no 
 ! issue due to the the fact that anything after "/" on the same line is 
@@ -245,7 +251,9 @@ do
          backspace(uvtu)
 ! Read or skip the variable values depending on the variable name
          select case(trim(adjustl(var_name)))
-            case("Points")
+            case("Points","nSurfaceLayers")
+! The variable "nSurfaceLayers" can be available as point-centred attribute 
+! (useful here) or as cell-centred attribute (not interesting here)
                if (n_nodes==n_vtu_points) then
                   call vtu_variable_reading(i_vtu_grid,n_nodes,n_components,   &
                      n_lines_var,n_tokens_line,var_name)

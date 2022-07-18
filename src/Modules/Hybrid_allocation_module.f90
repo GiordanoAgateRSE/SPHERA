@@ -389,6 +389,10 @@ end type body_element
 type body
 ! A solid body can be CAE-made or handmade
    logical :: CAE
+#ifdef SPACE_3D
+! Method to detect the surface body particles
+   integer(4) :: surface_detection
+#endif
 ! Number of body particles
    integer(4) :: npart
 ! Flag to impose Ic in input
@@ -988,6 +992,8 @@ end type vtu_cell_der_type
 
 ! Derived type for the ".vtu" points
 type vtu_point_der_type
+! Flag for surface vs. inner ".vtu" points
+   logical,allocatable,dimension(:) :: surface
 ! Positions of the ".vtu" points
 ! vertex(1:n_vtu_points)%pos(1:3)
    type(vertex_der_type),allocatable,dimension(:) :: vertex

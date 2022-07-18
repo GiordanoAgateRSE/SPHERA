@@ -113,6 +113,16 @@ ___ ___ ___
 !-------------------------------------------------------------------------------
 ___ ___ ___
 !-------------------------------------------------------------------------------
+![?] <surface_detection>
+!    =1: surface body particles are detected from the definition of vertices 
+!        and cells
+!    =2: surface body particles are detected from the input values of the 
+!        variable "nSurfaceLayers" in the ".vtu" file
+!-------------------------------------------------------------------------------
+![*] <surface_detection>
+!-------------------------------------------------------------------------------
+___
+!-------------------------------------------------------------------------------
 ![?] endif (CAE.and.3D)
 !-------------------------------------------------------------------------------
 ![*] <body_mass>: in case of imposed kinematics, the body mass is not 
@@ -247,7 +257,8 @@ ___ ___ ___ ___ ___ ___
 ![?] Each “.vtu” file has to contain the following variables: "types" 
 ![?] (“CellData”, ".vtu" cell type); "connectivity" (“CellData”): vertex ID 
 ![?] belonging to the ".vtu" cell; "Points" ("PointData"): ".vtu" point 
-![?] position.
+![?] position; "nSurfaceLayers" ("PointData"): ".vtu" flag for surface points 
+![?] (optional).
 ![?] The CAE-made meshes for solid bodies are produced by SnappyHexMesh 
 ![?] (OpenFOAM, OpenCFD Ltd). The normals 
 ![?] of the resulting ".vtu" input files to SPHERA point outward the solid 

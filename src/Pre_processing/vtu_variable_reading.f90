@@ -26,6 +26,8 @@
 !                 var_name="connectivity": vertex ID belonging to the ".vtu" 
 !                                          cell;
 !                 var_name="Points": ".vtu" point position;
+!                 var_name="nSurfaceLayers": ".vtu" flag for surface points (if 
+!                                            under "PointData"; optional)
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Further Copyright acknowledgments
@@ -48,7 +50,7 @@ implicit none
 integer(4),intent(in) :: i_vtu_grid,n_nodes,n_components,n_lines_var
 integer(4),intent(in) :: n_tokens_line
 character(100),intent(in) :: var_name
-integer(4) :: n_values,i_line,io_err,i_tok,i_value,i_node,i_component
+integer(4) :: n_values,i_line,io_err,i_tok,i_value,i_node,i_component,aux_int
 character(100) :: token
 character(200) :: line
 !------------------------
@@ -112,6 +114,17 @@ do i_line=1,n_lines_var
          case ("Points")
             read(token,*)                                                      &
                vtu_grids(i_vtu_grid)%points%vertex(i_node)%pos(i_component)
+         case ("nSurfaceLayers")
+            read(token,*) aux_int
+            if (aux_int==1) then
+               vtu_grids(i_vtu_grid)%points%surface(i_node) = .true.
+               elseif (aux_int==0) then
+                  vtu_grids(i_vtu_grid)%points%surface(i_node) = .false.
+                  else
+                     write(uerr,*) 'Error in the values of the ".vtu" point',  &
+                        'variable "nSurfaceLayers": the only values admitted ',&
+                        'are "1" and "0".'
+            endif
          case ("types")
             read(token,*) vtu_grids(i_vtu_grid)%cells%type_(i_node)
             if (vtu_grids(i_vtu_grid)%cells%type_(i_node)/=10) then

@@ -43,9 +43,10 @@ type(body_particle),dimension(:),allocatable :: aux_bp_arr
 ! Explicit interfaces
 !------------------------
 interface
-   subroutine vtu_file_reading(i_vtu_grid,file_name,n_vtu_cells)
+   subroutine vtu_file_reading(i_vtu_grid,surface_detection,file_name,         &
+      n_vtu_cells)
       implicit none
-      integer(4),intent(in) :: i_vtu_grid
+      integer(4),intent(in) :: i_vtu_grid,surface_detection
       character(100),intent(in) :: file_name
       integer(4),intent(inout) :: n_vtu_cells
    end subroutine vtu_file_reading
@@ -105,7 +106,9 @@ do i_vtu_grid=1,n_vtu_grids
 ! Read the ".vtu" file
    file_name = "input/10_body_dynamics/vtu/" // trim(adjustl(aux_char_2))
    n_vtu_cells = 0
-   call vtu_file_reading(i_vtu_grid,file_name,n_vtu_cells)
+   call vtu_file_reading(i_vtu_grid,                                           &
+      body_arr(n_bodies-n_bodies_CAE+i_vtu_grid)%surface_detection,file_name,  &
+      n_vtu_cells)
 ! Counting update for the number of CAE-made body particles
    n_body_part_CAE = n_body_part_CAE + n_vtu_cells
 ! Number of body particles of the current body
@@ -153,6 +156,12 @@ do i_vtu_grid=1,n_vtu_grids
    array_name = "vtu_points_vertices"
    call allocate_de_vertex_r1(.false.,vtu_grids(i_vtu_grid)%points%vertex,     &
       array_name=array_name,ulog_flag=.true.)
+   if (body_arr(i_vtu_grid)%surface_detection>1) then
+! Deallocation of the array of the ".vtu" point "surface"
+      array_name = "vtu_points_surface"
+      call allocate_de_log_r1(.false.,vtu_grids(i_vtu_grid)%points%surface,    &
+        array_name=array_name,ulog_flag=.true.)
+  endif
 enddo
 ! Deallocation of the ".vtu" grids
 array_name = "vtu_grids"
