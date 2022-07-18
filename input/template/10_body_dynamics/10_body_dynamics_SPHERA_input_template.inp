@@ -114,10 +114,16 @@ ___ ___ ___
 ___ ___ ___
 !-------------------------------------------------------------------------------
 ![?] <surface_detection>
-!    =1: surface body particles are detected from the definition of vertices 
-!        and cells
-!    =2: surface body particles are detected from the input values of the 
-!        variable "nSurfaceLayers" in the ".vtu" file
+!    =1: Surface body particles are detected from the definition of vertices 
+!        and cells. E.g., this option is useful in the absence of any input 
+!        value for "nSurfaceLayers".
+!    =2: Surface body particles are detected from the input values of the 
+!        variable "nSurfaceLayers" in the ".vtu" file. E.g., this option is 
+!        useful if the mesh boundary-refinement single-level completely wraps 
+!        the solid body.
+!    =3: Surface body particles are detected if any of the above criteria are 
+!        respected. E.g., this option is useful if the mesh boundary-refinement 
+!        single-level does not completely wrap the solid body.
 !-------------------------------------------------------------------------------
 ![*] <surface_detection>
 !-------------------------------------------------------------------------------

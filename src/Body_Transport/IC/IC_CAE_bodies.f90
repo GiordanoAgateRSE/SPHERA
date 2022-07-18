@@ -156,8 +156,9 @@ do i_vtu_grid=1,n_vtu_grids
    array_name = "vtu_points_vertices"
    call allocate_de_vertex_r1(.false.,vtu_grids(i_vtu_grid)%points%vertex,     &
       array_name=array_name,ulog_flag=.true.)
-   if (body_arr(i_vtu_grid)%surface_detection>1) then
 ! Deallocation of the array of the ".vtu" point "surface"
+   if ((body_arr(i_vtu_grid)%surface_detection==2).or.                         &
+      (body_arr(i_vtu_grid)%surface_detection==3)) then
       array_name = "vtu_points_surface"
       call allocate_de_log_r1(.false.,vtu_grids(i_vtu_grid)%points%surface,    &
         array_name=array_name,ulog_flag=.true.)

@@ -153,18 +153,14 @@ vtu_grids(i_vtu_grid)%cells%points_IDs(1:n_vtu_cells,1:4) = 0
 array_name = "vtu_cells_surface"
 call allocate_de_log_r2(.true.,vtu_grids(i_vtu_grid)%cells%surface,            &
    n_vtu_cells,4,array_name,ulog_flag=.true.)
-if (surface_detection==1) then
-   vtu_grids(i_vtu_grid)%cells%surface(1:n_vtu_cells,1:4) = .false.
-   elseif (surface_detection==2) then
-      vtu_grids(i_vtu_grid)%cells%surface(1:n_vtu_cells,1:4) = .true.
-endif
+vtu_grids(i_vtu_grid)%cells%surface(1:n_vtu_cells,1:4) = .false.
 array_name = "vtu_points_vertices"
 call allocate_de_vertex_r1(.true.,vtu_grids(i_vtu_grid)%points%vertex,         &
    n_vtu_points,array_name,ulog_flag=.true.)
 do ii=1,3
    vtu_grids(i_vtu_grid)%points%vertex(1:n_vtu_points)%pos(ii) = 0.d0
 enddo
-if (surface_detection>1) then
+if ((surface_detection==2).or.(surface_detection==3)) then
    array_name = "vtu_points_surface"
    call allocate_de_log_r1(.true.,vtu_grids(i_vtu_grid)%points%surface,        &
       n_vtu_points,array_name,ulog_flag=.true.)

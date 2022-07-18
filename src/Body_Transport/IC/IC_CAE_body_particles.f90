@@ -31,6 +31,7 @@ use Hybrid_allocation_module
 use Static_allocation_module
 use Dynamic_allocation_module
 use Memory_I_O_interface_module
+use I_O_file_module
 !------------------------
 ! Declarations
 !------------------------
@@ -43,7 +44,7 @@ double precision,dimension(3) :: P1,P2,P3,P4,vec_P1_P2,vec_P1_P3
 double precision,dimension(3) :: vec_P1_P4,aux_vec,face_normal
 integer(4),dimension(4) :: cell_1,cell_2
 character(100) :: array_name
-logical,dimension(:,:),allocatable :: test_surface_faces
+logical,dimension(:,:),allocatable :: test_surface_faces_1,test_surface_faces_2
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -91,14 +92,21 @@ do i_vtu_grid=1,n_bodies_CAE
    do ib_aux=1,(ib-1)
       aux_int = aux_int + body_arr(ib_aux)%npart
    enddo
-! Allocation and initialization of a temporary array to test the faces of the 
-! ".vtu" cells to define them as surface or internal.
+! Allocation and initialization of the temporary arrays to test the faces of 
+! the ".vtu" cells to define them as surface or internal.
 if ((body_arr(ib)%surface_detection==1).or.                                    &
    (body_arr(ib)%surface_detection==3)) then
-   array_name = "test_surface_faces"
-   call allocate_de_log_r2(.true.,test_surface_faces,body_arr(ib)%npart,4,     &
+   array_name = "test_surface_faces_1"
+   call allocate_de_log_r2(.true.,test_surface_faces_1,body_arr(ib)%npart,4,   &
       array_name,ulog_flag=.true.)
-   test_surface_faces(1:body_arr(ib)%npart,1:4) = .true.
+   test_surface_faces_1(1:body_arr(ib)%npart,1:4) = .true.
+endif
+if ((body_arr(ib)%surface_detection==2).or.                                    &
+   (body_arr(ib)%surface_detection==3)) then
+   array_name = "test_surface_faces_2"
+   call allocate_de_log_r2(.true.,test_surface_faces_2,body_arr(ib)%npart,4,   &
+      array_name,ulog_flag=.true.)
+   test_surface_faces_2(1:body_arr(ib)%npart,1:4) = .false.
 endif
 ! First loop over the body particles of the current body; they are bijectively 
 ! associated with the ".vtu" cells. 
@@ -107,7 +115,7 @@ endif
 ! Body variables assessed: volume, maximum velocity.
 !$omp parallel do default(none)                                                &
 !$omp shared(vtu_grids,bp_arr,ib,body_arr,i_vtu_grid,aux_int)                  &
-!$omp shared(test_surface_faces)                                               &
+!$omp shared(test_surface_faces_1,test_surface_faces_2)                        &
 !$omp private(i_vtu_cell,i_bp,i_vert2,P1,P2,P3,P4,vec_P1_P2)                   &
 !$omp private(vec_P1_P3,vec_P1_P4,aux_vec,aux_scal,i_vert,j_vtu_cell,test)     &
 !$omp private(shared_face_cell_1,shared_face_cell_2,cell_1,cell_2,aux_int_2)
@@ -116,11 +124,9 @@ endif
       i_bp = i_vtu_cell + aux_int
 ! Initializations
       bp_arr(i_bp)%body = ib
-      if (body_arr(ib)%surface_detection==1) then
-         bp_arr(i_bp)%surface = .false.
-         elseif (body_arr(ib)%surface_detection==2) then
-            bp_arr(i_bp)%surface = .true.
-      endif
+! For surface detection method "1", this initialization has no effect, for the 
+! methods "2" and "3", it is mandatory
+      bp_arr(i_bp)%surface = .true.
       bp_arr(i_bp)%pos(1:3) = 0.d0
       bp_arr(i_bp)%area = 0.d0
       bp_arr(i_bp)%normal(1:3) = 0.d0
@@ -156,7 +162,8 @@ endif
          bp_arr(i_bp)%pos(1:3) = bp_arr(i_bp)%pos(1:3) +                       &
             vtu_grids(i_vtu_grid)%points%vertex(i_vert2)%pos(1:3)
 ! Surface detection
-         if (body_arr(ib)%surface_detection==2) then
+         if ((body_arr(ib)%surface_detection==2).or.                           &
+             (body_arr(ib)%surface_detection==3)) then
 ! Possibly invalidate the surface faces (of the cell) associated with an inner 
 ! cell point
             if ((bp_arr(i_bp)%surface).and.                                    &
@@ -170,21 +177,21 @@ endif
 ! Invalidate the cell faces associated with the inner point as surface faces 
 ! (from the point to the faces)
                   case(1)
-                     vtu_grids(i_vtu_grid)%cells%surface(i_vtu_cell,1) = .false.
-                     vtu_grids(i_vtu_grid)%cells%surface(i_vtu_cell,2) = .false.
-                     vtu_grids(i_vtu_grid)%cells%surface(i_vtu_cell,3) = .false.
+                     test_surface_faces_2(i_vtu_cell,1) = .false.
+                     test_surface_faces_2(i_vtu_cell,2) = .false.
+                     test_surface_faces_2(i_vtu_cell,3) = .false.
                   case(2)
-                     vtu_grids(i_vtu_grid)%cells%surface(i_vtu_cell,1) = .false.
-                     vtu_grids(i_vtu_grid)%cells%surface(i_vtu_cell,2) = .false.
-                     vtu_grids(i_vtu_grid)%cells%surface(i_vtu_cell,4) = .false.
+                     test_surface_faces_2(i_vtu_cell,1) = .false.
+                     test_surface_faces_2(i_vtu_cell,2) = .false.
+                     test_surface_faces_2(i_vtu_cell,4) = .false.
                   case(3)
-                     vtu_grids(i_vtu_grid)%cells%surface(i_vtu_cell,1) = .false.
-                     vtu_grids(i_vtu_grid)%cells%surface(i_vtu_cell,3) = .false.
-                     vtu_grids(i_vtu_grid)%cells%surface(i_vtu_cell,4) = .false.
+                     test_surface_faces_2(i_vtu_cell,1) = .false.
+                     test_surface_faces_2(i_vtu_cell,3) = .false.
+                     test_surface_faces_2(i_vtu_cell,4) = .false.
                   case(4)
-                     vtu_grids(i_vtu_grid)%cells%surface(i_vtu_cell,2) = .false.
-                     vtu_grids(i_vtu_grid)%cells%surface(i_vtu_cell,3) = .false.
-                     vtu_grids(i_vtu_grid)%cells%surface(i_vtu_cell,4) = .false.
+                     test_surface_faces_2(i_vtu_cell,2) = .false.
+                     test_surface_faces_2(i_vtu_cell,3) = .false.
+                     test_surface_faces_2(i_vtu_cell,4) = .false.
                   case default
 ! This case cannot occur
                endselect
@@ -205,8 +212,8 @@ endif
                shared_face_cell_1,shared_face_cell_2)
             if (test) then
 ! Invalidate surface flag for shared faces
-               test_surface_faces(i_vtu_cell,shared_face_cell_1) = .false.
-               test_surface_faces(j_vtu_cell,shared_face_cell_2) = .false.
+               test_surface_faces_1(i_vtu_cell,shared_face_cell_1) = .false.
+               test_surface_faces_1(j_vtu_cell,shared_face_cell_2) = .false.
             endif
          enddo
       endif
@@ -244,24 +251,43 @@ endif
 ! Surface body particle features: area; normal (with possible IC rotation).
 !$omp parallel do default(none)                                                &
 !$omp shared(vtu_grids,i_vtu_grid,bp_arr,body_arr,ib,aux_int)                  &
-!$omp shared(test_surface_faces)                                               &
+!$omp shared(test_surface_faces_1,test_surface_faces_2,uerr)                   &
 !$omp private(i_vtu_cell,i_bp,i_vert2,P1,P2,P3,face_area,face_normal,i_face)
    do i_vtu_cell=1,body_arr(ib)%npart
       i_bp = i_vtu_cell + aux_int
-! Surface detection
-      if ((body_arr(ib)%surface_detection==1).or.                              &
-         (body_arr(ib)%surface_detection==3)) then
+! Surface assignment
+! Re-inizialization from scratch, even if for the "method 2" the values have 
+! been already computed. This way is faster for treating any method, than 
+! avoiding redundancy for the method "2".
+      bp_arr(i_bp)%surface = .false.
 ! Loop over the cell faces
-         do i_face=1,4
-            if (test_surface_faces(i_vtu_cell,i_face)) then
+      do i_face=1,4
+         select case (body_arr(ib)%surface_detection)
+            case(1)
 ! Activate surface flag for faces not shared
-               vtu_grids(i_vtu_grid)%cells%surface(i_vtu_cell,i_face) = .true.
+               vtu_grids(i_vtu_grid)%cells%surface(i_vtu_cell,i_face) =        &
+                  test_surface_faces_1(i_vtu_cell,i_face)
+            case(2)
+               vtu_grids(i_vtu_grid)%cells%surface(i_vtu_cell,i_face) =        &
+                  test_surface_faces_2(i_vtu_cell,i_face)
+            case(3)
+               if ((test_surface_faces_1(i_vtu_cell,i_face)).or.               &
+                  (test_surface_faces_2(i_vtu_cell,i_face))) then
+                  vtu_grids(i_vtu_grid)%cells%surface(i_vtu_cell,i_face) =     &
+                     .true.
+               endif
+            case default
+               write(uerr,*) "Error. The surface detection method for ",       &
+                  "CAE-made solid bodies has not benn properly assigned. ",    &
+                  "The program stops here."
+               stop
+         endselect
+         if (vtu_grids(i_vtu_grid)%cells%surface(i_vtu_cell,i_face)) then
 ! Activate surface flag for body particle in case of at least 1 surface face of 
-! the associated vtu cell
-               bp_arr(i_bp)%surface = .true.
-            endif
-         enddo
-      endif
+! the associated vtu cell.
+            bp_arr(i_bp)%surface = .true.
+         endif
+      enddo
       if (bp_arr(i_bp)%surface) then
 ! Surface body particles
 ! Particle area (internal faces are not considered)
@@ -341,12 +367,18 @@ enddo
 !------------------------
 ! Deallocations
 !------------------------
-! Deallocation of the temporary array to test the faces of the 
+! Deallocation of the temporary arrays to test the faces of the 
 ! ".vtu" cells to define them as surface or internal.
 if ((body_arr(ib)%surface_detection==1).or.                                    &
    (body_arr(ib)%surface_detection==3)) then
-   array_name = "test_surface_faces"
-   call allocate_de_log_r2(.false.,test_surface_faces,array_name=array_name,   &
+   array_name = "test_surface_faces_1"
+   call allocate_de_log_r2(.false.,test_surface_faces_1,array_name=array_name, &
+      ulog_flag=.true.)
+endif
+if ((body_arr(ib)%surface_detection==2).or.                                    &
+   (body_arr(ib)%surface_detection==3)) then
+   array_name = "test_surface_faces_2"
+   call allocate_de_log_r2(.false.,test_surface_faces_2,array_name=array_name, &
       ulog_flag=.true.)
 endif
 return
