@@ -35,11 +35,11 @@ use Dynamic_allocation_module
 !------------------------
 implicit none
 integer(4) :: nceli,ncel,igridi,kgridi,jgridi,irang,krang,jrang,fw
-integer(4) :: mm,npj,irestocell,ID_closest_fb,number_SASPH_neighbours
+integer(4) :: mm,npj,irestocell
 #ifdef SOLID_BODIES
 integer(4) :: sb
 #endif
-double precision :: rijlocal,uni, pesoj,plocal,rho,dis_closest_fb
+double precision :: rijlocal,uni, pesoj,plocal,rho
 double precision,dimension(3) :: raglocal,vel
 type (TyCtlPoint) :: pglocal
 integer(4),external :: CellIndices,CellNumber
@@ -60,14 +60,6 @@ uni = zero
 plocal = zero
 rho = zero
 vel(:) = zero
-! Distance between the monitoring element and the possible closest fluid  
-! particle (within the kernel support of the monitoring element)
-dis_closest_fb = 2.d0 * Domain%h
-! ID of the possible closest fluid particle
-ID_closest_fb = 0
-! Number of the neighbouring SA-SPH frontiers of the possible fluid particle 
-! which is the closest to the monitoring element  
-number_SASPH_neighbours = 0
 !------------------------
 ! Statements
 !------------------------
@@ -95,10 +87,6 @@ do jrang = jgridi-1,jgridi+1
 ! Update of the monitoring element density (mono-phase SPH approximation)
                rho = rho + pg(npj)%dens * pesoj
                vel(:) = vel(:) + pg(npj)%vel(:) * pesoj
-! Update the information on the possible closest fluid particle (within the 
-! kernel support of the monitoring element)
-               dis_closest_fb = min(dis_closest_fb,rijlocal)
-               if (dis_closest_fb==rijlocal) ID_closest_fb = npj
             enddo
          endif
 ! Contributions from wall elements
@@ -151,31 +139,11 @@ pglocal%uni = uni
 if (uni>=1.d-1) then
 ! In case the dicrete Shepard coefficient is smaller than 0.1 the monitor 
 ! element assumes null pressure, velocity and density.
-   if ((ID_closest_fb>0).and.(Domain%tipo=="semi")) then
-#ifdef SPACE_3D
-         number_SASPH_neighbours = BoundaryDataPointer(1,ID_closest_fb)
-#elif defined SPACE_2D
-            number_SASPH_neighbours = BoundaryDataPointer(2,ID_closest_fb)
-#endif
-   endif
-   if ((ID_closest_fb>0).and.(number_SASPH_neighbours>0)) then
-! If the possible closest fluid particle has neighbouring SA-SPH frontiers, 
-! then interpolations are replaced by this particle value (if the monitoring 
-! element has neighbouring SA-SPH frontiers, then one cannot neglect the SA-SPH 
-! contributions; as they are cumbersome to estimate for a monitoring element, 
-! which is not a particle, it seems smarter to refer to the closest fluid 
-! particle as the particle values are already representative of their kernel 
-! support).
-      pglocal%pres = pg(ID_closest_fb)%pres
-      pglocal%dens = pg(ID_closest_fb)%dens
-      pglocal%vel(:) = pg(ID_closest_fb)%vel(:)
-      else
 ! SPH interpolations at the position of the monitoring element from the values 
 ! of the neighbouring fluid particles, wall elements and body particles.
          pglocal%pres = plocal/uni
          pglocal%dens = rho/uni
          pglocal%vel(:) = vel(:)/uni
-   endif
 endif
 !------------------------
 ! Deallocations

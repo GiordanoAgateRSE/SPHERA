@@ -96,6 +96,12 @@ type input_any_time_der_type
 ! Density_thresholds flag (default=0; =1 for very low bulk modulus -preliminary 
 ! simulations-)
    integer(4) :: density_thresholds
+! ID for the consistency/conservation of the pressure-gradient term in the 
+! momentum equation
+   integer(4) :: ME_gradp_cons
+! ID for the consistency of the post-processing procedures at the monitoring 
+! elements
+   integer(4) :: monitor_cons
 #ifdef SPACE_3D
 ! Maximum number of neighbouring SA-SPH faces for a computational particle
    integer(4) :: MAXCLOSEBOUNDFACES

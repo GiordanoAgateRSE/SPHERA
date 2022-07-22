@@ -41,7 +41,7 @@ integer(4) :: ioerr,time_split,RKscheme,body_part_reorder
 #ifdef SPACE_3D
 integer(4) :: MAXCLOSEBOUNDFACES,MAXNUMCONVEXEDGES,GCBFVecDim_loc,nag_aux
 #endif
-integer(4) :: density_thresholds
+integer(4) :: density_thresholds,ME_gradp_cons,monitor_cons
 character(100) :: token
 logical,external :: ReadCheck
 character(100),external :: lcase
@@ -101,6 +101,10 @@ do while (trim(lcase(ainp))/="##### end run parameters #####")
    read(ainp,*,iostat=ioerr) COEFNMAXPARTI,COEFNMAXPARTJ,body_part_reorder
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"COEFNMAXPARTI and COEFNMAXPARTJ ",&
       ninp,ulog)) return
+   call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
+   read(ainp,*,iostat=ioerr) ME_gradp_cons,monitor_cons
+   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"ME_gradp_cons,monitor_cons",      &
+      ninp,ulog)) return
 #ifdef SPACE_3D
    call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
       read(ainp,*,iostat=ioerr) nag_aux,MAXCLOSEBOUNDFACES,MAXNUMCONVEXEDGES,  &
@@ -143,6 +147,8 @@ if (input_second_read.eqv..true.) then
    Domain%COEFNMAXPARTI = COEFNMAXPARTI
    input_any_t%COEFNMAXPARTJ = COEFNMAXPARTJ
    input_any_t%body_part_reorder = body_part_reorder
+   input_any_t%ME_gradp_cons = ME_gradp_cons
+   input_any_t%monitor_cons = monitor_cons   
 #ifdef SPACE_3D
       input_any_t%MAXCLOSEBOUNDFACES = MAXCLOSEBOUNDFACES
       input_any_t%MAXNUMCONVEXEDGES = MAXNUMCONVEXEDGES
@@ -173,6 +179,10 @@ if (input_second_read.eqv..true.) then
          input_any_t%COEFNMAXPARTJ
       write(ulog,"(1x,a,1p,i1)")    "body_part_reorder          : ",           &
          input_any_t%body_part_reorder
+      write(ulog,"(1x,a,1p,i1)")    "ME_gradp_cons              : ",           &
+         input_any_t%ME_gradp_cons
+      write(ulog,"(1x,a,1p,i1)")    "monitor_cons               : ",           &
+         input_any_t%monitor_cons
 #ifdef SPACE_3D
       write(ulog,"(1x,a,1p,i12)")   "NAG_AUX                    : ",           &
          Domain%nag_aux

@@ -85,20 +85,32 @@
 !    element neighbours. Its value can be effectively modified at any restart 
 !    time.
 ![?] <body_part_reorder>: for DB-SPH; its value can be effectively modified at 
-!    any restart time.
+!    any restart time. Its value can be effectively modified at any restart 
+!    time.
 !    =0 (fixed frontiers)
 !    =1 (mobile frontiers)
+![?] <ME_gradp_cons>: ID for the consistency/conservation of the 
+!    pressure-gradient term in the momentum equation. Its value can be 
+!    effectively modified at any restart time.
+!    =-1 (conservative)
+!    =1 (1st-order consistent)
+![?] <monitor_cons>: ID for the consistency of the post-processing procedures 
+!    at the monitoring elements
+!    =0 (0th-order consistency)
+!    =1 (1st-order consistency)
 !-------------------------------------------------------------------------------
 ![*] <final_time> <final_time_step>
 ![*] <CFL> <vsc_coeff> <Leapfrog_flag> <scheme_order> <factor> <dt_alfa_Mon>
 ![*] <teta_p> <teta_u>
 ![*] <COEFNMAXPARTI> <COEFNMAXPARTJ> <body_part_reorder>
+![*] <ME_gradp_cons> <monitor_cons>
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
 ___ ___
 ___ ___ ___ ___ ___ ___
 ___ ___
 ___ ___ ___
+___ ___
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
 ![?] if (3D) then
