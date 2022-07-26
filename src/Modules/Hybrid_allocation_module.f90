@@ -152,8 +152,11 @@ type TyGriglia
    double precision :: extr(3,2)
 end type TyGriglia
 
-! Fluid particle 
+! Fluid particle
 type TyParticle
+! Variable to immediately detect a fluid particle with (.true.) or without 
+! (.false.) body-particle neighbours
+   logical :: fp_bp_flag
 ! ID of an inlet neighbouring DB-SPH surface element, if any (otherwise it is
 ! null)                
    integer(4) :: DBSPH_inlet_ID
@@ -180,7 +183,12 @@ type TyParticle
    integer(4) :: CloseBcOut                     
    integer(4) :: cella                          
    integer(4) :: izona
-! Colour                         
+! Status on renormalization matrix involving fluid particles (B_ren_fp_stat)
+! =1: renormalization matrix is computed
+! =0: renormalization matrix is replaced by the opposite of the identity matrix
+! =-1: renormalization matrix is not used
+   integer(4) :: B_ren_fp_stat
+! Colour
    integer(4) :: icol
 ! Fluid ID 
    integer(4) :: imed
@@ -200,7 +208,7 @@ type TyParticle
    double precision :: uni
 ! Pressure correction
    double precision :: vpres
-! Density correction                          
+! Density correction
    double precision :: vden
 ! Second invariant of the strain rate tensor for incompressible fluids                         
    double precision :: secinv        
@@ -308,6 +316,8 @@ type TyParticle
    double precision :: velass(3)
 ! Velocity gradient (SPH pseudo-consistent approximation over fluid particles) 
    double precision :: dvel(3,3)
+! Renormalization matrix involving fluid particles (B_ren_fp)
+   double precision,dimension(3,3) :: B_ren_fp
 ! BC conditions for fixed particles (f=free-slip; n=no-slip; c=cont slip)
    character(1) :: slip
 ! Movement type

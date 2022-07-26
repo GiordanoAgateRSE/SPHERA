@@ -20,10 +20,15 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: grad_W_sub
-! Description: Gradient of the kernel function. Cubic beta-spline kernel 
-!              function as defined in the paper of Monaghan & Lattanzio (1985).
+! Description: Gradient of the kernel function. kernel_ID:
+!              =1 cubic beta-spline cubic kernel as defined in the paper of 
+!                 Monaghan & Lattanzio (1985); first used by SPHERA for a 
+!                 journal paper in Di Monaco et al. (2011, IJNME);
+!              =2 anti-cluster cubic kernel as defined in the paper of Gallati 
+!                 & Braschi (2000, "L'Acqua"); first used by SPHERA for a 
+!                 journal paper in Amicarelli et al. (2015, CAF).
 !-------------------------------------------------------------------------------
-subroutine grad_W_sub(r_vec,grad_W)
+subroutine grad_W_sub(kernel_ID,r_vec,grad_W)
 !------------------------
 ! Modules
 !------------------------
@@ -33,6 +38,7 @@ use Hybrid_allocation_module
 ! Declarations
 !------------------------
 implicit none
+integer(4),intent(in) :: kernel_ID
 double precision,dimension(3),intent(in) :: r_vec
 double precision,dimension(3),intent(out) :: grad_W
 double precision :: dW_by_dq,q_scal,abs_r_vec
@@ -45,23 +51,46 @@ double precision :: dW_by_dq,q_scal,abs_r_vec
 !------------------------
 ! Initializations
 !------------------------
+grad_w(1:3) = 0.d0
 !------------------------
 ! Statements
 !------------------------
 abs_r_vec = dsqrt(dot_product(r_vec,r_vec))
+if (abs_r_vec<(Domain%h*1.d-6)) return
 q_scal = abs_r_vec / Domain%h
-if (q_scal<=1.d0) then
-   dW_by_dq = 1.d0 / (PIGRECO * (Domain%h ** 3)) * (9.d0 / 4.d0 * (q_scal **   &
-                2) - 3.d0 * q_scal)
-   elseif (q_scal>=2.d0) then
-      dW_by_dq = 0.d0
-      else
-            dW_by_dq = -3.d0 / (4.d0 * PIGRECO * (Domain%h ** 3)) * ((2.d0 -   &
-                         q_scal) ** 2)
-endif
+select case(kernel_ID)
+   case(1)
+! beta-spline cubic kernel
+      if (q_scal<=1.d0) then
+         dW_by_dq = 1.d0 / (PIGRECO * (Domain%h ** 3)) * (9.d0 / 4.d0 *        &
+                    (q_scal ** 2) - 3.d0 * q_scal)
+         elseif (q_scal>=2.d0) then
+            dW_by_dq = 0.d0
+            else
+               dW_by_dq = -3.d0 / (4.d0 * PIGRECO * (Domain%h ** 3)) * ((2.d0 -&
+                          q_scal) ** 2)
+      endif
+   case(2)
+! anti-cluster cubic kernel
+      if (q_scal<=2.d0) then
+         dW_by_dq = -3.d0 * ((2.d0 - q_scal) ** 2) * (15.d0 / (64.d0 * PIGRECO &
+                    * (Domain%h ** 3)))
+         else
+            dW_by_dq = 0.d0
+      endif
+   case default
+endselect
 grad_w(1:3) = dW_by_dq / Domain%h * r_vec(1:3) / abs_r_vec
 #ifdef SPACE_2D
-grad_w(1:3) = grad_w(1:3) * Domain%h * 10.d0 / 7.d0
+select case(kernel_ID)
+   case(1)
+! beta-spline cubic kernel
+      grad_w(1:3) = grad_w(1:3) * Domain%h * 10.d0 / 7.d0
+   case(2)
+! anti-cluster cubic kernel
+      grad_w(1:3) = grad_w(1:3) * Domain%h * 4.d0 / 3.d0
+   case default
+endselect
 #endif
 !------------------------
 ! Deallocations

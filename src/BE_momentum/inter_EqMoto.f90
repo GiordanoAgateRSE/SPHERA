@@ -32,6 +32,7 @@ subroutine inter_EqMoto(npi,tpres,tdiss,tvisc)
 use Static_allocation_module
 use Hybrid_allocation_module
 use Dynamic_allocation_module
+use I_O_file_module
 !------------------------
 ! Declarations
 !------------------------
@@ -47,7 +48,7 @@ double precision :: gradmod,gradmodwacl,wu,denom,absv_pres_grav_inner
 double precision :: absv_Morris_inner,Morris_inner_weigth,kernel_der
 double precision :: dervel(3),dervelmorr(3),appopres(3),appodiss(3),rvw(3)
 double precision :: rvwalfa(3),rvwbeta(3),ragtemp(3),rvw_sum(3),rvw_semi_part(3)
-double precision :: DBSPH_wall_she_vis_term(3),t_visc_semi_part(3)
+double precision :: DBSPH_wall_she_vis_term(3),t_visc_semi_part(3),aux_vec(3)
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -63,6 +64,13 @@ interface
    character(3),intent(in) :: vel_type
    double precision,intent(out) :: rvw(3)
    end subroutine viscomorris
+   subroutine MatrixProduct(AA,BB,CC,nr,nrc,nc)
+      implicit none
+      integer(4),intent(in) :: nr,nrc,nc
+      double precision,intent(in),dimension(nr,nrc) :: AA
+      double precision,intent(in),dimension(nrc,nc) :: BB
+      double precision,intent(inout),dimension(nr,nc) :: CC
+   end subroutine MatrixProduct
 end interface
 !------------------------
 ! Allocations
@@ -192,24 +200,67 @@ do contj=1,nPartIntorno(npi)
    endif
 ! Momentum equation: start
    if (Granular_flows_options%KTGF_config/=1) then
-      alpha = pi / (rhoi * rhoi) + pj / (rhoj * rhoj) 
+! Liquids
+      if ((input_any_t%ME_gradp_cons==-1).or.                                  &
+         (pg(npi)%fp_bp_flag).or.                                              &
+#ifdef SPACE_3D
+         (BoundaryDataPointer(1,npi)>0))                                       &
+#elif defined SPACE_2D
+         (BoundaryDataPointer(1,npi)>0).or.                                    &
+         (BoundaryDataPointer(2,npi)>0))                                       &
+#endif
+         then
+! Conservative formulation (always close to any boundary)
+         alpha = pi / (rhoi * rhoi) + pj / (rhoj * rhoj)
+         elseif (input_any_t%ME_gradp_cons==1) then
+! 1st-order consistent (applied only far from boundaries)
+            alpha = (pj - pi) / (rhoi * rhoj)
+            else
+               write(uerr,*) "The option chosen for 'ME_gradp_cons' is wrong.",&
+                  "The program stops here."
+               stop
+      endif
+! Dense granular flows
       else
-         alpha = (pi + pj) / rhoi 
+         alpha = (pi + pj) / rhoi
    endif
    if (Domain%tipo=="semi") then
       if (Granular_flows_options%KTGF_config/=1) then
-         appopres(:) = ( - amassj * alpha * rag(:,npartint) *                  &
-                       PartKernel(3,npartint) )
+! Liquids
+         if ((input_any_t%ME_gradp_cons==-1).or.                               &
+            (pg(npi)%fp_bp_flag).or.                                           &
+#ifdef SPACE_3D
+            (BoundaryDataPointer(1,npi)>0))                                    &
+#elif defined SPACE_2D
+            (BoundaryDataPointer(1,npi)>0).or.                                 &
+            (BoundaryDataPointer(2,npi)>0))                                    &
+#endif
+            then
+! Conservative
+            appopres(1:3) = -amassj * alpha * rag(1:3,npartint) *              &
+                            PartKernel(3,npartint)
+            elseif (input_any_t%ME_gradp_cons==1) then
+! 1st-order consistent (applied only far from boundaries)
+               call MatrixProduct(pg(npi)%B_ren_fp,BB=rag(1:3,npartint),       &
+                  CC=aux_vec,nr=3,nrc=3,nc=1)
+               appopres(1:3) = amassj * alpha * aux_vec(1:3) *                 &
+                               PartKernel(3,npartint)
+               else
+                  write(uerr,*) "The option chosen for 'ME_gradp_cons' ",      &
+                     "is wrong. The program stops here."
+                  stop
+         endif
          else
-            appopres(:) = ( - amassj / rhoj * alpha * rag(:,npartint) *        &
-                          PartKernel(3,npartint) )
+! Dense granular flows
+            appopres(1:3) = -amassj / rhoj * alpha * rag(1:3,npartint) *       &
+                            PartKernel(3,npartint)
       endif
       else
 ! DB-SPH: the equation has to use the same kernel type when using the kernel 
 ! function (cubic spline) and its derivative
          if (Domain%tipo=="bsph") then
-            appopres(:) = ( - amassj * alpha * rag(:,npartint) *               &
-                          PartKernel(1,npartint) ) 
+            appopres(1:3) = -amassj * alpha * rag(1:3,npartint) *              &
+                            PartKernel(1,npartint)
          endif
    endif
    tpres(:) = tpres(:) + appopres(:)

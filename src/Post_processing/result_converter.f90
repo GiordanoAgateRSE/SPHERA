@@ -216,7 +216,7 @@ if (nag>0) then
       if (k2>numpoints) k2 = numpoints
       write(unitvtk,'(8x,16(1x,ES12.4E3))') (pg(finger(k))%coord(3),k=k1,k2)
    enddo
-   write(unitvtk,'(a)') '      </DataArray>' 
+   write(unitvtk,'(a)') '      </DataArray>'
 ! Fluid ID
    write(unitvtk,'(a)')                                                        &
       '      <DataArray type="Float32" Name="Medium" format="ascii" >'
@@ -262,7 +262,53 @@ if (nag>0) then
       write(unitvtk,'(8x,24(1x,i8))') (finger(k),k=k1,k2)
    enddo
    write(unitvtk,'(a)') '      </DataArray>'
+   if (input_any_t%ME_gradp_cons==1) then
+! B_ren_fp(1,1-3)
+      write(unitvtk,'(a)')                                                     &
+'      <DataArray type="Float32" Name="B_ren_fp_1_1-3"  NumberOfComponents="3"  format="ascii" >'
+      do i=1,numpoints,6
+         k1 = i
+         k2 = k1 + 5
+         if (k2>numpoints) k2 = numpoints
+         write(unitvtk,'(8x,6(3(1x,ES12.4E3)))') (pg(finger(k))%B_ren_fp(1,1), &
+            pg(finger(k))%B_ren_fp(1,2),pg(finger(k))%B_ren_fp(1,3),k=k1,k2)
+      enddo
+      write(unitvtk,'(a)') '      </DataArray>'
+! B_ren_fp(2,1-3)
+      write(unitvtk,'(a)')                                                     &
+'      <DataArray type="Float32" Name="B_ren_fp_2_1-3"  NumberOfComponents="3"  format="ascii" >'
+      do i=1,numpoints,6
+         k1 = i
+         k2 = k1 + 5
+         if (k2>numpoints) k2 = numpoints
+         write(unitvtk,'(8x,6(3(1x,ES12.4E3)))') (pg(finger(k))%B_ren_fp(2,1), &
+            pg(finger(k))%B_ren_fp(2,2),pg(finger(k))%B_ren_fp(2,3),k=k1,k2)
+      enddo
+      write(unitvtk,'(a)') '      </DataArray>'
+! B_ren_fp(3,1-3)
+      write(unitvtk,'(a)')                                                     &
+'      <DataArray type="Float32" Name="B_ren_fp_3_1-3"  NumberOfComponents="3"  format="ascii" >'
+      do i=1,numpoints,6
+         k1 = i
+         k2 = k1 + 5
+         if (k2>numpoints) k2 = numpoints
+         write(unitvtk,'(8x,6(3(1x,ES12.4E3)))') (pg(finger(k))%B_ren_fp(3,1), &
+            pg(finger(k))%B_ren_fp(3,2),pg(finger(k))%B_ren_fp(3,3),k=k1,k2)
+      enddo
+      write(unitvtk,'(a)') '      </DataArray>'
+! B_ren_fp_stat
+      write(unitvtk,'(a)')                                                     &
+         '      <DataArray type="Float32" Name="B_ren_fp_stat" format="ascii" >'
+      do i=1,numpoints,24
+         k1 = i
+         k2 = k1 + 23
+         if (k2>numpoints) k2 = numpoints
+         write(unitvtk,'(8x,24(1x,i6))') (pg(finger(k))%B_ren_fp_stat,k=k1,k2)
+      enddo
+      write(unitvtk,'(a)') '      </DataArray>'
+   endif
    if (Domain%tipo=="bsph") then
+! DBSPH
 ! Shepard coefficient
       write(unitvtk,'(a)')                                                     &
 '      <DataArray type="Float32" Name="Shepard coefficient" format="ascii" >'

@@ -40,7 +40,7 @@ use Memory_I_O_interface_module
 implicit none
 integer(4) :: nceli,igridi,kgridi,jgridi,irang,krang,jrang,ncelj,jgrid1
 integer(4) :: jgrid2,contliq,mm,npi,npj,npartint,index_rij_su_h
-integer(4) :: irestocell,celleloop,fw,i_grid,j_grid
+integer(4) :: irestocell,celleloop,fw,i_grid,j_grid,test
 #ifdef SOLID_BODIES
 integer(4) :: aux2,ibp,bp_f,bp
 #endif
@@ -48,15 +48,32 @@ double precision :: rij_su_h,ke_coef,kacl_coef,rij_su_h_quad,rijtemp,rijtemp2
 double precision :: gradmod,gradmodwacl,wu,denom,normal_int_abs,abs_vel
 double precision :: min_sigma_Gamma,dis_fp_dbsph_inoutlet
 double precision :: dbsph_inoutlet_threshold,normal_int_mixture_top_abs
-double precision :: normal_int_sat_top_abs
-double precision :: ragtemp(3)
+double precision :: normal_int_sat_top_abs,abs_det_thresh
+double precision,dimension(3) :: ragtemp,r_vec,grad_W,gradWomegaj,aux_vec
+double precision,dimension(3) :: aux_vec_2,aux_vec_3
 integer(4),dimension(:),allocatable :: bounded
 double precision,dimension(:),allocatable :: dShep_old
+double precision,dimension(3,3) :: aux_mat
 character(len=lencard)  :: nomsub = "CalcVarLength"
 integer(4),external :: ParticleCellNumber,CellIndices,CellNumber
 !------------------------
 ! Explicit interfaces
 !------------------------
+interface
+   subroutine grad_W_sub(kernel_ID,r_vec,grad_W)
+      implicit none
+      integer(4),intent(in) :: kernel_ID
+      double precision,dimension(3),intent(in) :: r_vec
+      double precision,dimension(3),intent(out) :: grad_W
+   end subroutine grad_W_sub
+   subroutine Matrix_Inversion_3x3(mat,inv,abs_det_thresh,test)
+      implicit none
+      double precision,intent(in) :: abs_det_thresh
+      double precision,intent(in) :: mat(3,3)
+      double precision,intent(inout) :: inv(3,3)
+      integer(4),intent(inout) :: test
+   end subroutine Matrix_Inversion_3x3
+end interface
 !------------------------
 ! Allocations
 !------------------------
@@ -80,6 +97,7 @@ if ((Domain%tipo=="bsph").and.(nag>0)) then
    pg_w(:)%grad_vel_VSL_times_mu(2) = 0.d0
    pg_w(:)%grad_vel_VSL_times_mu(3) = 0.d0
 endif
+abs_det_thresh = 0.1d0
 #ifdef SOLID_BODIES
    nPartIntorno_bp_f = 0
    nPartIntorno_bp_bp = 0
@@ -94,12 +112,14 @@ endif
 !$omp private(rij_su_h,rij_su_h_quad,denom,index_rij_su_h,gradmod,gradmodwacl) &
 !$omp private(wu,contliq,fw,normal_int_abs,abs_vel,dis_fp_dbsph_inoutlet)      &
 !$omp private(dbsph_inoutlet_threshold,normal_int_mixture_top_abs)             &
-!$omp private(normal_int_sat_top_abs)                                          &                 
+!$omp private(normal_int_sat_top_abs,r_vec,grad_W,gradWomegaj,aux_vec)         &
+!$omp private(aux_vec_2,aux_vec_3,aux_mat,test)                                &   
 !$omp shared(nag,pg,Domain,Med,Icont,Npartord,NMAXPARTJ,rag,nPartIntorno)      &
 !$omp shared(Partintorno,PartKernel,ke_coef,kacl_coef,Doubleh,square_doubleh)  &
 !$omp shared(squareh,nomsub,eta,eta2,ulog,uerr,ind_interfaces,DBSPH,pg_w)      &
 !$omp shared(Icont_w,Npartord_w,rag_fw,nPartIntorno_fw,Partintorno_fw)         &
-!$omp shared(kernel_fw,dShep_old,Granular_flows_options,NMedium)
+!$omp shared(kernel_fw,dShep_old,Granular_flows_options,NMedium)               &
+!$omp shared(abs_det_thresh,simulation_time,input_any_t)
 loop_nag: do npi=1,nag
    if (Domain%tipo=="bsph") then
       pg(npi)%rhoSPH_old = pg(npi)%rhoSPH_new
@@ -145,6 +165,9 @@ loop_nag: do npi=1,nag
    pg(npi)%ind_neigh_mix_bed = 0
    pg(npi)%ind_neigh_mob_for_granmob = 0
    pg(npi)%blt_flag = 0
+   pg(npi)%B_ren_fp(1:3,1:3) = 0.d0
+   pg(npi)%B_ren_fp_stat = -1
+   pg(npi)%fp_bp_flag = .false.
    pg(npi)%rijtempmin = 99999.d0
    jgrid1 = jgridi - (ncord - 2)
    jgrid2 = jgridi + (ncord - 2)
@@ -243,7 +266,25 @@ loop_nag: do npi=1,nag
 ! Gallati anti-cluster kernel, interesting test: start
 !    kernel_fw(2,npartint) = (5.d0/(16.d0*PIGRECO*Domain%h**2)) *              &
 !    ((2.d0 - rij_su_h)**3) 
-! Gallati anti-cluster kernel, interesting test: end
+! Gallati anti-cluster kernel, interesting test: end               
+! Contributions to the inverse of the renormalization matrices
+               if (input_any_t%ME_gradp_cons==1) then
+                  r_vec(1:3) = -ragtemp(1:3)
+                  call grad_W_sub(kernel_ID=2,r_vec=r_vec,grad_W=grad_W)
+                  gradWomegaj(1:3) = grad_W(1:3) * pg(npj)%mass / pg(npj)%dens
+                  aux_vec(1:3) = (pg(npj)%coord(1) - pg(npi)%coord(1)) *       &
+                                 gradWomegaj(1:3)
+                  aux_vec_2(1:3) = (pg(npj)%coord(2) - pg(npi)%coord(2)) *     &
+                                   gradWomegaj(1:3)
+                  aux_vec_3(1:3) = (pg(npj)%coord(3) - pg(npi)%coord(3)) *     &
+                                   gradWomegaj(1:3)
+                  pg(npi)%B_ren_fp(1:3,1) = pg(npi)%B_ren_fp(1:3,1) +          &
+                                            aux_vec(1:3)
+                  pg(npi)%B_ren_fp(1:3,2) = pg(npi)%B_ren_fp(1:3,2) +          &
+                                            aux_vec_2(1:3)
+                  pg(npi)%B_ren_fp(1:3,3) = pg(npi)%B_ren_fp(1:3,3) +          &
+                                            aux_vec_3(1:3)
+               endif
                if (Domain%tipo=="bsph") then
                   pg(npi)%sigma = pg(npi)%sigma + pg(npj)%mass *               &
                                   PartKernel(4,npartint) / pg(npj)%dens 
@@ -576,6 +617,20 @@ loop_nag: do npi=1,nag
       endif
 !$omp end critical (interface_definition) 
    endif
+   if (input_any_t%ME_gradp_cons==1) then
+! Matrix inversion to get the renormalization matrix
+      call Matrix_Inversion_3x3(pg(npi)%B_ren_fp,aux_mat,abs_det_thresh,test)
+      if (test==1) then
+         pg(npi)%B_ren_fp(1:3,1:3) = aux_mat(1:3,1:3)
+         pg(npi)%B_ren_fp_stat = 1
+         else
+            pg(npi)%B_ren_fp(1:3,1:3) = 0.d0
+            pg(npi)%B_ren_fp(1,1) = -1.d0
+            pg(npi)%B_ren_fp(2,2) = -1.d0
+            pg(npi)%B_ren_fp(3,3) = -1.d0
+            pg(npi)%B_ren_fp_stat = 0
+      endif
+   endif
 enddo loop_nag
 !$omp end parallel do
 ! In case of bed-load transport 
@@ -770,6 +825,8 @@ endif
 ! Loop over the neighbouring body particles in the cell
                loop_bp_f: do bp_f=Icont(ncelj),Icont(ncelj+1)-1
                   npj = NPartOrd(bp_f)
+! This fluid particle has at least 1 neighbouring body particle
+                  pg(npj)%fp_bp_flag = .true.
 ! Relative positions and distances
 ! Sign inversion because body particle acts here as a computational particle
                   ragtemp(1:3) = - pg(npj)%coord(1:3) + bp_arr(npi)%pos(1:3)  

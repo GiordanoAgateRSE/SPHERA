@@ -31,6 +31,7 @@ subroutine SPH_approximations_at_monitors(pglocal)
 use Static_allocation_module
 use Hybrid_allocation_module
 use Dynamic_allocation_module
+use I_O_file_module
 !------------------------
 ! Declarations
 !------------------------
@@ -96,8 +97,9 @@ interface
       double precision,intent(in),dimension(nrc,nc) :: BB
       double precision,intent(inout),dimension(nr,nc) :: CC
    end subroutine MatrixProduct
-   subroutine grad_W_sub(r_vec,grad_W)
+   subroutine grad_W_sub(kernel_ID,r_vec,grad_W)
       implicit none
+      integer(4),intent(in) :: kernel_ID
       double precision,dimension(3),intent(in) :: r_vec
       double precision,dimension(3),intent(out) :: grad_W
    end subroutine grad_W_sub
@@ -183,7 +185,7 @@ do jrang=jgridi-1,jgridi+1
                                         pg(npj)%coord(1:3) * Womegaj
 #endif
 ! grad_W
-                  call grad_W_sub(r_vec,grad_W)
+                  call grad_W_sub(kernel_ID=1,r_vec=r_vec,grad_W=grad_W)
                   gradWomegaj(1:3) = grad_W(1:3) * pg(npj)%mass / pg(npj)%dens
 ! Contributions to raw SPH approximations of the gradients of the following 
 ! functions: 1, density, pressure, velocity
@@ -285,7 +287,7 @@ do jrang=jgridi-1,jgridi+1
                   x_cons0_fp_bp(1:3) = x_cons0_fp_bp(1:3) +                    &
                                        bp_arr(npj)%pos(1:3) * Womegaj
 ! grad_W
-                  call grad_W_sub(r_vec,grad_W)
+                  call grad_W_sub(kernel_ID=1,r_vec=r_vec,grad_W=grad_W)
 ! Contributions to raw SPH approximations of the gradients of the following 
 ! functions: 1, pressure
                   gradWomegaj(1:3) = grad_W(1:3) * bp_arr(npj)%volume
@@ -395,13 +397,13 @@ if (pglocal%sigma_fp<1.d-1) then
             x_cons0_fp_bp(1:3) = x_cons0_fp_bp(1:3) / pglocal%sigma_fp_bp
             x_cons0_fp_sbp(1:3) = x_cons0_fp_sbp(1:3) / pglocal%sigma_fp_sbp
 #endif
-! Inversion of the renormalization matrices
+! Matrix inversion to get the renormalization matrices
             call Matrix_Inversion_3x3(pglocal%B_ren_fp,aux_mat,abs_det_thresh, &
                test)
             if (test==1) then
                pglocal%B_ren_fp(1:3,1:3) = aux_mat(1:3,1:3)
                else
-                  write(*,*) "Monitors. 1st-order consistency replaced by ",   &
+                  write(ulog,*) "Monitors. 1st-order consistency replaced by ",&
                      "0th-order consistency. Monitor position: ",              &
                      pglocal%coord(1:3)," . Simulation time: ",simulation_time,&
                      " ."
@@ -416,7 +418,7 @@ if (pglocal%sigma_fp<1.d-1) then
             if (test==1) then
                pglocal%B_ren_fp_bp(1:3,1:3) = aux_mat(1:3,1:3)
                else
-                  write(*,*) "Monitors. 1st-order consistency replaced by ",   &
+                  write(ulog,*) "Monitors. 1st-order consistency replaced by ",&
                      "0th-order consistency. Monitor position: ",              &
                      pglocal%coord(1:3)," . Simulation time: ",simulation_time,&
                      " ."
@@ -430,7 +432,7 @@ if (pglocal%sigma_fp<1.d-1) then
             if (test==1) then
                pglocal%B_ren_fp_sbp(1:3,1:3) = aux_mat(1:3,1:3)
                else
-                  write(*,*) "Monitors. 1st-order consistency replaced by ",   &
+                  write(ulog,*) "Monitors. 1st-order consistency replaced by ",&
                      "0th-order consistency. Monitor position: ",              &
                      pglocal%coord(1:3)," . Simulation time: ",simulation_time,&
                      " ."

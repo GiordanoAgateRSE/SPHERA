@@ -112,7 +112,7 @@ do ii = 1,indarrayFlu
 #endif
    endif
    if ((Domain%tipo=="semi").and.                                              &
-#ifdef SPACE_3D   
+#ifdef SPACE_3D
       (Ncbf>0)) then
 #elif defined SPACE_2D
       (Ncbs>0).and.(IntNcbs>0)) then

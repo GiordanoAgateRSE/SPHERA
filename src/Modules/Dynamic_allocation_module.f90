@@ -82,7 +82,7 @@ integer(4),dimension(:),allocatable :: PartIntorno
 ! PartKernel(2,b): PartKernel(1,b)/(|r_0b|^2+eps^2) =
 !                  -|gradW_0b|/|r_0b|/(|r_0b|^2+eps^2)
 ! PartKernel(3,b): -|gradW_0b|/|r_0b|, Gallati anti-cluster kernel, 
-!                  used for pressure terms (SA-SPH) 
+!                  used for pressure terms (SA-SPH)
 ! PartKernel(4,b): W_0b: absolute value of the kernel cubic spline (SASPH, but
 !                        not used)
 ! gradW vector is equal to -PartKernel(1 or 3,b)*rag_0b
