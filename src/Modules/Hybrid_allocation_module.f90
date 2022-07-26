@@ -736,13 +736,30 @@ type TyCtlPoint
    double precision :: pres
 ! Interpolated density 
    double precision :: dens
-! Interpolated Shepard coefficient
-   double precision :: uni
+! Shepard coefficient (contributions from fluid particles and DBSPH 
+! semi-particles)
+   double precision :: sigma_fp
+#ifdef SOLID_BODIES
+! Shepard coefficient (contributions from fluid particles, DBSPH 
+! semi-particles and body particles)
+   double precision :: sigma_fp_bp
+! Shepard coefficient (contributions from fluid particles, DBSPH 
+! semi-particles and surface body particles)
+   double precision :: sigma_fp_sbp
+#endif
    double precision :: dist
 ! Position
    double precision :: coord(3)
 ! Interpolated velocity
    double precision :: vel(3)
+! Renormalization matrix involving fluid particles (B_ren_fp)
+   double precision,dimension(3,3) :: B_ren_fp
+#ifdef SOLID_BODIES
+! Renormalization matrix involving:
+! fluid and solid body particles (B_ren_fp_bp)
+! fluid particles and surface solid body particles (B_ren_fp_sbp)
+   double precision,dimension(3,3) :: B_ren_fp_bp,B_ren_fp_sbp
+#endif
 end type TyCtlPoint
 
 ! Control line

@@ -19,7 +19,7 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: CalcVarp              
+! Program unit: CalcVarp
 ! Description: To calculate physical quantities at a monitoring point.     
 !-------------------------------------------------------------------------------
 subroutine CalcVarp 
@@ -50,12 +50,19 @@ integer(4),external :: CellNumber
 ! Statements
 !------------------------
 if (npointst<1) return
+!$omp parallel do default(none)                                                &
+!$omp shared(npointst,control_points,Grid)                                     &
+!$omp private(i,pglocal,xp,yp,zp,ii,jj,kk,pointcellnumber)
 do i=1,npointst
-   pglocal%coord(:) = control_points(i)%coord(:)
-   pglocal%pres = zero
-   pglocal%dens = zero
-   pglocal%vel(:) = zero
-   pglocal%uni = zero
+   pglocal%coord(1:3) = control_points(i)%coord(1:3)
+   pglocal%pres = 0.d0
+   pglocal%dens = 0.d0
+   pglocal%vel(1:3) = 0.d0
+   pglocal%sigma_fp = 0.d0
+#ifdef SOLID_BODIES
+   pglocal%sigma_fp_bp = 0.d0
+   pglocal%sigma_fp_sbp = 0.d0
+#endif
    xp = pglocal%coord(1) - Grid%extr(1,1)
    yp = pglocal%coord(2) - Grid%extr(2,1)
    zp = pglocal%coord(3) - Grid%extr(3,1)
@@ -64,13 +71,28 @@ do i=1,npointst
    kk = ceiling(zp / Grid%dcd(3)) 
    pointcellnumber = CellNumber(ii,jj,kk)
    pglocal%cella = pointcellnumber
-   call interpolations_for_monitoring_element(pglocal)
+   pglocal%B_ren_fp(1:3,1:3) = 0.d0
+#ifdef SOLID_BODIES
+   pglocal%B_ren_fp_bp(1:3,1:3) = 0.d0
+   pglocal%B_ren_fp_sbp(1:3,1:3) = 0.d0
+#endif
+   call SPH_approximations_at_monitors(pglocal)
    control_points(i)%pres = pglocal%pres
    control_points(i)%dens = pglocal%dens
-   control_points(i)%vel(:) = pglocal%vel(:)
-   control_points(i)%uni = pglocal%uni
+   control_points(i)%vel(1:3) = pglocal%vel(1:3)
+   control_points(i)%sigma_fp = pglocal%sigma_fp
+#ifdef SOLID_BODIES
+   control_points(i)%sigma_fp_bp = pglocal%sigma_fp_bp
+   control_points(i)%sigma_fp_sbp = pglocal%sigma_fp_sbp
+#endif
+   control_points(i)%B_ren_fp(1:3,1:3) = pglocal%B_ren_fp(1:3,1:3)
+#ifdef SOLID_BODIES
+   control_points(i)%B_ren_fp_bp(1:3,1:3) = pglocal%B_ren_fp_bp(1:3,1:3)
+   control_points(i)%B_ren_fp_sbp(1:3,1:3) = pglocal%B_ren_fp_sbp(1:3,1:3)
+#endif
    control_points(i)%cella  = pglocal%cella
 enddo
+!$omp end parallel do
 !------------------------
 ! Deallocations
 !------------------------

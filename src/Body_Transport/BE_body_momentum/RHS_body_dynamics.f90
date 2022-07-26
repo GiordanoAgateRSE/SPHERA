@@ -42,7 +42,7 @@ integer(4) :: n_interactions,aux2,aux3,test,aux_scal_test
 #ifdef SPACE_3D
 integer(4) :: aux_int
 #endif
-double precision :: k_masses,r_per,r_par,alfa_boun,dx_dxbp,dxbp
+double precision :: k_masses,r_per,r_par,alfa_boun,dx_dxbp,dxbp,abs_det_thresh
 double precision :: aux_impact_vel,aux4,aux_scalar,aux_scalar_2
 double precision :: friction_limiter
 #ifdef SPACE_2D
@@ -258,6 +258,7 @@ mean_bound_normal(:,:) = 0.d0
 sliding_app_point(:,:) = 0.d0
 sliding_dir(:,:) = 0.d0
 interface_sliding_vel_max(:) = 0.d0
+abs_det_thresh = 1.d-9
 !------------------------
 ! Statements
 !------------------------
@@ -621,7 +622,7 @@ enddo
 #endif
 !$omp shared(n_bodies,body_arr,it_start,on_going_time_step,aux,r_per_min)      &
 !$omp shared(Domain,alfa_denom,Force_bod_sol,Moment_bod_sol,inter_front)       &
-!$omp shared(Force_bod_flu)
+!$omp shared(Force_bod_flu,abs_det_thresh)
 do i=1,n_bodies
    if (body_arr(i)%imposed_kinematics==0) then
 ! Saving the hydrodynamic forces 
@@ -656,7 +657,8 @@ do i=1,n_bodies
          body_arr(i)%Ic(2,1) = body_arr(i)%Ic(1,2)
          body_arr(i)%Ic(3,1) = body_arr(i)%Ic(1,3)
          body_arr(i)%Ic(3,2) = body_arr(i)%Ic(2,3)
-         call Matrix_Inversion_3x3(body_arr(i)%Ic,body_arr(i)%Ic_inv,aux_int)
+         call Matrix_Inversion_3x3(body_arr(i)%Ic,body_arr(i)%Ic_inv,          &
+            abs_det_thresh,aux_int)
 #elif defined SPACE_2D
             if ((it_start+1)==on_going_time_step) then
                body_arr(i)%Ic_inv(:,:) = 0.d0 

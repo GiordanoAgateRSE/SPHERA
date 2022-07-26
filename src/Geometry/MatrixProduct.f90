@@ -34,10 +34,10 @@ use Static_allocation_module
 ! Declarations
 !------------------------
 implicit none
-integer(4),intent(IN) :: nr,nrc,nc
-double precision,intent(IN),dimension(nr,nrc) :: AA
-double precision,intent(IN),dimension(nrc,nc) :: BB
-double precision,intent(INOUT),dimension(nr, nc) :: CC
+integer(4),intent(in) :: nr,nrc,nc
+double precision,intent(in),dimension(nr,nrc) :: AA
+double precision,intent(in),dimension(nrc,nc) :: BB
+double precision,intent(inout),dimension(nr,nc) :: CC
 integer(4) :: i,j,k
 double precision :: sum
 !------------------------
@@ -66,4 +66,3 @@ enddo
 !------------------------
 return
 end subroutine MatrixProduct
-

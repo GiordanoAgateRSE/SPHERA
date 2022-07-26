@@ -20,7 +20,8 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: w
-! Description: kernel function 
+! Description: Kernel function. Cubic beta-spline function as defined in 
+!              the paper of Monaghan & Lattanzio (1985).
 !-------------------------------------------------------------------------------
 double precision function w(r,h,coef)
 !------------------------

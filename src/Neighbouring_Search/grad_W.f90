@@ -19,26 +19,23 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: three_plane_intersection   
-! Description: Computation of the intersection of 3 planes. It is also called 
-!              in 2D.         
+! Program unit: grad_W_sub
+! Description: Gradient of the kernel function. Cubic beta-spline kernel 
+!              function as defined in the paper of Monaghan & Lattanzio (1985).
 !-------------------------------------------------------------------------------
-subroutine three_plane_intersection(a1,b1,c1,d1,a2,b2,c2,d2,a3,b3,c3,d3,       &
-                                    test_point,intersection_pl)
+subroutine grad_W_sub(r_vec,grad_W)
 !------------------------
 ! Modules
 !------------------------
-implicit none
-double precision,intent(in) :: a1,b1,c1,d1,a2,b2,c2,d2,a3,b3,c3,d3
-integer(4),intent(inout) :: test_point
-double precision,intent(inout) :: intersection_pl(3)
-integer(4) :: test
-double precision :: abs_det_thresh
-double precision :: b_vec(3)
-double precision :: matrix(3,3),inverted(3,3)
+use Static_allocation_module
+use Hybrid_allocation_module
 !------------------------
 ! Declarations
 !------------------------
+implicit none
+double precision,dimension(3),intent(in) :: r_vec
+double precision,dimension(3),intent(out) :: grad_W
+double precision :: dW_by_dq,q_scal,abs_r_vec
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -48,33 +45,26 @@ double precision :: matrix(3,3),inverted(3,3)
 !------------------------
 ! Initializations
 !------------------------
-abs_det_thresh = 1.d-9
 !------------------------
 ! Statements
 !------------------------
-matrix(1,1) = a1
-matrix(1,2) = b1
-matrix(1,3) = c1
-matrix(2,1) = a2
-matrix(2,2) = b2
-matrix(2,3) = c2
-matrix(3,1) = a3
-matrix(3,2) = b3
-matrix(3,3) = c3 
-call Matrix_Inversion_3x3(matrix,inverted,abs_det_thresh,test)
-if (test==1) then
-   test_point = 1
-   b_vec(1) = - d1
-   b_vec(2) = - d2
-   b_vec(3) = - d3
-   intersection_pl(1) = dot_product(inverted(1,:),b_vec) 
-   intersection_pl(2) = dot_product(inverted(2,:),b_vec) 
-   intersection_pl(3) = dot_product(inverted(3,:),b_vec) 
-   else
-      test_point = 0 
+abs_r_vec = dsqrt(dot_product(r_vec,r_vec))
+q_scal = abs_r_vec / Domain%h
+if (q_scal<=1.d0) then
+   dW_by_dq = 1.d0 / (PIGRECO * (Domain%h ** 3)) * (9.d0 / 4.d0 * (q_scal **   &
+                2) - 3.d0 * q_scal)
+   elseif (q_scal>=2.d0) then
+      dW_by_dq = 0.d0
+      else
+            dW_by_dq = -3.d0 / (4.d0 * PIGRECO * (Domain%h ** 3)) * ((2.d0 -   &
+                         q_scal) ** 2)
 endif
+grad_w(1:3) = dW_by_dq / Domain%h * r_vec(1:3) / abs_r_vec
+#ifdef SPACE_2D
+grad_w(1:3) = grad_w(1:3) * Domain%h * 10.d0 / 7.d0
+#endif
 !------------------------
 ! Deallocations
 !------------------------
 return
-end subroutine three_plane_intersection
+end subroutine grad_W_sub

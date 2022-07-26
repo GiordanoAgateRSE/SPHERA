@@ -24,7 +24,7 @@
 !              It is also called in 2D. The program unit "Matrix_Inversion_2x2" 
 !              was available until SPHERA v.9.0.0.   
 !-------------------------------------------------------------------------------
-subroutine Matrix_Inversion_3x3(mat,inv,test)
+subroutine Matrix_Inversion_3x3(mat,inv,abs_det_thresh,test)
 !------------------------
 ! Modules
 !------------------------
@@ -32,10 +32,13 @@ subroutine Matrix_Inversion_3x3(mat,inv,test)
 ! Declarations
 !------------------------
 implicit none
-double precision,intent(in) :: mat(3,3) 
+! abs_det_thresh: absolute value of the minimum threshold below which no 
+! inversion applies 
+double precision,intent(in) :: abs_det_thresh
+double precision,intent(in) :: mat(3,3)
 double precision,intent(inout) :: inv(3,3)
-integer(4),intent(inout) :: test  
-double precision :: det
+integer(4),intent(inout) :: test
+double precision :: det,aux_scal
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -51,7 +54,8 @@ double precision :: det
 det = mat(1,1) * mat(2,2) * mat(3,3) + mat(2,1) * mat(3,2) * mat(1,3) +        &
       mat(3,1) * mat(1,2) * mat(2,3) - mat(1,1) * mat(3,2) * mat(2,3) -        &
       mat(3,1) * mat(2,2) * mat(1,3) - mat(2,1) * mat(1,2) * mat(3,3)
-if (det/=0.d0) then
+aux_scal = dabs(det)
+if (aux_scal>=abs_det_thresh) then
    test = 1
    inv(1,1) = mat(2,2) * mat(3,3) - mat(2,3) * mat(3,2)
    inv(1,2) = mat(1,3) * mat(3,2) - mat(1,2) * mat(3,3)

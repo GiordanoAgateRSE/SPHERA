@@ -275,12 +275,12 @@ if (.not.restart) then
    close(ninp)
    nag = 0
 #ifdef SPACE_2D
-! 10 / (7 * pigreco) *(3./2.) /(h**2)
+! 10 / (7 * pigreco) * (3./2.) / (h**2)
       Domain%coefke = 0.682093d0 / (Domain%h ** ncord)
 ! 5 / (16 * pigreco)/(h**2)
       Domain%coefkacl = 0.099472d0 / (Domain%h ** ncord)
 #elif defined SPACE_3D
-! 1 / pigreco/(h**3)
+! 1 / pigreco * (3./2.) / (h**3)
          Domain%coefke = 0.477464d0 / (Domain%h ** ncord) 
 ! 15 / (64 * pigreco)/(h**3)
          Domain%coefkacl = 0.074603d0 / (Domain%h ** ncord)

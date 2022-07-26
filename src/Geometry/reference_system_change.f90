@@ -36,6 +36,7 @@ integer(4) :: i,aux_int
 double precision,intent(in) :: pos_old_ref(3),new_origin_old_ref(3) 
 double precision,intent(in) :: new_cos_dir_old_ref(3,3)
 double precision,intent(inout) :: pos_new_ref(3)
+double precision :: abs_det_thresh
 double precision :: aux_vec(3)
 double precision :: inv_new_cos_dir_old_ref(3,3)
 !------------------------
@@ -47,11 +48,13 @@ double precision :: inv_new_cos_dir_old_ref(3,3)
 !------------------------
 ! Initializations
 !------------------------
+abs_det_thresh = 1.d-9
 aux_vec(:) = pos_old_ref(:) - new_origin_old_ref(:)
 !------------------------
 ! Statements
 !------------------------
-call Matrix_Inversion_3x3(new_cos_dir_old_ref,inv_new_cos_dir_old_ref,aux_int)
+call Matrix_Inversion_3x3(new_cos_dir_old_ref,inv_new_cos_dir_old_ref,         &
+   abs_det_thresh,aux_int)
 do i=1,3
    pos_new_ref(i) = dot_product(inv_new_cos_dir_old_ref(i,:),aux_vec)
 enddo

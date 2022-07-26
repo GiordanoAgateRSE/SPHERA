@@ -103,7 +103,14 @@ do i=1,size(Control_Points)
    Control_Points(i)%vel(3) = zero
    Control_Points(i)%pres = zero
    Control_Points(i)%dens = zero
-   Control_Points(i)%uni = zero
+   Control_Points(i)%sigma_fp = zero
+   Control_Points(i)%B_ren_fp(1:3,1:3) = 0.d0
+#ifdef SOLID_BODIES
+   Control_Points(i)%sigma_fp_bp = zero
+   Control_Points(i)%sigma_fp_sbp = zero
+   Control_Points(i)%B_ren_fp_bp(1:3,1:3) = 0.d0
+   Control_Points(i)%B_ren_fp_sbp(1:3,1:3) = 0.d0
+#endif
    Control_Points(i)%dist = zero
 enddo
 do i=1,size(Control_Lines)
