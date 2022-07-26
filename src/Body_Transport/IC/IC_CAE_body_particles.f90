@@ -106,7 +106,7 @@ if ((body_arr(ib)%surface_detection==2).or.                                    &
    array_name = "test_surface_faces_2"
    call allocate_de_log_r2(.true.,test_surface_faces_2,body_arr(ib)%npart,4,   &
       array_name,ulog_flag=.true.)
-   test_surface_faces_2(1:body_arr(ib)%npart,1:4) = .false.
+   test_surface_faces_2(1:body_arr(ib)%npart,1:4) = .true.
 endif
 ! First loop over the body particles of the current body; they are bijectively 
 ! associated with the ".vtu" cells. 
