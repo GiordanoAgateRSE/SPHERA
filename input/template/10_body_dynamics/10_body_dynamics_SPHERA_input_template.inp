@@ -75,13 +75,18 @@
 ![?] <FSI_free_slip_conditions>
 !    =.true. (free-slip conditions for FSI)
 !    =.false. (no-slip conditions for FSI)
+![?] <thin_walls>
+!    =.true. (treatment for submerged boundary thin walls, far from other 
+!    boundary types)
+!    =.false. (no treatment for submerged boundary thin walls, far from other 
+!    boundary types)
 !-------------------------------------------------------------------------------
 ![*] <n_bodies> <dx/dx_body> <friction_angle> <time_max_no_gravity_force> 
 !    <time_max_no_body_frontier_impingements> <body_minimum_pressure_limiter> 
-!    <body_maximum_pressure_limiter> <FSI_free_slip_conditions>
+!    <body_maximum_pressure_limiter> <FSI_free_slip_conditions> <thin_walls>
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
-___ ___ ___ ___ ___ ___ ___ ___
+___ ___ ___ ___ ___ ___ ___ ___ ___
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
 ![?] <ID_body>: body ID

@@ -272,6 +272,11 @@ do npi=1,n_body_part
 ! Contribution to the pressure gradient term
       aux_scalar = (pg(npj)%pres + bp_arr(npi)%pres) / (pg(npj)%dens *         &
                    pg(npj)%dens)
+      if (thin_walls) then
+! Treatment for thin walls (to the coupling term on the pressure gradient)
+         aux_scalar = aux_scalar * (1.d0 + (1.d0 - pg(npj)%sigma_fp -          &
+                      pg(npj)%sigma_bp) / pg(npj)%sigma_bp)
+      endif
 #ifdef SPACE_3D
       dx_dxbp = Domain%dx / (bp_arr(npi)%volume ** (1.d0/3.d0))
 #elif defined SPACE_2D
@@ -284,6 +289,11 @@ do npi=1,n_body_part
 ! Body particle volume
          aux_scalar = pg(npj)%mass / Med(pg(npj)%imed)%den0 / (dx_dxbp **      &
                       ncord)
+      if (thin_walls) then
+! Treatment for thin walls (to the coupling term on the shear-stress gradient)
+         aux_scalar = aux_scalar * (1.d0 + (1.d0 - pg(npj)%sigma_fp -          &
+                      pg(npj)%sigma_bp) / pg(npj)%sigma_bp)
+      endif
 ! Contribution to the shear stress gradient term
          pg(npj)%acc(:) = pg(npj)%acc(:) - 2.d0 * pg(npj)%kin_visc *           &
                           (bp_arr(npi)%vel(:) - pg(npj)%vel(:)) *              &

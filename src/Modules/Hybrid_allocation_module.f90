@@ -158,7 +158,7 @@ type TyParticle
 ! (.false.) body-particle neighbours
    logical :: fp_bp_flag
 ! ID of an inlet neighbouring DB-SPH surface element, if any (otherwise it is
-! null)                
+! null)
    integer(4) :: DBSPH_inlet_ID
 ! ID of an outlet neighbouring DB-SPH surface element, if any (otherwise it is 
 ! null)               
@@ -239,10 +239,16 @@ type TyParticle
    double precision :: rhoSPH_old
 ! Lagrangian derivative of Shepard coefficient 
    double precision :: dShep
-! Discrete Shepard coefficient
+! Discrete Shepard coefficient (for DBSPH)
    double precision :: sigma
-! Discrete Shepard coefficient involving neighbours of the same fluid   
-   double precision :: sigma_same_fluid
+#ifdef SOLID_BODIES
+! Discrete Shepard coefficient (contributions from fluid particles, beta-spline 
+! cubic kernel)
+   double precision :: sigma_fp
+! Discrete Shepard coefficient (contributions from body particles, beta-spline 
+! cubic kernel)
+   double precision :: sigma_bp
+#endif
 ! Integral Shepard coefficient
    double precision :: Gamma
 ! Last value of Gamma before FS=3

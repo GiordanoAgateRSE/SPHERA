@@ -57,7 +57,7 @@ double precision,external :: w
 !$omp shared(n_body_part,bp_arr,nPartIntorno_bp_f,NMAXPARTJ,PartIntorno_bp_f)  &
 !$omp shared(KerDer_bp_f_cub_spl,rag_bp_f,pg,Domain)                           &
 !$omp shared(FSI_free_slip_conditions,ulog,on_going_time_step,n_surf_body_part)&
-!$omp shared(surf_body_part)                                                   &
+!$omp shared(surf_body_part,thin_walls)                                        &
 !$omp private(npi,sum_W_vol,W_vol,j,npartint,npj,k,temp_dden,aux,dis,dis_min)  &
 !$omp private(mod_normal,dvar,aux_vec,aux_nor,dis_s0_sb,dis_fb_s0,dis_fb_sb)   &
 !$omp private(dx_dxbp)
@@ -163,6 +163,11 @@ do npi=1,n_body_part
                   KerDer_bp_f_cub_spl(npartint) * (dvar(1) * ( -               &
                   rag_bp_f(1,npartint)) + dvar(2) * ( - rag_bp_f(2,npartint))  &
                   + dvar(3) * ( - rag_bp_f(3,npartint)))
+      if (thin_walls) then
+! Treatment for thin walls (to the coupling term for the continuity equation)
+         temp_dden = temp_dden * (1.d0 + (1.d0 - pg(npj)%sigma_fp -            &
+                     pg(npj)%sigma_bp) / pg(npj)%sigma_bp)
+      endif
 !$omp critical (omp_body_particles_to_continuity)
       pg(npj)%dden = pg(npj)%dden - temp_dden
 !$omp end critical (omp_body_particles_to_continuity)

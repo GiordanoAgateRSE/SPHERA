@@ -56,6 +56,9 @@ double precision,dimension(:),allocatable :: dShep_old
 double precision,dimension(3,3) :: aux_mat
 character(len=lencard)  :: nomsub = "CalcVarLength"
 integer(4),external :: ParticleCellNumber,CellIndices,CellNumber
+#ifdef SOLID_BODIES
+double precision,external :: w
+#endif
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -126,8 +129,7 @@ loop_nag: do npi=1,nag
       pg(npi)%rhoSPH_new = zero
       dShep_old(npi) = pg(npi)%dShep
       pg(npi)%dShep = zero 
-      pg(npi)%sigma = zero 
-      pg(npi)%sigma_same_fluid = zero
+      pg(npi)%sigma = zero
       pg(npi)%FS = 0
       pg(npi)%DBSPH_inlet_ID = 0
       pg(npi)%DBSPH_outlet_ID = 0
@@ -152,6 +154,10 @@ loop_nag: do npi=1,nag
          endif      
       enddo
    endif
+#ifdef SOLID_BODIES
+   pg(npi)%sigma_fp = 0.d0
+   pg(npi)%sigma_bp = 0.d0
+#endif
    if (Granular_flows_options%KTGF_config>0) then
       pg(npi)%normal_int(:) = 0.d0
       pg(npi)%normal_int_mixture_top(:) = 0.d0
@@ -285,6 +291,11 @@ loop_nag: do npi=1,nag
                   pg(npi)%B_ren_fp(1:3,3) = pg(npi)%B_ren_fp(1:3,3) +          &
                                             aux_vec_3(1:3)
                endif
+#ifdef SOLID_BODIES
+              pg(npi)%sigma_fp = pg(npi)%sigma_fp +                            &
+                                 w(rijtemp,Domain%h,Domain%coefke) *           &
+                                 pg(npj)%mass / pg(npj)%dens
+#endif
                if (Domain%tipo=="bsph") then
                   pg(npi)%sigma = pg(npi)%sigma + pg(npj)%mass *               &
                                   PartKernel(4,npartint) / pg(npj)%dens 
@@ -849,7 +860,7 @@ endif
 #ifdef SPACE_2D
                      rag_bp_f(2,npartint) = 0.d0
 #endif
-! Kernel gradients (cubic spline)
+! Kernel gradients (beta-spline cubic kernel)
                   gradmod = zero
                   KerDer_bp_f_cub_spl(npartint) = zero
                   if (index_rij_su_h>=2) cycle
@@ -859,11 +870,15 @@ endif
                   endif 
                   gradmod = gradmod * ke_coef
                   KerDer_bp_f_cub_spl(npartint) = gradmod * denom 
-! Kernel gradients (Gallati's kernel derivative)
-                  gradmodwacl = - 12.d0 - 3.d0 * rij_su_h_quad + 12.d0 *       &
-                                rij_su_h 
+! Kernel gradients (anti-cluster cubic kernel)
+                  gradmodwacl = -12.d0 - 3.d0 * rij_su_h_quad + 12.d0 *        &
+                                rij_su_h
                   gradmodwacl = gradmodwacl * kacl_coef
                   KerDer_bp_f_Gal(npartint) = gradmodwacl * denom
+! Shepard coefficient (contributions from body particles)
+                  pg(npj)%sigma_bp = pg(npj)%sigma_bp +                        &
+                                     w(rijtemp,Domain%h,Domain%coefke) *       &
+                                     bp_arr(npi)%volume
                enddo loop_bp_f
 ! End Loop over the neighbouring body particles in the cell
 ! Loop over the neighbouring body particles in the cell

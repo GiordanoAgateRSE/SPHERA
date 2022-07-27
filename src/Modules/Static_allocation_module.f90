@@ -178,11 +178,13 @@ logical :: kill_flag
 logical :: current_version
 #ifdef SOLID_BODIES
 ! Flags to activate/deactivate pressure limiters on the body surfaces (input)
-logical :: body_minimum_pressure_limiter
-logical :: body_maximum_pressure_limiter
-#endif
+logical :: body_minimum_pressure_limiter,body_maximum_pressure_limiter
 ! Slip conditions for FSI (input)
 logical :: FSI_free_slip_conditions
+! Flag to activate/deactivate the treatment for submerged boundary thin walls, 
+! far from other boundary types
+logical :: thin_walls
+#endif
 ! Max number of neighbouring particles
 integer(4) :: NMAXPARTJ
 #ifdef SPACE_3D
