@@ -68,10 +68,10 @@ interface
       integer(4),intent(out) :: io_err
    end function GetToken
    subroutine vtu_variable_reading(i_vtu_grid,n_nodes,n_components,n_lines_var,&
-      n_tokens_line,var_name)
+      n_tokens_line,surface_detection,var_name)
       implicit none
       integer(4),intent(in) :: i_vtu_grid,n_nodes,n_components,n_lines_var
-      integer(4),intent(in) :: n_tokens_line
+      integer(4),intent(in) :: n_tokens_line,surface_detection
       character(100),intent(in) :: var_name
    end subroutine vtu_variable_reading
 end interface
@@ -252,7 +252,7 @@ do
 ! (useful here) or as cell-centred attribute (not interesting here)
                if (n_nodes==n_vtu_points) then
                   call vtu_variable_reading(i_vtu_grid,n_nodes,n_components,   &
-                     n_lines_var,n_tokens_line,var_name)
+                     n_lines_var,n_tokens_line,surface_detection,var_name)
                   n_var_read = n_var_read + 1
                   else
                       write(aux_char,*) n_lines_var
@@ -261,11 +261,11 @@ do
                endif
             case("types")
                call vtu_variable_reading(i_vtu_grid,n_nodes,n_components,      &
-                  n_lines_var,n_tokens_line,var_name)
+                  n_lines_var,n_tokens_line,surface_detection,var_name)
                n_var_read = n_var_read + 1
             case("connectivity")
                call vtu_variable_reading(i_vtu_grid,n_nodes,n_components,      &
-                  n_lines_var,n_tokens_line,var_name)
+                  n_lines_var,n_tokens_line,surface_detection,var_name)
                n_var_read = n_var_read + 1
             case default
 ! Useless variable: the reading is skipped

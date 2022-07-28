@@ -37,7 +37,7 @@
 !-------------------------------------------------------------------------------
 #if (defined SPACE_3D) && (defined SOLID_BODIES)
 subroutine vtu_variable_reading(i_vtu_grid,n_nodes,n_components,n_lines_var,   &
-   n_tokens_line,var_name)
+   n_tokens_line,surface_detection,var_name)
 !------------------------
 ! Modules
 !------------------------
@@ -48,7 +48,7 @@ use I_O_file_module
 !------------------------
 implicit none
 integer(4),intent(in) :: i_vtu_grid,n_nodes,n_components,n_lines_var
-integer(4),intent(in) :: n_tokens_line
+integer(4),intent(in) :: n_tokens_line,surface_detection
 character(100),intent(in) :: var_name
 integer(4) :: n_values,i_line,io_err,i_tok,i_value,i_node,i_component,aux_int
 character(100) :: token
@@ -115,15 +115,17 @@ do i_line=1,n_lines_var
             read(token,*)                                                      &
                vtu_grids(i_vtu_grid)%points%vertex(i_node)%pos(i_component)
          case ("nSurfaceLayers")
-            read(token,*) aux_int
-            if (aux_int==1) then
-               vtu_grids(i_vtu_grid)%points%surface(i_node) = .true.
-               elseif (aux_int==0) then
-                  vtu_grids(i_vtu_grid)%points%surface(i_node) = .false.
-                  else
-                     write(uerr,*) 'Error in the values of the ".vtu" point',  &
-                        'variable "nSurfaceLayers": the only values admitted ',&
-                        'are "1" and "0".'
+            if ((surface_detection==2).or.(surface_detection==3)) then
+               read(token,*) aux_int
+               if (aux_int==1) then
+                  vtu_grids(i_vtu_grid)%points%surface(i_node) = .true.
+                  elseif (aux_int==0) then
+                     vtu_grids(i_vtu_grid)%points%surface(i_node) = .false.
+                     else
+                        write(uerr,*) 'Error in the values of the ".vtu" ',    &
+                           'point variable "nSurfaceLayers": the only values ',&
+                           'admitted are "1" and "0".'
+               endif
             endif
          case ("types")
             read(token,*) vtu_grids(i_vtu_grid)%cells%type_(i_node)
