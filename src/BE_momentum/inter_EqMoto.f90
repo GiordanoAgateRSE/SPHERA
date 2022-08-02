@@ -212,6 +212,9 @@ do contj=1,nPartIntorno(npi)
          then
 ! Conservative formulation (always close to any boundary)
          alpha = pi / (rhoi * rhoi) + pj / (rhoj * rhoj)
+! The renormalization matrix of the particle is computed but not used because 
+! the particle has neighbouring frontiers
+         if (input_any_t%ME_gradp_cons==1) pg(npi)%B_ren_fp_stat = -1
          elseif (input_any_t%ME_gradp_cons==1) then
 ! 1st-order consistent (applied only far from boundaries)
             alpha = (pj - pi) / (rhoi * rhoj)

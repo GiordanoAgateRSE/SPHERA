@@ -355,8 +355,8 @@ TIME_STEP_DO: do while (it<=input_any_t%itmax)
       call body_particles_to_continuity
       call start_and_stop(3,19)
 #endif
-      call start_and_stop(2,12)      
-      if (Domain%time_split==0) then   
+      call start_and_stop(2,12)
+      if (Domain%time_split==0) then
 ! For explicit RK schemes: nothing to do
          call start_and_stop(3,12)
          elseif (Domain%time_split==1) then
