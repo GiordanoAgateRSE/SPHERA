@@ -179,9 +179,9 @@ if (input_second_read.eqv..true.) then
          input_any_t%COEFNMAXPARTJ
       write(ulog,"(1x,a,1p,i1)")    "body_part_reorder          : ",           &
          input_any_t%body_part_reorder
-      write(ulog,"(1x,a,1p,i1)")    "ME_gradp_cons              : ",           &
+      write(ulog,"(1x,a,1p,i3)")    "ME_gradp_cons              : ",           &
          input_any_t%ME_gradp_cons
-      write(ulog,"(1x,a,1p,i1)")    "monitor_cons               : ",           &
+      write(ulog,"(1x,a,1p,i3)")    "monitor_cons               : ",           &
          input_any_t%monitor_cons
 #ifdef SPACE_3D
       write(ulog,"(1x,a,1p,i12)")   "NAG_AUX                    : ",           &

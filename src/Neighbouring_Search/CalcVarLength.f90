@@ -826,7 +826,7 @@ endif
       jgrid1 = jgridi - (ncord - 2)
       jgrid2 = jgridi + (ncord - 2)
 ! Loop over the adjacent cells
-      do jrang = jgrid1,jgrid2         
+      do jrang = jgrid1,jgrid2
          do irang = igridi-1,igridi+1      
             do krang = kgridi-1,kgridi+1      
                ncelj = CellNumber (irang,jrang,krang)
@@ -836,8 +836,6 @@ endif
 ! Loop over the neighbouring body particles in the cell
                loop_bp_f: do bp_f=Icont(ncelj),Icont(ncelj+1)-1
                   npj = NPartOrd(bp_f)
-! This fluid particle has at least 1 neighbouring body particle
-                  pg(npj)%fp_bp_flag = .true.
 ! Relative positions and distances
 ! Sign inversion because body particle acts here as a computational particle
                   ragtemp(1:3) = - pg(npj)%coord(1:3) + bp_arr(npi)%pos(1:3)  
@@ -849,6 +847,8 @@ endif
                   nPartIntorno_bp_f(npi) = nPartIntorno_bp_f(npi) + 1
                   npartint = (npi - 1) * NMAXPARTJ + nPartIntorno_bp_f(npi)
                   PartIntorno_bp_f(npartint) = npj
+! This fluid particle has at least 1 neighbouring body particle
+                  pg(npj)%fp_bp_flag = .true.
 ! Relative distance
                   rijtemp2 = rijtemp
                   rijtemp = dsqrt(rijtemp)
