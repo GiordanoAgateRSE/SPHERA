@@ -27,6 +27,8 @@ subroutine distance_point_line_3D(P0,P1_line,P2_line,dis)
 !------------------------
 ! Modules
 !------------------------
+use Static_allocation_module
+use I_O_file_module
 !------------------------
 ! Declarations
 !------------------------
@@ -36,30 +38,37 @@ double precision,intent(inout) :: dis
 integer(4) :: test_point
 double precision :: a1,b1,c1,d1,a2,b2,c2,d2,a3,b3,c3,d3
 double precision :: P3_plane1(3),P3_plane2(3),intersection_pl(3),aux_vec(3)
+double precision :: aux_vec_2(3)
 !------------------------
 ! Explicit interfaces
 !------------------------
+interface
+   subroutine Vector_Product(uu,VV,ww,SPACEDIM)
+      implicit none
+      integer(4),intent(in) :: SPACEDIM
+      double precision,intent(in),dimension(SPACEDIM) :: uu,VV
+      double precision,intent(inout),dimension(SPACEDIM) :: ww
+   end subroutine Vector_Product
+end interface
 !------------------------
 ! Allocations
 !------------------------
 !------------------------
 ! Initializations
 !------------------------
+test_point = 0
 !------------------------
 ! Statements
 !------------------------
-! Fictitious points to define the fictitious planes whose intersection is the 
-! given line
-P3_plane1(1) = P1_line(1) - 999.d0
-P3_plane1(2) = P1_line(2)
+! First fictitious point "P3_plane1" the complete the first fictitious plane
+P3_plane1(1) = P1_line(1) + P2_line(2) - P1_line(2)
+P3_plane1(2) = P1_line(2) - (P2_line(1) - P1_line(1))
 P3_plane1(3) = P1_line(3)
-P3_plane2(1) = P1_line(1) 
-P3_plane2(2) = P1_line(2) - 999.d0
-if (P2_line(3)==P2_line(3)) then
-   P3_plane2(3) = P1_line(3) - 999.d0
-   else
-      P3_plane2(3) = P1_line(3)
-endif 
+! Second fictitious point "P3_plane2" the complete the first fictitious plane
+aux_vec(1:3) = P2_line(1:3) - P1_line(1:3)
+aux_vec_2(1:3) = P3_plane1(1:3) - P1_line(1:3)
+call Vector_Product(aux_vec,aux_vec_2,P3_plane2,3)
+P3_plane2(1:3) = P1_line(1:3) + P3_plane2(1:3)
 ! Finding the coefficients for the Cartesian equation of the planes
 ! Plane 1: first auxiliary plane passing for the line 
 ! (containing the points P1_line, P2_line and P3_plane1)
@@ -72,24 +81,34 @@ c1 = (P2_line(1) - P1_line(1)) * (P3_plane1(2) - P1_line(2)) -                 &
 d1 = - (a1 * P1_line(1) + b1 * P1_line(2) + c1 * P1_line(3))
 ! Plane 2: second auxiliary plane passing for the line (containing the points 
 ! P1_line, P2_line and P3_plane2)
-a2 = (P2_line(2) - P1_line(2)) * (P3_plane2(3) - P1_line(3)) - (P3_plane2(2) - &
-     P1_line(2)) * (P2_line(3) - P1_line(3))
+a2 = (P2_line(2) - P1_line(2)) * (P3_plane2(3) - P1_line(3)) -                 &
+     (P3_plane2(2) - P1_line(2)) * (P2_line(3) - P1_line(3))
 b2 = - ((P2_line(1) - P1_line(1)) * (P3_plane2(3) - P1_line(3)) -              &
      (P3_plane2(1) - P1_line(1)) * (P2_line(3) - P1_line(3)))
-c2 = (P2_line(1) - P1_line(1)) * (P3_plane2(2) - P1_line(2)) - (P3_plane2(1) - &
-     P1_line(1)) * (P2_line(2) - P1_line(2))
+c2 = (P2_line(1) - P1_line(1)) * (P3_plane2(2) - P1_line(2)) -                 &
+     (P3_plane2(1) - P1_line(1)) * (P2_line(2) - P1_line(2))
 d2 = - (a2 * P1_line(1) + b2 * P1_line(2) + c2 * P1_line(3))
-! Plane 3: plane passing for P0 and perpendicular to P1-P2 
+! Plane 3: plane passing for P0 and perpendicular to P1-P2
 a3 = P2_line(1) - P1_line(1) 
 b3 = P2_line(2) - P1_line(2) 
 c3 = P2_line(3) - P1_line(3) 
 d3 = - (a3 * P0(1) + b3 * P0(2) + c3 * P0(3)) 
 ! Intersection line-plane (intersection_pl): intersection of 3 planes
-call three_plane_intersection(a1,b1,c1,d1,a2,b2,c2,d2,a3,b3,c3,d3,test_point,  &
-                              intersection_pl)
+call three_plane_intersection(a1,b1,c1,d1,a2,b2,c2,d2,a3,b3,c3,d3,             &
+   test_point,intersection_pl)
 ! distance point-intersection
-aux_vec(:) = intersection_pl(:)-P0(:)
-dis = sqrt(dot_product(aux_vec,aux_vec))
+if (test_point==1) then
+   aux_vec(:) = intersection_pl(:) - P0(:)
+   dis = sqrt(dot_product(aux_vec,aux_vec))
+   else
+      write(uerr,*) 'Program unit "distance_point_line_3D" did not work ',     &
+         'properly. '
+      write(uerr,*) '   P0 : ',P0(1:3)
+      write(uerr,*) '   P1_line : ',P1_line(1:3)
+      write(uerr,*) '   P1_line : ',P2_line(1:3)
+      write(uerr,*) 'The program stops here. '
+      stop
+endif
 !------------------------
 ! Deallocations
 !------------------------

@@ -48,7 +48,7 @@ double precision :: matrix(3,3),inverted(3,3)
 !------------------------
 ! Initializations
 !------------------------
-abs_det_thresh = 1.d-9
+abs_det_thresh = 1.d-18
 !------------------------
 ! Statements
 !------------------------
@@ -71,7 +71,7 @@ if (test==1) then
    intersection_pl(2) = dot_product(inverted(2,:),b_vec) 
    intersection_pl(3) = dot_product(inverted(3,:),b_vec) 
    else
-      test_point = 0 
+      test_point = 0
 endif
 !------------------------
 ! Deallocations
