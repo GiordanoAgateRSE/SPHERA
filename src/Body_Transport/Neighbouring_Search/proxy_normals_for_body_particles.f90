@@ -79,13 +79,18 @@ do npi=1,n_body_part
 ! The candidate solid particle "kk" (or "sb") has a non-null normal and lies 
 ! within the kernel support of the fluid particle "npj" (or "fb")
             if (bp_arr(kk)%body==bp_arr(npi)%body) then
+! The proxy normal cannot belong to another body to be suitable for the 
+! visibility criterion
                aux_scal=dot_product(rag_bp_f(:,npartint),bp_arr(kk)%normal)
                if (aux_scal>1.d-12) then
 ! The fluid particle "npj" and the solid particle "kk" can "see" each other
                   if (npi==kk) then
+! The computational body particle has a normal suitable for this interaction: 
+! the visibility check was already passed.
                      proxy_normal_bp_f(npartint) = kk
                      exit
                      else
+! Otherwise a proxy normal is needed
                         aux_vec(1:3) = bp_arr(npi)%pos(1:3) -                  &
                                        bp_arr(kk)%pos(1:3)
                         dis_s0_sb = dsqrt(dot_product(aux_vec,aux_vec))
@@ -112,15 +117,16 @@ do npi=1,n_body_part
       enddo
       if (proxy_normal_bp_f(npartint)==0) then
 ! In case the normal is not yet defined, there is a fluid-solid mass 
-! penetration. The normal vector is taken from the neighbouring surface body 
+! penetration or some normals are wrongly defined. Under these cimrcumstances, 
+! the normal vector is taken from the neighbouring surface body 
 ! particle, which is the closest to the neighbouring fluid particle.
          write(ulog,'(3a)') 'The search for the fluid-body interaction ',      &
-            'normals detects a fluid-solid mass penetration (in case of ',     &
+            'normals detects a fluid-solid mass penetration or some normals ', &
+            'were wrongly calculated by the input mesh (in case of ',          &
             'no-slip conditions there is no detection).'
          write(ulog,'(a,i10,a,i10,a,i10,a,i10,a)')                             &
             'Computational body particle: ',npi,                               &
             ' . Neighbouring fluid particle: ',npj,                            &
-            ' . Neighbouring body particle: ',kk,                              &
             ' . Current time step: ',on_going_time_step,' .'
 ! Here the array PartIntorno_bp_bp cannot be used as it only refers to 
 ! neighbouring body particles of other bodies
