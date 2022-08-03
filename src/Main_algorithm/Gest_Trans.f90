@@ -226,6 +226,15 @@ endif
          write(ulog,'(1x,a)')                                                  &
             "   Array PartIntorno_bp_f successfully allocated "
    endif
+   allocate(proxy_normal_bp_f(NMAXPARTJ*n_body_part),stat=ier)
+   if (ier/=0) then
+      write(ulog,'(1x,a,i2)')                                                  &
+         "   Array proxy_normal_bp_f not allocated. Error code: ",ier
+      call diagnostic(arg1=4,arg3=nomsub)
+      else
+         write(ulog,'(1x,a)')                                                  &
+            "   Array proxy_normal_bp_f successfully allocated "
+   endif
    allocate(KerDer_bp_f_cub_spl(NMAXPARTJ*n_body_part),stat=ier)
    if (ier/=0) then
       write(ulog,'(1x,a,i2)')                                                  &
@@ -329,6 +338,8 @@ endif
       size(nPartIntorno_bp_f)
    write(ulog,*) " Size # of elements in array PartIntorno_bp_f    : ",        &
       size(PartIntorno_bp_f)
+   write(ulog,*) " Size # of elements in array proxy_normal_bp_f   : ",        &
+      size(proxy_normal_bp_f)
    write(ulog,*) " Size # of elements in array KerDer_bp_f_cub_spl : ",        &
       size(KerDer_bp_f_cub_spl)
    write(ulog,*) " Size # of elements in array KerDer_bp_f_Gal     : ",        &
@@ -378,6 +389,8 @@ endif
       sizeof(nPartIntorno_bp_f)
    write(ulog,*) " Size in bytes of array PartIntorno_bp_f         : ",        &
       sizeof(PartIntorno_bp_f)
+   write(ulog,*) " Size in bytes of array proxy_normal_bp_f        : ",        &
+      sizeof(proxy_normal_bp_f)
    write(ulog,*) " Size in bytes of array KerDer_bp_f_cub_spl      : ",        &
       sizeof(KerDer_bp_f_cub_spl)
    write(ulog,*) " Size in bytes of array KerDer_bp_f_Gal          : ",        &

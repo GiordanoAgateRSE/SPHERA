@@ -127,8 +127,12 @@ if ((Domain%tipo=="bsph").and.(nag>0).and.(DBSPH%n_w>0)) then
 endif
 call start_and_stop(3,18)
 #ifdef SOLID_BODIES
-! Pressure initialization for body particles
    call start_and_stop(2,19)
+! Proxy normals for body particles
+   if (FSI_free_slip_conditions.eqv..true.) then
+      call proxy_normals_for_body_particles
+   endif
+! Pressure initialization for body particles
    call body_pressure_mirror
    call body_pressure_postpro
    call start_and_stop(3,19)
@@ -352,6 +356,10 @@ TIME_STEP_DO: do while (it<=input_any_t%itmax)
       call start_and_stop(3,12)
 #ifdef SOLID_BODIES
       call start_and_stop(2,19)
+! Proxy normals for body particles
+      if (FSI_free_slip_conditions.eqv..true.) then
+         call proxy_normals_for_body_particles
+      endif
       call body_particles_to_continuity
       call start_and_stop(3,19)
 #endif

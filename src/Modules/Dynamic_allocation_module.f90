@@ -119,7 +119,11 @@ double precision,dimension(:,:),allocatable :: grad_vel_VSL_fw
 integer(4),dimension(:),allocatable :: nPartIntorno_bp_f
 ! PartIntorno_bp_f(NMAXPARTJ*n_body_particles): array of the indices of 
 ! the neighbouring fluid particles to each body particle
-integer(4),dimension(:),allocatable :: PartIntorno_bp_f   
+integer(4),dimension(:),allocatable :: PartIntorno_bp_f
+! proxy_normal_bp_f(NMAXPARTJ*n_body_particles): array of the indices of 
+! the neighbouring surface body particles providing the normal to the 
+! "body-particle - fluid-particle" interactions
+integer(4),dimension(:),allocatable :: proxy_normal_bp_f
 ! Kernel derivative neighbouring array (fluid neighbours), 
 ! KerDer_bp_f_cub_spl(n_body_particles*NMAXPARTJ), cubic spline;
 ! KerDer_bp_f_cub_spl = -|gradW_bp_f|/|r_bp_f|

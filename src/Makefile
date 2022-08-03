@@ -165,6 +165,7 @@ $(wildcard ./Body_Transport/BE_body_momentum/*.f90) \
 $(wildcard ./Body_Transport/BE_mass/*.f90) \
 $(wildcard ./Body_Transport/BE_momentum/*.f90) \
 $(wildcard ./Body_Transport/IC/*.f90) \
+$(wildcard ./Body_Transport/Neighbouring_Search/*.f90) \
 $(wildcard ./Body_Transport/Post_processing/*.f90) \
 $(wildcard ./Body_Transport/Time_Integration/*.f90) \
 $(wildcard ./CLC/*.f90) \
