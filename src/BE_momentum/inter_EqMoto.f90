@@ -39,7 +39,7 @@ use I_O_file_module
 implicit none
 integer(4),intent(in) :: npi
 double precision,intent(inout),dimension(1:SPACEDIM) :: tpres,tdiss,tvisc
-integer(4) :: npj,contj,npartint,index_rij_su_h,grad_p_option
+integer(4) :: npj,contj,npartint,index_rij_su_h,gradp_PPST_flag
 double precision :: rhoi,rhoj,amassj,pi,pj,alpha,veln,velti,veltj,deltan,pre   
 double precision :: coeff,secinv,nupa,nu,modderveln,moddervelt,moddervel
 double precision :: dvtdn,denorm,rij_su_h,ke_coef,kacl_coef,rij_su_h_quad
@@ -90,7 +90,7 @@ rvw_sum(:) = zero
 DBSPH_wall_she_vis_term(:) = 0.d0
 t_visc_semi_part(:) = 0.d0
 Morris_inner_weigth = 0.d0
-grad_p_option = 0
+gradp_PPST_flag = 0
 !------------------------
 ! Statements
 !------------------------
@@ -206,8 +206,9 @@ do contj=1,nPartIntorno(npi)
 ! Liquids
          if (input_any_t%ME_gradp_cons==-1) then
 ! Conservative formulation
-            grad_p_option = 1
-            elseif (input_any_t%ME_gradp_cons==1) then
+            gradp_PPST_flag = 1
+            elseif ((input_any_t%ME_gradp_cons==1).or.                         &
+               (input_any_t%ME_gradp_cons==2)) then
                if ((pg(npi)%fp_bp_flag).or.                                    &
 #ifdef SPACE_3D
                   (BoundaryDataPointer(1,npi)>0))                              &
@@ -217,36 +218,48 @@ do contj=1,nPartIntorno(npi)
 #endif
                   then
 ! Conservative formulation at boundaries: 0th-order consistency + PPST
-                  grad_p_option = 5      
+                  gradp_PPST_flag = 5
 ! Formal neutralization of the normalization matrix
                   pg(npi)%B_ren_fp_stat = -1
                   else
-! 1st-order consistency (inner domain)
-                     grad_p_option = 2
+! 1st-order consistency for gradp term, no PPST term (inner domain)
+                     gradp_PPST_flag = 2
+                     if (input_any_t%ME_gradp_cons==2) then
+! 1st-order consistency for gradp term, PPST term active (inner domain)
+                        gradp_PPST_flag = 6
+                     endif
                endif
          endif
          else
 ! Dense granular flows
-            grad_p_option = 3
+            gradp_PPST_flag = 3
       endif
       else
 ! DB-SPH
          if (Domain%tipo=="bsph") then
-            grad_p_option = 4
+            gradp_PPST_flag = 4
          endif
    endif
-   select case (grad_p_option)
+   select case (gradp_PPST_flag)
 ! Conservative formulation for "grad_p + PPST term"
+! (input_any_t%ME_gradp_cons==-1); neighbouring SASPH or body frontiers
       case(1,5)
          alpha = pi / (rhoi * rhoi) + pj / (rhoj * rhoj)
          appopres(1:3) = -amassj * alpha * rag(1:3,npartint) *                 &
                          PartKernel(3,npartint)
-! 1st-order consistency (inner domain)
-      case(2)
+! 1st-order consistency for the pressure-gradient term (inner domain)
+! if (input_any_t%ME_gradp_cons==1,2)
+      case(2,6)
          alpha = (pj - pi) / (rhoi * rhoj)
          call MatrixProduct(pg(npi)%B_ren_fp,BB=rag(1:3,npartint),             &
             CC=aux_vec,nr=3,nrc=3,nc=1)
          appopres(1:3) = amassj * alpha * aux_vec(1:3) * PartKernel(3,npartint)
+! Additional PPST term (only if (input_any_t%ME_gradp_cons==1))
+         if (gradp_PPST_flag==6) then
+            alpha = 2.d0 * pi / (rhoi * rhoj)
+            appopres(1:3) = appopres(1:3) - amassj * alpha * rag(1:3,npartint) &
+                            * PartKernel(3,npartint)
+         endif
 ! KTGF
       case(3)
          alpha = (pi + pj) / (rhoi * rhoj)
