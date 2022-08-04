@@ -270,8 +270,8 @@ do npi=1,n_body_part
       npartint = (npi - 1) * NMAXPARTJ + j
       npj = PartIntorno_bp_f(npartint)
 ! Contribution to the pressure gradient term
-      aux_scalar = (pg(npj)%pres + bp_arr(npi)%pres) / (pg(npj)%dens *         &
-                   pg(npj)%dens)
+         aux_scalar = (bp_arr(npi)%pres + pg(npj)%pres) / (pg(npj)%dens *      &
+                      pg(npj)%dens)
       if (thin_walls) then
 ! Treatment for thin walls (to the coupling term on the pressure gradient)
          aux_scalar = aux_scalar * (1.d0 + (1.d0 - pg(npj)%sigma_fp -          &

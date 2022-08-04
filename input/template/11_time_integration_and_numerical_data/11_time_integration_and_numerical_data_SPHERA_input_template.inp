@@ -93,7 +93,8 @@
 !    pressure-gradient term in the momentum equation. Its value can be 
 !    effectively modified at any restart time.
 !    =-1 (conservative)
-!    =1 (1st-order consistent)
+!    =1 (1st-order consistent in the inner domain, conservative at 
+!        boundaries)
 ![?] <monitor_cons>: ID for the consistency of the post-processing procedures 
 !    at the monitoring elements
 !    =0 (0th-order consistency)

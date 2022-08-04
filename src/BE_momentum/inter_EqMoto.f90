@@ -39,7 +39,7 @@ use I_O_file_module
 implicit none
 integer(4),intent(in) :: npi
 double precision,intent(inout),dimension(1:SPACEDIM) :: tpres,tdiss,tvisc
-integer(4) :: npj,contj,npartint,index_rij_su_h
+integer(4) :: npj,contj,npartint,index_rij_su_h,grad_p_option
 double precision :: rhoi,rhoj,amassj,pi,pj,alpha,veln,velti,veltj,deltan,pre   
 double precision :: coeff,secinv,nupa,nu,modderveln,moddervelt,moddervel
 double precision :: dvtdn,denorm,rij_su_h,ke_coef,kacl_coef,rij_su_h_quad
@@ -90,6 +90,7 @@ rvw_sum(:) = zero
 DBSPH_wall_she_vis_term(:) = 0.d0
 t_visc_semi_part(:) = 0.d0
 Morris_inner_weigth = 0.d0
+grad_p_option = 0
 !------------------------
 ! Statements
 !------------------------
@@ -199,74 +200,72 @@ do contj=1,nPartIntorno(npi)
       endif
    endif
 ! Momentum equation: start
-   if (Granular_flows_options%KTGF_config/=1) then
-! Liquids
-      if ((input_any_t%ME_gradp_cons==-1).or.                                  &
-         (pg(npi)%fp_bp_flag).or.                                              &
-#ifdef SPACE_3D
-         (BoundaryDataPointer(1,npi)>0))                                       &
-#elif defined SPACE_2D
-         (BoundaryDataPointer(1,npi)>0).or.                                    &
-         (BoundaryDataPointer(2,npi)>0))                                       &
-#endif
-         then
-! Conservative formulation (always close to any boundary)
-         alpha = pi / (rhoi * rhoi) + pj / (rhoj * rhoj)
-! The renormalization matrix of the particle is computed but not used because 
-! the particle has neighbouring frontiers
-         if (input_any_t%ME_gradp_cons==1) pg(npi)%B_ren_fp_stat = -1
-         elseif (input_any_t%ME_gradp_cons==1) then
-! 1st-order consistent (applied only far from boundaries)
-            alpha = (pj - pi) / (rhoi * rhoj)
-            else
-               write(uerr,*) "The option chosen for 'ME_gradp_cons' is wrong.",&
-                  "The program stops here."
-               stop
-      endif
-! Dense granular flows
-      else
-         alpha = (pi + pj) / rhoi
-   endif
+! grad_p term: start
    if (Domain%tipo=="semi") then
       if (Granular_flows_options%KTGF_config/=1) then
 ! Liquids
-         if ((input_any_t%ME_gradp_cons==-1).or.                               &
-            (pg(npi)%fp_bp_flag).or.                                           &
-#ifdef SPACE_3D
-            (BoundaryDataPointer(1,npi)>0))                                    &
-#elif defined SPACE_2D
-            (BoundaryDataPointer(1,npi)>0).or.                                 &
-            (BoundaryDataPointer(2,npi)>0))                                    &
-#endif
-            then
-! Conservative
-            appopres(1:3) = -amassj * alpha * rag(1:3,npartint) *              &
-                            PartKernel(3,npartint)
+         if (input_any_t%ME_gradp_cons==-1) then
+! Conservative formulation
+            grad_p_option = 1
             elseif (input_any_t%ME_gradp_cons==1) then
-! 1st-order consistent (applied only far from boundaries)
-               call MatrixProduct(pg(npi)%B_ren_fp,BB=rag(1:3,npartint),       &
-                  CC=aux_vec,nr=3,nrc=3,nc=1)
-               appopres(1:3) = amassj * alpha * aux_vec(1:3) *                 &
-                               PartKernel(3,npartint)
-               else
-                  write(uerr,*) "The option chosen for 'ME_gradp_cons' ",      &
-                     "is wrong. The program stops here."
-                  stop
+               if ((pg(npi)%fp_bp_flag).or.                                    &
+#ifdef SPACE_3D
+                  (BoundaryDataPointer(1,npi)>0))                              &
+#elif defined SPACE_2D
+                  (BoundaryDataPointer(1,npi)>0).or.                           &
+                  (BoundaryDataPointer(2,npi)>0))                              &
+#endif
+                  then
+! Conservative formulation at boundaries
+                  grad_p_option = 5      
+! Formal neutralization of the normalization matrix
+                  pg(npi)%B_ren_fp_stat = -1
+                  else
+! 1st-order consistency (inner domain)
+                     grad_p_option = 2
+               endif
          endif
          else
 ! Dense granular flows
-            appopres(1:3) = -amassj / rhoj * alpha * rag(1:3,npartint) *       &
-                            PartKernel(3,npartint)
+            grad_p_option = 3
       endif
       else
-! DB-SPH: the equation has to use the same kernel type when using the kernel 
-! function (cubic spline) and its derivative
+! DB-SPH
          if (Domain%tipo=="bsph") then
-            appopres(1:3) = -amassj * alpha * rag(1:3,npartint) *              &
-                            PartKernel(1,npartint)
+            grad_p_option = 4
          endif
    endif
+   select case (grad_p_option)
+! Conservative formulation
+      case(1,5)
+         alpha = pi / (rhoi * rhoi) + pj / (rhoj * rhoj)
+         appopres(1:3) = -amassj * alpha * rag(1:3,npartint) *                 &
+                         PartKernel(3,npartint)
+! 1st-order consistency (inner domain)
+      case(2)
+         alpha = (pj - pi) / (rhoi * rhoj)
+         call MatrixProduct(pg(npi)%B_ren_fp,BB=rag(1:3,npartint),             &
+            CC=aux_vec,nr=3,nrc=3,nc=1)
+         appopres(1:3) = amassj * alpha * aux_vec(1:3) * PartKernel(3,npartint)
+! KTGF
+      case(3)
+         alpha = (pi + pj) / (rhoi * rhoj)
+         appopres(1:3) = -amassj * alpha * rag(1:3,npartint) *                 &
+                         PartKernel(3,npartint)
+! DBSPH: the equation has to use the same kernel type when using the kernel 
+! function (cubic spline) and its derivative
+      case(4)
+         alpha = pi / (rhoi * rhoi) + pj / (rhoj * rhoj)
+         appopres(1:3) = -amassj * alpha * rag(1:3,npartint) *                 &
+                         PartKernel(1,npartint)
+! default
+      case default
+         write(uerr,*) 'The option chosen for "ME_gradp_cons" is wrong.',      &
+            "The program stops here."
+         stop
+   endselect
    tpres(:) = tpres(:) + appopres(:)
+! grad_p term: end
 ! To compute Monaghan term (artificial viscosity)   
    call viscomon(npi,npj,npartint,dervel,rvwalfa,rvwbeta)
    appodiss(:) = rvwalfa(:) + rvwbeta(:)

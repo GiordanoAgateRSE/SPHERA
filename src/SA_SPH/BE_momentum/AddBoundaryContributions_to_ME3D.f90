@@ -104,14 +104,14 @@ face_loop: do icbf=1,Ncbf
             dvij(SD) = two * (vi(SD) - vb(SD))
             dvn = dvn + BoundaryFace(iface)%T(SD,3) * dvij(SD)
 ! Gravity local components
-            Grav_Loc(SD) = zero                           
+            Grav_Loc(SD) = zero
             do sdj=1,SPACEDIM
                Grav_Loc(SD) = Grav_Loc(SD) + BoundaryFace(iface)%T(sdj,SD) *   &
                   Domain%grav(sdj)
             enddo
          enddo
-! Boundary contribution to the pressre gradient term 
-! Local components 
+! Boundary contribution to the pressure gradient term 
+! Local components
          do i=1,SPACEDIM
             Gpsurob_Loc(i) = -Qii * BoundaryDataTab(ibdp)%BoundaryIntegral(3+i)
             do j=1,SPACEDIM
