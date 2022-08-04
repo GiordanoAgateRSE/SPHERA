@@ -269,7 +269,7 @@ do npi=1,n_body_part
    do j=1,nPartIntorno_bp_f(npi)
       npartint = (npi - 1) * NMAXPARTJ + j
       npj = PartIntorno_bp_f(npartint)
-! Contribution to the pressure gradient term
+! Contribution to the "grad_p + PPST term"
          aux_scalar = (bp_arr(npi)%pres + pg(npj)%pres) / (pg(npj)%dens *      &
                       pg(npj)%dens)
       if (thin_walls) then

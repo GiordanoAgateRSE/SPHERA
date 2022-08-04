@@ -200,7 +200,7 @@ do contj=1,nPartIntorno(npi)
       endif
    endif
 ! Momentum equation: start
-! grad_p term: start
+! "grad_p + PPST" term: start
    if (Domain%tipo=="semi") then
       if (Granular_flows_options%KTGF_config/=1) then
 ! Liquids
@@ -216,7 +216,7 @@ do contj=1,nPartIntorno(npi)
                   (BoundaryDataPointer(2,npi)>0))                              &
 #endif
                   then
-! Conservative formulation at boundaries
+! Conservative formulation at boundaries: 0th-order consistency + PPST
                   grad_p_option = 5      
 ! Formal neutralization of the normalization matrix
                   pg(npi)%B_ren_fp_stat = -1
@@ -236,7 +236,7 @@ do contj=1,nPartIntorno(npi)
          endif
    endif
    select case (grad_p_option)
-! Conservative formulation
+! Conservative formulation for "grad_p + PPST term"
       case(1,5)
          alpha = pi / (rhoi * rhoi) + pj / (rhoj * rhoj)
          appopres(1:3) = -amassj * alpha * rag(1:3,npartint) *                 &
@@ -265,7 +265,7 @@ do contj=1,nPartIntorno(npi)
          stop
    endselect
    tpres(:) = tpres(:) + appopres(:)
-! grad_p term: end
+! "grad_p + PPST" term: end
 ! To compute Monaghan term (artificial viscosity)   
    call viscomon(npi,npj,npartint,dervel,rvwalfa,rvwbeta)
    appodiss(:) = rvwalfa(:) + rvwbeta(:)

@@ -92,9 +92,9 @@
 ![?] <ME_gradp_cons>: ID for the consistency/conservation of the 
 !    pressure-gradient term in the momentum equation. Its value can be 
 !    effectively modified at any restart time.
-!    =-1 (conservative)
-!    =1 (1st-order consistent in the inner domain, conservative at 
-!        boundaries)
+!    =-1 (conservative "grad_p + PPST term": 0th-order consistency + PPST term)
+!    =1 (1st-order consistent in the inner domain; 0th-order consistency + PPST 
+!        term at boundaries)
 ![?] <monitor_cons>: ID for the consistency of the post-processing procedures 
 !    at the monitoring elements
 !    =0 (0th-order consistency)

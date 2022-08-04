@@ -110,7 +110,7 @@ face_loop: do icbf=1,Ncbf
                   Domain%grav(sdj)
             enddo
          enddo
-! Boundary contribution to the pressure gradient term 
+! Boundary contribution to the "grad_p + PPST term"
 ! Local components
          do i=1,SPACEDIM
             Gpsurob_Loc(i) = -Qii * BoundaryDataTab(ibdp)%BoundaryIntegral(3+i)

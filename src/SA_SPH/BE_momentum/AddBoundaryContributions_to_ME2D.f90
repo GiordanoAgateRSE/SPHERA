@@ -129,8 +129,7 @@ do icbs=1,IntNcbs
             sidevel(i) = RifBoundarySide%velocity(acix(i))
          enddo
    endselect
-! Boundary contribution to "gradP" 
-! (pressure gradient term in the momentum equation) 
+! Boundary contribution to "grad_p + PPST term"
    if ((strtype=="fixe").or.(strtype=="tapi"))  then
       do i=1,PLANEDIM
          Dvel(i) = two * (pg(npi)%var(acix(i)) - sidevel(i))   
