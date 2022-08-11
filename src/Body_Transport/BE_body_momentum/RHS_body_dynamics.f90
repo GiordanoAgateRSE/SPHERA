@@ -302,7 +302,7 @@ do npi=1,n_body_part
                             ncord) * aux_scalar * ( - aux_vec(1:3)) *          &
                             KerDer_bp_f_Gal(npartint))
          else
-! grad_p + PPST (no renormalization at boundaries: 0th-order consistency)
+! grad_p (no renormalization at boundaries: 0th-order consistency)
             pg(npj)%acc(1:3) = pg(npj)%acc(1:3) + ( - pg(npj)%mass /           &
                                (dx_dxbp ** ncord) * aux_scalar *               &
                                ( - rag_bp_f(1:3,npartint)) *                   &

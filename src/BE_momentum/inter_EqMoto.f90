@@ -253,6 +253,8 @@ do contj=1,nPartIntorno(npi)
    select case (gradp_PPST_flag)
 ! Conservative formulation for "grad_p + PPST" terms
       case(1)
+! In the absence of 1st-order consistency, "appopres" also includes the PPST 
+! term, which is not explicitly calculated
          alpha = pi / (rhoi * rhoi) + pj / (rhoj * rhoj)
          appopres(1:3) = -amassj * alpha * rag(1:3,npartint) *                 &
                          PartKernel(3,npartint)
@@ -265,7 +267,8 @@ do contj=1,nPartIntorno(npi)
                          PartKernel(3,npartint)
          if (gradp_PPST_flag==2) then
 ! Presence of the PPST term
-            alpha = 2.d0 * pi / (rhoi * rhoj)
+            alpha = (pi * (rhoj / rhoi + 1.d0) + pj * (rhoi / rhoj - 1.d0)) /  &
+                    (rhoi * rhoj)
             PPST_term_sum(1:3) = PPST_term_sum(1:3) - amassj * alpha *         &
                                  rag(1:3,npartint) * PartKernel(3,npartint)
          endif
