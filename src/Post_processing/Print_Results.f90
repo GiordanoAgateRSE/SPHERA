@@ -360,8 +360,8 @@ if (nag>0) then
                      Domain%t_pre_iter) * 1.d0
       if (elapsed_time<0.d0) elapsed_time =                                    &
          elapsed_time + 366.d0 * 24.d0 * 60.d0 * 60.d0
-      aux_scal = int(elapsed_time / 3600.d0)
-      aux_scal_2 = int(aux_scal / 24.d0)
+      aux_scal = elapsed_time / 3600.d0
+      aux_scal_2 = aux_scal / 24.d0
       write(ulog,'(a,3(ES15.6,a))') "Elapsed time: ",                          &
          elapsed_time," s = ",aux_scal,                                        &
          " hours = ",aux_scal_2," days."

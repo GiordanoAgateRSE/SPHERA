@@ -137,6 +137,13 @@ interface
       integer(4) :: i,j,k
       integer(4),dimension(3) :: iseg=(/2,3,1/)
    end subroutine
+   subroutine MatrixProduct(AA,BB,CC,nr,nrc,nc)
+      implicit none
+      integer(4),intent(in) :: nr,nrc,nc
+      double precision,intent(in),dimension(nr,nrc) :: AA
+      double precision,intent(in),dimension(nrc,nc) :: BB
+      double precision,intent(inout),dimension(nr,nc) :: CC
+   end subroutine MatrixProduct
 end interface
 !------------------------
 ! Allocations
@@ -266,25 +273,47 @@ abs_det_thresh = 1.d-9
 call body_pressure_mirror
 ! Contributions to fluid dynamics momentum equations
 do npi=1,n_body_part
+#ifdef SPACE_3D
+   dx_dxbp = Domain%dx / (bp_arr(npi)%volume ** (1.d0/3.d0))
+#elif defined SPACE_2D
+   dx_dxbp = Domain%dx / (bp_arr(npi)%volume ** (1.d0/2.d0))
+#endif
    do j=1,nPartIntorno_bp_f(npi)
       npartint = (npi - 1) * NMAXPARTJ + j
       npj = PartIntorno_bp_f(npartint)
-! Contribution to the "grad_p + PPST term"
-         aux_scalar = (bp_arr(npi)%pres + pg(npj)%pres) / (pg(npj)%dens *      &
-                      pg(npj)%dens)
+! Contribution to the "grad_p + PPST term": start
+! Term for grad_p
+      aux_scalar = (bp_arr(npi)%pres - pg(npj)%pres) / (pg(npj)%dens *         &
+                   pg(npj)%dens)
+! Term for PPST
+      aux_scalar_2 = 2.d0 * pg(npj)%pres / (pg(npj)%dens * pg(npj)%dens)
       if (thin_walls) then
 ! Treatment for thin walls (to the coupling term on the pressure gradient)
          aux_scalar = aux_scalar * (1.d0 + (1.d0 - pg(npj)%sigma_fp -          &
                       pg(npj)%sigma_bp) / pg(npj)%sigma_bp)
+         aux_scalar_2 = aux_scalar_2 * (1.d0 + (1.d0 - pg(npj)%sigma_fp -      &
+                      pg(npj)%sigma_bp) / pg(npj)%sigma_bp)
       endif
-#ifdef SPACE_3D
-      dx_dxbp = Domain%dx / (bp_arr(npi)%volume ** (1.d0/3.d0))
-#elif defined SPACE_2D
-      dx_dxbp = Domain%dx / (bp_arr(npi)%volume ** (1.d0/2.d0))
-#endif
-      pg(npj)%acc(:) = pg(npj)%acc(:) + ( - pg(npj)%mass / (dx_dxbp **         &
-                       ncord) * aux_scalar * ( - rag_bp_f(:,npartint)) *       &
-                       KerDer_bp_f_Gal(npartint))
+      if (input_any_t%ME_gradp_cons==3) then
+! grad_p (renormalization at boundaries)
+         call MatrixProduct(pg(npj)%B_ren_fp,BB=rag_bp_f(1:3,npartint),        &
+            CC=aux_vec,nr=3,nrc=3,nc=1)
+         pg(npj)%acc(1:3) = pg(npj)%acc(1:3) + (pg(npj)%mass / (dx_dxbp **     &
+                            ncord) * aux_scalar * ( - aux_vec(1:3)) *          &
+                            KerDer_bp_f_Gal(npartint))
+         else
+! grad_p + PPST (no renormalization at boundaries: 0th-order consistency)
+            pg(npj)%acc(1:3) = pg(npj)%acc(1:3) + ( - pg(npj)%mass /           &
+                               (dx_dxbp ** ncord) * aux_scalar *               &
+                               ( - rag_bp_f(1:3,npartint)) *                   &
+                               KerDer_bp_f_Gal(npartint))
+      endif
+! PPST
+      pg(npj)%acc(1:3) = pg(npj)%acc(1:3) + ( - pg(npj)%mass /                 &
+                         (dx_dxbp ** ncord) * aux_scalar_2 *                   &
+                         ( - rag_bp_f(1:3,npartint)) *                         &
+                         KerDer_bp_f_Gal(npartint))
+! Contribution to the "grad_p + PPST term": end
       if (FSI_free_slip_conditions.eqv..false.) then
 ! Body particle volume
          aux_scalar = pg(npj)%mass / Med(pg(npj)%imed)%den0 / (dx_dxbp **      &

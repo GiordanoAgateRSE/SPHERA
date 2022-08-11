@@ -94,9 +94,13 @@
 !    effectively modified at any restart time.
 !    =-1 (conservative "grad_p + PPST term": 0th-order consistency + PPST term)
 !    =1 (1st-order consistent in the inner domain, no PPST term; 0th-order 
-!        consistency + PPST term at SASPH and body boundaries)
+!        consistency + PPST term at SASPH and body boundaries; renormalization 
+!        at boundaries is computed but not used)
 !    =2 (1st-order consistent + PPST term in the inner domain; 0th-order 
-!        consistency + PPST term at SASPH and body boundaries)
+!        consistency + PPST term at SASPH and body boundaries; renormalization 
+!        at boundaries is computed but not used)
+!    =3 (1st-order consistent + PPST term in the inner domain and at SASPH and 
+!        body boundaries)
 ![?] <monitor_cons>: ID for the consistency of the post-processing procedures 
 !    at the monitoring elements
 !    =0 (0th-order consistency)

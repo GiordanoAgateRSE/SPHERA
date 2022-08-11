@@ -60,11 +60,11 @@ test_point = 0
 !------------------------
 ! Statements
 !------------------------
-! First fictitious point "P3_plane1" the complete the first fictitious plane
+! First fictitious point "P3_plane1" to complete the first fictitious plane
 P3_plane1(1) = P1_line(1) + P2_line(2) - P1_line(2)
 P3_plane1(2) = P1_line(2) - (P2_line(1) - P1_line(1))
 P3_plane1(3) = P1_line(3)
-! Second fictitious point "P3_plane2" the complete the first fictitious plane
+! Second fictitious point "P3_plane2" to complete the second fictitious plane
 aux_vec(1:3) = P2_line(1:3) - P1_line(1:3)
 aux_vec_2(1:3) = P3_plane1(1:3) - P1_line(1:3)
 call Vector_Product(aux_vec,aux_vec_2,P3_plane2,3)

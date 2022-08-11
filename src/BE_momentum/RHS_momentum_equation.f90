@@ -69,6 +69,7 @@ slip_coeff_counter(:) = 0
 !------------------------
 !$omp parallel do default(none)                                                &
 !$omp shared(pg,Domain,BoundaryDataPointer,indarrayFlu,Array_Flu,Med)          &
+!$omp shared(input_any_t)                                                      &
 #ifdef SPACE_3D
 !$omp shared(Ncbf_Max)                                                         &
 #endif
@@ -88,8 +89,11 @@ do ii = 1,indarrayFlu
       pg(npi)%acc(:) = zero
       cycle
    endif
-! Inner terms of the momentum equation
-   call inter_EqMoto(npi,tpres,tdiss,tvisc)
+! Initialization of the RHS terms of the momentum equation
+   tpres(:) = zero
+   tdiss(:) = zero
+   tvisc(:) = zero
+! SASPH boundary terms of the momentum equation: start
 ! Searching for the boundary faces/sides, which are the nearest the npi-th 
 ! current particle
    if ((Domain%time_stage==1).or.(Domain%time_split==1)) then 
@@ -111,12 +115,17 @@ do ii = 1,indarrayFlu
                IntNcbs = 0
 #endif
    endif
-   if ((Domain%tipo=="semi").and.                                              &
+   if (Domain%tipo=="semi") then
 #ifdef SPACE_3D
-      (Ncbf>0)) then
+      if ((Ncbf>0).or.                                                         &
 #elif defined SPACE_2D
-      (Ncbs>0).and.(IntNcbs>0)) then
+      if (((Ncbs>0).and.(IntNcbs>0)).or.                                       &
 #endif
+! The inversion of the renormalization matrix is executed within the program 
+! units "AddBoundaryContributions_to_ME3D" or "AddBoundaryContributions_to_ME2D"
+! even in the absence of SASPH neighbours to fasten the algorithm under general 
+! conditions
+         (input_any_t%ME_gradp_cons>0)) then
 #ifdef SPACE_3D
 !$omp critical (omp_Ncbf_Max)
          Ncbf_Max = max(Ncbf_Max,Ncbf)
@@ -127,24 +136,34 @@ do ii = 1,indarrayFlu
             call AddBoundaryContributions_to_ME2D(npi,IntNcbs,tpres,tdiss,     &
                tvisc,slip_coeff_counter)
 #endif
-      if (pg(npi)%kodvel==0) then
+      endif
+! SASPH boundary terms of the momentum equation: end
+! Inner terms of the momentum equation
+      call inter_EqMoto(npi,tpres,tdiss,tvisc)
+#ifdef SPACE_3D
+      if (Ncbf>0) then
+#elif defined SPACE_2D
+      if ((Ncbs>0).and.(IntNcbs>0)) then
+#endif
+         if (pg(npi)%kodvel==0) then
 #ifdef SPACE_3D
             call AddElasticBoundaryReaction_3D(npi,Ncbf,BoundReaction)
 #elif defined SPACE_2D
                call AddElasticBoundaryReaction_2D(npi,IntNcbs,BoundReaction)
 #endif
-         pg(npi)%acc(:) = tpres(:) + tdiss(:) + tvisc(:) + Domain%grav(:) +    &
-                          BoundReaction(:)
-         else
-            pg(npi)%acc(:) = zero
-      endif
-      else
-         if (Domain%tipo=="semi") then
-            pg(npi)%acc(:) = tpres(:) + tdiss(:) + tvisc(:) + Domain%grav(:)
-            elseif (Domain%tipo=="bsph") then
-               pg(npi)%acc(:) = (tpres(:) + tdiss(:) + tvisc(:)) /             &
-                                pg(npi)%Gamma + Domain%grav(:)
+            pg(npi)%acc(:) = tpres(:) + tdiss(:) + tvisc(:) + Domain%grav(:) + &
+                             BoundReaction(:)
+            else
+               pg(npi)%acc(:) = zero
          endif
+         else
+            pg(npi)%acc(:) = tpres(:) + tdiss(:) + tvisc(:) + Domain%grav(:)
+      endif
+      elseif (Domain%tipo=="bsph") then
+! Inner terms of the momentum equation
+         call inter_EqMoto(npi,tpres,tdiss,tvisc)
+         pg(npi)%acc(:) = (tpres(:) + tdiss(:) + tvisc(:)) /                   &
+                          pg(npi)%Gamma + Domain%grav(:)
    endif
 enddo
 !$omp end parallel do

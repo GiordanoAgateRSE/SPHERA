@@ -214,7 +214,7 @@ TIME_STEP_DO: do while (it<=input_any_t%itmax)
          if (Granular_flows_options%KTGF_config>0) call KTGF_update
          call liquid_particle_ID_array
       endif
-! Momentum equation 
+! Momentum equation
       call start_and_stop(2,6)
       call RHS_momentum_equation
 #ifdef SOLID_BODIES

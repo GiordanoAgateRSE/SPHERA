@@ -40,7 +40,7 @@ use Memory_I_O_interface_module
 implicit none
 integer(4) :: nceli,igridi,kgridi,jgridi,irang,krang,jrang,ncelj,jgrid1
 integer(4) :: jgrid2,contliq,mm,npi,npj,npartint,index_rij_su_h
-integer(4) :: irestocell,celleloop,fw,i_grid,j_grid,test
+integer(4) :: irestocell,celleloop,fw,i_grid,j_grid
 #ifdef SOLID_BODIES
 integer(4) :: aux2,ibp,bp_f,bp
 #endif
@@ -48,12 +48,11 @@ double precision :: rij_su_h,ke_coef,kacl_coef,rij_su_h_quad,rijtemp,rijtemp2
 double precision :: gradmod,gradmodwacl,wu,denom,normal_int_abs,abs_vel
 double precision :: min_sigma_Gamma,dis_fp_dbsph_inoutlet
 double precision :: dbsph_inoutlet_threshold,normal_int_mixture_top_abs
-double precision :: normal_int_sat_top_abs,abs_det_thresh
+double precision :: normal_int_sat_top_abs
 double precision,dimension(3) :: ragtemp,r_vec,grad_W,gradWomegaj,aux_vec
 double precision,dimension(3) :: aux_vec_2,aux_vec_3
 integer(4),dimension(:),allocatable :: bounded
 double precision,dimension(:),allocatable :: dShep_old
-double precision,dimension(3,3) :: aux_mat
 character(len=lencard)  :: nomsub = "CalcVarLength"
 integer(4),external :: ParticleCellNumber,CellIndices,CellNumber
 #ifdef SOLID_BODIES
@@ -69,13 +68,6 @@ interface
       double precision,dimension(3),intent(in) :: r_vec
       double precision,dimension(3),intent(out) :: grad_W
    end subroutine grad_W_sub
-   subroutine Matrix_Inversion_3x3(mat,inv,abs_det_thresh,test)
-      implicit none
-      double precision,intent(in) :: abs_det_thresh
-      double precision,intent(in) :: mat(3,3)
-      double precision,intent(inout) :: inv(3,3)
-      integer(4),intent(inout) :: test
-   end subroutine Matrix_Inversion_3x3
 end interface
 !------------------------
 ! Allocations
@@ -100,7 +92,6 @@ if ((Domain%tipo=="bsph").and.(nag>0)) then
    pg_w(:)%grad_vel_VSL_times_mu(2) = 0.d0
    pg_w(:)%grad_vel_VSL_times_mu(3) = 0.d0
 endif
-abs_det_thresh = 0.1d0
 #ifdef SOLID_BODIES
    nPartIntorno_bp_f = 0
    nPartIntorno_bp_bp = 0
@@ -116,13 +107,13 @@ abs_det_thresh = 0.1d0
 !$omp private(wu,contliq,fw,normal_int_abs,abs_vel,dis_fp_dbsph_inoutlet)      &
 !$omp private(dbsph_inoutlet_threshold,normal_int_mixture_top_abs)             &
 !$omp private(normal_int_sat_top_abs,r_vec,grad_W,gradWomegaj,aux_vec)         &
-!$omp private(aux_vec_2,aux_vec_3,aux_mat,test)                                &   
+!$omp private(aux_vec_2,aux_vec_3)                                             &   
 !$omp shared(nag,pg,Domain,Med,Icont,Npartord,NMAXPARTJ,rag,nPartIntorno)      &
 !$omp shared(Partintorno,PartKernel,ke_coef,kacl_coef,Doubleh,square_doubleh)  &
 !$omp shared(squareh,nomsub,eta,eta2,ulog,uerr,ind_interfaces,DBSPH,pg_w)      &
 !$omp shared(Icont_w,Npartord_w,rag_fw,nPartIntorno_fw,Partintorno_fw)         &
 !$omp shared(kernel_fw,dShep_old,Granular_flows_options,NMedium)               &
-!$omp shared(abs_det_thresh,simulation_time,input_any_t)
+!$omp shared(simulation_time,input_any_t)
 loop_nag: do npi=1,nag
    if (Domain%tipo=="bsph") then
       pg(npi)%rhoSPH_old = pg(npi)%rhoSPH_new
@@ -172,7 +163,6 @@ loop_nag: do npi=1,nag
    pg(npi)%ind_neigh_mob_for_granmob = 0
    pg(npi)%blt_flag = 0
    pg(npi)%B_ren_fp(1:3,1:3) = 0.d0
-   pg(npi)%B_ren_fp_stat = -1
    pg(npi)%fp_bp_flag = .false.
    pg(npi)%rijtempmin = 99999.d0
    jgrid1 = jgridi - (ncord - 2)
@@ -273,8 +263,9 @@ loop_nag: do npi=1,nag
 !    kernel_fw(2,npartint) = (5.d0/(16.d0*PIGRECO*Domain%h**2)) *              &
 !    ((2.d0 - rij_su_h)**3) 
 ! Gallati anti-cluster kernel, interesting test: end               
-! Contributions to the inverse of the renormalization matrices
-               if (input_any_t%ME_gradp_cons==1) then
+! Contributions of the neighbouring fluid particles to the inverse of the 
+! renormalization matrices
+               if (input_any_t%ME_gradp_cons>0) then
                   r_vec(1:3) = -ragtemp(1:3)
                   call grad_W_sub(kernel_ID=2,r_vec=r_vec,grad_W=grad_W)
                   gradWomegaj(1:3) = grad_W(1:3) * pg(npj)%mass / pg(npj)%dens
@@ -628,20 +619,6 @@ loop_nag: do npi=1,nag
       endif
 !$omp end critical (interface_definition) 
    endif
-   if (input_any_t%ME_gradp_cons==1) then
-! Matrix inversion to get the renormalization matrix
-      call Matrix_Inversion_3x3(pg(npi)%B_ren_fp,aux_mat,abs_det_thresh,test)
-      if (test==1) then
-         pg(npi)%B_ren_fp(1:3,1:3) = aux_mat(1:3,1:3)
-         pg(npi)%B_ren_fp_stat = 1
-         else
-            pg(npi)%B_ren_fp(1:3,1:3) = 0.d0
-            pg(npi)%B_ren_fp(1,1) = -1.d0
-            pg(npi)%B_ren_fp(2,2) = -1.d0
-            pg(npi)%B_ren_fp(3,3) = -1.d0
-            pg(npi)%B_ren_fp_stat = 0
-      endif
-   endif
 enddo loop_nag
 !$omp end parallel do
 ! In case of bed-load transport 
@@ -806,12 +783,13 @@ endif
 !$omp private(npi,nceli,irestocell,igridi,jgridi,kgridi,jgrid1,jgrid2,irang)   &
 !$omp private(jrang,krang,bp_f,npj,npartint,ncelj,ragtemp,rijtemp,rijtemp2)    &
 !$omp private(rij_su_h,rij_su_h_quad,denom,index_rij_su_h,gradmod,bp)          &
-!$omp private(gradmodwacl,ibp,aux2)                                            &
+!$omp private(gradmodwacl,ibp,aux2,r_vec,grad_W,gradWomegaj,aux_vec,aux_vec_2) &
+!$omp private(aux_vec_3)                                                       &
 !$omp shared(NMAXPARTJ,ke_coef,kacl_coef,square_doubleh,squareh,Domain)        &
 !$omp shared(Icont_bp,NPartOrd_bp,bp_arr,nPartIntorno_bp_bp,PartIntorno_bp_bp) &
 !$omp shared(rag_bp_bp,n_body_part,Icont,n_bodies,nPartIntorno_bp_f)           &
 !$omp shared(PartIntorno_bp_f,rag_bp_f,KerDer_bp_f_cub_spl,KerDer_bp_f_Gal)    &
-!$omp shared(NPartOrd,eta,pg)
+!$omp shared(NPartOrd,eta,pg,input_any_t)
    do npi=1,n_body_part
 ! Computation of the ID of the surface body particles
       ibp = 0
@@ -875,6 +853,25 @@ endif
                                 rij_su_h
                   gradmodwacl = gradmodwacl * kacl_coef
                   KerDer_bp_f_Gal(npartint) = gradmodwacl * denom
+! Contributions of the neighbouring body particles to the inverse of the 
+! renormalization matrix
+               if (input_any_t%ME_gradp_cons==3) then
+                  r_vec(1:3) = ragtemp(1:3)
+                  call grad_W_sub(kernel_ID=2,r_vec=r_vec,grad_W=grad_W)
+                  gradWomegaj(1:3) = grad_W(1:3) * bp_arr(npi)%volume
+                  aux_vec(1:3) = (bp_arr(npi)%pos(1) - pg(npj)%coord(1)) *     &
+                                 gradWomegaj(1:3)
+                  aux_vec_2(1:3) = (bp_arr(npi)%pos(2) - pg(npj)%coord(2)) *   &
+                                   gradWomegaj(1:3)
+                  aux_vec_3(1:3) = (bp_arr(npi)%pos(3) - pg(npj)%coord(3)) *   &
+                                   gradWomegaj(1:3)
+                  pg(npj)%B_ren_fp(1:3,1) = pg(npj)%B_ren_fp(1:3,1) +          &
+                                            aux_vec(1:3)
+                  pg(npj)%B_ren_fp(1:3,2) = pg(npj)%B_ren_fp(1:3,2) +          &
+                                            aux_vec_2(1:3)
+                  pg(npj)%B_ren_fp(1:3,3) = pg(npj)%B_ren_fp(1:3,3) +          &
+                                            aux_vec_3(1:3)
+               endif
 ! Shepard coefficient (contributions from body particles)
                   pg(npj)%sigma_bp = pg(npj)%sigma_bp +                        &
                                      w(rijtemp,Domain%h,Domain%coefke) *       &

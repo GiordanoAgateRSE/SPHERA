@@ -262,7 +262,7 @@ if (nag>0) then
       write(unitvtk,'(8x,24(1x,i8))') (finger(k),k=k1,k2)
    enddo
    write(unitvtk,'(a)') '      </DataArray>'
-   if (input_any_t%ME_gradp_cons==1) then
+   if (input_any_t%ME_gradp_cons>0) then
 ! B_ren_fp(1,1-3)
       write(unitvtk,'(a)')                                                     &
 '      <DataArray type="Float32" Name="B_ren_fp_1_1-3"  NumberOfComponents="3"  format="ascii" >'
