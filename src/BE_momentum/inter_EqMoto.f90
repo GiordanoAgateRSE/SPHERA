@@ -220,7 +220,7 @@ do contj=1,nPartIntorno(npi)
 ! Conservative formulation at boundaries: 0th-order consistency + PPST
                   gradp_PPST_flag = 1
 ! Formal disuse of the renormalization matrix at boundaries
-                  pg(npi)%B_ren_fp_stat = -1
+                  pg(npi)%B_ren_gradp_stat = -1
                   else
                      if (input_any_t%ME_gradp_cons==2) then
 ! 1st-order consistency for gradp term, PPST term active (inner domain)
@@ -304,7 +304,8 @@ do contj=1,nPartIntorno(npi)
 enddo
 if ((gradp_PPST_flag==2).or.(gradp_PPST_flag==5)) then
 ! 1st-order consistency: here only the matrix product
-   call MatrixProduct(pg(npi)%B_ren_fp,BB=t_pres_aux,CC=aux_vec,nr=3,nrc=3,nc=1)
+   call MatrixProduct(pg(npi)%B_ren_gradp,BB=t_pres_aux,CC=aux_vec,nr=3,nrc=3, &
+      nc=1)
    t_pres_aux(1:3) = aux_vec(1:3)
 endif
 ! grad_p term and PPST term are summed to the acceleration

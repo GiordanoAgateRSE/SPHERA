@@ -296,7 +296,7 @@ do npi=1,n_body_part
       endif
       if (input_any_t%ME_gradp_cons==3) then
 ! grad_p (renormalization at boundaries)
-         call MatrixProduct(pg(npj)%B_ren_fp,BB=rag_bp_f(1:3,npartint),        &
+         call MatrixProduct(pg(npj)%B_ren_gradp,BB=rag_bp_f(1:3,npartint),     &
             CC=aux_vec,nr=3,nrc=3,nc=1)
          pg(npj)%acc(1:3) = pg(npj)%acc(1:3) + (pg(npj)%mass / (dx_dxbp **     &
                             ncord) * aux_scalar * ( - aux_vec(1:3)) *          &

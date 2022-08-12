@@ -101,6 +101,13 @@
 !        at boundaries is computed but not used)
 !    =3 (1st-order consistent + PPST term in the inner domain and at SASPH and 
 !        body boundaries)
+![?] <CE_divu_cons>: ID for the consistency/conservation of the 
+!    velocity-divergence term in the continuity equation. Its value can be 
+!    effectively modified at any restart time.
+!    =0 (0th-order consistency)
+!    =1 (1st-order consistency)
+!    =2 (1st-order consistency in the inner domain, 0th-order consistency at 
+!        boundaries)
 ![?] <monitor_cons>: ID for the consistency of the post-processing procedures 
 !    at the monitoring elements
 !    =0 (0th-order consistency)
@@ -110,14 +117,14 @@
 ![*] <CFL> <vsc_coeff> <Leapfrog_flag> <scheme_order> <factor> <dt_alfa_Mon>
 ![*] <teta_p> <teta_u>
 ![*] <COEFNMAXPARTI> <COEFNMAXPARTJ> <body_part_reorder>
-![*] <ME_gradp_cons> <monitor_cons>
+![*] <ME_gradp_cons> <CE_divu_cons> <monitor_cons>
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
 ___ ___
 ___ ___ ___ ___ ___ ___
 ___ ___
 ___ ___ ___
-___ ___
+___ ___ ___
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
 ![?] if (3D) then

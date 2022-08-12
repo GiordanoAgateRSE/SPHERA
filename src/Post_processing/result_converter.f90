@@ -263,47 +263,51 @@ if (nag>0) then
    enddo
    write(unitvtk,'(a)') '      </DataArray>'
    if (input_any_t%ME_gradp_cons>0) then
-! B_ren_fp(1,1-3)
+! B_ren_gradp(1,1-3)
       write(unitvtk,'(a)')                                                     &
-'      <DataArray type="Float32" Name="B_ren_fp_1_1-3"  NumberOfComponents="3"  format="ascii" >'
+'      <DataArray type="Float32" Name="B_ren_gradp_1_1-3"  NumberOfComponents="3"  format="ascii" >'
       do i=1,numpoints,6
          k1 = i
          k2 = k1 + 5
          if (k2>numpoints) k2 = numpoints
-         write(unitvtk,'(8x,6(3(1x,ES12.4E3)))') (pg(finger(k))%B_ren_fp(1,1), &
-            pg(finger(k))%B_ren_fp(1,2),pg(finger(k))%B_ren_fp(1,3),k=k1,k2)
+         write(unitvtk,'(8x,6(3(1x,ES12.4E3)))')                               &
+            (pg(finger(k))%B_ren_gradp(1,1),pg(finger(k))%B_ren_gradp(1,2),    &
+            pg(finger(k))%B_ren_gradp(1,3),k=k1,k2)
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
-! B_ren_fp(2,1-3)
+! B_ren_gradp(2,1-3)
       write(unitvtk,'(a)')                                                     &
-'      <DataArray type="Float32" Name="B_ren_fp_2_1-3"  NumberOfComponents="3"  format="ascii" >'
+'      <DataArray type="Float32" Name="B_ren_gradp_2_1-3"  NumberOfComponents="3"  format="ascii" >'
       do i=1,numpoints,6
          k1 = i
          k2 = k1 + 5
          if (k2>numpoints) k2 = numpoints
-         write(unitvtk,'(8x,6(3(1x,ES12.4E3)))') (pg(finger(k))%B_ren_fp(2,1), &
-            pg(finger(k))%B_ren_fp(2,2),pg(finger(k))%B_ren_fp(2,3),k=k1,k2)
+         write(unitvtk,'(8x,6(3(1x,ES12.4E3)))')                               &
+            (pg(finger(k))%B_ren_gradp(2,1),pg(finger(k))%B_ren_gradp(2,2),    &
+            pg(finger(k))%B_ren_gradp(2,3),k=k1,k2)
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
-! B_ren_fp(3,1-3)
+! B_ren_gradp(3,1-3)
       write(unitvtk,'(a)')                                                     &
-'      <DataArray type="Float32" Name="B_ren_fp_3_1-3"  NumberOfComponents="3"  format="ascii" >'
+'      <DataArray type="Float32" Name="B_ren_gradp_3_1-3"  NumberOfComponents="3"  format="ascii" >'
       do i=1,numpoints,6
          k1 = i
          k2 = k1 + 5
          if (k2>numpoints) k2 = numpoints
-         write(unitvtk,'(8x,6(3(1x,ES12.4E3)))') (pg(finger(k))%B_ren_fp(3,1), &
-            pg(finger(k))%B_ren_fp(3,2),pg(finger(k))%B_ren_fp(3,3),k=k1,k2)
+         write(unitvtk,'(8x,6(3(1x,ES12.4E3)))')                               &
+            (pg(finger(k))%B_ren_gradp(3,1),pg(finger(k))%B_ren_gradp(3,2),    &
+            pg(finger(k))%B_ren_gradp(3,3),k=k1,k2)
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
-! B_ren_fp_stat
+! B_ren_gradp_stat
       write(unitvtk,'(a)')                                                     &
-         '      <DataArray type="Float32" Name="B_ren_fp_stat" format="ascii" >'
+         '      <DataArray type="Float32" Name="B_ren_gradp_stat" format="ascii" >'
       do i=1,numpoints,24
          k1 = i
          k2 = k1 + 23
          if (k2>numpoints) k2 = numpoints
-         write(unitvtk,'(8x,24(1x,i6))') (pg(finger(k))%B_ren_fp_stat,k=k1,k2)
+         write(unitvtk,'(8x,24(1x,i6))') (pg(finger(k))%B_ren_gradp_stat,      &
+            k=k1,k2)
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
    endif

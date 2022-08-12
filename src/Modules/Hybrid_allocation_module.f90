@@ -96,9 +96,12 @@ type input_any_time_der_type
 ! Density_thresholds flag (default=0; =1 for very low bulk modulus -preliminary 
 ! simulations-)
    integer(4) :: density_thresholds
-! ID for the consistency/conservation of the pressure-gradient term in the 
+! ID for the consistency options for the pressure-gradient term in the 
 ! momentum equation
    integer(4) :: ME_gradp_cons
+! ID for the consistency options for the velocity-gradient term in the 
+! continuity equation
+   integer(4) :: CE_divu_cons
 ! ID for the consistency of the post-processing procedures at the monitoring 
 ! elements
    integer(4) :: monitor_cons
@@ -183,11 +186,13 @@ type TyParticle
    integer(4) :: CloseBcOut                     
    integer(4) :: cella                          
    integer(4) :: izona
-! Status on renormalization matrix involving fluid particles (B_ren_fp_stat)
-! =1: renormalization matrix is computed
-! =0: renormalization matrix is replaced by the opposite of the identity matrix
-! =-1: renormalization matrix is not used
-   integer(4) :: B_ren_fp_stat
+! Status on renormalization matrix for the pressure-gradient term in the 
+! momentum equation:
+!  =1: renormalization matrix is computed
+!  =0: renormalization matrix is not computed and replaced by the opposite of 
+!      the identity matrix
+! =-1: renormalization matrix is computed, but not used
+   integer(4) :: B_ren_gradp_stat
 ! Colour
    integer(4) :: icol
 ! Fluid ID 
@@ -322,8 +327,12 @@ type TyParticle
    double precision :: velass(3)
 ! Velocity gradient (SPH pseudo-consistent approximation over fluid particles) 
    double precision :: dvel(3,3)
-! Renormalization matrix involving fluid particles (B_ren_fp)
-   double precision,dimension(3,3) :: B_ren_fp
+! Renormalization matrix for the pressure-gradient term in the momentum 
+! equation
+   double precision,dimension(3,3) :: B_ren_gradp
+! Renormalization matrix for the velocity-divergence term in the continuity 
+! equation
+   double precision,dimension(3,3) :: B_ren_divu
 ! BC conditions for fixed particles (f=free-slip; n=no-slip; c=cont slip)
    character(1) :: slip
 ! Movement type

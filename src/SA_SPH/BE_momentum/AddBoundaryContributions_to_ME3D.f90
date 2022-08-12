@@ -173,8 +173,8 @@ face_loop: do icbf=1,Ncbf
 ! Contribution to the renormalization matrix (the sign change is only apparent 
 ! because "Grav_Glo_sum" will be subtracted later, not added)
             do ii=1,3
-               pg(npi)%B_ren_fp(ii,1:3) = pg(npi)%B_ren_fp(ii,1:3) -           &
-                                          B_ren_aux_Glo(ii)
+               pg(npi)%B_ren_gradp(ii,1:3) = pg(npi)%B_ren_gradp(ii,1:3) -     &
+                                             B_ren_aux_Glo(ii)
             enddo
          endif
 ! Contributions of the neighbouring SASPH frontiers to the inverse of the 
@@ -288,7 +288,7 @@ face_loop: do icbf=1,Ncbf
                   pg(npi)%kodvel = 2
                   pg(npi)%velass(:) = Tratto(stretch)%NormVelocity * nnlocal(:) 
                endif
-               return                                                          
+               return
    endif
 enddo face_loop
 ! The renormalization matrix for the pressure-gradient term is inverted 
@@ -303,8 +303,8 @@ if (Ncbf==0) return
 ! grad_p (renormalization at boundaries): start
 if (input_any_t%ME_gradp_cons==3) then
 ! Renormalization of the contributions to the pressure-gradient term
-   call MatrixProduct(pg(npi)%B_ren_fp,BB=Grav_Glo_sum,CC=aux_vec,nr=3,nrc=3,  &
-      nc=1)
+   call MatrixProduct(pg(npi)%B_ren_gradp,BB=Grav_Glo_sum,CC=aux_vec,nr=3,     &
+      nrc=3,nc=1)
 ! Pressure gradient SASPH term: contribution to acceleration (renormalization)
    gradpt_SASPH(1:3) = aux_vec(1:3)
    else

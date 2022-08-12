@@ -295,11 +295,11 @@ do icbs=1,IntNcbs
    RG_sum(1:2) = RG_sum(1:2) + RG(1:2)
    if (input_any_t%ME_gradp_cons==3) then
 ! Renormalization at SASPH frontiers
-! Notice that the contributions to RHS and B_ren_fp have different signs as RHS 
-! will be subtracted from the acceleration
+! Notice that the contributions to RHS and B_ren_gradp have different signs as 
+! RHS will be subtracted from the acceleration
       do i=1,PLANEDIM
-            pg(npi)%B_ren_fp(acix(i),1:3) = pg(npi)%B_ren_fp(acix(i),1:3) -    &
-                                            RG_like(i)
+            pg(npi)%B_ren_gradp(acix(i),1:3) = pg(npi)%B_ren_gradp(acix(i),1:3)&
+                                               - RG_like(i)
       enddo
    endif
 ! SASPH contribution to "grad_p" and renormalization matrix: end
@@ -381,7 +381,7 @@ if (input_any_t%ME_gradp_cons==3) then
    do i=1,PLANEDIM
       aux_vec_2(acix(i)) = RG_sum(i)
    enddo
-   call MatrixProduct(pg(npi)%B_ren_fp,BB=aux_vec_2,CC=aux_vec,nr=3,nrc=3,     &
+   call MatrixProduct(pg(npi)%B_ren_gradp,BB=aux_vec_2,CC=aux_vec,nr=3,nrc=3,  &
       nc=1)
    do i=1,PLANEDIM
       RG_sum(i) = -aux_vec(acix(i))

@@ -162,7 +162,7 @@ loop_nag: do npi=1,nag
    pg(npi)%ind_neigh_mix_bed = 0
    pg(npi)%ind_neigh_mob_for_granmob = 0
    pg(npi)%blt_flag = 0
-   pg(npi)%B_ren_fp(1:3,1:3) = 0.d0
+   pg(npi)%B_ren_gradp(1:3,1:3) = 0.d0
    pg(npi)%fp_bp_flag = .false.
    pg(npi)%rijtempmin = 99999.d0
    jgrid1 = jgridi - (ncord - 2)
@@ -275,12 +275,12 @@ loop_nag: do npi=1,nag
                                    gradWomegaj(1:3)
                   aux_vec_3(1:3) = (pg(npj)%coord(3) - pg(npi)%coord(3)) *     &
                                    gradWomegaj(1:3)
-                  pg(npi)%B_ren_fp(1:3,1) = pg(npi)%B_ren_fp(1:3,1) +          &
-                                            aux_vec(1:3)
-                  pg(npi)%B_ren_fp(1:3,2) = pg(npi)%B_ren_fp(1:3,2) +          &
-                                            aux_vec_2(1:3)
-                  pg(npi)%B_ren_fp(1:3,3) = pg(npi)%B_ren_fp(1:3,3) +          &
-                                            aux_vec_3(1:3)
+                  pg(npi)%B_ren_gradp(1:3,1) = pg(npi)%B_ren_gradp(1:3,1) +    &
+                                               aux_vec(1:3)
+                  pg(npi)%B_ren_gradp(1:3,2) = pg(npi)%B_ren_gradp(1:3,2) +    &
+                                               aux_vec_2(1:3)
+                  pg(npi)%B_ren_gradp(1:3,3) = pg(npi)%B_ren_gradp(1:3,3) +    &
+                                               aux_vec_3(1:3)
                endif
 #ifdef SOLID_BODIES
               pg(npi)%sigma_fp = pg(npi)%sigma_fp +                            &
@@ -865,12 +865,12 @@ endif
                                    gradWomegaj(1:3)
                   aux_vec_3(1:3) = (bp_arr(npi)%pos(3) - pg(npj)%coord(3)) *   &
                                    gradWomegaj(1:3)
-                  pg(npj)%B_ren_fp(1:3,1) = pg(npj)%B_ren_fp(1:3,1) +          &
-                                            aux_vec(1:3)
-                  pg(npj)%B_ren_fp(1:3,2) = pg(npj)%B_ren_fp(1:3,2) +          &
-                                            aux_vec_2(1:3)
-                  pg(npj)%B_ren_fp(1:3,3) = pg(npj)%B_ren_fp(1:3,3) +          &
-                                            aux_vec_3(1:3)
+                  pg(npj)%B_ren_gradp(1:3,1) = pg(npj)%B_ren_gradp(1:3,1) +    &
+                                               aux_vec(1:3)
+                  pg(npj)%B_ren_gradp(1:3,2) = pg(npj)%B_ren_gradp(1:3,2) +    &
+                                               aux_vec_2(1:3)
+                  pg(npj)%B_ren_gradp(1:3,3) = pg(npj)%B_ren_gradp(1:3,3) +    &
+                                               aux_vec_3(1:3)
                endif
 ! Shepard coefficient (contributions from body particles)
                   pg(npj)%sigma_bp = pg(npj)%sigma_bp +                        &
