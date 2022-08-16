@@ -23,7 +23,10 @@
 ! Description: Neighbouring search (pre-conditioned dynamic vector), relative 
 !              positions, kernel functions/derivatives, Shepard's coefficient, 
 !              position of the fluid-sediment interfaces along each background 
-!              grid column.                                             
+!              grid column.
+!              Fluid-fluid and fluid-body contributions to the renormalization 
+!              matrices for the pressure-gradient term and the 
+!              velocity-divergence term.
 !-------------------------------------------------------------------------------
 subroutine CalcVarLength
 !------------------------
@@ -163,6 +166,7 @@ loop_nag: do npi=1,nag
    pg(npi)%ind_neigh_mob_for_granmob = 0
    pg(npi)%blt_flag = 0
    pg(npi)%B_ren_gradp(1:3,1:3) = 0.d0
+   pg(npi)%B_ren_divu(1:3,1:3) = 0.d0
    pg(npi)%fp_bp_flag = .false.
    pg(npi)%rijtempmin = 99999.d0
    jgrid1 = jgridi - (ncord - 2)
@@ -281,6 +285,23 @@ loop_nag: do npi=1,nag
                                                aux_vec_2(1:3)
                   pg(npi)%B_ren_gradp(1:3,3) = pg(npi)%B_ren_gradp(1:3,3) +    &
                                                aux_vec_3(1:3)
+               endif
+               if (input_any_t%CE_divu_cons>0) then
+                  r_vec(1:3) = -ragtemp(1:3)
+                  call grad_W_sub(kernel_ID=1,r_vec=r_vec,grad_W=grad_W)
+                  gradWomegaj(1:3) = grad_W(1:3) * pg(npj)%mass / pg(npj)%dens
+                  aux_vec(1:3) = (pg(npj)%coord(1) - pg(npi)%coord(1)) *       &
+                                 gradWomegaj(1:3)
+                  aux_vec_2(1:3) = (pg(npj)%coord(2) - pg(npi)%coord(2)) *     &
+                                   gradWomegaj(1:3)
+                  aux_vec_3(1:3) = (pg(npj)%coord(3) - pg(npi)%coord(3)) *     &
+                                   gradWomegaj(1:3)
+                  pg(npi)%B_ren_divu(1:3,1) = pg(npi)%B_ren_divu(1:3,1) +      &
+                                              aux_vec(1:3)
+                  pg(npi)%B_ren_divu(1:3,2) = pg(npi)%B_ren_divu(1:3,2) +      &
+                                              aux_vec_2(1:3)
+                  pg(npi)%B_ren_divu(1:3,3) = pg(npi)%B_ren_divu(1:3,3) +      &
+                                              aux_vec_3(1:3)
                endif
 #ifdef SOLID_BODIES
               pg(npi)%sigma_fp = pg(npi)%sigma_fp +                            &
@@ -854,7 +875,7 @@ endif
                   gradmodwacl = gradmodwacl * kacl_coef
                   KerDer_bp_f_Gal(npartint) = gradmodwacl * denom
 ! Contributions of the neighbouring body particles to the inverse of the 
-! renormalization matrix
+! renormalization matrices
                if (input_any_t%ME_gradp_cons==3) then
                   r_vec(1:3) = ragtemp(1:3)
                   call grad_W_sub(kernel_ID=2,r_vec=r_vec,grad_W=grad_W)
@@ -871,6 +892,23 @@ endif
                                                aux_vec_2(1:3)
                   pg(npj)%B_ren_gradp(1:3,3) = pg(npj)%B_ren_gradp(1:3,3) +    &
                                                aux_vec_3(1:3)
+               endif
+               if (input_any_t%CE_divu_cons==1) then
+                  r_vec(1:3) = ragtemp(1:3)
+                  call grad_W_sub(kernel_ID=1,r_vec=r_vec,grad_W=grad_W)
+                  gradWomegaj(1:3) = grad_W(1:3) * bp_arr(npi)%volume
+                  aux_vec(1:3) = (bp_arr(npi)%pos(1) - pg(npj)%coord(1)) *     &
+                                 gradWomegaj(1:3)
+                  aux_vec_2(1:3) = (bp_arr(npi)%pos(2) - pg(npj)%coord(2)) *   &
+                                   gradWomegaj(1:3)
+                  aux_vec_3(1:3) = (bp_arr(npi)%pos(3) - pg(npj)%coord(3)) *   &
+                                   gradWomegaj(1:3)
+                  pg(npj)%B_ren_divu(1:3,1) = pg(npj)%B_ren_divu(1:3,1) +      &
+                                              aux_vec(1:3)
+                  pg(npj)%B_ren_divu(1:3,2) = pg(npj)%B_ren_divu(1:3,2) +      &
+                                              aux_vec_2(1:3)
+                  pg(npj)%B_ren_divu(1:3,3) = pg(npj)%B_ren_divu(1:3,3) +      &
+                                              aux_vec_3(1:3)
                endif
 ! Shepard coefficient (contributions from body particles)
                   pg(npj)%sigma_bp = pg(npj)%sigma_bp +                        &

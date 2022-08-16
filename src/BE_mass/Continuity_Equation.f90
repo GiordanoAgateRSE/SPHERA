@@ -43,7 +43,8 @@ double precision :: moddia,modout
 #elif defined SPACE_2D
 double precision :: det
 #endif
-double precision,dimension(3) :: pesogradj,dvar
+double precision,dimension(3) :: pesogradj,dvar,aux_vec
+double precision,dimension(3) :: appo_vec_1,appo_vec_2,appo_vec_3
 double precision,dimension(9) :: dvdi
 #ifdef SPACE_2D
 double precision,dimension(9) :: aij
@@ -51,17 +52,28 @@ double precision,dimension(9) :: aij
 !------------------------
 ! Explicit interfaces
 !------------------------
+interface
+   subroutine MatrixProduct(AA,BB,CC,nr,nrc,nc)
+      implicit none
+      integer(4),intent(in) :: nr,nrc,nc
+      double precision,intent(in),dimension(nr,nrc) :: AA
+      double precision,intent(in),dimension(nrc,nc) :: BB
+      double precision,intent(inout),dimension(nr,nc) :: CC
+   end subroutine MatrixProduct
+end interface
 !------------------------
 ! Allocations
 !------------------------
 !------------------------
 ! Initializations
 !------------------------
+appo_vec_1(1:3) = 0.d0
+appo_vec_2(1:3) = 0.d0
+appo_vec_3(1:3) = 0.d0
 !------------------------
 ! Statements
 !------------------------
 if ((pg(npi)%vel_type/="std").or.(pg(npi)%cella==0)) return
-pg(npi)%dden  = zero
 dvar(:) = zero
 #ifdef SPACE_2D
    aij(:) = zero
@@ -92,15 +104,22 @@ do contj=1,nPartIntorno(npi)
 ! Continuity equation
    pesogradj(:) = amassj * rag(:,npartint) * PartKernel(1,npartint) / rhoj
    if (Granular_flows_options%KTGF_config.ne.1) then
-      appo = amassj * PartKernel(1,npartint) *                                 &
-             (dvar(1)*rag(1,npartint) + dvar(2)*rag(2,npartint) +              &
-             dvar(3)*rag(3,npartint))
+! Liquid flows
+      appo_vec_1(1:3) = appo_vec_1(1:3) + amassj * PartKernel(1,npartint) *    &
+                        dvar(1) * rag(1:3,npartint)
+#ifdef SPACE_3D
+      appo_vec_2(1:3) = appo_vec_2(1:3) + amassj * PartKernel(1,npartint) *    &
+                        dvar(2) * rag(1:3,npartint)
+#endif
+      appo_vec_3(1:3) = appo_vec_3(1:3) + amassj * PartKernel(1,npartint) *    &
+                        dvar(3) * rag(1:3,npartint)
       else
+! Dense granular flows
          appo = rhoi * PartKernel(1,npartint) * (amassj / rhoj) *              &
                 (dvar(1) * rag(1,npartint) + dvar(2) * rag(2,npartint) +       &
                 dvar(3) * rag(3,npartint))
+         pg(npi)%dden = pg(npi)%dden - appo
    endif
-   pg(npi)%dden = pg(npi)%dden - appo
 ! Velocity derivatives 
    if (pg(npj)%vel_type/="std") return
    if (Granular_flows_options%KTGF_config==1) then
@@ -132,6 +151,29 @@ do contj=1,nPartIntorno(npi)
 #endif
    endif
 enddo
+! Inner term for the RHS of the continuity equation: start
+if (Granular_flows_options%KTGF_config.ne.1) then
+! Liquid flows
+   if (input_any_t%CE_divu_cons>0) then
+! 1st-order consistency
+      call MatrixProduct(pg(npi)%B_ren_divu,BB=appo_vec_1,CC=aux_vec,&
+         nr=3,nrc=3,nc=1)
+      appo_vec_1(1:3) = -aux_vec(1:3)
+#ifdef SPACE_3D
+      call MatrixProduct(pg(npi)%B_ren_divu,BB=appo_vec_2,CC=aux_vec,&
+         nr=3,nrc=3,nc=1)
+      appo_vec_2(1:3) = -aux_vec(1:3)
+#endif
+      call MatrixProduct(pg(npi)%B_ren_divu,BB=appo_vec_3,CC=aux_vec,&
+         nr=3,nrc=3,nc=1)
+      appo_vec_3(1:3) = -aux_vec(1:3)
+! Formal disuse of the renormalization matrix at boundaries, if needed
+      if (input_any_t%CE_divu_cons==2) pg(npi)%B_ren_divu_stat = -1
+   endif
+! Update of the RHS of the continuity equation
+   pg(npi)%dden = pg(npi)%dden - (appo_vec_1(1) + appo_vec_2(2) + appo_vec_3(3))
+endif
+! Inner term for the RHS of the continuity equation: end
 ! Boundary contributions (DB-SPH)
 #ifdef SPACE_2D
    if (Domain%tipo=="bsph") then

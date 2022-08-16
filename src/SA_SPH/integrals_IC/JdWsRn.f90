@@ -64,7 +64,7 @@ JdWsRn = zero
 !------------------------
 select case (kernel)
    case(1)              
-! Cubic spline  Kernel
+! Beta-spline cubic kernel
       select case (n)
          case(0)      
             if ((ro>=zero).and.(ro<one)) then
@@ -96,7 +96,7 @@ select case (kernel)
       endselect
       JdWsRn = JdWsRn * KS3D
    case(2)              
-! Gallati anti-cluster kernel
+! Anti-cluster cubic kernel
       select case (n)
          case(1)      
             if (ro<two) then

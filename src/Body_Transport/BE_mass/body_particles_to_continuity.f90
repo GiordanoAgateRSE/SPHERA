@@ -36,11 +36,20 @@ use Dynamic_allocation_module
 implicit none
 integer(4) :: npi,j,npartint,npj
 double precision :: temp_dden,dis,W_vol,sum_W_vol,dx_dxbp
-double precision :: dvar(3),aux_vec(3)
+double precision :: dvar(3),aux_vec(3),rag_bp_f_aux(3)
 double precision,external :: w  
 !------------------------
 ! Explicit interfaces
 !------------------------
+interface
+   subroutine MatrixProduct(AA,BB,CC,nr,nrc,nc)
+      implicit none
+      integer(4),intent(in) :: nr,nrc,nc
+      double precision,intent(in),dimension(nr,nrc) :: AA
+      double precision,intent(in),dimension(nrc,nc) :: BB
+      double precision,intent(inout),dimension(nr,nc) :: CC
+   end subroutine MatrixProduct
+end interface
 !------------------------
 ! Allocations
 !------------------------
@@ -54,9 +63,9 @@ double precision,external :: w
 !$omp parallel do default(none)                                                &
 !$omp shared(n_body_part,bp_arr,nPartIntorno_bp_f,NMAXPARTJ,PartIntorno_bp_f)  &
 !$omp shared(KerDer_bp_f_cub_spl,rag_bp_f,pg,Domain,FSI_free_slip_conditions)  &
-!$omp shared(surf_body_part,thin_walls,proxy_normal_bp_f)                      &
+!$omp shared(surf_body_part,thin_walls,proxy_normal_bp_f,input_any_t)          &
 !$omp private(npi,sum_W_vol,W_vol,j,npartint,npj,temp_dden,dis,dvar,aux_vec)   &
-!$omp private(dx_dxbp)
+!$omp private(dx_dxbp,rag_bp_f_aux)
 do npi=1,n_body_part
    bp_arr(npi)%vel_mir(:) = 0.d0
    sum_W_vol = 0.d0
@@ -87,10 +96,17 @@ do npi=1,n_body_part
 #elif defined SPACE_2D
       dx_dxbp = Domain%dx / (bp_arr(npi)%volume ** (1.d0/2.d0))
 #endif
+      if (input_any_t%CE_divu_cons==1) then
+! 1st-order consistency: body-particle terms
+         call MatrixProduct(pg(npj)%B_ren_divu,BB=rag_bp_f(1:3,npartint),      &
+            CC=aux_vec,nr=3,nrc=3,nc=1)
+         rag_bp_f_aux(1:3) = -aux_vec(1:3)
+         else
+            rag_bp_f_aux(1:3) = rag_bp_f(1:3,npartint)
+      endif
       temp_dden = pg(npj)%mass / (dx_dxbp ** ncord) *                          &
-                  KerDer_bp_f_cub_spl(npartint) * (dvar(1) * ( -               &
-                  rag_bp_f(1,npartint)) + dvar(2) * ( - rag_bp_f(2,npartint))  &
-                  + dvar(3) * ( - rag_bp_f(3,npartint)))
+                  KerDer_bp_f_cub_spl(npartint) *                              &
+                  (-dot_product(dvar,rag_bp_f_aux))
       if (thin_walls) then
 ! Treatment for thin walls (to the coupling term for the continuity equation)
          temp_dden = temp_dden * (1.d0 + (1.d0 - pg(npj)%sigma_fp -            &

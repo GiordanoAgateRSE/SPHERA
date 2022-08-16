@@ -193,6 +193,13 @@ type TyParticle
 !      the identity matrix
 ! =-1: renormalization matrix is computed, but not used
    integer(4) :: B_ren_gradp_stat
+! Status on renormalization matrix for the velocity-divergence term in the 
+! momentum equation:
+!  =1: renormalization matrix is computed
+!  =0: renormalization matrix is not computed and replaced by the opposite of 
+!      the identity matrix
+! =-1: renormalization matrix is computed, but not used
+   integer(4) :: B_ren_divu_stat
 ! Colour
    integer(4) :: icol
 ! Fluid ID 
@@ -695,7 +702,7 @@ type TyBoundarySide
    double precision :: angle
    double precision :: velocity(1:SPACEDIM)
 ! Direction cosines of the local reference system of the boundary 
-! (T(SPACEDIM,1:SPACEDIM) is the normal) 
+! (T(1:SPACEDIM,SPACEDIM) is the normal)
    double precision :: T(1:SPACEDIM,1:SPACEDIM)
    double precision :: R(1:SPACEDIM,1:SPACEDIM)      
    double precision :: RN(1:SPACEDIM,1:SPACEDIM)

@@ -20,14 +20,13 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: AddBoundaryContribution_to_CE2D                                
-! Description: To compute boundary terms for the 2D continuity equation 
-!              (rodivV) of a generic "npi" SPH particle. It performs implicit 
-!              computation of "gradPsuro". In case of a neighbouring inlet 
-!              section, the particle density and pressure do not change.
-!              (Di Monaco et al., 2011, EACFM)                       
+! Description: Computation of the SASPH term for the 2D continuity equation 
+!              of a generic "npi" SPH particle (Di Monaco et al., 2011, EACFM).
+!              SASPH contributions to the renormalization matrix for the 2D 
+!              velocity-divergence term.
 !-------------------------------------------------------------------------------
 #ifdef SPACE_2D
-subroutine AddBoundaryContribution_to_CE2D(npi,IntNcbs,BCrodivV)
+subroutine AddBoundaryContribution_to_CE2D(npi,IntNcbs,grad_u_SA,grad_w_SA)
 !------------------------
 ! Modules
 !------------------------
@@ -41,11 +40,14 @@ use SA_SPH_module
 !------------------------
 implicit none
 integer(4),intent(in) :: npi,IntNcbs
-double precision,intent(inout) :: BCrodivV
-integer(4) :: pd,icbs,iside,sidestr,ibdt,ibdp
-double precision :: IntWds,roi,vin 
+double precision,dimension(3),intent(inout) :: grad_u_SA,grad_w_SA
+integer(4) :: pd,icbs,iside,sidestr,ibdt,ibdp,ii,jj
+double precision :: IntWds,roi,IntWdV
 integer(4),dimension(1:PLANEDIM) :: acix
-double precision,dimension(1:PLANEDIM) :: IntLocXY,nnlocal,Dvel
+double precision,dimension(1:PLANEDIM) :: IntLocXY,nnlocal,dvel,gradbPsuro_like
+double precision,dimension(1:PLANEDIM) :: RG_like
+! Unit vector of the unity vector: direction of (1,1)
+double precision,dimension(1:SPACEDIM) :: one_vec_dir
 type (TyBoundarySide) :: RifBoundarySide
 character(4) :: strtype
 !------------------------
@@ -57,13 +59,16 @@ character(4) :: strtype
 !------------------------
 ! Initializations
 !------------------------
-BCrodivV = zero
 if (IntNcbs<=0) return
 ! Active coordinate indices
 acix(1) = 1        
 acix(2) = 3
 roi = pg(npi)%dens
 ibdt = BoundaryDataPointer(3,npi)
+one_vec_dir(1:3) = 0.d0
+do ii=1,PLANEDIM
+   one_vec_dir(acix(ii)) = 1.d0 / dsqrt(2.d0)
+enddo
 !------------------------
 ! Statements
 !------------------------
@@ -74,34 +79,61 @@ do icbs=1,IntNcbs
    RifBoundarySide = BoundarySide(iside)
    sidestr = RifBoundarySide%stretch
    strtype = Tratto(sidestr)%tipo
+! SASPH contributions to the renormalization matrix for div_u_: start
+   if (input_any_t%CE_divu_cons==1) then
+! "IntWdV", or equivalently "J_3,w" (2D version) is always computed using the 
+! beta-spline cubic kernel, no matter about the renormalization
+      IntWdV = BoundaryDataTab(ibdp)%BoundaryIntegral(3)
+      do ii=1,PLANEDIM
+         gradbPsuro_like(ii) = one_vec_dir(acix(ii))
+      enddo
+      RG_like(1:2) = 0.d0
+      do ii=1,PLANEDIM
+         do jj=1,PLANEDIM
+            RG_like(ii) = RG_like(ii) + RifBoundarySide%RN(acix(ii),acix(jj)) *&
+                          gradbPsuro_like(jj)
+         enddo
+         RG_like(ii) = RG_like(ii) * IntWdV
+      enddo
+! Renormalization at SASPH frontiers
+      do ii=1,PLANEDIM
+         pg(npi)%B_ren_divu(acix(ii),1:3) = pg(npi)%B_ren_divu(acix(ii),1:3) - &
+                                            RG_like(ii)
+      enddo
+   endif
+! SASPH contributions to the renormalization matrix for div_u_: end
    if (strtype=="fixe".or.strtype=="tapi".or.strtype=="velo".or.               &
       strtype=="flow".or.strtype=="sour") then 
       IntWdS = BoundaryDataTab(ibdp)%BoundaryIntegral(1)
-      vin = zero
       do pd=1,PLANEDIM
          nnlocal(pd) = RifBoundarySide%T(acix(pd),acix(2))
       enddo
       select case (strtype)
          case ("fixe")
             do pd=1,PLANEDIM
-               Dvel(pd) = pg(npi)%var(acix(pd))
+               dvel(pd) = 2.d0 * (-pg(npi)%var(acix(pd)))
             enddo
-            vin = Dvel(1) * nnlocal(1) + Dvel(2) * nnlocal(2)
          case ("tapi")
             do pd=1,PLANEDIM
-               Dvel(pd) = pg(npi)%var(acix(pd)) -                              &
-                          RifBoundarySide%velocity(acix(pd))
+               dvel(pd) = 2.d0 * (RifBoundarySide%velocity(acix(pd)) -         &
+                          pg(npi)%var(acix(pd)))
             enddo
-            vin = Dvel(1) * nnlocal(1) + Dvel(2) * nnlocal(2)
          case ("velo", "flow", "sour")
             if ((Domain%time_stage==1).or.(Domain%time_split==1)) then 
                pg(npi)%koddens = 2
-               BCrodivV = zero
+               grad_u_SA(1:3) = 0.d0
+               grad_w_SA(1:3) = 0.d0
             endif
             return
       endselect
-! Boundary contribution to the continuity equation 
-      BCrodivV = BCrodivV + two * vin * roi * IntWdS
+! Summations of the SASPH terms for grad_u_SA and grad_w_SA: start
+      do ii=1,PLANEDIM
+         grad_u_SA(acix(ii)) = grad_u_SA(acix(ii)) - dvel(1) *                 &
+                               RifBoundarySide%T(acix(ii),acix(2)) * IntWdS
+         grad_w_SA(acix(ii)) = grad_w_SA(acix(ii)) - dvel(2) *                 &
+                               RifBoundarySide%T(acix(ii),acix(2)) * IntWdS
+      enddo
+! Summations of the SASPH terms for grad_u_SA and grad_w_SA: end
    endif
 enddo
 !------------------------

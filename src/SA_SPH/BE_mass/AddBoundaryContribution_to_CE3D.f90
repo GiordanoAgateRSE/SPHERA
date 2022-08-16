@@ -20,14 +20,14 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: AddBoundaryContribution_to_CE3D                                 
-! Description: To compute boundary terms for the 3D continuity equation 
-!              (rodivV). Equation refers to particle npi. It performs implicit 
-!              computation of gradPsuro. In case of a neighbouring inlet 
-!              section, the particle density and pressure do not change.
-!              (Di Monaco et al., 2011, EACFM)                        
+! Description: Computation of the SASPH boundary term for the 3D continuity 
+!              equation (Di Monaco et al., 2011, EACFM),
+!              SASPH contributions to the renormalization matrix for the 3D 
+!              velocity-divergence term.
 !-------------------------------------------------------------------------------
 #ifdef SPACE_3D
-subroutine AddBoundaryContribution_to_CE3D(npi,Ncbf,BCtorodivV)
+subroutine AddBoundaryContribution_to_CE3D(npi,Ncbf,grad_u_SA,grad_v_SA,       &
+   grad_w_SA)
 !------------------------
 ! Modules
 !------------------------
@@ -39,25 +39,33 @@ use Dynamic_allocation_module
 !------------------------
 implicit none
 integer(4),intent(in)    :: npi,Ncbf
-double precision,intent(inout) :: BCtorodivV
-integer(4) :: sd,sdj,icbf,iface,ibdt,ibdp,stretch        
-double precision :: roi,scaprod
-double precision,dimension(1:SPACEDIM) :: vb,vi,dvij,LocPi,LocDvij
+double precision,dimension(3),intent(inout) :: grad_u_SA,grad_v_SA,grad_w_SA
+integer(4) :: sd,sdj,icbf,iface,ibdt,ibdp,stretch,ii
+double precision,dimension(1:SPACEDIM) :: LocPi,one_Loc,dvel
+double precision,dimension(1:SPACEDIM) :: one_vec_dir,B_ren_aux_Loc
+double precision,dimension(1:SPACEDIM) :: B_ren_aux_Glo,aux_vec,aux_vec_2
 character(4) :: boundtype
 !------------------------
 ! Explicit interfaces
 !------------------------
+interface
+   subroutine MatrixProduct(AA,BB,CC,nr,nrc,nc)
+      implicit none
+      integer(4),intent(in) :: nr,nrc,nc
+      double precision,intent(in),dimension(nr,nrc) :: AA
+      double precision,intent(in),dimension(nrc,nc) :: BB
+      double precision,intent(inout),dimension(nr,nc) :: CC
+   end subroutine MatrixProduct
+end interface
 !------------------------
 ! Allocations
 !------------------------
 !------------------------
 ! Initializations
 !------------------------
-roi = pg(npi)%dens
-vi(:) = pg(npi)%var(:)
-BCtorodivV = zero
 if (Ncbf<=0) return
 ibdt = BoundaryDataPointer(3,npi)
+one_vec_dir(1:3) = 1.d0 / dsqrt(3.d0)
 !------------------------
 ! Statements
 !------------------------
@@ -69,26 +77,56 @@ do icbf=1,Ncbf
    boundtype = Tratto(stretch)%tipo
    if (boundtype=="fixe".or.boundtype=="tapi") then
 ! The face "iface" interacts with particle Pi
-      if (LocPi(3)>zero) then          
-         vb(:) = BoundaryFace(iface)%velocity(:)
-         dvij(:) = two * (vi(:) - vb(:))
-         scaprod = zero
-         sd = 3
-! Local components of the vector "2*(vi-vb)"
-         Locdvij(sd) = zero  
-         do sdj=1,SPACEDIM
-            Locdvij(sd) = Locdvij(sd) + dvij(sdj) *                            &
-               BoundaryFace(iface)%T(sdj,sd)
-         enddo
-         scaprod = scaprod + Locdvij(sd) *                                     &
-            BoundaryDataTab(ibdp)%BoundaryIntegral(3+sd)        
-! Boundary contribution to the continuity equation 
-         BCtorodivV = BCtorodivV + roi * scaprod
+      if (LocPi(3)>zero) then
+! Contributions of the neighbouring SASPH frontiers to the inverse of the 
+! renormalization matrix for div_u_: start
+! It is more convenient not to unify this part with the analogous computation 
+! for grad_p because it might be convenient to change the kernel function in 
+! the future, depending on the matrix.
+         if (input_any_t%CE_divu_cons==1) then
+! Local components explicitly depending on the unit vector of the unity vector
+            do sd=1,SPACEDIM
+               one_Loc(sd) = 0.d0
+               do sdj=1,SPACEDIM
+                  one_Loc(sd) = one_Loc(sd) + BoundaryFace(iface)%T(sdj,sd) *  &
+                     one_vec_dir(sdj)
+               enddo
+            enddo
+! Local components (second assessment)
+! "IntGiWrRdV", or equivalently "J_3,w" is always computed using the 
+! beta-spline cubic kernel, no matter about the renormalization
+            call MatrixProduct(BoundaryDataTab(ibdp)%IntGiWrRdV,BB=one_Loc,    &
+               CC=B_ren_aux_Loc,nr=3,nrc=3,nc=1)
+! Global components
+            call MatrixProduct(BoundaryFace(iface)%T,BB=B_ren_aux_Loc,         &
+               CC=B_ren_aux_Glo,nr=3,nrc=3,nc=1)
+! Contribution to the renormalization matrix
+            do ii=1,3
+               pg(npi)%B_ren_divu(ii,1:3) = pg(npi)%B_ren_divu(ii,1:3) -       &
+                                            B_ren_aux_Glo(ii)
+            enddo
+         endif
+! Contributions of the neighbouring SASPH frontiers to the inverse of the 
+! renormalization matrix for div_u_: end
+! Summations of the SASPH terms for grad_u_SA, grad_v_SA and grad_w_SA: start
+         aux_vec_2(1:3) = two * (BoundaryFace(iface)%velocity(1:3) -           &
+                          pg(npi)%var(1:3))
+         aux_vec(1:3) = BoundaryFace(iface)%T(1:3,3)
+         dvel(1:3) = dot_product(aux_vec_2,aux_vec) * aux_vec(1:3)
+         grad_u_SA(1:3) = grad_u_SA(1:3) - dvel(1) *                           &
+                          BoundaryDataTab(ibdp)%BoundaryIntegral(4:6)
+         grad_v_SA(1:3) = grad_v_SA(1:3) - dvel(2) *                           &
+                          BoundaryDataTab(ibdp)%BoundaryIntegral(4:6)
+         grad_w_SA(1:3) = grad_w_SA(1:3) - dvel(3) *                           &
+                          BoundaryDataTab(ibdp)%BoundaryIntegral(4:6)
+! Summations of the SASPH terms for grad_u_SA, grad_v_SA and grad_w_SA: end
       endif
       elseif (boundtype=="velo".or.boundtype=="flow".or.boundtype=="sour") then
          if ((Domain%time_stage==1).or.(Domain%time_split==1)) then 
             pg(npi)%koddens = 2
-            BCtorodivV = zero
+            grad_u_SA(1:3) = 0.d0
+            grad_v_SA(1:3) = 0.d0
+            grad_w_SA(1:3) = 0.d0
          endif
          return
    endif

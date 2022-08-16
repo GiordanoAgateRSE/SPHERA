@@ -59,19 +59,17 @@ abs_det_thresh = 0.01d0
 !------------------------
 ! Statements
 !------------------------
-if (input_any_t%ME_gradp_cons>0) then
 ! Matrix inversion to get the renormalization matrix
-   call Matrix_Inversion_3x3(pg(npi)%B_ren_gradp,aux_mat,abs_det_thresh,test)
-   if (test==1) then
-      pg(npi)%B_ren_gradp(1:3,1:3) = aux_mat(1:3,1:3)
-      pg(npi)%B_ren_gradp_stat = 1
-      else
-         pg(npi)%B_ren_gradp(1:3,1:3) = 0.d0
-         pg(npi)%B_ren_gradp(1,1) = -1.d0
-         pg(npi)%B_ren_gradp(2,2) = -1.d0
-         pg(npi)%B_ren_gradp(3,3) = -1.d0
-         pg(npi)%B_ren_gradp_stat = 0
-   endif
+call Matrix_Inversion_3x3(pg(npi)%B_ren_gradp,aux_mat,abs_det_thresh,test)
+if (test==1) then
+   pg(npi)%B_ren_gradp(1:3,1:3) = aux_mat(1:3,1:3)
+   pg(npi)%B_ren_gradp_stat = 1
+   else
+      pg(npi)%B_ren_gradp(1:3,1:3) = 0.d0
+      pg(npi)%B_ren_gradp(1,1) = -1.d0
+      pg(npi)%B_ren_gradp(2,2) = -1.d0
+      pg(npi)%B_ren_gradp(3,3) = -1.d0
+      pg(npi)%B_ren_gradp_stat = 0
 endif
 !------------------------
 ! Deallocations

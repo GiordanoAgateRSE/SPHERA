@@ -87,7 +87,7 @@ if (ypi>=yplimite) then
       alfa = alfa + dalfa
       tanalfa = Tan(alfa)
       ris = ypi * dsqrt(one + tanalfa * tanalfa)
-      VIntWdV = VIntWdV + WIntegr(ris, Domain%h) * dalfa
+      VIntWdV = VIntWdV + WIntegr(ris,Domain%h) * dalfa
    enddo
    elseif (ypi<yplimite.and.Ncbslocal==1) then        
 ! There is only one close side: "icbs"

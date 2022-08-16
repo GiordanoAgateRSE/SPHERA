@@ -24,9 +24,11 @@
 !              (gradPsuro,ViscoF). Equations refer to particle npi. In case of 
 !              a neighbouring inlet section, the particle velocity is assigned 
 !              (Di Monaco et al., 2011, EACFM).
+!              SASPH contributions to the renormalization matrix for the 2D 
+!              pressure-gradient term.
 !              Inversion of the renormalization matrix in 2D, even in the 
 !              absence of SASPH neighbours (to fasten the algorithm under 
-!              general conditions).                    
+!              general conditions).
 !-------------------------------------------------------------------------------
 #ifdef SPACE_2D
 subroutine AddBoundaryContributions_to_ME2D(npi,IntNcbs,tpres,tdiss,tvisc,     &
@@ -285,6 +287,8 @@ do icbs=1,IntNcbs
                          gradbPsuro_like(j)
          endif
       enddo
+! "IntWdV", or equivalently "J_3,w" (2D version) is always computed using the 
+! beta-spline cubic kernel, no matter about the renormalization
       RG(i) = RG(i) * IntWdV
       if (input_any_t%ME_gradp_cons==3) then
 ! Renormalization at SASPH frontiers

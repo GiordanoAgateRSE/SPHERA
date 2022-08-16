@@ -141,6 +141,9 @@ call start_and_stop(3,18)
 ! every loop and storing them in the general storage array. Computation and 
 ! storage of the intersections between the kernel support and the frontier and 
 ! the corresponding boundary integrals (SA-SPH).
+! Computation and storage of the SASPH time-step position-based terms, 
+! based on interpolating values of the IC SASPH position-based integrals 
+! collected in tables
 if (Domain%tipo=="semi") then
    call start_and_stop(2,11)
 #ifdef SPACE_3D
@@ -197,7 +200,9 @@ TIME_STEP_DO: do while (it<=input_any_t%itmax)
 ! To evaluate the close boundaries and integrals
 ! for the current particle in every loop and storing them in the general 
 ! storage array.
-! Computation and storage of the boundary integrals
+! Computation and storage of the SASPH time-step position-based terms, 
+! based on interpolating values of the IC SASPH position-based integrals 
+! collected in tables
          if (Domain%tipo=="semi") then
             call start_and_stop(2,11)
 #ifdef SPACE_3D
@@ -307,7 +312,9 @@ TIME_STEP_DO: do while (it<=input_any_t%itmax)
 ! Assessing the close boundaries and the integrals
 ! for the current particle in every loop and storing them in the general 
 ! storage array.
-! Computation and storage of the boundary integrals
+! Computation and storage of the SASPH time-step position-based terms, 
+! based on interpolating values of the IC SASPH position-based integrals 
+! collected in tables
                call start_and_stop(2,11)
 #ifdef SPACE_3D
                   call ComputeBoundaryDataTab_3D
@@ -333,7 +340,7 @@ TIME_STEP_DO: do while (it<=input_any_t%itmax)
 #endif
 !$omp private(npi)
       do npi=1,nag
-         call Continuity_Equation(npi)
+         pg(npi)%dden = zero
          if ((Domain%time_stage==1).or.(Domain%time_split==1)) then
             pg(npi)%koddens = 0
          endif
@@ -344,6 +351,8 @@ TIME_STEP_DO: do while (it<=input_any_t%itmax)
 #endif
                )
          endif
+         call Continuity_Equation(npi)
+         if (pg(npi)%koddens==0) pg(npi)%dden = zero
       enddo
 !$omp end parallel do
 #ifdef SPACE_3D

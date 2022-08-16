@@ -19,59 +19,60 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: ComputeKernelTable                                   
-! Description: To compute and save in kerneltab(0:ktrows,0:ktcols) the 
-!              following values (Di Monaco et al., 201, EACFM):
-!                 kerneltab(0:ktrows,0) = rob = r_0b/h = q_0b
-!                 kerneltab(0:ktrows,1) = Integral (W_norm * q**2 * dq) 
-!                                         (from q_0b to 2)
-!                 kerneltab(0:ktrows,2) = Integral (dW_norm/dq * q * dq) 
-!                                         (from q_0b to 2)
-!                 kerneltab(0:ktrows,3) = Integral (dW_norm/dq * q**2 * dq) 
-!                                         (from q_0b to 2)
-!                 kerneltab(0:ktrows,4) = Integral (dW/dq * q**3 * dq) 
-!                                         (from q_0b to 2)
+! Program unit: B_ren_divu_inversion
+! Description: Inversion of the renormalization matrix of an input fluid 
+!              particle for the approximation of the velocity-divergence term
 !-------------------------------------------------------------------------------
-#ifdef SPACE_3D
-subroutine ComputeKernelTable
+subroutine B_ren_divu_inversion(npi)
 !------------------------
 ! Modules
 !------------------------
-use Static_allocation_module
 use Hybrid_allocation_module
+use Dynamic_allocation_module
 !------------------------
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: nr
-double precision :: rob
-double precision,external :: IWro2dro,JdWsRn
+integer(4),intent(in) :: npi
+integer(4) :: test
+double precision :: abs_det_thresh
+double precision,dimension(3,3) :: aux_mat
 !------------------------
 ! Explicit interfaces
 !------------------------
+interface
+   subroutine Matrix_Inversion_3x3(mat,inv,abs_det_thresh,test)
+      implicit none
+      double precision,intent(in) :: abs_det_thresh
+      double precision,intent(in) :: mat(3,3)
+      double precision,intent(inout) :: inv(3,3)
+      integer(4),intent(inout) :: test
+   end subroutine Matrix_Inversion_3x3
+end interface
 !------------------------
 ! Allocations
 !------------------------
 !------------------------
 ! Initializations
 !------------------------
-ktdelta = two / INT_KERNELTABLE
+abs_det_thresh = 0.01d0
 !------------------------
 ! Statements
 !------------------------
-do nr=0,ktrows
-  rob = ktdelta * nr
-  kerneltab(nr,0) = rob
-  kerneltab(nr,1) = IWro2dro(rob)
-  kerneltab(nr,2) = JdWsRn(rob,1,1) * Unosusquareh
-  kerneltab(nr,3) = JdWsRn(rob,2,1) * Unosuh
-! The beta-spline cubic kernel is always used to compute the term "J_3,w", even 
-! for the SASPH term of the pressure-gradient
-  kerneltab(nr,4) = JdWsRn(rob,3,1)
-enddo
+! Matrix inversion to get the renormalization matrix
+call Matrix_Inversion_3x3(pg(npi)%B_ren_divu,aux_mat,abs_det_thresh,test)
+if (test==1) then
+   pg(npi)%B_ren_divu(1:3,1:3) = aux_mat(1:3,1:3)
+   pg(npi)%B_ren_divu_stat = 1
+   else
+      pg(npi)%B_ren_divu(1:3,1:3) = 0.d0
+      pg(npi)%B_ren_divu(1,1) = -1.d0
+      pg(npi)%B_ren_divu(2,2) = -1.d0
+      pg(npi)%B_ren_divu(3,3) = -1.d0
+      pg(npi)%B_ren_divu_stat = 0
+endif
 !------------------------
 ! Deallocations
 !------------------------
 return
-end subroutine ComputeKernelTable
-#endif
+end subroutine B_ren_divu_inversion

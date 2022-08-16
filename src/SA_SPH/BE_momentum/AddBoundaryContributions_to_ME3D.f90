@@ -25,6 +25,8 @@
 !              computation of "gradPsuro". In case of a neighbouring inlet 
 !              section, the particle velocity is assigned (Di Monaco et al., 
 !              2011, EACFM).
+!              SASPH contributions to the renormalization matrix for the 3D 
+!              pressure-gradient term.
 !              Inversion of the renormalization matrix in 3D, even in the 
 !              absence of SASPH neighbours (to fasten the algorithm under 
 !              general conditions).
@@ -154,7 +156,7 @@ face_loop: do icbf=1,Ncbf
          PPSTt_SASPH(1:3) = PPSTt_SASPH(1:3) - Gpsurob_Glo(1:3)
 ! Boundary contribution to the "PPST term": end
 ! Contributions of the neighbouring SASPH frontiers to the inverse of the 
-! renormalization matrices: start
+! renormalization matrix for grad_p: start
          if (input_any_t%ME_gradp_cons==3) then
 ! Local components explicitly depending on the unit vector of the unity vector
             do SD=1,SPACEDIM
@@ -165,6 +167,8 @@ face_loop: do icbf=1,Ncbf
                enddo
             enddo
 ! Local components (second assessment)
+! "IntGiWrRdV", or equivalently "J_3,w" is always computed using the 
+! beta-spline cubic kernel, no matter about the renormalization
             call MatrixProduct(BoundaryDataTab(ibdp)%IntGiWrRdV,BB=one_Loc,    &
                CC=B_ren_aux_Loc,nr=3,nrc=3,nc=1)
 ! Global components
@@ -178,7 +182,7 @@ face_loop: do icbf=1,Ncbf
             enddo
          endif
 ! Contributions of the neighbouring SASPH frontiers to the inverse of the 
-! renormalization matrix: end
+! renormalization matrix for grad_p: end
 ! Boundary contributions to the viscosity terms 
          IntGWZrm1dV = BoundaryDataTab(ibdp)%BoundaryIntegral(7)
          IntdWrm1dV = BoundaryDataTab(ibdp)%BoundaryIntegral(3)
