@@ -101,6 +101,8 @@
 !        at boundaries is computed but not used)
 !    =3 (1st-order consistent + PPST term in the inner domain and at SASPH and 
 !        body boundaries)
+!    1st-order consistency options do not work in the presence of: dense 
+!    granular flows; DBSPH boundaries; explicit RK time integration schemes.
 ![?] <CE_divu_cons>: ID for the consistency/conservation of the 
 !    velocity-divergence term in the continuity equation. Its value can be 
 !    effectively modified at any restart time.
@@ -108,10 +110,14 @@
 !    =1 (1st-order consistency)
 !    =2 (1st-order consistency in the inner domain, 0th-order consistency at 
 !        boundaries)
+!    1st-order consistency options do not work in the presence of: dense 
+!    granular flows; DBSPH boundaries; explicit RK time integration schemes.
 ![?] <monitor_cons>: ID for the consistency of the post-processing procedures 
 !    at the monitoring elements
 !    =0 (0th-order consistency)
 !    =1 (1st-order consistency)
+!    1st-order consistency options work also in the presence of: dense 
+!    granular flows; DBSPH boundaries; explicit RK time integration schemes.
 !-------------------------------------------------------------------------------
 ![*] <final_time> <final_time_step>
 ![*] <CFL> <vsc_coeff> <Leapfrog_flag> <scheme_order> <factor> <dt_alfa_Mon>
