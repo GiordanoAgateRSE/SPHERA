@@ -23,7 +23,8 @@
 ! Description: Computation of the momentum equation RHS (with DB-SPH boundary 
 !              treatment scheme, Shepard's coefficient and gravity are added at 
 !              a later stage) and the energy equation RHS (this last equation is
-!              not validated).   
+!              not validated).
+!              Fluid-fluid contributions to the PPST velocity increment.             
 !-------------------------------------------------------------------------------
 subroutine inter_EqMoto(npi,tpres,tdiss,tvisc)
 !------------------------
@@ -253,11 +254,17 @@ do contj=1,nPartIntorno(npi)
    select case (gradp_PPST_flag)
 ! Conservative formulation for "grad_p + PPST" terms
       case(1)
-! In the absence of 1st-order consistency, "appopres" also includes the PPST 
-! term, which is not explicitly calculated
-         alpha = pi / (rhoi * rhoi) + pj / (rhoj * rhoj)
+         alpha = (pj - pi) / (rhoi * rhoj)
+! The sign change applies here, but the matrix product applies later only 
+! once, after all the neighbour-dependent contributions are collected
          appopres(1:3) = -amassj * alpha * rag(1:3,npartint) *                 &
                          PartKernel(3,npartint)
+! PPST term
+         alpha = (pi * (rhoj / rhoi + 1.d0) + pj * (rhoi / rhoj - 1.d0)) /     &
+                 (rhoi * rhoj)
+         PPST_term_sum(1:3) = PPST_term_sum(1:3) - amassj * alpha *            &
+                              rag(1:3,npartint) * PartKernel(3,npartint)
+! Notice that: alpha_new + alpha_old = pi / (rhoi * rhoi) + pj / (rhoj * rhoj)
 ! 1st-order consistency for the pressure-gradient term
       case(2,5)
          alpha = (pj - pi) / (rhoi * rhoj)
@@ -286,7 +293,7 @@ do contj=1,nPartIntorno(npi)
    endselect
    t_pres_aux(1:3) = t_pres_aux(1:3) + appopres(1:3)
 ! "grad_p + PPST" term: end
-! To compute Monaghan term (artificial viscosity)   
+! To compute Monaghan term (artificial viscosity)
    call viscomon(npi,npj,npartint,dervel,rvwalfa,rvwbeta)
    appodiss(:) = rvwalfa(:) + rvwbeta(:)
 ! To add Monaghan term (artificial viscosity)
@@ -308,8 +315,11 @@ if ((gradp_PPST_flag==2).or.(gradp_PPST_flag==5)) then
       nc=1)
    t_pres_aux(1:3) = aux_vec(1:3)
 endif
-! grad_p term and PPST term are summed to the acceleration
+! grad_p term and PPST term are summed to the acceleration (PPST term is 
+! formally added to the grad_p term)
 tpres(1:3) = tpres(1:3) + t_pres_aux(1:3) + PPST_term_sum(1:3)
+! Update of the PPST velocity increment (here it is still an acceleration)
+pg(npi)%dvel_PPST(1:3) = pg(npi)%dvel_PPST(1:3) + PPST_term_sum(1:3)
 pg(npi)%laminar_flag = 0
 if (pg(npi)%kin_visc>0.d0) then
    absv_pres_grav_inner = dsqrt(dot_product(tpres,tpres)) + GI

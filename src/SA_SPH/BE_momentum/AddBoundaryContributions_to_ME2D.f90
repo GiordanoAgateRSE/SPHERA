@@ -29,6 +29,7 @@
 !              Inversion of the renormalization matrix in 2D, even in the 
 !              absence of SASPH neighbours (to fasten the algorithm under 
 !              general conditions).
+!              2D SASPH contributions to the PPST velocity increment.
 !-------------------------------------------------------------------------------
 #ifdef SPACE_2D
 subroutine AddBoundaryContributions_to_ME2D(npi,IntNcbs,tpres,tdiss,tvisc,     &
@@ -59,12 +60,14 @@ double precision :: QiiIntWdS,level,pressj,Qsi,Qsj,velix,veliz,veliq,hcrit
 double precision :: hcritmin,zbottom,FlowRate1,Lb,L,minquotanode,maxquotanode
 double precision :: SomQsiQsj,DiffQsiQsj,d_50
 integer(4),dimension(1:PLANEDIM) :: acix
-double precision,dimension(1:PLANEDIM) :: RHS,RG,ss,nnlocal,gradbPsuro
+double precision,dimension(1:PLANEDIM) :: RG,ss,nnlocal,gradbPsuro
 double precision,dimension(1:PLANEDIM) :: ViscoMon,ViscoShear,sidevel,TT,Dvel
 double precision,dimension(1:PLANEDIM) :: RG_like,gradbPsuro_like,RG_sum
 double precision,dimension(1:SPACEDIM) :: u_t_0_vector,aux_vec_2,aux_vec
 ! Unit vector of the unity vector: direction of (1,1)
 double precision,dimension(1:SPACEDIM) :: one_vec_dir
+! SASPH ME PPST term
+double precision,dimension(1:SPACEDIM) :: PPSTt_SASPH
 type (TyBoundarySide) :: RifBoundarySide
 character(4):: strtype
 !------------------------
@@ -96,8 +99,6 @@ ro0 = Med(imed)%den0
 roi = pg(npi)%dens
 pressi = pg(npi)%pres
 distpimin = Domain%dx
-RHS(1) = -tpres(1)
-RHS(2) = -tpres(3)
 ViscoMon(1) = zero
 ViscoMon(2) = zero
 ViscoShear(1) = zero
@@ -108,6 +109,7 @@ do i=1,PLANEDIM
    one_vec_dir(acix(i)) = 1.d0 / dsqrt(2.d0)
 enddo
 RG_sum(1:2) = 0.d0
+PPSTt_SASPH(1:3) = 0.d0
 !------------------------
 ! Statements
 !------------------------
@@ -299,16 +301,17 @@ do icbs=1,IntNcbs
    RG_sum(1:2) = RG_sum(1:2) + RG(1:2)
    if (input_any_t%ME_gradp_cons==3) then
 ! Renormalization at SASPH frontiers
-! Notice that the contributions to RHS and B_ren_gradp have different signs as 
-! RHS will be subtracted from the acceleration
+! Notice that the contributions to RG_sum and B_ren_gradp have different signs 
+! as RG_sum will be subtracted from the acceleration
       do i=1,PLANEDIM
             pg(npi)%B_ren_gradp(acix(i),1:3) = pg(npi)%B_ren_gradp(acix(i),1:3)&
                                                - RG_like(i)
       enddo
    endif
 ! SASPH contribution to "grad_p" and renormalization matrix: end
-! Collection of the SASPH PPST terms directly in the RHS vector
-   RHS(1:2) = RHS(1:2) - nnlocal(1:2) * QiiIntWdS
+! Contributions to the ME SASPH PPST term
+   PPSTt_SASPH(1) = PPSTt_SASPH(1) - nnlocal(1) * QiiIntWdS
+   PPSTt_SASPH(3) = PPSTt_SASPH(3) - nnlocal(2) * QiiIntWdS
 ! Volume viscosity force (with changed sign) and artificial viscosity term
    if (strtype=="fixe".or.strtype=="tapi") then
       if (xpi>=zero.and.xpi<=RifBoundarySide%length) then
@@ -392,11 +395,11 @@ if (input_any_t%ME_gradp_cons==3) then
    enddo
 endif
 ! grad_p (renormalization at boundaries): end
-! SASPH contributions to the grad_p term are collected in RHS (both with and 
-! without renormalization)
-RHS(1:2) = RHS(1:2) + RG_sum(1:2)
 do i=1,PLANEDIM
-   tpres(acix(i)) = - RHS(i)
+   tpres(acix(i)) = tpres(acix(i)) - RG_sum(i) - PPSTt_SASPH(acix(i))
+! Contribution to the PPST velocity increment (here it is still an acceleration)
+   pg(npi)%dvel_PPST(acix(i)) = pg(npi)%dvel_PPST(acix(i)) -                   &
+                                PPSTt_SASPH(acix(i))
    tdiss(acix(i)) = tdiss(acix(i)) - ViscoMon(i)
    tvisc(acix(i)) = tvisc(acix(i)) - ViscoShear(i)
 enddo

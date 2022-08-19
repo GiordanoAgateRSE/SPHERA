@@ -308,11 +308,12 @@ do npi=1,n_body_part
                                ( - rag_bp_f(1:3,npartint)) *                   &
                                KerDer_bp_f_Gal(npartint))
       endif
-! PPST
-      pg(npj)%acc(1:3) = pg(npj)%acc(1:3) + ( - pg(npj)%mass /                 &
-                         (dx_dxbp ** ncord) * aux_scalar_2 *                   &
-                         ( - rag_bp_f(1:3,npartint)) *                         &
-                         KerDer_bp_f_Gal(npartint))
+! PPST contribution to the acceleration
+      aux_vec(1:3) = -pg(npj)%mass / (dx_dxbp ** ncord) * aux_scalar_2 *       &
+                     (-rag_bp_f(1:3,npartint)) * KerDer_bp_f_Gal(npartint)
+      pg(npj)%acc(1:3) = pg(npj)%acc(1:3) + aux_vec(1:3)
+! Contribution to the PPST velocity increment (here it is still an acceleration)
+      pg(npj)%dvel_PPST(1:3) = pg(npj)%dvel_PPST(1:3) + aux_vec(1:3)
 ! Contribution to the "grad_p + PPST term": end
       if (FSI_free_slip_conditions.eqv..false.) then
 ! Body particle volume

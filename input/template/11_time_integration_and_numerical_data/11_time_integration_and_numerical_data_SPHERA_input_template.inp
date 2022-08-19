@@ -103,6 +103,8 @@
 !        body boundaries)
 !    1st-order consistency options do not work in the presence of: dense 
 !    granular flows; DBSPH boundaries; explicit RK time integration schemes.
+!    1st-order consistency options activate the PPST corrective term in the 
+!    continuity equation
 ![?] <CE_divu_cons>: ID for the consistency/conservation of the 
 !    velocity-divergence term in the continuity equation. Its value can be 
 !    effectively modified at any restart time.
@@ -112,6 +114,8 @@
 !        boundaries)
 !    1st-order consistency options do not work in the presence of: dense 
 !    granular flows; DBSPH boundaries; explicit RK time integration schemes.
+!    1st-order consistency options activate the PPST corrective term in the 
+!    continuity equation 
 ![?] <monitor_cons>: ID for the consistency of the post-processing procedures 
 !    at the monitoring elements
 !    =0 (0th-order consistency)

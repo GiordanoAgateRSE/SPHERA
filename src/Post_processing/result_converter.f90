@@ -360,6 +360,17 @@ if (nag>0) then
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
    endif
+! dvel_PPST
+   write(unitvtk,'(a)')                                                        &
+'      <DataArray type="Float32" Name="dvel_PPST vectors"  NumberOfComponents="3"  format="ascii" >'
+   do i=1,numpoints,6
+      k1 = i
+      k2 = k1 + 5
+      if (k2>numpoints) k2 = numpoints
+      write(unitvtk,'(8x,6(3(1x,ES12.4E3)))') (pg(finger(k))%dvel_PPST(1),     &
+         pg(finger(k))%dvel_PPST(2),pg(finger(k))%dvel_PPST(3),k=k1,k2)
+   enddo
+   write(unitvtk,'(a)') '      </DataArray>'
    if (Domain%tipo=="bsph") then
 ! DBSPH
 ! Shepard coefficient

@@ -30,6 +30,7 @@
 !              Inversion of the renormalization matrix in 3D, even in the 
 !              absence of SASPH neighbours (to fasten the algorithm under 
 !              general conditions).
+!              3D SASPH contributions to the PPST velocity increment.
 !-------------------------------------------------------------------------------
 #ifdef SPACE_3D
 subroutine AddBoundaryContributions_to_ME3D(npi,Ncbf,tpres,tdiss,tvisc,        &
@@ -320,6 +321,8 @@ endif
 ! Adding boundary contributions to the momentum equation
 ! grad_p term and PPST term
 tpres(1:3) = tpres(1:3) + PPSTt_SASPH(1:3) + gradpt_SASPH(1:3)
+! Contribution to the PPST velocity increment (here it is still an acceleration)
+pg(npi)%dvel_PPST(1:3) = pg(npi)%dvel_PPST(1:3) + PPSTt_SASPH(1:3)
 ! Sub-grid term
 tdiss(1:3) = tdiss(1:3) - ViscoMon(1:3)
 ! For the sign of "ViscoShear", refer to the mathematical model

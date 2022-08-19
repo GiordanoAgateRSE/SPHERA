@@ -62,8 +62,10 @@ pg(npi)%vel = partz(Nz)%vel
 pg(npi)%vstart = partz(Nz)%vel
 ! To compute time stop for particle of type "law"
 call stoptime (partz(Nz),tstop)
-! TO compute velocity for particle of type "law"
+! To compute velocity for particle of type "law"
 call vellaw (partz(Nz)%vlaw,partz(Nz)%vel,partz(Nz)%npointv)
+! Initial PPST velocity increment
+pg(npi)%dvel_PPST(1:3) = 0.d0
 ! Stopping time for blocks in movement
 pg(npi)%tstop = tstop                    
 ! Material ID

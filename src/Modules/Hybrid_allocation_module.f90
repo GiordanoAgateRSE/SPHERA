@@ -182,7 +182,7 @@ type TyParticle
 ! Velocity code
    integer(4) :: kodvel
 ! Density code                    
-   integer(4) :: koddens                       
+   integer(4) :: koddens
    integer(4) :: CloseBcOut                     
    integer(4) :: cella                          
    integer(4) :: izona
@@ -332,6 +332,8 @@ type TyParticle
    double precision :: vel(3)
 ! Imposed velocity
    double precision :: velass(3)
+! PPST velocity increment
+   double precision :: dvel_PPST(3)
 ! Velocity gradient (SPH pseudo-consistent approximation over fluid particles) 
    double precision :: dvel(3,3)
 ! Renormalization matrix for the pressure-gradient term in the momentum 

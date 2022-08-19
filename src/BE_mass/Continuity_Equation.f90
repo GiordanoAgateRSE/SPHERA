@@ -43,8 +43,9 @@ double precision :: moddia,modout
 #elif defined SPACE_2D
 double precision :: det
 #endif
-double precision,dimension(3) :: pesogradj,dvar,aux_vec
-double precision,dimension(3) :: appo_vec_1,appo_vec_2,appo_vec_3
+double precision,dimension(3) :: pesogradj,dvar,aux_vec,d_rho_dvelPPST
+double precision,dimension(3) :: aux_vec_1,aux_vec_2,aux_vec_3
+double precision,dimension(3) :: aux_vec_1_PPST,aux_vec_2_PPST,aux_vec_3_PPST
 double precision,dimension(9) :: dvdi
 #ifdef SPACE_2D
 double precision,dimension(9) :: aij
@@ -67,9 +68,12 @@ end interface
 !------------------------
 ! Initializations
 !------------------------
-appo_vec_1(1:3) = 0.d0
-appo_vec_2(1:3) = 0.d0
-appo_vec_3(1:3) = 0.d0
+aux_vec_1(1:3) = 0.d0
+aux_vec_2(1:3) = 0.d0
+aux_vec_3(1:3) = 0.d0
+aux_vec_1_PPST(1:3) = 0.d0
+aux_vec_2_PPST(1:3) = 0.d0
+aux_vec_3_PPST(1:3) = 0.d0
 !------------------------
 ! Statements
 !------------------------
@@ -101,18 +105,49 @@ do contj=1,nPartIntorno(npi)
          endif
       endif
    endif
+! For the PPST term
+   d_rho_dvelPPST(1:3) = pg(npj)%dens * pg(npj)%dvel_PPST(1:3) -               &
+                         pg(npi)%dens * pg(npi)%dvel_PPST(1:3)
 ! Continuity equation
    pesogradj(:) = amassj * rag(:,npartint) * PartKernel(1,npartint) / rhoj
    if (Granular_flows_options%KTGF_config.ne.1) then
 ! Liquid flows
-      appo_vec_1(1:3) = appo_vec_1(1:3) + amassj * PartKernel(1,npartint) *    &
+! Auxiliary vectors for the RHS term of the material control volume
+      aux_vec_1(1:3) = aux_vec_1(1:3) + amassj * PartKernel(1,npartint) *      &
                         dvar(1) * rag(1:3,npartint)
 #ifdef SPACE_3D
-      appo_vec_2(1:3) = appo_vec_2(1:3) + amassj * PartKernel(1,npartint) *    &
+      aux_vec_2(1:3) = aux_vec_2(1:3) + amassj * PartKernel(1,npartint) *      &
                         dvar(2) * rag(1:3,npartint)
 #endif
-      appo_vec_3(1:3) = appo_vec_3(1:3) + amassj * PartKernel(1,npartint) *    &
+      aux_vec_3(1:3) = aux_vec_3(1:3) + amassj * PartKernel(1,npartint) *      &
                         dvar(3) * rag(1:3,npartint)
+! Auxiliary vectors for the RHS term of the material control volume (only in 
+! the presence of any 1st-order consistency option)
+      if (input_any_t%CE_divu_cons>0) then
+         aux_vec_1_PPST(1:3) = aux_vec_1_PPST(1:3) + (amassj / rhoj)  *        &
+                               PartKernel(1,npartint) * d_rho_dvelPPST(1) *    &
+                               rag(1:3,npartint)
+#ifdef SPACE_3D
+         aux_vec_2_PPST(1:3) = aux_vec_2_PPST(1:3) + (amassj / rhoj) *         &
+                               PartKernel(1,npartint) * d_rho_dvelPPST(2) *    &
+                               rag(1:3,npartint)
+#endif
+         aux_vec_3_PPST(1:3) = aux_vec_3_PPST(1:3) + (amassj / rhoj) *         &
+                               PartKernel(1,npartint) * d_rho_dvelPPST(3) *    &
+                               rag(1:3,npartint)
+         elseif (input_any_t%ME_gradp_cons>0) then
+            aux_vec_1_PPST(1:3) = aux_vec_1_PPST(1:3) + (amassj / rhoj) *      &
+                                  PartKernel(3,npartint) * d_rho_dvelPPST(1) * &
+                                  rag(1:3,npartint)
+#ifdef SPACE_3D
+            aux_vec_2_PPST(1:3) = aux_vec_2_PPST(1:3) + (amassj / rhoj) *      &
+                                  PartKernel(3,npartint) * d_rho_dvelPPST(2) * &
+                                  rag(1:3,npartint)
+#endif
+            aux_vec_3_PPST(1:3) = aux_vec_3_PPST(1:3) + (amassj / rhoj) *      &
+                                  PartKernel(3,npartint) * d_rho_dvelPPST(3) * &
+                                  rag(1:3,npartint)
+      endif
       else
 ! Dense granular flows
          appo = rhoi * PartKernel(1,npartint) * (amassj / rhoj) *              &
@@ -151,29 +186,57 @@ do contj=1,nPartIntorno(npi)
 #endif
    endif
 enddo
-! Inner term for the RHS of the continuity equation: start
+! Inner terms for the RHS of the continuity equation: start
 if (Granular_flows_options%KTGF_config.ne.1) then
 ! Liquid flows
    if (input_any_t%CE_divu_cons>0) then
-! 1st-order consistency
-      call MatrixProduct(pg(npi)%B_ren_divu,BB=appo_vec_1,CC=aux_vec,&
+! 1st-order consistency: RHS term of the material control volume
+      call MatrixProduct(pg(npi)%B_ren_divu,BB=aux_vec_1,CC=aux_vec,           &
          nr=3,nrc=3,nc=1)
-      appo_vec_1(1:3) = -aux_vec(1:3)
+      aux_vec_1(1:3) = -aux_vec(1:3)
 #ifdef SPACE_3D
-      call MatrixProduct(pg(npi)%B_ren_divu,BB=appo_vec_2,CC=aux_vec,&
+      call MatrixProduct(pg(npi)%B_ren_divu,BB=aux_vec_2,CC=aux_vec,           &
          nr=3,nrc=3,nc=1)
-      appo_vec_2(1:3) = -aux_vec(1:3)
+      aux_vec_2(1:3) = -aux_vec(1:3)
 #endif
-      call MatrixProduct(pg(npi)%B_ren_divu,BB=appo_vec_3,CC=aux_vec,&
+      call MatrixProduct(pg(npi)%B_ren_divu,BB=aux_vec_3,CC=aux_vec,           &
          nr=3,nrc=3,nc=1)
-      appo_vec_3(1:3) = -aux_vec(1:3)
+      aux_vec_3(1:3) = -aux_vec(1:3)
 ! Formal disuse of the renormalization matrix at boundaries, if needed
       if (input_any_t%CE_divu_cons==2) pg(npi)%B_ren_divu_stat = -1
+! 1st-order consistency: additional RHS term for non-material control volume 
+! (in case of 1st-order consistency for the material RHS term)
+      call MatrixProduct(pg(npi)%B_ren_divu,BB=aux_vec_1_PPST,CC=aux_vec,      &
+         nr=3,nrc=3,nc=1)
+      aux_vec_1_PPST(1:3) = -aux_vec(1:3)
+#ifdef SPACE_3D
+      call MatrixProduct(pg(npi)%B_ren_divu,BB=aux_vec_2_PPST,CC=aux_vec,      &
+         nr=3,nrc=3,nc=1)
+      aux_vec_2_PPST(1:3) = -aux_vec(1:3)
+#endif
+      call MatrixProduct(pg(npi)%B_ren_divu,BB=aux_vec_3_PPST,CC=aux_vec,      &
+         nr=3,nrc=3,nc=1)
+      aux_vec_3_PPST(1:3) = -aux_vec(1:3)
+      elseif (input_any_t%ME_gradp_cons>0) then
+! 1st-order consistency: additional RHS term for non-material control volume 
+! (in case of 0th-order consistency for the material RHS term)
+         call MatrixProduct(pg(npi)%B_ren_gradp,BB=aux_vec_1_PPST,CC=aux_vec,  &
+            nr=3,nrc=3,nc=1)
+         aux_vec_1_PPST(1:3) = -aux_vec(1:3)
+#ifdef SPACE_3D
+         call MatrixProduct(pg(npi)%B_ren_gradp,BB=aux_vec_2_PPST,CC=aux_vec,  &
+            nr=3,nrc=3,nc=1)
+         aux_vec_2_PPST(1:3) = -aux_vec(1:3)
+#endif
+         call MatrixProduct(pg(npi)%B_ren_gradp,BB=aux_vec_3_PPST,CC=aux_vec,  &
+            nr=3,nrc=3,nc=1)
+         aux_vec_3_PPST(1:3) = -aux_vec(1:3)
    endif
 ! Update of the RHS of the continuity equation
-   pg(npi)%dden = pg(npi)%dden - (appo_vec_1(1) + appo_vec_2(2) + appo_vec_3(3))
+   pg(npi)%dden = pg(npi)%dden - (aux_vec_1(1) + aux_vec_2(2) + aux_vec_3(3))  &
+                  + (aux_vec_1_PPST(1) + aux_vec_2_PPST(2) + aux_vec_3_PPST(3))
 endif
-! Inner term for the RHS of the continuity equation: end
+! Inner terms for the RHS of the continuity equation: end
 ! Boundary contributions (DB-SPH)
 #ifdef SPACE_2D
    if (Domain%tipo=="bsph") then
@@ -205,9 +268,9 @@ if (Granular_flows_options%KTGF_config==1) then
          pg(npi)%dudy = ( - dvdi(1) * aij(3) + dvdi(3) * aij(1)) / det       
          pg(npi)%dvdx = ( dvdi(7) * aij(4) - dvdi(9) * aij(2)) / det       
          pg(npi)%dvdy = ( - dvdi(7) * aij(3) + dvdi(9) * aij(1)) / det       
-         pg(npi)%secinv = dsqrt(half * pg(npi)%dudx * pg(npi)%dudx + half * &
-                          pg(npi)%dvdy * pg(npi)%dvdy + quarter *           &
-                          (pg(npi)%dudy + pg(npi)%dvdx) * (pg(npi)%dudy +   &
+         pg(npi)%secinv = dsqrt(half * pg(npi)%dudx * pg(npi)%dudx + half *    &
+                          pg(npi)%dvdy * pg(npi)%dvdy + quarter *              &
+                          (pg(npi)%dudy + pg(npi)%dvdx) * (pg(npi)%dudy +      &
                           pg(npi)%dvdx)) 
 #endif
 endif
