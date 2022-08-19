@@ -106,7 +106,7 @@ do contj=1,nPartIntorno(npi)
       endif
    endif
 ! For the PPST term
-   d_rho_dvelPPST(1:3) = pg(npj)%dens * pg(npj)%dvel_PPST(1:3) +               &
+   d_rho_dvelPPST(1:3) = pg(npj)%dens * pg(npj)%dvel_PPST(1:3) -               &
                          pg(npi)%dens * pg(npi)%dvel_PPST(1:3)
 ! Continuity equation
    pesogradj(:) = amassj * rag(:,npartint) * PartKernel(1,npartint) / rhoj
