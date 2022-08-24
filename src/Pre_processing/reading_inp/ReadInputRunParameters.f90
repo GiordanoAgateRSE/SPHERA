@@ -32,6 +32,7 @@ use Hybrid_allocation_module
 ! Declarations
 !------------------------
 implicit none
+logical :: C1_monitors,ME_gradp_cons,CE_divu_cons
 integer(4) :: nrighe,ier,ninp,ulog,uerr
 character(1) :: comment
 character(len=lencard) :: ainp
@@ -41,7 +42,7 @@ integer(4) :: ioerr,time_split,RKscheme,body_part_reorder
 #ifdef SPACE_3D
 integer(4) :: MAXCLOSEBOUNDFACES,MAXNUMCONVEXEDGES,GCBFVecDim_loc,nag_aux
 #endif
-integer(4) :: density_thresholds,ME_gradp_cons,CE_divu_cons,C1_monitors
+integer(4) :: density_thresholds
 character(100) :: token
 logical,external :: ReadCheck
 character(100),external :: lcase
@@ -180,11 +181,11 @@ if (input_second_read.eqv..true.) then
          input_any_t%COEFNMAXPARTJ
       write(ulog,"(1x,a,1p,i1)")    "body_part_reorder          : ",           &
          input_any_t%body_part_reorder
-      write(ulog,"(1x,a,1p,i3)")    "ME_gradp_cons              : ",           &
+      write(ulog,"(1x,a,1p,l8)")    "ME_gradp_cons              : ",           &
          input_any_t%ME_gradp_cons
-      write(ulog,"(1x,a,1p,i3)")    "CE_divu_cons               : ",           &
+      write(ulog,"(1x,a,1p,l8)")    "CE_divu_cons               : ",           &
          input_any_t%CE_divu_cons
-      write(ulog,"(1x,a,1p,i3)")    "C1_monitors               : ",           &
+      write(ulog,"(1x,a,1p,l8)")    "C1_monitors               : ",            &
          input_any_t%C1_monitors
 #ifdef SPACE_3D
       write(ulog,"(1x,a,1p,i12)")   "NAG_AUX                    : ",           &

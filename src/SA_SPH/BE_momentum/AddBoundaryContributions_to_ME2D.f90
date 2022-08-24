@@ -133,7 +133,7 @@ do icbs=1,IntNcbs
       nnlocal(i) = RifBoundarySide%T(acix(i),acix(2))
       gradbPsuro(i) = Domain%grav(acix(i))
 ! For the renormalization at SASPH frontiers
-      if (input_any_t%ME_gradp_cons==3) then
+      if (input_any_t%ME_gradp_cons) then
          gradbPsuro_like(i) = one_vec_dir(acix(i))
       endif
       GravN = GravN + Domain%grav(acix(i)) * nnlocal(i)
@@ -283,7 +283,7 @@ do icbs=1,IntNcbs
    do i=1,PLANEDIM
       do j=1,PLANEDIM
          RG(i) = RG(i) + RifBoundarySide%RN(acix(i),acix(j)) * gradbPsuro(j)
-         if (input_any_t%ME_gradp_cons==3) then          
+         if (input_any_t%ME_gradp_cons) then          
 ! Renormalization at SASPH frontiers
             RG_like(i) = RG_like(i) + RifBoundarySide%RN(acix(i),acix(j)) *    &
                          gradbPsuro_like(j)
@@ -292,14 +292,14 @@ do icbs=1,IntNcbs
 ! "IntWdV", or equivalently "J_3,w" (2D version) is always computed using the 
 ! beta-spline cubic kernel, no matter about the renormalization
       RG(i) = RG(i) * IntWdV
-      if (input_any_t%ME_gradp_cons==3) then
+      if (input_any_t%ME_gradp_cons) then
 ! Renormalization at SASPH frontiers
          RG_like(i) = RG_like(i) * IntWdV
       endif
    enddo
 ! Collecting the temporary SASPH contributions to the grad_p term
    RG_sum(1:2) = RG_sum(1:2) + RG(1:2)
-   if (input_any_t%ME_gradp_cons==3) then
+   if (input_any_t%ME_gradp_cons) then
 ! Renormalization at SASPH frontiers
 ! Notice that the contributions to RG_sum and B_ren_gradp have different signs 
 ! as RG_sum will be subtracted from the acceleration
@@ -377,13 +377,13 @@ enddo
 ! just after all its components are collected and just before the 
 ! 1st-order consistency scheme applies to the summation of all the 
 ! particle-boundary contributions
-if (input_any_t%ME_gradp_cons>0) then
+if (input_any_t%ME_gradp_cons) then
 ! Inversion of the renormalization matrix
    call B_ren_gradp_inversion(npi)
 endif
 if (IntNcbs==0) return
 ! grad_p (renormalization at boundaries): start
-if (input_any_t%ME_gradp_cons==3) then
+if (input_any_t%ME_gradp_cons) then
    aux_vec_2(1:3) = 0.d0
    do i=1,PLANEDIM
       aux_vec_2(acix(i)) = RG_sum(i)

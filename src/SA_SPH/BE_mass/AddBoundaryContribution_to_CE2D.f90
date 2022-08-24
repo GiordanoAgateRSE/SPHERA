@@ -80,7 +80,7 @@ do icbs=1,IntNcbs
    sidestr = RifBoundarySide%stretch
    strtype = Tratto(sidestr)%tipo
 ! SASPH contributions to the renormalization matrix for div_u_: start
-   if (input_any_t%CE_divu_cons==1) then
+   if (input_any_t%CE_divu_cons) then
 ! "IntWdV", or equivalently "J_3,w" (2D version) is always computed using the 
 ! beta-spline cubic kernel, no matter about the renormalization
       IntWdV = BoundaryDataTab(ibdp)%BoundaryIntegral(3)

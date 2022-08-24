@@ -96,7 +96,7 @@ do npi=1,n_body_part
 #elif defined SPACE_2D
       dx_dxbp = Domain%dx / (bp_arr(npi)%volume ** (1.d0/2.d0))
 #endif
-      if (input_any_t%CE_divu_cons==1) then
+      if (input_any_t%CE_divu_cons) then
 ! 1st-order consistency: body-particle terms
          call MatrixProduct(pg(npj)%B_ren_divu,BB=rag_bp_f(1:3,npartint),      &
             CC=aux_vec,nr=3,nrc=3,nc=1)

@@ -87,6 +87,12 @@ type TyGlobal
 end type TyGlobal
 
 type input_any_time_der_type
+! ID for the consistency options for the pressure-gradient term in the 
+! momentum equation
+   logical :: ME_gradp_cons
+! ID for the consistency options for the velocity-gradient term in the 
+! continuity equation
+   logical :: CE_divu_cons
 ! ID for the consistency of the post-processing procedures at the monitoring 
 ! elements
    logical :: C1_monitors
@@ -99,12 +105,6 @@ type input_any_time_der_type
 ! Density_thresholds flag (default=0; =1 for very low bulk modulus -preliminary 
 ! simulations-)
    integer(4) :: density_thresholds
-! ID for the consistency options for the pressure-gradient term in the 
-! momentum equation
-   integer(4) :: ME_gradp_cons
-! ID for the consistency options for the velocity-gradient term in the 
-! continuity equation
-   integer(4) :: CE_divu_cons
 #ifdef SPACE_3D
 ! Maximum number of neighbouring SA-SPH faces for a computational particle
    integer(4) :: MAXCLOSEBOUNDFACES

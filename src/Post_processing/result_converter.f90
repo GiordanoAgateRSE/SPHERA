@@ -262,7 +262,7 @@ if (nag>0) then
       write(unitvtk,'(8x,24(1x,i8))') (finger(k),k=k1,k2)
    enddo
    write(unitvtk,'(a)') '      </DataArray>'
-   if (input_any_t%ME_gradp_cons>0) then
+   if (input_any_t%ME_gradp_cons) then
 ! B_ren_gradp(1,1-3)
       write(unitvtk,'(a)')                                                     &
 '      <DataArray type="Float32" Name="B_ren_gradp_1_1-3"  NumberOfComponents="3"  format="ascii" >'
@@ -311,7 +311,7 @@ if (nag>0) then
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
    endif
-   if (input_any_t%CE_divu_cons>0) then
+   if (input_any_t%CE_divu_cons) then
 ! B_ren_divu(1,1-3)
       write(unitvtk,'(a)')                                                     &
 '      <DataArray type="Float32" Name="B_ren_divu_1_1-3"  NumberOfComponents="3"  format="ascii" >'

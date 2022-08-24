@@ -123,7 +123,7 @@ do contj=1,nPartIntorno(npi)
                        PartKernel(1,npartint) * dvar(3) * rag(1:3,npartint)
 ! Auxiliary vectors for the RHS term of the material control volume (only in 
 ! the presence of any 1st-order consistency option)
-      if (input_any_t%CE_divu_cons>0) then
+      if (input_any_t%CE_divu_cons) then
          aux_vec_1_ALE(1:3) = aux_vec_1_ALE(1:3) + (amassj / rhoj)  *          &
                               PartKernel(1,npartint) * d_rho_dvelALE(1) *      &
                               rag(1:3,npartint)
@@ -135,7 +135,7 @@ do contj=1,nPartIntorno(npi)
          aux_vec_3_ALE(1:3) = aux_vec_3_ALE(1:3) + (amassj / rhoj) *           &
                               PartKernel(1,npartint) * d_rho_dvelALE(3) *      &
                               rag(1:3,npartint)
-         elseif (input_any_t%ME_gradp_cons>0) then
+         elseif (input_any_t%ME_gradp_cons) then
             aux_vec_1_ALE(1:3) = aux_vec_1_ALE(1:3) + (amassj / rhoj) *        &
                                  PartKernel(3,npartint) * d_rho_dvelALE(1) *   &
                                  rag(1:3,npartint)
@@ -189,7 +189,7 @@ enddo
 ! Inner terms for the RHS of the continuity equation: start
 if (Granular_flows_options%KTGF_config.ne.1) then
 ! Liquid flows
-   if (input_any_t%CE_divu_cons>0) then
+   if (input_any_t%CE_divu_cons) then
 ! 1st-order consistency: RHS term of the material control volume
       call MatrixProduct(pg(npi)%B_ren_divu,BB=aux_vec_1,CC=aux_vec,           &
          nr=3,nrc=3,nc=1)
@@ -215,7 +215,7 @@ if (Granular_flows_options%KTGF_config.ne.1) then
       call MatrixProduct(pg(npi)%B_ren_divu,BB=aux_vec_3_ALE,CC=aux_vec,       &
          nr=3,nrc=3,nc=1)
       aux_vec_3_ALE(1:3) = -aux_vec(1:3)
-      elseif (input_any_t%ME_gradp_cons>0) then
+      elseif (input_any_t%ME_gradp_cons) then
 ! 1st-order consistency: additional RHS term for non-material control volume 
 ! (in case of 0th-order consistency for the material RHS term)
          call MatrixProduct(pg(npi)%B_ren_gradp,BB=aux_vec_1_ALE,CC=aux_vec,   &

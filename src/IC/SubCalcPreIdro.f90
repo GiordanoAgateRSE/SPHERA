@@ -97,8 +97,7 @@ particle_loop: do npi=1,nag
       pg(npi)%pres = partz(Nz)%valp + Domain%prif
       pg(npi)%dens = med(pg(npi)%imed)%den0
 ! Mass update
-      if ((input_any_t%CE_divu_cons>0).or.                                     &
-         (input_any_t%ME_gradp_cons>0)) then
+      if ((input_any_t%CE_divu_cons).or.(input_any_t%ME_gradp_cons)) then
          pg(npi)%mass = pg(npi)%dens * pg(npi)%volume
       endif
       cycle particle_loop
@@ -189,8 +188,7 @@ particle_loop: do npi=1,nag
    call EoS_barotropic_linear(Med(pg(npi)%imed)%eps,Med(pg(npi)%imed)%den0,    &
       Domain%prif,p_in=pg(npi)%pres,rho_out=pg(npi)%dens)
 ! Mass update
-   if ((input_any_t%CE_divu_cons>0).or.                                        &
-      (input_any_t%ME_gradp_cons>0)) then
+   if ((input_any_t%CE_divu_cons).or.(input_any_t%ME_gradp_cons)) then
       pg(npi)%mass = pg(npi)%dens * pg(npi)%volume
    endif
    pg(npi)%dden = zero

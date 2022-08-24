@@ -205,20 +205,11 @@ do contj=1,nPartIntorno(npi)
    if (Domain%tipo=="semi") then
       if (Granular_flows_options%KTGF_config/=1) then
 ! Liquids
-         select case (input_any_t%ME_gradp_cons)
-            case(-1)
-! Conservative formulation everywhere
+         if (input_any_t%ME_gradp_cons) then
+            gradp_ALE_flag = 2
+            else
                gradp_ALE_flag = 1
-            case(3)
-! 1st-order consistency for gradp term everywhere, ALE term active (inner 
-! domain)
-               gradp_ALE_flag = 2
-! default
-            case default
-               write(uerr,*) 'The option chosen for "ME_gradp_cons" is wrong.',&
-                  "The program stops here."
-               stop
-         endselect
+         endif
          else
 ! Dense granular flows
             gradp_ALE_flag = 3

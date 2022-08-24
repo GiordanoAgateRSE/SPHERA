@@ -269,7 +269,7 @@ loop_nag: do npi=1,nag
 ! Gallati anti-cluster kernel, interesting test: end               
 ! Contributions of the neighbouring fluid particles to the inverse of the 
 ! renormalization matrices
-               if (input_any_t%ME_gradp_cons>0) then
+               if (input_any_t%ME_gradp_cons) then
                   r_vec(1:3) = -ragtemp(1:3)
                   call grad_W_sub(kernel_ID=2,r_vec=r_vec,grad_W=grad_W)
                   gradWomegaj(1:3) = grad_W(1:3) * pg(npj)%mass / pg(npj)%dens
@@ -286,7 +286,7 @@ loop_nag: do npi=1,nag
                   pg(npi)%B_ren_gradp(1:3,3) = pg(npi)%B_ren_gradp(1:3,3) +    &
                                                aux_vec_3(1:3)
                endif
-               if (input_any_t%CE_divu_cons>0) then
+               if (input_any_t%CE_divu_cons) then
                   r_vec(1:3) = -ragtemp(1:3)
                   call grad_W_sub(kernel_ID=1,r_vec=r_vec,grad_W=grad_W)
                   gradWomegaj(1:3) = grad_W(1:3) * pg(npj)%mass / pg(npj)%dens
@@ -876,7 +876,7 @@ endif
                   KerDer_bp_f_Gal(npartint) = gradmodwacl * denom
 ! Contributions of the neighbouring body particles to the inverse of the 
 ! renormalization matrices
-               if (input_any_t%ME_gradp_cons==3) then
+               if (input_any_t%ME_gradp_cons) then
                   r_vec(1:3) = ragtemp(1:3)
                   call grad_W_sub(kernel_ID=2,r_vec=r_vec,grad_W=grad_W)
                   gradWomegaj(1:3) = grad_W(1:3) * bp_arr(npi)%volume
@@ -893,7 +893,7 @@ endif
                   pg(npj)%B_ren_gradp(1:3,3) = pg(npj)%B_ren_gradp(1:3,3) +    &
                                                aux_vec_3(1:3)
                endif
-               if (input_any_t%CE_divu_cons==1) then
+               if (input_any_t%CE_divu_cons) then
                   r_vec(1:3) = ragtemp(1:3)
                   call grad_W_sub(kernel_ID=1,r_vec=r_vec,grad_W=grad_W)
                   gradWomegaj(1:3) = grad_W(1:3) * bp_arr(npi)%volume

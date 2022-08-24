@@ -100,7 +100,7 @@ grad_w_SA(1:3) = 0.d0
 ! just after all its components are collected and just before the 
 ! 1st-order consistency scheme applies to the summation of all the 
 ! particle-boundary contributions.
-if (input_any_t%CE_divu_cons>0) then
+if (input_any_t%CE_divu_cons) then
 ! Inversion of the renormalization matrix (even in the absence of SASPH 
 ! neighbouring frontiers)
    call B_ren_divu_inversion(npi)
@@ -111,7 +111,7 @@ if (Ncbf>0) then
 #elif defined SPACE_2D
 if ((Ncbs>0).and.(IntNcbs>0)) then
 #endif
-   if (input_any_t%CE_divu_cons==1) then
+   if (input_any_t%CE_divu_cons) then
 ! 1st-order consistency for the SASPH terms
       call MatrixProduct(pg(npi)%B_ren_divu,BB=grad_u_SA,CC=aux_vec,nr=3,      &
          nrc=3,nc=1)
