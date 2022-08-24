@@ -121,9 +121,8 @@ do contj=1,nPartIntorno(npi)
 #endif
       aux_vec_3(1:3) = aux_vec_3(1:3) + rhoi * (amassj / rhoj) *               &
                        PartKernel(1,npartint) * dvar(3) * rag(1:3,npartint)
-! Auxiliary vectors for the RHS term of the material control volume (only in 
-! the presence of any 1st-order consistency option)
-      if (input_any_t%CE_divu_cons) then
+! Auxiliary vectors for the ALE term (only in case of 1st-order consistency)
+      if (input_any_t%C1_BE) then
          aux_vec_1_ALE(1:3) = aux_vec_1_ALE(1:3) + (amassj / rhoj)  *          &
                               PartKernel(1,npartint) * d_rho_dvelALE(1) *      &
                               rag(1:3,npartint)
@@ -135,18 +134,6 @@ do contj=1,nPartIntorno(npi)
          aux_vec_3_ALE(1:3) = aux_vec_3_ALE(1:3) + (amassj / rhoj) *           &
                               PartKernel(1,npartint) * d_rho_dvelALE(3) *      &
                               rag(1:3,npartint)
-         elseif (input_any_t%ME_gradp_cons) then
-            aux_vec_1_ALE(1:3) = aux_vec_1_ALE(1:3) + (amassj / rhoj) *        &
-                                 PartKernel(3,npartint) * d_rho_dvelALE(1) *   &
-                                 rag(1:3,npartint)
-#ifdef SPACE_3D
-            aux_vec_2_ALE(1:3) = aux_vec_2_ALE(1:3) + (amassj / rhoj) *        &
-                                 PartKernel(3,npartint) * d_rho_dvelALE(2) *   &
-                                 rag(1:3,npartint)
-#endif
-            aux_vec_3_ALE(1:3) = aux_vec_3_ALE(1:3) + (amassj / rhoj) *        &
-                                 PartKernel(3,npartint) * d_rho_dvelALE(3) *   &
-                                 rag(1:3,npartint)
       endif
       else
 ! Dense granular flows
@@ -189,8 +176,8 @@ enddo
 ! Inner terms for the RHS of the continuity equation: start
 if (Granular_flows_options%KTGF_config.ne.1) then
 ! Liquid flows
-   if (input_any_t%CE_divu_cons) then
-! 1st-order consistency: RHS term of the material control volume
+   if (input_any_t%C1_BE) then
+! Non-ALE term
       call MatrixProduct(pg(npi)%B_ren_divu,BB=aux_vec_1,CC=aux_vec,           &
          nr=3,nrc=3,nc=1)
       aux_vec_1(1:3) = -aux_vec(1:3)
@@ -202,8 +189,7 @@ if (Granular_flows_options%KTGF_config.ne.1) then
       call MatrixProduct(pg(npi)%B_ren_divu,BB=aux_vec_3,CC=aux_vec,           &
          nr=3,nrc=3,nc=1)
       aux_vec_3(1:3) = -aux_vec(1:3)
-! 1st-order consistency: additional RHS term for non-material control volume 
-! (in case of 1st-order consistency for the material RHS term)
+! ALE term
       call MatrixProduct(pg(npi)%B_ren_divu,BB=aux_vec_1_ALE,CC=aux_vec,       &
          nr=3,nrc=3,nc=1)
       aux_vec_1_ALE(1:3) = -aux_vec(1:3)
@@ -215,23 +201,8 @@ if (Granular_flows_options%KTGF_config.ne.1) then
       call MatrixProduct(pg(npi)%B_ren_divu,BB=aux_vec_3_ALE,CC=aux_vec,       &
          nr=3,nrc=3,nc=1)
       aux_vec_3_ALE(1:3) = -aux_vec(1:3)
-      elseif (input_any_t%ME_gradp_cons) then
-! 1st-order consistency: additional RHS term for non-material control volume 
-! (in case of 0th-order consistency for the material RHS term)
-         call MatrixProduct(pg(npi)%B_ren_gradp,BB=aux_vec_1_ALE,CC=aux_vec,   &
-            nr=3,nrc=3,nc=1)
-         aux_vec_1_ALE(1:3) = -aux_vec(1:3)
-#ifdef SPACE_3D
-         call MatrixProduct(pg(npi)%B_ren_gradp,BB=aux_vec_2_ALE,CC=aux_vec,   &
-            nr=3,nrc=3,nc=1)
-         aux_vec_2_ALE(1:3) = -aux_vec(1:3)
-#endif
-         call MatrixProduct(pg(npi)%B_ren_gradp,BB=aux_vec_3_ALE,CC=aux_vec,   &
-            nr=3,nrc=3,nc=1)
-         aux_vec_3_ALE(1:3) = -aux_vec(1:3)
-! Update the CE ALE term
-         pg(npi)%dden_ALE = (aux_vec_1_ALE(1) + aux_vec_2_ALE(2) +             &
-                            aux_vec_3_ALE(3))
+! Update the CE ALE term (only in case of 1st-order consistency)
+      pg(npi)%dden_ALE = aux_vec_1_ALE(1) + aux_vec_2_ALE(2) + aux_vec_3_ALE(3)
    endif
 ! Update of the RHS of the continuity equation
    pg(npi)%dden = pg(npi)%dden - (aux_vec_1(1) + aux_vec_2(2) + aux_vec_3(3))  &

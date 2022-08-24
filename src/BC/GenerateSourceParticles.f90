@@ -178,7 +178,7 @@ if (simulation_time>=emission_time) then
             call EoS_barotropic_linear(Med(mat)%eps,Med(mat)%den0,Domain%prif, &
                p_in=pg(nag)%pres,rho_out=pg(nag)%dens)
 ! Mass update
-            if ((input_any_t%CE_divu_cons).or.(input_any_t%ME_gradp_cons)) then
+            if (input_any_t%C1_BE) then
                pg(nag)%mass = pg(nag)%dens * pg(nag)%volume
             endif
          enddo

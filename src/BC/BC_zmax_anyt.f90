@@ -155,8 +155,7 @@ do i_zone=1,NPartZone
                   Med(Partz(i_zone)%Medium)%den0,Domain%prif,p_in=pg(npi)%pres,&
                   rho_out=pg(npi)%dens)
 ! Mass update
-               if ((input_any_t%CE_divu_cons).or.                              &
-                  (input_any_t%ME_gradp_cons)) then
+               if (input_any_t%C1_BE) then
                   pg(npi)%mass = pg(npi)%dens * pg(npi)%volume
                endif
 ! Formal null velocity initialization (it will follow a selective partial 

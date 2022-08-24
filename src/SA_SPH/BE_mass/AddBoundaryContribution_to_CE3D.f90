@@ -83,7 +83,7 @@ do icbf=1,Ncbf
 ! It is more convenient not to unify this part with the analogous computation 
 ! for grad_p because it might be convenient to change the kernel function in 
 ! the future, depending on the matrix.
-         if (input_any_t%CE_divu_cons) then
+         if (input_any_t%C1_BE) then
 ! Local components explicitly depending on the unit vector of the unity vector
             do sd=1,SPACEDIM
                one_Loc(sd) = 0.d0

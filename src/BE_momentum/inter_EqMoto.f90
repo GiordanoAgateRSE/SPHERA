@@ -205,7 +205,7 @@ do contj=1,nPartIntorno(npi)
    if (Domain%tipo=="semi") then
       if (Granular_flows_options%KTGF_config/=1) then
 ! Liquids
-         if (input_any_t%ME_gradp_cons) then
+         if (input_any_t%C1_BE) then
             gradp_ALE_flag = 2
             else
                gradp_ALE_flag = 1

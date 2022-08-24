@@ -68,7 +68,7 @@ do ii=1,indarrayFlu
    endif
 ! Volume equation and mass update
    if (Domain%tipo=="semi") then
-      if ((input_any_t%CE_divu_cons).or.(input_any_t%ME_gradp_cons)) then
+      if (input_any_t%C1_BE) then
          pg(npi)%volume = pg(npi)%volume + dt * ((-pg(npi)%volume / rho_old) * &
                           (pg(npi)%dden - pg(npi)%dden_ALE))
          pg(npi)%mass = pg(npi)%dens * pg(npi)%volume

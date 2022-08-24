@@ -128,7 +128,7 @@ do ii = 1,indarrayFlu
 ! units "AddBoundaryContributions_to_ME3D" or "AddBoundaryContributions_to_ME2D"
 ! even in the absence of SASPH neighbours to fasten the algorithm under general 
 ! conditions
-         (input_any_t%ME_gradp_cons)) then
+         (input_any_t%C1_BE)) then
 #ifdef SPACE_3D
 !$omp critical (omp_Ncbf_Max)
          Ncbf_Max = max(Ncbf_Max,Ncbf)
