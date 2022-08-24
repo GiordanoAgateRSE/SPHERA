@@ -52,7 +52,9 @@ integer(4), external :: ParticleCellNumber
 !------------------------
 if (Domain%RKscheme>1) ts0_pg(npi) = ts_pgZero
 pg(npi)%izona = Nz
-pg(npi)%mass = Domain%PVolume * Med(Mate)%den0
+pg(npi)%volume = Domain%PVolume
+pg(npi)%mass = pg(npi)%volume * Med(Mate)%den0
+pg(nag)%dden_PPST = 0.d0
 #ifdef SPACE_2D
    pg(npi)%coord(2) = zero              
    pg(npi)%CoordOld(2) = zero
@@ -61,9 +63,9 @@ pg(npi)%mass = Domain%PVolume * Med(Mate)%den0
 pg(npi)%vel = partz(Nz)%vel
 pg(npi)%vstart = partz(Nz)%vel
 ! To compute time stop for particle of type "law"
-call stoptime (partz(Nz),tstop)
+call stoptime(partz(Nz),tstop)
 ! To compute velocity for particle of type "law"
-call vellaw (partz(Nz)%vlaw,partz(Nz)%vel,partz(Nz)%npointv)
+call vellaw(partz(Nz)%vlaw,partz(Nz)%vel,partz(Nz)%npointv)
 ! Initial PPST velocity increment
 pg(npi)%dvel_PPST(1:3) = 0.d0
 ! Stopping time for blocks in movement
@@ -115,7 +117,7 @@ if (partz(Nz)%move/="std") pg(npi)%kin_visc = zero
 ! Grid cell 
 pg(npi)%cella = ParticleCellNumber(pg(npi)%coord)
 ! Particle color definition, as defined in the input file.
-call defcolpartzero (Nz,partz,pg(npi))
+call defcolpartzero(Nz,partz,pg(npi))
 !------------------------
 ! Deallocations
 !------------------------

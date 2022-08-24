@@ -23,7 +23,8 @@
 ! Description: To initialize pressure and density fields. Hydrostatic pressure 
 !              profiles or unifrom pressure as initial conditions. Hydrostatic 
 !              profiles are formally correct only in the presence of maximum 2 
-!              fluid media along the vertical.            
+!              fluid media along the vertical. Update/initialization of the 
+!              particle volume.
 !-------------------------------------------------------------------------------
 subroutine SubCalcPreIdro
 !------------------------
@@ -95,6 +96,11 @@ particle_loop: do npi=1,nag
    if (partz(Nz)%pressure=="pa") then  
       pg(npi)%pres = partz(Nz)%valp + Domain%prif
       pg(npi)%dens = med(pg(npi)%imed)%den0
+! Mass update
+      if ((input_any_t%CE_divu_cons>0).or.                                     &
+         (input_any_t%ME_gradp_cons>0)) then
+         pg(npi)%mass = pg(npi)%dens * pg(npi)%volume
+      endif
       cycle particle_loop
    endif   
 ! To detect the cell number of the current particle
@@ -182,6 +188,11 @@ particle_loop: do npi=1,nag
 ! EoS inverse
    call EoS_barotropic_linear(Med(pg(npi)%imed)%eps,Med(pg(npi)%imed)%den0,    &
       Domain%prif,p_in=pg(npi)%pres,rho_out=pg(npi)%dens)
+! Mass update
+   if ((input_any_t%CE_divu_cons>0).or.                                        &
+      (input_any_t%ME_gradp_cons>0)) then
+      pg(npi)%mass = pg(npi)%dens * pg(npi)%volume
+   endif
    pg(npi)%dden = zero
 enddo particle_loop
 !------------------------

@@ -20,7 +20,8 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: Leapfrog_continuity
-! Description: Leapfrog time integration scheme (continuity equation)
+! Description: Leapfrog time integration scheme for: the continuity equation; 
+!              the volume balance equation. Mass update.
 !-------------------------------------------------------------------------------
 subroutine Leapfrog_continuity
 !------------------------
@@ -34,6 +35,7 @@ use Hybrid_allocation_module
 !------------------------
 implicit none
 integer(4) :: npi,ii
+double precision :: rho_old
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -48,11 +50,13 @@ integer(4) :: npi,ii
 !------------------------
 !$omp parallel do default(none)                                                &
 !$omp shared(pg,dt,indarrayFlu,Array_Flu,Domain,Med,input_any_t)               &
-!$omp private(npi,ii)
+!$omp private(npi,ii,rho_old)
 do ii=1,indarrayFlu
    npi = Array_Flu(ii)
+   rho_old = pg(npi)%dens
    if ((pg(npi)%cella==0).or.(pg(npi)%vel_type/="std")) cycle
    if (Domain%tipo=="bsph") pg(npi)%dden = pg(npi)%dden / pg(npi)%uni
+! Continuity equation
    if (Domain%tipo=="semi") pg(npi)%dens = pg(npi)%dens + dt * pg(npi)%dden
    if (input_any_t%density_thresholds==1) then        
       if (pg(npi)%dens<(0.9d0*Med(pg(npi)%imed)%den0)) then
@@ -60,6 +64,15 @@ do ii=1,indarrayFlu
       endif
       if (pg(npi)%dens>(1.1d0*Med(pg(npi)%imed)%den0)) then
          pg(npi)%dens = 1.1d0 * Med(pg(npi)%imed)%den0
+      endif
+   endif
+! Volume equation and mass update
+   if (Domain%tipo=="semi") then
+      if ((input_any_t%CE_divu_cons>0).or.                                     &
+         (input_any_t%ME_gradp_cons>0)) then
+         pg(npi)%volume = pg(npi)%volume + dt * ((-pg(npi)%volume / rho_old) * &
+                          (pg(npi)%dden - pg(npi)%dden_PPST))
+         pg(npi)%mass = pg(npi)%dens * pg(npi)%volume
       endif
    endif
 enddo

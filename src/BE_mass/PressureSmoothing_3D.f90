@@ -149,6 +149,11 @@ do ii=1,indarrayFlu
 ! EoS inverse
       call EoS_barotropic_linear(Med(pg(npi)%imed)%eps,Med(pg(npi)%imed)%den0, &
          Domain%prif,p_in=pg(npi)%pres,rho_out=pg(npi)%dens)
+! Mass update
+      if ((input_any_t%CE_divu_cons>0).or.                                     &
+         (input_any_t%ME_gradp_cons>0)) then
+         pg(npi)%mass = pg(npi)%dens * pg(npi)%volume
+      endif
    endif
 enddo
 !$omp end parallel do

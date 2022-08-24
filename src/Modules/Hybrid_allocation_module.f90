@@ -183,7 +183,7 @@ type TyParticle
    integer(4) :: kodvel
 ! Density code                    
    integer(4) :: koddens
-   integer(4) :: CloseBcOut                     
+   integer(4) :: CloseBcOut
    integer(4) :: cella                          
    integer(4) :: izona
 ! Status on renormalization matrix for the pressure-gradient term in the 
@@ -211,6 +211,10 @@ type TyParticle
    double precision :: mass
 ! Density                          
    double precision :: dens
+! Volume
+   double precision :: volume
+! PPST term in the contiuity equation
+   double precision :: dden_PPST
 ! Pressure                          
    double precision :: pres
 ! Continuity equation LHS                           

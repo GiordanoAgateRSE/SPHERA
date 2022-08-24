@@ -85,7 +85,7 @@ do i_zone=1,NPartZone
 ! blossom around the same bottom vertex 
 !$omp parallel do default(none)                                                &
 !$omp shared (Partz,i_zone,Domain,aux_factor,nag,SpCount,PARTICLEBUFFER,uerr)  &
-!$omp shared (pg,PgZero,Med,i_vertex,n_levels)                                 &
+!$omp shared (pg,PgZero,Med,i_vertex,n_levels,input_any_t)                     &
 !$omp private (ii,jj,kk,npi)
       do kk=1,n_levels
          do jj=1,aux_factor
@@ -127,7 +127,9 @@ do i_zone=1,NPartZone
                pg(npi)%coord(3) = (Partz(i_zone)%H_res - Domain%dx / 2.d0) -   &
                                   (kk - 1) * Domain%dx
                pg(npi)%izona = i_zone
-               pg(npi)%mass = Domain%PVolume * Med(Partz(i_zone)%Medium)%den0
+               pg(npi)%volume = Domain%PVolume
+               pg(npi)%mass = pg(npi)%volume * Med(Partz(i_zone)%Medium)%den0
+               pg(nag)%dden_PPST = 0.d0
                pg(npi)%imed = Partz(i_zone)%Medium  
                pg(npi)%kin_visc = Med(Partz(i_zone)%Medium)%kin_visc
                pg(npi)%mu = Med(Partz(i_zone)%Medium)%kin_visc *               &
@@ -149,9 +151,14 @@ do i_zone=1,NPartZone
                                     Partz(i_zone)%valp) + Domain%prif
                endif
 ! EoS inverse
-            call EoS_barotropic_linear(Med(Partz(i_zone)%Medium)%eps,          &
-               Med(Partz(i_zone)%Medium)%den0,Domain%prif,p_in=pg(npi)%pres,   &
-               rho_out=pg(npi)%dens)
+               call EoS_barotropic_linear(Med(Partz(i_zone)%Medium)%eps,       &
+                  Med(Partz(i_zone)%Medium)%den0,Domain%prif,p_in=pg(npi)%pres,&
+                  rho_out=pg(npi)%dens)
+! Mass update
+               if ((input_any_t%CE_divu_cons>0).or.                            &
+                  (input_any_t%ME_gradp_cons>0)) then
+                  pg(npi)%mass = pg(npi)%dens * pg(npi)%volume
+               endif
 ! Formal null velocity initialization (it will follow a selective partial 
 ! velocity smoothing)
                pg(npi)%vel(:) = 0.d0

@@ -147,7 +147,9 @@ if (simulation_time>=emission_time) then
             endif
 ! Particle zone
             pg(nag)%izona = inlet_zone
-            pg(nag)%mass = Domain%PVolume * Med(Mat)%den0
+            pg(nag)%volume = Domain%PVolume
+            pg(nag)%mass = pg(nag)%volume * Med(Mat)%den0
+            pg(nag)%dden_PPST = 0.d0
             pg(nag)%imed = mat  
             pg(nag)%kin_visc = Med(mat)%kin_visc
             pg(nag)%mu = Med(mat)%kin_visc * Med(Mat)%den0
@@ -167,7 +169,7 @@ if (simulation_time>=emission_time) then
 ! Pressure value from input file
                pg(nag)%pres = partz(inlet_zone)%valp + Domain%prif
                elseif (partz(inlet_zone)%pressure=="qp") then
-! Free surface level from input file 
+! Free surface level from input file
                   pg(nag)%pres = Med(mat)%den0 * Domain%grav(3) *              &
                                  (pg(nag)%coord(3) - partz(inlet_zone)%valp) + &
                                  Domain%prif
@@ -175,6 +177,11 @@ if (simulation_time>=emission_time) then
 ! EoS inverse
             call EoS_barotropic_linear(Med(mat)%eps,Med(mat)%den0,Domain%prif, &
                p_in=pg(nag)%pres,rho_out=pg(nag)%dens)
+! Mass update
+            if ((input_any_t%CE_divu_cons>0).or.                               &
+               (input_any_t%ME_gradp_cons>0)) then
+               pg(nag)%mass = pg(nag)%dens * pg(nag)%volume
+            endif
          enddo
       endif 
    enddo
