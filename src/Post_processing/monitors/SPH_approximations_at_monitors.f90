@@ -173,7 +173,7 @@ do jrang=jgridi-1,jgridi+1
                dens_cons0 = dens_cons0 + pg(npj)%dens * Womegaj
 ! Contribution to the monitoring-element velocity (0th-order consistency)
                vel_cons0(1:3) = vel_cons0(1:3) + pg(npj)%vel(1:3) * Womegaj
-               if (input_any_t%monitor_cons==1) then
+               if (input_any_t%C1_monitors) then
 ! Additional statements for 1st-order consistency SPH approximations
 ! Contributions to x (0th-odrer consistency)
                   x_cons0_fp(1:3) = x_cons0_fp(1:3) + pg(npj)%coord(1:3) *     &
@@ -237,7 +237,7 @@ do jrang=jgridi-1,jgridi+1
 ! Contributions from DBSPH semi-particles (wall elements; excluded for 
 ! 1st-order consistency approximations)
          if ((Domain%tipo=="bsph").and.(DBSPH%n_w>0).and.                      &
-            (input_any_t%monitor_cons==0)) then
+            (.not.input_any_t%C1_monitors)) then
             if (Icont_w(ncel+1)>Icont_w(ncel)) then
 ! Loop over the neighbouring wall particles in the cell
                do fw=Icont_w(ncel),Icont_w(ncel+1)-1
@@ -281,7 +281,7 @@ do jrang=jgridi-1,jgridi+1
 ! Contribution to the Shepard coefficient
                   pglocal%sigma_fp_sbp = pglocal%sigma_fp_sbp + Womegaj
                endif
-               if (input_any_t%monitor_cons==1) then
+               if (input_any_t%C1_monitors) then
 ! Additional statements for 1st-order consistency SPH approximations
 ! Contribution to x
                   x_cons0_fp_bp(1:3) = x_cons0_fp_bp(1:3) +                    &
@@ -348,7 +348,7 @@ if (pglocal%sigma_fp<1.d-1) then
       dens_cons0 = dens_cons0 / pglocal%sigma_fp
       pres_cons0 = pres_cons0 / pglocal%sigma_fp_bp
       vel_cons0(1:3) = vel_cons0(1:3) / pglocal%sigma_fp_sbp
-      if (input_any_t%monitor_cons==0) then
+      if (.not.input_any_t%C1_monitors) then
 ! 0th-order consistency SPH approximations
 ! rho
          pglocal%dens = dens_cons0
@@ -356,7 +356,7 @@ if (pglocal%sigma_fp<1.d-1) then
          pglocal%pres = pres_cons0
 ! u,v,w
          pglocal%vel(1:3) = vel_cons0(1:3)
-         elseif (input_any_t%monitor_cons==1) then
+         else
 ! Statements for the 1st-order consistency SPH approximations
 ! 0th-order consistency SPH approximation of grad_rho
             grad_rho_cons0(1:3) = grad_rho_raw(1:3) - dens_cons0 *             &

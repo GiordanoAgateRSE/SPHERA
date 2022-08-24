@@ -41,7 +41,7 @@ integer(4) :: ioerr,time_split,RKscheme,body_part_reorder
 #ifdef SPACE_3D
 integer(4) :: MAXCLOSEBOUNDFACES,MAXNUMCONVEXEDGES,GCBFVecDim_loc,nag_aux
 #endif
-integer(4) :: density_thresholds,ME_gradp_cons,CE_divu_cons,monitor_cons
+integer(4) :: density_thresholds,ME_gradp_cons,CE_divu_cons,C1_monitors
 character(100) :: token
 logical,external :: ReadCheck
 character(100),external :: lcase
@@ -102,9 +102,9 @@ do while (trim(lcase(ainp))/="##### end run parameters #####")
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"COEFNMAXPARTI and COEFNMAXPARTJ ",&
       ninp,ulog)) return
    call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
-   read(ainp,*,iostat=ioerr) ME_gradp_cons,CE_divu_cons,monitor_cons
+   read(ainp,*,iostat=ioerr) ME_gradp_cons,CE_divu_cons,C1_monitors
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                                   &
-      "ME_gradp_cons,CE_divu_cons,monitor_cons",ninp,ulog)) return
+      "ME_gradp_cons,CE_divu_cons,C1_monitors",ninp,ulog)) return
 #ifdef SPACE_3D
    call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
       read(ainp,*,iostat=ioerr) nag_aux,MAXCLOSEBOUNDFACES,MAXNUMCONVEXEDGES,  &
@@ -149,7 +149,7 @@ if (input_second_read.eqv..true.) then
    input_any_t%body_part_reorder = body_part_reorder
    input_any_t%ME_gradp_cons = ME_gradp_cons
    input_any_t%CE_divu_cons = CE_divu_cons
-   input_any_t%monitor_cons = monitor_cons   
+   input_any_t%C1_monitors = C1_monitors   
 #ifdef SPACE_3D
       input_any_t%MAXCLOSEBOUNDFACES = MAXCLOSEBOUNDFACES
       input_any_t%MAXNUMCONVEXEDGES = MAXNUMCONVEXEDGES
@@ -184,8 +184,8 @@ if (input_second_read.eqv..true.) then
          input_any_t%ME_gradp_cons
       write(ulog,"(1x,a,1p,i3)")    "CE_divu_cons               : ",           &
          input_any_t%CE_divu_cons
-      write(ulog,"(1x,a,1p,i3)")    "monitor_cons               : ",           &
-         input_any_t%monitor_cons
+      write(ulog,"(1x,a,1p,i3)")    "C1_monitors               : ",           &
+         input_any_t%C1_monitors
 #ifdef SPACE_3D
       write(ulog,"(1x,a,1p,i12)")   "NAG_AUX                    : ",           &
          Domain%nag_aux

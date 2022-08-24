@@ -108,10 +108,10 @@
 !    granular flows; DBSPH boundaries; explicit RK time integration schemes.
 !    1st-order consistency options activate the ALE corrective term in the 
 !    continuity equation 
-![?] <monitor_cons>: ID for the consistency of the post-processing procedures 
+![?] <C1_monitors>: ID for the consistency of the post-processing procedures 
 !    at the monitoring elements
-!    =0 (0th-order consistency)
-!    =1 (1st-order consistency)
+!    =.false. (0th-order consistency)
+!    =.true. (1st-order consistency)
 !    1st-order consistency options work also in the presence of: dense 
 !    granular flows; DBSPH boundaries; explicit RK time integration schemes.
 !-------------------------------------------------------------------------------
@@ -119,7 +119,7 @@
 ![*] <CFL> <vsc_coeff> <Leapfrog_flag> <scheme_order> <factor> <dt_alfa_Mon>
 ![*] <teta_p> <teta_u>
 ![*] <COEFNMAXPARTI> <COEFNMAXPARTJ> <body_part_reorder>
-![*] <ME_gradp_cons> <CE_divu_cons> <monitor_cons>
+![*] <ME_gradp_cons> <CE_divu_cons> <C1_monitors>
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
 ___ ___

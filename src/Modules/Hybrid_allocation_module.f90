@@ -87,6 +87,9 @@ type TyGlobal
 end type TyGlobal
 
 type input_any_time_der_type
+! ID for the consistency of the post-processing procedures at the monitoring 
+! elements
+   logical :: C1_monitors
 ! Maximum step number                       
    integer(4) :: itmax
 ! Reference fluid for free surface                      
@@ -102,9 +105,6 @@ type input_any_time_der_type
 ! ID for the consistency options for the velocity-gradient term in the 
 ! continuity equation
    integer(4) :: CE_divu_cons
-! ID for the consistency of the post-processing procedures at the monitoring 
-! elements
-   integer(4) :: monitor_cons
 #ifdef SPACE_3D
 ! Maximum number of neighbouring SA-SPH faces for a computational particle
    integer(4) :: MAXCLOSEBOUNDFACES
