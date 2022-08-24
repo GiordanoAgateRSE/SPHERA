@@ -40,7 +40,7 @@ use I_O_file_module
 implicit none
 integer(4),intent(in) :: npi
 double precision,intent(inout),dimension(1:SPACEDIM) :: tpres,tdiss,tvisc
-integer(4) :: npj,contj,npartint,index_rij_su_h,gradp_ALE_flag
+integer(4) :: npj,contj,npartint,index_rij_su_h
 double precision :: rhoi,rhoj,amassj,pi,pj,alpha,veln,velti,veltj,deltan,pre   
 double precision :: coeff,secinv,nupa,nu,modderveln,moddervelt,moddervel
 double precision :: dvtdn,denorm,rij_su_h,ke_coef,kacl_coef,rij_su_h_quad
@@ -89,7 +89,6 @@ rvw_sum(:) = zero
 DBSPH_wall_she_vis_term(:) = 0.d0
 t_visc_semi_part(:) = 0.d0
 Morris_inner_weigth = 0.d0
-gradp_ALE_flag = 0
 t_pres_aux(1:3) = 0.d0
 ALE_term_sum(1:3) = 0.d0
 !------------------------
@@ -205,61 +204,30 @@ do contj=1,nPartIntorno(npi)
    if (Domain%tipo=="semi") then
       if (Granular_flows_options%KTGF_config/=1) then
 ! Liquids
-         if (input_any_t%C1_BE) then
-            gradp_ALE_flag = 2
-            else
-               gradp_ALE_flag = 1
-         endif
-         else
-! Dense granular flows
-            gradp_ALE_flag = 3
-      endif
-      else
-! DB-SPH
-         if (Domain%tipo=="bsph") then
-            gradp_ALE_flag = 4
-         endif
-   endif
-   select case (gradp_ALE_flag)
-! Conservative formulation for "grad_p + ALE" terms
-      case(1)
+! For the pressure-gradient term
          alpha = (pj - pi) / (rhoi * rhoj)
-! The sign change applies here, but the matrix product applies later only 
-! once, after all the neighbour-dependent contributions are collected
          appopres(1:3) = -amassj * alpha * rag(1:3,npartint) *                 &
                          PartKernel(3,npartint)
-! ALE term
+! For the ALE1 term in the ME
          alpha = (pi * (rhoj / rhoi + 1.d0) + pj * (rhoi / rhoj - 1.d0)) /     &
                  (rhoi * rhoj)
-         ALE_term_sum(1:3) = ALE_term_sum(1:3) - amassj * alpha *            &
-                              rag(1:3,npartint) * PartKernel(3,npartint)
-! Notice that: alpha_new + alpha_old = pi / (rhoi * rhoi) + pj / (rhoj * rhoj)
-! 1st-order consistency for the pressure-gradient term
-      case(2,5)
-         alpha = (pj - pi) / (rhoi * rhoj)
-! The sign change applies here, but the matrix product applies later only 
-! once, after all the neighbour-dependent contributions are collected
-         appopres(1:3) = amassj * alpha * rag(1:3,npartint) *                  &
-                         PartKernel(3,npartint)
-         if (gradp_ALE_flag==2) then
-! Presence of the ALE term
-            alpha = (pi * (rhoj / rhoi + 1.d0) + pj * (rhoi / rhoj - 1.d0)) /  &
-                    (rhoi * rhoj)
-            ALE_term_sum(1:3) = ALE_term_sum(1:3) - amassj * alpha *         &
-                                 rag(1:3,npartint) * PartKernel(3,npartint)
-         endif
-! KTGF
-      case(3)
-         alpha = (pi + pj) / (rhoi * rhoj)
-         appopres(1:3) = -amassj * alpha * rag(1:3,npartint) *                 &
-                         PartKernel(3,npartint)
+         ALE_term_sum(1:3) = ALE_term_sum(1:3) - amassj * alpha *              &
+                             rag(1:3,npartint) * PartKernel(3,npartint)
+         else
+! Dense granular flows
+            alpha = (pi + pj) / (rhoi * rhoj)
+            appopres(1:3) = -amassj * alpha * rag(1:3,npartint) *              &
+                            PartKernel(3,npartint)            
+      endif
+      else
 ! DBSPH: the equation has to use the same kernel type when using the kernel 
 ! function (cubic spline) and its derivative
-      case(4)
-         alpha = pi / (rhoi * rhoi) + pj / (rhoj * rhoj)
-         appopres(1:3) = -amassj * alpha * rag(1:3,npartint) *                 &
-                         PartKernel(1,npartint)
-   endselect
+         if (Domain%tipo=="bsph") then
+            alpha = pi / (rhoi * rhoi) + pj / (rhoj * rhoj)
+            appopres(1:3) = -amassj * alpha * rag(1:3,npartint) *              &
+                            PartKernel(1,npartint)            
+         endif
+   endif
    t_pres_aux(1:3) = t_pres_aux(1:3) + appopres(1:3)
 ! "grad_p + ALE" term: end
 ! To compute Monaghan term (artificial viscosity)
@@ -278,14 +246,14 @@ do contj=1,nPartIntorno(npi)
    endif
 ! Momentum equation: end
 enddo
-if ((gradp_ALE_flag==2).or.(gradp_ALE_flag==5)) then
-! 1st-order consistency: here only the matrix product
+if (input_any_t%C1_BE) then
+! 1st-order consistency
    call MatrixProduct(pg(npi)%B_ren_gradp,BB=t_pres_aux,CC=aux_vec,nr=3,nrc=3, &
       nc=1)
-   t_pres_aux(1:3) = aux_vec(1:3)
+   t_pres_aux(1:3) = -aux_vec(1:3)
 endif
-! grad_p term and ALE term are summed to the acceleration (ALE term is 
-! formally added to the grad_p term)
+! grad_p term and ALE term are summed to the acceleration (ALE term is here 
+! formally pre-added to the grad_p term)
 tpres(1:3) = tpres(1:3) + t_pres_aux(1:3) + ALE_term_sum(1:3)
 ! Update of the ALE velocity increment (here it is still an acceleration)
 pg(npi)%dvel_ALE(1:3) = pg(npi)%dvel_ALE(1:3) + ALE_term_sum(1:3)

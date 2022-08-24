@@ -89,13 +89,16 @@
 !    time.
 !    =0 (fixed frontiers)
 !    =1 (mobile frontiers)
-![?] <C1_BE>: consistency options for the Balance Equations. Its value can be 
+![?] <ALE3>: ALE3 flag
+!    =.false. (SPH-ALE1 C0 unbalanced)
+!    =.true. (SPH-ALE3-LC)
+![?] <C1_BE>: C1-consistency flag for the Balance Equations. Its value can be 
 !    effectively modified at any restart time.
 !    =.false. (0th-order consistency)
 !    =.true. (1st-order consistency. This value has not to be chosen in the 
 !            presence of: dense granular flows; DBSPH boundaries; explicit RK 
 !            time integration schemes.)
-![?] <C1_monitors>: ID for the consistency of the post-processing procedures 
+![?] <C1_monitors>: C1-consistency flag for the post-processing procedures 
 !    at the monitoring elements
 !    =.false. (0th-order consistency)
 !    =.true. (1st-order consistency; no constraint: it also works in the 
@@ -106,14 +109,14 @@
 ![*] <CFL> <vsc_coeff> <Leapfrog_flag> <scheme_order> <factor> <dt_alfa_Mon>
 ![*] <teta_p> <teta_u>
 ![*] <COEFNMAXPARTI> <COEFNMAXPARTJ> <body_part_reorder>
-![*] <C1_BE> <C1_monitors>
+![*] <ALE3> <C1_BE> <C1_monitors>
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
 ___ ___
 ___ ___ ___ ___ ___ ___
 ___ ___
 ___ ___ ___
-___ ___
+___ ___ ___
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
 ![?] if (3D) then

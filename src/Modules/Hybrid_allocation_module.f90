@@ -87,6 +87,8 @@ type TyGlobal
 end type TyGlobal
 
 type input_any_time_der_type
+! ALE3 flag (ref. input template)
+   logical :: ALE3
 ! Flag on the consistency options for the Balance Equations
    logical :: C1_BE
 ! ID for the consistency of the post-processing procedures at the monitoring 

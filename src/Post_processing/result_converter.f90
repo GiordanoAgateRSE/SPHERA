@@ -359,6 +359,7 @@ if (nag>0) then
       write(unitvtk,'(a)') '      </DataArray>'
    endif
 ! dvel_ALE
+   if (input_any_t%ALE3) then
    write(unitvtk,'(a)')                                                        &
 '      <DataArray type="Float32" Name="dvel_ALE vectors"  NumberOfComponents="3"  format="ascii" >'
    do i=1,numpoints,6
@@ -369,6 +370,7 @@ if (nag>0) then
          pg(finger(k))%dvel_ALE(2),pg(finger(k))%dvel_ALE(3),k=k1,k2)
    enddo
    write(unitvtk,'(a)') '      </DataArray>'
+   endif
    if (Domain%tipo=="bsph") then
 ! DBSPH
 ! Shepard coefficient

@@ -225,7 +225,7 @@ do ii=1,indarrayFlu
       call EoS_barotropic_linear(Med(pg(npi)%imed)%eps,Med(pg(npi)%imed)%den0, &
          Domain%prif,p_in=pg(npi)%vpres,rho_out=pg(npi)%dens)
 ! Mass update
-      if (input_any_t%C1_BE) then
+      if (input_any_t%ALE3) then
          pg(npi)%mass = pg(npi)%dens * pg(npi)%volume
       endif
    endif

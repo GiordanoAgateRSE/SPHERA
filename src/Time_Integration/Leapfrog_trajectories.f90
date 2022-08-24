@@ -46,7 +46,7 @@ integer(4) :: npi
 ! Statements
 !------------------------
 !$omp parallel do default(none)                                                &
-!$omp shared(nag,pg,dt)                                                        &
+!$omp shared(nag,pg,dt,input_any_t)                                            &
 !$omp private(npi)
 ! Loop over the active particles
 do npi=1,nag
@@ -61,7 +61,9 @@ do npi=1,nag
          pg(npi)%coord(:) = pg(npi)%coord(:) + dt * pg(npi)%vel(:)  
    endif
 ! ALE velocity increment (it was already integrated in the acceleration)
-   pg(npi)%dvel_ALE(1:3) = pg(npi)%dvel_ALE(1:3) * dt
+   if (input_any_t%ALE3) then
+      pg(npi)%dvel_ALE(1:3) = pg(npi)%dvel_ALE(1:3) * dt
+   endif
 enddo
 !$omp end parallel do
 !------------------------

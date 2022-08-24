@@ -32,7 +32,7 @@ use Hybrid_allocation_module
 ! Declarations
 !------------------------
 implicit none
-logical :: C1_monitors,C1_BE
+logical :: ALE3,C1_BE,C1_monitors
 integer(4) :: nrighe,ier,ninp,ulog,uerr
 character(1) :: comment
 character(len=lencard) :: ainp
@@ -103,9 +103,9 @@ do while (trim(lcase(ainp))/="##### end run parameters #####")
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"COEFNMAXPARTI and COEFNMAXPARTJ ",&
       ninp,ulog)) return
    call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
-   read(ainp,*,iostat=ioerr) C1_BE,C1_monitors
+   read(ainp,*,iostat=ioerr) ALE3,C1_BE,C1_monitors
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                                   &
-      "C1_BE,C1_monitors",ninp,ulog)) return
+      "ALE3,C1_BE,C1_monitors",ninp,ulog)) return
 #ifdef SPACE_3D
    call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
       read(ainp,*,iostat=ioerr) nag_aux,MAXCLOSEBOUNDFACES,MAXNUMCONVEXEDGES,  &
@@ -148,6 +148,7 @@ if (input_second_read.eqv..true.) then
    Domain%COEFNMAXPARTI = COEFNMAXPARTI
    input_any_t%COEFNMAXPARTJ = COEFNMAXPARTJ
    input_any_t%body_part_reorder = body_part_reorder
+   input_any_t%ALE3 = ALE3
    input_any_t%C1_BE = C1_BE
    input_any_t%C1_monitors = C1_monitors   
 #ifdef SPACE_3D
@@ -180,7 +181,9 @@ if (input_second_read.eqv..true.) then
          input_any_t%COEFNMAXPARTJ
       write(ulog,"(1x,a,1p,i1)")    "body_part_reorder          : ",           &
          input_any_t%body_part_reorder
-      write(ulog,"(1x,a,1p,l8)")    "C1_BE              : ",           &
+      write(ulog,"(1x,a,1p,l8)")    "ALE3               : ",                   &
+         input_any_t%ALE3
+      write(ulog,"(1x,a,1p,l8)")    "C1_BE              : ",                   &
          input_any_t%C1_BE
       write(ulog,"(1x,a,1p,l8)")    "C1_monitors               : ",            &
          input_any_t%C1_monitors

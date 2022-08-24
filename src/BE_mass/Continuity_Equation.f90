@@ -105,9 +105,6 @@ do contj=1,nPartIntorno(npi)
          endif
       endif
    endif
-! For the ALE term
-   d_rho_dvelALE(1:3) = pg(npj)%dens * pg(npj)%dvel_ALE(1:3) -                 &
-                         pg(npi)%dens * pg(npi)%dvel_ALE(1:3)
 ! Continuity equation
    pesogradj(:) = amassj * rag(:,npartint) * PartKernel(1,npartint) / rhoj
    if (Granular_flows_options%KTGF_config.ne.1) then
@@ -121,8 +118,10 @@ do contj=1,nPartIntorno(npi)
 #endif
       aux_vec_3(1:3) = aux_vec_3(1:3) + rhoi * (amassj / rhoj) *               &
                        PartKernel(1,npartint) * dvar(3) * rag(1:3,npartint)
-! Auxiliary vectors for the ALE term (only in case of 1st-order consistency)
-      if (input_any_t%C1_BE) then
+! Auxiliary vectors for the ALE term
+      if (input_any_t%ALE3) then
+         d_rho_dvelALE(1:3) = pg(npj)%dens * pg(npj)%dvel_ALE(1:3) -           &
+                              pg(npi)%dens * pg(npi)%dvel_ALE(1:3)
          aux_vec_1_ALE(1:3) = aux_vec_1_ALE(1:3) + (amassj / rhoj)  *          &
                               PartKernel(1,npartint) * d_rho_dvelALE(1) *      &
                               rag(1:3,npartint)
@@ -201,12 +200,15 @@ if (Granular_flows_options%KTGF_config.ne.1) then
       call MatrixProduct(pg(npi)%B_ren_divu,BB=aux_vec_3_ALE,CC=aux_vec,       &
          nr=3,nrc=3,nc=1)
       aux_vec_3_ALE(1:3) = -aux_vec(1:3)
-! Update the CE ALE term (only in case of 1st-order consistency)
-      pg(npi)%dden_ALE = aux_vec_1_ALE(1) + aux_vec_2_ALE(2) + aux_vec_3_ALE(3)
    endif
 ! Update of the RHS of the continuity equation
-   pg(npi)%dden = pg(npi)%dden - (aux_vec_1(1) + aux_vec_2(2) + aux_vec_3(3))  &
-                  + pg(npi)%dden_ALE
+   pg(npi)%dden = pg(npi)%dden - (aux_vec_1(1) + aux_vec_2(2) + aux_vec_3(3))
+   if (input_any_t%ALE3) then
+! Update the CE ALE term (null in case if ALE3==.false.)
+      pg(npi)%dden_ALE = aux_vec_1_ALE(1) + aux_vec_2_ALE(2) + aux_vec_3_ALE(3)
+! Update of the RHS of the continuity equation
+      pg(npi)%dden = pg(npi)%dden + pg(npi)%dden_ALE
+   endif
 endif
 ! Inner terms for the RHS of the continuity equation: end
 ! Boundary contributions (DB-SPH)
