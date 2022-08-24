@@ -91,7 +91,7 @@ do contj=1,nPartIntorno(npi)
    rhoj = pg(npj)%dens
    amassj = pg(npj)%mass
    dvar(:) = pg(npj)%var(:) - pg(npi)%var(:)
-   if (pg(npj)%vel_type/="std") then          
+   if (pg(npj)%vel_type/="std") then
       rhoj = rhoi
       amassj = pg(npi)%mass
 ! Particles with "fix" movement, but not still.
@@ -113,14 +113,14 @@ do contj=1,nPartIntorno(npi)
    if (Granular_flows_options%KTGF_config.ne.1) then
 ! Liquid flows
 ! Auxiliary vectors for the RHS term of the material control volume
-      aux_vec_1(1:3) = aux_vec_1(1:3) + amassj * PartKernel(1,npartint) *      &
-                        dvar(1) * rag(1:3,npartint)
+      aux_vec_1(1:3) = aux_vec_1(1:3) + rhoi * (amassj / rhoj) *               &
+                       PartKernel(1,npartint) * dvar(1) * rag(1:3,npartint)
 #ifdef SPACE_3D
-      aux_vec_2(1:3) = aux_vec_2(1:3) + amassj * PartKernel(1,npartint) *      &
-                        dvar(2) * rag(1:3,npartint)
+      aux_vec_2(1:3) = aux_vec_2(1:3) + rhoi * (amassj / rhoj) *               &
+                       PartKernel(1,npartint) * dvar(2) * rag(1:3,npartint)
 #endif
-      aux_vec_3(1:3) = aux_vec_3(1:3) + amassj * PartKernel(1,npartint) *      &
-                        dvar(3) * rag(1:3,npartint)
+      aux_vec_3(1:3) = aux_vec_3(1:3) + rhoi * (amassj / rhoj) *               &
+                       PartKernel(1,npartint) * dvar(3) * rag(1:3,npartint)
 ! Auxiliary vectors for the RHS term of the material control volume (only in 
 ! the presence of any 1st-order consistency option)
       if (input_any_t%CE_divu_cons>0) then
