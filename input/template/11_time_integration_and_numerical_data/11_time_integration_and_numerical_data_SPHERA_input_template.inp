@@ -93,12 +93,6 @@
 !    pressure-gradient term in the momentum equation. Its value can be 
 !    effectively modified at any restart time.
 !    =-1 (conservative "grad_p + ALE term": 0th-order consistency + ALE term)
-!    =1 (1st-order consistent in the inner domain, no ALE term; 0th-order 
-!        consistency + ALE term at SASPH and body boundaries; renormalization 
-!        at boundaries is computed but not used)
-!    =2 (1st-order consistent + ALE term in the inner domain; 0th-order 
-!        consistency + ALE term at SASPH and body boundaries; renormalization 
-!        at boundaries is computed but not used)
 !    =3 (1st-order consistent + ALE term in the inner domain and at SASPH and 
 !        body boundaries)
 !    1st-order consistency options do not work in the presence of: dense 
@@ -110,8 +104,6 @@
 !    effectively modified at any restart time.
 !    =0 (0th-order consistency)
 !    =1 (1st-order consistency)
-!    =2 (1st-order consistency in the inner domain, 0th-order consistency at 
-!        boundaries)
 !    1st-order consistency options do not work in the presence of: dense 
 !    granular flows; DBSPH boundaries; explicit RK time integration schemes.
 !    1st-order consistency options activate the ALE corrective term in the 

@@ -209,28 +209,6 @@ do contj=1,nPartIntorno(npi)
             case(-1)
 ! Conservative formulation everywhere
                gradp_ALE_flag = 1
-            case(1,2)
-               if ((pg(npi)%fp_bp_flag).or.                                    &
-#ifdef SPACE_3D
-                  (BoundaryDataPointer(1,npi)>0))                              &
-#elif defined SPACE_2D
-                  (BoundaryDataPointer(1,npi)>0).or.                           &
-                  (BoundaryDataPointer(2,npi)>0))                              &
-#endif
-                  then
-! Conservative formulation at boundaries: 0th-order consistency + ALE
-                  gradp_ALE_flag = 1
-! Formal disuse of the renormalization matrix at boundaries
-                  pg(npi)%B_ren_gradp_stat = -1
-                  else
-                     if (input_any_t%ME_gradp_cons==2) then
-! 1st-order consistency for gradp term, ALE term active (inner domain)
-                        gradp_ALE_flag = 2
-                        else
-! 1st-order consistency for gradp term, no ALE term (inner domain)
-                           gradp_ALE_flag = 5
-                     endif
-               endif
             case(3)
 ! 1st-order consistency for gradp term everywhere, ALE term active (inner 
 ! domain)

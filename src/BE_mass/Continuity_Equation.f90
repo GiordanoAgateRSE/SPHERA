@@ -202,8 +202,6 @@ if (Granular_flows_options%KTGF_config.ne.1) then
       call MatrixProduct(pg(npi)%B_ren_divu,BB=aux_vec_3,CC=aux_vec,           &
          nr=3,nrc=3,nc=1)
       aux_vec_3(1:3) = -aux_vec(1:3)
-! Formal disuse of the renormalization matrix at boundaries, if needed
-      if (input_any_t%CE_divu_cons==2) pg(npi)%B_ren_divu_stat = -1
 ! 1st-order consistency: additional RHS term for non-material control volume 
 ! (in case of 1st-order consistency for the material RHS term)
       call MatrixProduct(pg(npi)%B_ren_divu,BB=aux_vec_1_ALE,CC=aux_vec,       &
