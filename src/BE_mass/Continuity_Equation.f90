@@ -120,7 +120,7 @@ do contj=1,nPartIntorno(npi)
                        PartKernel(1,npartint) * dvar(3) * rag(1:3,npartint)
 ! Auxiliary vectors for the ALE term
       if (input_any_t%ALE3) then
-         d_rho_dvelALE(1:3) = pg(npj)%dens * pg(npj)%dvel_ALE(1:3) -           &
+         d_rho_dvelALE(1:3) = pg(npj)%dens * pg(npj)%dvel_ALE(1:3) +           &
                               pg(npi)%dens * pg(npi)%dvel_ALE(1:3)
          aux_vec_1_ALE(1:3) = aux_vec_1_ALE(1:3) + (amassj / rhoj)  *          &
                               PartKernel(1,npartint) * d_rho_dvelALE(1) *      &
