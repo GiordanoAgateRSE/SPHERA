@@ -71,7 +71,7 @@ do ii=1,indarrayFlu
       if ((input_any_t%CE_divu_cons>0).or.                                     &
          (input_any_t%ME_gradp_cons>0)) then
          pg(npi)%volume = pg(npi)%volume + dt * ((-pg(npi)%volume / rho_old) * &
-                          (pg(npi)%dden - pg(npi)%dden_PPST))
+                          (pg(npi)%dden - pg(npi)%dden_ALE))
          pg(npi)%mass = pg(npi)%dens * pg(npi)%volume
       endif
    endif

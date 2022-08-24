@@ -30,7 +30,7 @@
 !              Inversion of the renormalization matrix in 3D, even in the 
 !              absence of SASPH neighbours (to fasten the algorithm under 
 !              general conditions).
-!              3D SASPH contributions to the PPST velocity increment.
+!              3D SASPH contributions to the ALE velocity increment.
 !-------------------------------------------------------------------------------
 #ifdef SPACE_3D
 subroutine AddBoundaryContributions_to_ME3D(npi,Ncbf,tpres,tdiss,tvisc,        &
@@ -64,8 +64,8 @@ double precision,dimension(1:SPACEDIM) :: B_ren_aux_Loc,B_ren_aux_Glo
 double precision,dimension(1:SPACEDIM) :: Grav_Glo_sum,aux_vec,Grav_Loc
 ! Pressure-gradient SASPH term
 double precision,dimension(1:SPACEDIM) :: gradpt_SASPH
-! PPST SASPH term
-double precision,dimension(1:SPACEDIM) :: PPSTt_SASPH
+! ALE SASPH term
+double precision,dimension(1:SPACEDIM) :: ALEt_SASPH
 character(4) :: stretchtype
 !------------------------
 ! Explicit interfaces
@@ -96,7 +96,7 @@ roi = pg(npi)%dens
 pressi = pg(npi)%pres
 Qii = (pressi + pressi) / roi
 vi(:) = pg(npi)%var(:)
-PPSTt_SASPH(1:3) = 0.d0
+ALEt_SASPH(1:3) = 0.d0
 Grav_Glo_sum(1:3) = 0.d0
 ViscoMon(:) = zero
 ViscoShear(:) = zero
@@ -147,15 +147,15 @@ face_loop: do icbf=1,Ncbf
 ! inversion of the renormalization matrix)
          Grav_Glo_sum(1:3) = Grav_Glo_sum(1:3) + Grav_Glo(1:3)
 ! Boundary contribution to the "grad_p term": end
-! Boundary contribution to the "PPST term": start
+! Boundary contribution to the "ALE term": start
 ! Local components
          Gpsurob_Loc(1:3) = -Qii * BoundaryDataTab(ibdp)%BoundaryIntegral(4:6)
 ! Global components
          call MatrixProduct(BoundaryFace(iface)%T,BB=Gpsurob_Loc,              &
             CC=Gpsurob_Glo,nr=3,nrc=3,nc=1)
 ! Contribution to acceleration
-         PPSTt_SASPH(1:3) = PPSTt_SASPH(1:3) - Gpsurob_Glo(1:3)
-! Boundary contribution to the "PPST term": end
+         ALEt_SASPH(1:3) = ALEt_SASPH(1:3) - Gpsurob_Glo(1:3)
+! Boundary contribution to the "ALE term": end
 ! Contributions of the neighbouring SASPH frontiers to the inverse of the 
 ! renormalization matrix for grad_p: start
          if (input_any_t%ME_gradp_cons==3) then
@@ -319,10 +319,10 @@ if (input_any_t%ME_gradp_cons==3) then
 endif
 ! grad_p (renormalization at boundaries): end
 ! Adding boundary contributions to the momentum equation
-! grad_p term and PPST term
-tpres(1:3) = tpres(1:3) + PPSTt_SASPH(1:3) + gradpt_SASPH(1:3)
-! Contribution to the PPST velocity increment (here it is still an acceleration)
-pg(npi)%dvel_PPST(1:3) = pg(npi)%dvel_PPST(1:3) + PPSTt_SASPH(1:3)
+! grad_p term and ALE term
+tpres(1:3) = tpres(1:3) + ALEt_SASPH(1:3) + gradpt_SASPH(1:3)
+! Contribution to the ALE velocity increment (here it is still an acceleration)
+pg(npi)%dvel_ALE(1:3) = pg(npi)%dvel_ALE(1:3) + ALEt_SASPH(1:3)
 ! Sub-grid term
 tdiss(1:3) = tdiss(1:3) - ViscoMon(1:3)
 ! For the sign of "ViscoShear", refer to the mathematical model

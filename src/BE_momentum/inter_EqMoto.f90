@@ -24,7 +24,7 @@
 !              treatment scheme, Shepard's coefficient and gravity are added at 
 !              a later stage) and the energy equation RHS (this last equation is
 !              not validated).
-!              Fluid-fluid contributions to the PPST velocity increment.             
+!              Fluid-fluid contributions to the ALE velocity increment.             
 !-------------------------------------------------------------------------------
 subroutine inter_EqMoto(npi,tpres,tdiss,tvisc)
 !------------------------
@@ -40,7 +40,7 @@ use I_O_file_module
 implicit none
 integer(4),intent(in) :: npi
 double precision,intent(inout),dimension(1:SPACEDIM) :: tpres,tdiss,tvisc
-integer(4) :: npj,contj,npartint,index_rij_su_h,gradp_PPST_flag
+integer(4) :: npj,contj,npartint,index_rij_su_h,gradp_ALE_flag
 double precision :: rhoi,rhoj,amassj,pi,pj,alpha,veln,velti,veltj,deltan,pre   
 double precision :: coeff,secinv,nupa,nu,modderveln,moddervelt,moddervel
 double precision :: dvtdn,denorm,rij_su_h,ke_coef,kacl_coef,rij_su_h_quad
@@ -50,7 +50,7 @@ double precision :: absv_Morris_inner,Morris_inner_weigth,kernel_der
 double precision :: dervel(3),dervelmorr(3),appopres(3),appodiss(3),rvw(3)
 double precision :: rvwalfa(3),rvwbeta(3),ragtemp(3),rvw_sum(3),rvw_semi_part(3)
 double precision :: DBSPH_wall_she_vis_term(3),t_visc_semi_part(3),aux_vec(3)
-double precision :: t_pres_aux(3),PPST_term_sum(3)
+double precision :: t_pres_aux(3),ALE_term_sum(3)
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -89,9 +89,9 @@ rvw_sum(:) = zero
 DBSPH_wall_she_vis_term(:) = 0.d0
 t_visc_semi_part(:) = 0.d0
 Morris_inner_weigth = 0.d0
-gradp_PPST_flag = 0
+gradp_ALE_flag = 0
 t_pres_aux(1:3) = 0.d0
-PPST_term_sum(1:3) = 0.d0
+ALE_term_sum(1:3) = 0.d0
 !------------------------
 ! Statements
 !------------------------
@@ -201,14 +201,14 @@ do contj=1,nPartIntorno(npi)
       endif
    endif
 ! Momentum equation: start
-! "grad_p + PPST" term: start
+! "grad_p + ALE" term: start
    if (Domain%tipo=="semi") then
       if (Granular_flows_options%KTGF_config/=1) then
 ! Liquids
          select case (input_any_t%ME_gradp_cons)
             case(-1)
 ! Conservative formulation everywhere
-               gradp_PPST_flag = 1
+               gradp_ALE_flag = 1
             case(1,2)
                if ((pg(npi)%fp_bp_flag).or.                                    &
 #ifdef SPACE_3D
@@ -218,23 +218,23 @@ do contj=1,nPartIntorno(npi)
                   (BoundaryDataPointer(2,npi)>0))                              &
 #endif
                   then
-! Conservative formulation at boundaries: 0th-order consistency + PPST
-                  gradp_PPST_flag = 1
+! Conservative formulation at boundaries: 0th-order consistency + ALE
+                  gradp_ALE_flag = 1
 ! Formal disuse of the renormalization matrix at boundaries
                   pg(npi)%B_ren_gradp_stat = -1
                   else
                      if (input_any_t%ME_gradp_cons==2) then
-! 1st-order consistency for gradp term, PPST term active (inner domain)
-                        gradp_PPST_flag = 2
+! 1st-order consistency for gradp term, ALE term active (inner domain)
+                        gradp_ALE_flag = 2
                         else
-! 1st-order consistency for gradp term, no PPST term (inner domain)
-                           gradp_PPST_flag = 5
+! 1st-order consistency for gradp term, no ALE term (inner domain)
+                           gradp_ALE_flag = 5
                      endif
                endif
             case(3)
-! 1st-order consistency for gradp term everywhere, PPST term active (inner 
+! 1st-order consistency for gradp term everywhere, ALE term active (inner 
 ! domain)
-               gradp_PPST_flag = 2
+               gradp_ALE_flag = 2
 ! default
             case default
                write(uerr,*) 'The option chosen for "ME_gradp_cons" is wrong.',&
@@ -243,26 +243,26 @@ do contj=1,nPartIntorno(npi)
          endselect
          else
 ! Dense granular flows
-            gradp_PPST_flag = 3
+            gradp_ALE_flag = 3
       endif
       else
 ! DB-SPH
          if (Domain%tipo=="bsph") then
-            gradp_PPST_flag = 4
+            gradp_ALE_flag = 4
          endif
    endif
-   select case (gradp_PPST_flag)
-! Conservative formulation for "grad_p + PPST" terms
+   select case (gradp_ALE_flag)
+! Conservative formulation for "grad_p + ALE" terms
       case(1)
          alpha = (pj - pi) / (rhoi * rhoj)
 ! The sign change applies here, but the matrix product applies later only 
 ! once, after all the neighbour-dependent contributions are collected
          appopres(1:3) = -amassj * alpha * rag(1:3,npartint) *                 &
                          PartKernel(3,npartint)
-! PPST term
+! ALE term
          alpha = (pi * (rhoj / rhoi + 1.d0) + pj * (rhoi / rhoj - 1.d0)) /     &
                  (rhoi * rhoj)
-         PPST_term_sum(1:3) = PPST_term_sum(1:3) - amassj * alpha *            &
+         ALE_term_sum(1:3) = ALE_term_sum(1:3) - amassj * alpha *            &
                               rag(1:3,npartint) * PartKernel(3,npartint)
 ! Notice that: alpha_new + alpha_old = pi / (rhoi * rhoi) + pj / (rhoj * rhoj)
 ! 1st-order consistency for the pressure-gradient term
@@ -272,11 +272,11 @@ do contj=1,nPartIntorno(npi)
 ! once, after all the neighbour-dependent contributions are collected
          appopres(1:3) = amassj * alpha * rag(1:3,npartint) *                  &
                          PartKernel(3,npartint)
-         if (gradp_PPST_flag==2) then
-! Presence of the PPST term
+         if (gradp_ALE_flag==2) then
+! Presence of the ALE term
             alpha = (pi * (rhoj / rhoi + 1.d0) + pj * (rhoi / rhoj - 1.d0)) /  &
                     (rhoi * rhoj)
-            PPST_term_sum(1:3) = PPST_term_sum(1:3) - amassj * alpha *         &
+            ALE_term_sum(1:3) = ALE_term_sum(1:3) - amassj * alpha *         &
                                  rag(1:3,npartint) * PartKernel(3,npartint)
          endif
 ! KTGF
@@ -292,7 +292,7 @@ do contj=1,nPartIntorno(npi)
                          PartKernel(1,npartint)
    endselect
    t_pres_aux(1:3) = t_pres_aux(1:3) + appopres(1:3)
-! "grad_p + PPST" term: end
+! "grad_p + ALE" term: end
 ! To compute Monaghan term (artificial viscosity)
    call viscomon(npi,npj,npartint,dervel,rvwalfa,rvwbeta)
    appodiss(:) = rvwalfa(:) + rvwbeta(:)
@@ -309,17 +309,17 @@ do contj=1,nPartIntorno(npi)
    endif
 ! Momentum equation: end
 enddo
-if ((gradp_PPST_flag==2).or.(gradp_PPST_flag==5)) then
+if ((gradp_ALE_flag==2).or.(gradp_ALE_flag==5)) then
 ! 1st-order consistency: here only the matrix product
    call MatrixProduct(pg(npi)%B_ren_gradp,BB=t_pres_aux,CC=aux_vec,nr=3,nrc=3, &
       nc=1)
    t_pres_aux(1:3) = aux_vec(1:3)
 endif
-! grad_p term and PPST term are summed to the acceleration (PPST term is 
+! grad_p term and ALE term are summed to the acceleration (ALE term is 
 ! formally added to the grad_p term)
-tpres(1:3) = tpres(1:3) + t_pres_aux(1:3) + PPST_term_sum(1:3)
-! Update of the PPST velocity increment (here it is still an acceleration)
-pg(npi)%dvel_PPST(1:3) = pg(npi)%dvel_PPST(1:3) + PPST_term_sum(1:3)
+tpres(1:3) = tpres(1:3) + t_pres_aux(1:3) + ALE_term_sum(1:3)
+! Update of the ALE velocity increment (here it is still an acceleration)
+pg(npi)%dvel_ALE(1:3) = pg(npi)%dvel_ALE(1:3) + ALE_term_sum(1:3)
 pg(npi)%laminar_flag = 0
 if (pg(npi)%kin_visc>0.d0) then
    absv_pres_grav_inner = dsqrt(dot_product(tpres,tpres)) + GI

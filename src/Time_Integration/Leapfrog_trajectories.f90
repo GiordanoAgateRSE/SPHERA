@@ -60,8 +60,8 @@ do npi=1,nag
 ! Otherwise, the partial smoothed velocity field is integrated in time
          pg(npi)%coord(:) = pg(npi)%coord(:) + dt * pg(npi)%vel(:)  
    endif
-! PPST velocity increment (it was already integrated in the acceleration)
-   pg(npi)%dvel_PPST(1:3) = pg(npi)%dvel_PPST(1:3) * dt
+! ALE velocity increment (it was already integrated in the acceleration)
+   pg(npi)%dvel_ALE(1:3) = pg(npi)%dvel_ALE(1:3) * dt
 enddo
 !$omp end parallel do
 !------------------------

@@ -21,7 +21,7 @@
 !-------------------------------------------------------------------------------
 ! Program unit: RHS_momentum_equation
 ! Description: Right Hand Side of the momentum equation and contributions to 
-!              the PPST velocity increment.
+!              the ALE velocity increment.
 !-------------------------------------------------------------------------------
 subroutine RHS_momentum_equation
 !------------------------
@@ -94,8 +94,8 @@ do ii = 1,indarrayFlu
    tpres(:) = zero
    tdiss(:) = zero
    tvisc(:) = zero
-! Initialization of the PPST velocity increment
-   pg(npi)%dvel_PPST(1:3) = 0.d0
+! Initialization of the ALE velocity increment
+   pg(npi)%dvel_ALE(1:3) = 0.d0
 ! SASPH boundary terms of the momentum equation: start
 ! Searching for the boundary faces/sides, which are the nearest the npi-th 
 ! current particle

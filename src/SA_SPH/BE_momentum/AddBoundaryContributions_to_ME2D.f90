@@ -29,7 +29,7 @@
 !              Inversion of the renormalization matrix in 2D, even in the 
 !              absence of SASPH neighbours (to fasten the algorithm under 
 !              general conditions).
-!              2D SASPH contributions to the PPST velocity increment.
+!              2D SASPH contributions to the ALE velocity increment.
 !-------------------------------------------------------------------------------
 #ifdef SPACE_2D
 subroutine AddBoundaryContributions_to_ME2D(npi,IntNcbs,tpres,tdiss,tvisc,     &
@@ -66,8 +66,8 @@ double precision,dimension(1:PLANEDIM) :: RG_like,gradbPsuro_like,RG_sum
 double precision,dimension(1:SPACEDIM) :: u_t_0_vector,aux_vec_2,aux_vec
 ! Unit vector of the unity vector: direction of (1,1)
 double precision,dimension(1:SPACEDIM) :: one_vec_dir
-! SASPH ME PPST term
-double precision,dimension(1:SPACEDIM) :: PPSTt_SASPH
+! SASPH ME ALE term
+double precision,dimension(1:SPACEDIM) :: ALEt_SASPH
 type (TyBoundarySide) :: RifBoundarySide
 character(4):: strtype
 !------------------------
@@ -109,7 +109,7 @@ do i=1,PLANEDIM
    one_vec_dir(acix(i)) = 1.d0 / dsqrt(2.d0)
 enddo
 RG_sum(1:2) = 0.d0
-PPSTt_SASPH(1:3) = 0.d0
+ALEt_SASPH(1:3) = 0.d0
 !------------------------
 ! Statements
 !------------------------
@@ -153,7 +153,7 @@ do icbs=1,IntNcbs
          Dvel(i) = two * (pg(npi)%var(acix(i)) - sidevel(i))   
       enddo
       DvelN = Dvel(1) * nnlocal(1) + Dvel(2) * nnlocal(2)
-! SASPH "PPST term": start
+! SASPH "ALE term": start
       distpi = max(ypi,distpimin)
       pressib = pressi
       pressibmin = pibmink * ro0 * distpimin
@@ -162,7 +162,7 @@ do icbs=1,IntNcbs
       endif
       PressB = pressib - ro0 * GravN * distpi
       QiiIntWdS = IntWdS * (pressib + PressB) / roi
-! SASPH "PPST term": end
+! SASPH "ALE term": end
 ! Sub-critical flow
       elseif (strtype=="leve") then   
          Qsi = pressi / roi
@@ -309,9 +309,9 @@ do icbs=1,IntNcbs
       enddo
    endif
 ! SASPH contribution to "grad_p" and renormalization matrix: end
-! Contributions to the ME SASPH PPST term
-   PPSTt_SASPH(1) = PPSTt_SASPH(1) - nnlocal(1) * QiiIntWdS
-   PPSTt_SASPH(3) = PPSTt_SASPH(3) - nnlocal(2) * QiiIntWdS
+! Contributions to the ME SASPH ALE term
+   ALEt_SASPH(1) = ALEt_SASPH(1) - nnlocal(1) * QiiIntWdS
+   ALEt_SASPH(3) = ALEt_SASPH(3) - nnlocal(2) * QiiIntWdS
 ! Volume viscosity force (with changed sign) and artificial viscosity term
    if (strtype=="fixe".or.strtype=="tapi") then
       if (xpi>=zero.and.xpi<=RifBoundarySide%length) then
@@ -396,10 +396,10 @@ if (input_any_t%ME_gradp_cons==3) then
 endif
 ! grad_p (renormalization at boundaries): end
 do i=1,PLANEDIM
-   tpres(acix(i)) = tpres(acix(i)) - RG_sum(i) - PPSTt_SASPH(acix(i))
-! Contribution to the PPST velocity increment (here it is still an acceleration)
-   pg(npi)%dvel_PPST(acix(i)) = pg(npi)%dvel_PPST(acix(i)) -                   &
-                                PPSTt_SASPH(acix(i))
+   tpres(acix(i)) = tpres(acix(i)) - RG_sum(i) - ALEt_SASPH(acix(i))
+! Contribution to the ALE velocity increment (here it is still an acceleration)
+   pg(npi)%dvel_ALE(acix(i)) = pg(npi)%dvel_ALE(acix(i)) -                     &
+                                ALEt_SASPH(acix(i))
    tdiss(acix(i)) = tdiss(acix(i)) - ViscoMon(i)
    tvisc(acix(i)) = tvisc(acix(i)) - ViscoShear(i)
 enddo

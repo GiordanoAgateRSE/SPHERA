@@ -135,7 +135,7 @@ if (simulation_time>=emission_time) then
                pg(nag)%var(sd) = pg(nag)%vel(sd)
             enddo
             pg(nag)%sect_old_pos(:) = pg(nag)%coord(:)
-            pg(nag)%dvel_PPST(1:3) = 0.d0
+            pg(nag)%dvel_ALE(1:3) = 0.d0
             if (Domain%tipo=="bsph") call wavy_inlet(i_source)
             if (Domain%tipo=="bsph") then
                pg(nag)%rhoSPH_new = zero
@@ -149,7 +149,7 @@ if (simulation_time>=emission_time) then
             pg(nag)%izona = inlet_zone
             pg(nag)%volume = Domain%PVolume
             pg(nag)%mass = pg(nag)%volume * Med(Mat)%den0
-            pg(nag)%dden_PPST = 0.d0
+            pg(nag)%dden_ALE = 0.d0
             pg(nag)%imed = mat  
             pg(nag)%kin_visc = Med(mat)%kin_visc
             pg(nag)%mu = Med(mat)%kin_visc * Med(Mat)%den0

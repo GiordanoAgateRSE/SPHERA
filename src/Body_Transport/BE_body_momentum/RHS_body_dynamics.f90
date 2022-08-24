@@ -281,11 +281,11 @@ do npi=1,n_body_part
    do j=1,nPartIntorno_bp_f(npi)
       npartint = (npi - 1) * NMAXPARTJ + j
       npj = PartIntorno_bp_f(npartint)
-! Contribution to the "grad_p + PPST term": start
+! Contribution to the "grad_p + ALE term": start
 ! Term for grad_p
       aux_scalar = (bp_arr(npi)%pres - pg(npj)%pres) / (pg(npj)%dens *         &
                    pg(npj)%dens)
-! Term for PPST
+! Term for ALE
       aux_scalar_2 = 2.d0 * pg(npj)%pres / (pg(npj)%dens * pg(npj)%dens)
       if (thin_walls) then
 ! Treatment for thin walls (to the coupling term on the pressure gradient)
@@ -308,13 +308,13 @@ do npi=1,n_body_part
                                ( - rag_bp_f(1:3,npartint)) *                   &
                                KerDer_bp_f_Gal(npartint))
       endif
-! PPST contribution to the acceleration
+! ALE contribution to the acceleration
       aux_vec(1:3) = -pg(npj)%mass / (dx_dxbp ** ncord) * aux_scalar_2 *       &
                      (-rag_bp_f(1:3,npartint)) * KerDer_bp_f_Gal(npartint)
       pg(npj)%acc(1:3) = pg(npj)%acc(1:3) + aux_vec(1:3)
-! Contribution to the PPST velocity increment (here it is still an acceleration)
-      pg(npj)%dvel_PPST(1:3) = pg(npj)%dvel_PPST(1:3) + aux_vec(1:3)
-! Contribution to the "grad_p + PPST term": end
+! Contribution to the ALE velocity increment (here it is still an acceleration)
+      pg(npj)%dvel_ALE(1:3) = pg(npj)%dvel_ALE(1:3) + aux_vec(1:3)
+! Contribution to the "grad_p + ALE term": end
       if (FSI_free_slip_conditions.eqv..false.) then
 ! Body particle volume
          aux_scalar = pg(npj)%mass / Med(pg(npj)%imed)%den0 / (dx_dxbp **      &

@@ -213,8 +213,8 @@ type TyParticle
    double precision :: dens
 ! Volume
    double precision :: volume
-! PPST term in the contiuity equation
-   double precision :: dden_PPST
+! ALE term in the contiuity equation
+   double precision :: dden_ALE
 ! Pressure                          
    double precision :: pres
 ! Continuity equation LHS                           
@@ -336,8 +336,8 @@ type TyParticle
    double precision :: vel(3)
 ! Imposed velocity
    double precision :: velass(3)
-! PPST velocity increment
-   double precision :: dvel_PPST(3)
+! ALE velocity increment
+   double precision :: dvel_ALE(3)
 ! Velocity gradient (SPH pseudo-consistent approximation over fluid particles) 
    double precision :: dvel(3,3)
 ! Renormalization matrix for the pressure-gradient term in the momentum 
