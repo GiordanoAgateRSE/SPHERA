@@ -55,7 +55,7 @@ end interface
 !------------------------
 ! Initializations
 !------------------------
-abs_det_thresh = 0.01d0
+abs_det_thresh = 1.d-3
 !------------------------
 ! Statements
 !------------------------
