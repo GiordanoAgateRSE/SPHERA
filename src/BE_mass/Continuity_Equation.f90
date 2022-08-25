@@ -37,13 +37,13 @@ use Dynamic_allocation_module
 implicit none
 integer(4),intent(in) :: npi
 integer(4) :: npj,contj,npartint
-double precision :: rhoi,rhoj,amassj,moddervel,appo
+double precision :: rhoi,rhoj,amassj,moddervel,appo,ALE2_CE
 #ifdef SPACE_3D
 double precision :: moddia,modout
 #elif defined SPACE_2D
 double precision :: det
 #endif
-double precision,dimension(3) :: pesogradj,dvar,aux_vec,d_rho_dvelALE12
+double precision,dimension(3) :: pesogradj,dvar,aux_vec,d_rho_dvelALE1
 double precision,dimension(3) :: aux_vec_1,aux_vec_2,aux_vec_3
 double precision,dimension(3) :: aux_vec_1_ALE,aux_vec_2_ALE,aux_vec_3_ALE
 double precision,dimension(9) :: dvdi
@@ -77,6 +77,10 @@ aux_vec_3_ALE(1:3) = 0.d0
 !------------------------
 ! Statements
 !------------------------
+if (input_any_t%ALE3) then
+   ALE2_CE = -(pg(npi)%dens ** 2) * dot_product(pg(npi)%dvel_ALE1,             &
+             pg(npi)%dvel_ALE1) / (pg(npi)%pres * dt)
+endif
 if ((pg(npi)%vel_type/="std").or.(pg(npi)%cella==0)) return
 dvar(:) = zero
 #ifdef SPACE_2D
@@ -118,20 +122,20 @@ do contj=1,nPartIntorno(npi)
 #endif
       aux_vec_3(1:3) = aux_vec_3(1:3) + rhoi * (amassj / rhoj) *               &
                        PartKernel(1,npartint) * dvar(3) * rag(1:3,npartint)
-! Auxiliary vectors for the ALE12 term in CE
+! Auxiliary vectors for the ALE1 term in CE
       if (input_any_t%ALE3) then
-         d_rho_dvelALE12(1:3) = pg(npj)%dens * pg(npj)%dvel_ALE1(1:3) +        &
-                                pg(npi)%dens * pg(npi)%dvel_ALE1(1:3)
+         d_rho_dvelALE1(1:3) = pg(npj)%dens * pg(npj)%dvel_ALE1(1:3) -         &
+                               pg(npi)%dens * pg(npi)%dvel_ALE1(1:3)
          aux_vec_1_ALE(1:3) = aux_vec_1_ALE(1:3) + (amassj / rhoj)  *          &
-                              PartKernel(1,npartint) * d_rho_dvelALE12(1) *    &
+                              PartKernel(1,npartint) * d_rho_dvelALE1(1) *     &
                               rag(1:3,npartint)
 #ifdef SPACE_3D
          aux_vec_2_ALE(1:3) = aux_vec_2_ALE(1:3) + (amassj / rhoj) *           &
-                              PartKernel(1,npartint) * d_rho_dvelALE12(2) *    &
+                              PartKernel(1,npartint) * d_rho_dvelALE1(2) *     &
                               rag(1:3,npartint)
 #endif
          aux_vec_3_ALE(1:3) = aux_vec_3_ALE(1:3) + (amassj / rhoj) *           &
-                              PartKernel(1,npartint) * d_rho_dvelALE12(3) *    &
+                              PartKernel(1,npartint) * d_rho_dvelALE1(3) *     &
                               rag(1:3,npartint)
       endif
       else
@@ -206,7 +210,7 @@ if (Granular_flows_options%KTGF_config.ne.1) then
    if (input_any_t%ALE3) then
 ! Update the CE ALE term (null if ALE3==.false.)
       pg(npi)%dden_ALE12 = aux_vec_1_ALE(1) + aux_vec_2_ALE(2) +               &
-                           aux_vec_3_ALE(3)
+                           aux_vec_3_ALE(3) + ALE2_CE
 ! Update of the RHS of the continuity equation
       pg(npi)%dden = pg(npi)%dden + pg(npi)%dden_ALE12
    endif
