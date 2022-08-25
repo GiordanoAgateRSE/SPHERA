@@ -301,7 +301,7 @@ TIME_STEP_DO: do while (it<=input_any_t%itmax)
                   enddo
                   if (BC_zmax_flag.eqv..true.) then
 ! Update the array of the fluid particles
-                  call liquid_particle_ID_array
+                     call liquid_particle_ID_array
 ! Velocity initialization of the new BC_zmax particles by means of a SPH 
 ! interpolation (selective partial velocity smoothing)
                      call velocity_smoothing(BC_zmax_flag)

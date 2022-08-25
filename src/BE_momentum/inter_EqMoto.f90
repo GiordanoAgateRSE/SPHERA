@@ -23,8 +23,7 @@
 ! Description: Computation of the momentum equation RHS (with DB-SPH boundary 
 !              treatment scheme, Shepard's coefficient and gravity are added at 
 !              a later stage) and the energy equation RHS (this last equation is
-!              not validated).
-!              Fluid-fluid contributions to the ALE velocity increment.             
+!              not validated). ALE1+ALE3 contributions.
 !-------------------------------------------------------------------------------
 subroutine inter_EqMoto(npi,tpres,tdiss,tvisc)
 !------------------------
@@ -50,7 +49,8 @@ double precision :: absv_Morris_inner,Morris_inner_weigth,kernel_der
 double precision :: dervel(3),dervelmorr(3),appopres(3),appodiss(3),rvw(3)
 double precision :: rvwalfa(3),rvwbeta(3),ragtemp(3),rvw_sum(3),rvw_semi_part(3)
 double precision :: DBSPH_wall_she_vis_term(3),t_visc_semi_part(3),aux_vec(3)
-double precision :: t_pres_aux(3),ALE_term_sum(3)
+double precision :: t_pres_aux(3),ALE1_term_sum(3),ALE3_term_sum(3),dvel(3)
+double precision :: d_rho_dvelALE1(3)
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -90,7 +90,8 @@ DBSPH_wall_she_vis_term(:) = 0.d0
 t_visc_semi_part(:) = 0.d0
 Morris_inner_weigth = 0.d0
 t_pres_aux(1:3) = 0.d0
-ALE_term_sum(1:3) = 0.d0
+ALE1_term_sum(1:3) = 0.d0
+ALE3_term_sum(1:3) = 0.d0
 !------------------------
 ! Statements
 !------------------------
@@ -200,7 +201,7 @@ do contj=1,nPartIntorno(npi)
       endif
    endif
 ! Momentum equation: start
-! "grad_p + ALE" term: start
+! "grad_p + ALE1 + ALE3" terms: start
    if (Domain%tipo=="semi") then
       if (Granular_flows_options%KTGF_config/=1) then
 ! Liquids
@@ -208,11 +209,21 @@ do contj=1,nPartIntorno(npi)
          alpha = (pj - pi) / (rhoi * rhoj)
          appopres(1:3) = -amassj * alpha * rag(1:3,npartint) *                 &
                          PartKernel(3,npartint)
-! For the ALE1 term in the ME
+! Contribution to the ALE1 term in the ME-VC
          alpha = (pi * (rhoj / rhoi + 1.d0) + pj * (rhoi / rhoj - 1.d0)) /     &
                  (rhoi * rhoj)
-         ALE_term_sum(1:3) = ALE_term_sum(1:3) - amassj * alpha *              &
-                             rag(1:3,npartint) * PartKernel(3,npartint)
+         ALE1_term_sum(1:3) = ALE1_term_sum(1:3) - amassj * alpha *            &
+                              rag(1:3,npartint) * PartKernel(3,npartint)
+         if (input_any_t%ALE3) then
+! Contribution to the ALE3 term in the ME-VC
+            dvel(1:3) = pg(npj)%vel(1:3) - pg(npi)%vel(1:3)
+            d_rho_dvelALE1(1:3) = pg(npj)%dens * pg(npj)%dvel_ALE1(1:3) +      &
+                                  pg(npi)%dens * pg(npi)%dvel_ALE1(1:3)
+            ALE3_term_sum(1:3) = ALE3_term_sum(1:3) + dvel(1:3) * (amassj /    &
+                                 rhoj) * PartKernel(1,npartint) *              &
+                                 dot_product(d_rho_dvelALE1(1:3),              &
+                                 rag(1:3,npartint)) / (2.d0 * rhoi)
+         endif
          else
 ! Dense granular flows
             alpha = (pi + pj) / (rhoi * rhoj)
@@ -229,7 +240,7 @@ do contj=1,nPartIntorno(npi)
          endif
    endif
    t_pres_aux(1:3) = t_pres_aux(1:3) + appopres(1:3)
-! "grad_p + ALE" term: end
+! "grad_p + ALE1 + ALE3" terms: end
 ! To compute Monaghan term (artificial viscosity)
    call viscomon(npi,npj,npartint,dervel,rvwalfa,rvwbeta)
    appodiss(:) = rvwalfa(:) + rvwbeta(:)
@@ -252,11 +263,19 @@ if (input_any_t%C1_BE) then
       nc=1)
    t_pres_aux(1:3) = -aux_vec(1:3)
 endif
-! grad_p term and ALE term are summed to the acceleration (ALE term is here 
+! grad_p term and ALE1 term are summed to the acceleration (ALE1 term is here 
 ! formally pre-added to the grad_p term)
-tpres(1:3) = tpres(1:3) + t_pres_aux(1:3) + ALE_term_sum(1:3)
-! Update of the ALE velocity increment (here it is still an acceleration)
-pg(npi)%dvel_ALE(1:3) = pg(npi)%dvel_ALE(1:3) + ALE_term_sum(1:3)
+tpres(1:3) = tpres(1:3) + t_pres_aux(1:3) + ALE1_term_sum(1:3)
+if (input_any_t%ALE3) then
+! ALE3 term is summed to the acceleration (ALE3 term is here formally pre-added 
+! to the grad_p term)
+   tpres(1:3) = tpres(1:3) + ALE3_term_sum(1:3)
+! Update of the ALE velocity increments (here they are expressed as 
+! accelerations). ALE1 term (always used) is explicitly saved, printed and used 
+! also for the CE only if ALE3==.true. 
+   pg(npi)%dvel_ALE1(1:3) = pg(npi)%dvel_ALE1(1:3) + ALE1_term_sum(1:3)
+   pg(npi)%dvel_ALE3(1:3) = pg(npi)%dvel_ALE3(1:3) + ALE3_term_sum(1:3)
+endif
 pg(npi)%laminar_flag = 0
 if (pg(npi)%kin_visc>0.d0) then
    absv_pres_grav_inner = dsqrt(dot_product(tpres,tpres)) + GI

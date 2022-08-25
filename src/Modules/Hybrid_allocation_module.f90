@@ -212,7 +212,7 @@ type TyParticle
 ! Volume
    double precision :: volume
 ! ALE term in the contiuity equation
-   double precision :: dden_ALE
+   double precision :: dden_ALE12
 ! Pressure                          
    double precision :: pres
 ! Continuity equation LHS                           
@@ -320,7 +320,8 @@ type TyParticle
 ! Velocity to use for Morris scheme   
    double precision :: velmorr(3)
    double precision :: zer(3)
-! Partially smoothed velocity 
+! Partially smoothed velocity (in the absence of the velocity partial 
+! smoothing, var=vel everywhere)
    double precision :: var(3)
 ! Acceleration 
    double precision :: acc(3)
@@ -335,7 +336,9 @@ type TyParticle
 ! Imposed velocity
    double precision :: velass(3)
 ! ALE velocity increment
-   double precision :: dvel_ALE(3)
+   double precision :: dvel_ALE1(3)
+! ALE velocity increment
+   double precision :: dvel_ALE3(3)
 ! Velocity gradient (SPH pseudo-consistent approximation over fluid particles) 
    double precision :: dvel(3,3)
 ! Renormalization matrix for the pressure-gradient term in the momentum 

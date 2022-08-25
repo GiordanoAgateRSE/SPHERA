@@ -54,7 +54,7 @@ if (Domain%RKscheme>1) ts0_pg(npi) = ts_pgZero
 pg(npi)%izona = Nz
 pg(npi)%volume = Domain%PVolume
 pg(npi)%mass = pg(npi)%volume * Med(Mate)%den0
-pg(nag)%dden_ALE = 0.d0
+pg(nag)%dden_ALE12 = 0.d0
 #ifdef SPACE_2D
    pg(npi)%coord(2) = zero              
    pg(npi)%CoordOld(2) = zero
@@ -66,8 +66,9 @@ pg(npi)%vstart = partz(Nz)%vel
 call stoptime(partz(Nz),tstop)
 ! To compute velocity for particle of type "law"
 call vellaw(partz(Nz)%vlaw,partz(Nz)%vel,partz(Nz)%npointv)
-! Initial ALE velocity increment
-pg(npi)%dvel_ALE(1:3) = 0.d0
+! Initial ALE velocity increments
+pg(npi)%dvel_ALE1(1:3) = 0.d0
+pg(npi)%dvel_ALE3(1:3) = 0.d0
 ! Stopping time for blocks in movement
 pg(npi)%tstop = tstop                    
 ! Material ID

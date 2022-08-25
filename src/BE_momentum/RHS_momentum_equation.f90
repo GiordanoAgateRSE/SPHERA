@@ -94,8 +94,9 @@ do ii = 1,indarrayFlu
    tpres(:) = zero
    tdiss(:) = zero
    tvisc(:) = zero
-! Initialization of the ALE velocity increment
-   pg(npi)%dvel_ALE(1:3) = 0.d0
+! Initialization of the ALE velocity increments
+   pg(npi)%dvel_ALE1(1:3) = 0.d0
+   pg(npi)%dvel_ALE3(1:3) = 0.d0
 ! SASPH boundary terms of the momentum equation: start
 ! Searching for the boundary faces/sides, which are the nearest the npi-th 
 ! current particle

@@ -62,7 +62,8 @@ do npi=1,nag
    endif
 ! ALE velocity increment (it was already integrated in the acceleration)
    if (input_any_t%ALE3) then
-      pg(npi)%dvel_ALE(1:3) = pg(npi)%dvel_ALE(1:3) * dt
+      pg(npi)%dvel_ALE1(1:3) = pg(npi)%dvel_ALE1(1:3) * dt
+      pg(npi)%dvel_ALE3(1:3) = pg(npi)%dvel_ALE3(1:3) * dt
    endif
 enddo
 !$omp end parallel do

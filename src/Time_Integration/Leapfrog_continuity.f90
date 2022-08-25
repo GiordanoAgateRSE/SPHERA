@@ -70,7 +70,7 @@ do ii=1,indarrayFlu
    if (Domain%tipo=="semi") then
       if (input_any_t%ALE3) then
          pg(npi)%volume = pg(npi)%volume + dt * ((-pg(npi)%volume / rho_old) * &
-                          (pg(npi)%dden - pg(npi)%dden_ALE))
+                          (pg(npi)%dden - pg(npi)%dden_ALE12))
          pg(npi)%mass = pg(npi)%dens * pg(npi)%volume
       endif
    endif

@@ -322,7 +322,7 @@ endif
 ! grad_p term and ALE term
 tpres(1:3) = tpres(1:3) + ALEt_SASPH(1:3) + gradpt_SASPH(1:3)
 ! Contribution to the ALE velocity increment (here it is still an acceleration)
-pg(npi)%dvel_ALE(1:3) = pg(npi)%dvel_ALE(1:3) + ALEt_SASPH(1:3)
+pg(npi)%dvel_ALE1(1:3) = pg(npi)%dvel_ALE1(1:3) + ALEt_SASPH(1:3)
 ! Sub-grid term
 tdiss(1:3) = tdiss(1:3) - ViscoMon(1:3)
 ! For the sign of "ViscoShear", refer to the mathematical model

@@ -358,16 +358,27 @@ if (nag>0) then
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
    endif
-! dvel_ALE
    if (input_any_t%ALE3) then
+! dvel_ALE1
    write(unitvtk,'(a)')                                                        &
-'      <DataArray type="Float32" Name="dvel_ALE vectors"  NumberOfComponents="3"  format="ascii" >'
+'      <DataArray type="Float32" Name="dvel_ALE1 vectors"  NumberOfComponents="3"  format="ascii" >'
    do i=1,numpoints,6
       k1 = i
       k2 = k1 + 5
       if (k2>numpoints) k2 = numpoints
-      write(unitvtk,'(8x,6(3(1x,ES12.4E3)))') (pg(finger(k))%dvel_ALE(1),      &
-         pg(finger(k))%dvel_ALE(2),pg(finger(k))%dvel_ALE(3),k=k1,k2)
+      write(unitvtk,'(8x,6(3(1x,ES12.4E3)))') (pg(finger(k))%dvel_ALE1(1),     &
+         pg(finger(k))%dvel_ALE1(2),pg(finger(k))%dvel_ALE1(3),k=k1,k2)
+   enddo
+   write(unitvtk,'(a)') '      </DataArray>'
+! dvel_ALE3
+   write(unitvtk,'(a)')                                                        &
+'      <DataArray type="Float32" Name="dvel_ALE3 vectors"  NumberOfComponents="3"  format="ascii" >'
+   do i=1,numpoints,6
+      k1 = i
+      k2 = k1 + 5
+      if (k2>numpoints) k2 = numpoints
+      write(unitvtk,'(8x,6(3(1x,ES12.4E3)))') (pg(finger(k))%dvel_ALE3(1),     &
+         pg(finger(k))%dvel_ALE3(2),pg(finger(k))%dvel_ALE3(3),k=k1,k2)
    enddo
    write(unitvtk,'(a)') '      </DataArray>'
    endif

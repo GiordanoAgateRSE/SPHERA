@@ -398,7 +398,7 @@ endif
 do i=1,PLANEDIM
    tpres(acix(i)) = tpres(acix(i)) - RG_sum(i) - ALEt_SASPH(acix(i))
 ! Contribution to the ALE velocity increment (here it is still an acceleration)
-   pg(npi)%dvel_ALE(acix(i)) = pg(npi)%dvel_ALE(acix(i)) -                     &
+   pg(npi)%dvel_ALE1(acix(i)) = pg(npi)%dvel_ALE1(acix(i)) -                   &
                                 ALEt_SASPH(acix(i))
    tdiss(acix(i)) = tdiss(acix(i)) - ViscoMon(i)
    tvisc(acix(i)) = tvisc(acix(i)) - ViscoShear(i)
