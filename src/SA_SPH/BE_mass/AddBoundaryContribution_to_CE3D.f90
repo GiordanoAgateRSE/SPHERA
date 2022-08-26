@@ -79,10 +79,7 @@ do icbf=1,Ncbf
 ! The face "iface" interacts with particle Pi
       if (LocPi(3)>zero) then
 ! Contributions of the neighbouring SASPH frontiers to the inverse of the 
-! renormalization matrix for div_u_: start
-! It is more convenient not to unify this part with the analogous computation 
-! for grad_p because it might be convenient to change the kernel function in 
-! the future, depending on the matrix.
+! renormalization matrix for div_u_ and grad_p: start
          if (input_any_t%C1_BE) then
 ! Local components explicitly depending on the unit vector of the unity vector
             do sd=1,SPACEDIM
@@ -104,10 +101,12 @@ do icbf=1,Ncbf
             do ii=1,3
                pg(npi)%B_ren_divu(ii,1:3) = pg(npi)%B_ren_divu(ii,1:3) -       &
                                             B_ren_aux_Glo(ii)
+               pg(npi)%B_ren_gradp(ii,1:3) = pg(npi)%B_ren_gradp(ii,1:3) -     &
+                                             B_ren_aux_Glo(ii)
             enddo
          endif
 ! Contributions of the neighbouring SASPH frontiers to the inverse of the 
-! renormalization matrix for div_u_: end
+! renormalization matrix for div_u_ and grad_p: end
 ! Summations of the SASPH terms for grad_u_SA, grad_v_SA and grad_w_SA: start
          aux_vec_2(1:3) = two * (BoundaryFace(iface)%velocity(1:3) -           &
                           pg(npi)%var(1:3))

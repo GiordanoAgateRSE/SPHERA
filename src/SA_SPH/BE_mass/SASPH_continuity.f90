@@ -101,9 +101,10 @@ grad_w_SA(1:3) = 0.d0
 ! 1st-order consistency scheme applies to the summation of all the 
 ! particle-boundary contributions.
 if (input_any_t%C1_BE) then
-! Inversion of the renormalization matrix (even in the absence of SASPH 
+! Inversion of the renormalization matrices (even in the absence of SASPH 
 ! neighbouring frontiers)
    call B_ren_divu_inversion(npi)
+   call B_ren_gradp_inversion(npi)
 endif
 ! SASPH term of the momentum divergence: start
 #ifdef SPACE_3D

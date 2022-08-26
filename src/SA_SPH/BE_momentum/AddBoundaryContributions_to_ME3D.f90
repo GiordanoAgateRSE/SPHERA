@@ -158,7 +158,7 @@ face_loop: do icbf=1,Ncbf
 ! Boundary contribution to the "ALE term": end
 ! Contributions of the neighbouring SASPH frontiers to the inverse of the 
 ! renormalization matrix for grad_p: start
-         if (input_any_t%C1_BE) then
+         if ((on_going_time_step==1).and.(input_any_t%C1_BE)) then
 ! Local components explicitly depending on the unit vector of the unity vector
             do SD=1,SPACEDIM
                one_Loc(SD) = 0.d0
@@ -300,7 +300,7 @@ enddo face_loop
 ! just after all its components are collected and just before the 
 ! 1st-order consistency scheme applies to the summation of all the 
 ! particle-boundary contributions.
-if (input_any_t%C1_BE) then
+if ((on_going_time_step==1).and.(input_any_t%C1_BE)) then
 ! Inversion of the renormalization matrix
    call B_ren_gradp_inversion(npi)
 endif

@@ -79,7 +79,7 @@ do icbs=1,IntNcbs
    RifBoundarySide = BoundarySide(iside)
    sidestr = RifBoundarySide%stretch
    strtype = Tratto(sidestr)%tipo
-! SASPH contributions to the renormalization matrix for div_u_: start
+! SASPH contributions to the renormalization matrix for div_u_ and grad_p: start
    if (input_any_t%C1_BE) then
 ! "IntWdV", or equivalently "J_3,w" (2D version) is always computed using the 
 ! beta-spline cubic kernel, no matter about the renormalization
@@ -99,9 +99,11 @@ do icbs=1,IntNcbs
       do ii=1,PLANEDIM
          pg(npi)%B_ren_divu(acix(ii),1:3) = pg(npi)%B_ren_divu(acix(ii),1:3) - &
                                             RG_like(ii)
+         pg(npi)%B_ren_gradp(acix(ii),1:3) = pg(npi)%B_ren_gradp(acix(ii),1:3) &
+                                            - RG_like(ii)
       enddo
    endif
-! SASPH contributions to the renormalization matrix for div_u_: end
+! SASPH contributions to the renormalization matrix for div_u_ and grad_p: end
    if (strtype=="fixe".or.strtype=="tapi".or.strtype=="velo".or.               &
       strtype=="flow".or.strtype=="sour") then 
       IntWdS = BoundaryDataTab(ibdp)%BoundaryIntegral(1)
