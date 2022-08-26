@@ -274,7 +274,8 @@ if (input_any_t%ALE3) then
 ! accelerations). ALE1 term (always used) is explicitly saved, printed and used 
 ! also for the CE only if ALE3==.true. 
    pg(npi)%dvel_ALE1(1:3) = pg(npi)%dvel_ALE1(1:3) + ALE1_term_sum(1:3)
-   pg(npi)%dvel_ALE3(1:3) = pg(npi)%dvel_ALE3(1:3) + ALE3_term_sum(1:3)
+! BC ALE3 terms for ME+CV are null
+   pg(npi)%dvel_ALE3(1:3) = ALE3_term_sum(1:3)
 endif
 pg(npi)%laminar_flag = 0
 if (pg(npi)%kin_visc>0.d0) then

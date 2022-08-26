@@ -37,7 +37,7 @@ use Dynamic_allocation_module
 implicit none
 integer(4),intent(in) :: npi
 integer(4) :: npj,contj,npartint
-double precision :: rhoi,rhoj,amassj,moddervel,appo,ALE2_CE
+double precision :: rhoi,rhoj,amassj,moddervel,appo,ALE2_CE,aux_scalar
 #ifdef SPACE_3D
 double precision :: moddia,modout
 #elif defined SPACE_2D
@@ -78,8 +78,13 @@ aux_vec_3_ALE(1:3) = 0.d0
 ! Statements
 !------------------------
 if (input_any_t%ALE3) then
-   ALE2_CE = -(pg(npi)%dens ** 2) * dot_product(pg(npi)%dvel_ALE1,             &
-             pg(npi)%dvel_ALE1) / (pg(npi)%pres * dt)
+   aux_scalar = dabs(pg(npi)%pres)
+   if (aux_scalar>1.d-18) then
+      ALE2_CE = -(pg(npi)%dens ** 2) * dot_product(pg(npi)%dvel_ALE1,          &
+                pg(npi)%dvel_ALE1) / (pg(npi)%pres * dt)
+      else
+         ALE2_CE = 0.d0
+   endif
 endif
 if ((pg(npi)%vel_type/="std").or.(pg(npi)%cella==0)) return
 dvar(:) = zero
