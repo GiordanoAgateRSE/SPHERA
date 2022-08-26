@@ -25,11 +25,10 @@
 !              a neighbouring inlet section, the particle velocity is assigned 
 !              (Di Monaco et al., 2011, EACFM).
 !              SASPH contributions to the renormalization matrix for the 2D 
-!              pressure-gradient term.
+!              pressure-gradient term (only for the first time step).
 !              Inversion of the renormalization matrix in 2D, even in the 
-!              absence of SASPH neighbours (to fasten the algorithm under 
-!              general conditions).
-!              2D SASPH contributions to the ALE velocity increment.
+!              absence of SASPH neighbours (only for the first time step).
+!              2D SASPH contributions to the ALE1 velocity increment.
 !-------------------------------------------------------------------------------
 #ifdef SPACE_2D
 subroutine AddBoundaryContributions_to_ME2D(npi,IntNcbs,tpres,tdiss,tvisc,     &

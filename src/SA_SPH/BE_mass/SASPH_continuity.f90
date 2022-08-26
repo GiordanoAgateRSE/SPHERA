@@ -21,10 +21,11 @@
 !-------------------------------------------------------------------------------
 ! Program unit: SASPH_continuity
 ! Description: SASPH boundary term for the continuity equation.
-!              Inversion of the renormalization matrix for the 3D and 2D 
-!              velocity-divergence term (also in the absence of SASPH 
-!              neighbouring frontiers).
-!              Renormalization of the SASPH term of the continuity equation.
+!              Inversion of the renormalization matrices for the 3D and 2D 
+!              velocity-divergence term and pressure-gradient term (also in the 
+!              absence of SASPH neighbouring frontiers).
+!              Renormalization of the SASPH velocity-divergence term of the 
+!              continuity equation.
 !-------------------------------------------------------------------------------
 subroutine SASPH_continuity(npi                                                &
 #ifdef SPACE_3D
@@ -96,13 +97,11 @@ grad_w_SA(1:3) = 0.d0
          call AddBoundaryContribution_to_CE2D(npi,IntNcbs,grad_u_SA,grad_w_SA)
       endif
 #endif
-! The renormalization matrix for the velocity-divergence term is inverted 
-! just after all its components are collected and just before the 
-! 1st-order consistency scheme applies to the summation of all the 
-! particle-boundary contributions.
 if (input_any_t%C1_BE) then
-! Inversion of the renormalization matrices (even in the absence of SASPH 
-! neighbouring frontiers)
+! The renormalization matrices are inverted just after all its components are 
+! collected and before the 1st-order consistency scheme applies to the 
+! summation of all the particle-boundary contributions (even in the absence of 
+! SASPH neighbouring frontiers).
    call B_ren_divu_inversion(npi)
    call B_ren_gradp_inversion(npi)
 endif

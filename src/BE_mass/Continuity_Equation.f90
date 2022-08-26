@@ -20,7 +20,7 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: Continuity_Equation
-! Description: To accumulate contributions for the continuity equation.
+! Description: Continuity Equation RHS, included explicit ALE1 and ALE2 terms.
 !              Computation of velocity gradients and the second invariant of the
 !              strain-rate tensor (with 2D renormalization).    
 !-------------------------------------------------------------------------------

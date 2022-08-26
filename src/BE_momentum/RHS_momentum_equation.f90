@@ -20,8 +20,9 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: RHS_momentum_equation
-! Description: Right Hand Side of the momentum equation and contributions to 
-!              the ALE velocity increment.
+! Description: Right Hand Side of the momentum equation merged with the 
+!              control-volume velocity equation, included contributions to 
+!              the ALE velocity increments.
 !-------------------------------------------------------------------------------
 subroutine RHS_momentum_equation
 !------------------------
@@ -125,10 +126,9 @@ do ii = 1,indarrayFlu
 #elif defined SPACE_2D
       if (((Ncbs>0).and.(IntNcbs>0)).or.                                       &
 #endif
-! The inversion of the renormalization matrix is executed within the program 
-! units "AddBoundaryContributions_to_ME3D" or "AddBoundaryContributions_to_ME2D"
-! even in the absence of SASPH neighbours to fasten the algorithm under general 
-! conditions
+! The inversion of the renormalization matrix is executed within the SASPH 
+! program units even in the absence of SASPH neighbours to fasten the algorithm 
+! under general conditions
          (input_any_t%C1_BE)) then
 #ifdef SPACE_3D
 !$omp critical (omp_Ncbf_Max)

@@ -22,8 +22,8 @@
 ! Program unit: inter_EqMoto
 ! Description: Computation of the momentum equation RHS (with DB-SPH boundary 
 !              treatment scheme, Shepard's coefficient and gravity are added at 
-!              a later stage) and the energy equation RHS (this last equation is
-!              not validated). ALE1+ALE3 contributions.
+!              a later stage) merged with the control-volume velocity equation, 
+!              included contributions to the ALE velocity increments.
 !-------------------------------------------------------------------------------
 subroutine inter_EqMoto(npi,tpres,tdiss,tvisc)
 !------------------------

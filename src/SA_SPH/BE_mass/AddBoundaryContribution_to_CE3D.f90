@@ -20,10 +20,10 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: AddBoundaryContribution_to_CE3D                                 
-! Description: Computation of the SASPH boundary term for the 3D continuity 
+! Description: Computation of the SASPH boundary terms for the 3D continuity 
 !              equation (Di Monaco et al., 2011, EACFM),
 !              SASPH contributions to the renormalization matrix for the 3D 
-!              velocity-divergence term.
+!              velocity-divergence term (only for the first step).
 !-------------------------------------------------------------------------------
 #ifdef SPACE_3D
 subroutine AddBoundaryContribution_to_CE3D(npi,Ncbf,grad_u_SA,grad_v_SA,       &

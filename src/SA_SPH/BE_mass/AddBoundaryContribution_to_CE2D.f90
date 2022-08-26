@@ -20,10 +20,10 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: AddBoundaryContribution_to_CE2D                                
-! Description: Computation of the SASPH term for the 2D continuity equation 
+! Description: Computation of the SASPH terms for the 2D continuity equation 
 !              of a generic "npi" SPH particle (Di Monaco et al., 2011, EACFM).
 !              SASPH contributions to the renormalization matrix for the 2D 
-!              velocity-divergence term.
+!              velocity-divergence term (only for the first step).
 !-------------------------------------------------------------------------------
 #ifdef SPACE_2D
 subroutine AddBoundaryContribution_to_CE2D(npi,IntNcbs,grad_u_SA,grad_w_SA)

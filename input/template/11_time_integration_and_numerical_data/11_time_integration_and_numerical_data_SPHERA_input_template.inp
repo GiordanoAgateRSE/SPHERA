@@ -95,15 +95,15 @@
 ![?] <C1_BE>: C1-consistency flag for the Balance Equations. Its value can be 
 !    effectively modified at any restart time.
 !    =.false. (0th-order consistency)
-!    =.true. (1st-order consistency. This value has not to be chosen in the 
+!    =.true. (1st-order consistency. This option has not to be chosen in the 
 !            presence of: dense granular flows; DBSPH boundaries; explicit RK 
-!            time integration schemes.)
+!            time integration schemes. This option needs ALE3==.true.)
 ![?] <C1_monitors>: C1-consistency flag for the post-processing procedures 
 !    at the monitoring elements
 !    =.false. (0th-order consistency)
 !    =.true. (1st-order consistency; no constraint: it also works in the 
 !            presence of: dense granular flows; DBSPH boundaries; explicit RK 
-!            time integration schemes)
+!            time integration schemes. This option does not need ALE3==.true.)
 !-------------------------------------------------------------------------------
 ![*] <final_time> <final_time_step>
 ![*] <CFL> <vsc_coeff> <Leapfrog_flag> <scheme_order> <factor> <dt_alfa_Mon>
