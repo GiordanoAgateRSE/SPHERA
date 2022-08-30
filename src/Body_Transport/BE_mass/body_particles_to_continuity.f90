@@ -38,6 +38,7 @@ implicit none
 integer(4) :: npi,j,npartint,npj
 double precision :: temp_dden,dis,W_vol,sum_W_vol,dx_dxbp,aux_scalar
 double precision :: dvar(3),aux_vec(3),rag_bp_f_aux(3),aux_vec_ALE1(3)
+double precision :: delta_dvel_ALE1(3)
 double precision,external :: w  
 !------------------------
 ! Explicit interfaces
@@ -66,7 +67,7 @@ end interface
 !$omp shared(KerDer_bp_f_cub_spl,rag_bp_f,pg,Domain,FSI_free_slip_conditions)  &
 !$omp shared(surf_body_part,thin_walls,proxy_normal_bp_f,input_any_t)          &
 !$omp private(npi,sum_W_vol,W_vol,j,npartint,npj,temp_dden,dis,dvar,aux_vec)   &
-!$omp private(dx_dxbp,rag_bp_f_aux,aux_vec_ALE1,aux_scalar)
+!$omp private(dx_dxbp,rag_bp_f_aux,aux_vec_ALE1,aux_scalar,delta_dvel_ALE1)
 do npi=1,n_body_part
    bp_arr(npi)%vel_mir(:) = 0.d0
    sum_W_vol = 0.d0
@@ -85,6 +86,16 @@ do npi=1,n_body_part
          else
 ! no-slip conditions
             dvar(:) = 2.d0 * aux_vec(:)
+      endif
+      if (input_any_t%ALE3) then
+         aux_vec(1:3) = bp_arr(npi)%vel(1:3) - pg(npj)%dvel_ALE1(1:3)
+         if (FSI_free_slip_conditions.eqv..true.) then
+            delta_dvel_ALE1(1:3) =                                             &
+               bp_arr(proxy_normal_bp_f(npartint))%normal(1:3) * 2.d0 *        &
+               dot_product(aux_vec,bp_arr(proxy_normal_bp_f(npartint))%normal)
+            else
+               delta_dvel_ALE1(1:3) = 2.d0 * aux_vec(1:3)
+         endif
       endif
       dis = dsqrt(dot_product(rag_bp_f(:,npartint),rag_bp_f(:,npartint)))
       W_vol = w(dis,Domain%h,Domain%coefke) * pg(npj)%mass / pg(npj)%dens
@@ -112,7 +123,7 @@ do npi=1,n_body_part
 ! Contribution to the continuity equation and to the BODY BC CE ALE1 term
          aux_vec_ALE1(1:3) = bp_arr(npi)%volume * KerDer_bp_f_cub_spl(npartint)&
                              * rag_bp_f_aux(1:3)
-         aux_scalar = pg(npj)%dens * dot_product(pg(npj)%dvel_ALE1,aux_vec_ALE1)
+         aux_scalar = -pg(npj)%dens * dot_product(delta_dvel_ALE1,aux_vec_ALE1)
          temp_dden = temp_dden + aux_scalar
          if (thin_walls) then
             aux_scalar = aux_scalar * (1.d0 + (1.d0 - pg(npj)%sigma_fp -       &
