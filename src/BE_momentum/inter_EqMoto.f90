@@ -269,7 +269,8 @@ tpres(1:3) = tpres(1:3) + t_pres_aux(1:3) + ALE1_term_sum(1:3)
 if (input_any_t%ALE3) then
 ! ALE3 term is summed to the acceleration (ALE3 term is here formally pre-added 
 ! to the grad_p term)
-   tpres(1:3) = tpres(1:3) + ALE3_term_sum(1:3)
+!!! Test
+!   tpres(1:3) = tpres(1:3) + ALE3_term_sum(1:3)
 ! Update of the ALE velocity increments (here they are expressed as 
 ! accelerations). ALE1 term (always used) is explicitly saved, printed and used 
 ! also for the CE only if ALE3==.true. 
