@@ -20,7 +20,8 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: body_particles_to_continuity
-! Description: Contributions of the body particles to the continuity equation.  
+! Description: Contributions of the body particles to the continuity equation, 
+!              included explicit BODY BC ALE1 term.  
 !-------------------------------------------------------------------------------
 #ifdef SOLID_BODIES
 subroutine body_particles_to_continuity
@@ -35,8 +36,8 @@ use Dynamic_allocation_module
 !------------------------
 implicit none
 integer(4) :: npi,j,npartint,npj
-double precision :: temp_dden,dis,W_vol,sum_W_vol,dx_dxbp
-double precision :: dvar(3),aux_vec(3),rag_bp_f_aux(3)
+double precision :: temp_dden,dis,W_vol,sum_W_vol,dx_dxbp,aux_scalar
+double precision :: dvar(3),aux_vec(3),rag_bp_f_aux(3),aux_vec_ALE1(3)
 double precision,external :: w  
 !------------------------
 ! Explicit interfaces
@@ -65,7 +66,7 @@ end interface
 !$omp shared(KerDer_bp_f_cub_spl,rag_bp_f,pg,Domain,FSI_free_slip_conditions)  &
 !$omp shared(surf_body_part,thin_walls,proxy_normal_bp_f,input_any_t)          &
 !$omp private(npi,sum_W_vol,W_vol,j,npartint,npj,temp_dden,dis,dvar,aux_vec)   &
-!$omp private(dx_dxbp,rag_bp_f_aux)
+!$omp private(dx_dxbp,rag_bp_f_aux,aux_vec_ALE1,aux_scalar)
 do npi=1,n_body_part
    bp_arr(npi)%vel_mir(:) = 0.d0
    sum_W_vol = 0.d0
@@ -106,14 +107,29 @@ do npi=1,n_body_part
       endif
       temp_dden = pg(npj)%mass / (dx_dxbp ** ncord) *                          &
                   KerDer_bp_f_cub_spl(npartint) *                              &
-                  (-dot_product(dvar,rag_bp_f_aux))
+                  dot_product(dvar,rag_bp_f_aux)
+      if (input_any_t%ALE3) then
+! Contribution to the continuity equation and to the BODY BC CE ALE1 term
+         aux_vec_ALE1(1:3) = bp_arr(npi)%volume * KerDer_bp_f_cub_spl(npartint)&
+                             * rag_bp_f_aux(1:3)
+         aux_scalar = pg(npj)%dens * dot_product(pg(npj)%dvel_ALE1,aux_vec_ALE1)
+         temp_dden = temp_dden + aux_scalar
+         if (thin_walls) then
+            aux_scalar = aux_scalar * (1.d0 + (1.d0 - pg(npj)%sigma_fp -       &
+                         pg(npj)%sigma_bp) / pg(npj)%sigma_bp)
+         endif
+!$omp critical (omp_dden_ALE12)
+         pg(npj)%dden_ALE12 = pg(npj)%dden_ALE12 + aux_scalar
+!$omp end critical (omp_dden_ALE12)
+      endif
       if (thin_walls) then
-! Treatment for thin walls (to the coupling term for the continuity equation)
+! Treatment for thin walls (to all the coupling terms for the continuity 
+! equation)
          temp_dden = temp_dden * (1.d0 + (1.d0 - pg(npj)%sigma_fp -            &
                      pg(npj)%sigma_bp) / pg(npj)%sigma_bp)
       endif
 !$omp critical (omp_body_particles_to_continuity)
-      pg(npj)%dden = pg(npj)%dden - temp_dden
+      pg(npj)%dden = pg(npj)%dden + temp_dden
 !$omp end critical (omp_body_particles_to_continuity)
    enddo
    if (sum_W_vol>1.d-18) bp_arr(npi)%vel_mir(:) = bp_arr(npi)%vel_mir(:) /     &
