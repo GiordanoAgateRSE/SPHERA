@@ -180,7 +180,7 @@ if (simulation_time>=emission_time) then
                p_in=pg(nag)%pres,rho_out=pg(nag)%dens)
 ! Mass update
             if (input_any_t%ALE3) then
-               pg(nag)%mass = pg(nag)%dens * pg(nag)%volume
+               pg(nag)%volume = pg(nag)%mass / pg(nag)%dens
             endif
          enddo
       endif 

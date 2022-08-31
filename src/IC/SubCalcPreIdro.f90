@@ -98,7 +98,7 @@ particle_loop: do npi=1,nag
       pg(npi)%dens = med(pg(npi)%imed)%den0
 ! Mass update
       if (input_any_t%ALE3) then
-         pg(npi)%mass = pg(npi)%dens * pg(npi)%volume
+         pg(npi)%volume = pg(npi)%mass / pg(npi)%dens
       endif
       cycle particle_loop
    endif   
@@ -189,7 +189,7 @@ particle_loop: do npi=1,nag
       Domain%prif,p_in=pg(npi)%pres,rho_out=pg(npi)%dens)
 ! Mass update
    if (input_any_t%ALE3) then
-      pg(npi)%mass = pg(npi)%dens * pg(npi)%volume
+      pg(npi)%volume = pg(npi)%mass / pg(npi)%dens
    endif
    pg(npi)%dden = zero
 enddo particle_loop
