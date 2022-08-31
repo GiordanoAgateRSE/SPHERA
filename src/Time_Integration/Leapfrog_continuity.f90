@@ -69,10 +69,9 @@ do ii=1,indarrayFlu
 ! Volume equation and mass update
    if (Domain%tipo=="semi") then
       if (input_any_t%ALE3) then
-!!!Test
-!         pg(npi)%volume = pg(npi)%volume + dt * ((-pg(npi)%volume / rho_old) * &
-!                          (pg(npi)%dden - pg(npi)%dden_ALE12))
-!         pg(npi)%mass = pg(npi)%dens * pg(npi)%volume
+         pg(npi)%volume = pg(npi)%volume + dt * ((-pg(npi)%volume / rho_old) * &
+                          (pg(npi)%dden - pg(npi)%dden_ALE12))
+         pg(npi)%mass = pg(npi)%dens * pg(npi)%volume
       endif
    endif
 enddo

@@ -80,10 +80,8 @@ aux_vec_3_ALE(1:3) = 0.d0
 if (input_any_t%ALE3) then
    aux_scalar = dabs(pg(npi)%pres)
    if (aux_scalar>1.d-18) then
-!!!Test
-      ALE2_CE = 0.d0
-!      ALE2_CE = -(pg(npi)%dens ** 2) * dot_product(pg(npi)%dvel_ALE1,          &
-!                pg(npi)%dvel_ALE1) / (pg(npi)%pres * dt)
+      ALE2_CE = -(pg(npi)%dens ** 2) * dot_product(pg(npi)%dvel_ALE1,          &
+                pg(npi)%dvel_ALE1) / (pg(npi)%pres * dt)
       else
          ALE2_CE = 0.d0
    endif

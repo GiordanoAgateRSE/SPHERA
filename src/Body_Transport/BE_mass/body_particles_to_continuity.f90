@@ -124,15 +124,13 @@ do npi=1,n_body_part
          aux_vec_ALE1(1:3) = bp_arr(npi)%volume * KerDer_bp_f_cub_spl(npartint)&
                              * rag_bp_f_aux(1:3)
          aux_scalar = -pg(npj)%dens * dot_product(delta_dvel_ALE1,aux_vec_ALE1)
-!!!Test
-!         temp_dden = temp_dden + aux_scalar
+         temp_dden = temp_dden + aux_scalar
          if (thin_walls) then
             aux_scalar = aux_scalar * (1.d0 + (1.d0 - pg(npj)%sigma_fp -       &
                          pg(npj)%sigma_bp) / pg(npj)%sigma_bp)
          endif
 !$omp critical (omp_dden_ALE12)
-!!!Test
-!         pg(npj)%dden_ALE12 = pg(npj)%dden_ALE12 + aux_scalar
+         pg(npj)%dden_ALE12 = pg(npj)%dden_ALE12 + aux_scalar
 !$omp end critical (omp_dden_ALE12)
       endif
       if (thin_walls) then

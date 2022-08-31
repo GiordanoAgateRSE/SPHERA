@@ -151,8 +151,7 @@ do ii=1,indarrayFlu
          Domain%prif,p_in=pg(npi)%pres,rho_out=pg(npi)%dens)
 ! Mass update
       if (input_any_t%ALE3) then
-!!!Test
-!         pg(npi)%mass = pg(npi)%dens * pg(npi)%volume
+         pg(npi)%mass = pg(npi)%dens * pg(npi)%volume
       endif
    endif
 enddo
