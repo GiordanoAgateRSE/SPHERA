@@ -71,6 +71,8 @@ integer(4) :: urz0 = 35
 ! Time-independent restart file for z0 to write
 integer(4) :: usz0 = 36
 #endif
+! Output file for the fluid global quantities
+integer(4) :: ufgl=37
 ! Killer file
 integer(4) :: unitkill = 51
 ! Elapsed time

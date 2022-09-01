@@ -53,7 +53,7 @@
 !    number
 ![?] <dt_out_mon>: writing time step for the time series of: monitoring points, 
 !    monitoring lines (but the free surface height), body dynamics, DB-SPH 
-!    elements
+!    elements, fluid global quantities
 ![?] <dt_out_FS>: writing time step for the time series of the free surface 
 !    height
 ![?] <dt_out_depth>: writing time step for 2D synthetic fields of the 

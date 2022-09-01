@@ -106,6 +106,11 @@ if (DBSPH%n_w>0) then
       call system("mv wall-Fx.txt wall_Fx.txt")
    endif
 endif
+! Fluid global quantities
+call system("touch fluid_global_quantities.txt draft_fluid_global_quantities_draft.txt")
+call system("cat fluid_global_quantities.txt *fluid_global_quantities_* > fluid-global-quantities.txt")
+call system("rm -f *fluid_global_quantities*")
+call system("mv fluid-global-quantities.txt fluid_global_quantities.txt")
 !------------------------
 ! Deallocations
 !------------------------
