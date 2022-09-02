@@ -88,14 +88,8 @@ do npi=1,n_body_part
             dvar(:) = 2.d0 * aux_vec(:)
       endif
       if (input_any_t%ALE3) then
-         aux_vec(1:3) = bp_arr(npi)%vel(1:3) - pg(npj)%dvel_ALE1(1:3)
-         if (FSI_free_slip_conditions.eqv..true.) then
-            delta_dvel_ALE1(1:3) =                                             &
-               bp_arr(proxy_normal_bp_f(npartint))%normal(1:3) * 2.d0 *        &
-               dot_product(aux_vec,bp_arr(proxy_normal_bp_f(npartint))%normal)
-            else
-               delta_dvel_ALE1(1:3) = 2.d0 * aux_vec(1:3)
-         endif
+! valid for any slip condition
+         delta_dvel_ALE1(1:3) = -2.d0 * pg(npj)%dvel_ALE1(1:3)
       endif
       dis = dsqrt(dot_product(rag_bp_f(:,npartint),rag_bp_f(:,npartint)))
       W_vol = w(dis,Domain%h,Domain%coefke) * pg(npj)%mass / pg(npj)%dens
