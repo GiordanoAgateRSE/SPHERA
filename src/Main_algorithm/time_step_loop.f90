@@ -340,7 +340,8 @@ TIME_STEP_DO: do while (it<=input_any_t%itmax)
 #endif
 !$omp private(npi)
       do npi=1,nag
-         pg(npi)%dden = zero
+         pg(npi)%dden = 0.d0
+         pg(npi)%dden_ALE12 = 0.d0
          if ((Domain%time_stage==1).or.(Domain%time_split==1)) then
             pg(npi)%koddens = 0
          endif

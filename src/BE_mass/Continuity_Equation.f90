@@ -22,7 +22,7 @@
 ! Program unit: Continuity_Equation
 ! Description: Continuity Equation RHS, included explicit ALE1 and ALE2 terms.
 !              Computation of velocity gradients and the second invariant of the
-!              strain-rate tensor (with 2D renormalization).    
+!              strain-rate tensor (with 2D renormalization).
 !-------------------------------------------------------------------------------
 subroutine Continuity_Equation(npi)
 !------------------------
@@ -37,7 +37,7 @@ use Dynamic_allocation_module
 implicit none
 integer(4),intent(in) :: npi
 integer(4) :: npj,contj,npartint
-double precision :: rhoi,rhoj,amassj,moddervel,appo,ALE2_CE,aux_scalar
+double precision :: rhoi,rhoj,amassj,moddervel,appo,ALE2_CE
 #ifdef SPACE_3D
 double precision :: moddia,modout
 #elif defined SPACE_2D
@@ -74,18 +74,10 @@ aux_vec_3(1:3) = 0.d0
 aux_vec_1_ALE(1:3) = 0.d0
 aux_vec_2_ALE(1:3) = 0.d0
 aux_vec_3_ALE(1:3) = 0.d0
+ALE2_CE = 0.d0
 !------------------------
 ! Statements
 !------------------------
-if (input_any_t%ALE3) then
-   aux_scalar = dabs(pg(npi)%pres)
-   if (aux_scalar>1.d-18) then
-      ALE2_CE = -(pg(npi)%dens ** 2) * dot_product(pg(npi)%dvel_ALE1,          &
-                pg(npi)%dvel_ALE1) / (pg(npi)%pres * dt)
-      else
-         ALE2_CE = 0.d0
-   endif
-endif
 if ((pg(npi)%vel_type/="std").or.(pg(npi)%cella==0)) return
 dvar(:) = zero
 #ifdef SPACE_2D
@@ -142,6 +134,9 @@ do contj=1,nPartIntorno(npi)
          aux_vec_3_ALE(1:3) = aux_vec_3_ALE(1:3) + (amassj / rhoj) *           &
                               PartKernel(1,npartint) * d_rho_dvelALE1(3) *     &
                               rag(1:3,npartint)
+         ALE2_CE = ALE2_CE + 2.d0 * pg(npi)%dens * (amassj / rhoj) *           &
+                   PartKernel(1,npartint) * dot_product(pg(npi)%dvel_ALE1(1:3),&
+                   rag(1:3,npartint))
       endif
       else
 ! Dense granular flows
@@ -213,11 +208,12 @@ if (Granular_flows_options%KTGF_config.ne.1) then
 ! Update of the RHS of the continuity equation
    pg(npi)%dden = pg(npi)%dden - (aux_vec_1(1) + aux_vec_2(2) + aux_vec_3(3))
    if (input_any_t%ALE3) then
-! Update the CE ALE term (null if ALE3==.false.)
-      pg(npi)%dden_ALE12 = aux_vec_1_ALE(1) + aux_vec_2_ALE(2) +               &
-                           aux_vec_3_ALE(3) + ALE2_CE
+! Update the explicit CE ALE terms
+      pg(npi)%dden_ALE12 = pg(npi)%dden_ALE12 + aux_vec_1_ALE(1) +             &
+                           aux_vec_2_ALE(2) + aux_vec_3_ALE(3) + ALE2_CE
 ! Update of the RHS of the continuity equation
-      pg(npi)%dden = pg(npi)%dden + pg(npi)%dden_ALE12
+      pg(npi)%dden = pg(npi)%dden + aux_vec_1_ALE(1) + aux_vec_2_ALE(2) +      &
+                     aux_vec_3_ALE(3) + ALE2_CE
    endif
 endif
 ! Inner terms for the RHS of the continuity equation: end
