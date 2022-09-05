@@ -93,15 +93,15 @@ do npi=1,n_body_part
       if (input_any_t%ALE3) then
 ! For the ALE2-CE term (valid for any slip condition)
          delta_dvel_ALE1(1:3) = -2.d0 * pg(npj)%dvel_ALE1(1:3)
+         if (FSI_free_slip_conditions.eqv..true.) then
 ! Correction for the velocity divergence (no-slip conditions requires no 
 ! correction)
-         aux_vec(1:3) = pg(npj)%dvel_ALE1(1:3) + pg(npj)%dvel_ALE3(1:3)
-         tau_s(1:3) = pg(npj)%vel(1:3) -                                       &
-                      bp_arr(proxy_normal_bp_f(npartint))%normal(1:3) *        &
-                      dot_product(pg(npj)%vel,                                 &
-                      bp_arr(proxy_normal_bp_f(npartint))%normal)
-         tau_s(1:3) = tau_s(1:3) / dsqrt(dot_product(tau_s,tau_s))
-         if (FSI_free_slip_conditions.eqv..true.) then
+            aux_vec(1:3) = pg(npj)%dvel_ALE1(1:3) + pg(npj)%dvel_ALE3(1:3)
+            tau_s(1:3) = pg(npj)%vel(1:3) -                                    &
+                         bp_arr(proxy_normal_bp_f(npartint))%normal(1:3) *     &
+                         dot_product(pg(npj)%vel,                              &
+                         bp_arr(proxy_normal_bp_f(npartint))%normal)
+            tau_s(1:3) = tau_s(1:3) / dsqrt(dot_product(tau_s,tau_s))
             dvar(1:3) = dvar(1:3) -2.d0 * dot_product(aux_vec,tau_s) *         &
                         tau_s(1:3)
          endif
@@ -117,6 +117,7 @@ do npi=1,n_body_part
 #elif defined SPACE_2D
       dx_dxbp = Domain%dx / (bp_arr(npi)%volume ** (1.d0/2.d0))
 #endif
+      rag_bp_f_aux(1:3) = rag_bp_f(1:3,npartint)
       if (input_any_t%ALE3) then
 ! BODY BC CE ALE2 term (it has not be renormalized)
          aux_vec_ALE2(1:3) = bp_arr(npi)%volume * KerDer_bp_f_cub_spl(npartint)&
@@ -130,8 +131,6 @@ do npi=1,n_body_part
          call MatrixProduct(pg(npj)%B_ren_divu,BB=rag_bp_f(1:3,npartint),      &
             CC=aux_vec,nr=3,nrc=3,nc=1)
          rag_bp_f_aux(1:3) = -aux_vec(1:3)
-         else
-            rag_bp_f_aux(1:3) = rag_bp_f(1:3,npartint)
       endif
 ! Body BC contribution to CE (velocity-divergence term)
       temp_dden = temp_dden + pg(npj)%mass / (dx_dxbp ** ncord) *              &
