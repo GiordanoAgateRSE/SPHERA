@@ -23,7 +23,7 @@
 ! Description: Computation of the momentum equation RHS (with DB-SPH boundary 
 !              treatment scheme, Shepard's coefficient and gravity are added at 
 !              a later stage) merged with the control-volume velocity equation, 
-!              included contributions to the ALE velocity increments.
+!              included contributions to the ALE1 velocity increment.
 !-------------------------------------------------------------------------------
 subroutine inter_EqMoto(npi,tpres,tdiss,tvisc)
 !------------------------
@@ -49,8 +49,7 @@ double precision :: absv_Morris_inner,Morris_inner_weigth,kernel_der
 double precision :: dervel(3),dervelmorr(3),appopres(3),appodiss(3),rvw(3)
 double precision :: rvwalfa(3),rvwbeta(3),ragtemp(3),rvw_sum(3),rvw_semi_part(3)
 double precision :: DBSPH_wall_she_vis_term(3),t_visc_semi_part(3),aux_vec(3)
-double precision :: t_pres_aux(3),ALE1_term_sum(3),ALE3_term_sum(3),dvel(3)
-double precision :: d_rho_dvelALE1(3)
+double precision :: t_pres_aux(3),ALE1_term_sum(3)
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -91,7 +90,6 @@ t_visc_semi_part(:) = 0.d0
 Morris_inner_weigth = 0.d0
 t_pres_aux(1:3) = 0.d0
 ALE1_term_sum(1:3) = 0.d0
-ALE3_term_sum(1:3) = 0.d0
 !------------------------
 ! Statements
 !------------------------
@@ -111,7 +109,7 @@ do contj=1,nPartIntorno(npi)
    npartint = (npi - 1) * NMAXPARTJ + contj
    npj = PartIntorno(npartint)
 ! To check if this term is needed in the previous loop 
-   if (npi==npj) cycle  
+   if (npi==npj) cycle
 ! Kernel computations only for intermediate time stages
    if (Domain%time_stage>1) then
 ! To compute inter-particle distance vector 
@@ -201,7 +199,7 @@ do contj=1,nPartIntorno(npi)
       endif
    endif
 ! Momentum equation: start
-! "grad_p + ALE1 + ALE3" terms: start
+! "grad_p + ALE1" terms: start
    if (Domain%tipo=="semi") then
       if (Granular_flows_options%KTGF_config/=1) then
 ! Liquids
@@ -214,16 +212,6 @@ do contj=1,nPartIntorno(npi)
                  (rhoi * rhoj)
          ALE1_term_sum(1:3) = ALE1_term_sum(1:3) - amassj * alpha *            &
                               rag(1:3,npartint) * PartKernel(3,npartint)
-         if (input_any_t%ALE3) then
-! Contribution to the ALE3 term in the ME-VC
-            dvel(1:3) = pg(npj)%vel(1:3) - pg(npi)%vel(1:3)
-            d_rho_dvelALE1(1:3) = pg(npj)%dens * pg(npj)%dvel_ALE1(1:3) +      &
-                                  pg(npi)%dens * pg(npi)%dvel_ALE1(1:3)
-            ALE3_term_sum(1:3) = ALE3_term_sum(1:3) + dvel(1:3) * (amassj /    &
-                                 rhoj) * PartKernel(1,npartint) *              &
-                                 dot_product(d_rho_dvelALE1(1:3),              &
-                                 rag(1:3,npartint)) / (2.d0 * rhoi)
-         endif
          else
 ! Dense granular flows
             alpha = (pi + pj) / (rhoi * rhoj)
@@ -240,7 +228,7 @@ do contj=1,nPartIntorno(npi)
          endif
    endif
    t_pres_aux(1:3) = t_pres_aux(1:3) + appopres(1:3)
-! "grad_p + ALE1 + ALE3" terms: end
+! "grad_p + ALE1" terms: end
 ! To compute Monaghan term (artificial viscosity)
    call viscomon(npi,npj,npartint,dervel,rvwalfa,rvwbeta)
    appodiss(:) = rvwalfa(:) + rvwbeta(:)
@@ -267,15 +255,9 @@ endif
 ! formally pre-added to the grad_p term)
 tpres(1:3) = tpres(1:3) + t_pres_aux(1:3) + ALE1_term_sum(1:3)
 if (input_any_t%ALE3) then
-! ALE3 term is summed to the acceleration (ALE3 term is here formally pre-added 
-! to the grad_p term)
-   tpres(1:3) = tpres(1:3) + ALE3_term_sum(1:3)
-! Update of the ALE velocity increments (here they are expressed as 
-! accelerations). ALE1 term (always used) is explicitly saved, printed and used 
+! ALE1 term (always used) is explicitly saved, printed and used 
 ! also for the CE only if ALE3==.true. 
    pg(npi)%dvel_ALE1(1:3) = pg(npi)%dvel_ALE1(1:3) + ALE1_term_sum(1:3)
-! BC ALE3 terms for ME+CV are null
-   pg(npi)%dvel_ALE3(1:3) = ALE3_term_sum(1:3)
 endif
 pg(npi)%laminar_flag = 0
 if (pg(npi)%kin_visc>0.d0) then

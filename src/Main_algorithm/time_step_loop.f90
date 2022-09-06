@@ -230,9 +230,10 @@ TIME_STEP_DO: do while (it<=input_any_t%itmax)
          call start_and_stop(3,19)
          call start_and_stop(2,6)
 #endif
-
-
-
+      if ((Domain%tipo=="semi").and.(input_any_t%ALE3).and.                    &
+         (Granular_flows_options%KTGF_config/=1)) then
+         call ALE3_term_momentum
+      endif
 ! Time integration scheme for momentum equations 
       if (Domain%time_split==0) then   
 ! Explicit RK schemes

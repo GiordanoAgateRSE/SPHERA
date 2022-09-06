@@ -22,7 +22,7 @@
 ! Program unit: RHS_momentum_equation
 ! Description: Right Hand Side of the momentum equation merged with the 
 !              control-volume velocity equation, included contributions to 
-!              the ALE velocity increments.
+!              the ALE1 velocity increment.
 !-------------------------------------------------------------------------------
 subroutine RHS_momentum_equation
 !------------------------
@@ -95,16 +95,15 @@ do ii = 1,indarrayFlu
    tpres(:) = zero
    tdiss(:) = zero
    tvisc(:) = zero
-! Initialization of the ALE velocity increments
+! Initialization of the ALE1 velocity increment
    pg(npi)%dvel_ALE1(1:3) = 0.d0
-   pg(npi)%dvel_ALE3(1:3) = 0.d0
-! SASPH boundary terms of the momentum equation: start
-! Searching for the boundary faces/sides, which are the nearest the npi-th 
-! current particle
    if ((Domain%time_stage==1).or.(Domain%time_split==1)) then 
       pg(npi)%kodvel = 0
       pg(npi)%velass = zero
    endif
+! SASPH boundary terms of the momentum equation: start
+! Searching for the boundary faces/sides, which are the nearest the npi-th 
+! current particle
    if (Domain%tipo=="semi") then
 #ifdef SPACE_3D
          Ncbf = BoundaryDataPointer(1,npi)
