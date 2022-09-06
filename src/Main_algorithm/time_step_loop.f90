@@ -230,6 +230,9 @@ TIME_STEP_DO: do while (it<=input_any_t%itmax)
          call start_and_stop(3,19)
          call start_and_stop(2,6)
 #endif
+
+
+
 ! Time integration scheme for momentum equations 
       if (Domain%time_split==0) then   
 ! Explicit RK schemes

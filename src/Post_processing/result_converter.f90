@@ -998,7 +998,7 @@ if (nag>0) then
          write(unitvtk,'(8x,16(1x,ES12.4E3))') (bp_arr(finger(k))%pres,k=k1,k2)
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
-! Mass 
+! Mass
       write(unitvtk,'(a)')                                                     &
          '      <DataArray type="Float32" Name="mass (kg)" format="ascii" >'
       do i=1,numpoints,16
@@ -1006,6 +1006,17 @@ if (nag>0) then
          k2 = k1 + 15
          if (k2>numpoints) k2 = numpoints
          write(unitvtk,'(8x,16(1x,ES12.4E3))') (bp_arr(finger(k))%mass,k=k1,k2)
+      enddo
+      write(unitvtk,'(a)') '      </DataArray>'
+! Volume
+      write(unitvtk,'(a)')                                                     &
+         '      <DataArray type="Float32" Name="volume (m3)" format="ascii" >'
+      do i=1,numpoints,16
+         k1 = i
+         k2 = k1 + 15
+         if (k2>numpoints) k2 = numpoints
+         write(unitvtk,'(8x,16(1x,ES12.4E3))') (bp_arr(finger(k))%volume,k=k1, &
+            k2)
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
 ! Area 

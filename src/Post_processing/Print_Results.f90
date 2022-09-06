@@ -63,9 +63,7 @@ double precision :: maxk_BetaGamma,minu_star,maxu_star,elapsed_time_tot_est
 double precision :: minvelo,maxvelo,laminar_flag_perc,blt_laminar_flag_perc
 integer(4),dimension(1) :: pos
 character(len=42) :: fmt100="(a,i10,a,e18.9,a,e18.9,a,i  ,a,i  ,a,i  )"
-character(len=47) :: fmt101="(a,2(1x,f11.4,1x,a,1x,i8,1x,a,3(1x,f8.2,1x,a)))"
-character(len=47) :: fmt102="(a,2(1x,f11.1,1x,a,1x,i8,1x,a,3(1x,f8.2,1x,a)))"
-character(len=47) :: fmt105="(a,2(1x,e11.4,1x,a,1x,i8,1x,a,3(1x,f8.2,1x,a)))"
+character(len=54) :: fmt101="(a,2(1x,ES11.3E3,1x,a,1x,i8,1x,a,3(1x,ES11.3E3,1x,a)))"
 character(len=12) :: stringa
 character(len=2) :: coppia
 !------------------------
@@ -411,19 +409,19 @@ if (nag>0) then
       pg(minlocvelz)%coord(3),"||",maxvelz,"|",maxlocvelz,"|",                 &
       pg(maxlocvelz)%coord(1),"|",pg(maxlocvelz)%coord(2),"|",                 &
       pg(maxlocvelz)%coord(3),"|"
-   write(ulog,fmt102)                                                          &
+   write(ulog,fmt101)                                                          &
       "Pressure p(Pa)               |",minpres,"|",minlocpres,"|",             &
       pg(minlocpres)%coord(1),"|",pg(minlocpres)%coord(2),"|",                 &
       pg(minlocpres)%coord(3),"||",maxpres,"|",maxlocpres,"|",                 &
       pg(maxlocpres)%coord(1),"|",pg(maxlocpres)%coord(2),"|",                 &
       pg(maxlocpres)%coord(3),"|"
-   write(ulog,fmt102)                                                          &
+   write(ulog,fmt101)                                                          &
       "Density rho(kg/m^3)          |",mindens,"|",minlocdens,"|",             &
       pg(minlocdens)%coord(1),"|",pg(minlocdens)%coord(2),"|",                 &
       pg(minlocdens)%coord(3),"||",maxdens,"|",maxlocdens,"|",                 &
       pg(maxlocdens)%coord(1),"|",pg(maxlocdens)%coord(2),"|",                 &
       pg(maxlocdens)%coord(3),"|"
-   write(ulog,fmt105)  "Kinem. viscosity ni(m/s^2)   |",minvisc,"|",minlocvisc,&
+   write(ulog,fmt101)  "Kinem. viscosity ni(m/s^2)   |",minvisc,"|",minlocvisc,&
       "|",pg(minlocvisc)%coord(1),"|",pg(minlocvisc)%coord(2),"|",             &
       pg(minlocvisc)%coord(3),"||",maxvisc,"|",maxlocvisc,"|",                 &
       pg(maxlocvisc)%coord(1),"|",pg(maxlocvisc)%coord(2),"|",                 &
@@ -434,7 +432,7 @@ if (nag>0) then
          pg_w(minlocvelo_w)%coord(2),"|",pg_w(minlocvelo_w)%coord(3),"||",     &
          maxvelo_w,"|",maxlocvelo_w,"|",pg_w(maxlocvelo_w)%coord(1),"|",       &
          pg_w(maxlocvelo_w)%coord(2),"|",pg_w(maxlocvelo_w)%coord(3),"|"
-      write(ulog,fmt102)  "Wall pressure p_a(Pa)       |",minpres_w,"|",       &
+      write(ulog,fmt101)  "Wall pressure p_a(Pa)       |",minpres_w,"|",       &
          minlocpres_w,"|",pg_w(minlocpres_w)%coord(1),"|",                     &
          pg_w(minlocpres_w)%coord(2),"|",pg_w(minlocpres_w)%coord(3),"||",     &
          maxpres_w,"|",maxlocpres_w,"|",pg_w(maxlocpres_w)%coord(1),"|",       &
@@ -451,7 +449,7 @@ if (nag>0) then
          bp_arr(minlocacc_bp)%pos(2),"|",bp_arr(minlocacc_bp)%pos(3),"||",     &
          maxacc_bp,"|",maxlocacc_bp,"|",bp_arr(maxlocacc_bp)%pos(1),"|",       &
          bp_arr(maxlocacc_bp)%pos(2),"|",bp_arr(maxlocacc_bp)%pos(3),"|"
-      write(ulog,fmt102)  "Body part. pressure p_s(Pa)  |",minpres_bp,"|",     &
+      write(ulog,fmt101)  "Body part. pressure p_s(Pa)  |",minpres_bp,"|",     &
          minlocpres_bp,"|",bp_arr(minlocpres_bp)%pos(1),"|",                   &
          bp_arr(minlocpres_bp)%pos(2),"|",bp_arr(minlocpres_bp)%pos(3),"||",   &
          maxpres_bp,"|",maxlocpres_bp,"|",bp_arr(maxlocpres_bp)%pos(1),"|",    &

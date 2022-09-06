@@ -42,7 +42,7 @@ integer(4) :: n_interactions,aux2,aux3,test,aux_scal_test
 #ifdef SPACE_3D
 integer(4) :: aux_int
 #endif
-double precision :: k_masses,r_per,r_par,alfa_boun,dx_dxbp,dxbp,abs_det_thresh
+double precision :: k_masses,r_per,r_par,alfa_boun,dxbp,abs_det_thresh
 double precision :: aux_impact_vel,aux4,aux_scalar,aux_scalar_2
 double precision :: friction_limiter
 #ifdef SPACE_2D
@@ -273,11 +273,6 @@ abs_det_thresh = 1.d-9
 call body_pressure_mirror
 ! Contributions to fluid dynamics momentum equations
 do npi=1,n_body_part
-#ifdef SPACE_3D
-   dx_dxbp = Domain%dx / (bp_arr(npi)%volume ** (1.d0/3.d0))
-#elif defined SPACE_2D
-   dx_dxbp = Domain%dx / (bp_arr(npi)%volume ** (1.d0/2.d0))
-#endif
    do j=1,nPartIntorno_bp_f(npi)
       npartint = (npi - 1) * NMAXPARTJ + j
       npj = PartIntorno_bp_f(npartint)
@@ -298,18 +293,18 @@ do npi=1,n_body_part
 ! grad_p (renormalization at boundaries)
          call MatrixProduct(pg(npj)%B_ren_gradp,BB=rag_bp_f(1:3,npartint),     &
             CC=aux_vec,nr=3,nrc=3,nc=1)
-         pg(npj)%acc(1:3) = pg(npj)%acc(1:3) + (pg(npj)%mass / (dx_dxbp **     &
-                            ncord) * aux_scalar * ( - aux_vec(1:3)) *          &
-                            KerDer_bp_f_Gal(npartint))
+         pg(npj)%acc(1:3) = pg(npj)%acc(1:3) + pg(npj)%dens *                  &
+                            bp_arr(npi)%volume * aux_scalar * (-aux_vec(1:3))  &
+                            * KerDer_bp_f_Gal(npartint)
          else
 ! grad_p (no renormalization at boundaries: 0th-order consistency)
-            pg(npj)%acc(1:3) = pg(npj)%acc(1:3) + ( - pg(npj)%mass /           &
-                               (dx_dxbp ** ncord) * aux_scalar *               &
+            pg(npj)%acc(1:3) = pg(npj)%acc(1:3) + (-pg(npj)%dens *             &
+                               bp_arr(npi)%volume * aux_scalar *               &
                                ( - rag_bp_f(1:3,npartint)) *                   &
                                KerDer_bp_f_Gal(npartint))
       endif
 ! ALE contribution to the acceleration
-      aux_vec(1:3) = -pg(npj)%mass / (dx_dxbp ** ncord) * aux_scalar_2 *       &
+      aux_vec(1:3) = -pg(npj)%dens * bp_arr(npi)%volume * aux_scalar_2 *       &
                      (-rag_bp_f(1:3,npartint)) * KerDer_bp_f_Gal(npartint)
       pg(npj)%acc(1:3) = pg(npj)%acc(1:3) + aux_vec(1:3)
 ! Contribution to the ALE velocity increment (here it is still an acceleration)
@@ -317,8 +312,7 @@ do npi=1,n_body_part
 ! Contribution to the "grad_p + ALE term": end
       if (FSI_free_slip_conditions.eqv..false.) then
 ! Body particle volume
-         aux_scalar = pg(npj)%mass / Med(pg(npj)%imed)%den0 / (dx_dxbp **      &
-                      ncord)
+         aux_scalar = bp_arr(npi)%volume
       if (thin_walls) then
 ! Treatment for thin walls (to the coupling term on the shear-stress gradient)
          aux_scalar = aux_scalar * (1.d0 + (1.d0 - pg(npj)%sigma_fp -          &

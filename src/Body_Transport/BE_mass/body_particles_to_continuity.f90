@@ -36,7 +36,7 @@ use Dynamic_allocation_module
 !------------------------
 implicit none
 integer(4) :: npi,j,npartint,npj
-double precision :: temp_dden,dis,W_vol,sum_W_vol,dx_dxbp,ALE1_CE_BODY
+double precision :: temp_dden,dis,W_vol,sum_W_vol,ALE1_CE_BODY
 double precision :: ALE2_CE_BODY
 double precision :: dvar(3),aux_vec(3),rag_bp_f_aux(3),aux_vec_ALE1(3),tau_s(3)
 double precision :: delta_dvel_ALE1(3),aux_vec_ALE2(3)
@@ -68,7 +68,7 @@ end interface
 !$omp shared(KerDer_bp_f_cub_spl,rag_bp_f,pg,Domain,FSI_free_slip_conditions)  &
 !$omp shared(surf_body_part,thin_walls,proxy_normal_bp_f,input_any_t)          &
 !$omp private(npi,sum_W_vol,W_vol,j,npartint,npj,temp_dden,dis,dvar,aux_vec)   &
-!$omp private(dx_dxbp,rag_bp_f_aux,aux_vec_ALE1,delta_dvel_ALE1,aux_vec_ALE2)  &
+!$omp private(rag_bp_f_aux,aux_vec_ALE1,delta_dvel_ALE1,aux_vec_ALE2)          &
 !$omp private(tau_s,ALE1_CE_BODY,ALE2_CE_BODY)
 do npi=1,n_body_part
    bp_arr(npi)%vel_mir(:) = 0.d0
@@ -112,11 +112,6 @@ do npi=1,n_body_part
                                pg(npj)%vel(:)) * W_vol
       sum_W_vol = sum_W_vol + W_vol
 ! Contributions to the continuity equation
-#ifdef SPACE_3D
-      dx_dxbp = Domain%dx / (bp_arr(npi)%volume ** (1.d0/3.d0))
-#elif defined SPACE_2D
-      dx_dxbp = Domain%dx / (bp_arr(npi)%volume ** (1.d0/2.d0))
-#endif
       rag_bp_f_aux(1:3) = rag_bp_f(1:3,npartint)
       if (input_any_t%ALE3) then
 ! BODY BC CE ALE2 term (it has not be renormalized)
@@ -133,7 +128,7 @@ do npi=1,n_body_part
          rag_bp_f_aux(1:3) = -aux_vec(1:3)
       endif
 ! Body BC contribution to CE (velocity-divergence term)
-      temp_dden = temp_dden + pg(npj)%mass / (dx_dxbp ** ncord) *              &
+      temp_dden = temp_dden + pg(npj)%dens * bp_arr(npi)%volume *              &
                   KerDer_bp_f_cub_spl(npartint) *                              &
                   dot_product(dvar,rag_bp_f_aux)
       if (input_any_t%ALE3) then
