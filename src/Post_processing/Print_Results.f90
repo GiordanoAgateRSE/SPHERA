@@ -382,9 +382,9 @@ if (nag>0) then
          elapsed_time_tot_est," hours = ",elapsed_time_tot_est/24.d0," days."
    endif
    write(ulog,'(a,a,a)')                                                       &
-      ".............................|  Min. val.  |  Min.loc.| X coord. | ",   &
-      "Y coord. | Z coord. ||  Max. val.  |  Max.loc.| X coord. | ",           &
-      "Y coord. | Z coord. |"
+      ".............................|  Min. val.  |  Min.loc.| X coord.    | ",&
+      "Y coord.    | Z coord.    ||  Max. val.  |  Max.loc.| X coord.    | ",  &
+      "Y coord.    | Z coord.    |"
    write(ulog,fmt101)                                                          &
       "Velocity abs. val. |u_|(m/s) |",minvelo,"|",minlocvelo,"|",             &
       pg(minlocvelo)%coord(1),"|",pg(minlocvelo)%coord(2),"|",                 &
