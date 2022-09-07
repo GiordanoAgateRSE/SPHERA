@@ -26,6 +26,8 @@
 !              absence of SASPH neighbouring frontiers).
 !              Renormalization of the SASPH velocity-divergence term of the 
 !              continuity equation.
+!              ALE3-LC: explicit ALE1 and ALE2 SASPH terms of CE (both C0 and 
+!              C1 consistency).
 !-------------------------------------------------------------------------------
 subroutine SASPH_continuity(npi                                                &
 #ifdef SPACE_3D
@@ -51,8 +53,11 @@ integer(4) :: Ncbf
 #elif defined SPACE_2D
 integer(4) :: Ncbs,IntNcbs
 #endif
+! Explicit SASPH ALE1 and ALE2 terms in CE
+double precision :: ALE1_CE_SA,ALE2_CE_SA
 ! SASPH terms for the gradients of the velocity components
 double precision,dimension(3) :: grad_u_SA,grad_v_SA,grad_w_SA
+double precision,dimension(3) :: grad_rhod1u_SA,grad_rhod1v_SA,grad_rhod1w_SA
 double precision,dimension(3) :: aux_vec
 !------------------------
 ! Explicit interfaces
@@ -75,6 +80,9 @@ end interface
 grad_u_SA(1:3) = 0.d0
 grad_v_SA(1:3) = 0.d0
 grad_w_SA(1:3) = 0.d0
+grad_rhod1u_SA(1:3) = 0.d0
+grad_rhod1v_SA(1:3) = 0.d0
+grad_rhod1w_SA(1:3) = 0.d0
 !------------------------
 ! Statements
 !------------------------
@@ -87,16 +95,20 @@ grad_w_SA(1:3) = 0.d0
       Ncbf_Max = max(Ncbf_Max,Ncbf)
 !$omp end critical (omp_Ncbf_Max_2)
       call AddBoundaryContribution_to_CE3D(npi,Ncbf,grad_u_SA,grad_v_SA,       &
-         grad_w_SA)
+         grad_w_SA,grad_rhod1u_SA,grad_rhod1v_SA,grad_rhod1w_SA)
    endif
 #elif defined SPACE_2D
       Ncbs = BoundaryDataPointer(1,npi)
       IntNcbs = BoundaryDataPointer(2,npi)
 ! Detecting the sides with actual contributions
       if ((Ncbs>0).and.(IntNcbs>0)) then
-         call AddBoundaryContribution_to_CE2D(npi,IntNcbs,grad_u_SA,grad_w_SA)
+         call AddBoundaryContribution_to_CE2D(npi,IntNcbs,grad_u_SA,grad_w_SA, &
+            grad_rhod1u_SA,grad_rhod1w_SA)
       endif
 #endif
+if (input_any_t%ALE3) then
+   ALE2_CE_SA = -(grad_rhod1u_SA(1) + grad_rhod1v_SA(2) + grad_rhod1w_SA(3))
+endif
 if (input_any_t%C1_BE) then
 ! The renormalization matrices are inverted just after all its components are 
 ! collected and before the 1st-order consistency scheme applies to the 
@@ -113,6 +125,7 @@ if ((Ncbs>0).and.(IntNcbs>0)) then
 #endif
    if (input_any_t%C1_BE) then
 ! 1st-order consistency for the SASPH terms
+! For the velocity-divergence SASPH term
       call MatrixProduct(pg(npi)%B_ren_divu,BB=grad_u_SA,CC=aux_vec,nr=3,      &
          nrc=3,nc=1)
       grad_u_SA(1:3) = -aux_vec(1:3)
@@ -124,12 +137,31 @@ if ((Ncbs>0).and.(IntNcbs>0)) then
       call MatrixProduct(pg(npi)%B_ren_divu,BB=grad_w_SA,CC=aux_vec,nr=3,      &
          nrc=3,nc=1)
       grad_w_SA(1:3) = -aux_vec(1:3)
+      if (input_any_t%ALE3) then
+! For the explicit ALE1 SASPH term
+         call MatrixProduct(pg(npi)%B_ren_divu,BB=grad_rhod1u_SA,CC=aux_vec,   &
+            nr=3,nrc=3,nc=1)
+         grad_rhod1u_SA(1:3) = -aux_vec(1:3)
+#ifdef SPACE_3D
+         call MatrixProduct(pg(npi)%B_ren_divu,BB=grad_rhod1v_SA,CC=aux_vec,   &
+            nr=3,nrc=3,nc=1)
+         grad_rhod1v_SA(1:3) = -aux_vec(1:3)
+#endif
+         call MatrixProduct(pg(npi)%B_ren_divu,BB=grad_rhod1w_SA,CC=aux_vec,   &
+            nr=3,nrc=3,nc=1)
+         grad_rhod1w_SA(1:3) = -aux_vec(1:3)
+      endif
    endif
 ! Adding the SASPH boundary term of the momentum divergence to the continuity 
 ! equation
    if (pg(npi)%koddens==0) then
       pg(npi)%dden = pg(npi)%dden - pg(npi)%dens * (grad_u_SA(1) + grad_v_SA(2)&
                      + grad_w_SA(3))
+      if (input_any_t%ALE3) then
+         ALE1_CE_SA = grad_rhod1u_SA(1) + grad_rhod1v_SA(2) + grad_rhod1w_SA(3)
+         pg(npi)%dden = pg(npi)%dden + ALE1_CE_SA + ALE2_CE_SA
+         pg(npi)%dden_ALE12 = pg(npi)%dden_ALE12 + ALE1_CE_SA + ALE2_CE_SA
+      endif
    endif
 endif
 ! SASPH term of the momentum divergence: end

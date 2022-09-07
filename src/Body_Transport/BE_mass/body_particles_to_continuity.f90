@@ -102,7 +102,7 @@ do npi=1,n_body_part
                          dot_product(pg(npj)%vel,                              &
                          bp_arr(proxy_normal_bp_f(npartint))%normal)
             tau_s(1:3) = tau_s(1:3) / dsqrt(dot_product(tau_s,tau_s))
-            dvar(1:3) = dvar(1:3) -2.d0 * dot_product(aux_vec,tau_s) *         &
+            dvar(1:3) = dvar(1:3) - 2.d0 * dot_product(aux_vec,tau_s) *         &
                         tau_s(1:3)
          endif
       endif

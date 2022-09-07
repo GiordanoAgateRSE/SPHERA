@@ -24,9 +24,12 @@
 !              of a generic "npi" SPH particle (Di Monaco et al., 2011, EACFM).
 !              SASPH contributions to the renormalization matrix for the 2D 
 !              velocity-divergence term (only for the first step).
+!              ALE3-LC: 2D auxiliary vectors for the explicit ALE1 SASPH term 
+!              of CE.
 !-------------------------------------------------------------------------------
 #ifdef SPACE_2D
-subroutine AddBoundaryContribution_to_CE2D(npi,IntNcbs,grad_u_SA,grad_w_SA)
+subroutine AddBoundaryContribution_to_CE2D(npi,IntNcbs,grad_u_SA,grad_w_SA,    &
+   grad_rhod1u_SA,grad_rhod1w_SA)
 !------------------------
 ! Modules
 !------------------------
@@ -41,6 +44,7 @@ use SA_SPH_module
 implicit none
 integer(4),intent(in) :: npi,IntNcbs
 double precision,dimension(3),intent(inout) :: grad_u_SA,grad_w_SA
+double precision,dimension(3),intent(inout) :: grad_rhod1u_SA,grad_rhod1w_SA
 integer(4) :: pd,icbs,iside,sidestr,ibdt,ibdp,ii,jj
 double precision :: IntWds,roi,IntWdV
 integer(4),dimension(1:PLANEDIM) :: acix
@@ -111,6 +115,7 @@ do icbs=1,IntNcbs
          nnlocal(pd) = RifBoundarySide%T(acix(pd),acix(2))
       enddo
       select case (strtype)
+! No-slip conditions always apply to the 2D SASPH CE term
          case ("fixe")
             do pd=1,PLANEDIM
                dvel(pd) = 2.d0 * (-pg(npi)%var(acix(pd)))
@@ -120,7 +125,7 @@ do icbs=1,IntNcbs
                dvel(pd) = 2.d0 * (RifBoundarySide%velocity(acix(pd)) -         &
                           pg(npi)%var(acix(pd)))
             enddo
-         case ("velo", "flow", "sour")
+         case ("velo","flow","sour")
             if ((Domain%time_stage==1).or.(Domain%time_split==1)) then 
                pg(npi)%koddens = 2
                grad_u_SA(1:3) = 0.d0
@@ -136,6 +141,17 @@ do icbs=1,IntNcbs
                                RifBoundarySide%T(acix(ii),acix(2)) * IntWdS
       enddo
 ! Summations of the SASPH terms for grad_u_SA and grad_w_SA: end
+      if (input_any_t%ALE3) then
+! Auxiliary vectors for the SASPH ALE1 explicit term in CE
+         do ii=1,PLANEDIM
+            grad_rhod1u_SA(ii) = grad_rhod1u_SA(ii) + 2.d0 * pg(npi)%dens *    &
+                                 pg(npi)%dvel_ALE1(ii) *                       &
+                                 RifBoundarySide%T(acix(ii),acix(2)) * IntWdS
+            grad_rhod1w_SA(ii) = grad_rhod1w_SA(ii) + 2.d0 * pg(npi)%dens *    &
+                                 pg(npi)%dvel_ALE1(ii) *                       &
+                                 RifBoundarySide%T(acix(ii),acix(2)) * IntWdS
+         enddo
+      endif
    endif
 enddo
 !------------------------

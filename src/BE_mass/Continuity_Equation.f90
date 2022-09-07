@@ -119,7 +119,7 @@ do contj=1,nPartIntorno(npi)
 #endif
       aux_vec_3(1:3) = aux_vec_3(1:3) + rhoi * (amassj / rhoj) *               &
                        PartKernel(1,npartint) * dvar(3) * rag(1:3,npartint)
-! Auxiliary vectors for the ALE1 term in CE
+! Auxiliary vectors for the ALE1 term in CE and update of ALE2 term
       if (input_any_t%ALE3) then
          d_rho_dvelALE1(1:3) = pg(npj)%dens * pg(npj)%dvel_ALE1(1:3) -         &
                                pg(npi)%dens * pg(npi)%dvel_ALE1(1:3)
