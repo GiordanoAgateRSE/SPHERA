@@ -36,7 +36,7 @@ use Dynamic_allocation_module
 !------------------------
 implicit none
 integer(4) :: npi,j,npartint,npj
-double precision :: temp_dden,dis,W_vol,sum_W_vol,ALE1_CE_BODY
+double precision :: temp_dden,dis,W_vol,sum_W_vol,ALE1_CE_BODY,aux_scalar
 double precision :: ALE2_CE_BODY
 double precision :: dvar(3),aux_vec(3),rag_bp_f_aux(3),aux_vec_ALE1(3),tau_s(3)
 double precision :: delta_dvel_ALE1(3),aux_vec_ALE2(3)
@@ -69,7 +69,7 @@ end interface
 !$omp shared(surf_body_part,thin_walls,proxy_normal_bp_f,input_any_t)          &
 !$omp private(npi,sum_W_vol,W_vol,j,npartint,npj,temp_dden,dis,dvar,aux_vec)   &
 !$omp private(rag_bp_f_aux,aux_vec_ALE1,delta_dvel_ALE1,aux_vec_ALE2)          &
-!$omp private(tau_s,ALE1_CE_BODY,ALE2_CE_BODY)
+!$omp private(tau_s,ALE1_CE_BODY,ALE2_CE_BODY,aux_scalar)
 do npi=1,n_body_part
    bp_arr(npi)%vel_mir(:) = 0.d0
    sum_W_vol = 0.d0
@@ -101,7 +101,21 @@ do npi=1,n_body_part
                          bp_arr(proxy_normal_bp_f(npartint))%normal(1:3) *     &
                          dot_product(pg(npj)%vel,                              &
                          bp_arr(proxy_normal_bp_f(npartint))%normal)
-            tau_s(1:3) = tau_s(1:3) / dsqrt(dot_product(tau_s,tau_s))
+            aux_scalar = dsqrt(dot_product(tau_s,tau_s))
+            if (aux_scalar>1.d-9) then
+               tau_s(1:3) = tau_s(1:3) / aux_scalar
+               else
+                  tau_s(1:3) = aux_vec(1:3) -                                  &
+                               bp_arr(proxy_normal_bp_f(npartint))%normal(1:3) &
+                               * dot_product(aux_vec,                          &
+                               bp_arr(proxy_normal_bp_f(npartint))%normal)
+                  aux_scalar = dsqrt(dot_product(tau_s,tau_s))
+                  if (aux_scalar>1.d-9) then
+                     tau_s(1:3) = tau_s(1:3) / aux_scalar
+                     else
+                        tau_s(1:3) = 0.d0
+                  endif
+            endif
             dvar(1:3) = dvar(1:3) - 2.d0 * dot_product(aux_vec,tau_s) *         &
                         tau_s(1:3)
          endif

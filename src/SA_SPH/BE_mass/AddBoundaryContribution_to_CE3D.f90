@@ -45,6 +45,7 @@ double precision,dimension(3),intent(inout) :: grad_u_SA,grad_v_SA,grad_w_SA
 double precision,dimension(3),intent(inout) :: grad_rhod1u_SA,grad_rhod1v_SA
 double precision,dimension(3),intent(inout) :: grad_rhod1w_SA
 integer(4) :: sd,sdj,icbf,iface,ibdt,ibdp,stretch,ii
+double precision :: aux_scalar
 double precision,dimension(1:SPACEDIM) :: LocPi,one_Loc,dvel
 double precision,dimension(1:SPACEDIM) :: one_vec_dir,B_ren_aux_Loc,aux_vec_3
 double precision,dimension(1:SPACEDIM) :: B_ren_aux_Glo,aux_vec,aux_vec_2,tau_s
@@ -122,7 +123,21 @@ do icbf=1,Ncbf
             aux_vec_3(1:3) = pg(npi)%dvel_ALE1(1:3) + pg(npi)%dvel_ALE3(1:3)
             tau_s(1:3) = pg(npi)%vel(1:3) - BoundaryFace(iface)%T(1:3,3) *     &
                          dot_product(pg(npi)%vel,BoundaryFace(iface)%T(1:3,3))
-            tau_s(1:3) = tau_s(1:3) / dsqrt(dot_product(tau_s,tau_s))
+            aux_scalar = dsqrt(dot_product(tau_s,tau_s))
+            if (aux_scalar>1.d-9) then
+               tau_s(1:3) = tau_s(1:3) / aux_scalar
+               else
+                  tau_s(1:3) = aux_vec_3(1:3) -                                &
+                               BoundaryFace(iface)%T(1:3,3)                    &
+                               * dot_product(aux_vec_3,                        &
+                               BoundaryFace(iface)%T(1:3,3))
+                  aux_scalar = dsqrt(dot_product(tau_s,tau_s))
+                  if (aux_scalar>1.d-9) then
+                     tau_s(1:3) = tau_s(1:3) / aux_scalar
+                     else
+                        tau_s(1:3) = 0.d0
+                  endif
+            endif
             dvel(1:3) = dvel(1:3) - 2.d0 * dot_product(aux_vec_3,tau_s) *      &
                         tau_s(1:3)
          endif
