@@ -199,7 +199,8 @@ endif
          endif
       enddo
 ! Surface detection
-      if (body_arr(ib)%surface_detection==1) then
+      if ((body_arr(ib)%surface_detection==1).or.                              &
+         (body_arr(ib)%surface_detection==3)) then
 ! Tetmesh cell. 1 face shared: internal face; 0 faces shared: surface face; 
 ! >1 face shared: error.
 ! Loop over the foolowing ".vtu" cells for point-to-point (face-to-face) 
