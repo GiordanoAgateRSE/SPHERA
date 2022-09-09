@@ -30,9 +30,9 @@ subroutine MatrixTransposition(AA,AAT,m,n)
 ! Declarations
 !------------------------
 implicit none
-integer(4),intent(IN) :: m,n
-double precision,intent(IN),dimension(m,n) :: AA
-double precision,intent(INOUT),dimension(n,m) :: AAT
+integer(4),intent(in) :: m,n
+double precision,intent(in),dimension(m,n) :: AA
+double precision,intent(inout),dimension(n,m) :: AAT
 integer(4) :: i,j
 !------------------------
 ! Explicit interfaces

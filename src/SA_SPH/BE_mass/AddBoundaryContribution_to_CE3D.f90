@@ -44,11 +44,12 @@ integer(4),intent(in)    :: npi,Ncbf
 double precision,dimension(3),intent(inout) :: grad_u_SA,grad_v_SA,grad_w_SA
 double precision,dimension(3),intent(inout) :: grad_rhod1u_SA,grad_rhod1v_SA
 double precision,dimension(3),intent(inout) :: grad_rhod1w_SA
-integer(4) :: sd,sdj,icbf,iface,ibdt,ibdp,stretch,ii
+integer(4) :: sd,sdj,icbf,iface,ibdt,ibdp,stretch,ii,test
 double precision :: aux_scalar
 double precision,dimension(1:SPACEDIM) :: LocPi,one_Loc,dvel
 double precision,dimension(1:SPACEDIM) :: one_vec_dir,B_ren_aux_Loc,aux_vec_3
 double precision,dimension(1:SPACEDIM) :: B_ren_aux_Glo,aux_vec,aux_vec_2,tau_s
+double precision,dimension(3,3) :: aux_mat,aux_mat_2
 character(4) :: boundtype
 !------------------------
 ! Explicit interfaces
@@ -61,6 +62,19 @@ interface
       double precision,intent(in),dimension(nrc,nc) :: BB
       double precision,intent(inout),dimension(nr,nc) :: CC
    end subroutine MatrixProduct
+   subroutine Matrix_Inversion_3x3(mat,inv,abs_det_thresh,test)
+      implicit none
+      double precision,intent(in) :: abs_det_thresh
+      double precision,intent(in) :: mat(3,3)
+      double precision,intent(inout) :: inv(3,3)
+      integer(4),intent(inout) :: test
+   end subroutine Matrix_Inversion_3x3
+   subroutine MatrixTransposition(AA,AAT,m,n)
+      implicit none
+      integer(4),intent(in) :: m,n
+      double precision,intent(in),dimension(m,n) :: AA
+      double precision,intent(inout),dimension(n,m) :: AAT
+   end subroutine MatrixTransposition
 end interface
 !------------------------
 ! Allocations
@@ -141,12 +155,16 @@ do icbf=1,Ncbf
             dvel(1:3) = dvel(1:3) - 2.d0 * dot_product(aux_vec_3,tau_s) *      &
                         tau_s(1:3)
          endif
-         grad_u_SA(1:3) = grad_u_SA(1:3) - dvel(1) *                           &
-                          BoundaryDataTab(ibdp)%BoundaryIntegral(4:6)
-         grad_v_SA(1:3) = grad_v_SA(1:3) - dvel(2) *                           &
-                          BoundaryDataTab(ibdp)%BoundaryIntegral(4:6)
-         grad_w_SA(1:3) = grad_w_SA(1:3) - dvel(3) *                           &
-                          BoundaryDataTab(ibdp)%BoundaryIntegral(4:6)
+         call MatrixTransposition(BoundaryFace(iface)%T,aux_mat_2,m=3,n=3)
+! This matrix inversion has no issue (direction-cosine matrix)
+         call Matrix_Inversion_3x3(aux_mat_2,aux_mat,abs_det_thresh=1.d-18,    &
+            test=test)
+         call MatrixProduct(aux_mat,                                           &
+            BB=BoundaryDataTab(ibdp)%BoundaryIntegral(4:6),CC=aux_vec,nr=3,    &
+            nrc=3,nc=1)
+         grad_u_SA(1:3) = grad_u_SA(1:3) - dvel(1) * aux_vec(1:3)
+         grad_v_SA(1:3) = grad_v_SA(1:3) - dvel(2) * aux_vec(1:3)
+         grad_w_SA(1:3) = grad_w_SA(1:3) - dvel(3) * aux_vec(1:3)
 ! Summations of the SASPH terms for grad_u_SA, grad_v_SA and grad_w_SA: end
          if (input_any_t%ALE3) then
 ! Auxiliary vectors for the SASPH ALE1 explicit term in CE
