@@ -357,7 +357,6 @@ TIME_STEP_DO: do while (it<=input_any_t%itmax)
                )
          endif
          call Continuity_Equation(npi)
-         if (pg(npi)%koddens==0) pg(npi)%dden = zero
       enddo
 !$omp end parallel do
 #ifdef SPACE_3D

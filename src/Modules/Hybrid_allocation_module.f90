@@ -179,7 +179,8 @@ type TyParticle
    integer(4) :: ind_neigh_mob_for_granmob
 ! Velocity code
    integer(4) :: kodvel
-! Density code                    
+! Density code (0: computational particles far from SASPH inlet sections; 2: 
+! computational particles with neighbouring SASPH inlet sections)                    
    integer(4) :: koddens
    integer(4) :: CloseBcOut
    integer(4) :: cella                          
