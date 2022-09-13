@@ -20,16 +20,14 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: AddBoundaryContributions_to_ME3D                                
-! Description: To compute boundary terms for 3D momentum equation (gradPsuro, 
-!              ViscoF). Equations refer to particle npi. It performs implicit 
-!              computation of "gradPsuro". In case of a neighbouring inlet 
-!              section, the particle velocity is assigned (Di Monaco et al., 
-!              2011, EACFM).
+! Description: 3D SASPH boundary terms for the momentum equation of any 
+!              computational particle (Di Monaco et al., 2011, EACFM).
 !              SASPH contributions to the renormalization matrix for the 3D 
 !              pressure-gradient term (only for the first time step).
 !              Inversion of the renormalization matrix in 3D, even in the 
 !              absence of SASPH neighbours (only for the first time step).
-!              3D SASPH contributions to the ALE1 velocity increment.
+!              3D SASPH contributions to the ALE1 velocity increment and its 
+!              associated term in the momentum equation.
 !-------------------------------------------------------------------------------
 #ifdef SPACE_3D
 subroutine AddBoundaryContributions_to_ME3D(npi,Ncbf,tpres,tdiss,tvisc,        &
@@ -59,7 +57,7 @@ double precision,dimension(1:SPACEDIM) :: ViscoMon,ViscoShear,LocPi
 double precision,dimension(1:SPACEDIM) :: u_t_0_vector,one_Loc
 ! Unit vector of the unity vector: direction of (1,1,1)
 double precision,dimension(1:SPACEDIM) :: one_vec_dir
-! Gravity in the local reference system of the SASPH boundary
+! Gravity vector in the local reference system of the SASPH boundary
 double precision,dimension(1:SPACEDIM) :: gravity_local
 double precision,dimension(1:SPACEDIM) :: B_ren_aux_Loc,B_ren_aux_Glo
 double precision,dimension(1:SPACEDIM) :: aux_vec
@@ -101,7 +99,7 @@ end interface
 ! Initializations
 !------------------------
 mati = pg(npi)%imed
-vi(:) = pg(npi)%var(:)
+vi(1:3) = pg(npi)%var(1:3)
 ALEt_SA(1:3) = 0.d0
 gradpt_SA(1:3) = 0.d0
 ViscoMon(:) = zero
