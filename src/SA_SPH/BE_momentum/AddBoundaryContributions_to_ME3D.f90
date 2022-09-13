@@ -50,21 +50,31 @@ integer(4),intent(in) :: npi,Ncbf
 double precision,intent(inout),dimension(1:SPACEDIM) :: tpres,tdiss,tvisc
 double precision,intent(inout),dimension(1:size(Partz)) :: slip_coeff_counter
 integer(4) :: sd,icbf,iface,ibdp,sdj,i,mati,stretch,ix,iy,aux_int,aux_int_2,ii
-double precision :: IntdWrm1dV,cinvisci,Monvisc,cinviscmult,pressi,dvn
+double precision :: IntdWrm1dV,cinvisci,Monvisc,cinviscmult,dvn
 double precision :: FlowRate1,Lb,L,minquotanode,maxquotanode,u_t_0
-double precision :: Qii,roi,celeri,alfaMon,Mmult,IntGWZrm1dV,slip_coefficient
+double precision :: celeri,alfaMon,Mmult,IntGWZrm1dV,slip_coefficient
 double precision :: aux_scal
 double precision,dimension(1:SPACEDIM) :: vb,vi,dvij,nnlocal 
-double precision,dimension(1:SPACEDIM) :: ViscoMon,ViscoShear,LocPi,Gpsurob_Loc
-double precision,dimension(1:SPACEDIM) :: Gpsurob_Glo,u_t_0_vector,one_Loc
+double precision,dimension(1:SPACEDIM) :: ViscoMon,ViscoShear,LocPi
+double precision,dimension(1:SPACEDIM) :: u_t_0_vector,one_Loc
 ! Unit vector of the unity vector: direction of (1,1,1)
-double precision,dimension(1:SPACEDIM) :: one_vec_dir,Grav_Loc_aux,Grav_Glo
+double precision,dimension(1:SPACEDIM) :: one_vec_dir
+! Gravity in the local reference system of the SASPH boundary
+double precision,dimension(1:SPACEDIM) :: gravity_local
 double precision,dimension(1:SPACEDIM) :: B_ren_aux_Loc,B_ren_aux_Glo
-double precision,dimension(1:SPACEDIM) :: Grav_Glo_sum,aux_vec,Grav_Loc
-! Pressure-gradient SASPH term
-double precision,dimension(1:SPACEDIM) :: gradpt_SASPH
+double precision,dimension(1:SPACEDIM) :: aux_vec
+! Pressure-gradient "grad_p" SASPH term
+double precision,dimension(1:SPACEDIM) :: gradpt_SA
+! SASPH "grad_p" interaction term (local reference system)
+double precision,dimension(1:SPACEDIM) :: gradpt_SA_0w_loc
+! SASPH "grad_p" interaction term (global reference system)
+double precision,dimension(1:SPACEDIM) :: gradpt_SA_0w
 ! ALE SASPH term
-double precision,dimension(1:SPACEDIM) :: ALEt_SASPH
+double precision,dimension(1:SPACEDIM) :: ALEt_SA
+! ALE SASPH interaction term (local reference system)
+double precision,dimension(1:SPACEDIM) :: ALEt_SA_0w_loc
+! ALE SASPH interaction term (global reference system)
+double precision,dimension(1:SPACEDIM) :: ALEt_SA_0w
 character(4) :: stretchtype
 !------------------------
 ! Explicit interfaces
@@ -91,12 +101,9 @@ end interface
 ! Initializations
 !------------------------
 mati = pg(npi)%imed
-roi = pg(npi)%dens
-pressi = pg(npi)%pres
-Qii = (pressi + pressi) / roi
 vi(:) = pg(npi)%var(:)
-ALEt_SASPH(1:3) = 0.d0
-Grav_Glo_sum(1:3) = 0.d0
+ALEt_SA(1:3) = 0.d0
+gradpt_SA(1:3) = 0.d0
 ViscoMon(:) = zero
 ViscoShear(:) = zero
 if ((Domain%time_stage==1).or.(Domain%time_split==1)) then 
@@ -129,31 +136,32 @@ face_loop: do icbf=1,Ncbf
 ! Boundary contribution to the "grad_p term": start
 ! Local components (first assessment)
          do SD=1,SPACEDIM
-            Grav_Loc_aux(SD) = zero
+            gravity_local(SD) = zero
             do sdj=1,SPACEDIM
-               Grav_Loc_aux(SD) = Grav_Loc_aux(SD) +                           &
-                                  BoundaryFace(iface)%T(sdj,SD) *              &
-                                  Domain%grav(sdj)
+               gravity_local(SD) = gravity_local(SD) +                         &
+                                   BoundaryFace(iface)%T(sdj,SD) *             &
+                                   Domain%grav(sdj)
             enddo
          enddo
 ! Local components (second assessment)
-         call MatrixProduct(BoundaryDataTab(ibdp)%IntGiWrRdV,BB=Grav_Loc_aux,  &
-            CC=Grav_Loc,nr=3,nrc=3,nc=1)
+         call MatrixProduct(BoundaryDataTab(ibdp)%IntGiWrRdV,BB=gravity_local, &
+            CC=gradpt_SA_0w_loc,nr=3,nrc=3,nc=1)
 ! Global components
-         call MatrixProduct(BoundaryFace(iface)%T,BB=Grav_Loc,CC=Grav_Glo,     &
-            nr=3,nrc=3,nc=1)
+         call MatrixProduct(BoundaryFace(iface)%T,BB=gradpt_SA_0w_loc,         &
+            CC=gradpt_SA_0w,nr=3,nrc=3,nc=1)
 ! Collecting the contributions to acceleration (added later after the possible 
 ! inversion of the renormalization matrix)
-         Grav_Glo_sum(1:3) = Grav_Glo_sum(1:3) + Grav_Glo(1:3)
+         gradpt_SA(1:3) = gradpt_SA(1:3) + gradpt_SA_0w(1:3)
 ! Boundary contribution to the "grad_p term": end
 ! Boundary contribution to the "ALE term": start
 ! Local components
-         Gpsurob_Loc(1:3) = -Qii * BoundaryDataTab(ibdp)%BoundaryIntegral(4:6)
+         ALEt_SA_0w_loc(1:3) = 2.d0 * pg(npi)%pres / pg(npi)%dens *            &
+                               BoundaryDataTab(ibdp)%BoundaryIntegral(4:6)
 ! Global components
-         call MatrixProduct(BoundaryFace(iface)%T,BB=Gpsurob_Loc,              &
-            CC=Gpsurob_Glo,nr=3,nrc=3,nc=1)
+         call MatrixProduct(BoundaryFace(iface)%T,BB=ALEt_SA_0w_loc,           &
+            CC=ALEt_SA_0w,nr=3,nrc=3,nc=1)
 ! Contribution to acceleration
-         ALEt_SASPH(1:3) = ALEt_SASPH(1:3) - Gpsurob_Glo(1:3)
+         ALEt_SA(1:3) = ALEt_SA(1:3) + ALEt_SA_0w(1:3)
 ! Boundary contribution to the "ALE term": end
 ! Contributions of the neighbouring SASPH frontiers to the inverse of the 
 ! renormalization matrix for grad_p: start
@@ -174,10 +182,9 @@ face_loop: do icbf=1,Ncbf
 ! Global components
             call MatrixProduct(BoundaryFace(iface)%T,BB=B_ren_aux_Loc,         &
                CC=B_ren_aux_Glo,nr=3,nrc=3,nc=1)
-! Contribution to the renormalization matrix (the sign change is only apparent 
-! because "Grav_Glo_sum" will be subtracted later, not added)
+! Contribution to the renormalization matrix
             do ii=1,3
-               pg(npi)%B_ren_gradp(ii,1:3) = pg(npi)%B_ren_gradp(ii,1:3) -     &
+               pg(npi)%B_ren_gradp(ii,1:3) = pg(npi)%B_ren_gradp(ii,1:3) +     &
                                              B_ren_aux_Glo(ii)
             enddo
          endif
@@ -307,21 +314,17 @@ if (Ncbf==0) return
 ! grad_p (renormalization at boundaries): start
 if (input_any_t%C1_BE) then
 ! Renormalization of the contributions to the pressure-gradient term
-   call MatrixProduct(pg(npi)%B_ren_gradp,BB=Grav_Glo_sum,CC=aux_vec,nr=3,     &
+   call MatrixProduct(pg(npi)%B_ren_gradp,BB=gradpt_SA,CC=aux_vec,nr=3,     &
       nrc=3,nc=1)
 ! Pressure gradient SASPH term: contribution to acceleration (renormalization)
-   gradpt_SASPH(1:3) = aux_vec(1:3)
-   else
-! Pressure gradient SASPH term: contribution to acceleration (no 
-! renormalization)
-      gradpt_SASPH(1:3) = -Grav_Glo_sum(1:3)
+   gradpt_SA(1:3) = -aux_vec(1:3)
 endif
 ! grad_p (renormalization at boundaries): end
 ! Adding boundary contributions to the momentum equation
 ! grad_p term and ALE term
-tpres(1:3) = tpres(1:3) + ALEt_SASPH(1:3) + gradpt_SASPH(1:3)
+tpres(1:3) = tpres(1:3) + ALEt_SA(1:3) + gradpt_SA(1:3)
 ! Contribution to the ALE velocity increment (here it is still an acceleration)
-pg(npi)%dvel_ALE1(1:3) = pg(npi)%dvel_ALE1(1:3) + ALEt_SASPH(1:3)
+pg(npi)%dvel_ALE1(1:3) = pg(npi)%dvel_ALE1(1:3) + ALEt_SA(1:3)
 ! Sub-grid term
 tdiss(1:3) = tdiss(1:3) - ViscoMon(1:3)
 ! For the sign of "ViscoShear", refer to the mathematical model
