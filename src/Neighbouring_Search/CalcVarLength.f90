@@ -828,8 +828,8 @@ endif
       do jrang = jgrid1,jgrid2
          do irang = igridi-1,igridi+1      
             do krang = kgridi-1,kgridi+1      
-               ncelj = CellNumber (irang,jrang,krang)
-               if (ncelj==0) cycle    
+               ncelj = CellNumber(irang,jrang,krang)
+               if (ncelj==0) cycle
 ! Parameters for body particle - fluid particle  interactions 
 ! (for body and fluid dynamics)
 ! Loop over the neighbouring body particles in the cell

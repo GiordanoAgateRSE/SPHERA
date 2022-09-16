@@ -76,13 +76,13 @@ write(file_name,"(a,a,i8.8,a)") nomecaso(1:len_trim(nomecaso)),&
 call open_close_file(.true.,ufgl,file_name)
 if (on_going_time_step==1) then
    write(ufgl,*) "Fluid global quantities "
-   write(ufgl,'((12x,a),(11x,a),6(2x,a),(9x,a))')                              &
+   write(ufgl,'((11x,a),(10x,a),3(1x,a),3(a),(8x,a))')                         &
       " Time(s)"," Mass(kg)"," LinMomx(kg*m*s-2)"," LinMomy(kg*m*s-2)",        &
       " LinMomz(kg*m*s-2)"," AngMomx(kg*m2*s-2)"," AngMomy(kg*m2*s-2)",        &
       " AngMomz(kg*m2*s-2)"," Volume(m3)"
 endif
 ! Output record
-write(ufgl,'(9(ES18.9E2,1x))') simulation_time,glob_mass,glob_lin_mom(1:3),    &
+write(ufgl,'(9(ES19.9E2,1x))') simulation_time,glob_mass,glob_lin_mom(1:3),    &
    glob_ang_mom(1:3),glob_vol
 call open_close_file(.false.,ufgl,file_name)
 !------------------------
