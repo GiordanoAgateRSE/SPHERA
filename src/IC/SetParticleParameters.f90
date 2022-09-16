@@ -37,6 +37,7 @@ use Memory_I_O_interface_module
 implicit none
 integer(4),intent(in) :: npi,Nz,Mate
 double precision :: tstop
+double precision,dimension(3) :: aux_vec
 integer(4), external :: ParticleCellNumber
 !------------------------
 ! Explicit interfaces
@@ -59,8 +60,11 @@ pg(nag)%dden_ALE12 = 0.d0
    pg(npi)%coord(2) = zero              
    pg(npi)%CoordOld(2) = zero
 #endif
-! Current velocity and initial velocity
-pg(npi)%vel = partz(Nz)%vel
+! Current velocity
+call Vector_Product(partz(Nz)%omega,pg(npi)%coord,aux_vec,3)
+pg(npi)%vel(1:3) = partz(Nz)%vel(1:3) + aux_vec(1:3)
+! The initial velocity "vstart" is only influential in case of non-standard 
+! motion
 pg(npi)%vstart = partz(Nz)%vel
 ! To compute time stop for particle of type "law"
 call stoptime(partz(Nz),tstop)

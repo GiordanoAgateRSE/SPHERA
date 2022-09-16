@@ -167,14 +167,17 @@ ___ ___
 ![?] if (motion_type=std) then
 ![?] <motion_type>
 !    =std (computational particles)
+![?] <angular_velocity_i>: angular velocity with respect to the origin of the 
+!    reference system
 ![?] <slip_condition>
 !    =0. (computational particles)
 !-------------------------------------------------------------------------------
 ![*] <motion_type> <IC_velocity_x> <IC_velocity_y> <IC_velocity_z> 
+!    <IC_angular_velocity_x> <IC_angular_velocity_y> <IC_angular_velocity_z>
 !    <slip_condition>
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
-std ___ ___ ___ ___
+std ___ ___ ___ ___ ___ ___ ___
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
 ![?] endif (motion_type=std)

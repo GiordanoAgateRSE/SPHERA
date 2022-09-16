@@ -74,7 +74,7 @@ do i_zone=1,NPartZone
             pg(npi)%var(:) = Partz(i_zone)%vel(:)
             if (simulation_time>=pg(npi)%tstop) then
                pg(npi)%vstart(:) = zero
-               pg(npi)%vel(:)    = zero
+               pg(npi)%vel(:) = zero
                else
                   pg(npi)%vel(:) = Partz(i_zone)%vel(:)
             endif

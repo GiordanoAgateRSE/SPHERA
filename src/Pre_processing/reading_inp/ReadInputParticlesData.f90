@@ -20,10 +20,11 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: ReadInputParticlesData                          
-! Description:                        
+! Description: Reading the particle data from the section "BOUNDARIES" of the 
+!              input files
 !-------------------------------------------------------------------------------
 subroutine ReadInputParticlesData(NumberEntities,Medium,icolor,bends,move,slip,&
-                                  npointv,valuev,values3,pressu,valp,ainp,     &
+                                  npointv,valuev,values6,pressu,valp,ainp,     &
                                   comment,nrighe,ier,ninp,ulog)
 !------------------------
 ! Modules
@@ -37,7 +38,7 @@ implicit none
 integer(4),intent(inout) :: Medium,icolor,npointv,nrighe,ier,ninp,ulog
 double precision,intent(inout) :: valp
 integer(4),dimension(20),intent(inout) :: NumberEntities
-double precision,dimension(3),intent(inout) :: values3
+double precision,dimension(6),intent(inout) :: values6
 double precision,dimension(0:3,maxpointsvlaw),intent(inout) :: valuev
 character(1),intent(inout) :: bends,slip,comment
 character(2),intent(inout) :: pressu
@@ -94,24 +95,24 @@ call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
 move = trim(GetToken(1,ainp,ioerr))
 if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"INITIAL MOVE STATUS TYPE",ninp,ulog))&
    return
-values3(:) = zero
+values6(1:6) = zero
 slip = " "                             
 npointv = 0
 select case (lcase(move))
    case ("std")
       npointv = 0
-      do n=1,3
+      do n=1,6
          token = GetToken((n+1),ainp,ioerr)
-         read(token,*,iostat=ioerr) values3(n)
-         if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"INITIAL VELOCITY",ninp,ulog)&
-            ) return
+         read(token,*,iostat=ioerr) values6(n)
+         if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                             &
+            "INITIAL VELOCITY AND ANGULAR VELOCITY",ninp,ulog)) return
       enddo
    case ("fix")
       npointv = 1
       valuev = zero
       do n=1,ncord
          token = GetToken((n+1),ainp,ioerr)
-         read(token,*,iostat=ioerr) values3(n)
+         read(token,*,iostat=ioerr) values6(n)
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"INITIAL VELOCITY",ninp,ulog &
             )) return
       enddo
@@ -153,7 +154,7 @@ select case (lcase(move))
                ninp,ulog)) return
             read(token,*,iostat=ioerr) valuev(n,i)
          enddo
-         if (i==1) values3(1:3) = valuev(1:3,1)
+         if (i==1) values6(1:3) = valuev(1:3,1)
       enddo
    case default
       if (ulog>0) write(ulog,*) "Unknown option: ",trim(ainp)

@@ -76,6 +76,7 @@ do i=1,size(Partz)
       Partz(i)%coordMM(j,1) = zero
       Partz(i)%coordMM(j,2) = zero
       Partz(i)%vel(j) = zero
+      Partz(i)%omega(j) = zero
    enddo
    do j=0,3
       do n=1,MAXPOINTSVLAW

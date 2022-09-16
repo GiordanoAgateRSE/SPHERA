@@ -44,7 +44,7 @@ integer(4),intent(in)    :: npi,Ncbf
 double precision,dimension(3),intent(inout) :: grad_u_SA,grad_v_SA,grad_w_SA
 double precision,dimension(3),intent(inout) :: grad_rhod1u_SA,grad_rhod1v_SA
 double precision,dimension(3),intent(inout) :: grad_rhod1w_SA
-integer(4) :: sd,sdj,icbf,iface,ibdt,ibdp,stretch,ii,test
+integer(4) :: sd,sdj,icbf,iface,ibdt,ibdp,stretch,ii
 double precision :: aux_scalar
 double precision,dimension(1:SPACEDIM) :: LocPi,one_Loc,dvel
 double precision,dimension(1:SPACEDIM) :: one_vec_dir,B_ren_aux_Loc,aux_vec_3

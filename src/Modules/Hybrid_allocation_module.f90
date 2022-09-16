@@ -316,7 +316,7 @@ type TyParticle
    double precision :: drho(3)
 ! Minimum distance between a SPH mixture particle and a SPH liquid particle
    double precision :: rijtempmin(3)
-! Initial velocity for fixed particles
+! Initial velocity (influential only for particles with non-standard motion)
    double precision :: vstart(3)
 ! Velocity to use for Morris scheme   
    double precision :: velmorr(3)
@@ -590,6 +590,8 @@ type TyZone
    integer(4) :: limit(2)
 ! Initial velocity
    double precision :: vel(3)
+! Initial angular velocity (with respect to the origin of the reference system)
+   double precision :: omega(3)
 ! Coordinates of the vertices
    double precision :: coordMM(3,2)
 ! Horizontal coordinates of the points (3 or 4), which describe the reservoir,

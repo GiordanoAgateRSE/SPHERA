@@ -62,7 +62,8 @@ double precision :: eps_sigma_z,H_sgr
 #ifdef SPACE_3D
 double precision :: dx_CartTopog,H_res
 #endif
-double precision,dimension(3) :: values1,values3
+double precision,dimension(3) :: values1
+double precision,dimension(6) :: values6
 double precision,dimension(0:3,maxpointsvlaw) :: valuev
 #ifdef SPACE_3D
 double precision :: plan_reservoir_pos(4,2),dam_zone_vertices(4,2)
@@ -103,7 +104,7 @@ end interface
 ! Initializations
 !------------------------
 npointv = 0
-values3 = zero
+values6 = zero
 valp = zero
 slip_coefficient_mode = 0
 BC_shear_stress_input = -9.99d9
@@ -142,7 +143,7 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
    move = "   "
    Medium = 0
    values1 = zero
-   values3 = zero
+   values6 = zero
    pool_plane = " "
    pool_value = zero
    slip_coefficient_mode = 0
@@ -223,7 +224,7 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
             "ID_first_vertex_sel,ID_last_vertex_sel",ninp,ulog)) return
 #endif
 ! Boundary condition "sour"
-      case("sour")    
+      case("sour")
          NumberEntities(3) = NumberEntities(3) + 1
          call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
          if (ioerr==0) read(ainp,*,iostat=ioerr) Medium,time_flag
@@ -336,7 +337,7 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
       case("peri")
          NumberEntities(3) = NumberEntities(3) + 1
          call ReadInputParticlesData(NumberEntities,Medium,icolor,bends,move,  &
-            slip,npointv,valuev,values3,pressu,valp,ainp,comment,nrighe,ier,   &
+            slip,npointv,valuev,values6,pressu,valp,ainp,comment,nrighe,ier,   &
             ninp,ulog)
          if (ier/=0) return
          call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
@@ -436,7 +437,7 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
             if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"POOL: PLANE VALUE",ninp, &
                ulog)) return
             call ReadInputParticlesData(NumberEntities,Medium,icolor,bends,    &
-                                        move,slip,npointv,valuev,values3,      &
+                                        move,slip,npointv,valuev,values6,      &
                                         pressu,valp,ainp,comment,nrighe,ier,   &
                                         ninp,ulog)
             if (ier/=0) return
@@ -534,8 +535,8 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
          Partz(zone_ID)%vlaw(icoordp(0:ncord,ncord-1),1:npointv) =             &
             valuev(0:ncord,1:npointv)
       endif
-      Partz(zone_ID)%vel = zero
-      Partz(zone_ID)%vel(icoordp(1:ncord,ncord-1)) = values3(1:ncord)
+      Partz(zone_ID)%vel(1:3) = values6(1:3)
+      Partz(zone_ID)%omega(1:3) = values6(4:6)
       Partz(zone_ID)%pressure = pressu
       Partz(zone_ID)%valp = valp
       Partz(zone_ID)%slip_coefficient_mode = slip_coefficient_mode
@@ -663,10 +664,13 @@ BoundaryVertex(Tratto(zone_ID)%inivertex+Tratto(zone_ID)%numvertices-1)
                            Partz(zone_ID)%vlaw(icoordp(n,ncord-1),i2),n=0,ncord)
                      enddo
                   endif
-                  do n=1,ncord
-                     icord = icoordp(n,ncord-1)
-                     write(ulog,"(1x,a,a,1pe12.4)") xyzlabel(icord),           &
-                        " velocity       : ",Partz(zone_ID)%vel(icord) 
+                  do n=1,3
+                     write(ulog,"(1x,a,a,1pe12.4)") xyzlabel(n),               &
+                        " velocity       : ",Partz(zone_ID)%vel(n)
+                  enddo
+                  do n=1,3
+                     write(ulog,"(1x,a,a,1pe12.4)") xyzlabel(n),               &
+                        " angular vel.   : ",Partz(zone_ID)%omega(n)
                   enddo
                   write(ulog,"(1x,a,2x,a)")    "Pressure Type   : ",           &
                      Partz(zone_ID)%pressure
