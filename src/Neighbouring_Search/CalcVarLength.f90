@@ -45,13 +45,16 @@ integer(4) :: nceli,igridi,kgridi,jgridi,irang,krang,jrang,ncelj,jgrid1
 integer(4) :: jgrid2,contliq,mm,npi,npj,npartint,index_rij_su_h
 integer(4) :: irestocell,celleloop,fw,i_grid,j_grid
 #ifdef SOLID_BODIES
-integer(4) :: aux2,ibp,bp_f,bp
+integer(4) :: aux2,ibp,bp_f,bp,f_sbp
 #endif
 double precision :: rij_su_h,ke_coef,kacl_coef,rij_su_h_quad,rijtemp,rijtemp2
 double precision :: gradmod,gradmodwacl,wu,denom,normal_int_abs,abs_vel
 double precision :: min_sigma_Gamma,dis_fp_dbsph_inoutlet
 double precision :: dbsph_inoutlet_threshold,normal_int_mixture_top_abs
 double precision :: normal_int_sat_top_abs
+#ifdef SOLID_BODIES
+double precision :: dis_min
+#endif
 double precision,dimension(3) :: ragtemp,r_vec,grad_W,gradWomegaj,aux_vec
 double precision,dimension(3) :: aux_vec_2,aux_vec_3
 integer(4),dimension(:),allocatable :: bounded
@@ -96,9 +99,11 @@ if ((Domain%tipo=="bsph").and.(nag>0)) then
    pg_w(:)%grad_vel_VSL_times_mu(3) = 0.d0
 endif
 #ifdef SOLID_BODIES
-   nPartIntorno_bp_f = 0
-   nPartIntorno_bp_bp = 0
-   aux2 = 0
+nPartIntorno_bp_f = 0
+nPartIntorno_bp_bp = 0
+aux2 = 0
+nPartIntorno_f_sbp(:) = 0
+closest_f_sbp(:) = 0
 #endif
 !------------------------
 ! Statements
@@ -111,11 +116,18 @@ endif
 !$omp private(dbsph_inoutlet_threshold,normal_int_mixture_top_abs)             &
 !$omp private(normal_int_sat_top_abs,r_vec,grad_W,gradWomegaj,aux_vec)         &
 !$omp private(aux_vec_2,aux_vec_3)                                             &   
+#ifdef SOLID_BODIES
+!$omp private(f_sbp,dis_min)                                                   &
+#endif
 !$omp shared(nag,pg,Domain,Med,Icont,Npartord,NMAXPARTJ,rag,nPartIntorno)      &
 !$omp shared(Partintorno,PartKernel,ke_coef,kacl_coef,Doubleh,square_doubleh)  &
 !$omp shared(squareh,nomsub,eta,eta2,ulog,uerr,ind_interfaces,DBSPH,pg_w)      &
 !$omp shared(Icont_w,Npartord_w,rag_fw,nPartIntorno_fw,Partintorno_fw)         &
 !$omp shared(kernel_fw,dShep_old,Granular_flows_options,NMedium)               &
+#ifdef SOLID_BODIES
+!$omp shared(Icont_bp,NPartOrd_bp,nPartIntorno_f_sbp,PartIntorno_f_sbp)        &
+!$omp shared(FSI_free_slip_conditions,dis_f_sbp,bp_arr,closest_f_sbp)          &
+#endif
 !$omp shared(simulation_time,input_any_t)
 loop_nag: do npi=1,nag
    if (Domain%tipo=="bsph") then
@@ -398,6 +410,44 @@ loop_nag: do npi=1,nag
                   endif
                endif
             enddo loop_mm
+#ifdef SOLID_BODIES
+            if (FSI_free_slip_conditions) then
+               dis_min = 1.d9
+! Loop over the surface body particles in the cell
+               loop_f_sbp: do f_sbp=Icont_bp(ncelj),Icont_bp(ncelj+1)-1
+                  npj = NPartOrd_bp(f_sbp)
+! Relative positions and distances
+                  ragtemp(1:3) = pg(npi)%coord(1:3) - bp_arr(npj)%pos(1:3)
+                  rijtemp = ragtemp(1) * ragtemp(1) + ragtemp(2) * ragtemp(2) +&
+                            ragtemp(3) * ragtemp(3)
+! Distance check
+                  if (rijtemp>square_doubleh) cycle
+                  if (bp_arr(npj)%surface) then
+! The neigbouring body particle is a surface body particle
+! For very large values of dx/dx_s, all the surface body particles are 
+! considered for the closest surface body particle (default choice for the 
+! proxy normal), but not all of them are involved in the accurate computation 
+! of the proxy normal.
+                     rijtemp = dsqrt(rijtemp)
+                     if (nPartIntorno_f_sbp(npi)<NMAXPARTJ) then
+! Neighbour-counter increase
+                        nPartIntorno_f_sbp(npi) = nPartIntorno_f_sbp(npi) + 1
+! Saving the neighbour ID
+                        npartint = (npi - 1) * NMAXPARTJ +                     &
+                                   nPartIntorno_f_sbp(npi)
+                        PartIntorno_f_sbp(npartint) = npj
+! Saving the inter-particle distance
+                        dis_f_sbp(npartint) = rijtemp
+                     endif
+! Updating the ID of the closest surface body particle
+                     if (rijtemp<dis_min) then
+                        dis_min = rijtemp
+                        closest_f_sbp(npi) = npj
+                     endif
+                  endif
+               enddo loop_f_sbp
+            endif
+#endif
 ! Loop over the neighbouring wall particles in the cell
             if ((Domain%tipo=="bsph").and.(DBSPH%n_w>0)) then
                loop_fw: do fw=Icont_w(ncelj),Icont_w(ncelj+1)-1
@@ -478,9 +528,9 @@ loop_nag: do npi=1,nag
                      call DBSPH_velocity_gradients_VSL_SNBL(npi,npj,npartint)
                enddo loop_fw
             endif
-         enddo loop_krang      
-      enddo loop_irang       
-   enddo loop_jrang   
+         enddo loop_krang
+      enddo loop_irang
+   enddo loop_jrang
    if (Granular_flows_options%KTGF_config>0) then
 ! Free surface detection along the grid column
       if (index(Med(pg(npi)%imed)%tipo,"liquid")>0) then

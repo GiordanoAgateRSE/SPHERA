@@ -300,6 +300,23 @@ endif
          write(ulog,'(1x,a)') "   Array impact_vel successfully allocated "
    endif
    impact_vel(:,:) = 0.d0
+   if (FSI_free_slip_conditions) then
+      array_name = "nPartIntorno_f_sbp"
+      call allocate_de_int4_r1(.true.,nPartIntorno_f_sbp,PARTICLEBUFFER,       &
+         array_name,ulog_flag=.true.)
+      array_name = "PartIntorno_f_sbp"
+      call allocate_de_int4_r1(.true.,PartIntorno_f_sbp,                       &
+         extent_1=NMAXPARTJ*PARTICLEBUFFER,array_name=array_name,              &
+         ulog_flag=.true.)
+      array_name = "dis_f_sbp"
+      call allocate_de_dp_r1(.true.,dis_f_sbp,                                 &
+         extent_1=NMAXPARTJ*PARTICLEBUFFER,array_name=array_name,              &
+         ulog_flag=.true.)
+      array_name = "closest_f_sbp"
+      call allocate_de_int4_r1(.true.,closest_f_sbp,                           &
+         extent_1=NMAXPARTJ*PARTICLEBUFFER,array_name=array_name,              &
+         ulog_flag=.true.)
+   endif
 #endif
 write(ulog,'(1x,a)') "..."
 write(ulog,'(a,i15)') " Max number of particles  : PARTICLEBUFFER = ",         &
@@ -354,6 +371,16 @@ endif
       size(PartIntorno_bp_bp)
    write(ulog,*) " Size # of elements in array rag_bp_bp           : ",        &
       size(rag_bp_bp)
+   if (FSI_free_slip_conditions) then
+      write(ulog,*) " Size # of elements in array nPartIntorno_f_sbp  : ",     &
+         size(nPartIntorno_f_sbp)
+      write(ulog,*) " Size # of elements in array PartIntorno_f_sbp   : ",     &
+         size(PartIntorno_f_sbp)
+      write(ulog,*) " Size # of elements in array dis_f_sbp           : ",     &
+         size(dis_f_sbp)
+      write(ulog,*) " Size # of elements in array closest_f_sbp       : ",     &
+         size(closest_f_sbp)
+   endif
 #endif
 write(ulog,'(1x,a)') "..."
 write(ulog,*) " Size in bytes of array pg                       : ",sizeof(pg)
@@ -405,6 +432,16 @@ endif
       sizeof(PartIntorno_bp_bp)
    write(ulog,*) " Size in bytes of array rag_bp_bp                : ",        &
       sizeof(rag_bp_bp)
+   if (FSI_free_slip_conditions) then
+      write(ulog,*) " Size in bytes of array nPartIntorno_f_sbp       : ",     &
+         sizeof(nPartIntorno_f_sbp)
+      write(ulog,*) " Size in bytes of array PartIntorno_f_sbp        : ",     &
+         sizeof(PartIntorno_f_sbp)
+      write(ulog,*) " Size in bytes of array dis_f_sbp                : ",     &
+         sizeof(dis_f_sbp)
+      write(ulog,*) " Size in bytes of array closest_f_sbp            : ",     &
+         sizeof(closest_f_sbp)
+   endif
 #endif
 write(ulog,'(1x,a)') "..."
 write(ulog,'(1x,a)') " "

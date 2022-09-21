@@ -89,13 +89,13 @@ integer(4),dimension(:),allocatable :: PartIntorno
 double precision,dimension(:,:),allocatable :: PartKernel
 ! rag(3,NMAXPARTJ*PARTICLEBUFFER): 3D vector list of -r_0b=x_0-x_b,
 ! r_0b (vector distance between the computational particle and the neighbour)
-double precision,dimension(:,:),allocatable :: rag  
+double precision,dimension(:,:),allocatable :: rag
 ! nPartIntorno_fw(PARTICLEBUFFER): array of the number of the neighbouring 
 ! wall particles
 integer(4),dimension(:),allocatable :: nPartIntorno_fw
 ! PartIntorno_fw(NMAXPARTJ*PARTICLEBUFFER): array of the indices of the 
 ! neighbouring wall particles 
-integer(4),dimension(:),allocatable :: PartIntorno_fw   
+integer(4),dimension(:),allocatable :: PartIntorno_fw
 ! Kernel parameter neighbouring array: kernel_fw(2,NMAXPARTJ*PARTICLEBUFFER),
 ! (wall neighbours; DBSPH)
 !    kernel_fw(1,i): W_0a: absolute value of the kernel cubic spline (DBSPH)
@@ -145,6 +145,18 @@ integer(4),dimension(:),allocatable :: nPartIntorno_bp_bp
 ! PartIntorno_bp_bp(n_surf_body_part*NMAXPARTJ): array of the indices of the 
 ! neighbouring body particles (of another body) 
 integer(4),dimension(:),allocatable :: PartIntorno_bp_bp
+! nPartIntorno_f_sbp(PARTICLEBUFFER): array of the number of the neighbouring 
+! surface body particles
+integer(4),dimension(:),allocatable :: nPartIntorno_f_sbp
+! PartIntorno_f_sbp(NMAXPARTJ*PARTICLEBUFFER): array of the indices of the 
+! neighbouring surface body particles
+integer(4),dimension(:),allocatable :: PartIntorno_f_sbp
+! dis_fb_sb(NMAXPARTJ*PARTICLEBUFFER): array of the distances between the 
+! fluid particles and the neighbouring surface body particles
+double precision,dimension(:),allocatable :: dis_f_sbp
+! closest_f_sbp(NMAXPARTJ*PARTICLEBUFFER): array of the IDs of the closest 
+! surface body particles
+integer(4),dimension(:),allocatable :: closest_f_sbp
 #endif
 #ifdef SPACE_3D   
 ! n_neigh_hcell_CLCpol(n_hcells): array of the number of the neighbouring 

@@ -37,9 +37,8 @@ use I_O_file_module
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: npi,jj,npartint,npj,kk
-double precision :: aux_scal,dis,dis_min,dis_fb_sb,dis_s0_sb
-double precision :: dis_fb_s0
+integer(4) :: npi,jj,npartint,npj,kk,npartint_2,npk
+double precision :: aux_scal,dis,dis_min,dis_s0_sb,dis_fb_s0
 double precision :: aux_vec(3)
 !------------------------
 ! Explicit interfaces
@@ -56,92 +55,87 @@ double precision :: aux_vec(3)
 ! Loop over the body particles
 !$omp parallel do default(none)                                                &
 !$omp shared(n_body_part,bp_arr,nPartIntorno_bp_f,NMAXPARTJ,PartIntorno_bp_f)  &
-!$omp shared(rag_bp_f,pg,Domain,surf_body_part,proxy_normal_bp_f,ulog)         &
-!$omp shared(on_going_time_step,n_surf_body_part)                              &
+!$omp shared(rag_bp_f,pg,Domain,proxy_normal_bp_f,ulog,uerr,closest_f_sbp)     &
+!$omp shared(on_going_time_step,dis_f_sbp,nPartIntorno_f_sbp,PartIntorno_f_sbp)&
 !$omp private(npi,jj,npartint,npj,kk,aux_scal,dis,dis_min)                     &
-!$omp private(aux_vec,dis_s0_sb,dis_fb_s0,dis_fb_sb)
+!$omp private(aux_vec,dis_s0_sb,dis_fb_s0,npartint_2,npk)
 do npi=1,n_body_part
-! Loop over fluid particles 
+! Loop over the neighbouring fluid particles 
    do jj=1,nPartIntorno_bp_f(npi)
       npartint = (npi - 1) * NMAXPARTJ + jj
       npj = PartIntorno_bp_f(npartint)
-      dis_min = 1.d9
       proxy_normal_bp_f(npartint) = 0
-! Here the array PartIntorno_bp_bp cannot be used as it only refers to 
-! neighbouring body particles of other bodies
-! Here the array PartIntorno_bp_f cannot be used as usually as it refers to the 
-! fluid neighbours of a body particles, not to the solid neighbours of a fluid 
-! particle.
-      do kk=1,n_body_part
-         aux_vec(1:3) = bp_arr(kk)%pos(1:3) - pg(npj)%coord(1:3) 
-         dis_fb_sb = dsqrt(dot_product(aux_vec,aux_vec))
-         if (dis_fb_sb<=2.d0*Domain%h) then
-! The candidate solid particle "kk" (or "sb") has a non-null normal and lies 
-! within the kernel support of the fluid particle "npj" (or "fb")
-            if (bp_arr(kk)%body==bp_arr(npi)%body) then
-! The proxy normal cannot belong to another body to be suitable for the 
+      dis_min = 1.d9
+! Check if the normal of the interacting body particle is suitable: start
+      aux_scal = dot_product(rag_bp_f(:,npartint),bp_arr(npi)%normal)
+! Visibility criterion and check on non-null normal
+      if (aux_scal>1.d-12) then
+! The computational body particle is a surface body particle with a normal 
+! suitable for this interaction
+         proxy_normal_bp_f(npartint) = npi
+! Check if the normal of the interacting body particle is suitable: end
+         else
+! Search for a proxy normal from a representative surface body particle
+            dis_fb_s0 = dsqrt(dot_product(rag_bp_f(:,npartint),                &
+                        rag_bp_f(:,npartint)))
+! Loop over the neighbouring surface body particles.
+! Here the array "PartIntorno_bp_bp" cannot be used as elsewhere as it only 
+! refers to neighbouring body particles of other bodies
+! Here the array "PartIntorno_bp_f" cannot be used as elsewhere as it refers to 
+! the fluid neighbours of a body particles, not to the solid neighbours of a 
+! fluid particle.
+            do kk=1,nPartIntorno_f_sbp(npj)
+               npartint_2 = (npj - 1) * NMAXPARTJ + kk
+               npk = PartIntorno_f_sbp(npartint_2)
+! The candidate solid particle "npk" (or "sb") lies 
+! within the kernel support of the fluid particle "npj" (or "fb").
+! Herefater an explicit exclusion of the interacting body particle would slow 
+! down the algorithm; it is better to execute few lines just once without 
+! effects.
+               if (bp_arr(npk)%body==bp_arr(npi)%body) then
+! The proxy normal does not belong to another body to be suitable for the 
 ! visibility criterion
-               aux_scal=dot_product(rag_bp_f(:,npartint),bp_arr(kk)%normal)
-               if (aux_scal>1.d-12) then
-! The fluid particle "npj" and the solid particle "kk" can "see" each other
-                  if (npi==kk) then
-! The computational body particle has a normal suitable for this interaction: 
-! the visibility check was already passed.
-                     proxy_normal_bp_f(npartint) = kk
-                     exit
-                     else
-! Otherwise a proxy normal is needed
-                        aux_vec(1:3) = bp_arr(npi)%pos(1:3) -                  &
-                                       bp_arr(kk)%pos(1:3)
-                        dis_s0_sb = dsqrt(dot_product(aux_vec,aux_vec))
-                        aux_vec(1:3) = bp_arr(npi)%pos(1:3) -                  &
-                                       pg(npj)%coord(1:3) 
-                        dis_fb_s0 = dsqrt(dot_product(aux_vec,aux_vec))
-                        if ((dis_s0_sb<=dis_fb_s0).and.                        &
-                           (dis_fb_sb<=dis_fb_s0)) then
-! The candidate solid particle "kk" (or "sb") lies "between" the fluid particle 
-! "npj" (or "fb") and the solid particle "npi" (or "s0"). The candidate lies 
-! within the intersection of two equal spheres of radius dis_fb_s0 and centres 
-! x_fb and x_s0.
-                           call distance_point_line_3D(bp_arr(kk)%pos,         &
-                              bp_arr(npi)%pos,pg(npj)%coord,dis)
-                           if (dis<dis_min) then
-                              dis_min = dis
-                              proxy_normal_bp_f(npartint) = kk
-                           endif
+                  aux_scal = dot_product(rag_bp_f(:,npartint),                 &
+                             bp_arr(npk)%normal)
+                  if (aux_scal>1.d-12) then
+! The fluid particle "npj" and the solid particle "npk" can "see" each other
+                     aux_vec(1:3) = bp_arr(npi)%pos(1:3) - bp_arr(npk)%pos(1:3)
+                     dis_s0_sb = dsqrt(dot_product(aux_vec,aux_vec))
+                     if ((dis_s0_sb<=dis_fb_s0).and.                           &
+                        (dis_f_sbp(npartint_2)<=dis_fb_s0)) then
+! The candidate solid particle "npk" (or "sb") lies "between" 
+! the fluid particle "npj" (or "fb") and the solid particle "npi" (or "s0"): 
+! the candidate lies within the intersection of two equal spheres of radius 
+! "dis_fb_s0" and centres "x_fb" and "x_s0".
+                        call distance_point_line_3D(bp_arr(npk)%pos,           &
+                           bp_arr(npi)%pos,pg(npj)%coord,dis)
+                        if (dis<dis_min) then
+                           dis_min = dis
+                           proxy_normal_bp_f(npartint) = npk
                         endif
+                     endif
                   endif
                endif
+            enddo
+            if (proxy_normal_bp_f(npartint)==0) then
+! In case the normal is not yet defined, this means that there is a fluid-solid 
+! mass penetration or some normals are wrongly defined or dx/dx_s is very large 
+! so that not all the surface body particles have been considered above. Under 
+! these cimrcumstances, the normal vector is taken from the neighbouring 
+! surface body particle, which is the closest to the computational body 
+! particle (default choice).
+               if (closest_f_sbp(npj)>0) then
+                  proxy_normal_bp_f(npartint) = closest_f_sbp(npj)
+                  else
+! In case the normal is not yet defined, this means that there is a fluid-solid 
+! mass penetration or some normals are wrongly defined, so that a fluid 
+! particle migh have neighbouring body particles, but not neighbouing surface 
+! body particles. Under these cimrcumstances, the normal vector is zeroed 
+! (secondary default choice) by considering the computational body particle, 
+! which here is not on the surface of its body.
+                     proxy_normal_bp_f(npartint) = npi
+               endif
             endif
-         endif
-      enddo
-      if (proxy_normal_bp_f(npartint)==0) then
-! In case the normal is not yet defined, there is a fluid-solid mass 
-! penetration or some normals are wrongly defined. Under these cimrcumstances, 
-! the normal vector is taken from the neighbouring surface body 
-! particle, which is the closest to the neighbouring fluid particle.
-         write(ulog,'(3a)') 'The search for the fluid-body interaction ',      &
-            'normals detects a fluid-solid mass penetration or some normals ', &
-            'were wrongly calculated by the input mesh (in case of ',          &
-            'no-slip conditions there is no detection).'
-         write(ulog,'(a,i10,a,i10,a,i10,a,i10,a)')                             &
-            'Computational body particle: ',npi,                               &
-            ' . Neighbouring fluid particle: ',npj,                            &
-            ' . Current time step: ',on_going_time_step,' .'
-! Here the array PartIntorno_bp_bp cannot be used as it only refers to 
-! neighbouring body particles of other bodies
-! Here the array PartIntorno_bp_f cannot be used as it refers to the 
-! fluid neighbours of a body particles, not to the solid neighbours of a fluid 
-! particle.
-         do kk=1,n_surf_body_part
-            aux_vec(1:3) = bp_arr(surf_body_part(kk))%pos(1:3) -               &
-                           pg(npj)%coord(1:3) 
-            dis = dsqrt(dot_product(aux_vec,aux_vec))
-            if (dis<dis_min) then
-               dis_min = dis
-               proxy_normal_bp_f(npartint) = kk
-            endif
-         enddo
       endif
    enddo
 enddo

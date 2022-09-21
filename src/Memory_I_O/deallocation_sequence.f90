@@ -202,6 +202,20 @@ call allocate_de_dp_r2(.false.,rag_bp_bp,array_name=array_name,ulog_flag=.true.)
 array_name = "impact_vel"
 call allocate_de_dp_r2(.false.,impact_vel,array_name=array_name,               &
    ulog_flag=.true.)
+if (FSI_free_slip_conditions) then
+   array_name = "nPartIntorno_f_sbp"
+   call allocate_de_int4_r1(.false.,nPartIntorno_f_sbp,array_name=array_name,  &
+      ulog_flag=.true.)
+   array_name = "PartIntorno_f_sbp"
+   call allocate_de_int4_r1(.false.,PartIntorno_f_sbp,array_name=array_name,   &
+      ulog_flag=.true.)
+   array_name = "dis_f_sbp"
+   call allocate_de_dp_r1(.false.,dis_f_sbp,array_name=array_name,             &
+      ulog_flag=.true.)
+   array_name = "closest_f_sbp"
+   call allocate_de_int4_r1(.false.,closest_f_sbp,array_name=array_name,       &
+      ulog_flag=.true.)
+endif
 #endif
 #ifdef SPACE_3D
 array_name = "BoundaryConvexEdge"
