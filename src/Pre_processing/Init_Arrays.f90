@@ -84,6 +84,7 @@ do i=1,size(Partz)
       enddo
    enddo
    Partz(i)%valp = zero
+   Partz(i)%valp2 = zero
    Partz(i)%BC_shear_stress_input = zero
    Partz(i)%slip_Coefficient_mode = 0
    Partz(i)%avg_comp_slip_coeff = 0.d0

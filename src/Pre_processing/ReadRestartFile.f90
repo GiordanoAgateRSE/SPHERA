@@ -221,6 +221,7 @@ Partz(i_zone)%plan_reservoir_points,Partz(i_zone)%ID_first_vertex_sel,         &
             Partz(i_zone)%BC_shear_stress_input,                               &
             Partz(i_zone)%avg_comp_slip_coeff,Partz(i_zone)%avg_ni_T_SASPH,    &
             Partz(i_zone)%avg_tau_wall_f,Partz(i_zone)%pool,Partz(i_zone)%valp,&
+            Partz(i_zone)%valp2,                                               &
             Partz(i_zone)%limit(1:2),Partz(i_zone)%vel(1:3),                   &
             Partz(i_zone)%coordMM(1:3,1:2),                                    &
             Partz(i_zone)%plan_reservoir_pos(1:4,1:2)

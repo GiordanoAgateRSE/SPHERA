@@ -212,16 +212,23 @@ ___ ___ ___ ___ ___
 !    =qp (hydrostatic conditions with equivalent free surface level as input)
 !    =pl (hydrostatic conditions with equivalent free surface level equal to 
 !         the particle maximum height of a subset of boundaries)
-![?] <IC_pressure_value>: uniform pressure value (IC_pressure_type=pa), 
+!    =pr (IC pressure going with the square of the distance rh from z-axis; 
+!         e.g., solid rotation)
+![?] <IC_pressure_value_1>: uniform pressure value (IC_pressure_type=pa), 
 !    equivalent free surface level (IC_pressure_type=qp; it is influential only 
 !    if there is no other medium along the vertical above the current medium), 
 !    ID indicating a subset of boundaries (IC_pressure_type=pl; only one subset 
-!    is allowed; real input datum then treated as an integer)
+!    is allowed; real input datum then treated as an integer), first constant 
+!    for "pr" (pressure along the z-axis)
+![?] <IC_pressure_value_2>: second constant for "pr" (coefficient of "rh^2"; 
+!    e.g., in case of solid rotation it is "0.5*density*omega_z**2", where 
+!    omega_z is the z-component of the angular velocity), non-influential value 
+!    for the other options
 !-------------------------------------------------------------------------------
-![*] <IC_pressure_type> <IC_pressure_value>
+![*] <IC_pressure_type> <IC_pressure_value_1> <IC_pressure_value_2>
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
-___ ___
+___ ___ ___
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
 ![?] <IC_source_type>

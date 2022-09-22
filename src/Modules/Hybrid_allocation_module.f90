@@ -584,8 +584,10 @@ type TyZone
 ! Average shear stress computed according to the wall function at SASPH walls
    double precision :: avg_tau_wall_f
    double precision :: pool
-! IC for pressure or free surface height 
+! First IC value for pressure (ref. input template)
    double precision :: valp
+! Second IC value for pressure (ref. input template)
+   double precision :: valp2
 ! Indices of the first and last particle IDs in the zone
    integer(4) :: limit(2)
 ! Initial velocity

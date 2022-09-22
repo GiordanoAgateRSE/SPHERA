@@ -58,7 +58,7 @@ integer(4) :: ID_first_vertex_sel,ID_last_vertex_sel
 integer(4) :: i2,i1
 #endif
 double precision :: pool_value,velocity,valp,flowrate,BC_shear_stress_input
-double precision :: eps_sigma_z,H_sgr
+double precision :: eps_sigma_z,H_sgr,valp2
 #ifdef SPACE_3D
 double precision :: dx_CartTopog,H_res
 #endif
@@ -105,7 +105,8 @@ end interface
 !------------------------
 npointv = 0
 values6 = zero
-valp = zero
+valp = 0.d0
+valp2 = 0.d0
 slip_coefficient_mode = 0
 BC_shear_stress_input = -9.99d9
 time_flag = .false.
@@ -150,7 +151,8 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
    velocity = zero
    flowrate = zero
    pressu = "  "
-   valp = zero
+   valp = 0.d0
+   valp2 = 0.d0
    IC_source_type = 0
    Car_top_zone = 0
    DBSPH_fictitious_reservoir_flag = .false.
@@ -337,8 +339,8 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
       case("peri")
          NumberEntities(3) = NumberEntities(3) + 1
          call ReadInputParticlesData(NumberEntities,Medium,icolor,bends,move,  &
-            slip,npointv,valuev,values6,pressu,valp,ainp,comment,nrighe,ier,   &
-            ninp,ulog)
+            slip,npointv,valuev,values6,pressu,valp,valp2,ainp,comment,nrighe, &
+            ier,ninp,ulog)
          if (ier/=0) return
          call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
          if (ioerr==0) read(ainp,*,iostat=ioerr) IC_source_type,Car_top_zone,  &
@@ -438,8 +440,8 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
                ulog)) return
             call ReadInputParticlesData(NumberEntities,Medium,icolor,bends,    &
                                         move,slip,npointv,valuev,values6,      &
-                                        pressu,valp,ainp,comment,nrighe,ier,   &
-                                        ninp,ulog)
+                                        pressu,valp,valp2,ainp,comment,nrighe, &
+                                        ier,ninp,ulog)
             if (ier/=0) return
 ! Boundary condition "zmax"
       case("zmax")
@@ -539,6 +541,7 @@ do while (trim(lcase(ainp))/="##### end boundaries #####")
       Partz(zone_ID)%omega(1:3) = values6(4:6)
       Partz(zone_ID)%pressure = pressu
       Partz(zone_ID)%valp = valp
+      Partz(zone_ID)%valp2 = valp2
       Partz(zone_ID)%slip_coefficient_mode = slip_coefficient_mode
       Partz(zone_ID)%BC_shear_stress_input = BC_shear_stress_input
       if ((pool_plane=="X").or.(pool_plane=="x")) Partz(zone_ID)%ipool = 1
@@ -676,6 +679,8 @@ BoundaryVertex(Tratto(zone_ID)%inivertex+Tratto(zone_ID)%numvertices-1)
                      Partz(zone_ID)%pressure
                   write(ulog,"(1x,a,1pe12.4)") "Pressure Value  : ",           &
                      Partz(zone_ID)%valp
+                  write(ulog,"(1x,a,1pe12.4)") "Pressure Value 2: ",           &
+                     Partz(zone_ID)%valp2
                endif      
 #elif defined SPACE_3D
                   Tratto(zone_ID)%ColorCode = icolor

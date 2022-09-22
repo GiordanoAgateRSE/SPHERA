@@ -21,10 +21,10 @@
 !-------------------------------------------------------------------------------
 ! Program unit: SubCalcPreIdro      
 ! Description: To initialize pressure and density fields. Hydrostatic pressure 
-!              profiles or unifrom pressure as initial conditions. Hydrostatic 
-!              profiles are formally correct only in the presence of maximum 2 
-!              fluid media along the vertical. Update/initialization of the 
-!              particle volume.
+!              profiles or uniform pressure or radial pressure as initial 
+!              conditions. Hydrostatic profiles are formally correct only in 
+!              the presence of maximum 2 fluid media along the vertical. 
+!              Update/initialization of the particle volume.
 !-------------------------------------------------------------------------------
 subroutine SubCalcPreIdro
 !------------------------
@@ -93,7 +93,7 @@ enddo
 particle_loop: do npi=1,nag
 ! Initial conditions for pressure (from input file)
    Nz = pg(npi)%izona
-   if (partz(Nz)%pressure=="pa") then  
+   if (partz(Nz)%pressure=="pa") then
       pg(npi)%pres = partz(Nz)%valp + Domain%prif
       pg(npi)%dens = med(pg(npi)%imed)%den0
 ! Mass update
@@ -101,7 +101,17 @@ particle_loop: do npi=1,nag
          pg(npi)%volume = pg(npi)%mass / pg(npi)%dens
       endif
       cycle particle_loop
-   endif   
+   endif
+   if (partz(Nz)%pressure=="pr") then
+      pg(npi)%pres = partz(Nz)%valp + partz(Nz)%valp2 * (pg(npi)%coord(1) ** 2 &
+                     + pg(npi)%coord(2) ** 2)
+      pg(npi)%dens = med(pg(npi)%imed)%den0
+! Mass update
+      if (input_any_t%ALE3) then
+         pg(npi)%volume = pg(npi)%mass / pg(npi)%dens
+      endif
+      cycle particle_loop
+   endif
 ! To detect the cell number of the current particle
    ncelcorr = ParticleCellNumber(pg(npi)%coord)
    iappo = CellIndices(ncelcorr,igridi,jgridi,kgridi)

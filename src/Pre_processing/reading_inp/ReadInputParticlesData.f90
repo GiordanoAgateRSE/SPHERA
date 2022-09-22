@@ -24,8 +24,8 @@
 !              input files
 !-------------------------------------------------------------------------------
 subroutine ReadInputParticlesData(NumberEntities,Medium,icolor,bends,move,slip,&
-                                  npointv,valuev,values6,pressu,valp,ainp,     &
-                                  comment,nrighe,ier,ninp,ulog)
+                                  npointv,valuev,values6,pressu,valp,valp2,    &
+                                  ainp,comment,nrighe,ier,ninp,ulog)
 !------------------------
 ! Modules
 !------------------------
@@ -36,7 +36,7 @@ use Hybrid_allocation_module
 !------------------------
 implicit none
 integer(4),intent(inout) :: Medium,icolor,npointv,nrighe,ier,ninp,ulog
-double precision,intent(inout) :: valp
+double precision,intent(inout) :: valp,valp2
 integer(4),dimension(20),intent(inout) :: NumberEntities
 double precision,dimension(6),intent(inout) :: values6
 double precision,dimension(0:3,maxpointsvlaw),intent(inout) :: valuev
@@ -164,33 +164,49 @@ call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
 pressu = trim(GetToken(1,ainp,ioerr))
 if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"INITIAL PRESSURE TYPE",ninp,ulog))   &
    return
-! IC uniform pressure ("pa") is assigned 
-if (pressu=="pa") then  
-   token = lcase(GetToken(2,ainp,ioerr))
-   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"PRESSURE VALUES",ninp,ulog)) return
-   read(token,*,iostat=ioerr) valp
-   if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"PRESSURE VALUES",ninp,ulog)) return
+select case(pressu)
+   case("pa")
+! IC uniform pressure ("pa") is assigned
+      token = lcase(GetToken(2,ainp,ioerr))
+      if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"PRESSURE VALUES",ninp,ulog))   &
+         return
+      read(token,*,iostat=ioerr) valp
+      if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"PRESSURE VALUES",ninp,ulog))   &
+         return
+   case("qp")
 ! IC hydrostatic pressure based on a reference free surface height ("qp")
-   elseif (pressu=="qp") then 
       token = lcase(GetToken(2,ainp,ioerr))
       if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"INITIAL PIEZO LINE",ninp,ulog))&
          return
       read(token,*,iostat=ioerr) valp
       if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"INITIAL PIEZO LINE",ninp,ulog))&
          return
-! IC hydrostatic pressure based on the maximum level ("pl") of
-! an assigned fluid 
-         elseif (pressu=="pl") then
-            token = lcase(GetToken(2,ainp,ioerr))
-            if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"FREE LEVEL LINE",ninp,   &
-               ulog)) return
-            read(token,*,iostat=ioerr) valp
-            if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"FREE LEVEL LINE",ninp,   &
-               ulog)) return
-            else
-               if (ulog>0) write(ulog,*) "Unknown option: ",trim(ainp)
-               stop
-endif
+   case("pl")
+! IC hydrostatic pressure based on the maximum level ("pl") of an assigned fluid
+      token = lcase(GetToken(2,ainp,ioerr))
+      if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"FREE LEVEL LINE",ninp,ulog))   &
+         return
+      read(token,*,iostat=ioerr) valp
+      if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"FREE LEVEL LINE",ninp,ulog))   &
+         return
+   case("pr")
+! IC pressure going with the square of the distance rh from z-axis
+      token = lcase(GetToken(2,ainp,ioerr))
+      if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"RADIAL PRESSURE 1",ninp,ulog)) &
+         return
+      read(token,*,iostat=ioerr) valp
+      if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"RADIAL PRESSURE 1",ninp,ulog)) &
+         return
+      token = lcase(GetToken(3,ainp,ioerr))
+      if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"RADIAL PRESSURE 2",ninp,ulog)) &
+         return
+      read(token,*,iostat=ioerr) valp2
+      if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"RADIAL PRESSURE 2",ninp,ulog)) &
+         return
+   case default
+      if (ulog>0) write(ulog,*) "Unknown option: ",trim(ainp)
+      stop
+endselect
 if (input_second_read.eqv..true.) then
    if ((bends=="b").and.(icolor>5)) then
       icolor = 5
