@@ -93,107 +93,104 @@ enddo
 particle_loop: do npi=1,nag
 ! Initial conditions for pressure (from input file)
    Nz = pg(npi)%izona
-   if (partz(Nz)%pressure=="pa") then
-      pg(npi)%pres = partz(Nz)%valp + Domain%prif
-      pg(npi)%dens = med(pg(npi)%imed)%den0
-! Mass update
-      if (input_any_t%ALE3) then
-         pg(npi)%volume = pg(npi)%mass / pg(npi)%dens
-      endif
-      cycle particle_loop
-   endif
-   if (partz(Nz)%pressure=="pr") then
+   select case(partz(Nz)%pressure)
+      case("pa")
+         pg(npi)%pres = partz(Nz)%valp + Domain%prif
+      case("pr")
       pg(npi)%pres = partz(Nz)%valp + partz(Nz)%valp2 * (pg(npi)%coord(1) ** 2 &
                      + pg(npi)%coord(2) ** 2)
-      pg(npi)%dens = med(pg(npi)%imed)%den0
-! Mass update
-      if (input_any_t%ALE3) then
-         pg(npi)%volume = pg(npi)%mass / pg(npi)%dens
-      endif
-      cycle particle_loop
-   endif
+      case("pl","qp")
 ! To detect the cell number of the current particle
-   ncelcorr = ParticleCellNumber(pg(npi)%coord)
-   iappo = CellIndices(ncelcorr,igridi,jgridi,kgridi)
-   i = igridi
-   j = jgridi
+         ncelcorr = ParticleCellNumber(pg(npi)%coord)
+         iappo = CellIndices(ncelcorr,igridi,jgridi,kgridi)
+         i = igridi
+         j = jgridi
 ! To check if there is a cell including a medium interface in the column.
 ! If this is so, it evaluates the medium interface level.
-   idpel = 0
-   foundcell = .false.
-   ZQuotaMediumCorr = pg(npi)%coord(3)
-   ZQuotaColonna = pg(npi)%coord(3)
-   ZQuotaSecondMedium = pg(npi)%coord(3)
+         idpel = 0
+         foundcell = .false.
+         ZQuotaMediumCorr = pg(npi)%coord(3)
+         ZQuotaColonna = pg(npi)%coord(3)
+         ZQuotaSecondMedium = pg(npi)%coord(3)
 ! Loop over the column cells above
-   do k = kgridi,Grid%ncd(3)
-      numcell = CellNumber(i,j,k)
-      if (numcell==0) cycle
+         do k = kgridi,Grid%ncd(3)
+            numcell = CellNumber(i,j,k)
+            if (numcell==0) cycle
 ! Loop over the number of particles inside the cell
-      do m=Icont(numcell),Icont(numcell+1)-1
-         nnlocal = npartord(m)
+            do m=Icont(numcell),Icont(numcell+1)-1
+               nnlocal = npartord(m)
 ! A particle of different medium is found, so the interface cell identifier 
 ! is set
-         if ((med(pg(npi)%imed)%index/=med(pg(nnlocal)%imed)%index)) then
+               if ((med(pg(npi)%imed)%index/=med(pg(nnlocal)%imed)%index)) then
 ! The interface cell is set
-            if (.not.foundcell) then
-               idpel = numcell
-               foundcell = .true.
-               nnsave = nnlocal
-            endif
+                  if (.not.foundcell) then
+                     idpel = numcell
+                     foundcell = .true.
+                     nnsave = nnlocal
+                  endif
 ! The minimum level in the interface cell for the medium different from the 
 ! current one is set
-            if (numcell==idpel) then
-               ZQuotaSecondMedium = min(ZQuotaSecondMedium,pg(nnlocal)%coord(3))
-            endif
+                  if (numcell==idpel) then
+                     ZQuotaSecondMedium = min(ZQuotaSecondMedium,              &
+                                          pg(nnlocal)%coord(3))
+                  endif
 ! To increase in any case the reference level of the column 
-            ZQuotaColonna = max(ZQuotaColonna,pg(nnlocal)%coord(3))
-            else
+                  ZQuotaColonna = max(ZQuotaColonna,pg(nnlocal)%coord(3))
+                  else
 ! To evaluate the reference levels: "ZQuotaMediumCorr" is the maximum level 
 ! of the same medium of the current particle, while "ZQuotaColonna" is the 
 ! maximum level of the other medium located above (maximum of the column of 
 ! cells)
-               ZQuotaMediumCorr = max(ZQuotaMediumCorr,pg(nnlocal)%coord(3))
-               ZQuotaColonna    = max(ZQuotaColonna,pg(nnlocal)%coord(3))
-         endif
-      enddo
-   enddo
+                     ZQuotaMediumCorr = max(ZQuotaMediumCorr,                  &
+                                        pg(nnlocal)%coord(3))
+                     ZQuotaColonna    = max(ZQuotaColonna,pg(nnlocal)%coord(3))
+               endif
+            enddo
+         enddo
 ! To check if the current particles is inside the intermediate cell, but it is 
 ! of the upper medium type
-   if (abs(ZQuotaMediumCorr-ZQuotaColonna)<xyz_tolerance) foundcell = .false.
+         if (abs(ZQuotaMediumCorr-ZQuotaColonna)<xyz_tolerance) then
+            foundcell = .false.
+         endif
 ! To set the reference pressure quote depending on the condition type
-   if (partz(Nz)%pressure=="qp") ZQuotaColonna = partz(Nz)%valp
-   if (partz(Nz)%pressure=="pl") ZQuotaColonna = pl_quote + Domain%dx / 2.d0
+         if (partz(Nz)%pressure=="qp") ZQuotaColonna = partz(Nz)%valp
+         if (partz(Nz)%pressure=="pl") then
+            ZQuotaColonna = pl_quote + Domain%dx / 2.d0
+         endif
 ! An upper medium interface cell has been found
-   if (foundcell) then
+         if (foundcell) then
 ! The average quote of the medium interface in the cell is calculated
-      ZQuotaMediumCorr  = (ZquotaMediumCorr + ZQuotaSecondMedium) * half
+            ZQuotaMediumCorr  = (ZquotaMediumCorr + ZQuotaSecondMedium) * half
 ! particle pressure and density are evaluated, accounting
 ! for the medium interface
-      affond1 = (ZQuotaColonna - ZQuotaMediumCorr) * coshor +                  &
-                pg(nnsave)%coord(1) * senhor
-      affond2 = (ZQuotaMediumCorr - pg(npi)%coord(3)) * coshor +               &
-                pg(npi)%coord(1) * senhor 
-      if (Domain%tipo=="bsph") then  
+            affond1 = (ZQuotaColonna - ZQuotaMediumCorr) * coshor +            &
+                      pg(nnsave)%coord(1) * senhor
+            affond2 = (ZQuotaMediumCorr - pg(npi)%coord(3)) * coshor +         &
+                      pg(npi)%coord(1) * senhor 
+            if (Domain%tipo=="bsph") then  
 ! To check this line
-         pg(npi)%pres = 0.d0 * (affond1 * med(pg(npi)%imed)%den0 * gravmod) *  &
-                       (1.d0 - pg(npi)%coord(1) / 0.5925d0)
-         else
-            pg(npi)%pres = (affond1 * Med(pg(nnsave)%imed)%den0 + affond2 *    &
-                            med(pg(npi)%imed)%den0) * gravmod + Domain%prif
-      endif
-      else
-         affond1 = (ZQuotaColonna - pg(npi)%coord(3)) * coshor +               &
-                   pg(npi)%coord(1) * senhor 
-         pg(npi)%pres = affond1 * med(pg(npi)%imed)%den0 * gravmod + Domain%prif
-         if (Domain%tipo == "bsph") then
-! To check this line
-            pg(npi)%pres = 0.d0 * (affond1 * med(pg(npi)%imed)%den0 * gravmod) &
-                           * (1.d0 - pg(npi)%coord(1) / 0.5925d0)
+               pg(npi)%pres = 0.d0 * (affond1 * med(pg(npi)%imed)%den0 *       &
+                              gravmod) * (1.d0 - pg(npi)%coord(1) / 0.5925d0)
+               else
+                  pg(npi)%pres = (affond1 * Med(pg(nnsave)%imed)%den0 +        &
+                                 affond2 * med(pg(npi)%imed)%den0) * gravmod + &
+                                 Domain%prif
+            endif
             else
-               pg(npi)%pres = (affond1 * med(pg(npi)%imed)%den0 * gravmod) +   &
+               affond1 = (ZQuotaColonna - pg(npi)%coord(3)) * coshor +         &
+                         pg(npi)%coord(1) * senhor 
+               pg(npi)%pres = affond1 * med(pg(npi)%imed)%den0 * gravmod +     &
                               Domain%prif
+               if (Domain%tipo == "bsph") then
+! To check this line
+                  pg(npi)%pres = 0.d0 * (affond1 * med(pg(npi)%imed)%den0 *    &
+                                 gravmod) * (1.d0 - pg(npi)%coord(1) / 0.5925d0)
+                  else
+                     pg(npi)%pres = (affond1 * med(pg(npi)%imed)%den0 *        &
+                                    gravmod) + Domain%prif
+               endif
          endif
-   endif
+   endselect
 ! EoS inverse
    call EoS_barotropic_linear(Med(pg(npi)%imed)%eps,Med(pg(npi)%imed)%den0,    &
       Domain%prif,p_in=pg(npi)%pres,rho_out=pg(npi)%dens)
