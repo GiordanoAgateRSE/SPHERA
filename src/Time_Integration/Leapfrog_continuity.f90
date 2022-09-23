@@ -35,7 +35,7 @@ use Hybrid_allocation_module
 !------------------------
 implicit none
 integer(4) :: npi,ii
-double precision :: rho_old
+double precision :: rho_old,dvolume_dt
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -50,7 +50,7 @@ double precision :: rho_old
 !------------------------
 !$omp parallel do default(none)                                                &
 !$omp shared(pg,dt,indarrayFlu,Array_Flu,Domain,Med,input_any_t)               &
-!$omp private(npi,ii,rho_old)
+!$omp private(npi,ii,rho_old,dvolume_dt)
 do ii=1,indarrayFlu
    npi = Array_Flu(ii)
    rho_old = pg(npi)%dens
@@ -66,12 +66,14 @@ do ii=1,indarrayFlu
          pg(npi)%dens = 1.1d0 * Med(pg(npi)%imed)%den0
       endif
    endif
-! Volume equation and mass update
+! Mass equation and volume update
    if (Domain%tipo=="semi") then
       if (input_any_t%ALE3) then
-         pg(npi)%volume = pg(npi)%volume + dt * ((-pg(npi)%volume / rho_old) * &
-                          (pg(npi)%dden - pg(npi)%dden_ALE12))
-         pg(npi)%mass = pg(npi)%dens * pg(npi)%volume
+         dvolume_dt = -pg(npi)%volume / rho_old * (pg(npi)%dden -              &
+                      pg(npi)%dden_ALE12)
+         pg(npi)%mass = pg(npi)%mass + (rho_old * dvolume_dt + pg(npi)%volume *&
+                        pg(npi)%dden) * dt
+         pg(npi)%volume = pg(npi)%mass / pg(npi)%dens
       endif
    endif
 enddo
