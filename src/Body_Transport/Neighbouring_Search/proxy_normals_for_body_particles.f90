@@ -22,7 +22,9 @@
 ! Program unit: proxy_normals_for_body_particles
 ! Description: Computation of the array «proxy_normal_bp_f» of the indices of 
 !              the neighbouring surface body particles providing the normal to 
-!              the "body-particle - fluid-particle" interactions.  
+!              the "body-particle - fluid-particle" interactions (only for 
+!              no-slip conditions) and the boundary velocity (for free-slip and 
+!              no-slip conditions).  
 !-------------------------------------------------------------------------------
 #ifdef SOLID_BODIES
 subroutine proxy_normals_for_body_particles

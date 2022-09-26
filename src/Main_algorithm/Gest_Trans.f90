@@ -300,23 +300,21 @@ endif
          write(ulog,'(1x,a)') "   Array impact_vel successfully allocated "
    endif
    impact_vel(:,:) = 0.d0
-   if (FSI_free_slip_conditions) then
-      array_name = "nPartIntorno_f_sbp"
-      call allocate_de_int4_r1(.true.,nPartIntorno_f_sbp,PARTICLEBUFFER,       &
-         array_name,ulog_flag=.true.)
-      array_name = "PartIntorno_f_sbp"
-      call allocate_de_int4_r1(.true.,PartIntorno_f_sbp,                       &
-         extent_1=NMAXPARTJ*PARTICLEBUFFER,array_name=array_name,              &
-         ulog_flag=.true.)
-      array_name = "dis_f_sbp"
-      call allocate_de_dp_r1(.true.,dis_f_sbp,                                 &
-         extent_1=NMAXPARTJ*PARTICLEBUFFER,array_name=array_name,              &
-         ulog_flag=.true.)
-      array_name = "closest_f_sbp"
-      call allocate_de_int4_r1(.true.,closest_f_sbp,                           &
-         extent_1=NMAXPARTJ*PARTICLEBUFFER,array_name=array_name,              &
-         ulog_flag=.true.)
-   endif
+   array_name = "nPartIntorno_f_sbp"
+   call allocate_de_int4_r1(.true.,nPartIntorno_f_sbp,PARTICLEBUFFER,          &
+      array_name,ulog_flag=.true.)
+   array_name = "PartIntorno_f_sbp"
+   call allocate_de_int4_r1(.true.,PartIntorno_f_sbp,                          &
+      extent_1=NMAXPARTJ*PARTICLEBUFFER,array_name=array_name,                 &
+      ulog_flag=.true.)
+   array_name = "dis_f_sbp"
+   call allocate_de_dp_r1(.true.,dis_f_sbp,                                    &
+      extent_1=NMAXPARTJ*PARTICLEBUFFER,array_name=array_name,                 &
+      ulog_flag=.true.)
+   array_name = "closest_f_sbp"
+   call allocate_de_int4_r1(.true.,closest_f_sbp,                              &
+      extent_1=NMAXPARTJ*PARTICLEBUFFER,array_name=array_name,                 &
+      ulog_flag=.true.)
 #endif
 write(ulog,'(1x,a)') "..."
 write(ulog,'(a,i15)') " Max number of particles  : PARTICLEBUFFER = ",         &

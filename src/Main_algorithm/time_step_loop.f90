@@ -129,9 +129,7 @@ call start_and_stop(3,18)
 #ifdef SOLID_BODIES
    call start_and_stop(2,19)
 ! Proxy normals for body particles
-   if (FSI_free_slip_conditions.eqv..true.) then
-      call proxy_normals_for_body_particles
-   endif
+   call proxy_normals_for_body_particles
 ! Pressure initialization for body particles
    call body_pressure_mirror
    call body_pressure_postpro
@@ -370,9 +368,7 @@ TIME_STEP_DO: do while (it<=input_any_t%itmax)
 #ifdef SOLID_BODIES
       call start_and_stop(2,19)
 ! Proxy normals for body particles
-      if (FSI_free_slip_conditions.eqv..true.) then
-         call proxy_normals_for_body_particles
-      endif
+      call proxy_normals_for_body_particles
       call body_particles_to_continuity
       call start_and_stop(3,19)
 #endif

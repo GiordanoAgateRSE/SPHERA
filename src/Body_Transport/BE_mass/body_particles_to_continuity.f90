@@ -80,7 +80,7 @@ do npi=1,n_body_part
       temp_dden = 0.d0
 ! Continuity equation
 ! Relative velocity for the continuity equation     
-      aux_vec(:) = bp_arr(npi)%vel(:) - pg(npj)%vel(:)
+      aux_vec(:) = bp_arr(proxy_normal_bp_f(npartint))%vel(:) - pg(npj)%vel(:)
       if (FSI_free_slip_conditions.eqv..true.) then
 ! free-slip conditions
          dvar(:) = bp_arr(proxy_normal_bp_f(npartint))%normal(1:3) * 2.d0 *    &

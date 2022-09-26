@@ -126,7 +126,7 @@ closest_f_sbp(:) = 0
 !$omp shared(kernel_fw,dShep_old,Granular_flows_options,NMedium)               &
 #ifdef SOLID_BODIES
 !$omp shared(Icont_bp,NPartOrd_bp,nPartIntorno_f_sbp,PartIntorno_f_sbp)        &
-!$omp shared(FSI_free_slip_conditions,dis_f_sbp,bp_arr,closest_f_sbp)          &
+!$omp shared(dis_f_sbp,bp_arr,closest_f_sbp)                                   &
 #endif
 !$omp shared(simulation_time,input_any_t)
 loop_nag: do npi=1,nag
@@ -411,42 +411,39 @@ loop_nag: do npi=1,nag
                endif
             enddo loop_mm
 #ifdef SOLID_BODIES
-            if (FSI_free_slip_conditions) then
-               dis_min = 1.d9
+            dis_min = 1.d9
 ! Loop over the surface body particles in the cell
-               loop_f_sbp: do f_sbp=Icont_bp(ncelj),Icont_bp(ncelj+1)-1
-                  npj = NPartOrd_bp(f_sbp)
+            loop_f_sbp: do f_sbp=Icont_bp(ncelj),Icont_bp(ncelj+1)-1
+               npj = NPartOrd_bp(f_sbp)
 ! Relative positions and distances
-                  ragtemp(1:3) = pg(npi)%coord(1:3) - bp_arr(npj)%pos(1:3)
-                  rijtemp = ragtemp(1) * ragtemp(1) + ragtemp(2) * ragtemp(2) +&
-                            ragtemp(3) * ragtemp(3)
+               ragtemp(1:3) = pg(npi)%coord(1:3) - bp_arr(npj)%pos(1:3)
+               rijtemp = ragtemp(1) * ragtemp(1) + ragtemp(2) * ragtemp(2) +   &
+                         ragtemp(3) * ragtemp(3)
 ! Distance check
-                  if (rijtemp>square_doubleh) cycle
-                  if (bp_arr(npj)%surface) then
+               if (rijtemp>square_doubleh) cycle
+               if (bp_arr(npj)%surface) then
 ! The neigbouring body particle is a surface body particle
 ! For very large values of dx/dx_s, all the surface body particles are 
 ! considered for the closest surface body particle (default choice for the 
 ! proxy normal), but not all of them are involved in the accurate computation 
 ! of the proxy normal.
-                     rijtemp = dsqrt(rijtemp)
-                     if (nPartIntorno_f_sbp(npi)<NMAXPARTJ) then
+                  rijtemp = dsqrt(rijtemp)
+                  if (nPartIntorno_f_sbp(npi)<NMAXPARTJ) then
 ! Neighbour-counter increase
-                        nPartIntorno_f_sbp(npi) = nPartIntorno_f_sbp(npi) + 1
+                     nPartIntorno_f_sbp(npi) = nPartIntorno_f_sbp(npi) + 1
 ! Saving the neighbour ID
-                        npartint = (npi - 1) * NMAXPARTJ +                     &
-                                   nPartIntorno_f_sbp(npi)
-                        PartIntorno_f_sbp(npartint) = npj
+                     npartint = (npi - 1) * NMAXPARTJ + nPartIntorno_f_sbp(npi)
+                     PartIntorno_f_sbp(npartint) = npj
 ! Saving the inter-particle distance
-                        dis_f_sbp(npartint) = rijtemp
-                     endif
-! Updating the ID of the closest surface body particle
-                     if (rijtemp<dis_min) then
-                        dis_min = rijtemp
-                        closest_f_sbp(npi) = npj
-                     endif
+                     dis_f_sbp(npartint) = rijtemp
                   endif
-               enddo loop_f_sbp
-            endif
+! Updating the ID of the closest surface body particle
+                  if (rijtemp<dis_min) then
+                     dis_min = rijtemp
+                     closest_f_sbp(npi) = npj
+                  endif
+               endif
+            enddo loop_f_sbp
 #endif
 ! Loop over the neighbouring wall particles in the cell
             if ((Domain%tipo=="bsph").and.(DBSPH%n_w>0)) then
