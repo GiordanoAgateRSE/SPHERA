@@ -91,7 +91,7 @@
 !-------------------------------------------------------------------------------
 ![*] <n_bodies> <dx/dx_body> <friction_angle> <time_max_no_gravity_force> 
 !    <time_max_no_body_frontier_impingements> <body_minimum_pressure_limiter> 
-!    <body_maximum_pressure_limiter> <FSI_free_slip_conditions> <thin_walls>
+!    <body_maximum_pressure_limiter> <FSI_slip_conditions> <thin_walls>
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
 ___ ___ ___ ___ ___ ___ ___ ___ ___
