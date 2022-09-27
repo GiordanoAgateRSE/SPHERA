@@ -48,7 +48,7 @@ double precision :: matrix(3,3),inverted(3,3)
 !------------------------
 ! Initializations
 !------------------------
-abs_det_thresh = 1.d-18
+abs_det_thresh = 1.d-36
 !------------------------
 ! Statements
 !------------------------

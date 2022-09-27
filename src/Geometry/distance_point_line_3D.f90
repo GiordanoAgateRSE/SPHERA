@@ -19,7 +19,7 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: distance_point_line_3D  
+! Program unit: distance_point_line_3D
 ! Description: Computation of the distance between a point and a line in 3D.      
 !-------------------------------------------------------------------------------
 #ifdef SOLID_BODIES
@@ -105,7 +105,7 @@ if (test_point==1) then
          'properly. '
       write(uerr,*) '   P0 : ',P0(1:3)
       write(uerr,*) '   P1_line : ',P1_line(1:3)
-      write(uerr,*) '   P1_line : ',P2_line(1:3)
+      write(uerr,*) '   P2_line : ',P2_line(1:3)
       write(uerr,*) 'The program stops here. '
       stop
 endif
