@@ -369,16 +369,14 @@ endif
       size(PartIntorno_bp_bp)
    write(ulog,*) " Size # of elements in array rag_bp_bp           : ",        &
       size(rag_bp_bp)
-   if (FSI_free_slip_conditions) then
-      write(ulog,*) " Size # of elements in array nPartIntorno_f_sbp  : ",     &
-         size(nPartIntorno_f_sbp)
-      write(ulog,*) " Size # of elements in array PartIntorno_f_sbp   : ",     &
-         size(PartIntorno_f_sbp)
-      write(ulog,*) " Size # of elements in array dis_f_sbp           : ",     &
-         size(dis_f_sbp)
-      write(ulog,*) " Size # of elements in array closest_f_sbp       : ",     &
-         size(closest_f_sbp)
-   endif
+   write(ulog,*) " Size # of elements in array nPartIntorno_f_sbp  : ",        &
+      size(nPartIntorno_f_sbp)
+   write(ulog,*) " Size # of elements in array PartIntorno_f_sbp   : ",        &
+      size(PartIntorno_f_sbp)
+   write(ulog,*) " Size # of elements in array dis_f_sbp           : ",        &
+      size(dis_f_sbp)
+   write(ulog,*) " Size # of elements in array closest_f_sbp       : ",        &
+      size(closest_f_sbp)
 #endif
 write(ulog,'(1x,a)') "..."
 write(ulog,*) " Size in bytes of array pg                       : ",sizeof(pg)
@@ -430,16 +428,14 @@ endif
       sizeof(PartIntorno_bp_bp)
    write(ulog,*) " Size in bytes of array rag_bp_bp                : ",        &
       sizeof(rag_bp_bp)
-   if (FSI_free_slip_conditions) then
-      write(ulog,*) " Size in bytes of array nPartIntorno_f_sbp       : ",     &
-         sizeof(nPartIntorno_f_sbp)
-      write(ulog,*) " Size in bytes of array PartIntorno_f_sbp        : ",     &
-         sizeof(PartIntorno_f_sbp)
-      write(ulog,*) " Size in bytes of array dis_f_sbp                : ",     &
-         sizeof(dis_f_sbp)
-      write(ulog,*) " Size in bytes of array closest_f_sbp            : ",     &
-         sizeof(closest_f_sbp)
-   endif
+   write(ulog,*) " Size in bytes of array nPartIntorno_f_sbp       : ",        &
+      sizeof(nPartIntorno_f_sbp)
+   write(ulog,*) " Size in bytes of array PartIntorno_f_sbp        : ",        &
+      sizeof(PartIntorno_f_sbp)
+   write(ulog,*) " Size in bytes of array dis_f_sbp                : ",        &
+      sizeof(dis_f_sbp)
+   write(ulog,*) " Size in bytes of array closest_f_sbp            : ",        &
+      sizeof(closest_f_sbp)
 #endif
 write(ulog,'(1x,a)') "..."
 write(ulog,'(1x,a)') " "

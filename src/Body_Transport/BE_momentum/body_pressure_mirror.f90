@@ -82,7 +82,7 @@ endif
 !$omp private(aux_scalar)                                                      &
 !$omp shared(n_body_part,bp_arr,nPartIntorno_bp_f,NMAXPARTJ,PartIntorno_bp_f)  &
 !$omp shared(Domain,pg,rag_bp_f,body_minimum_pressure_limiter)                 &
-!$omp shared(body_maximum_pressure_limiter,body_arr,FSI_free_slip_conditions)  &
+!$omp shared(body_maximum_pressure_limiter,body_arr,FSI_slip_conditions)       &
 !$omp shared(proxy_normal_bp_f)
 do npi=1,n_body_part
    bp_arr(npi)%pres = 0.d0
@@ -99,7 +99,7 @@ do npi=1,n_body_part
          else
             aux_acc(:) = Domain%grav(:) - aux_scalar / aux * bp_arr(npi)%acc(:)
       endif
-      if (FSI_free_slip_conditions.eqv..true.) then
+      if ((FSI_slip_conditions==0).or.(FSI_slip_conditions==2)) then
          pres_mir = pg(npj)%pres + pg(npj)%dens *                              &
                     dot_product(aux_acc(:),                                    &
                     bp_arr(proxy_normal_bp_f(npartint))%normal(:)) *           &

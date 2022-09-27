@@ -72,9 +72,17 @@
 !    =.true. (maximum pressure on the body surface is limited by physical
 !             constraints)
 !    =.false. (no limiter);
-![?] <FSI_free_slip_conditions>
-!    =.true. (free-slip conditions for FSI)
-!    =.false. (no-slip conditions for FSI)
+![?] <FSI_slip_conditions>
+!    =0 (free-slip conditions for FSI)
+!    =1 (no-slip conditions for FSI)
+!    =2 (free-slip conditions for the Momentum Equation; mirror velocity as 
+!        solid velocity for the Continuity Equation)
+!    =3 (no-slip conditions for the Momentum Equation; mirror velocity as 
+!        solid velocity for the Continuity Equation)
+![?] "mirror velocity as solid velocity": when active, this formulation only 
+!    applies to the velocity-divergence term in the continuity equation, but 
+!    not to the shear-stress gradient term in the momentum equation, neither to 
+!    the mirror body pressure.
 ![?] <thin_walls>
 !    =.true. (treatment for submerged boundary thin walls, far from other 
 !    boundary types)

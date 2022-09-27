@@ -85,7 +85,7 @@ do while (trim(lcase(ainp)) /= "##### end body dynamics #####")
    read(ainp,*,iostat=ioerr) n_bodies,dx_dxbodies,friction_angle,              &
       time_max_no_body_gravity_force,time_max_no_body_frontier_impingements,   &
       body_minimum_pressure_limiter,body_maximum_pressure_limiter,             &
-      FSI_free_slip_conditions,thin_walls
+      FSI_slip_conditions,thin_walls
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"BODY DYNAMICS GENERAL INPUT",ninp,&
       ulog)) return
 ! Writing the number of bodies and "dx_dxbodies" on the log file
@@ -105,8 +105,8 @@ do while (trim(lcase(ainp)) /= "##### end body dynamics #####")
          body_minimum_pressure_limiter
       write(ulog,"(1x,a,1p,l12)") "body_maximum_pressure_limiter:",            &
          body_maximum_pressure_limiter
-      write(ulog,"(1x,a,1p,l12)") "FSI_free_slip_conditions:.....",            &
-         FSI_free_slip_conditions
+      write(ulog,"(1x,a,1p,i12)") "FSI_slip_conditions:..........",            &
+         FSI_slip_conditions
       write(ulog,"(1x,a,1p,l12)") "thin_walls:...................",            &
          thin_walls
       write(ulog,"(1x,a)")  " "

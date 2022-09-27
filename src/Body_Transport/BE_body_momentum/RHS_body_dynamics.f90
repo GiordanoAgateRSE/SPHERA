@@ -310,7 +310,7 @@ do npi=1,n_body_part
 ! Contribution to the ALE velocity increment (here it is still an acceleration)
       pg(npj)%dvel_ALE1(1:3) = pg(npj)%dvel_ALE1(1:3) + aux_vec(1:3)
 ! Contribution to the "grad_p + ALE term": end
-      if (FSI_free_slip_conditions.eqv..false.) then
+      if ((FSI_slip_conditions==1).or.(FSI_slip_conditions==3)) then
 ! Body particle volume
          aux_scalar = bp_arr(npi)%volume
       if (thin_walls) then

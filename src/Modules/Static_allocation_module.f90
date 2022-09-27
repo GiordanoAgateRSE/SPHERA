@@ -179,8 +179,6 @@ logical :: current_version
 #ifdef SOLID_BODIES
 ! Flags to activate/deactivate pressure limiters on the body surfaces (input)
 logical :: body_minimum_pressure_limiter,body_maximum_pressure_limiter
-! Slip conditions for FSI (input)
-logical :: FSI_free_slip_conditions
 ! Flag to activate/deactivate the treatment for submerged boundary thin walls, 
 ! far from other boundary types
 logical :: thin_walls
@@ -205,6 +203,8 @@ integer(4) :: n_body_part_CAE
 integer(4) :: n_surf_body_part
 ! Total number of bodies 
 integer(4) :: n_bodies
+! Slip conditions for FSI (ref. input file template)
+integer(4) :: FSI_slip_conditions
 #ifdef SPACE_3D
 ! Number of CAE-made solid bodies
 integer(4) :: n_bodies_CAE
