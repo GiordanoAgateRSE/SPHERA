@@ -28,6 +28,7 @@ subroutine Leapfrog_momentum(dt_previous_step,dtvel)
 !------------------------
 use Static_allocation_module
 use Dynamic_allocation_module
+use Hybrid_allocation_module
 !------------------------
 ! Declarations
 !------------------------
@@ -35,6 +36,7 @@ implicit none
 double precision,intent(in) :: dt_previous_step
 double precision,intent(inout) :: dtvel
 integer(4) :: ii,npi
+double precision,dimension(3) :: dmom_dt
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -50,22 +52,33 @@ integer(4) :: ii,npi
 ! dt computation
 dtvel = half * (dt + dt_previous_step) 
 !$omp parallel do default(none)                                                &
-!$omp shared(pg,dtvel,indarrayFlu,Array_Flu)                                   &
-!$omp private(npi,ii)
+!$omp shared(pg,dtvel,indarrayFlu,Array_Flu,input_any_t)                       &
+!$omp private(npi,ii,dmom_dt)
 do ii=1,indarrayFlu
    npi = Array_Flu(ii)
+   if (input_any_t%ALE3) then
+      dmom_dt(1:3) = pg(npi)%mass * pg(npi)%acc(1:3) + pg(npi)%vel(1:3) *      &
+                     pg(npi)%dmass_dt
+      pg(npi)%mom(1:3) = pg(npi)%mom(1:3) + dtvel * dmom_dt(1:3)
+      pg(npi)%vel(1:3) = pg(npi)%mom(1:3) / pg(npi)%mass
+      else
+         pg(npi)%vel(:) = pg(npi)%vel(:) + dtvel * pg(npi)%acc(:)
+   endif
 ! kodvel=0: the particle is internal to the domain. 
-   if (pg(npi)%kodvel==0) then 
-      pg(npi)%vel(:) = pg(npi)%vel(:) + dtvel * pg(npi)%acc(:)
 ! kodvel=1: the particle has a critical flux condition. The vertical 
 ! velocity component is assigned.
-      elseif (pg(npi)%kodvel==1) then                                                    
-         pg(npi)%vel(:) = pg(npi)%vel(:) + dtvel * pg(npi)%acc(:)                            
-         pg(npi)%vel(3) = pg(npi)%velass(3)
+   if (pg(npi)%kodvel==1) then
+      pg(npi)%vel(3) = pg(npi)%velass(3)
+      if (input_any_t%ALE3) then
+         pg(npi)%mom(3) = pg(npi)%vel(3) * pg(npi)%mass
+      endif
 ! kodvel=2: the particle has an assigned normal velocity or source 
 ! condition. All the velocity components are assigned.
-         elseif (pg(npi)%kodvel==2) then                                                    
-            pg(npi)%vel(:) = pg(npi)%velass(:)                                                
+      elseif (pg(npi)%kodvel==2) then
+         pg(npi)%vel(1:3) = pg(npi)%velass(1:3)
+         if (input_any_t%ALE3) then
+            pg(npi)%mom(1:3) = pg(npi)%vel(1:3) * pg(npi)%mass
+         endif
    endif
 enddo
 !$omp end parallel do

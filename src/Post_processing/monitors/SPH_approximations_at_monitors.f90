@@ -234,13 +234,13 @@ do jrang=jgridi-1,jgridi+1
                                                   aux_vec_2(1:3)
                      pglocal%B_ren_fp_bp(1:3,3) = pglocal%B_ren_fp_bp(1:3,3) + &
                                                   aux_vec_3(1:3)
-                     pglocal%B_ren_fp_sbp(1:3,1) = pglocal%B_ren_fp_sbp(1:3,1) &
-                                                   + aux_vec(1:3)
-                     pglocal%B_ren_fp_sbp(1:3,2) = pglocal%B_ren_fp_sbp(1:3,2) &
-                                                   + aux_vec_2(1:3)
-                     pglocal%B_ren_fp_sbp(1:3,3) = pglocal%B_ren_fp_sbp(1:3,3) &
-                                                   + aux_vec_3(1:3)
                   endif
+                  pglocal%B_ren_fp_sbp(1:3,1) = pglocal%B_ren_fp_sbp(1:3,1)    &
+                                                + aux_vec(1:3)
+                  pglocal%B_ren_fp_sbp(1:3,2) = pglocal%B_ren_fp_sbp(1:3,2)    &
+                                                + aux_vec_2(1:3)
+                  pglocal%B_ren_fp_sbp(1:3,3) = pglocal%B_ren_fp_sbp(1:3,3)    &
+                                                + aux_vec_3(1:3)
 #endif
                endif
             enddo

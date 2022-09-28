@@ -129,7 +129,8 @@ do i_zone=1,NPartZone
                pg(npi)%izona = i_zone
                pg(npi)%volume = Domain%PVolume
                pg(npi)%mass = pg(npi)%volume * Med(Partz(i_zone)%Medium)%den0
-               pg(nag)%dden_ALE12 = 0.d0
+               pg(npi)%dmass_dt = 0.d0
+               pg(npi)%dden_ALE12 = 0.d0
                pg(npi)%imed = Partz(i_zone)%Medium  
                pg(npi)%kin_visc = Med(Partz(i_zone)%Medium)%kin_visc
                pg(npi)%mu = Med(Partz(i_zone)%Medium)%kin_visc *               &
@@ -161,6 +162,7 @@ do i_zone=1,NPartZone
 ! Formal null velocity initialization (it will follow a selective partial 
 ! velocity smoothing)
                pg(npi)%vel(:) = 0.d0
+               pg(npi)%mom(1:3) = 0.d0
                pg(npi)%vel_type = "std"
                pg(npi)%sect_old_pos(:) = pg(npi)%coord(:)
             enddo

@@ -218,6 +218,8 @@ type TyParticle
    double precision :: pres
 ! Continuity equation LHS                           
    double precision :: dden
+! Mass equation LHS
+   double precision :: dmass_dt
 ! Shepard coefficient ("Shep": discrete or integral, it depends on the input 
 ! data)                                                        
    double precision :: uni
@@ -334,6 +336,8 @@ type TyParticle
    double precision :: sect_old_pos(3)
 ! Velocity
    double precision :: vel(3)
+! Momentum
+   double precision :: mom(3)
 ! Imposed velocity
    double precision :: velass(3)
 ! ALE velocity increment

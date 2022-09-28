@@ -71,8 +71,8 @@ do ii=1,indarrayFlu
       if (input_any_t%ALE3) then
          dvolume_dt = -pg(npi)%volume / rho_old * (pg(npi)%dden -              &
                       pg(npi)%dden_ALE12)
-         pg(npi)%mass = pg(npi)%mass + (rho_old * dvolume_dt + pg(npi)%volume *&
-                        pg(npi)%dden) * dt
+         pg(npi)%dmass_dt = rho_old * dvolume_dt + pg(npi)%volume * pg(npi)%dden
+         pg(npi)%mass = pg(npi)%mass + pg(npi)%dmass_dt * dt
          pg(npi)%volume = pg(npi)%mass / pg(npi)%dens
       endif
    endif

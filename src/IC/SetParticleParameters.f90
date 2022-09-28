@@ -55,7 +55,8 @@ if (Domain%RKscheme>1) ts0_pg(npi) = ts_pgZero
 pg(npi)%izona = Nz
 pg(npi)%volume = Domain%PVolume
 pg(npi)%mass = pg(npi)%volume * Med(Mate)%den0
-pg(nag)%dden_ALE12 = 0.d0
+pg(npi)%dmass_dt = 0.d0
+pg(npi)%dden_ALE12 = 0.d0
 #ifdef SPACE_2D
    pg(npi)%coord(2) = zero              
    pg(npi)%CoordOld(2) = zero
@@ -63,6 +64,7 @@ pg(nag)%dden_ALE12 = 0.d0
 ! Current velocity
 call Vector_Product(partz(Nz)%omega,pg(npi)%coord,aux_vec,3)
 pg(npi)%vel(1:3) = partz(Nz)%vel(1:3) + aux_vec(1:3)
+pg(npi)%mom(1:3) = pg(npi)%vel(1:3) * pg(npi)%mass
 ! The initial velocity "vstart" is only influential in case of non-standard 
 ! motion
 pg(npi)%vstart = partz(Nz)%vel
