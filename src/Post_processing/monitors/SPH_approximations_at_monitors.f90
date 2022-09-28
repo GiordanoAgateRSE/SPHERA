@@ -38,6 +38,8 @@ use I_O_file_module
 implicit none
 ! Monitor point position
 type (TyCtlPoint),intent(inout) :: pglocal
+! Flag to include/exclude body particles in assessing pressure
+logical :: bp_for_pres
 integer(4) :: nceli,ncel,igridi,kgridi,jgridi,irang,krang,jrang,fw,test,mm,npj
 integer(4) :: irestocell
 #ifdef SOLID_BODIES
@@ -117,6 +119,7 @@ end interface
 !------------------------
 ! Initializations
 !------------------------
+bp_for_pres = .false.
 nceli = pglocal%cella
 if (nceli==0) return
 irestocell = CellIndices(nceli,igridi,jgridi,kgridi)
@@ -164,7 +167,9 @@ do jrang=jgridi-1,jgridi+1
                          pg(npj)%dens
                pglocal%sigma_fp = pglocal%sigma_fp + Womegaj
 #ifdef SOLID_BODIES
-               pglocal%sigma_fp_bp = pglocal%sigma_fp_bp + Womegaj
+               if (bp_for_pres) then
+                  pglocal%sigma_fp_bp = pglocal%sigma_fp_bp + Womegaj
+               endif
                pglocal%sigma_fp_sbp = pglocal%sigma_fp_sbp + Womegaj
 #endif
 ! Contribution to the monitoring-element pressure (0th-order consistency)
@@ -179,8 +184,10 @@ do jrang=jgridi-1,jgridi+1
                   x_cons0_fp(1:3) = x_cons0_fp(1:3) + pg(npj)%coord(1:3) *     &
                                     Womegaj
 #ifdef SOLID_BODIES
-                  x_cons0_fp_bp(1:3) = x_cons0_fp_bp(1:3) + pg(npj)%coord(1:3) &
-                                       * Womegaj
+                  if (bp_for_pres) then
+                     x_cons0_fp_bp(1:3) = x_cons0_fp_bp(1:3) +                 &
+                                          pg(npj)%coord(1:3) * Womegaj
+                  endif
                   x_cons0_fp_sbp(1:3) = x_cons0_fp_sbp(1:3) +                  &
                                         pg(npj)%coord(1:3) * Womegaj
 #endif
@@ -191,7 +198,9 @@ do jrang=jgridi-1,jgridi+1
 ! functions: 1, density, pressure, velocity
                   grad_1_fp(1:3) = grad_1_fp(1:3) - gradWomegaj(1:3)
 #ifdef SOLID_BODIES
-                  grad_1_fp_bp(1:3) = grad_1_fp_bp(1:3) - gradWomegaj(1:3)
+                  if (bp_for_pres) then
+                     grad_1_fp_bp(1:3) = grad_1_fp_bp(1:3) - gradWomegaj(1:3)
+                  endif
                   grad_1_fp_sbp(1:3) = grad_1_fp_sbp(1:3) - gradWomegaj(1:3)
 #endif
                   grad_rho_raw(1:3) = grad_rho_raw(1:3) - pg(npj)%dens *       &
@@ -218,18 +227,20 @@ do jrang=jgridi-1,jgridi+1
                   pglocal%B_ren_fp(1:3,3) = pglocal%B_ren_fp(1:3,3) +          &
                                             aux_vec_3(1:3)
 #ifdef SOLID_BODIES
-                  pglocal%B_ren_fp_bp(1:3,1) = pglocal%B_ren_fp_bp(1:3,1) +    &
-                                               aux_vec(1:3)
-                  pglocal%B_ren_fp_bp(1:3,2) = pglocal%B_ren_fp_bp(1:3,2) +    &
-                                               aux_vec_2(1:3)
-                  pglocal%B_ren_fp_bp(1:3,3) = pglocal%B_ren_fp_bp(1:3,3) +    &
-                                               aux_vec_3(1:3)
-                  pglocal%B_ren_fp_sbp(1:3,1) = pglocal%B_ren_fp_sbp(1:3,1) +  &
-                                                aux_vec(1:3)
-                  pglocal%B_ren_fp_sbp(1:3,2) = pglocal%B_ren_fp_sbp(1:3,2) +  &
-                                                aux_vec_2(1:3)
-                  pglocal%B_ren_fp_sbp(1:3,3) = pglocal%B_ren_fp_sbp(1:3,3) +  &
-                                                aux_vec_3(1:3)
+                  if (bp_for_pres) then
+                     pglocal%B_ren_fp_bp(1:3,1) = pglocal%B_ren_fp_bp(1:3,1) + &
+                                                  aux_vec(1:3)
+                     pglocal%B_ren_fp_bp(1:3,2) = pglocal%B_ren_fp_bp(1:3,2) + &
+                                                  aux_vec_2(1:3)
+                     pglocal%B_ren_fp_bp(1:3,3) = pglocal%B_ren_fp_bp(1:3,3) + &
+                                                  aux_vec_3(1:3)
+                     pglocal%B_ren_fp_sbp(1:3,1) = pglocal%B_ren_fp_sbp(1:3,1) &
+                                                   + aux_vec(1:3)
+                     pglocal%B_ren_fp_sbp(1:3,2) = pglocal%B_ren_fp_sbp(1:3,2) &
+                                                   + aux_vec_2(1:3)
+                     pglocal%B_ren_fp_sbp(1:3,3) = pglocal%B_ren_fp_sbp(1:3,3) &
+                                                   + aux_vec_3(1:3)
+                  endif
 #endif
                endif
             enddo
@@ -271,9 +282,13 @@ do jrang=jgridi-1,jgridi+1
                rijlocal = dsqrt(rijlocal)
                Womegaj = w(rijlocal,Domain%h,Domain%coefke) * bp_arr(npj)%volume
 ! Contribution to the Shepard coefficient
-               pglocal%sigma_fp_bp = pglocal%sigma_fp_bp + Womegaj
+               if (bp_for_pres) then
+                  pglocal%sigma_fp_bp = pglocal%sigma_fp_bp + Womegaj
+               endif
 ! Contribution to the 0-th order consistency approximation of pressure
-               pres_cons0 = pres_cons0 + bp_arr(npj)%pres * Womegaj
+               if (bp_for_pres) then
+                  pres_cons0 = pres_cons0 + bp_arr(npj)%pres * Womegaj
+               endif
                if (bp_arr(npj)%surface) then
 ! Only surface body particles are involved in the SPH approximation of velocity
                   vel_cons0(1:3) = vel_cons0(1:3) + bp_arr(npj)%vel(1:3)       &
@@ -284,16 +299,20 @@ do jrang=jgridi-1,jgridi+1
                if (input_any_t%C1_monitors) then
 ! Additional statements for 1st-order consistency SPH approximations
 ! Contribution to x
-                  x_cons0_fp_bp(1:3) = x_cons0_fp_bp(1:3) +                    &
-                                       bp_arr(npj)%pos(1:3) * Womegaj
+                  if (bp_for_pres) then
+                     x_cons0_fp_bp(1:3) = x_cons0_fp_bp(1:3) +                 &
+                                          bp_arr(npj)%pos(1:3) * Womegaj
+                  endif
 ! grad_W
                   call grad_W_sub(kernel_ID=1,r_vec=r_vec,grad_W=grad_W)
 ! Contributions to raw SPH approximations of the gradients of the following 
 ! functions: 1, pressure
                   gradWomegaj(1:3) = grad_W(1:3) * bp_arr(npj)%volume
-                  grad_1_fp_bp(1:3) = grad_1_fp_bp(1:3) - gradWomegaj(1:3)
-                  grad_p_raw(1:3) = grad_p_raw(1:3) - bp_arr(npj)%pres *       &
-                                    gradWomegaj(1:3)
+                  if (bp_for_pres) then
+                     grad_1_fp_bp(1:3) = grad_1_fp_bp(1:3) - gradWomegaj(1:3)
+                     grad_p_raw(1:3) = grad_p_raw(1:3) - bp_arr(npj)%pres *    &
+                                       gradWomegaj(1:3)
+                  endif
 ! Contributions to the inverse of the renormalization matrices
                   aux_vec(1:3) = (bp_arr(npj)%pos(1) - pglocal%coord(1)) *     &
                                  gradWomegaj(1:3)
@@ -301,12 +320,14 @@ do jrang=jgridi-1,jgridi+1
                                    gradWomegaj(1:3)
                   aux_vec_3(1:3) = (bp_arr(npj)%pos(3) - pglocal%coord(3)) *   &
                                    gradWomegaj(1:3)
-                  pglocal%B_ren_fp_bp(1:3,1) = pglocal%B_ren_fp_bp(1:3,1) +    &
-                                               aux_vec(1:3)
-                  pglocal%B_ren_fp_bp(1:3,2) = pglocal%B_ren_fp_bp(1:3,2) +    &
-                                               aux_vec_2(1:3)
-                  pglocal%B_ren_fp_bp(1:3,3) = pglocal%B_ren_fp_bp(1:3,3) +    &
-                                               aux_vec_3(1:3)
+                  if (bp_for_pres) then
+                     pglocal%B_ren_fp_bp(1:3,1) = pglocal%B_ren_fp_bp(1:3,1) + &
+                                                  aux_vec(1:3)
+                     pglocal%B_ren_fp_bp(1:3,2) = pglocal%B_ren_fp_bp(1:3,2) + &
+                                                  aux_vec_2(1:3)
+                     pglocal%B_ren_fp_bp(1:3,3) = pglocal%B_ren_fp_bp(1:3,3) + &
+                                                  aux_vec_3(1:3)
+                  endif
                   if (bp_arr(npj)%surface) then
 ! Only surface body particles are involved in the SPH approximation of velocity
 ! Contribution to x
@@ -346,7 +367,11 @@ if (pglocal%sigma_fp<1.d-1) then
    else
 ! 0th-order consistency SPH approximations: temporary variables
       dens_cons0 = dens_cons0 / pglocal%sigma_fp
-      pres_cons0 = pres_cons0 / pglocal%sigma_fp_bp
+      if (bp_for_pres) then
+         pres_cons0 = pres_cons0 / pglocal%sigma_fp_bp
+         else
+            pres_cons0 = pres_cons0 / pglocal%sigma_fp
+      endif
       vel_cons0(1:3) = vel_cons0(1:3) / pglocal%sigma_fp_sbp
       if (.not.input_any_t%C1_monitors) then
 ! 0th-order consistency SPH approximations
@@ -363,7 +388,13 @@ if (pglocal%sigma_fp<1.d-1) then
                                   grad_1_fp(1:3)
 ! 0th-order consistency SPH approximation of grad_p
 #ifdef SOLID_BODIES
-            grad_p_cons0(1:3) = grad_p_raw(1:3) - pres_cons0 * grad_1_fp_bp(1:3)
+            if (bp_for_pres) then
+               grad_p_cons0(1:3) = grad_p_raw(1:3) - pres_cons0 *              &
+                                   grad_1_fp_bp(1:3)
+               else
+                  grad_p_cons0(1:3) = grad_p_raw(1:3) - pres_cons0 *           &
+                                      grad_1_fp(1:3)
+            endif
 #else
             grad_p_cons0(1:3) = grad_p_raw(1:3) - pres_cons0 * grad_1_fp(1:3)
 #endif
@@ -394,7 +425,9 @@ if (pglocal%sigma_fp<1.d-1) then
 ! 0th-order consistency SPH approximations of x
             x_cons0_fp(1:3) = x_cons0_fp(1:3) / pglocal%sigma_fp
 #ifdef SOLID_BODIES
-            x_cons0_fp_bp(1:3) = x_cons0_fp_bp(1:3) / pglocal%sigma_fp_bp
+            if (bp_for_pres) then
+               x_cons0_fp_bp(1:3) = x_cons0_fp_bp(1:3) / pglocal%sigma_fp_bp
+            endif
             x_cons0_fp_sbp(1:3) = x_cons0_fp_sbp(1:3) / pglocal%sigma_fp_sbp
 #endif
 ! Matrix inversion to get the renormalization matrices
@@ -413,19 +446,21 @@ if (pglocal%sigma_fp<1.d-1) then
                   pglocal%B_ren_fp(3,3) = -1.d0
             endif
 #ifdef SOLID_BODIES
-            call Matrix_Inversion_3x3(pglocal%B_ren_fp_bp,aux_mat,             &
-               abs_det_thresh,test)
-            if (test==1) then
-               pglocal%B_ren_fp_bp(1:3,1:3) = aux_mat(1:3,1:3)
-               else
-                  write(ulog,*) "Monitors. 1st-order consistency replaced by ",&
-                     "0th-order consistency. Monitor position: ",              &
-                     pglocal%coord(1:3)," . Simulation time: ",simulation_time,&
-                     " ."
-                  pglocal%B_ren_fp_bp(1:3,1:3) = 0.d0
-                  pglocal%B_ren_fp_bp(1,1) = -1.d0
-                  pglocal%B_ren_fp_bp(2,2) = -1.d0
-                  pglocal%B_ren_fp_bp(3,3) = -1.d0
+            if (bp_for_pres) then
+               call Matrix_Inversion_3x3(pglocal%B_ren_fp_bp,aux_mat,          &
+                  abs_det_thresh,test)
+               if (test==1) then
+                  pglocal%B_ren_fp_bp(1:3,1:3) = aux_mat(1:3,1:3)
+                  else
+                     write(ulog,*) "Monitors. 1st-order consistency replaced ",&
+                        "by 0th-order consistency. Monitor position: ",        &
+                        pglocal%coord(1:3)," . Simulation time: ",             &
+                        simulation_time," ."
+                     pglocal%B_ren_fp_bp(1:3,1:3) = 0.d0
+                     pglocal%B_ren_fp_bp(1,1) = -1.d0
+                     pglocal%B_ren_fp_bp(2,2) = -1.d0
+                     pglocal%B_ren_fp_bp(3,3) = -1.d0
+               endif
             endif
             call Matrix_Inversion_3x3(pglocal%B_ren_fp_sbp,aux_mat,            &
                abs_det_thresh,test)
@@ -448,8 +483,13 @@ if (pglocal%sigma_fp<1.d-1) then
             grad_rho_cons1(1:3) = -grad_rho_cons1(1:3)
 ! grad_p
 #ifdef SOLID_BODIES
-            call MatrixProduct(pglocal%B_ren_fp_bp,grad_p_cons0,grad_p_cons1,  &
-               nr=3,nrc=3,nc=1)
+            if (bp_for_pres) then
+               call MatrixProduct(pglocal%B_ren_fp_bp,grad_p_cons0,            &
+                  grad_p_cons1,nr=3,nrc=3,nc=1)
+               else
+                  call MatrixProduct(pglocal%B_ren_fp,grad_p_cons0,            &
+                     grad_p_cons1,nr=3,nrc=3,nc=1)   
+            endif
 #else
             call MatrixProduct(pglocal%B_ren_fp,grad_p_cons0,grad_p_cons1,     &
                nr=3,nrc=3,nc=1)
@@ -488,7 +528,11 @@ if (pglocal%sigma_fp<1.d-1) then
             pglocal%dens = dens_cons0 + dot_product(grad_rho_cons1,aux_vec)
 ! delta_x for pressure approximation
 #ifdef SOLID_BODIES
-            aux_vec(1:3) = pglocal%coord(1:3) - x_cons0_fp_bp(1:3)
+            if (bp_for_pres) then
+               aux_vec(1:3) = pglocal%coord(1:3) - x_cons0_fp_bp(1:3)
+               else
+                  aux_vec(1:3) = pglocal%coord(1:3) - x_cons0_fp(1:3)
+            endif
 #else
             aux_vec(1:3) = pglocal%coord(1:3) - x_cons0_fp(1:3)
 #endif

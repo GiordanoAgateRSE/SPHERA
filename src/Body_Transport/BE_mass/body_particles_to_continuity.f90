@@ -127,7 +127,7 @@ do npi=1,n_body_part
             elseif (FSI_slip_conditions>1) then
 ! Correction for the velocity divergence (mirror velocity as solid velocity); 
 ! no-slip conditions require no correction
-               dvar(1:3) = dvar(1:3) - 2.d0 * (pg(npj)%dvel_ALE1(1:3) +        &
+               dvar(1:3) = dvar(1:3) - (pg(npj)%dvel_ALE1(1:3) +               &
                            pg(npj)%dvel_ALE3(1:3))
          endif
       endif
