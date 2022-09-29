@@ -19,12 +19,12 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: body_pressure_mirror
-! Description: Computation of the body particle pressure (Amicarelli et al.,
-!              2015, CAF).   
+! Program unit: body_p_max_limiter
+! Description: Limiter for the body-particle maximum pressure (Amicarelli et 
+!              al., 2015, CAF).   
 !-------------------------------------------------------------------------------
 #ifdef SOLID_BODIES
-subroutine body_pressure_mirror
+subroutine body_p_max_limiter
 !------------------------
 ! Modules
 !------------------------
@@ -35,8 +35,8 @@ use Dynamic_allocation_module
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: npi,j,npartint,npj,i
-double precision :: Sum_W_vol,W_vol,pres_mir,rho_ref,z_max,c_ref
+integer(4) :: npi,i
+double precision :: rho_ref,z_max,c_ref
 double precision :: abs_u_max,abs_u,z_s_min_body,abs_gravity_acc
 !------------------------
 ! Explicit interfaces
@@ -51,7 +51,7 @@ double precision :: abs_u_max,abs_u,z_s_min_body,abs_gravity_acc
 ! Statements
 !------------------------
 ! Rough approximation of the maximum admissible pressure value on each body
-if (body_maximum_pressure_limiter.eqv..true.) then
+if (body_maximum_pressure_limiter) then
    rho_ref = maxval(Med(1:size(Med))%den0)
    z_max = maxval(pg(1:size(pg))%coord(3),mask=pg(1:size(pg))%cella/=0)
    c_ref = maxval(Med(1:size(Med))%celerita)
@@ -74,36 +74,9 @@ if (body_maximum_pressure_limiter.eqv..true.) then
       if (body_arr(i)%p_max_limiter<0.d0) body_arr(i)%p_max_limiter = 0.d0             
    enddo
 endif
-! Loop over body particles
-!$omp parallel do default(none)                                                &
-!$omp private(npi,Sum_W_vol,j,npartint,npj,pres_mir,W_vol)                     &
-!$omp shared(n_body_part,bp_arr,nPartIntorno_bp_f,NMAXPARTJ,PartIntorno_bp_f)  &
-!$omp shared(pg,body_minimum_pressure_limiter,body_maximum_pressure_limiter)   &
-!$omp shared(body_arr)
-do npi=1,n_body_part
-   bp_arr(npi)%pres = 0.d0
-   Sum_W_vol = 0.d0
-   do j=1,nPartIntorno_bp_f(npi)
-      npartint = (npi - 1) * NMAXPARTJ + j
-      npj = PartIntorno_bp_f(npartint)
-      call body_pressure_mirror_interaction(npi,npj,npartint,pres_mir,W_vol)
-      bp_arr(npi)%pres = bp_arr(npi)%pres + pres_mir * W_vol
-      Sum_W_vol = Sum_W_vol + W_vol
-   enddo
-   if (Sum_W_vol>1.d-3) bp_arr(npi)%pres = bp_arr(npi)%pres / Sum_W_vol
-   if (body_minimum_pressure_limiter.eqv..true.) then
-      if (bp_arr(npi)%pres<0.d0) bp_arr(npi)%pres = 0.d0 
-   endif
-   if (body_maximum_pressure_limiter.eqv..true.) then
-      if (bp_arr(npi)%pres>body_arr(bp_arr(npi)%body)%p_max_limiter) then
-         bp_arr(npi)%pres = body_arr(bp_arr(npi)%body)%p_max_limiter
-      endif
-   endif
-enddo
-!$omp end parallel do
 !------------------------
 ! Deallocations
 !------------------------
 return
-end subroutine body_pressure_mirror
+end subroutine body_p_max_limiter
 #endif

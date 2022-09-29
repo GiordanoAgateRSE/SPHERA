@@ -24,7 +24,8 @@
 !              the neighbouring surface body particles providing the normal to 
 !              the "body-particle - fluid-particle" interactions (only for 
 !              no-slip conditions) and the boundary velocity (for free-slip and 
-!              no-slip conditions).  
+!              no-slip conditions). Body-particle mirror pressure (only at 
+!              the first time step "it_start" of the current simulation).
 !-------------------------------------------------------------------------------
 #ifdef SOLID_BODIES
 subroutine proxy_normals_for_body_particles
@@ -40,7 +41,8 @@ use I_O_file_module
 !------------------------
 implicit none
 integer(4) :: npi,jj,npartint,npj,kk,npartint_2,npk
-double precision :: aux_scal,dis,dis_min,dis_s0_sb,dis_fb_s0
+double precision :: aux_scal,dis,dis_min,dis_s0_sb,dis_fb_s0,Sum_W_vol,pres_mir
+double precision :: W_vol
 double precision :: aux_vec(3)
 !------------------------
 ! Explicit interfaces
@@ -59,13 +61,29 @@ double precision :: aux_vec(3)
 !$omp shared(n_body_part,bp_arr,nPartIntorno_bp_f,NMAXPARTJ,PartIntorno_bp_f)  &
 !$omp shared(rag_bp_f,pg,Domain,proxy_normal_bp_f,ulog,uerr,closest_f_sbp)     &
 !$omp shared(on_going_time_step,dis_f_sbp,nPartIntorno_f_sbp,PartIntorno_f_sbp)&
+!$omp shared(body_minimum_pressure_limiter,body_maximum_pressure_limiter)      &
+!$omp shared(it_start,body_arr)                                                &
 !$omp private(npi,jj,npartint,npj,kk,aux_scal,dis,dis_min)                     &
-!$omp private(aux_vec,dis_s0_sb,dis_fb_s0,npartint_2,npk)
+!$omp private(aux_vec,dis_s0_sb,dis_fb_s0,npartint_2,npk,Sum_W_vol,pres_mir)   &
+!$omp private(W_vol)
 do npi=1,n_body_part
+! Body-particle mirror pressure: start
+   if (on_going_time_step==it_start) then
+      bp_arr(npi)%pres = 0.d0
+      Sum_W_vol = 0.d0
+   endif
+! Body-particle mirror pressure: end
 ! Loop over the neighbouring fluid particles 
    do jj=1,nPartIntorno_bp_f(npi)
       npartint = (npi - 1) * NMAXPARTJ + jj
       npj = PartIntorno_bp_f(npartint)
+! Body-particle mirror pressure: start
+      if (on_going_time_step==it_start) then
+         call body_pressure_mirror_interaction(npi,npj,npartint,pres_mir,W_vol)
+         bp_arr(npi)%pres = bp_arr(npi)%pres + pres_mir * W_vol
+         Sum_W_vol = Sum_W_vol + W_vol
+      endif
+! Body-particle mirror pressure: end
       proxy_normal_bp_f(npartint) = 0
       dis_min = 1.d9
 ! Check if the normal of the interacting body particle is suitable: start
@@ -140,6 +158,22 @@ do npi=1,n_body_part
             endif
       endif
    enddo
+! Body-particle mirror pressure: start
+   if (on_going_time_step==it_start) then
+! Unique value representative of the body-particle pressure (for body 
+!dynamics)  
+      if (Sum_W_vol>1.d-3) bp_arr(npi)%pres = bp_arr(npi)%pres / Sum_W_vol
+! Body-particle pressure limiters
+      if (body_minimum_pressure_limiter) then
+         if (bp_arr(npi)%pres<0.d0) bp_arr(npi)%pres = 0.d0 
+      endif
+      if (body_maximum_pressure_limiter) then
+         if (bp_arr(npi)%pres>body_arr(bp_arr(npi)%body)%p_max_limiter) then
+            bp_arr(npi)%pres = body_arr(bp_arr(npi)%body)%p_max_limiter
+         endif
+      endif
+   endif
+! Body-particle mirror pressure: end
 enddo
 !$omp end parallel do
 !------------------------

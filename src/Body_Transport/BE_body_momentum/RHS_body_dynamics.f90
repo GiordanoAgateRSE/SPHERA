@@ -21,7 +21,8 @@
 !-------------------------------------------------------------------------------
 ! Program unit: RHS_body_dynamics  
 ! Description:  To estimate the RHS of the body dynamics equations (Amicarelli 
-!               et al.,2015,CAF).     
+!               et al., 2015, CAF; Amicarelli et al., 2020, CPC; Amicarelli et 
+!               al., 2022, IJCFD)
 !-------------------------------------------------------------------------------
 #ifdef SOLID_BODIES
 subroutine RHS_body_dynamics(dtvel)
@@ -43,8 +44,8 @@ integer(4) :: n_interactions,aux2,aux3,test,aux_scal_test
 integer(4) :: aux_int
 #endif
 double precision :: k_masses,r_per,r_par,alfa_boun,dxbp,abs_det_thresh
-double precision :: aux_impact_vel,aux4,aux_scalar,aux_scalar_2
-double precision :: friction_limiter
+double precision :: aux_impact_vel,aux4,aux_scalar,aux_scalar_2,Sum_W_vol,W_vol
+double precision :: friction_limiter,pres_mir
 #ifdef SPACE_2D
 double precision :: aux_locx_max,aux_locx_min
 #endif
@@ -269,23 +270,27 @@ abs_det_thresh = 1.d-9
 !------------------------
 ! Statements
 !------------------------
-! Updating pressure of the body particles
-call body_pressure_mirror
+call body_p_max_limiter
 ! Contributions to fluid dynamics momentum equations
+!$omp parallel do default(none)                                                &
+!$omp shared(n_body_part,bp_arr,nPartIntorno_bp_f,NMAXPARTJ,PartIntorno_bp_f)  &
+!$omp shared(pg,thin_walls,input_any_t,rag_bp_f,KerDer_bp_f_Gal)               &
+!$omp shared(FSI_slip_conditions,body_minimum_pressure_limiter,body_arr)       &
+!$omp shared(body_maximum_pressure_limiter,KerDer_bp_f_cub_spl)                &
+!$omp private(npi,Sum_W_vol,j,npartint,npj,pres_mir,W_vol,aux_scalar)          &
+!$omp private(aux_scalar_2,aux_vec)
 do npi=1,n_body_part
+   bp_arr(npi)%pres = 0.d0
+   Sum_W_vol = 0.d0
    do j=1,nPartIntorno_bp_f(npi)
       npartint = (npi - 1) * NMAXPARTJ + j
       npj = PartIntorno_bp_f(npartint)
 ! Contribution to the "grad_p + ALE term": start
 ! Term for grad_p
-
-
-
-      aux_scalar = (bp_arr(npi)%pres - pg(npj)%pres) / (pg(npj)%dens *         &
-                   pg(npj)%dens)
-
-
-
+      call body_pressure_mirror_interaction(npi,npj,npartint,pres_mir,W_vol)
+      bp_arr(npi)%pres = bp_arr(npi)%pres + pres_mir * W_vol
+      Sum_W_vol = Sum_W_vol + W_vol
+      aux_scalar = (pres_mir - pg(npj)%pres) / (pg(npj)%dens ** 2)
 ! Term for ALE
       aux_scalar_2 = 2.d0 * pg(npj)%pres / (pg(npj)%dens * pg(npj)%dens)
       if (thin_walls) then
@@ -299,38 +304,58 @@ do npi=1,n_body_part
 ! grad_p (renormalization at boundaries)
          call MatrixProduct(pg(npj)%B_ren_gradp,BB=rag_bp_f(1:3,npartint),     &
             CC=aux_vec,nr=3,nrc=3,nc=1)
+!$omp critical (omp_RHS_bd_acc)
          pg(npj)%acc(1:3) = pg(npj)%acc(1:3) + pg(npj)%dens *                  &
                             bp_arr(npi)%volume * aux_scalar * (-aux_vec(1:3))  &
                             * KerDer_bp_f_Gal(npartint)
+!$omp end critical (omp_RHS_bd_acc)
          else
 ! grad_p (no renormalization at boundaries: 0th-order consistency)
+!$omp critical (omp_RHS_bd_acc)
             pg(npj)%acc(1:3) = pg(npj)%acc(1:3) + (-pg(npj)%dens *             &
                                bp_arr(npi)%volume * aux_scalar *               &
                                ( - rag_bp_f(1:3,npartint)) *                   &
                                KerDer_bp_f_Gal(npartint))
+!$omp end critical (omp_RHS_bd_acc)
       endif
 ! ALE contribution to the acceleration
       aux_vec(1:3) = -pg(npj)%dens * bp_arr(npi)%volume * aux_scalar_2 *       &
                      (-rag_bp_f(1:3,npartint)) * KerDer_bp_f_Gal(npartint)
+!$omp critical (omp_RHS_bd_acc)      
       pg(npj)%acc(1:3) = pg(npj)%acc(1:3) + aux_vec(1:3)
 ! Contribution to the ALE velocity increment (here it is still an acceleration)
       pg(npj)%dvel_ALE1(1:3) = pg(npj)%dvel_ALE1(1:3) + aux_vec(1:3)
 ! Contribution to the "grad_p + ALE term": end
+!$omp end critical (omp_RHS_bd_acc)
       if ((FSI_slip_conditions==1).or.(FSI_slip_conditions==3)) then
 ! Body particle volume
          aux_scalar = bp_arr(npi)%volume
-      if (thin_walls) then
+         if (thin_walls) then
 ! Treatment for thin walls (to the coupling term on the shear-stress gradient)
-         aux_scalar = aux_scalar * (1.d0 + (1.d0 - pg(npj)%sigma_fp -          &
-                      pg(npj)%sigma_bp) / pg(npj)%sigma_bp)
-      endif
+            aux_scalar = aux_scalar * (1.d0 + (1.d0 - pg(npj)%sigma_fp -       &
+                         pg(npj)%sigma_bp) / pg(npj)%sigma_bp)
+         endif
 ! Contribution to the shear stress gradient term
+!$omp critical (omp_RHS_bd_acc)
          pg(npj)%acc(:) = pg(npj)%acc(:) - 2.d0 * pg(npj)%kin_visc *           &
                           (bp_arr(npi)%vel(:) - pg(npj)%vel(:)) *              &
                           KerDer_bp_f_cub_spl(npartint) * aux_scalar
+!$omp end critical (omp_RHS_bd_acc)
       endif
    enddo
+! Unique value representative of the body-particle pressure (for body dynamics)  
+   if (Sum_W_vol>1.d-3) bp_arr(npi)%pres = bp_arr(npi)%pres / Sum_W_vol
+! Body-particle pressure limiters
+   if (body_minimum_pressure_limiter) then
+      if (bp_arr(npi)%pres<0.d0) bp_arr(npi)%pres = 0.d0 
+   endif
+   if (body_maximum_pressure_limiter) then
+      if (bp_arr(npi)%pres>body_arr(bp_arr(npi)%body)%p_max_limiter) then
+         bp_arr(npi)%pres = body_arr(bp_arr(npi)%body)%p_max_limiter
+      endif
+   endif
 enddo
+!$omp end parallel do
 ! Loop over the transported bodies (gravity forces and Ic initialization)
 !$omp parallel do default(none) private(i)                                     &
 !$omp shared(n_bodies,body_arr,Domain,it_start,on_going_time_step)             &

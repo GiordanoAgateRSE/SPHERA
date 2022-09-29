@@ -127,13 +127,14 @@ if ((Domain%tipo=="bsph").and.(nag>0).and.(DBSPH%n_w>0)) then
 endif
 call start_and_stop(3,18)
 #ifdef SOLID_BODIES
-   call start_and_stop(2,19)
-! Proxy normals for body particles
-   call proxy_normals_for_body_particles
-! Pressure initialization for body particles
-   call body_pressure_mirror
-   call body_pressure_postpro
-   call start_and_stop(3,19)
+call start_and_stop(2,19)
+! Body-particle proxy normals and pressure: start
+call body_p_max_limiter
+on_going_time_step = it_start
+call proxy_normals_for_body_particles
+! Body-particle proxy normals and pressure: end
+call body_pressure_postpro
+call start_and_stop(3,19)
 #endif
 ! To evaluate the close boundaries and integrals for the current particle in 
 ! every loop and storing them in the general storage array. Computation and 
@@ -387,7 +388,7 @@ TIME_STEP_DO: do while (it<=input_any_t%itmax)
 #ifdef SOLID_BODIES
 ! Continuity equation: end
                call start_and_stop(2,19)
-               call body_pressure_mirror
+               call body_p_max_limiter
                call start_and_stop(3,19)
 #endif
       endif
