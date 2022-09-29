@@ -278,8 +278,14 @@ do npi=1,n_body_part
       npj = PartIntorno_bp_f(npartint)
 ! Contribution to the "grad_p + ALE term": start
 ! Term for grad_p
+
+
+
       aux_scalar = (bp_arr(npi)%pres - pg(npj)%pres) / (pg(npj)%dens *         &
                    pg(npj)%dens)
+
+
+
 ! Term for ALE
       aux_scalar_2 = 2.d0 * pg(npj)%pres / (pg(npj)%dens * pg(npj)%dens)
       if (thin_walls) then

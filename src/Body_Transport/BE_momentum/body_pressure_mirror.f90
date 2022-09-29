@@ -36,10 +36,8 @@ use Dynamic_allocation_module
 !------------------------
 implicit none
 integer(4) :: npi,j,npartint,npj,i
-double precision :: Sum_W_vol,W_vol,dis,pres_mir,aux,rho_ref,z_max,c_ref
-double precision :: abs_u_max,abs_u,z_s_min_body,abs_gravity_acc,aux_scalar
-double precision :: aux_acc(3)
-double precision,external :: w
+double precision :: Sum_W_vol,W_vol,pres_mir,rho_ref,z_max,c_ref
+double precision :: abs_u_max,abs_u,z_s_min_body,abs_gravity_acc
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -78,39 +76,17 @@ if (body_maximum_pressure_limiter.eqv..true.) then
 endif
 ! Loop over body particles
 !$omp parallel do default(none)                                                &
-!$omp private(npi,Sum_W_vol,j,npartint,npj,aux_acc,pres_mir,dis,W_vol,aux)     &
-!$omp private(aux_scalar)                                                      &
+!$omp private(npi,Sum_W_vol,j,npartint,npj,pres_mir,W_vol)                     &
 !$omp shared(n_body_part,bp_arr,nPartIntorno_bp_f,NMAXPARTJ,PartIntorno_bp_f)  &
-!$omp shared(Domain,pg,rag_bp_f,body_minimum_pressure_limiter)                 &
-!$omp shared(body_maximum_pressure_limiter,body_arr,FSI_slip_conditions)       &
-!$omp shared(proxy_normal_bp_f)
+!$omp shared(pg,body_minimum_pressure_limiter,body_maximum_pressure_limiter)   &
+!$omp shared(body_arr)
 do npi=1,n_body_part
    bp_arr(npi)%pres = 0.d0
    Sum_W_vol = 0.d0
    do j=1,nPartIntorno_bp_f(npi)
       npartint = (npi - 1) * NMAXPARTJ + j
       npj = PartIntorno_bp_f(npartint)
-      aux = dsqrt(dot_product(bp_arr(npi)%acc(:),bp_arr(npi)%acc(:)))
-! Wall acceleration should be less than 100m/2^2, otherwise an impulse is 
-! assumed to occur and the formulation with acc_body is not valid
-      aux_scalar = 10.d0 * dsqrt(dot_product(Domain%grav(:),Domain%grav(:)))
-      if (aux<=aux_scalar) then
-         aux_acc(:) = Domain%grav(:) - bp_arr(npi)%acc(:)
-         else
-            aux_acc(:) = Domain%grav(:) - aux_scalar / aux * bp_arr(npi)%acc(:)
-      endif
-      if ((FSI_slip_conditions==0).or.(FSI_slip_conditions==2)) then
-         pres_mir = pg(npj)%pres + pg(npj)%dens *                              &
-                    dot_product(aux_acc(:),                                    &
-                    bp_arr(proxy_normal_bp_f(npartint))%normal(:)) *           &
-                    dot_product(rag_bp_f(:,npartint),                          &
-                    bp_arr(proxy_normal_bp_f(npartint))%normal(:))
-         else
-            pres_mir = pg(npj)%pres + pg(npj)%dens *                           &
-                       dot_product(aux_acc(:),rag_bp_f(:,npartint))
-      endif
-      dis = dsqrt(dot_product(rag_bp_f(:,npartint),rag_bp_f(:,npartint)))
-      W_vol = w(dis,Domain%h,Domain%coefke) * (pg(npj)%mass / pg(npj)%dens)
+      call body_pressure_mirror_interaction(npi,npj,npartint,pres_mir,W_vol)
       bp_arr(npi)%pres = bp_arr(npi)%pres + pres_mir * W_vol
       Sum_W_vol = Sum_W_vol + W_vol
    enddo
