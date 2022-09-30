@@ -144,7 +144,7 @@ ___
 !-------------------------------------------------------------------------------
 ![?] endif (CAE.and.3D)
 !-------------------------------------------------------------------------------
-![*] <body_mass>: in case of imposed kinematics, the body mass is not 
+![*] <body_mass>: in case of (imposed kinematics==1), the body mass is not 
 !    influential
 ![?] <pos_CM>: position of the centre of mass (Initial Conditions)
 ![?] <Ic_flag>
