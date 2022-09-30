@@ -68,7 +68,7 @@ do npi=1,n_body_part
       dis_ref = dsqrt(3.d0) * ((bp_arr(npi)%volume ** (1.d0/3.d0)) / 2.d0 +    &
                 Domain%dx / 2.d0) / 5.d0
 #elif defined SPACE_2D
-      dis_ref = dsqrt(2.d0) * ((bp_arr(npi)%volume ** (1.d0/3.d0)) / 2.d0 +    &
+      dis_ref = dsqrt(2.d0) * ((bp_arr(npi)%volume ** (1.d0/2.d0)) / 2.d0 +    &
                 Domain%dx / 2.d0) / 5.d0
 #endif
       if (dis_bp_f<=dis_ref) then

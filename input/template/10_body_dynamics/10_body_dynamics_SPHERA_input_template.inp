@@ -184,16 +184,18 @@ ___ ___ ___
 !    initial orientation in the global reference system
 ![?] <vel_CM>: velocity of the centre of mass at "t=0"
 ![?] <omega>: angular velocity of the body at "t=0"
-![?] <imposed_kinematics_flag>
-!    =0 (no imposed kinematics; dynamics is computed)
-!    =1 (kinematics is imposed)
+![?] <imposed_kinematics>
+!    =0 (no imposed kinematics; dynamics computed)
+!    =1 (kinematics imposed; dynamics not computed)
+!    =2 (kinematics imposed; dynamics computed without mass moment of inertia, 
+!        body angular velocity and velocity)
 ![?] <n_records>: number of records which describe the imposed kinematics
 !-------------------------------------------------------------------------------
 ![*] <n_R_IO_x> <n_R_IO_y> <n_R_IO_z> <teta_R_IO>
 ![*] <pos_rotC_x> <pos_rotC_y> <pos_rotC_z>
 ![*] <vel_CM_x> <vel_CM_y> <vel_CM_z>
 ![*] <omega_x> <omega_y> <omega_z>
-![*] <imposed_kinematics_flag> <n_records>
+![*] <imposed_kinematics> <n_records>
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
 ___ ___ ___ ___

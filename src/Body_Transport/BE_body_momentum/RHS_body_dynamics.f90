@@ -361,7 +361,8 @@ enddo
 !$omp shared(n_bodies,body_arr,Domain,it_start,on_going_time_step)             &
 !$omp shared(aux_gravity,simulation_time,time_max_no_body_gravity_force)
 do i=1,n_bodies
-   if (body_arr(i)%imposed_kinematics==0) then
+   if ((body_arr(i)%imposed_kinematics==0).or.                                 &
+      (body_arr(i)%imposed_kinematics==2))  then
       if (simulation_time>time_max_no_body_gravity_force) then
          aux_gravity(i,:) = body_arr(i)%mass * Domain%grav(:)
          else
@@ -378,7 +379,8 @@ enddo
 !$omp end parallel do
 ! Loop over the body particles  
 do npi=1,n_body_part
-   if (body_arr(bp_arr(npi)%body)%imposed_kinematics==0) then
+   if ((body_arr(bp_arr(npi)%body)%imposed_kinematics==0).or.                  &
+      (body_arr(bp_arr(npi)%body)%imposed_kinematics==2)) then
 ! Only body particles at the body surface     
       if (bp_arr(npi)%surface) then  
 ! Computation of the ID of the surface body particles
@@ -689,7 +691,8 @@ enddo
 !$omp shared(Domain,alfa_denom,Force_bod_sol,Moment_bod_sol,inter_front)       &
 !$omp shared(Force_bod_flu,abs_det_thresh)
 do i=1,n_bodies
-   if (body_arr(i)%imposed_kinematics==0) then
+   if ((body_arr(i)%imposed_kinematics==0).or.                                 &
+      (body_arr(i)%imposed_kinematics==2)) then
 ! Saving the hydrodynamic forces 
       Force_bod_flu(i,:) = body_arr(i)%Force(:)
 ! Finalizing the assessment of the body-solid forces 
@@ -717,6 +720,8 @@ do i=1,n_bodies
             endif
          endif
       enddo
+   endif
+   if (body_arr(i)%imposed_kinematics==0) then
 ! Ic and its inverse
 #ifdef SPACE_3D
          body_arr(i)%Ic(2,1) = body_arr(i)%Ic(1,2)
@@ -744,7 +749,8 @@ enddo
 !$omp private(j,k,nbi,npk,nbk,n_interactions,aux2,aux_scalar,aux_vec,aux_vec_2)&
 !$omp private(aux_scalar_2,sliding_friction,friction_limiter,rel_pos)
 do nbi=1,n_bodies
-   if (body_arr(nbi)%imposed_kinematics==0) then
+   if ((body_arr(nbi)%imposed_kinematics==0).or.                               &
+      (body_arr(nbi)%imposed_kinematics==2)) then
 ! Sliding friction, gravity and normal reaction: start
       if ((friction_angle>-1.d-9).and.(inter_front(nbi)>0).and.                &
          (simulation_time>time_max_no_body_gravity_force)) then
