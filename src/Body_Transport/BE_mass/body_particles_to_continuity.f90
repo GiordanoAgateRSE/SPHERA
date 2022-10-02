@@ -125,11 +125,11 @@ do npi=1,n_body_part
             dvar(1:3) = dvar(1:3) - 2.d0 * dot_product(aux_vec,tau_s) *        &
                         tau_s(1:3)
             elseif (FSI_slip_conditions>1) then
-! Correction for the velocity divergence (mirror velocity as solid velocity); 
-! no-slip conditions require no correction
-               dvar(1:3) = dvar(1:3) - (pg(npj)%dvel_ALE1(1:3) +               &
-                           pg(npj)%dvel_ALE3(1:3))
+! Possible correction for the velocity divergence (mirror velocity as solid 
+! velocity)
+               dvar(1:3) = dvar(1:3)
          endif
+!Note: in any case, no-slip conditions require no correction
       endif
       dis = dsqrt(dot_product(rag_bp_f(:,npartint),rag_bp_f(:,npartint)))
       W_vol = w(dis,Domain%h,Domain%coefke) * pg(npj)%mass / pg(npj)%dens
