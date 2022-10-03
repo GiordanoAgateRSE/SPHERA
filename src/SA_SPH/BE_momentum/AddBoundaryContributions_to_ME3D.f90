@@ -52,7 +52,7 @@ double precision :: IntdWrm1dV,cinvisci,Monvisc,cinviscmult,dvn
 double precision :: FlowRate1,Lb,L,minquotanode,maxquotanode,u_t_0
 double precision :: celeri,alfaMon,Mmult,IntGWZrm1dV,slip_coefficient
 double precision :: aux_scal
-double precision,dimension(1:SPACEDIM) :: vb,vi,dvij,nnlocal 
+double precision,dimension(1:SPACEDIM) :: vb,vi,dvij,dvij_Mor_SASPH,nnlocal 
 double precision,dimension(1:SPACEDIM) :: ViscoMon,ViscoShear,LocPi
 double precision,dimension(1:SPACEDIM) :: u_t_0_vector,one_Loc
 ! Unit vector of the unity vector: direction of (1,1,1)
@@ -252,7 +252,15 @@ face_loop: do icbf=1,Ncbf
                (Tratto(stretch)%laminar_no_slip_check.eqv..false.)) then
 ! The factor 2 is already present in "dvij"
                cinviscmult = cinvisci * IntdWrm1dV * slip_coefficient
-               ViscoShear(:) = ViscoShear(:) + cinviscmult * dvij(:)
+               if (input_any_t%ALE3) then
+                  dvij_Mor_SASPH(1:3) = 2.d0 * (pg(npi)%vel_fluid(1:3) -       &
+                                        BoundaryFace(iface)%velocity(1:3))
+                  else
+                     dvij_Mor_SASPH(1:3) = 2.d0 * (pg(npi)%var(1:3) -          &
+                                           BoundaryFace(iface)%velocity(1:3))
+               endif
+               ViscoShear(1:3) = ViscoShear(1:3) + cinviscmult *               &
+                                 dvij_Mor_SASPH(1:3)
             endif
          endif
       endif

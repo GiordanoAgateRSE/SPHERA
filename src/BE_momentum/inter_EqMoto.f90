@@ -49,7 +49,7 @@ double precision :: absv_Morris_inner,Morris_inner_weigth,kernel_der
 double precision :: dervel(3),dervelmorr(3),appopres(3),appodiss(3),rvw(3)
 double precision :: rvwalfa(3),rvwbeta(3),ragtemp(3),rvw_sum(3),rvw_semi_part(3)
 double precision :: DBSPH_wall_she_vis_term(3),t_visc_semi_part(3),aux_vec(3)
-double precision :: t_pres_aux(3),ALE1_term_sum(3)
+double precision :: t_pres_aux(3),ALE1_term_sum(3),dervel_Mon(3)
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -154,7 +154,12 @@ do contj=1,nPartIntorno(npi)
    amassj = pg(npj)%mass
    pi = pg(npi)%pres
    pj = pg(npj)%pres
-   dervel(:) = pg(npj)%vel(:) - pg(npi)%vel(:)
+   if (input_any_t%ALE3) then
+      dervel(1:3) = pg(npj)%vel_fluid(1:3) - pg(npi)%vel_fluid(1:3)
+      else
+         dervel(1:3) = pg(npj)%vel(1:3) - pg(npi)%vel(1:3)
+   endif
+   dervel_Mon(1:3) = pg(npj)%vel(1:3) - pg(npi)%vel(1:3)
    dervelmorr(:) = pg(npj)%vel(:) - pg(npi)%vel(:)
    if (pg(npj)%vel_type/="std") then  
       pj = pi
@@ -230,7 +235,7 @@ do contj=1,nPartIntorno(npi)
    t_pres_aux(1:3) = t_pres_aux(1:3) + appopres(1:3)
 ! "grad_p + ALE1" terms: end
 ! To compute Monaghan term (artificial viscosity)
-   call viscomon(npi,npj,npartint,dervel,rvwalfa,rvwbeta)
+   call viscomon(npi,npj,npartint,dervel_Mon,rvwalfa,rvwbeta)
    appodiss(:) = rvwalfa(:) + rvwbeta(:)
 ! To add Monaghan term (artificial viscosity)
    tdiss(:) = tdiss(:) + appodiss(:)

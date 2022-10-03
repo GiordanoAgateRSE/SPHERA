@@ -161,10 +161,13 @@ do i_zone=1,NPartZone
                endif
 ! Formal null velocity initialization (it will follow a selective partial 
 ! velocity smoothing)
-               pg(npi)%vel(:) = 0.d0
+               pg(npi)%vel(1:3) = 0.d0
                pg(npi)%mom(1:3) = 0.d0
                pg(npi)%vel_type = "std"
                pg(npi)%sect_old_pos(:) = pg(npi)%coord(:)
+               pg(npi)%dvel_ALE1(1:3) = 0.d0
+               pg(npi)%dvel_ALE3(1:3) = 0.d0
+               pg(npi)%vel_fluid(1:3) = 0.d0
             enddo
          enddo
       enddo

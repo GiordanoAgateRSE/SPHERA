@@ -340,10 +340,14 @@ type TyParticle
    double precision :: mom(3)
 ! Imposed velocity
    double precision :: velass(3)
-! ALE velocity increment
+! ALE1 velocity increment
    double precision :: dvel_ALE1(3)
-! ALE velocity increment
+! ALE3 velocity increment
    double precision :: dvel_ALE3(3)
+! Fluid velocity at the last momentum time integration: control-volume velocity 
+! minus ALE velocity increments (the latter are continuously updated during the 
+! time step)
+   double precision :: vel_fluid(3)
 ! Velocity gradient (SPH pseudo-consistent approximation over fluid particles) 
    double precision :: dvel(3,3)
 ! Renormalization matrix for the pressure-gradient term in the momentum 

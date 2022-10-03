@@ -64,6 +64,8 @@ do npi=1,nag
    if (input_any_t%ALE3) then
       pg(npi)%dvel_ALE1(1:3) = pg(npi)%dvel_ALE1(1:3) * dt
       pg(npi)%dvel_ALE3(1:3) = pg(npi)%dvel_ALE3(1:3) * dt
+      pg(npi)%vel_fluid(1:3) = pg(npi)%vel(1:3) - pg(npi)%dvel_ALE1(1:3) -     &
+                               pg(npi)%dvel_ALE3(1:3)
    endif
 enddo
 !$omp end parallel do

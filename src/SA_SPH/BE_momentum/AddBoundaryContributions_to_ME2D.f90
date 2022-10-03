@@ -63,6 +63,7 @@ double precision,dimension(1:PLANEDIM) :: RG,ss,nnlocal,gradbPsuro
 double precision,dimension(1:PLANEDIM) :: ViscoMon,ViscoShear,sidevel,TT,Dvel
 double precision,dimension(1:PLANEDIM) :: RG_like,gradbPsuro_like,RG_sum
 double precision,dimension(1:SPACEDIM) :: u_t_0_vector,aux_vec_2,aux_vec
+double precision,dimension(1:SPACEDIM) :: Dvel_Mor_SASPH
 ! Unit vector of the unity vector: direction of (1,1)
 double precision,dimension(1:SPACEDIM) :: one_vec_dir
 ! SASPH ME ALE term
@@ -365,9 +366,14 @@ do icbs=1,IntNcbs
             else
                SVforce = 0.d0
          endif
+         if (input_any_t%ALE3) then
+            Dvel_Mor_SASPH(1:3) = 2.d0 * pg(npi)%vel_fluid(1:3)
+            else
+               Dvel_Mor_SASPH(1:3) = 2.d0 * pg(npi)%var(1:3)
+         endif
          do i=1,PLANEDIM
             ViscoMon(i) = ViscoMon(i) + TT(i)
-            ViscoShear(i) = ViscoShear(i) + Dvel(i) * SVforce
+            ViscoShear(i) = ViscoShear(i) + Dvel_Mor_SASPH(acix(i)) * SVforce
          enddo
       endif
    endif

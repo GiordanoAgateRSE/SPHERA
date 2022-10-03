@@ -56,7 +56,7 @@ double precision :: loc_pos(3)
 #ifdef SPACE_2D
 double precision :: aux_locx_vert(3),pos_aux(3)
 #endif
-double precision :: sliding_friction(3)
+double precision :: sliding_friction(3),fluid_vel_npj(3)
 double precision :: aux_mat(3,3)
 ! "inter_front": Number of neighbouring frontiers for a given body. It is 
 ! approximated by the maximum number of neighbouring frontiers of a single body 
@@ -278,7 +278,7 @@ call body_p_max_limiter
 !$omp shared(FSI_slip_conditions,body_minimum_pressure_limiter,body_arr)       &
 !$omp shared(body_maximum_pressure_limiter,KerDer_bp_f_cub_spl)                &
 !$omp private(npi,Sum_W_vol,j,npartint,npj,pres_mir,W_vol,aux_scalar)          &
-!$omp private(aux_scalar_2,aux_vec)
+!$omp private(aux_scalar_2,aux_vec,fluid_vel_npj)
 do npi=1,n_body_part
    bp_arr(npi)%pres = 0.d0
    Sum_W_vol = 0.d0
@@ -336,10 +336,15 @@ do npi=1,n_body_part
                          pg(npj)%sigma_bp) / pg(npj)%sigma_bp)
          endif
 ! Contribution to the shear stress gradient term
+         if (input_any_t%ALE3) then
+            fluid_vel_npj(1:3) = pg(npj)%vel_fluid(1:3)
+            else
+               fluid_vel_npj(1:3) = pg(npj)%vel(1:3)            
+         endif
 !$omp critical (omp_RHS_bd_acc)
 ! Only slip condition available: mirror fluid velocity as solid velocity
          pg(npj)%acc(:) = pg(npj)%acc(:) - 2.d0 * pg(npj)%kin_visc *           &
-                          (bp_arr(npi)%vel(:) - pg(npj)%vel(:)) *              &
+                          (bp_arr(npi)%vel(1:3) - fluid_vel_npj(1:3)) *        &
                           KerDer_bp_f_cub_spl(npartint) * aux_scalar
 !$omp end critical (omp_RHS_bd_acc)
       endif

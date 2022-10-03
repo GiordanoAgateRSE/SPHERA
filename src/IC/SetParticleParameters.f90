@@ -72,11 +72,12 @@ pg(npi)%vstart = partz(Nz)%vel
 call stoptime(partz(Nz),tstop)
 ! To compute velocity for particle of type "law"
 call vellaw(partz(Nz)%vlaw,partz(Nz)%vel,partz(Nz)%npointv)
-! Initial ALE velocity increments
+! Initial ALE velocity increments and fluid velocity
 pg(npi)%dvel_ALE1(1:3) = 0.d0
 pg(npi)%dvel_ALE3(1:3) = 0.d0
+pg(npi)%vel_fluid(1:3) = pg(npi)%vel(1:3)
 ! Stopping time for blocks in movement
-pg(npi)%tstop = tstop                    
+pg(npi)%tstop = tstop
 ! Material ID
 pg(npi)%imed = Mate
 ! Viscosities

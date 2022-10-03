@@ -137,6 +137,7 @@ if (simulation_time>=emission_time) then
             pg(nag)%sect_old_pos(:) = pg(nag)%coord(:)
             pg(nag)%dvel_ALE1(1:3) = 0.d0
             pg(nag)%dvel_ALE3(1:3) = 0.d0
+            pg(nag)%vel_fluid(1:3) = pg(nag)%vel(1:3)
             if (Domain%tipo=="bsph") call wavy_inlet(i_source)
             if (Domain%tipo=="bsph") then
                pg(nag)%rhoSPH_new = zero
