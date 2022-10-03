@@ -25,7 +25,7 @@
 !              SASPH contributions to the renormalization matrix for the 2D 
 !              velocity-divergence term (only for the first step).
 !              ALE3-LC: 2D auxiliary vectors for the explicit ALE1 SASPH term 
-!              of CE.
+!              of CE; ALE implicit terms in CE.
 !-------------------------------------------------------------------------------
 #ifdef SPACE_2D
 subroutine AddBoundaryContribution_to_CE2D(npi,IntNcbs,grad_u_SA,grad_w_SA,    &
@@ -114,26 +114,30 @@ do icbs=1,IntNcbs
       do pd=1,PLANEDIM
          nnlocal(pd) = RifBoundarySide%T(acix(pd),acix(2))
       enddo
-      select case (strtype)
-! No-slip conditions always apply to the 2D SASPH CE term
-         case ("fixe")
-            do pd=1,PLANEDIM
-               dvel(pd) = 2.d0 * (-pg(npi)%var(acix(pd)))
-            enddo
-         case ("tapi")
-            do pd=1,PLANEDIM
-               dvel(pd) = 2.d0 * (RifBoundarySide%velocity(acix(pd)) -         &
-                          pg(npi)%var(acix(pd)))
-            enddo
-         case ("velo","flow","sour")
-            if ((Domain%time_stage==1).or.(Domain%time_split==1)) then 
-               pg(npi)%koddens = 2
-               grad_u_SA(1:3) = 0.d0
-               grad_w_SA(1:3) = 0.d0
-            endif
-            return
-      endselect
-! Summations of the SASPH terms for grad_u_SA and grad_w_SA: start
+      if (input_any_t%ALE3) then
+         dvel(1:3) = -pg(npi)%var(1:3)
+         else
+            select case (strtype)
+! No-slip conditions always apply to the 2D SASPH CE term, without ALE
+               case ("fixe")
+                  do pd=1,PLANEDIM
+                     dvel(pd) = 2.d0 * (-pg(npi)%var(acix(pd)))
+                  enddo
+               case ("tapi")
+                  do pd=1,PLANEDIM
+                     dvel(pd) = 2.d0 * (RifBoundarySide%velocity(acix(pd)) -   &
+                                pg(npi)%var(acix(pd)))
+                  enddo
+               case ("velo","flow","sour")
+                  if ((Domain%time_stage==1).or.(Domain%time_split==1)) then 
+                     pg(npi)%koddens = 2
+                     grad_u_SA(1:3) = 0.d0
+                     grad_w_SA(1:3) = 0.d0
+                  endif
+                  return
+            endselect
+      endif
+ ! Summations of the SASPH terms for grad_u_SA and grad_w_SA: start
       do ii=1,PLANEDIM
          grad_u_SA(acix(ii)) = grad_u_SA(acix(ii)) - dvel(1) *                 &
                                RifBoundarySide%T(acix(ii),acix(2)) * IntWdS

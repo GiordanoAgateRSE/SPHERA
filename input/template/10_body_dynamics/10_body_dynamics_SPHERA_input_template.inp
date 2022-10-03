@@ -82,7 +82,9 @@
 ![?] "mirror velocity as solid velocity": when active, this formulation only 
 !    applies to the velocity-divergence term in the continuity equation, but 
 !    not to the shear-stress gradient term in the momentum equation, neither to 
-!    the mirror body pressure.
+!    the mirror body pressure. This option has no influence if (ALE3).
+!    "FSI_slip_conditions" plays no role in the 
+!    mass/continuity/volume equations if (ALE3).
 ![?] <thin_walls>
 !    =.true. (treatment for submerged boundary thin walls, far from other 
 !    boundary types)
