@@ -287,7 +287,7 @@ do npi=1,n_body_part
       npj = PartIntorno_bp_f(npartint)
 ! Contribution to the "grad_p + ALE term": start
 ! Term for grad_p
-      call body_pressure_mirror_interaction(npi,npj,npartint,pres_mir,W_vol)
+      call body_pressure_mirror_interaction(npj,npartint,pres_mir,W_vol)
       bp_arr(npi)%pres = bp_arr(npi)%pres + pres_mir * W_vol
       Sum_W_vol = Sum_W_vol + W_vol
       aux_scalar = (pres_mir - pg(npj)%pres) / (pg(npj)%dens ** 2)
@@ -337,6 +337,7 @@ do npi=1,n_body_part
          endif
 ! Contribution to the shear stress gradient term
 !$omp critical (omp_RHS_bd_acc)
+! Only slip condition available: mirror fluid velocity as solid velocity
          pg(npj)%acc(:) = pg(npj)%acc(:) - 2.d0 * pg(npj)%kin_visc *           &
                           (bp_arr(npi)%vel(:) - pg(npj)%vel(:)) *              &
                           KerDer_bp_f_cub_spl(npartint) * aux_scalar

@@ -23,9 +23,10 @@
 ! Description: Computation of the array «proxy_normal_bp_f» of the indices of 
 !              the neighbouring surface body particles providing the normal to 
 !              the "body-particle - fluid-particle" interactions (only for 
-!              no-slip conditions) and the boundary velocity (for free-slip and 
-!              no-slip conditions). Body-particle mirror pressure (only at 
-!              the first time step "it_start" of the current simulation).
+!              no-slip conditions) and the surface boundary velocity and 
+!              acceleration (any slip condition). Body-particle mirror pressure 
+!              (only at the first time step "it_start" of the current 
+!              simulation).
 !-------------------------------------------------------------------------------
 #ifdef SOLID_BODIES
 subroutine proxy_normals_for_body_particles
@@ -79,7 +80,7 @@ do npi=1,n_body_part
       npj = PartIntorno_bp_f(npartint)
 ! Body-particle mirror pressure: start
       if (on_going_time_step==it_start) then
-         call body_pressure_mirror_interaction(npi,npj,npartint,pres_mir,W_vol)
+         call body_pressure_mirror_interaction(npj,npartint,pres_mir,W_vol)
          bp_arr(npi)%pres = bp_arr(npi)%pres + pres_mir * W_vol
          Sum_W_vol = Sum_W_vol + W_vol
       endif
@@ -152,7 +153,8 @@ do npi=1,n_body_part
 ! particle migh have neighbouring body particles, but not neighbouing surface 
 ! body particles. Under these cimrcumstances, the normal vector is zeroed 
 ! (secondary default choice) by considering the computational body particle, 
-! which here is not on the surface of its body.
+! which here is not on the surface of its body. This default option is crucial 
+! as also the surface velocity and acceleration refers to "proxy_normal_bp_f". 
                      proxy_normal_bp_f(npartint) = npi
                endif
             endif

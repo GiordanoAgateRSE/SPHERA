@@ -25,7 +25,7 @@
 !              Amicarelli et al., 2020, CPC; Amicarelli et al., 2022, IJCFD).   
 !-------------------------------------------------------------------------------
 #ifdef SOLID_BODIES
-subroutine body_pressure_mirror_interaction(npi,npj,npartint,pres_mir,W_vol)
+subroutine body_pressure_mirror_interaction(npj,npartint,pres_mir,W_vol)
 !------------------------
 ! Modules
 !------------------------
@@ -36,7 +36,7 @@ use Static_allocation_module
 ! Declarations
 !------------------------
 implicit none
-integer(4),intent(in) :: npi,npj,npartint
+integer(4),intent(in) :: npj,npartint
 double precision,intent(out) :: pres_mir,W_vol
 double precision :: aux,aux_scalar,dis
 double precision,dimension(3) :: aux_acc
@@ -53,14 +53,16 @@ double precision,external :: w
 !------------------------
 ! Statements
 !------------------------
-aux = dsqrt(dot_product(bp_arr(npi)%acc(:),bp_arr(npi)%acc(:)))
+aux = dsqrt(dot_product(bp_arr(proxy_normal_bp_f(npartint))%acc(:),            &
+      bp_arr(proxy_normal_bp_f(npartint))%acc(:)))
 ! Wall acceleration should be less than 100m/2^2, otherwise an impulse is 
 ! assumed to occur and the formulation with acc_body is not valid
 aux_scalar = 10.d0 * dsqrt(dot_product(Domain%grav(:),Domain%grav(:)))
 if (aux<=aux_scalar) then
-   aux_acc(:) = Domain%grav(:) - bp_arr(npi)%acc(:)
+   aux_acc(:) = Domain%grav(:) - bp_arr(proxy_normal_bp_f(npartint))%acc(:)
    else
-      aux_acc(:) = Domain%grav(:) - aux_scalar / aux * bp_arr(npi)%acc(:)
+      aux_acc(:) = Domain%grav(:) - aux_scalar / aux *                         &
+                   bp_arr(proxy_normal_bp_f(npartint))%acc(:)
 endif
 if ((FSI_slip_conditions==0).or.(FSI_slip_conditions==2)) then
    pres_mir = pg(npj)%pres + pg(npj)%dens * dot_product(aux_acc(:),            &
