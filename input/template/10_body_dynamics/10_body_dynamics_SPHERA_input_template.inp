@@ -90,13 +90,18 @@
 !    boundary types)
 !    =.false. (no treatment for submerged boundary thin walls, far from other 
 !    boundary types)
+![?] <c_ini_rem_fp_sb>: coefficient for the initial removal of fluid particles 
+!    within solid bodies. This only refine the initial geometry of the fluid 
+!    bodies around the surfaces of solid bodies.
+!    =1. (default value)
 !-------------------------------------------------------------------------------
 ![*] <n_bodies> <dx/dx_body> <friction_angle> <time_max_no_gravity_force> 
 !    <time_max_no_body_frontier_impingements> <body_minimum_pressure_limiter> 
-!    <body_maximum_pressure_limiter> <FSI_slip_conditions> <thin_walls>
+!    <body_maximum_pressure_limiter> <FSI_slip_conditions> <thin_walls> 
+!    <c_ini_rem_fp_sb>
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
-___ ___ ___ ___ ___ ___ ___ ___ ___
+___ ___ ___ ___ ___ ___ ___ ___ ___ ___
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
 ![?] <ID_body>: body ID

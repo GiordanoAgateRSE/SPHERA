@@ -85,10 +85,10 @@ do while (trim(lcase(ainp)) /= "##### end body dynamics #####")
    read(ainp,*,iostat=ioerr) n_bodies,dx_dxbodies,friction_angle,              &
       time_max_no_body_gravity_force,time_max_no_body_frontier_impingements,   &
       body_minimum_pressure_limiter,body_maximum_pressure_limiter,             &
-      FSI_slip_conditions,thin_walls
+      FSI_slip_conditions,thin_walls,c_ini_rem_fp_sb
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"BODY DYNAMICS GENERAL INPUT",ninp,&
       ulog)) return
-! Writing the number of bodies and "dx_dxbodies" on the log file
+! Writing on the log file
 ! In case of restart, Domain%dx>0 since the first (and only) reading of the main
 ! input file
    if ((input_second_read.eqv..true.).and.(ulog>0)) then
@@ -109,6 +109,8 @@ do while (trim(lcase(ainp)) /= "##### end body dynamics #####")
          FSI_slip_conditions
       write(ulog,"(1x,a,1p,l12)") "thin_walls:...................",            &
          thin_walls
+      write(ulog,"(1x,a,1p,e12.4)") "c_ini_rem_fp_sb:..............",          &
+         c_ini_rem_fp_sb
       write(ulog,"(1x,a)")  " "
    endif
 ! Allocation of the array of the bodies

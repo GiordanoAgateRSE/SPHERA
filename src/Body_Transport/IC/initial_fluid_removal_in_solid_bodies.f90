@@ -51,6 +51,12 @@ double precision :: dis_ref,dis_bp_f
 !------------------------
 ! Statements
 !------------------------
+! Distance threshold to remove fluid particles
+#ifdef SPACE_3D
+dis_ref = c_ini_rem_fp_sb * dsqrt(3.d0) / 4.d0 * Domain%dx 
+#elif defined SPACE_2D
+dis_ref = c_ini_rem_fp_sb * dsqrt(2.d0) / 4.d0 * Domain%dx
+#endif
 ! Loop over the body particles 
 !$omp parallel do default(none)                                                &
 !$omp shared(n_body_part,nPartIntorno_bp_f,NMAXPARTJ,PartIntorno_bp_f,pg)      &
@@ -64,13 +70,6 @@ do npi=1,n_body_part
       npj = PartIntorno_bp_f(npartint)
       dis_bp_f = dsqrt(dot_product(rag_bp_f(1:3,npartint),                     &
                  rag_bp_f(1:3,npartint)))
-#ifdef SPACE_3D
-      dis_ref = dsqrt(3.d0) * ((bp_arr(npi)%volume ** (1.d0/3.d0)) / 2.d0 +    &
-                Domain%dx / 2.d0) / 5.d0
-#elif defined SPACE_2D
-      dis_ref = dsqrt(2.d0) * ((bp_arr(npi)%volume ** (1.d0/2.d0)) / 2.d0 +    &
-                Domain%dx / 2.d0) / 5.d0
-#endif
       if (dis_bp_f<=dis_ref) then
 !$omp critical (omp_initial_fluid_removal_in_solid_bodies)
          if (pg(npj)%cella>-1) then

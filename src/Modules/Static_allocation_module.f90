@@ -234,6 +234,8 @@ double precision :: unosusquareh
 ! Ratio between fluid particle and body particle size (only for ICs of 
 ! handmade bodies)
 double precision :: dx_dxbodies
+! Coefficient for initial removal of fluid particles within solid bodies
+double precision :: c_ini_rem_fp_sb
 ! Numerical times for body dynamics (input)
 double precision :: time_max_no_body_gravity_force
 double precision :: time_max_no_body_frontier_impingements
