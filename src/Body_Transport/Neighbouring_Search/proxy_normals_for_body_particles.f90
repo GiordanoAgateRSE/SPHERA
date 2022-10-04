@@ -78,13 +78,6 @@ do npi=1,n_body_part
    do jj=1,nPartIntorno_bp_f(npi)
       npartint = (npi - 1) * NMAXPARTJ + jj
       npj = PartIntorno_bp_f(npartint)
-! Body-particle mirror pressure: start
-      if (on_going_time_step==it_start) then
-         call body_pressure_mirror_interaction(npj,npartint,pres_mir,W_vol)
-         bp_arr(npi)%pres = bp_arr(npi)%pres + pres_mir * W_vol
-         Sum_W_vol = Sum_W_vol + W_vol
-      endif
-! Body-particle mirror pressure: end
       proxy_normal_bp_f(npartint) = 0
       dis_min = 1.d9
 ! Check if the normal of the interacting body particle is suitable: start
@@ -159,6 +152,13 @@ do npi=1,n_body_part
                endif
             endif
       endif
+! Body-particle mirror pressure: start
+      if (on_going_time_step==it_start) then
+         call body_pressure_mirror_interaction(npj,npartint,pres_mir,W_vol)
+         bp_arr(npi)%pres = bp_arr(npi)%pres + pres_mir * W_vol
+         Sum_W_vol = Sum_W_vol + W_vol
+      endif
+! Body-particle mirror pressure: end
    enddo
 ! Body-particle mirror pressure: start
    if (on_going_time_step==it_start) then

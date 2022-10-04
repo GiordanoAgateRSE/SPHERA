@@ -58,7 +58,7 @@ aux = dsqrt(dot_product(bp_arr(proxy_normal_bp_f(npartint))%acc(:),            &
 ! Wall acceleration should be less than 100m/2^2, otherwise an impulse is 
 ! assumed to occur and the formulation with acc_body is not valid
 aux_scalar = 10.d0 * dsqrt(dot_product(Domain%grav(:),Domain%grav(:)))
-if (aux<=aux_scalar) then
+if ((aux_scalar<1.d-9).or.(aux<=aux_scalar)) then
    aux_acc(:) = Domain%grav(:) - bp_arr(proxy_normal_bp_f(npartint))%acc(:)
    else
       aux_acc(:) = Domain%grav(:) - aux_scalar / aux *                         &
