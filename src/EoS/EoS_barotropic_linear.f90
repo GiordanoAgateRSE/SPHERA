@@ -48,10 +48,10 @@ double precision,intent(out),optional :: rho_out,p_out
 !------------------------
 if (present(rho_in)) then
 ! EoS
-   p_out = k_bulk / rho_in * (rho_in - rho_ref) + p_ref
+   p_out = k_bulk / rho_ref * (rho_in - rho_ref) + p_ref
    elseif (present(p_in)) then
 ! inverse of EoS
-      rho_out = rho_ref / (1.d0 - (p_in - p_ref) / k_bulk)
+      rho_out = rho_ref * (1.d0 + (p_in - p_ref) / k_bulk)
 endif
 !------------------------
 ! Deallocations
