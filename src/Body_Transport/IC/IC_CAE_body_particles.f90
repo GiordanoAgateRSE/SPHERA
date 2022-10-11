@@ -39,7 +39,8 @@ implicit none
 logical :: test
 integer(4) :: i_vtu_grid,i_vert,i_vert2,i_bp,ib,i_vtu_cell,aux_int,aux_int_2
 integer(4) :: ib_aux,j_vtu_cell,shared_face_cell_1,shared_face_cell_2,i_face
-double precision :: aux_scal,face_area
+integer(4) :: i_vert3
+double precision :: aux_scal,face_area,aux_scalar
 double precision,dimension(3) :: P1,P2,P3,P4,vec_P1_P2,vec_P1_P3
 double precision,dimension(3) :: vec_P1_P4,aux_vec,face_normal
 integer(4),dimension(4) :: cell_1,cell_2
@@ -253,7 +254,8 @@ endif
 !$omp parallel do default(none)                                                &
 !$omp shared(vtu_grids,i_vtu_grid,bp_arr,body_arr,ib,aux_int)                  &
 !$omp shared(test_surface_faces_1,test_surface_faces_2,uerr)                   &
-!$omp private(i_vtu_cell,i_bp,i_vert2,P1,P2,P3,face_area,face_normal,i_face)
+!$omp private(i_vtu_cell,i_bp,i_vert2,P1,P2,P3,face_area,face_normal,i_face)   &
+!$omp private(i_vert3,aux_vec,aux_scalar)
    do i_vtu_cell=1,body_arr(ib)%npart
       i_bp = i_vtu_cell + aux_int
 ! Surface assignment
@@ -303,6 +305,14 @@ endif
             P3(1:3) = vtu_grids(i_vtu_grid)%points%vertex(i_vert2)%pos(1:3)
 ! Assess the area of the surface face
             call area_triangle(P1,P2,P3,face_area,face_normal)
+! Possible normal flip (the input mesh might have wrongly computed the normal)
+            i_vert3 = vtu_grids(i_vtu_grid)%cells%points_IDs(i_vtu_cell,4)
+aux_vec(1:3) = vtu_grids(i_vtu_grid)%points%vertex(i_vert3)%pos(1:3) -         &
+               vtu_grids(i_vtu_grid)%points%vertex(i_vert2)%pos(1:3)
+            aux_scalar = dot_product(aux_vec,face_normal)
+            if (aux_scalar<0.d0) then
+               face_normal(1:3) = -face_normal(1:3)
+            endif
 ! Update the normal of the surface body particle
             bp_arr(i_bp)%normal(1:3) = bp_arr(i_bp)%normal(1:3) + face_area *  &
                                        face_normal(1:3)
@@ -316,6 +326,14 @@ endif
             i_vert2 = vtu_grids(i_vtu_grid)%cells%points_IDs(i_vtu_cell,1)
             P3(1:3) = vtu_grids(i_vtu_grid)%points%vertex(i_vert2)%pos(1:3)
             call area_triangle(P1,P2,P3,face_area,face_normal)
+! Possible normal flip (the input mesh might have wrongly computed the normal)
+            i_vert3 = vtu_grids(i_vtu_grid)%cells%points_IDs(i_vtu_cell,3)
+aux_vec(1:3) = vtu_grids(i_vtu_grid)%points%vertex(i_vert3)%pos(1:3) -         &
+               vtu_grids(i_vtu_grid)%points%vertex(i_vert2)%pos(1:3)
+            aux_scalar = dot_product(aux_vec,face_normal)
+            if (aux_scalar<0.d0) then
+               face_normal(1:3) = -face_normal(1:3)
+            endif
             bp_arr(i_bp)%normal(:) = bp_arr(i_bp)%normal(1:3) + face_area *    &
                                      face_normal(1:3)
          endif
@@ -328,6 +346,14 @@ endif
             i_vert2 = vtu_grids(i_vtu_grid)%cells%points_IDs(i_vtu_cell,4)
             P3(1:3) = vtu_grids(i_vtu_grid)%points%vertex(i_vert2)%pos(1:3)
             call area_triangle(P1,P2,P3,face_area,face_normal)
+! Possible normal flip (the input mesh might have wrongly computed the normal)
+            i_vert3 = vtu_grids(i_vtu_grid)%cells%points_IDs(i_vtu_cell,2)
+aux_vec(1:3) = vtu_grids(i_vtu_grid)%points%vertex(i_vert3)%pos(1:3) -         &
+               vtu_grids(i_vtu_grid)%points%vertex(i_vert2)%pos(1:3)
+            aux_scalar = dot_product(aux_vec,face_normal)
+            if (aux_scalar<0.d0) then
+               face_normal(1:3) = -face_normal(1:3)
+            endif
             bp_arr(i_bp)%normal(:) = bp_arr(i_bp)%normal(1:3) + face_area *    &
                                      face_normal(1:3)
          endif
@@ -340,6 +366,14 @@ endif
             i_vert2 = vtu_grids(i_vtu_grid)%cells%points_IDs(i_vtu_cell,2)
             P3(1:3) = vtu_grids(i_vtu_grid)%points%vertex(i_vert2)%pos(1:3)
             call area_triangle(P1,P2,P3,face_area,face_normal)
+! Possible normal flip (the input mesh might have wrongly computed the normal)
+            i_vert3 = vtu_grids(i_vtu_grid)%cells%points_IDs(i_vtu_cell,1)
+aux_vec(1:3) = vtu_grids(i_vtu_grid)%points%vertex(i_vert3)%pos(1:3) -         &
+               vtu_grids(i_vtu_grid)%points%vertex(i_vert2)%pos(1:3)
+            aux_scalar = dot_product(aux_vec,face_normal)
+            if (aux_scalar<0.d0) then
+               face_normal(1:3) = -face_normal(1:3)
+            endif
             bp_arr(i_bp)%normal(:) = bp_arr(i_bp)%normal(1:3) + face_area *    &
                                      face_normal(1:3)
          endif
