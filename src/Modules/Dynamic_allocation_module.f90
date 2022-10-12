@@ -76,8 +76,9 @@ integer(4),dimension(:),allocatable :: nPartIntorno
 ! neighbouring particles
 integer(4),dimension(:),allocatable :: PartIntorno
 ! PartKernel(4,NMAXPARTJ*PARTICLEBUFFER):
-! PartKernel(1,b): -|gradW_0b|/|r_0b|, gradW: kernel gradient (cubic spline);
-!    Thus gradW = |gradW_0b| * (gradW_0b/|gradW_0b|) = - PartKernel*rag, 
+! PartKernel(1,b): -|gradW_0b|/|r_0b|=gradW_0b_/r_0b_, gradW: kernel gradient 
+!    (cubic spline);
+!    thus gradW = |gradW_0b| * (gradW_0b/|gradW_0b|) = - PartKernel*rag, 
 !    rag=-(x_b-x_0) is aligned with gradW
 ! PartKernel(2,b): PartKernel(1,b)/(|r_0b|^2+eps^2) =
 !                  -|gradW_0b|/|r_0b|/(|r_0b|^2+eps^2)

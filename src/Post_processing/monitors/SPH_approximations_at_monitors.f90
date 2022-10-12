@@ -119,7 +119,7 @@ end interface
 !------------------------
 ! Initializations
 !------------------------
-bp_for_pres = .false.
+bp_for_pres = .true.
 nceli = pglocal%cella
 if (nceli==0) return
 irestocell = CellIndices(nceli,igridi,jgridi,kgridi)
