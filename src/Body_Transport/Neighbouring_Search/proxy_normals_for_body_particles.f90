@@ -154,7 +154,7 @@ do npi=1,n_body_part
       endif
 ! Body-particle mirror pressure: start
       if (on_going_time_step==it_start) then
-         call body_pressure_mirror_interaction(npj,npartint,pres_mir,W_vol)
+         call body_pressure_mirror_interaction(npi,npj,npartint,pres_mir,W_vol)
          bp_arr(npi)%pres = bp_arr(npi)%pres + pres_mir * W_vol
          Sum_W_vol = Sum_W_vol + W_vol
       endif

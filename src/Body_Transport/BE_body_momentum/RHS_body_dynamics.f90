@@ -287,7 +287,7 @@ do npi=1,n_body_part
       npj = PartIntorno_bp_f(npartint)
 ! Contribution to the "grad_p + ALE term": start
 ! Term for grad_p
-      call body_pressure_mirror_interaction(npj,npartint,pres_mir,W_vol)
+      call body_pressure_mirror_interaction(npi,npj,npartint,pres_mir,W_vol)
       bp_arr(npi)%pres = bp_arr(npi)%pres + pres_mir * W_vol
       Sum_W_vol = Sum_W_vol + W_vol
       aux_scalar = (pres_mir - pg(npj)%pres) / (pg(npj)%dens ** 2)

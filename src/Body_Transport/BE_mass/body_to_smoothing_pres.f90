@@ -76,7 +76,7 @@ do npi=1,n_body_part
       AppUnity_vec(npj) = AppUnity_vec(npj) + W_vol_nb
 !$omp end critical (omp_AppUnity_vec)
 ! Mirror body-particle pressure: start
-      call body_pressure_mirror_interaction(npj,npartint,pres_mir,W_vol_nf)
+      call body_pressure_mirror_interaction(npi,npj,npartint,pres_mir,W_vol_nf)
       bp_arr(npi)%pres = bp_arr(npi)%pres + pres_mir * W_vol_nf
       Sum_W_vol_nf = Sum_W_vol_nf + W_vol_nf
 ! Mirror body-particle pressure: end
