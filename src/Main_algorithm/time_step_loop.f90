@@ -133,7 +133,6 @@ call body_p_max_limiter
 on_going_time_step = it_start
 call proxy_normals_for_body_particles
 ! Body-particle proxy normals and pressure: end
-call body_pressure_postpro
 call start_and_stop(3,19)
 #endif
 ! To evaluate the close boundaries and integrals for the current particle in 
@@ -404,11 +403,6 @@ TIME_STEP_DO: do while (it<=input_any_t%itmax)
 #endif
          call start_and_stop(3,14)
       endif
-#ifdef SOLID_BODIES
-         call start_and_stop(2,19)
-         call body_pressure_postpro
-         call start_and_stop(3,19)
-#endif
       call start_and_stop(2,20)
       if (Granular_flows_options%KTGF_config==1) call mixture_viscosity 
       call start_and_stop(3,20)
