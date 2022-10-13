@@ -20,7 +20,10 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: body_pressure_postpro
-! Description: Post-processing for body particle pressure.   
+! Description: Post-processing for body particle pressure. Pressure of the 
+!              surface body particles is smoothed only involving surface body 
+!              particles as neighbours. This post-processing procedures 
+!              influences the ".vtu" files and the monitors.
 !-------------------------------------------------------------------------------
 #ifdef SOLID_BODIES
 subroutine body_pressure_postpro
