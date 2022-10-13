@@ -48,7 +48,7 @@ double precision :: d_rho_dvelALE1(3),dvel(3)
 !------------------------
 !$omp parallel do default(none)                                                &
 !$omp shared(pg,indarrayFlu,Array_Flu,Med,nPartIntorno,NMAXPARTJ,PartIntorno)  &
-!$omp shared(PartKernel,rag)                                                   &
+!$omp shared(PartKernel,rag,input_any_t)                                       &
 !$omp private(npi,ii,contj,npartint,npj,dvel,d_rho_dvelALE1)
 ! Loop over particles
 do ii = 1,indarrayFlu
@@ -59,22 +59,24 @@ do ii = 1,indarrayFlu
    if (pg(npi)%mu>(Med(pg(npi)%imed)%mumx*(1.d0-1.d-9))) then
       cycle
    endif
-   do contj=1,nPartIntorno(npi)
-      npartint = (npi - 1) * NMAXPARTJ + contj
-      npj = PartIntorno(npartint)
-      if (npi==npj) cycle
+   if (.not.((pg(npi)%pres<1.d-21).and.(input_any_t%ALE3))) then
+      do contj=1,nPartIntorno(npi)
+         npartint = (npi - 1) * NMAXPARTJ + contj
+         npj = PartIntorno(npartint)
+         if (npi==npj) cycle
 ! Update of the ALE3 velocity increment (here expressed as acceleration). BC 
 ! ALE3 terms for ME+CV are null.
-      dvel(1:3) = pg(npj)%vel(1:3) - pg(npi)%vel(1:3)
-      d_rho_dvelALE1(1:3) = pg(npj)%dens * pg(npj)%dvel_ALE1(1:3) +            &
-                            pg(npi)%dens * pg(npi)%dvel_ALE1(1:3)
-      pg(npi)%dvel_ALE3(1:3) = pg(npi)%dvel_ALE3(1:3) + dvel(1:3) *            &
-                               pg(npj)%volume * PartKernel(1,npartint) *       &
-                               dot_product(d_rho_dvelALE1(1:3),                &
-                               rag(1:3,npartint)) / (2.d0 * pg(npi)%dens)
-   enddo
+         dvel(1:3) = pg(npj)%vel(1:3) - pg(npi)%vel(1:3)
+         d_rho_dvelALE1(1:3) = pg(npj)%dens * pg(npj)%dvel_ALE1(1:3) +         &
+                               pg(npi)%dens * pg(npi)%dvel_ALE1(1:3)
+         pg(npi)%dvel_ALE3(1:3) = pg(npi)%dvel_ALE3(1:3) + dvel(1:3) *         &
+                                  pg(npj)%volume * PartKernel(1,npartint) *    &
+                                  dot_product(d_rho_dvelALE1(1:3),             &
+                                  rag(1:3,npartint)) / (2.d0 * pg(npi)%dens)
+      enddo
 ! Contribution to the ALE3 term in the ME-VC
-   pg(npi)%acc(1:3) = pg(npi)%acc(1:3) + pg(npi)%dvel_ALE3(1:3)
+      pg(npi)%acc(1:3) = pg(npi)%acc(1:3) + pg(npi)%dvel_ALE3(1:3)
+   endif
 enddo
 !$omp end parallel do
 !------------------------
