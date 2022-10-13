@@ -282,7 +282,10 @@ loop_nag: do npi=1,nag
 ! Contributions of the neighbouring fluid particles to the inverse of the 
 ! renormalization matrices
                if (input_any_t%C1_BE) then
-! For the pressure-gradient term in the momentum equation
+! For the pressure-gradient term in the momentum equation. If 
+! "pg(npi)%p0_neg_ALE==.true." (maximum very few particles), the 
+! renormalization matrices are computed, but not used. The computation permits 
+! to have a clear representation in the ".vtu" files of the associated fields.
                   r_vec(1:3) = -ragtemp(1:3)
                   call grad_W_sub(kernel_ID=2,r_vec=r_vec,grad_W=grad_W)
                   gradWomegaj(1:3) = grad_W(1:3) * pg(npj)%mass / pg(npj)%dens

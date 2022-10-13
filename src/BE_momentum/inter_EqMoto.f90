@@ -250,7 +250,7 @@ do contj=1,nPartIntorno(npi)
    endif
 ! Momentum equation: end
 enddo
-if (input_any_t%C1_BE) then
+if ((input_any_t%C1_BE).and.(.not.(pg(npi)%p0_neg_ALE))) then
 ! 1st-order consistency
    call MatrixProduct(pg(npi)%B_ren_gradp,BB=t_pres_aux,CC=aux_vec,nr=3,nrc=3, &
       nc=1)

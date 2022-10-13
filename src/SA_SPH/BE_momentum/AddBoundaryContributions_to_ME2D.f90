@@ -388,7 +388,7 @@ if ((on_going_time_step==1).and.(input_any_t%C1_BE)) then
 endif
 if (IntNcbs==0) return
 ! grad_p (renormalization at boundaries): start
-if (input_any_t%C1_BE) then
+if ((input_any_t%C1_BE).and.(.not.(pg(npi)%p0_neg_ALE))) then
    aux_vec_2(1:3) = 0.d0
    do i=1,PLANEDIM
       aux_vec_2(acix(i)) = RG_sum(i)

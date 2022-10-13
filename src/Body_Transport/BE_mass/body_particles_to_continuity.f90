@@ -119,7 +119,7 @@ do npi=1,n_body_part
 ! Contribution to CE
          temp_dden = temp_dden + ALE2_CE_BODY
       endif
-      if (input_any_t%C1_BE) then
+      if ((input_any_t%C1_BE).and.(.not.(pg(npj)%p0_neg_ALE))) then
 ! 1st-order consistency
          call MatrixProduct(pg(npj)%B_ren_divu,BB=rag_bp_f(1:3,npartint),      &
             CC=aux_vec,nr=3,nrc=3,nc=1)

@@ -318,9 +318,9 @@ if ((on_going_time_step==1).and.(input_any_t%C1_BE)) then
 endif
 if (Ncbf==0) return
 ! grad_p (renormalization at boundaries): start
-if (input_any_t%C1_BE) then
+if ((input_any_t%C1_BE).and.(.not.(pg(npi)%p0_neg_ALE))) then
 ! Renormalization of the contributions to the pressure-gradient term
-   call MatrixProduct(pg(npi)%B_ren_gradp,BB=gradpt_SA,CC=aux_vec,nr=3,     &
+   call MatrixProduct(pg(npi)%B_ren_gradp,BB=gradpt_SA,CC=aux_vec,nr=3,        &
       nrc=3,nc=1)
 ! Pressure gradient SASPH term: contribution to acceleration (renormalization)
    gradpt_SA(1:3) = -aux_vec(1:3)

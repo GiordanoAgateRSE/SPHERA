@@ -179,7 +179,7 @@ enddo
 ! Inner terms for the RHS of the continuity equation: start
 if (Granular_flows_options%KTGF_config.ne.1) then
 ! Liquid flows
-   if (input_any_t%C1_BE) then
+   if ((input_any_t%C1_BE).and.(.not.(pg(npi)%p0_neg_ALE))) then
 ! Non-ALE term
       call MatrixProduct(pg(npi)%B_ren_divu,BB=aux_vec_1,CC=aux_vec,           &
          nr=3,nrc=3,nc=1)
