@@ -319,15 +319,18 @@ do npi=1,n_body_part
 !$omp end critical (omp_RHS_bd_acc)
       endif
 ! ALE contribution to the acceleration
-      if (.not.((pg(npj)%pres<1.d-21).and.(input_any_t%ALE3))) then
-         aux_vec(1:3) = -pg(npj)%dens * bp_arr(npi)%volume * aux_scalar_2 *    &
+      if ((pg(npj)%pres<1.d-21).and.(input_any_t%ALE3)) then
+         aux_vec(1:3) = pg(npj)%dens * bp_arr(npi)%volume * aux_scalar_2 *    &
                         (-rag_bp_f(1:3,npartint)) * KerDer_bp_f_Gal(npartint)
-!$omp critical (omp_RHS_bd_acc)
-         pg(npj)%acc(1:3) = pg(npj)%acc(1:3) + aux_vec(1:3)
-! Contribution to the ALE velocity increment (here it is still an acceleration)
-         pg(npj)%dvel_ALE1(1:3) = pg(npj)%dvel_ALE1(1:3) + aux_vec(1:3)
-!$omp end critical (omp_RHS_bd_acc)
+         else
+            aux_vec(1:3) = -pg(npj)%dens * bp_arr(npi)%volume * aux_scalar_2 * &
+                           (-rag_bp_f(1:3,npartint)) * KerDer_bp_f_Gal(npartint)
       endif
+!$omp critical (omp_RHS_bd_acc)
+      pg(npj)%acc(1:3) = pg(npj)%acc(1:3) + aux_vec(1:3)
+! Contribution to the ALE velocity increment (here it is still an acceleration)
+      pg(npj)%dvel_ALE1(1:3) = pg(npj)%dvel_ALE1(1:3) + aux_vec(1:3)
+!$omp end critical (omp_RHS_bd_acc)
 ! Contribution to the "grad_p + ALE term": end
       if ((FSI_slip_conditions==1).or.(FSI_slip_conditions==3)) then
 ! Body particle volume
