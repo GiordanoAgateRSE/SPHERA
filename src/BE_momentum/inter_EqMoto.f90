@@ -154,7 +154,7 @@ do contj=1,nPartIntorno(npi)
    amassj = pg(npj)%mass
    pi = pg(npi)%pres
    pj = pg(npj)%pres
-   if (input_any_t%ALE3) then
+   if ((input_any_t%ALE3).and.(.not.(pg(npi)%p0_neg_ALE))) then
       dervel(1:3) = pg(npj)%vel_fluid(1:3) - pg(npi)%vel_fluid(1:3)
       else
          dervel(1:3) = pg(npj)%vel(1:3) - pg(npi)%vel(1:3)
@@ -213,15 +213,10 @@ do contj=1,nPartIntorno(npi)
          appopres(1:3) = -amassj * alpha * rag(1:3,npartint) *                 &
                          PartKernel(3,npartint)
 ! Contribution to the ALE1 term in the ME-VC
-         alpha = (pi * (rhoj / rhoi + 1.d0) + pj * (rhoi / rhoj - 1.d0)) /  &
+         alpha = (pi * (rhoj / rhoi + 1.d0) + pj * (rhoi / rhoj - 1.d0)) /     &
                     (rhoi * rhoj)
-         if ((pg(npi)%pres<1.d-21).and.(input_any_t%ALE3)) then
-            ALE1_term_sum(1:3) = ALE1_term_sum(1:3) + amassj * alpha *         &
-                                 rag(1:3,npartint) * PartKernel(3,npartint)
-            else
-               ALE1_term_sum(1:3) = ALE1_term_sum(1:3) - amassj * alpha *      &
-                                    rag(1:3,npartint) * PartKernel(3,npartint)
-         endif
+         ALE1_term_sum(1:3) = ALE1_term_sum(1:3) - amassj * alpha *            &
+                              rag(1:3,npartint) * PartKernel(3,npartint)
          else
 ! Dense granular flows
             alpha = (pi + pj) / (rhoi * rhoj)

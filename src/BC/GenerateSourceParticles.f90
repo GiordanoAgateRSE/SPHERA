@@ -154,6 +154,7 @@ if (simulation_time>=emission_time) then
             pg(nag)%dmass_dt = 0.d0
             pg(nag)%mom(1:3) = pg(nag)%vel(1:3) * pg(nag)%mass
             pg(nag)%dden_ALE12 = 0.d0
+            pg(nag)%p0_neg_ALE = .false.
             pg(nag)%imed = mat  
             pg(nag)%kin_visc = Med(mat)%kin_visc
             pg(nag)%mu = Med(mat)%kin_visc * Med(Mat)%den0

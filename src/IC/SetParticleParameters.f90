@@ -57,6 +57,7 @@ pg(npi)%volume = Domain%PVolume
 pg(npi)%mass = pg(npi)%volume * Med(Mate)%den0
 pg(npi)%dmass_dt = 0.d0
 pg(npi)%dden_ALE12 = 0.d0
+pg(npi)%p0_neg_ALE = .false.
 #ifdef SPACE_2D
    pg(npi)%coord(2) = zero              
    pg(npi)%CoordOld(2) = zero

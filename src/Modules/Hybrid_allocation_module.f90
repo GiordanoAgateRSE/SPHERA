@@ -158,6 +158,9 @@ type TyParticle
 ! Variable to immediately detect a fluid particle with (.true.) or without 
 ! (.false.) body-particle neighbours
    logical :: fp_bp_flag
+! Flag to define the case of a particle with negative pressure at the beginning 
+! of assessing the momentum equation RHS to possibly switch ALE formulation
+   logical :: p0_neg_ALE
 ! ID of an inlet neighbouring DB-SPH surface element, if any (otherwise it is
 ! null)
    integer(4) :: DBSPH_inlet_ID

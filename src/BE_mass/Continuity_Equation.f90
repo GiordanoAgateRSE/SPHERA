@@ -120,7 +120,7 @@ do contj=1,nPartIntorno(npi)
       aux_vec_3(1:3) = aux_vec_3(1:3) + rhoi * (amassj / rhoj) *               &
                        PartKernel(1,npartint) * dvar(3) * rag(1:3,npartint)
 ! Auxiliary vectors for the ALE1 term in CE and update of ALE2 term
-      if (input_any_t%ALE3) then
+      if ((input_any_t%ALE3).and.(.not.(pg(npi)%p0_neg_ALE))) then
          d_rho_dvelALE1(1:3) = pg(npj)%dens * pg(npj)%dvel_ALE1(1:3) -         &
                                pg(npi)%dens * pg(npi)%dvel_ALE1(1:3)
          aux_vec_1_ALE(1:3) = aux_vec_1_ALE(1:3) + (amassj / rhoj)  *          &
@@ -207,7 +207,7 @@ if (Granular_flows_options%KTGF_config.ne.1) then
    endif
 ! Update of the RHS of the continuity equation
    pg(npi)%dden = pg(npi)%dden - (aux_vec_1(1) + aux_vec_2(2) + aux_vec_3(3))
-   if (input_any_t%ALE3) then
+   if ((input_any_t%ALE3).and.(.not.(pg(npi)%p0_neg_ALE))) then
 ! Update the explicit CE ALE terms
       pg(npi)%dden_ALE12 = pg(npi)%dden_ALE12 + aux_vec_1_ALE(1) +             &
                            aux_vec_2_ALE(2) + aux_vec_3_ALE(3) + ALE2_CE

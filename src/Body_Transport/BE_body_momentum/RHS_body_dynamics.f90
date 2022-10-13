@@ -319,13 +319,8 @@ do npi=1,n_body_part
 !$omp end critical (omp_RHS_bd_acc)
       endif
 ! ALE contribution to the acceleration
-      if ((pg(npj)%pres<1.d-21).and.(input_any_t%ALE3)) then
-         aux_vec(1:3) = pg(npj)%dens * bp_arr(npi)%volume * aux_scalar_2 *    &
-                        (-rag_bp_f(1:3,npartint)) * KerDer_bp_f_Gal(npartint)
-         else
-            aux_vec(1:3) = -pg(npj)%dens * bp_arr(npi)%volume * aux_scalar_2 * &
-                           (-rag_bp_f(1:3,npartint)) * KerDer_bp_f_Gal(npartint)
-      endif
+      aux_vec(1:3) = -pg(npj)%dens * bp_arr(npi)%volume * aux_scalar_2 *       &
+                     (-rag_bp_f(1:3,npartint)) * KerDer_bp_f_Gal(npartint)
 !$omp critical (omp_RHS_bd_acc)
       pg(npj)%acc(1:3) = pg(npj)%acc(1:3) + aux_vec(1:3)
 ! Contribution to the ALE velocity increment (here it is still an acceleration)
@@ -341,7 +336,7 @@ do npi=1,n_body_part
                          pg(npj)%sigma_bp) / pg(npj)%sigma_bp)
          endif
 ! Contribution to the shear stress gradient term
-         if (input_any_t%ALE3) then
+         if ((input_any_t%ALE3).and.(.not.(pg(npj)%p0_neg_ALE))) then
             fluid_vel_npj(1:3) = pg(npj)%vel_fluid(1:3)
             else
                fluid_vel_npj(1:3) = pg(npj)%vel(1:3)            

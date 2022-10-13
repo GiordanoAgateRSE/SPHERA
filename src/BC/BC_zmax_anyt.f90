@@ -131,6 +131,7 @@ do i_zone=1,NPartZone
                pg(npi)%mass = pg(npi)%volume * Med(Partz(i_zone)%Medium)%den0
                pg(npi)%dmass_dt = 0.d0
                pg(npi)%dden_ALE12 = 0.d0
+               pg(npi)%p0_neg_ALE = .false.
                pg(npi)%imed = Partz(i_zone)%Medium  
                pg(npi)%kin_visc = Med(Partz(i_zone)%Medium)%kin_visc
                pg(npi)%mu = Med(Partz(i_zone)%Medium)%kin_visc *               &

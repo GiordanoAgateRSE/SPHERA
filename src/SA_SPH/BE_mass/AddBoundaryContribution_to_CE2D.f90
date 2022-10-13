@@ -114,7 +114,7 @@ do icbs=1,IntNcbs
       do pd=1,PLANEDIM
          nnlocal(pd) = RifBoundarySide%T(acix(pd),acix(2))
       enddo
-      if (input_any_t%ALE3) then
+      if ((input_any_t%ALE3).and.(.not.(pg(npi)%p0_neg_ALE))) then
          dvel(1:3) = -pg(npi)%var(1:3)
          else
             select case (strtype)
@@ -145,7 +145,7 @@ do icbs=1,IntNcbs
                                RifBoundarySide%T(acix(ii),acix(2)) * IntWdS
       enddo
 ! Summations of the SASPH terms for grad_u_SA and grad_w_SA: end
-      if (input_any_t%ALE3) then
+      if ((input_any_t%ALE3).and.(.not.(pg(npi)%p0_neg_ALE))) then
 ! Auxiliary vectors for the SASPH ALE1 explicit term in CE
          do ii=1,PLANEDIM
             grad_rhod1u_SA(ii) = grad_rhod1u_SA(ii) + 2.d0 * pg(npi)%dens *    &

@@ -80,7 +80,7 @@ do npi=1,n_body_part
       temp_dden = 0.d0
 ! Continuity equation
 ! Relative velocity for the continuity equation     
-      if (input_any_t%ALE3) then
+      if ((input_any_t%ALE3).and.(.not.(pg(npj)%p0_neg_ALE))) then
 ! For the ALE2-CE term (valid for any slip condition)
          delta_dvel_ALE1(1:3) = -2.d0 * pg(npj)%dvel_ALE1(1:3)
 ! ALE solid velocity minus ALE fluid velocity, no matter about slip condition
@@ -111,7 +111,7 @@ do npi=1,n_body_part
       sum_W_vol = sum_W_vol + W_vol
 ! Contributions to the continuity equation
       rag_bp_f_aux(1:3) = rag_bp_f(1:3,npartint)
-      if (input_any_t%ALE3) then
+      if ((input_any_t%ALE3).and.(.not.(pg(npj)%p0_neg_ALE))) then
 ! BODY BC CE ALE2 term (it has not be renormalized)
          aux_vec_ALE2(1:3) = bp_arr(npi)%volume * KerDer_bp_f_cub_spl(npartint)&
                              * rag_bp_f_aux(1:3)
@@ -129,7 +129,7 @@ do npi=1,n_body_part
       temp_dden = temp_dden + pg(npj)%dens * bp_arr(npi)%volume *              &
                   KerDer_bp_f_cub_spl(npartint) *                              &
                   dot_product(dvar,rag_bp_f_aux)
-      if (input_any_t%ALE3) then
+      if ((input_any_t%ALE3).and.(.not.(pg(npj)%p0_neg_ALE))) then
 ! BODY BC CE ALE1 term
          aux_vec_ALE1(1:3) = bp_arr(npi)%volume * KerDer_bp_f_cub_spl(npartint)&
                              * rag_bp_f_aux(1:3)

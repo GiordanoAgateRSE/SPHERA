@@ -310,13 +310,8 @@ do icbs=1,IntNcbs
    endif
 ! SASPH contribution to "grad_p" and renormalization matrix: end
 ! Contributions to the ME SASPH ALE term
-   if ((pg(npi)%pres<1.d-21).and.(input_any_t%ALE3)) then
-      ALEt_SASPH(1) = ALEt_SASPH(1) + nnlocal(1) * QiiIntWdS
-      ALEt_SASPH(3) = ALEt_SASPH(3) + nnlocal(2) * QiiIntWdS
-      else
-         ALEt_SASPH(1) = ALEt_SASPH(1) - nnlocal(1) * QiiIntWdS
-         ALEt_SASPH(3) = ALEt_SASPH(3) - nnlocal(2) * QiiIntWdS
-   endif
+   ALEt_SASPH(1) = ALEt_SASPH(1) - nnlocal(1) * QiiIntWdS
+   ALEt_SASPH(3) = ALEt_SASPH(3) - nnlocal(2) * QiiIntWdS
 ! Volume viscosity force (with changed sign) and artificial viscosity term
    if (strtype=="fixe".or.strtype=="tapi") then
       if (xpi>=zero.and.xpi<=RifBoundarySide%length) then
@@ -371,7 +366,7 @@ do icbs=1,IntNcbs
             else
                SVforce = 0.d0
          endif
-         if (input_any_t%ALE3) then
+         if ((input_any_t%ALE3).and.(.not.(pg(npi)%p0_neg_ALE))) then
             Dvel_Mor_SASPH(1:3) = 2.d0 * pg(npi)%vel_fluid(1:3)
             else
                Dvel_Mor_SASPH(1:3) = 2.d0 * pg(npi)%var(1:3)

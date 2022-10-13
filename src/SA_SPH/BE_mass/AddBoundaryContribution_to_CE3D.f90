@@ -115,7 +115,7 @@ do icbf=1,Ncbf
          aux_vec_2(1:3) = two * (BoundaryFace(iface)%velocity(1:3) -           &
                           pg(npi)%var(1:3))
          aux_vec(1:3) = BoundaryFace(iface)%T(1:3,3)
-         if (input_any_t%ALE3) then
+         if ((input_any_t%ALE3).and.(.not.(pg(npi)%p0_neg_ALE))) then
             dvel(1:3) = BoundaryFace(iface)%velocity(1:3) - pg(npi)%var(1:3)
             else
 ! Always 3D SASPH free-slip conditions without ALE
@@ -128,7 +128,7 @@ do icbf=1,Ncbf
          grad_v_SA(1:3) = grad_v_SA(1:3) - dvel(2) * aux_vec(1:3)
          grad_w_SA(1:3) = grad_w_SA(1:3) - dvel(3) * aux_vec(1:3)
 ! Summations of the SASPH terms for grad_u_SA, grad_v_SA and grad_w_SA: end
-         if (input_any_t%ALE3) then
+         if ((input_any_t%ALE3).and.(.not.(pg(npi)%p0_neg_ALE))) then
 ! Auxiliary vectors for the SASPH ALE1 explicit term in CE
             grad_rhod1u_SA(1:3) = grad_rhod1u_SA(1:3) + 2.d0 * pg(npi)%dens *  &
                                   pg(npi)%dvel_ALE1(1) *                       &

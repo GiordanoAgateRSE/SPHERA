@@ -152,14 +152,9 @@ face_loop: do icbf=1,Ncbf
          gradpt_SA(1:3) = gradpt_SA(1:3) + gradpt_SA_0w(1:3)
 ! Boundary contribution to the "grad_p term": end
 ! Boundary contribution to the "ALE term": start
-         if ((pg(npi)%pres<1.d-21).and.(input_any_t%ALE3)) then
 ! Local components
-            ALEt_SA_0w_loc(1:3) = -2.d0 * pg(npi)%pres / pg(npi)%dens *        &
-                                  BoundaryDataTab(ibdp)%BoundaryIntegral(4:6)
-            else
-               ALEt_SA_0w_loc(1:3) = 2.d0 * pg(npi)%pres / pg(npi)%dens *      &
-                                     BoundaryDataTab(ibdp)%BoundaryIntegral(4:6)
-         endif
+         ALEt_SA_0w_loc(1:3) = 2.d0 * pg(npi)%pres / pg(npi)%dens *            &
+                               BoundaryDataTab(ibdp)%BoundaryIntegral(4:6)
 ! Global components
          call MatrixProduct(BoundaryFace(iface)%T,BB=ALEt_SA_0w_loc,           &
             CC=ALEt_SA_0w,nr=3,nrc=3,nc=1)
@@ -257,7 +252,7 @@ face_loop: do icbf=1,Ncbf
                (Tratto(stretch)%laminar_no_slip_check.eqv..false.)) then
 ! The factor 2 is already present in "dvij"
                cinviscmult = cinvisci * IntdWrm1dV * slip_coefficient
-               if (input_any_t%ALE3) then
+               if ((input_any_t%ALE3).and.(.not.(pg(npi)%p0_neg_ALE))) then
                   dvij_Mor_SASPH(1:3) = 2.d0 * (pg(npi)%vel_fluid(1:3) -       &
                                         BoundaryFace(iface)%velocity(1:3))
                   else
