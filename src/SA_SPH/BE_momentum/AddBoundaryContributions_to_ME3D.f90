@@ -71,7 +71,6 @@ double precision,dimension(1:SPACEDIM) :: ALEt_SA_0w_loc
 ! ALE SASPH interaction term (global reference system)
 double precision,dimension(1:SPACEDIM) :: ALEt_SA_0w
 character(4) :: stretchtype
-double precision,dimension(1:SPACEDIM,1:SPACEDIM) :: B_ren_aux_Glo
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -163,13 +162,9 @@ face_loop: do icbf=1,Ncbf
          if ((on_going_time_step==1).and.(input_any_t%C1_BE)) then
 ! "IntGiWrRdV", or equivalently "J_3,w" is always computed using the 
 ! beta-spline cubic kernel, no matter about the renormalization
-! Global components
-            call MatrixProduct(BoundaryFace(iface)%T,                          &
-               BB=BoundaryDataTab(ibdp)%IntGiWrRdV,CC=B_ren_aux_Glo,nr=3,nrc=3,&
-               nc=3)
 ! Contribution to the renormalization matrix
             pg(npi)%B_ren_gradp(1:3,1:3) = pg(npi)%B_ren_gradp(1:3,1:3) +      &
-                                           B_ren_aux_Glo(1:3,1:3)
+               BoundaryDataTab(ibdp)%IntGiWrRdV(1:3,1:3)
          endif
 ! Contributions of the neighbouring SASPH frontiers to the inverse of the 
 ! renormalization matrix for grad_p: end

@@ -48,7 +48,6 @@ integer(4) :: icbf,iface,ibdt,ibdp,stretch
 double precision,dimension(1:SPACEDIM) :: LocPi,dvel
 double precision,dimension(1:SPACEDIM) :: aux_vec,aux_vec_2
 character(4) :: boundtype
-double precision,dimension(1:SPACEDIM,1:SPACEDIM) :: B_ren_aux_Glo
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -86,15 +85,11 @@ do icbf=1,Ncbf
          if (input_any_t%C1_BE) then
 ! "IntGiWrRdV", or equivalently "J_3,w" is always computed using the 
 ! beta-spline cubic kernel, no matter about the renormalization
-! Global components
-            call MatrixProduct(BoundaryFace(iface)%T,                          &
-               BB=BoundaryDataTab(ibdp)%IntGiWrRdV,CC=B_ren_aux_Glo,nr=3,nrc=3,&
-               nc=3)
 ! Contribution to the renormalization matrix
             pg(npi)%B_ren_divu(1:3,1:3) = pg(npi)%B_ren_divu(1:3,1:3) +        &
-                                          B_ren_aux_Glo(1:3,1:3)
+               BoundaryDataTab(ibdp)%IntGiWrRdV(1:3,1:3)
             pg(npi)%B_ren_gradp(1:3,1:3) = pg(npi)%B_ren_gradp(1:3,1:3) +      &
-                                           B_ren_aux_Glo(1:3,1:3)
+               BoundaryDataTab(ibdp)%IntGiWrRdV(1:3,1:3)
          endif
 ! Contributions of the neighbouring SASPH frontiers to the inverse of the 
 ! renormalization matrix for div_u_ and grad_p: end
@@ -118,16 +113,13 @@ do icbf=1,Ncbf
          if ((input_any_t%ALE3).and.(.not.(pg(npi)%p0_neg_ALE))) then
 ! Auxiliary vectors for the SASPH ALE1 explicit term in CE
             grad_rhod1u_SA(1:3) = grad_rhod1u_SA(1:3) + 2.d0 * pg(npi)%dens *  &
-                                  pg(npi)%dvel_ALE1(1) *                       &
-                                  BoundaryDataTab(ibdp)%BoundaryIntegral(4:6)
+                                  pg(npi)%dvel_ALE1(1) * aux_vec(1:3)
 #ifdef SPACE_3D
             grad_rhod1v_SA(1:3) = grad_rhod1v_SA(1:3) + 2.d0 * pg(npi)%dens *  &
-                                  pg(npi)%dvel_ALE1(2) *                       &
-                                  BoundaryDataTab(ibdp)%BoundaryIntegral(4:6)
+                                  pg(npi)%dvel_ALE1(2) * aux_vec(1:3)
 #endif
             grad_rhod1w_SA(1:3) = grad_rhod1w_SA(1:3) + 2.d0 * pg(npi)%dens *  &
-                                  pg(npi)%dvel_ALE1(3) *                       &
-                                  BoundaryDataTab(ibdp)%BoundaryIntegral(4:6)
+                                  pg(npi)%dvel_ALE1(3) * aux_vec(1:3)
          endif
       endif
       elseif (boundtype=="velo".or.boundtype=="flow".or.boundtype=="sour") then
