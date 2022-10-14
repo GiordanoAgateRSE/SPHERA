@@ -45,15 +45,13 @@ implicit none
 integer(4),intent(in) :: npi,IntNcbs
 double precision,dimension(3),intent(inout) :: grad_u_SA,grad_w_SA
 double precision,dimension(3),intent(inout) :: grad_rhod1u_SA,grad_rhod1w_SA
-integer(4) :: pd,icbs,iside,sidestr,ibdt,ibdp,ii,jj
+integer(4) :: pd,icbs,iside,sidestr,ibdt,ibdp,ii
 double precision :: IntWds,roi,IntWdV
 integer(4),dimension(1:PLANEDIM) :: acix
-double precision,dimension(1:PLANEDIM) :: IntLocXY,nnlocal,dvel,gradbPsuro_like
-double precision,dimension(1:PLANEDIM) :: RG_like
-! Unit vector of the unity vector: direction of (1,1)
-double precision,dimension(1:SPACEDIM) :: one_vec_dir
+double precision,dimension(1:PLANEDIM) :: IntLocXY,nnlocal,dvel
 type (TyBoundarySide) :: RifBoundarySide
 character(4) :: strtype
+double precision,dimension(1:SPACEDIM,1:SPACEDIM) :: B_ren_aux
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -69,10 +67,6 @@ acix(1) = 1
 acix(2) = 3
 roi = pg(npi)%dens
 ibdt = BoundaryDataPointer(3,npi)
-one_vec_dir(1:3) = 0.d0
-do ii=1,PLANEDIM
-   one_vec_dir(acix(ii)) = 1.d0 / dsqrt(2.d0)
-enddo
 !------------------------
 ! Statements
 !------------------------
@@ -88,24 +82,12 @@ do icbs=1,IntNcbs
 ! "IntWdV", or equivalently "J_3,w" (2D version) is always computed using the 
 ! beta-spline cubic kernel, no matter about the renormalization
       IntWdV = BoundaryDataTab(ibdp)%BoundaryIntegral(3)
-      do ii=1,PLANEDIM
-         gradbPsuro_like(ii) = one_vec_dir(acix(ii))
-      enddo
-      RG_like(1:2) = 0.d0
-      do ii=1,PLANEDIM
-         do jj=1,PLANEDIM
-            RG_like(ii) = RG_like(ii) + RifBoundarySide%RN(acix(ii),acix(jj)) *&
-                          gradbPsuro_like(jj)
-         enddo
-         RG_like(ii) = RG_like(ii) * IntWdV
-      enddo
+      B_ren_aux(1:3,1:3) = -RifBoundarySide%RN(1:3,1:3) * IntWdV
 ! Renormalization at SASPH frontiers
-      do ii=1,PLANEDIM
-         pg(npi)%B_ren_divu(acix(ii),1:3) = pg(npi)%B_ren_divu(acix(ii),1:3) - &
-                                            RG_like(ii)
-         pg(npi)%B_ren_gradp(acix(ii),1:3) = pg(npi)%B_ren_gradp(acix(ii),1:3) &
-                                            - RG_like(ii)
-      enddo
+      pg(npi)%B_ren_divu(1:3,1:3) = pg(npi)%B_ren_divu(1:3,1:3) +              &
+                                    B_ren_aux(1:3,1:3)
+      pg(npi)%B_ren_gradp(1:3,1:3) = pg(npi)%B_ren_gradp(1:3,1:3) +            &
+                                     B_ren_aux(1:3,1:3)
    endif
 ! SASPH contributions to the renormalization matrix for div_u_ and grad_p: end
    if (strtype=="fixe".or.strtype=="tapi".or.strtype=="velo".or.               &

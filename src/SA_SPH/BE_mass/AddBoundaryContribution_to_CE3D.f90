@@ -44,11 +44,11 @@ integer(4),intent(in)    :: npi,Ncbf
 double precision,dimension(3),intent(inout) :: grad_u_SA,grad_v_SA,grad_w_SA
 double precision,dimension(3),intent(inout) :: grad_rhod1u_SA,grad_rhod1v_SA
 double precision,dimension(3),intent(inout) :: grad_rhod1w_SA
-integer(4) :: sd,sdj,icbf,iface,ibdt,ibdp,stretch,ii
-double precision,dimension(1:SPACEDIM) :: LocPi,one_Loc,dvel
-double precision,dimension(1:SPACEDIM) :: one_vec_dir,B_ren_aux_Loc
-double precision,dimension(1:SPACEDIM) :: B_ren_aux_Glo,aux_vec,aux_vec_2
+integer(4) :: icbf,iface,ibdt,ibdp,stretch
+double precision,dimension(1:SPACEDIM) :: LocPi,dvel
+double precision,dimension(1:SPACEDIM) :: aux_vec,aux_vec_2
 character(4) :: boundtype
+double precision,dimension(1:SPACEDIM,1:SPACEDIM) :: B_ren_aux_Glo
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -69,7 +69,6 @@ end interface
 !------------------------
 if (Ncbf<=0) return
 ibdt = BoundaryDataPointer(3,npi)
-one_vec_dir(1:3) = 1.d0 / dsqrt(3.d0)
 !------------------------
 ! Statements
 !------------------------
@@ -85,29 +84,17 @@ do icbf=1,Ncbf
 ! Contributions of the neighbouring SASPH frontiers to the inverse of the 
 ! renormalization matrix for div_u_ and grad_p: start
          if (input_any_t%C1_BE) then
-! Local components explicitly depending on the unit vector of the unity vector
-            do sd=1,SPACEDIM
-               one_Loc(sd) = 0.d0
-               do sdj=1,SPACEDIM
-                  one_Loc(sd) = one_Loc(sd) + BoundaryFace(iface)%T(sdj,sd) *  &
-                     one_vec_dir(sdj)
-               enddo
-            enddo
-! Local components (second assessment)
 ! "IntGiWrRdV", or equivalently "J_3,w" is always computed using the 
 ! beta-spline cubic kernel, no matter about the renormalization
-            call MatrixProduct(BoundaryDataTab(ibdp)%IntGiWrRdV,BB=one_Loc,    &
-               CC=B_ren_aux_Loc,nr=3,nrc=3,nc=1)
 ! Global components
-            call MatrixProduct(BoundaryFace(iface)%T,BB=B_ren_aux_Loc,         &
-               CC=B_ren_aux_Glo,nr=3,nrc=3,nc=1)
+            call MatrixProduct(BoundaryFace(iface)%T,                          &
+               BB=BoundaryDataTab(ibdp)%IntGiWrRdV,CC=B_ren_aux_Glo,nr=3,nrc=3,&
+               nc=3)
 ! Contribution to the renormalization matrix
-            do ii=1,3
-               pg(npi)%B_ren_divu(ii,1:3) = pg(npi)%B_ren_divu(ii,1:3) +       &
-                                            B_ren_aux_Glo(ii)
-               pg(npi)%B_ren_gradp(ii,1:3) = pg(npi)%B_ren_gradp(ii,1:3) +     &
-                                             B_ren_aux_Glo(ii)
-            enddo
+            pg(npi)%B_ren_divu(1:3,1:3) = pg(npi)%B_ren_divu(1:3,1:3) +        &
+                                          B_ren_aux_Glo(1:3,1:3)
+            pg(npi)%B_ren_gradp(1:3,1:3) = pg(npi)%B_ren_gradp(1:3,1:3) +      &
+                                           B_ren_aux_Glo(1:3,1:3)
          endif
 ! Contributions of the neighbouring SASPH frontiers to the inverse of the 
 ! renormalization matrix for div_u_ and grad_p: end

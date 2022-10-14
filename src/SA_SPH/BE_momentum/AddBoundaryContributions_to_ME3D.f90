@@ -47,19 +47,16 @@ implicit none
 integer(4),intent(in) :: npi,Ncbf
 double precision,intent(inout),dimension(1:SPACEDIM) :: tpres,tdiss,tvisc
 double precision,intent(inout),dimension(1:size(Partz)) :: slip_coeff_counter
-integer(4) :: sd,icbf,iface,ibdp,sdj,i,mati,stretch,ix,iy,aux_int,aux_int_2,ii
+integer(4) :: sd,icbf,iface,ibdp,sdj,i,mati,stretch,ix,iy,aux_int,aux_int_2
 double precision :: IntdWrm1dV,cinvisci,Monvisc,cinviscmult,dvn
 double precision :: FlowRate1,Lb,L,minquotanode,maxquotanode,u_t_0
 double precision :: celeri,alfaMon,Mmult,IntGWZrm1dV,slip_coefficient
 double precision :: aux_scal
 double precision,dimension(1:SPACEDIM) :: vb,vi,dvij,dvij_Mor_SASPH,nnlocal 
 double precision,dimension(1:SPACEDIM) :: ViscoMon,ViscoShear,LocPi
-double precision,dimension(1:SPACEDIM) :: u_t_0_vector,one_Loc
-! Unit vector of the unity vector: direction of (1,1,1)
-double precision,dimension(1:SPACEDIM) :: one_vec_dir
+double precision,dimension(1:SPACEDIM) :: u_t_0_vector
 ! Gravity vector in the local reference system of the SASPH boundary
 double precision,dimension(1:SPACEDIM) :: gravity_local
-double precision,dimension(1:SPACEDIM) :: B_ren_aux_Loc,B_ren_aux_Glo
 double precision,dimension(1:SPACEDIM) :: aux_vec
 ! Pressure-gradient "grad_p" SASPH term
 double precision,dimension(1:SPACEDIM) :: gradpt_SA
@@ -74,6 +71,7 @@ double precision,dimension(1:SPACEDIM) :: ALEt_SA_0w_loc
 ! ALE SASPH interaction term (global reference system)
 double precision,dimension(1:SPACEDIM) :: ALEt_SA_0w
 character(4) :: stretchtype
+double precision,dimension(1:SPACEDIM,1:SPACEDIM) :: B_ren_aux_Glo
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -108,7 +106,6 @@ if ((Domain%time_stage==1).or.(Domain%time_split==1)) then
    pg(npi)%kodvel = 0
    pg(npi)%velass(:) = zero
 endif
-one_vec_dir(1:3) = 1.d0 / dsqrt(3.d0)
 !------------------------
 ! Statements
 !------------------------
@@ -164,27 +161,15 @@ face_loop: do icbf=1,Ncbf
 ! Contributions of the neighbouring SASPH frontiers to the inverse of the 
 ! renormalization matrix for grad_p: start
          if ((on_going_time_step==1).and.(input_any_t%C1_BE)) then
-! Local components explicitly depending on the unit vector of the unity vector
-            do SD=1,SPACEDIM
-               one_Loc(SD) = 0.d0
-               do sdj=1,SPACEDIM
-                  one_Loc(SD) = one_Loc(SD) + BoundaryFace(iface)%T(sdj,SD) *  &
-                     one_vec_dir(sdj)
-               enddo
-            enddo
-! Local components (second assessment)
 ! "IntGiWrRdV", or equivalently "J_3,w" is always computed using the 
 ! beta-spline cubic kernel, no matter about the renormalization
-            call MatrixProduct(BoundaryDataTab(ibdp)%IntGiWrRdV,BB=one_Loc,    &
-               CC=B_ren_aux_Loc,nr=3,nrc=3,nc=1)
 ! Global components
-            call MatrixProduct(BoundaryFace(iface)%T,BB=B_ren_aux_Loc,         &
-               CC=B_ren_aux_Glo,nr=3,nrc=3,nc=1)
+            call MatrixProduct(BoundaryFace(iface)%T,                          &
+               BB=BoundaryDataTab(ibdp)%IntGiWrRdV,CC=B_ren_aux_Glo,nr=3,nrc=3,&
+               nc=3)
 ! Contribution to the renormalization matrix
-            do ii=1,3
-               pg(npi)%B_ren_gradp(ii,1:3) = pg(npi)%B_ren_gradp(ii,1:3) +     &
-                                             B_ren_aux_Glo(ii)
-            enddo
+            pg(npi)%B_ren_gradp(1:3,1:3) = pg(npi)%B_ren_gradp(1:3,1:3) +      &
+                                           B_ren_aux_Glo(1:3,1:3)
          endif
 ! Contributions of the neighbouring SASPH frontiers to the inverse of the 
 ! renormalization matrix for grad_p: end

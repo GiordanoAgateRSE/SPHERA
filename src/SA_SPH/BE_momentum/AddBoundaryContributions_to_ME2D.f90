@@ -61,15 +61,14 @@ double precision :: SomQsiQsj,DiffQsiQsj,d_50
 integer(4),dimension(1:PLANEDIM) :: acix
 double precision,dimension(1:PLANEDIM) :: RG,ss,nnlocal,gradbPsuro
 double precision,dimension(1:PLANEDIM) :: ViscoMon,ViscoShear,sidevel,TT,Dvel
-double precision,dimension(1:PLANEDIM) :: RG_like,gradbPsuro_like,RG_sum
+double precision,dimension(1:PLANEDIM) :: RG_sum
 double precision,dimension(1:SPACEDIM) :: u_t_0_vector,aux_vec_2,aux_vec
 double precision,dimension(1:SPACEDIM) :: Dvel_Mor_SASPH
-! Unit vector of the unity vector: direction of (1,1)
-double precision,dimension(1:SPACEDIM) :: one_vec_dir
 ! SASPH ME ALE term
 double precision,dimension(1:SPACEDIM) :: ALEt_SASPH
 type (TyBoundarySide) :: RifBoundarySide
 character(4):: strtype
+double precision,dimension(1:SPACEDIM,1:SPACEDIM) :: B_ren_aux
 !------------------------
 ! Explicit interfaces
 !------------------------
@@ -104,10 +103,6 @@ ViscoMon(2) = zero
 ViscoShear(1) = zero
 ViscoShear(2) = zero
 ibdt = BoundaryDataPointer(3,npi)
-one_vec_dir(1:3) = 0.d0
-do i=1,PLANEDIM
-   one_vec_dir(acix(i)) = 1.d0 / dsqrt(2.d0)
-enddo
 RG_sum(1:2) = 0.d0
 ALEt_SASPH(1:3) = 0.d0
 !------------------------
@@ -132,10 +127,6 @@ do icbs=1,IntNcbs
       ss(i) = RifBoundarySide%T(acix(i),acix(1))
       nnlocal(i) = RifBoundarySide%T(acix(i),acix(2))
       gradbPsuro(i) = Domain%grav(acix(i))
-! For the renormalization at SASPH frontiers
-      if ((on_going_time_step==1).and.(input_any_t%C1_BE)) then
-         gradbPsuro_like(i) = one_vec_dir(acix(i))
-      endif
       GravN = GravN + Domain%grav(acix(i)) * nnlocal(i)
    enddo
    select case (strtype)
@@ -279,34 +270,25 @@ do icbs=1,IntNcbs
    endif
 ! SASPH contribution to "grad_p" and renormalization matrix: start
    RG = zero
-   RG_like(1:2) = 0.d0
    do i=1,PLANEDIM
       do j=1,PLANEDIM
          RG(i) = RG(i) + RifBoundarySide%RN(acix(i),acix(j)) * gradbPsuro(j)
-         if ((on_going_time_step==1).and.(input_any_t%C1_BE)) then      
-! Renormalization at SASPH frontiers
-            RG_like(i) = RG_like(i) + RifBoundarySide%RN(acix(i),acix(j)) *    &
-                         gradbPsuro_like(j)
-         endif
       enddo
 ! "IntWdV", or equivalently "J_3,w" (2D version) is always computed using the 
 ! beta-spline cubic kernel, no matter about the renormalization
       RG(i) = RG(i) * IntWdV
-      if ((on_going_time_step==1).and.(input_any_t%C1_BE)) then
-! Renormalization at SASPH frontiers
-         RG_like(i) = RG_like(i) * IntWdV
-      endif
    enddo
 ! Collecting the temporary SASPH contributions to the grad_p term
    RG_sum(1:2) = RG_sum(1:2) + RG(1:2)
    if ((on_going_time_step==1).and.(input_any_t%C1_BE)) then
 ! Renormalization at SASPH frontiers
+! "IntWdV", or equivalently "J_3,w" (2D version) is always computed using the 
+! beta-spline cubic kernel, no matter about the renormalization
 ! Notice that the contributions to RG_sum and B_ren_gradp have different signs 
 ! as RG_sum will be subtracted from the acceleration
-      do i=1,PLANEDIM
-            pg(npi)%B_ren_gradp(acix(i),1:3) = pg(npi)%B_ren_gradp(acix(i),1:3)&
-                                               - RG_like(i)
-      enddo
+      B_ren_aux(1:3,1:3) = -RifBoundarySide%RN(1:3,1:3) * IntWdV
+      pg(npi)%B_ren_gradp(1:3,1:3) = pg(npi)%B_ren_gradp(1:3,1:3) +            &
+                                     B_ren_aux(1:3,1:3)
    endif
 ! SASPH contribution to "grad_p" and renormalization matrix: end
 ! Contributions to the ME SASPH ALE term
