@@ -37,7 +37,7 @@ use I_O_file_module
 !------------------------
 implicit none
 logical :: test
-integer(4) :: i_vtu_grid,i_vert,i_vert2,i_bp,ib,i_vtu_cell,aux_int,aux_int_2
+integer(4) :: i_vtu_grid,i_vert,i_vert2,i_bp,ib,i_vtu_cell,aux_int,aux_int_2,ii
 integer(4) :: ib_aux,j_vtu_cell,shared_face_cell_1,shared_face_cell_2,i_face
 integer(4) :: i_vert3
 double precision :: aux_scal,face_area,aux_scalar
@@ -381,10 +381,20 @@ aux_vec(1:3) = vtu_grids(i_vtu_grid)%points%vertex(i_vert3)%pos(1:3) -         &
          bp_arr(i_bp)%area =                                                   &
                   dsqrt(dot_product(bp_arr(i_bp)%normal,bp_arr(i_bp)%normal))
 ! Normal of the surface body particle
-         bp_arr(i_bp)%normal(1:3) = bp_arr(i_bp)%normal(1:3) / bp_arr(i_bp)%area
+         if (bp_arr(i_bp)%area>1.d-12) then
+            bp_arr(i_bp)%normal(1:3) = bp_arr(i_bp)%normal(1:3) /              &
+                                       bp_arr(i_bp)%area
 ! Rotation around the centre of rotation provided in input: normal
-         call vector_rotation_Rodrigues(body_arr(ib)%n_R_IO(:),                &
-            body_arr(ib)%teta_R_IO,bp_arr(i_bp)%normal(:))
+            call vector_rotation_Rodrigues(body_arr(ib)%n_R_IO(:),             &
+               body_arr(ib)%teta_R_IO,bp_arr(i_bp)%normal(:))
+            else
+! Error in the input mesh: the surface body particle is detached from the body. 
+! It has to be formally considered as an inner body particle not to be selected 
+! in representation of any fluid-body inter-particle interaction.
+               bp_arr(i_bp)%normal(1:3) = 0.d0
+               bp_arr(i_bp)%area = 0.d0
+               bp_arr(i_bp)%surface = .false.
+         endif
       endif
 !$omp critical (omp_IC_CAE_body_particles_area_int_ndA)
 ! Update the body area
@@ -398,6 +408,19 @@ aux_vec(1:3) = vtu_grids(i_vtu_grid)%points%vertex(i_vert3)%pos(1:3) -         &
                           body_arr(ib)%volume
    enddo
 !$omp end parallel do
+! Possibly flip normals according to the associated list of input particle IDs
+   do ii=1,body_arr(ib)%n_flip_nx_IDs
+      bp_arr(body_arr(ib)%flip_nx_IDs(ii))%normal(1) =                         &
+         -bp_arr(body_arr(ib)%flip_nx_IDs(ii))%normal(1)
+   enddo
+   do ii=1,body_arr(ib)%n_flip_ny_IDs
+      bp_arr(body_arr(ib)%flip_ny_IDs(ii))%normal(2) =                         &
+         -bp_arr(body_arr(ib)%flip_ny_IDs(ii))%normal(2)
+   enddo
+   do ii=1,body_arr(ib)%n_flip_nz_IDs
+      bp_arr(body_arr(ib)%flip_nz_IDs(ii))%normal(3) =                         &
+         -bp_arr(body_arr(ib)%flip_nz_IDs(ii))%normal(3)
+   enddo
 enddo
 !------------------------
 ! Deallocations
@@ -416,6 +439,15 @@ if ((body_arr(ib)%surface_detection==2).or.                                    &
    call allocate_de_log_r2(.false.,test_surface_faces_2,array_name=array_name, &
       ulog_flag=.true.)
 endif
+array_name = "flip_nx_IDs"
+call allocate_de_int4_r1(.false.,body_arr(ib)%flip_nx_IDs,                     &
+   array_name=array_name,ulog_flag=.true.)
+array_name = "flip_ny_IDs"
+call allocate_de_int4_r1(.false.,body_arr(ib)%flip_ny_IDs,                     &
+   array_name=array_name,ulog_flag=.true.)
+array_name = "flip_nz_IDs"
+call allocate_de_int4_r1(.false.,body_arr(ib)%flip_nz_IDs,                     &
+   array_name=array_name,ulog_flag=.true.)
 return
 end subroutine IC_CAE_body_particles
 #endif

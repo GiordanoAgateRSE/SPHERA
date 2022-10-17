@@ -77,9 +77,9 @@ call open_close_file(.true.,ufgl,file_name)
 if (on_going_time_step==1) then
    write(ufgl,*) "Fluid global quantities "
    write(ufgl,'((11x,a),(10x,a),3(1x,a),3(a),(8x,a))')                         &
-      " Time(s)"," Mass(kg)"," LinMomx(kg*m*s-2)"," LinMomy(kg*m*s-2)",        &
-      " LinMomz(kg*m*s-2)"," AngMomx(kg*m2*s-2)"," AngMomy(kg*m2*s-2)",        &
-      " AngMomz(kg*m2*s-2)"," Volume(m3)"
+      " Time(s)"," Mass(kg)","   LinMomx(kg*m/s)","   LinMomy(kg*m/s)",        &
+      "   LinMomz(kg*m/s)","   AngMomx(kg*m2/s)","   AngMomy(kg*m2/s)",        &
+      "   AngMomz(kg*m2/s)"," Volume(m3)"
 endif
 ! Output record
 write(ufgl,'(9(ES19.9E2,1x))') simulation_time,glob_mass,glob_lin_mom(1:3),    &

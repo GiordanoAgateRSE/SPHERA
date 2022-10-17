@@ -50,7 +50,8 @@ implicit none
 integer(4),intent(in) :: i_vtu_grid,n_nodes,n_components,n_lines_var
 integer(4),intent(in) :: n_tokens_line,surface_detection
 character(100),intent(in) :: var_name
-integer(4) :: n_values,i_line,io_err,i_tok,i_value,i_node,i_component,aux_int
+integer(4) :: n_values,i_line,io_err,i_tok,i_value,i_node,i_component
+double precision :: aux_scal
 character(100) :: token
 character(200) :: line
 !------------------------
@@ -116,15 +117,15 @@ do i_line=1,n_lines_var
                vtu_grids(i_vtu_grid)%points%vertex(i_node)%pos(i_component)
          case ("nSurfaceLayers")
             if ((surface_detection==2).or.(surface_detection==3)) then
-               read(token,*) aux_int
-               if (aux_int==1) then
+               read(token,*) aux_scal
+               if ((aux_scal>1.d-3).and.(aux_scal<1.001d0)) then
                   vtu_grids(i_vtu_grid)%points%surface(i_node) = .true.
-                  elseif (aux_int==0) then
+                  elseif ((aux_scal>-1.d-3).and.(aux_scal<1.001d0)) then
                      vtu_grids(i_vtu_grid)%points%surface(i_node) = .false.
                      else
                         write(uerr,*) 'Error in the values of the ".vtu" ',    &
                            'point variable "nSurfaceLayers": the only values ',&
-                           'admitted are "1" and "0".'
+                           'admitted lie in the interval [0,1].'
                endif
             endif
          case ("types")

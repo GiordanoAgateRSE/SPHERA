@@ -449,6 +449,10 @@ type body
 #ifdef SPACE_3D
 ! Method to detect the surface body particles
    integer(4) :: surface_detection
+! Number of particles to flip normals
+   integer(4) :: n_flip_nx_IDs
+   integer(4) :: n_flip_ny_IDs
+   integer(4) :: n_flip_nz_IDs
 #endif
 ! Number of body particles
    integer(4) :: npart
@@ -474,6 +478,12 @@ type body
    double precision :: teta_R_IO
 ! Maximum pressure value for the maximum pressure limiter
    double precision :: p_max_limiter
+#ifdef SPACE_3D
+! Arrays of the particle IDs to flip normals
+   integer(4),dimension(:),allocatable :: flip_nx_IDs
+   integer(4),dimension(:),allocatable :: flip_ny_IDs
+   integer(4),dimension(:),allocatable :: flip_nz_IDs
+#endif
 ! Position of the centre of mass
    double precision :: x_CM(3)
 ! Rotation angle of the body with respect to the reference system
@@ -505,7 +515,7 @@ type body
 ! Inverse of the moment of inertia
    double precision :: Ic_inv(3,3)
 ! Array for the imposed body kinematics (n_records*7) 
-   double precision,dimension(:,:),allocatable :: body_kinematics 
+   double precision,dimension(:,:),allocatable :: body_kinematics
 ! Array of the elements of the body 
    type(body_element),dimension(:),allocatable :: elem
 end type body

@@ -31,13 +31,15 @@ subroutine ReadBodyDynamics(ainp,comment,nrighe,ier,ninp,ulog)
 use Static_allocation_module                            
 use Hybrid_allocation_module
 use Dynamic_allocation_module
+use Memory_I_O_interface_module
 !------------------------
 ! Declarations
 !------------------------
 implicit none
 logical :: CAE
 integer(4) :: nrighe,ier,ninp,ulog,ioerr,i,Id_body,n_elem,j,Id_elem,alloc_stat
-integer(4) :: imposed_kinematics,n_records,Ic_imposed,surface_detection
+integer(4) :: imposed_kinematics,n_records,Ic_imposed,surface_detection,jj
+integer(4) :: n_flip_nx_IDs,n_flip_ny_IDs,n_flip_nz_IDs
 double precision :: mass,teta_R_IO
 integer(4) :: normal_act(6)
 double precision :: L_geom(3),x_CM(3),n_R_IO(3),u_CM(3),omega(3),x_rotC(3)
@@ -47,7 +49,7 @@ double precision :: vec_bp_CAE_trans(3)
 double precision :: mass_deact(6)
 double precision :: Ic(3,3)
 character(1) :: comment
-character(100) :: lcase
+character(100) :: lcase,array_name
 character(len=lencard) :: ainp
 logical,external :: ReadCheck
 !------------------------
@@ -72,6 +74,9 @@ end interface
 #ifdef SPACE_3D
 vec_bp_CAE_trans(1:3) = 0.d0
 surface_detection = 0
+n_flip_nx_IDs = 0
+n_flip_ny_IDs = 0
+n_flip_nz_IDs = 0
 #endif
 !------------------------
 ! Statements
@@ -91,7 +96,7 @@ do while (trim(lcase(ainp)) /= "##### end body dynamics #####")
 ! Writing on the log file
 ! In case of restart, Domain%dx>0 since the first (and only) reading of the main
 ! input file
-   if ((input_second_read.eqv..true.).and.(ulog>0)) then
+   if ((input_second_read).and.(ulog>0)) then
       write(ulog,"(1x,a,1p,i12)") "n_bodies:.....................",n_bodies
       write(ulog,"(1x,a,1p,e12.4)") "dx_dxbodies:..................",          &
          dx_dxbodies
@@ -141,9 +146,50 @@ do while (trim(lcase(ainp)) /= "##### end body dynamics #####")
          if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"vec_bp_CAE_trans",ninp,ulog)&
             ) return
          call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
-         read(ainp,*,iostat=ioerr) surface_detection
-         if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"surface_detection",ninp,    &
-            ulog)) return
+         read(ainp,*,iostat=ioerr) surface_detection,n_flip_nx_IDs,            &
+            n_flip_ny_IDs,n_flip_nz_IDs
+         if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                             &
+            "surface_detection, n_flip_normals_IDs",ninp,ulog)) return
+! Allocating the arrays of the particle IDs to flip normals
+         if (.not.(input_second_read)) then
+            if (n_flip_nx_IDs>0) then
+               array_name = "flip_nx_IDs"
+               call allocate_de_int4_r1(.true.,body_arr(Id_body)%flip_nx_IDs,  &
+                  n_flip_nx_IDs,array_name,ulog_flag=.true.)
+            endif
+            if (n_flip_ny_IDs>0) then
+               array_name = "flip_ny_IDs"
+               call allocate_de_int4_r1(.true.,body_arr(Id_body)%flip_ny_IDs,  &
+                  n_flip_ny_IDs,array_name,ulog_flag=.true.)
+            endif
+            if (n_flip_nz_IDs>0) then
+               array_name = "flip_nz_IDs"
+               call allocate_de_int4_r1(.true.,body_arr(Id_body)%flip_nz_IDs,  &
+                  n_flip_nz_IDs,array_name,ulog_flag=.true.)
+            endif
+         endif
+! Reading the eventual particle IDs to flip normals
+         do jj=1,n_flip_nx_IDs
+            call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,                 &
+               lines_treated=nrighe)
+            read(ainp,*,iostat=ioerr) body_arr(Id_body)%flip_nx_IDs(jj)
+            if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"flip_nx_IDS",ninp,ulog)) &
+               return
+         enddo
+         do jj=1,n_flip_ny_IDs
+            call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,                 &
+               lines_treated=nrighe)
+            read(ainp,*,iostat=ioerr) body_arr(Id_body)%flip_ny_IDs(jj)
+            if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"flip_ny_IDS",ninp,ulog)) &
+               return
+         enddo
+         do jj=1,n_flip_nz_IDs
+            call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,                 &
+               lines_treated=nrighe)
+            read(ainp,*,iostat=ioerr) body_arr(Id_body)%flip_nz_IDs(jj)
+            if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"flip_nz_IDS",ninp,ulog)) &
+               return
+         enddo
       endif
 #endif
       call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
@@ -186,13 +232,16 @@ do while (trim(lcase(ainp)) /= "##### end body dynamics #####")
       read(ainp,*,iostat=ioerr) imposed_kinematics,n_records
       if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"BODY_KINEMATICS",ninp,ulog))   &
          return
-! Assignment of the body parameters 
+! Assignment of the body parameters
       body_arr(Id_body)%CAE = CAE
       body_arr(Id_body)%n_elem = n_elem
       body_arr(Id_body)%mass = mass
 #ifdef SPACE_3D
       body_arr(Id_body)%vec_bp_CAE_trans(1:3) = vec_bp_CAE_trans(1:3)
       body_arr(Id_body)%surface_detection = surface_detection
+      body_arr(Id_body)%n_flip_nx_IDs = n_flip_nx_IDs
+      body_arr(Id_body)%n_flip_ny_IDs = n_flip_ny_IDs
+      body_arr(Id_body)%n_flip_nz_IDs = n_flip_nz_IDs
 #endif
       body_arr(Id_body)%x_CM = x_CM
       body_arr(Id_body)%Ic_imposed = Ic_imposed
@@ -221,6 +270,12 @@ do while (trim(lcase(ainp)) /= "##### end body dynamics #####")
                vec_bp_CAE_trans(1:3)
             write(ulog,"(1x,a,1p,i12)") "surface_detection:..........",        &
                surface_detection
+            write(ulog,"(1x,a,1p,i12)") "n_flip_nx_IDs:..............",        &
+               n_flip_nx_IDs
+            write(ulog,"(1x,a,1p,i12)") "n_flip_ny_IDs:..............",        &
+               n_flip_ny_IDs
+            write(ulog,"(1x,a,1p,i12)") "n_flip_nz_IDs:..............",        &
+               n_flip_nz_IDs
          endif
 #endif
          write(ulog,"(1x,a,1p,3e12.4)") "x_CM:.......................",x_CM
