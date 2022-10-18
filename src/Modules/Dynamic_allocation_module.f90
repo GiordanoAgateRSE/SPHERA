@@ -156,7 +156,8 @@ integer(4),dimension(:),allocatable :: PartIntorno_f_sbp
 ! fluid particles and the neighbouring surface body particles
 double precision,dimension(:),allocatable :: dis_f_sbp
 ! closest_f_sbp(NMAXPARTJ*PARTICLEBUFFER): array of the IDs of the closest 
-! surface body particles
+! surface body particles. If (remove_fluid_in_body) then only the visible 
+! neighbours are considered.
 integer(4),dimension(:),allocatable :: closest_f_sbp
 #endif
 #ifdef SPACE_3D   

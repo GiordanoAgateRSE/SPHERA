@@ -97,7 +97,7 @@ if (nag>0) then
    header_string =                                                             &
 "case "//prefix(1:len_trim(prefix))//" * time "//cargo(1:len_trim(cargo))//" (s)"
 ! Coordinates 
-   numpoints = count(pg(1:nag)%cella>0)
+   numpoints = count(pg(1:nag)%cella/=0)
    allocate(finger(numpoints))
    k = 0
    do npi=1,nag

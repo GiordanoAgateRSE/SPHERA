@@ -21,7 +21,7 @@
 !-------------------------------------------------------------------------------
 ! Program unit: OrdGrid1              
 ! Description: Ordering the numerical elements on the background positioning 
-!              grid.       
+!              grid.
 !-------------------------------------------------------------------------------
 subroutine OrdGrid1
 !------------------------
@@ -60,6 +60,9 @@ do while ((nag>0).and.(npi<nag))
    npi = npi + 1
    ncel = ParticleCellNumber(pg(npi)%coord)
    if (pg(npi)%cella<=0) then
+! Removal of:
+!    (cella==-1): particles having crossed open sections;
+!    (cella==-2): particles in solid bodies only if (remove_fluid_in_body).
       pg(npi) = pg(nag)
       pg(nag) = PgZero
       if (Domain%RKscheme>1) ts0_pg(nag) = ts_pgZero

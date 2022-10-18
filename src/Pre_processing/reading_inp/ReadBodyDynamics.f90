@@ -90,7 +90,7 @@ do while (trim(lcase(ainp)) /= "##### end body dynamics #####")
    read(ainp,*,iostat=ioerr) n_bodies,dx_dxbodies,friction_angle,              &
       time_max_no_body_gravity_force,time_max_no_body_frontier_impingements,   &
       body_minimum_pressure_limiter,body_maximum_pressure_limiter,             &
-      FSI_slip_conditions,thin_walls,c_ini_rem_fp_sb
+      FSI_slip_conditions,thin_walls,c_ini_rem_fp_sb,remove_fluid_in_body
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"BODY DYNAMICS GENERAL INPUT",ninp,&
       ulog)) return
 ! Writing on the log file
@@ -116,6 +116,8 @@ do while (trim(lcase(ainp)) /= "##### end body dynamics #####")
          thin_walls
       write(ulog,"(1x,a,1p,e12.4)") "c_ini_rem_fp_sb:..............",          &
          c_ini_rem_fp_sb
+      write(ulog,"(1x,a,1p,l12)") "remove_fluid_in_body:.........",            &
+         remove_fluid_in_body
       write(ulog,"(1x,a)")  " "
    endif
 ! Allocation of the array of the bodies

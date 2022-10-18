@@ -53,7 +53,7 @@ double precision :: min_sigma_Gamma,dis_fp_dbsph_inoutlet
 double precision :: dbsph_inoutlet_threshold,normal_int_mixture_top_abs
 double precision :: normal_int_sat_top_abs
 #ifdef SOLID_BODIES
-double precision :: dis_min
+double precision :: dis_min,aux_scal
 #endif
 double precision,dimension(3) :: ragtemp,r_vec,grad_W,gradWomegaj,aux_vec
 double precision,dimension(3) :: aux_vec_2,aux_vec_3
@@ -117,7 +117,7 @@ closest_f_sbp(:) = 0
 !$omp private(normal_int_sat_top_abs,r_vec,grad_W,gradWomegaj,aux_vec)         &
 !$omp private(aux_vec_2,aux_vec_3)                                             &   
 #ifdef SOLID_BODIES
-!$omp private(f_sbp,dis_min)                                                   &
+!$omp private(f_sbp,dis_min,aux_scal)                                          &
 #endif
 !$omp shared(nag,pg,Domain,Med,Icont,Npartord,NMAXPARTJ,rag,nPartIntorno)      &
 !$omp shared(Partintorno,PartKernel,ke_coef,kacl_coef,Doubleh,square_doubleh)  &
@@ -126,7 +126,8 @@ closest_f_sbp(:) = 0
 !$omp shared(kernel_fw,dShep_old,Granular_flows_options,NMedium)               &
 #ifdef SOLID_BODIES
 !$omp shared(Icont_bp,NPartOrd_bp,nPartIntorno_f_sbp,PartIntorno_f_sbp)        &
-!$omp shared(dis_f_sbp,bp_arr,closest_f_sbp)                                   &
+!$omp shared(dis_f_sbp,bp_arr,closest_f_sbp,remove_fluid_in_body)              &
+!$omp shared(fluid_in_body_count)                                              &
 #endif
 !$omp shared(simulation_time,input_any_t)
 loop_nag: do npi=1,nag
@@ -440,11 +441,17 @@ loop_nag: do npi=1,nag
 ! Saving the inter-particle distance
                      dis_f_sbp(npartint) = rijtemp
                   endif
-! Updating the ID of the closest surface body particle
-                  if (rijtemp<dis_min) then
-                     dis_min = rijtemp
-                     closest_f_sbp(npi) = npj
+! Updating the ID of the "closest surface body particle": start
+                  aux_scal = dot_product(ragtemp,bp_arr(npj)%normal)
+                  if ((aux_scal<-1.d-12).or.(.not.(remove_fluid_in_body))) then
+! Visibility criterion satisfied or no removal of fluid particles from solid 
+! bodies
+                     if (rijtemp<dis_min) then
+                        dis_min = rijtemp
+                        closest_f_sbp(npi) = npj
+                     endif
                   endif
+! Updating the ID of the "closest surface body particle": end
                endif
             enddo loop_f_sbp
 #endif
@@ -531,6 +538,20 @@ loop_nag: do npi=1,nag
          enddo loop_krang
       enddo loop_irang
    enddo loop_jrang
+#ifdef SOLID_BODIES
+! If (remove_fluid_in_body) then any fluid particle with neighbouring 
+! surface body particles but without visible neighbouring surface body 
+! particles is considered as penetrated in a solid body. The particle is 
+! still influential in the current time step (not easy to avoid it) but will be 
+! removed at the following particle reordering on the background grid.
+   if ((remove_fluid_in_body).and.(nPartIntorno_f_sbp(npi)>0).and.             &
+      (closest_f_sbp(npi)==0)) then
+      pg(npi)%cella = -2
+!$omp critical (omp_fluid_in_body_count)
+      fluid_in_body_count = fluid_in_body_count + 1
+!$omp end critical (omp_fluid_in_body_count)
+   endif
+#endif
    if (Granular_flows_options%KTGF_config>0) then
 ! Free surface detection along the grid column
       if (index(Med(pg(npi)%imed)%tipo,"liquid")>0) then

@@ -182,6 +182,8 @@ logical :: body_minimum_pressure_limiter,body_maximum_pressure_limiter
 ! Flag to activate/deactivate the treatment for submerged boundary thin walls, 
 ! far from other boundary types
 logical :: thin_walls
+! Flag to remove/keep fluid particles which have crossed a fluid-body interface
+logical :: remove_fluid_in_body
 #endif
 ! Max number of neighbouring particles
 integer(4) :: NMAXPARTJ
@@ -205,6 +207,9 @@ integer(4) :: n_surf_body_part
 integer(4) :: n_bodies
 ! Slip conditions for FSI (ref. input file template)
 integer(4) :: FSI_slip_conditions
+! Number of fluid particles removed from solid bodies after the initial 
+! conditions
+integer(4) :: fluid_in_body_count
 #ifdef SPACE_3D
 ! Number of CAE-made solid bodies
 integer(4) :: n_bodies_CAE

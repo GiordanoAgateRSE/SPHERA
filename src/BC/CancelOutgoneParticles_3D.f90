@@ -157,7 +157,7 @@ do iof=1,NumOpenFaces
 ! The particle projection falls outside the face and therefore must be deleted 
          if (esci) then
 !$omp critical (omp_outgone_particle_counting_3D)
-            OpCount(pg(npi)%imed) = OpCount(pg(npi)%imed) + 1    
+            OpCount(pg(npi)%imed) = OpCount(pg(npi)%imed) + 1
 !$omp end critical (omp_outgone_particle_counting_3D)
             pg(npi)%cella = -1
          endif

@@ -94,14 +94,16 @@
 !    within solid bodies. This only refine the initial geometry of the fluid 
 !    bodies around the surfaces of solid bodies.
 !    =1. (default value)
+![?] <remove_fluid_in_body>: logical flag to remove/keep fluid particles 
+!    which have crossed a fluid-body interface
 !-------------------------------------------------------------------------------
 ![*] <n_bodies> <dx/dx_body> <friction_angle> <time_max_no_gravity_force> 
 !    <time_max_no_body_frontier_impingements> <body_minimum_pressure_limiter> 
 !    <body_maximum_pressure_limiter> <FSI_slip_conditions> <thin_walls> 
-!    <c_ini_rem_fp_sb>
+!    <c_ini_rem_fp_sb> <remove_fluid_in_body>
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
-___ ___ ___ ___ ___ ___ ___ ___ ___ ___
+___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
 ![?] <ID_body>: body ID

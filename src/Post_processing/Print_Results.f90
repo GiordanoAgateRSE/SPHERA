@@ -89,7 +89,7 @@ mixture_count = 0
 ! Statements
 !------------------------
 ! To assess the proper formats
-dummy = count(pg(1:nag)%cella>0)
+dummy = count(pg(1:nag)%cella/=0)
 write(stringa,'(i12)') dummy
 i = len_trim(adjustl(stringa))
 write(coppia,'(i2)') i
@@ -346,7 +346,7 @@ if (nag>0) then
          call system("rm -f date_now.txt")
       endif   
    endif 
-! Final prints
+! Step data
    write(ulog,'(144("."))')
    write(ulog,fmt100) " Print at:                   | step: ",it," | time:  ", &
       simulation_time," | dt:  ",dt,"s| Particles: inside ",dummy," gone out ",&
@@ -513,6 +513,10 @@ if (nag>0) then
             Partz(i)%avg_tau_wall_f," Pa."
       endif
    enddo
+#ifdef SOLID_BODIES
+   write(ulog,'(a,i9)') 'Fluid particles removed from solid bodies: ',         &
+      fluid_in_body_count
+#endif
    else
       write(ulog,'(128("."))')
       write(ulog,'(a)') "No particles inside the domain at the moment"

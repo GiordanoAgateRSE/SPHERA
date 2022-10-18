@@ -132,22 +132,27 @@ do npi=1,n_body_part
                endif
             enddo
             if (proxy_normal_bp_f(npartint)==0) then
+! The fluid particle has neighbouring solid particles, but no visibility check 
+! has been passed: it is probable that the fluid particle has crossed 
+! a fluid-body interface.
 ! In case the normal is not yet defined, this means that there is a fluid-solid 
 ! mass penetration or some normals are wrongly defined or dx/dx_s is very large 
-! so that not all the surface body particles have been considered above. Under 
-! these cimrcumstances, the normal vector is taken from the neighbouring 
+! so that not all the surface body particles have been considered above or 
+! that the CAE-made mesh of the solid body is far from a regular Cartesian grid.
+               if (closest_f_sbp(npj)>0) then
+! The fluid particle has at least one neighbouring surface body particle.
+! Under these circumstances, the normal vector is taken from the neighbouring 
 ! surface body particle, which is the closest to the computational body 
 ! particle (default choice).
-               if (closest_f_sbp(npj)>0) then
+! If (remove_fluid_in_body) then the closest particle was selected only among 
+! the visible neighbours and this default choice was already avoided.
                   proxy_normal_bp_f(npartint) = closest_f_sbp(npj)
                   else
-! In case the normal is not yet defined, this means that there is a fluid-solid 
-! mass penetration or some normals are wrongly defined, so that a fluid 
-! particle migh have neighbouring body particles, but not neighbouing surface 
-! body particles. Under these cimrcumstances, the normal vector is zeroed 
-! (secondary default choice) by considering the computational body particle, 
-! which here is not on the surface of its body. This default option is crucial 
-! as also the surface velocity and acceleration refers to "proxy_normal_bp_f". 
+! The normal is not yet defined. Under these cimrcumstances, the normal 
+! vector is zeroed (secondary default choice) by considering the computational 
+! body particle, which here is not on the surface of its body. This default 
+! option is crucial as also the surface velocity and acceleration refers to 
+! "proxy_normal_bp_f".
                      proxy_normal_bp_f(npartint) = npi
                endif
             endif

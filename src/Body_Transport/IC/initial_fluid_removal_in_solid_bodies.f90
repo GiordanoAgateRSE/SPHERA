@@ -81,6 +81,7 @@ do npi=1,n_body_part
    enddo
 enddo
 !$omp end parallel do
+fluid_in_body_count = 0
 !------------------------
 ! Deallocations
 !------------------------
