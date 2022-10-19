@@ -50,7 +50,11 @@ integer(4) :: npi
 !$omp private(npi)
 ! Loop over the active particles
 do npi=1,nag
-   if (pg(npi)%cella==0) cycle
+   if (pg(npi)%cella<=0) then
+      pg(npi)%dvel_ALE1(1:3) = 0.d0
+      pg(npi)%dvel_ALE3(1:3) = 0.d0
+      cycle
+   endif
 ! To save the old coordinates
    pg(npi)%CoordOld(:) = pg(npi)%coord(:)
    if (pg(npi)%vel_type/="std") then

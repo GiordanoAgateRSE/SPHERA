@@ -56,6 +56,9 @@ dtvel = half * (dt + dt_previous_step)
 !$omp private(npi,ii,dmom_dt)
 do ii=1,indarrayFlu
    npi = Array_Flu(ii)
+#ifdef SOLID_BODIES
+   if (pg(npi)%cella==-2) cycle
+#endif
    if (input_any_t%ALE3) then
       dmom_dt(1:3) = pg(npi)%mass * pg(npi)%acc(1:3) + pg(npi)%vel(1:3) *      &
                      pg(npi)%dmass_dt

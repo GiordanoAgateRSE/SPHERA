@@ -69,7 +69,7 @@ BoundarySide(:)%CloseParticles_maxQuota = const_m_9999
 !$omp private(xpmin,xpmax,interlen,Ncols,Colmn,deltai,Func,ypi)                &
 !$omp private(IntWdS,IntWdV,IntDpWdV,IntWdV1,IntWd1s0,IntWd3s0,IntWd1s2)
 do npi=1,nag
-   if (pg(npi)%cella==0.or.pg(npi)%vel_type/="std") cycle
+   if (pg(npi)%cella<=0.or.pg(npi)%vel_type/="std") cycle
 ! Searching for the boundary sides, which are the nearest the current          
 ! particle "npi"
    call FindCloseBoundarySides2D(npi,Ncbs,Cloboside,LocXY)

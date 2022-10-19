@@ -78,7 +78,7 @@ ALE2_CE = 0.d0
 !------------------------
 ! Statements
 !------------------------
-if ((pg(npi)%vel_type/="std").or.(pg(npi)%cella==0)) return
+if ((pg(npi)%vel_type/="std").or.(pg(npi)%cella<=0)) return
 dvar(:) = zero
 #ifdef SPACE_2D
    aij(:) = zero

@@ -73,6 +73,9 @@ if (indarrayFlu==0) then
 ! Loop over the particles
       do ii=1,indarrayFlu
          npi = Array_Flu(ii)
+#ifdef SOLID_BODIES
+         if (pg(npi)%cella==-2) cycle
+#endif
          if (Med(pg(npi)%imed)%tipo=="granular") then
 ! Redundant and safety check
             if ((pg(npi)%state=="sol").or.                                     &

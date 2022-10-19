@@ -542,11 +542,15 @@ loop_nag: do npi=1,nag
 ! If (remove_fluid_in_body) then any fluid particle with neighbouring 
 ! surface body particles but without visible neighbouring surface body 
 ! particles is considered as penetrated in a solid body. The particle is 
-! still influential in the current time step (not easy to avoid it) but will be 
+! made non-influential in the current time step and will be 
 ! removed at the following particle reordering on the background grid.
    if ((remove_fluid_in_body).and.(nPartIntorno_f_sbp(npi)>0).and.             &
       (closest_f_sbp(npi)==0)) then
       pg(npi)%cella = -2
+      pg(npi)%volume = 0.d0
+      pg(npi)%mass = 0.d0
+      pg(npi)%dens = Med(pg(npi)%imed)%den0
+      pg(npi)%pres = 0.d0
 !$omp critical (omp_fluid_in_body_count)
       fluid_in_body_count = fluid_in_body_count + 1
 !$omp end critical (omp_fluid_in_body_count)

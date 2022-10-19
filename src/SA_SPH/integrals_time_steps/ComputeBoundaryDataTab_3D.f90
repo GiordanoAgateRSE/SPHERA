@@ -66,7 +66,7 @@ BoundaryFace(:)%CloseParticles_maxQuota = const_m_9999
 !$omp shared(nag,pg,BoundaryDataTab,BoundaryDataPointer,EpCount,MaxNcbf)       &
 !$omp shared(nomsub,Domain,input_any_t)
 loop_particle: do npi=1,nag
-   if (pg(npi)%cella==0.or.pg(npi)%vel_type/="std") cycle loop_particle
+   if (pg(npi)%cella<=0.or.pg(npi)%vel_type/="std") cycle loop_particle
 ! Searching for the boundary faces, which are the nearest the current          
 ! particle "npi"
    call FindCloseBoundaryFaces3D(npi,Ncbf,Cloboface,LocX,Nfzn)

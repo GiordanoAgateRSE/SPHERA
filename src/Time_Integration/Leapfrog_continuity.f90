@@ -53,8 +53,8 @@ double precision :: rho_old,dvolume_dt
 !$omp private(npi,ii,rho_old,dvolume_dt)
 do ii=1,indarrayFlu
    npi = Array_Flu(ii)
+   if ((pg(npi)%cella<=0).or.(pg(npi)%vel_type/="std")) cycle
    rho_old = pg(npi)%dens
-   if ((pg(npi)%cella==0).or.(pg(npi)%vel_type/="std")) cycle
    if (Domain%tipo=="bsph") pg(npi)%dden = pg(npi)%dden / pg(npi)%uni
 ! Continuity equation
    if (Domain%tipo=="semi") pg(npi)%dens = pg(npi)%dens + dt * pg(npi)%dden

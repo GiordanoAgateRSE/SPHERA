@@ -140,6 +140,9 @@ enddo
 !$omp private(npi,ii,TetaP1)
 do ii=1,indarrayFlu
    npi = Array_Flu(ii)
+#ifdef SOLID_BODIES
+   if (pg(npi)%cella==-2) cycle
+#endif
 ! Excluding particles close to the face with conditions "flow", "velo" and 
 ! "sour"
    if (pg(npi)%koddens==0) then 

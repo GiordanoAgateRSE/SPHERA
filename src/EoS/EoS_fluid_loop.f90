@@ -62,7 +62,7 @@ if (on_going_time_step>0) then
    do npi=1,nag
 ! Skip the outgone particles and the particles with velocity type different 
 ! from "std"
-      if ((pg(npi)%cella==0).or.(pg(npi)%vel_type/="std")) cycle
+      if ((pg(npi)%cella<=0).or.(pg(npi)%vel_type/="std")) cycle
       call EoS_barotropic_linear(Med(pg(npi)%imed)%eps,Med(pg(npi)%imed)%den0, &
          Domain%prif,rho_in=pg(npi)%dens,p_out=pg(npi)%pres)
    enddo
