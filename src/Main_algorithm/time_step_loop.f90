@@ -230,7 +230,7 @@ TIME_STEP_DO: do while (it<=input_any_t%itmax)
 #endif
       if ((Domain%tipo=="semi").and.(input_any_t%ALE3).and.                    &
          (Granular_flows_options%KTGF_config/=1)) then
-         call ALE3_term_momentum
+         call ALE3_term_momentum(dt_previous_step,dtvel)
       endif
 ! Time integration scheme for momentum equations 
       if (Domain%time_split==0) then   
