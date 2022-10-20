@@ -38,6 +38,7 @@ character(1) :: comment
 character(len=lencard) :: ainp
 integer(4) :: itmax
 double precision :: tmax,CFL,TetaP,TetaV,COEFNMAXPARTJ,COEFNMAXPARTI,vsc_coeff
+double precision :: invB_det_thresh
 integer(4) :: ioerr,time_split,RKscheme,body_part_reorder
 #ifdef SPACE_3D
 integer(4) :: MAXCLOSEBOUNDFACES,MAXNUMCONVEXEDGES,GCBFVecDim_loc,nag_aux
@@ -103,9 +104,9 @@ do while (trim(lcase(ainp))/="##### end run parameters #####")
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"COEFNMAXPARTI and COEFNMAXPARTJ ",&
       ninp,ulog)) return
    call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
-   read(ainp,*,iostat=ioerr) ALE3,C1_BE,C1_monitors
+   read(ainp,*,iostat=ioerr) ALE3,C1_BE,C1_monitors,invB_det_thresh
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                                   &
-      "ALE3,C1_BE,C1_monitors",ninp,ulog)) return
+      "ALE3,C1_BE,C1_monitors,invB_det_thresh",ninp,ulog)) return
 #ifdef SPACE_3D
    call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
       read(ainp,*,iostat=ioerr) nag_aux,MAXCLOSEBOUNDFACES,MAXNUMCONVEXEDGES,  &
@@ -150,7 +151,8 @@ if (input_second_read.eqv..true.) then
    input_any_t%body_part_reorder = body_part_reorder
    input_any_t%ALE3 = ALE3
    input_any_t%C1_BE = C1_BE
-   input_any_t%C1_monitors = C1_monitors   
+   input_any_t%C1_monitors = C1_monitors
+   input_any_t%invB_det_thresh = invB_det_thresh  
 #ifdef SPACE_3D
       input_any_t%MAXCLOSEBOUNDFACES = MAXCLOSEBOUNDFACES
       input_any_t%MAXNUMCONVEXEDGES = MAXNUMCONVEXEDGES
@@ -187,6 +189,10 @@ if (input_second_read.eqv..true.) then
          input_any_t%C1_BE
       write(ulog,"(1x,a,1p,l8)")    "C1_monitors               : ",            &
          input_any_t%C1_monitors
+      if (input_any_t%C1_BE) then
+         write(ulog,"(1x,a,1p,e12.4)") "invB_det_thresh           : ",         &
+            input_any_t%invB_det_thresh
+      endif
 #ifdef SPACE_3D
       write(ulog,"(1x,a,1p,i12)")   "NAG_AUX                    : ",           &
          Domain%nag_aux

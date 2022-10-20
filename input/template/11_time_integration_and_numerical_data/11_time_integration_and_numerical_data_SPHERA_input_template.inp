@@ -105,19 +105,26 @@
 !    =.true. (1st-order consistency; no constraint: it also works in the 
 !            presence of: dense granular flows; DBSPH boundaries; explicit RK 
 !            time integration schemes. This option does not need ALE3==.true.)
+![?] <invB_det_thresh>: minimum threshold for the absolute value of the 
+!    determinant of the inverse of the renormalization matrix. This threshold 
+!    is used as a high-pass filter to invert the two renormalization 
+!    matrices in the balance equations (not the renormalization matrix for 
+!    post-processing at monitors). This value is influential only if (C1_BE).
+!    For those renormalization which are not inverted, renormalization does not 
+!    apply.
 !-------------------------------------------------------------------------------
 ![*] <final_time> <final_time_step>
 ![*] <CFL> <vsc_coeff> <Leapfrog_flag> <scheme_order> <factor> <dt_alfa_Mon>
 ![*] <teta_p> <teta_u>
 ![*] <COEFNMAXPARTI> <COEFNMAXPARTJ> <body_part_reorder>
-![*] <ALE3> <C1_BE> <C1_monitors>
+![*] <ALE3> <C1_BE> <C1_monitors> <invB_det_thresh>
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
 ___ ___
 ___ ___ ___ ___ ___ ___
 ___ ___
 ___ ___ ___
-___ ___ ___
+___ ___ ___ ___
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
 ![?] if (3D) then

@@ -134,6 +134,9 @@ type input_any_time_der_type
    double precision :: pllb_fr 
 ! Output time step for water depth
    double precision :: depth_dt_out
+! Threshold for the absolute value of the determinant of the inverse of the 
+! renormalization matrix (ref. input-file template)
+   double precision :: invB_det_thresh
 ! Type of pressure partial smoothing
    character(1) :: Psurf
 ! Restart information path (influential only in case of authomatic reading of 

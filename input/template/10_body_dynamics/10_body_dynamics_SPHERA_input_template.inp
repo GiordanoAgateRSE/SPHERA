@@ -95,7 +95,10 @@
 !    bodies around the surfaces of solid bodies.
 !    =1. (default value)
 ![?] <remove_fluid_in_body>: logical flag to remove/keep fluid particles 
-!    which have crossed a fluid-body interface
+!    which have crossed a fluid-body interface. These particles are made 
+!    non-influential before their removal, but they affect some renormalization 
+!    matrices of their neighbouring particles during the time step they are 
+!    detected.
 !-------------------------------------------------------------------------------
 ![*] <n_bodies> <dx/dx_body> <friction_angle> <time_max_no_gravity_force> 
 !    <time_max_no_body_frontier_impingements> <body_minimum_pressure_limiter> 
