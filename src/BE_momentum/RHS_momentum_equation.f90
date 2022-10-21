@@ -97,9 +97,9 @@ do ii = 1,indarrayFlu
    tvisc(:) = zero
 ! Initialization of the ALE1 velocity increment
    if (pg(npi)%pres<1.d-21) then
-      pg(npi)%p0_neg_ALE = .false.
+      pg(npi)%p0_neg_ALE = .true.
       else
-         pg(npi)%p0_neg_ALE = .true.
+         pg(npi)%p0_neg_ALE = .false.
    endif
    pg(npi)%dvel_ALE1(1:3) = 0.d0
    if ((Domain%time_stage==1).or.(Domain%time_split==1)) then 
