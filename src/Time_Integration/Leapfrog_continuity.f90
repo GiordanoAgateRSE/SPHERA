@@ -69,11 +69,18 @@ do ii=1,indarrayFlu
 ! Mass equation and volume update
    if (Domain%tipo=="semi") then
       if (input_any_t%ALE3) then
-         dvolume_dt = -pg(npi)%volume / rho_old * (pg(npi)%dden -              &
-                      pg(npi)%dden_ALE12)
-         pg(npi)%dmass_dt = rho_old * dvolume_dt + pg(npi)%volume * pg(npi)%dden
-         pg(npi)%mass = pg(npi)%mass + pg(npi)%dmass_dt * dt
-         pg(npi)%volume = pg(npi)%mass / pg(npi)%dens
+         if (.not.(pg(npi)%p0_neg_ALE)) then
+            dvolume_dt = -pg(npi)%volume / rho_old * (pg(npi)%dden -           &
+                         pg(npi)%dden_ALE12)
+            pg(npi)%dmass_dt = rho_old * dvolume_dt + pg(npi)%volume *         &
+                               pg(npi)%dden
+            pg(npi)%mass = pg(npi)%mass + pg(npi)%dmass_dt * dt
+            pg(npi)%volume = pg(npi)%mass / pg(npi)%dens
+            else
+! Mass unchanged without ALE3-LC
+               pg(npi)%dmass_dt = 0.d0
+               pg(npi)%volume = pg(npi)%mass / pg(npi)%dens
+         endif
       endif
    endif
 enddo
