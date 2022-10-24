@@ -384,6 +384,11 @@ if ((input_any_t%C1_BE).and.(.not.(pg(npi)%p0_neg_ALE))) then
    enddo
 endif
 ! grad_p (renormalization at boundaries): end
+!!!test: start
+if (pg(npi)%p0_neg_ALE) then
+   ALEt_SASPH(1:3) = ALEt_SASPH(1:3) / 2.d0
+endif
+!!!test: end
 do i=1,PLANEDIM
    tpres(acix(i)) = tpres(acix(i)) - RG_sum(i) - ALEt_SASPH(acix(i))
 ! Contribution to the ALE velocity increment (here it is still an acceleration)

@@ -322,6 +322,8 @@ do npi=1,n_body_part
 !!!test      if (.not.(pg(npj)%p0_neg_ALE)) then
          aux_vec(1:3) = -pg(npj)%dens * bp_arr(npi)%volume * aux_scalar_2 *    &
                         (-rag_bp_f(1:3,npartint)) * KerDer_bp_f_Gal(npartint)
+!!!test
+         if (pg(npj)%p0_neg_ALE) aux_vec(1:3) = aux_vec(1:3) / 2.d0
 !$omp critical (omp_RHS_bd_acc)
          pg(npj)%acc(1:3) = pg(npj)%acc(1:3) + aux_vec(1:3)
 ! Contribution to the ALE velocity increment (here it is still an acceleration)

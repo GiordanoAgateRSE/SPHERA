@@ -98,7 +98,7 @@ do ii = 1,indarrayFlu
 ! Initialization of the ALE1 velocity increment
    if (input_any_t%ALE3) then
       if (pg(npi)%pres<1.d-21) then
-!!!test         pg(npi)%p0_neg_ALE = .false.
+         pg(npi)%p0_neg_ALE = .true.
          else
             pg(npi)%p0_neg_ALE = .false.
       endif

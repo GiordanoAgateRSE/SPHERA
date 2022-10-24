@@ -216,6 +216,8 @@ do contj=1,nPartIntorno(npi)
 !!!test         if (.not.(pg(npi)%p0_neg_ALE)) then
             alpha = (pi * (rhoj / rhoi + 1.d0) + pj * (rhoi / rhoj - 1.d0)) /  &
                        (rhoi * rhoj)
+!!!test
+            if (pg(npi)%p0_neg_ALE) alpha = alpha / 2.d0
             ALE1_term_sum(1:3) = ALE1_term_sum(1:3) - amassj * alpha *         &
                                  rag(1:3,npartint) * PartKernel(3,npartint)
 !!!test         endif
