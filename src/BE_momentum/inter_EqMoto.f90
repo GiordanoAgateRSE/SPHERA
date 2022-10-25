@@ -213,14 +213,10 @@ do contj=1,nPartIntorno(npi)
          appopres(1:3) = -amassj * alpha * rag(1:3,npartint) *                 &
                          PartKernel(3,npartint)
 ! Contribution to the ALE1 term in the ME-VC
-!!!test         if (.not.(pg(npi)%p0_neg_ALE)) then
-            alpha = (pi * (rhoj / rhoi + 1.d0) + pj * (rhoi / rhoj - 1.d0)) /  &
-                       (rhoi * rhoj)
-!!!test
-            if (pg(npi)%p0_neg_ALE) alpha = alpha / 2.d0
-            ALE1_term_sum(1:3) = ALE1_term_sum(1:3) - amassj * alpha *         &
-                                 rag(1:3,npartint) * PartKernel(3,npartint)
-!!!test         endif
+         alpha = (pi * (rhoj / rhoi + 1.d0) + pj * (rhoi / rhoj - 1.d0)) /     &
+                 (rhoi * rhoj)
+         ALE1_term_sum(1:3) = ALE1_term_sum(1:3) - amassj * alpha *            &
+                              rag(1:3,npartint) * PartKernel(3,npartint)
          else
 ! Dense granular flows
             alpha = (pi + pj) / (rhoi * rhoj)

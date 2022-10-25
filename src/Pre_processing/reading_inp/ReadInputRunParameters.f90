@@ -32,7 +32,7 @@ use Hybrid_allocation_module
 ! Declarations
 !------------------------
 implicit none
-logical :: ALE3,C1_BE,C1_monitors
+logical :: ALE3,C1_BE,C1_monitors,FS_flow
 integer(4) :: nrighe,ier,ninp,ulog,uerr
 character(1) :: comment
 character(len=lencard) :: ainp
@@ -104,9 +104,9 @@ do while (trim(lcase(ainp))/="##### end run parameters #####")
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"COEFNMAXPARTI and COEFNMAXPARTJ ",&
       ninp,ulog)) return
    call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
-   read(ainp,*,iostat=ioerr) ALE3,C1_BE,C1_monitors,invB_det_thresh
+   read(ainp,*,iostat=ioerr) ALE3,C1_BE,C1_monitors,invB_det_thresh,FS_flow
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                                   &
-      "ALE3,C1_BE,C1_monitors,invB_det_thresh",ninp,ulog)) return
+      "ALE3,C1_BE,C1_monitors,invB_det_thresh,FS_flow",ninp,ulog)) return
 #ifdef SPACE_3D
    call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
       read(ainp,*,iostat=ioerr) nag_aux,MAXCLOSEBOUNDFACES,MAXNUMCONVEXEDGES,  &
@@ -152,7 +152,8 @@ if (input_second_read.eqv..true.) then
    input_any_t%ALE3 = ALE3
    input_any_t%C1_BE = C1_BE
    input_any_t%C1_monitors = C1_monitors
-   input_any_t%invB_det_thresh = invB_det_thresh  
+   input_any_t%invB_det_thresh = invB_det_thresh
+   input_any_t%FS_flow = FS_flow
 #ifdef SPACE_3D
       input_any_t%MAXCLOSEBOUNDFACES = MAXCLOSEBOUNDFACES
       input_any_t%MAXNUMCONVEXEDGES = MAXNUMCONVEXEDGES
@@ -192,6 +193,10 @@ if (input_second_read.eqv..true.) then
       if (input_any_t%C1_BE) then
          write(ulog,"(1x,a,1p,e12.4)") "invB_det_thresh           : ",         &
             input_any_t%invB_det_thresh
+      endif
+      if (input_any_t%ALE3) then
+         write(ulog,"(1x,a,1p,l8)")    "FS_flow                   : ",         &
+            input_any_t%FS_flow
       endif
 #ifdef SPACE_3D
       write(ulog,"(1x,a,1p,i12)")   "NAG_AUX                    : ",           &

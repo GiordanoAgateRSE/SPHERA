@@ -148,21 +148,14 @@ face_loop: do icbf=1,Ncbf
          gradpt_SA(1:3) = gradpt_SA(1:3) + gradpt_SA_0w(1:3)
 ! Boundary contribution to the "grad_p term": end
 ! Boundary contribution to the "ALE term": start
-!!!test         if (.not.(pg(npi)%p0_neg_ALE)) then
 ! Local components
             ALEt_SA_0w_loc(1:3) = 2.d0 * pg(npi)%pres / pg(npi)%dens *         &
                                   BoundaryDataTab(ibdp)%BoundaryIntegral(4:6)
 ! Global components
             call MatrixProduct(BoundaryFace(iface)%T,BB=ALEt_SA_0w_loc,        &
                CC=ALEt_SA_0w,nr=3,nrc=3,nc=1)
-!!!test: start
-            if (pg(npi)%p0_neg_ALE) then
-                ALEt_SA_0w(1:3) = ALEt_SA_0w(1:3) / 2.d0
-            endif
-!!!test: end
 ! Contribution to acceleration
             ALEt_SA(1:3) = ALEt_SA(1:3) + ALEt_SA_0w(1:3)
-!!!test         endif
 ! Boundary contribution to the "ALE term": end
 ! Contributions of the neighbouring SASPH frontiers to the inverse of the 
 ! renormalization matrix for grad_p: start

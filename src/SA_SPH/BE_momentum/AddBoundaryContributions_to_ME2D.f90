@@ -292,10 +292,8 @@ do icbs=1,IntNcbs
    endif
 ! SASPH contribution to "grad_p" and renormalization matrix: end
 ! Contributions to the ME SASPH ALE term
-!!!test   if (.not.(pg(npi)%p0_neg_ALE)) then
-      ALEt_SASPH(1) = ALEt_SASPH(1) - nnlocal(1) * QiiIntWdS
-      ALEt_SASPH(3) = ALEt_SASPH(3) - nnlocal(2) * QiiIntWdS
-!!!test   endif
+   ALEt_SASPH(1) = ALEt_SASPH(1) - nnlocal(1) * QiiIntWdS
+   ALEt_SASPH(3) = ALEt_SASPH(3) - nnlocal(2) * QiiIntWdS
 ! Volume viscosity force (with changed sign) and artificial viscosity term
    if (strtype=="fixe".or.strtype=="tapi") then
       if (xpi>=zero.and.xpi<=RifBoundarySide%length) then
@@ -384,11 +382,6 @@ if ((input_any_t%C1_BE).and.(.not.(pg(npi)%p0_neg_ALE))) then
    enddo
 endif
 ! grad_p (renormalization at boundaries): end
-!!!test: start
-if (pg(npi)%p0_neg_ALE) then
-   ALEt_SASPH(1:3) = ALEt_SASPH(1:3) / 2.d0
-endif
-!!!test: end
 do i=1,PLANEDIM
    tpres(acix(i)) = tpres(acix(i)) - RG_sum(i) - ALEt_SASPH(acix(i))
 ! Contribution to the ALE velocity increment (here it is still an acceleration)

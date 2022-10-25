@@ -94,6 +94,9 @@ type input_any_time_der_type
 ! ID for the consistency of the post-processing procedures at the monitoring 
 ! elements
    logical :: C1_monitors
+! Logical flag to activate or deactivate the differential treatment for 
+! negative-pressure particles (ref. input-file template)
+   logical :: FS_flow
 ! Maximum step number                       
    integer(4) :: itmax
 ! Reference fluid for free surface                      

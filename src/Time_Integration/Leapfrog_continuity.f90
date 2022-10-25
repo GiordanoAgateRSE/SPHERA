@@ -58,12 +58,13 @@ do ii=1,indarrayFlu
    if (Domain%tipo=="bsph") pg(npi)%dden = pg(npi)%dden / pg(npi)%uni
 ! Continuity equation
    if (Domain%tipo=="semi") pg(npi)%dens = pg(npi)%dens + dt * pg(npi)%dden
-!!!test: start
-   if (pg(npi)%dens<Med(pg(npi)%imed)%den0) then
+! Primary treatment of negative-pressure particles: start
+   if ((pg(npi)%dens<Med(pg(npi)%imed)%den0).and.(input_any_t%FS_flow).and.    &
+      (input_any_t%ALE3)) then
       pg(npi)%dens = Med(pg(npi)%imed)%den0
       pg(npi)%dden = pg(npi)%dden + dt * (Med(pg(npi)%imed)%den0 - pg(npi)%dens)
-   endif 
-!!!test: end
+   endif
+! Primary treatment of negative-pressure particles: end
    if (input_any_t%density_thresholds==1) then        
       if (pg(npi)%dens<(0.9d0*Med(pg(npi)%imed)%den0)) then
          pg(npi)%dens = 0.9d0*Med(pg(npi)%imed)%den0
