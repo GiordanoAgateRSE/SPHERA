@@ -193,17 +193,19 @@ if (Granular_flows_options%KTGF_config.ne.1) then
          nr=3,nrc=3,nc=1)
       aux_vec_3(1:3) = -aux_vec(1:3)
 ! ALE term
-      call MatrixProduct(pg(npi)%B_ren_divu,BB=aux_vec_1_ALE,CC=aux_vec,       &
-         nr=3,nrc=3,nc=1)
-      aux_vec_1_ALE(1:3) = -aux_vec(1:3)
-#ifdef SPACE_3D
-      call MatrixProduct(pg(npi)%B_ren_divu,BB=aux_vec_2_ALE,CC=aux_vec,       &
-         nr=3,nrc=3,nc=1)
-      aux_vec_2_ALE(1:3) = -aux_vec(1:3)
-#endif
-      call MatrixProduct(pg(npi)%B_ren_divu,BB=aux_vec_3_ALE,CC=aux_vec,       &
-         nr=3,nrc=3,nc=1)
-      aux_vec_3_ALE(1:3) = -aux_vec(1:3)
+!!!test: start
+!      call MatrixProduct(pg(npi)%B_ren_divu,BB=aux_vec_1_ALE,CC=aux_vec,       &
+!         nr=3,nrc=3,nc=1)
+!      aux_vec_1_ALE(1:3) = -aux_vec(1:3)
+!#ifdef SPACE_3D
+!      call MatrixProduct(pg(npi)%B_ren_divu,BB=aux_vec_2_ALE,CC=aux_vec,       &
+!         nr=3,nrc=3,nc=1)
+!      aux_vec_2_ALE(1:3) = -aux_vec(1:3)
+!#endif
+!      call MatrixProduct(pg(npi)%B_ren_divu,BB=aux_vec_3_ALE,CC=aux_vec,       &
+!         nr=3,nrc=3,nc=1)
+!      aux_vec_3_ALE(1:3) = -aux_vec(1:3)
+!!!test: end
    endif
 ! Update of the RHS of the continuity equation
    pg(npi)%dden = pg(npi)%dden - (aux_vec_1(1) + aux_vec_2(2) + aux_vec_3(3))

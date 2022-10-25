@@ -139,17 +139,19 @@ if ((Ncbs>0).and.(IntNcbs>0)) then
       grad_w_SA(1:3) = -aux_vec(1:3)
 ! For the velocity-divergence SASPH term: end
 ! For the explicit ALE1 SASPH term: start
-      call MatrixProduct(pg(npi)%B_ren_divu,BB=grad_rhod1u_SA,CC=aux_vec,      &
-         nr=3,nrc=3,nc=1)
-      grad_rhod1u_SA(1:3) = -aux_vec(1:3)
-#ifdef SPACE_3D
-      call MatrixProduct(pg(npi)%B_ren_divu,BB=grad_rhod1v_SA,CC=aux_vec,      &
-         nr=3,nrc=3,nc=1)
-      grad_rhod1v_SA(1:3) = -aux_vec(1:3)
-#endif
-      call MatrixProduct(pg(npi)%B_ren_divu,BB=grad_rhod1w_SA,CC=aux_vec,      &
-         nr=3,nrc=3,nc=1)
-      grad_rhod1w_SA(1:3) = -aux_vec(1:3)
+!!!test: start
+!      call MatrixProduct(pg(npi)%B_ren_divu,BB=grad_rhod1u_SA,CC=aux_vec,      &
+!         nr=3,nrc=3,nc=1)
+!      grad_rhod1u_SA(1:3) = -aux_vec(1:3)
+!#ifdef SPACE_3D
+!      call MatrixProduct(pg(npi)%B_ren_divu,BB=grad_rhod1v_SA,CC=aux_vec,      &
+!         nr=3,nrc=3,nc=1)
+!      grad_rhod1v_SA(1:3) = -aux_vec(1:3)
+!#endif
+!      call MatrixProduct(pg(npi)%B_ren_divu,BB=grad_rhod1w_SA,CC=aux_vec,      &
+!         nr=3,nrc=3,nc=1)
+!      grad_rhod1w_SA(1:3) = -aux_vec(1:3)
+!!!test: end
 ! For the explicit ALE1 SASPH term: end
    endif
 ! Adding the SASPH boundary term of the momentum divergence to the continuity 

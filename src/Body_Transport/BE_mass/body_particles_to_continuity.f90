@@ -131,8 +131,12 @@ do npi=1,n_body_part
                   dot_product(dvar,rag_bp_f_aux)
       if ((input_any_t%ALE3).and.(.not.(pg(npj)%p0_neg_ALE))) then
 ! BODY BC CE ALE1 term
+!!!test: start
+!         aux_vec_ALE1(1:3) = bp_arr(npi)%volume * KerDer_bp_f_cub_spl(npartint)&
+!                             * rag_bp_f_aux(1:3)
          aux_vec_ALE1(1:3) = bp_arr(npi)%volume * KerDer_bp_f_cub_spl(npartint)&
-                             * rag_bp_f_aux(1:3)
+                             * rag_bp_f(1:3,npartint)
+!!!test: end
          ALE1_CE_BODY = -pg(npj)%dens * dot_product(delta_dvel_ALE1,           &
                         aux_vec_ALE1)
 ! Contribution to CE
