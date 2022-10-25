@@ -66,7 +66,8 @@
 !    >=0. (body-frontier impingements are deactivated until this time)
 !    <0. (no deactivation)
 ![?] <body_minimum_pressure_limiter>
-!    =.true. (no negative pressure on the body surface)
+!    =.true. (no negative pressure on the body surface; this is mandatory if 
+!            (ALE3))
 !    =.false. (no limiter)
 ![?] <body_maximum_pressure_limiter>
 !    =.true. (maximum pressure on the body surface is limited by physical

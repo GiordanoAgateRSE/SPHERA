@@ -60,7 +60,7 @@ do ii=1,indarrayFlu
    if (Domain%tipo=="semi") pg(npi)%dens = pg(npi)%dens + dt * pg(npi)%dden
 ! Primary treatment of negative-pressure particles: start
    if ((pg(npi)%dens<Med(pg(npi)%imed)%den0).and.(input_any_t%FS_flow).and.    &
-      (input_any_t%ALE3)) then
+      (input_any_t%ALE3).and.(.not.(pg(npi)%B_ren_gradp_stat==1))) then
       pg(npi)%dens = Med(pg(npi)%imed)%den0
       pg(npi)%dden = pg(npi)%dden + dt * (Med(pg(npi)%imed)%den0 - pg(npi)%dens)
    endif
