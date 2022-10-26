@@ -97,12 +97,12 @@ do icbf=1,Ncbf
          aux_vec_2(1:3) = two * (BoundaryFace(iface)%velocity(1:3) -           &
                           pg(npi)%var(1:3))
          aux_vec(1:3) = BoundaryFace(iface)%T(1:3,3)
-         if ((input_any_t%ALE3).and.(.not.(pg(npi)%p0_neg_ALE))) then
-            dvel(1:3) = BoundaryFace(iface)%velocity(1:3) - pg(npi)%var(1:3)
-            else
+!!!test         if ((input_any_t%ALE3).and.(.not.(pg(npi)%p0_neg_ALE))) then
+!!!test            dvel(1:3) = BoundaryFace(iface)%velocity(1:3) - pg(npi)%var(1:3)
+!!!test            else
 ! Always 3D SASPH free-slip conditions without ALE
                dvel(1:3) = dot_product(aux_vec_2,aux_vec) * aux_vec(1:3)
-         endif
+!!!test         endif
          call MatrixProduct(BoundaryFace(iface)%T,                             &
             BB=BoundaryDataTab(ibdp)%BoundaryIntegral(4:6),CC=aux_vec,nr=3,    &
             nrc=3,nc=1)

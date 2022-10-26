@@ -84,8 +84,10 @@ do npi=1,n_body_part
 ! For the ALE2-CE term (valid for any slip condition)
          delta_dvel_ALE1(1:3) = -2.d0 * pg(npj)%dvel_ALE1(1:3)
 ! ALE solid velocity minus ALE fluid velocity, no matter about slip condition
-         dvar(1:3) = bp_arr(npi)%vel(1:3) - pg(npj)%vel(:)
-         else
+!!!test         dvar(1:3) = bp_arr(npi)%vel(1:3) - pg(npj)%vel(:)
+!!!test
+      endif
+!!!test         else
             select case (FSI_slip_conditions)
                case(0)
 ! free-slip conditions
@@ -103,7 +105,7 @@ do npi=1,n_body_part
 ! mirror velocity as solid velocity
                   dvar(1:3) = bp_arr(npi)%vel(1:3) - pg(npj)%vel(:)
             endselect
-      endif
+!!!test      endif
       dis = dsqrt(dot_product(rag_bp_f(:,npartint),rag_bp_f(:,npartint)))
       W_vol = w(dis,Domain%h,Domain%coefke) * pg(npj)%mass / pg(npj)%dens
       bp_arr(npi)%vel_mir(:) = bp_arr(npi)%vel_mir(:) + (dvar(:) +             &
