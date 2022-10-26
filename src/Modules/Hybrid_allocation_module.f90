@@ -96,7 +96,7 @@ type input_any_time_der_type
    logical :: C1_monitors
 ! Logical flag to activate or deactivate the differential treatment for 
 ! negative-pressure particles (ref. input-file template)
-   logical :: FS_flow
+   logical :: neg_p_FS
 ! Maximum step number                       
    integer(4) :: itmax
 ! Reference fluid for free surface                      

@@ -112,20 +112,16 @@
 !    post-processing at monitors). This value is influential only if (C1_BE).
 !    For those renormalization which are not inverted, renormalization does not 
 !    apply.
-![?] <FS_flow>: logical flag to activate or deactivate the differential 
+![?] <neg_p_FS>: logical flag to activate or deactivate the differential 
 !    treatment for negative-pressure particles. This variable is only 
-!    influential if (ALE3):
-!    =.true. (free-surface flow; treatment for negative-pressure particles is 
-!            activated: the velocity-divergence term in the continuity equation 
-!            is corrected just to avoid negative pressure and keeping the other 
-!            equations coherent; a secondary treatment for negative-pressure 
-!            particles would apply in case negative pressure values were not 
-!            avoided: it is using 100% the unbalanced ALE1-ME terms as 
-!            representative of the missing BC terms in air, with stabilizing 
-!            effects).
-!    =.false. (confined flows; treatments for negative-pressure 
-!             particles are deactivated: negative pressure pressure has to be 
-!             avoided by means of the background pressure).
+!    influential if (ALE3) and assumes that negative-pressure particles only 
+!    occur at the free-surface (it can be used for free-surface flows unless 
+!    too many negative-pressure particles intrude the inner domain; it cannot 
+!    be used for confined flows):
+!    =.true. (100% of the unbalanced ALE1-ME terms as representative of the 
+!            missing BC terms in air).
+!    =.false. (full ALE3 formulation as representative of the missing BC terms 
+!             in air: no differential treatment for negative pressure).
 !-------------------------------------------------------------------------------
 ![*] <final_time> <final_time_step>
 ![*] <CFL> <vsc_coeff> <Leapfrog_flag> <scheme_order> <factor> <dt_alfa_Mon>

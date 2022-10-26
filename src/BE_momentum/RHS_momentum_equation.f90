@@ -95,8 +95,8 @@ do ii = 1,indarrayFlu
    tpres(:) = zero
    tdiss(:) = zero
    tvisc(:) = zero
-! Trigger for the secondary treatment for negative-pressure particles
-   if ((input_any_t%FS_flow).and.(input_any_t%ALE3)) then
+! Trigger for the treatment for negative-pressure particles
+   if ((input_any_t%neg_p_FS).and.(input_any_t%ALE3)) then
       if (pg(npi)%pres<1.d-21) then
          pg(npi)%p0_neg_ALE = .true.
          else
