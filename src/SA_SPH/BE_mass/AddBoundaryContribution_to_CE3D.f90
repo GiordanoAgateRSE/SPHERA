@@ -40,13 +40,14 @@ use Dynamic_allocation_module
 ! Declarations
 !------------------------
 implicit none
-integer(4),intent(in)    :: npi,Ncbf
+integer(4),intent(in) :: npi,Ncbf
+double precision :: aux_scalar
 double precision,dimension(3),intent(inout) :: grad_u_SA,grad_v_SA,grad_w_SA
 double precision,dimension(3),intent(inout) :: grad_rhod1u_SA,grad_rhod1v_SA
 double precision,dimension(3),intent(inout) :: grad_rhod1w_SA
 integer(4) :: icbf,iface,ibdt,ibdp,stretch
 double precision,dimension(1:SPACEDIM) :: LocPi,dvel
-double precision,dimension(1:SPACEDIM) :: aux_vec,aux_vec_2
+double precision,dimension(1:SPACEDIM) :: aux_vec,aux_vec_2,aux_vec_3,tau_s
 character(4) :: boundtype
 !------------------------
 ! Explicit interfaces
@@ -97,12 +98,31 @@ do icbf=1,Ncbf
          aux_vec_2(1:3) = two * (BoundaryFace(iface)%velocity(1:3) -           &
                           pg(npi)%var(1:3))
          aux_vec(1:3) = BoundaryFace(iface)%T(1:3,3)
-!!!test         if ((input_any_t%ALE3).and.(.not.(pg(npi)%p0_neg_ALE))) then
-!!!test            dvel(1:3) = BoundaryFace(iface)%velocity(1:3) - pg(npi)%var(1:3)
-!!!test            else
-! Always 3D SASPH free-slip conditions without ALE
-               dvel(1:3) = dot_product(aux_vec_2,aux_vec) * aux_vec(1:3)
-!!!test         endif
+! Free-slip conditions always apply to the 3D SASPH CE term
+         dvel(1:3) = dot_product(aux_vec_2,aux_vec) * aux_vec(1:3)
+         if (input_any_t%ALE3) then
+! Correction for the velocity divergence
+            aux_vec_3(1:3) = pg(npi)%dvel_ALE1(1:3) + pg(npi)%dvel_ALE3(1:3)
+            tau_s(1:3) = pg(npi)%vel(1:3) - BoundaryFace(iface)%T(1:3,3) *     &
+                         dot_product(pg(npi)%vel,BoundaryFace(iface)%T(1:3,3))
+            aux_scalar = dsqrt(dot_product(tau_s,tau_s))
+            if (aux_scalar>1.d-9) then
+               tau_s(1:3) = tau_s(1:3) / aux_scalar
+               else
+                  tau_s(1:3) = aux_vec_3(1:3) -                                &
+                               BoundaryFace(iface)%T(1:3,3)                    &
+                               * dot_product(aux_vec_3,                        &
+                               BoundaryFace(iface)%T(1:3,3))
+                  aux_scalar = dsqrt(dot_product(tau_s,tau_s))
+                  if (aux_scalar>1.d-9) then
+                     tau_s(1:3) = tau_s(1:3) / aux_scalar
+                     else
+                        tau_s(1:3) = 0.d0
+                  endif
+            endif
+            dvel(1:3) = dvel(1:3) - 2.d0 * dot_product(aux_vec_3,tau_s) *      &
+                        tau_s(1:3)
+         endif
          call MatrixProduct(BoundaryFace(iface)%T,                             &
             BB=BoundaryDataTab(ibdp)%BoundaryIntegral(4:6),CC=aux_vec,nr=3,    &
             nrc=3,nc=1)
