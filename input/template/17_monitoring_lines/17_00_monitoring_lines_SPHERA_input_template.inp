@@ -48,7 +48,13 @@
 ![?] The whole section can be effectively modified at any restart time.
 ![?] A space filtering is active for the time series of the free-surface 
 !    height: average height of the 2 particles the closest to the monitor 
-!    within the background cell, or height of the only particle within the cell.
+!    points within the background cell, or height of the only particle within 
+!    the cell. The search does not involve the highest particles in the cell, 
+!    but the closest particles to the monitoring points which discretize the 
+!    line. Thus, the line discretization has to be fine enough. The particle 
+!    search does not involve the highest particles in the cell, but the closest 
+!    particles to the monitoring points which discretize the line. Thus, the 
+!    line discretization has to be fine enough.
 !-------------------------------------------------------------------------------
 ![?] NUMBER_OF_MONITORING_LINES: do i=1,NUMBER_OF_MONITORING_LINES
 !-------------------------------------------------------------------------------
