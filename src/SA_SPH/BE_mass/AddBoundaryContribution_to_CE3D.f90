@@ -100,25 +100,17 @@ do icbf=1,Ncbf
          aux_vec(1:3) = BoundaryFace(iface)%T(1:3,3)
 ! Free-slip conditions always apply to the 3D SASPH CE term
          dvel(1:3) = dot_product(aux_vec_2,aux_vec) * aux_vec(1:3)
-         if (input_any_t%ALE3) then
+         if ((input_any_t%ALE3).and.(.not.(pg(npi)%p0_neg_ALE))) then
 ! Correction for the velocity divergence
             aux_vec_3(1:3) = pg(npi)%dvel_ALE1(1:3) + pg(npi)%dvel_ALE3(1:3)
-            tau_s(1:3) = pg(npi)%vel(1:3) - BoundaryFace(iface)%T(1:3,3) *     &
-                         dot_product(pg(npi)%vel,BoundaryFace(iface)%T(1:3,3))
+            tau_s(1:3) = pg(npi)%vel_fluid(1:3) - BoundaryFace(iface)%T(1:3,3) &
+                         * dot_product(pg(npi)%vel_fluid,                      &
+                         BoundaryFace(iface)%T(1:3,3))
             aux_scalar = dsqrt(dot_product(tau_s,tau_s))
             if (aux_scalar>1.d-9) then
                tau_s(1:3) = tau_s(1:3) / aux_scalar
                else
-                  tau_s(1:3) = aux_vec_3(1:3) -                                &
-                               BoundaryFace(iface)%T(1:3,3)                    &
-                               * dot_product(aux_vec_3,                        &
-                               BoundaryFace(iface)%T(1:3,3))
-                  aux_scalar = dsqrt(dot_product(tau_s,tau_s))
-                  if (aux_scalar>1.d-9) then
-                     tau_s(1:3) = tau_s(1:3) / aux_scalar
-                     else
-                        tau_s(1:3) = 0.d0
-                  endif
+                  tau_s(1:3) = 0.d0
             endif
             dvel(1:3) = dvel(1:3) - 2.d0 * dot_product(aux_vec_3,tau_s) *      &
                         tau_s(1:3)

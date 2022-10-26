@@ -97,30 +97,21 @@ do npi=1,n_body_part
 ! mirror velocity as solid velocity
             dvar(1:3) = bp_arr(npi)%vel(1:3) - pg(npj)%vel(:)
       endselect
-      if (input_any_t%ALE3) then
+      if ((input_any_t%ALE3).and.(.not.(pg(npj)%p0_neg_ALE))) then
 ! For the ALE2-CE term (valid for any slip condition)
          delta_dvel_ALE1(1:3) = -2.d0 * pg(npj)%dvel_ALE1(1:3)
          if (FSI_slip_conditions==0) then
 ! Correction for the velocity divergence (free-slip conditions)
             aux_vec(1:3) = pg(npj)%dvel_ALE1(1:3) + pg(npj)%dvel_ALE3(1:3)
-            tau_s(1:3) = pg(npj)%vel(1:3) -                                    &
+            tau_s(1:3) = pg(npj)%vel_fluid(1:3) -                              &
                          bp_arr(proxy_normal_bp_f(npartint))%normal(1:3) *     &
-                         dot_product(pg(npj)%vel,                              &
+                         dot_product(pg(npj)%vel_fluid,                        &
                          bp_arr(proxy_normal_bp_f(npartint))%normal)
             aux_scalar = dsqrt(dot_product(tau_s,tau_s))
             if (aux_scalar>1.d-9) then
                tau_s(1:3) = tau_s(1:3) / aux_scalar
                else
-                  tau_s(1:3) = aux_vec(1:3) -                                  &
-                               bp_arr(proxy_normal_bp_f(npartint))%normal(1:3) &
-                               * dot_product(aux_vec,                          &
-                               bp_arr(proxy_normal_bp_f(npartint))%normal)
-                  aux_scalar = dsqrt(dot_product(tau_s,tau_s))
-                  if (aux_scalar>1.d-9) then
-                     tau_s(1:3) = tau_s(1:3) / aux_scalar
-                     else
-                        tau_s(1:3) = 0.d0
-                  endif
+                  tau_s(1:3) = 0.d0
             endif
             dvar(1:3) = dvar(1:3) - 2.d0 * dot_product(aux_vec,tau_s) *        &
                         tau_s(1:3)
