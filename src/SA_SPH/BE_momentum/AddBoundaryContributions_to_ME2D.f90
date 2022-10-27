@@ -286,6 +286,7 @@ do icbs=1,IntNcbs
 ! beta-spline cubic kernel, no matter about the renormalization
 ! Notice that the contributions to RG_sum and B_ren_gradp have different signs 
 ! as RG_sum will be subtracted from the acceleration
+! 2D formulation is completely global, not local.
       B_ren_aux(1:3,1:3) = -RifBoundarySide%RN(1:3,1:3) * IntWdV
       pg(npi)%B_ren_gradp(1:3,1:3) = pg(npi)%B_ren_gradp(1:3,1:3) +            &
                                      B_ren_aux(1:3,1:3)
@@ -372,7 +373,7 @@ if ((on_going_time_step==1).and.(input_any_t%C1_BE)) then
 endif
 if (IntNcbs==0) return
 ! grad_p (renormalization at boundaries): start
-if ((input_any_t%C1_BE).and.(.not.(pg(npi)%p0_neg_ALE))) then
+if (input_any_t%C1_BE) then
    aux_vec_2(1:3) = 0.d0
    do i=1,PLANEDIM
       aux_vec_2(acix(i)) = RG_sum(i)

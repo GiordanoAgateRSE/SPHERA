@@ -300,8 +300,8 @@ do npi=1,n_body_part
          aux_scalar_2 = aux_scalar_2 * (1.d0 + (1.d0 - pg(npj)%sigma_fp -      &
                       pg(npj)%sigma_bp) / pg(npj)%sigma_bp)
       endif
-      if ((input_any_t%C1_BE).and.(.not.(pg(npj)%p0_neg_ALE))) then
-! grad_p (renormalization at boundaries)
+      if (input_any_t%C1_BE) then
+! grad_p (renormalization)
          call MatrixProduct(pg(npj)%B_ren_gradp,BB=rag_bp_f(1:3,npartint),     &
             CC=aux_vec,nr=3,nrc=3,nc=1)
 !$omp critical (omp_RHS_bd_acc)
@@ -310,7 +310,7 @@ do npi=1,n_body_part
                             * KerDer_bp_f_Gal(npartint)
 !$omp end critical (omp_RHS_bd_acc)
          else
-! grad_p (no renormalization at boundaries: 0th-order consistency)
+! grad_p (no renormalization)
 !$omp critical (omp_RHS_bd_acc)
             pg(npj)%acc(1:3) = pg(npj)%acc(1:3) + (-pg(npj)%dens *             &
                                bp_arr(npi)%volume * aux_scalar *               &
