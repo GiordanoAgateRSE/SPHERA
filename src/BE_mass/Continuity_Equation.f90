@@ -179,7 +179,7 @@ enddo
 ! Inner terms for the RHS of the continuity equation: start
 if (Granular_flows_options%KTGF_config.ne.1) then
 ! Liquid flows
-   if (input_any_t%C1_BE) then
+   if ((input_any_t%C1_divu).and.(input_any_t%C1_BE)) then
 ! Non-ALE term
       call MatrixProduct(pg(npi)%B_ren_divu,BB=aux_vec_1,CC=aux_vec,           &
          nr=3,nrc=3,nc=1)
@@ -194,21 +194,20 @@ if (Granular_flows_options%KTGF_config.ne.1) then
       aux_vec_3(1:3) = -aux_vec(1:3)
    endif
 ! ALE term
-!!!test: start
-!   if ((input_any_t%C1_BE).and.(.not.(pg(npi)%p0_neg_ALE))) then
-!      call MatrixProduct(pg(npi)%B_ren_divu,BB=aux_vec_1_ALE,CC=aux_vec,       &
-!         nr=3,nrc=3,nc=1)
-!      aux_vec_1_ALE(1:3) = -aux_vec(1:3)
-!#ifdef SPACE_3D
-!      call MatrixProduct(pg(npi)%B_ren_divu,BB=aux_vec_2_ALE,CC=aux_vec,       &
-!         nr=3,nrc=3,nc=1)
-!      aux_vec_2_ALE(1:3) = -aux_vec(1:3)
-!#endif
-!      call MatrixProduct(pg(npi)%B_ren_divu,BB=aux_vec_3_ALE,CC=aux_vec,       &
-!         nr=3,nrc=3,nc=1)
-!      aux_vec_3_ALE(1:3) = -aux_vec(1:3)
-!   endif
-!!!test: end
+   if ((input_any_t%C1_ALE1eCE).and.(input_any_t%C1_divu).and.                 &
+      (input_any_t%C1_BE).and.(.not.(pg(npi)%p0_neg_ALE))) then
+      call MatrixProduct(pg(npi)%B_ren_divu,BB=aux_vec_1_ALE,CC=aux_vec,       &
+         nr=3,nrc=3,nc=1)
+      aux_vec_1_ALE(1:3) = -aux_vec(1:3)
+#ifdef SPACE_3D
+      call MatrixProduct(pg(npi)%B_ren_divu,BB=aux_vec_2_ALE,CC=aux_vec,       &
+         nr=3,nrc=3,nc=1)
+      aux_vec_2_ALE(1:3) = -aux_vec(1:3)
+#endif
+      call MatrixProduct(pg(npi)%B_ren_divu,BB=aux_vec_3_ALE,CC=aux_vec,       &
+         nr=3,nrc=3,nc=1)
+      aux_vec_3_ALE(1:3) = -aux_vec(1:3)
+   endif
 ! Update of the RHS of the continuity equation
    pg(npi)%dden = pg(npi)%dden - (aux_vec_1(1) + aux_vec_2(2) + aux_vec_3(3))
    if ((input_any_t%ALE3).and.(.not.(pg(npi)%p0_neg_ALE))) then

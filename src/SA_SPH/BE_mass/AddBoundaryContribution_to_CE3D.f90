@@ -95,18 +95,20 @@ do icbf=1,Ncbf
 ! beta-spline cubic kernel, no matter about the renormalization
 ! Contribution to the renormalization matrix
 ! Transposed matrix of the directional cosine matrix
-         call MatrixTransposition(BoundaryFace(iface)%T,aux_mat,3,3)
+            call MatrixTransposition(BoundaryFace(iface)%T,aux_mat,3,3)
 ! Local value
-         call MatrixProduct(BoundaryDataTab(ibdp)%IntGiWrRdV,BB=aux_mat,       &
-            CC=aux_mat_2,nr=3,nrc=3,nc=3)
+            call MatrixProduct(BoundaryDataTab(ibdp)%IntGiWrRdV,BB=aux_mat,    &
+               CC=aux_mat_2,nr=3,nrc=3,nc=3)
 ! Global value
-         call MatrixProduct(BoundaryFace(iface)%T,BB=aux_mat_2,                &
-            CC=aux_mat,nr=3,nrc=3,nc=3)
-! Contribution2
-            pg(npi)%B_ren_divu(1:3,1:3) = pg(npi)%B_ren_divu(1:3,1:3) +        &
-               aux_mat(1:3,1:3)
+            call MatrixProduct(BoundaryFace(iface)%T,BB=aux_mat_2,             &
+               CC=aux_mat,nr=3,nrc=3,nc=3)
+! Contributions
+            if (input_any_t%C1_divu) then
+               pg(npi)%B_ren_divu(1:3,1:3) = pg(npi)%B_ren_divu(1:3,1:3) +     &
+                                             aux_mat(1:3,1:3)
+            endif
             pg(npi)%B_ren_gradp(1:3,1:3) = pg(npi)%B_ren_gradp(1:3,1:3) +      &
-               aux_mat(1:3,1:3)
+                                           aux_mat(1:3,1:3)
          endif
 ! Contributions of the neighbouring SASPH frontiers to the inverse of the 
 ! renormalization matrix for div_u_ and grad_p: end

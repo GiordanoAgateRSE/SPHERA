@@ -91,6 +91,10 @@ type input_any_time_der_type
    logical :: ALE3
 ! Flag on the consistency options for the Balance Equations
    logical :: C1_BE
+! C1-consistency flag for the velocity-divergence term
+   logical :: C1_divu
+! C1-consistency flag for the ALE1 explicit term in the Continuity Equation
+   logical :: C1_ALE1eCE
 ! ID for the consistency of the post-processing procedures at the monitoring 
 ! elements
    logical :: C1_monitors

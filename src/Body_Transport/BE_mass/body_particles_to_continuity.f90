@@ -137,7 +137,7 @@ do npi=1,n_body_part
 ! Contribution to CE
          temp_dden = temp_dden + ALE2_CE_BODY
       endif
-      if (input_any_t%C1_BE) then
+      if ((input_any_t%C1_divu).and.(input_any_t%C1_BE)) then
 ! 1st-order consistency
          call MatrixProduct(pg(npj)%B_ren_divu,BB=rag_bp_f(1:3,npartint),      &
             CC=aux_vec,nr=3,nrc=3,nc=1)
@@ -149,12 +149,16 @@ do npi=1,n_body_part
                   dot_product(dvar,rag_bp_f_aux)
       if ((input_any_t%ALE3).and.(.not.(pg(npj)%p0_neg_ALE))) then
 ! BODY BC CE ALE1 term
-!!!test: start
-!         aux_vec_ALE1(1:3) = bp_arr(npi)%volume * KerDer_bp_f_cub_spl(npartint)&
-!                             * rag_bp_f_aux(1:3)
-         aux_vec_ALE1(1:3) = bp_arr(npi)%volume * KerDer_bp_f_cub_spl(npartint)&
-                             * rag_bp_f(1:3,npartint)
-!!!test: end
+         if ((input_any_t%C1_ALE1eCE).and.(input_any_t%C1_divu).and.           &
+            (input_any_t%C1_BE)) then
+            aux_vec_ALE1(1:3) = bp_arr(npi)%volume *                           &
+                                KerDer_bp_f_cub_spl(npartint) *                &
+                                rag_bp_f_aux(1:3)
+            else
+               aux_vec_ALE1(1:3) = bp_arr(npi)%volume *                        &
+                                   KerDer_bp_f_cub_spl(npartint)               &
+                                   * rag_bp_f(1:3,npartint)
+         endif
          ALE1_CE_BODY = -pg(npj)%dens * dot_product(delta_dvel_ALE1,           &
                         aux_vec_ALE1)
 ! Contribution to CE

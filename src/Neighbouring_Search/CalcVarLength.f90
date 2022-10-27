@@ -303,21 +303,24 @@ loop_nag: do npi=1,nag
                   pg(npi)%B_ren_gradp(1:3,3) = pg(npi)%B_ren_gradp(1:3,3) +    &
                                                aux_vec_3(1:3)
 ! For the continuity equation
-                  r_vec(1:3) = -ragtemp(1:3)
-                  call grad_W_sub(kernel_ID=1,r_vec=r_vec,grad_W=grad_W)
-                  gradWomegaj(1:3) = grad_W(1:3) * pg(npj)%mass / pg(npj)%dens
-                  aux_vec(1:3) = (pg(npj)%coord(1) - pg(npi)%coord(1)) *       &
-                                 gradWomegaj(1:3)
-                  aux_vec_2(1:3) = (pg(npj)%coord(2) - pg(npi)%coord(2)) *     &
-                                   gradWomegaj(1:3)
-                  aux_vec_3(1:3) = (pg(npj)%coord(3) - pg(npi)%coord(3)) *     &
-                                   gradWomegaj(1:3)
-                  pg(npi)%B_ren_divu(1:3,1) = pg(npi)%B_ren_divu(1:3,1) +      &
-                                              aux_vec(1:3)
-                  pg(npi)%B_ren_divu(1:3,2) = pg(npi)%B_ren_divu(1:3,2) +      &
-                                              aux_vec_2(1:3)
-                  pg(npi)%B_ren_divu(1:3,3) = pg(npi)%B_ren_divu(1:3,3) +      &
-                                              aux_vec_3(1:3)
+                  if (input_any_t%C1_divu) then
+                     r_vec(1:3) = -ragtemp(1:3)
+                     call grad_W_sub(kernel_ID=1,r_vec=r_vec,grad_W=grad_W)
+                     gradWomegaj(1:3) = grad_W(1:3) * pg(npj)%mass /           &
+                                        pg(npj)%dens
+                     aux_vec(1:3) = (pg(npj)%coord(1) - pg(npi)%coord(1)) *    &
+                                    gradWomegaj(1:3)
+                     aux_vec_2(1:3) = (pg(npj)%coord(2) - pg(npi)%coord(2)) *  &
+                                      gradWomegaj(1:3)
+                     aux_vec_3(1:3) = (pg(npj)%coord(3) - pg(npi)%coord(3)) *  &
+                                      gradWomegaj(1:3)
+                     pg(npi)%B_ren_divu(1:3,1) = pg(npi)%B_ren_divu(1:3,1) +   &
+                                                 aux_vec(1:3)
+                     pg(npi)%B_ren_divu(1:3,2) = pg(npi)%B_ren_divu(1:3,2) +   &
+                                                 aux_vec_2(1:3)
+                     pg(npi)%B_ren_divu(1:3,3) = pg(npi)%B_ren_divu(1:3,3) +   &
+                                                 aux_vec_3(1:3)
+                  endif
                endif
 #ifdef SOLID_BODIES
               pg(npi)%sigma_fp = pg(npi)%sigma_fp +                            &
@@ -969,21 +972,23 @@ endif
                   pg(npj)%B_ren_gradp(1:3,3) = pg(npj)%B_ren_gradp(1:3,3) +    &
                                                aux_vec_3(1:3)
 ! For the continuity equation
-                  r_vec(1:3) = ragtemp(1:3)
-                  call grad_W_sub(kernel_ID=1,r_vec=r_vec,grad_W=grad_W)
-                  gradWomegaj(1:3) = grad_W(1:3) * bp_arr(npi)%volume
-                  aux_vec(1:3) = (bp_arr(npi)%pos(1) - pg(npj)%coord(1)) *     &
-                                 gradWomegaj(1:3)
-                  aux_vec_2(1:3) = (bp_arr(npi)%pos(2) - pg(npj)%coord(2)) *   &
-                                   gradWomegaj(1:3)
-                  aux_vec_3(1:3) = (bp_arr(npi)%pos(3) - pg(npj)%coord(3)) *   &
-                                   gradWomegaj(1:3)
-                  pg(npj)%B_ren_divu(1:3,1) = pg(npj)%B_ren_divu(1:3,1) +      &
-                                              aux_vec(1:3)
-                  pg(npj)%B_ren_divu(1:3,2) = pg(npj)%B_ren_divu(1:3,2) +      &
-                                              aux_vec_2(1:3)
-                  pg(npj)%B_ren_divu(1:3,3) = pg(npj)%B_ren_divu(1:3,3) +      &
-                                              aux_vec_3(1:3)
+                  if (input_any_t%C1_divu) then
+                     r_vec(1:3) = ragtemp(1:3)
+                     call grad_W_sub(kernel_ID=1,r_vec=r_vec,grad_W=grad_W)
+                     gradWomegaj(1:3) = grad_W(1:3) * bp_arr(npi)%volume
+                     aux_vec(1:3) = (bp_arr(npi)%pos(1) - pg(npj)%coord(1)) *  &
+                                    gradWomegaj(1:3)
+                     aux_vec_2(1:3) = (bp_arr(npi)%pos(2) - pg(npj)%coord(2)) *&
+                                      gradWomegaj(1:3)
+                     aux_vec_3(1:3) = (bp_arr(npi)%pos(3) - pg(npj)%coord(3)) *&
+                                      gradWomegaj(1:3)
+                     pg(npj)%B_ren_divu(1:3,1) = pg(npj)%B_ren_divu(1:3,1) +   &
+                                                 aux_vec(1:3)
+                     pg(npj)%B_ren_divu(1:3,2) = pg(npj)%B_ren_divu(1:3,2) +   &
+                                                 aux_vec_2(1:3)
+                     pg(npj)%B_ren_divu(1:3,3) = pg(npj)%B_ren_divu(1:3,3) +   &
+                                                 aux_vec_3(1:3)
+                  endif
                endif
 ! Shepard coefficient (contributions from body particles)
                   pg(npj)%sigma_bp = pg(npj)%sigma_bp +                        &

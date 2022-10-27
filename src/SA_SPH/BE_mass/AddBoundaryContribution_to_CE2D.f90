@@ -84,8 +84,10 @@ do icbs=1,IntNcbs
       IntWdV = BoundaryDataTab(ibdp)%BoundaryIntegral(3)
       B_ren_aux(1:3,1:3) = -RifBoundarySide%RN(1:3,1:3) * IntWdV
 ! Renormalization at SASPH frontiers
-      pg(npi)%B_ren_divu(1:3,1:3) = pg(npi)%B_ren_divu(1:3,1:3) +              &
-                                    B_ren_aux(1:3,1:3)
+      if (input_any_t%C1_divu) then
+         pg(npi)%B_ren_divu(1:3,1:3) = pg(npi)%B_ren_divu(1:3,1:3) +           &
+                                       B_ren_aux(1:3,1:3)
+      endif
       pg(npi)%B_ren_gradp(1:3,1:3) = pg(npi)%B_ren_gradp(1:3,1:3) +            &
                                      B_ren_aux(1:3,1:3)
    endif

@@ -32,7 +32,7 @@ use Hybrid_allocation_module
 ! Declarations
 !------------------------
 implicit none
-logical :: ALE3,C1_BE,C1_monitors,neg_p_FS
+logical :: ALE3,C1_BE,C1_monitors,neg_p_FS,C1_divu,C1_ALE1eCE
 integer(4) :: nrighe,ier,ninp,ulog,uerr
 character(1) :: comment
 character(len=lencard) :: ainp
@@ -104,9 +104,11 @@ do while (trim(lcase(ainp))/="##### end run parameters #####")
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,"COEFNMAXPARTI and COEFNMAXPARTJ ",&
       ninp,ulog)) return
    call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
-   read(ainp,*,iostat=ioerr) ALE3,C1_BE,C1_monitors,invB_det_thresh,neg_p_FS
+   read(ainp,*,iostat=ioerr) ALE3,C1_BE,C1_divu,C1_ALE1eCE,C1_monitors,        &
+      invB_det_thresh,neg_p_FS
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                                   &
-      "ALE3,C1_BE,C1_monitors,invB_det_thresh,neg_p_FS",ninp,ulog)) return
+      "ALE3,C1_BE,C1_divu,C1_ALE1eCE,C1_monitors,invB_det_thresh,neg_p_FS",    &
+         ninp,ulog)) return
 #ifdef SPACE_3D
    call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
       read(ainp,*,iostat=ioerr) nag_aux,MAXCLOSEBOUNDFACES,MAXNUMCONVEXEDGES,  &
@@ -151,6 +153,8 @@ if (input_second_read.eqv..true.) then
    input_any_t%body_part_reorder = body_part_reorder
    input_any_t%ALE3 = ALE3
    input_any_t%C1_BE = C1_BE
+   input_any_t%C1_divu = C1_divu
+   input_any_t%C1_ALE1eCE = C1_ALE1eCE
    input_any_t%C1_monitors = C1_monitors
    input_any_t%invB_det_thresh = invB_det_thresh
    input_any_t%neg_p_FS = neg_p_FS
@@ -188,6 +192,12 @@ if (input_second_read.eqv..true.) then
          input_any_t%ALE3
       write(ulog,"(1x,a,1p,l8)")    "C1_BE              : ",                   &
          input_any_t%C1_BE
+      if (input_any_t%C1_BE) then
+         write(ulog,"(1x,a,1p,l8)")    "C1_divu            : ",                &
+            input_any_t%C1_divu
+         write(ulog,"(1x,a,1p,l8)")    "C1_ALE1eCE         : ",                &
+            input_any_t%C1_ALE1eCE
+      endif
       write(ulog,"(1x,a,1p,l8)")    "C1_monitors               : ",            &
          input_any_t%C1_monitors
       if (input_any_t%C1_BE) then

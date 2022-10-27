@@ -311,52 +311,54 @@ if (nag>0) then
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
 ! B_ren_divu(1,1-3)
-      write(unitvtk,'(a)')                                                     &
+      if (input_any_t%C1_ALE1eCE) then
+         write(unitvtk,'(a)')                                                  &
 '      <DataArray type="Float32" Name="B_ren_divu_1_1-3"  NumberOfComponents="3"  format="ascii" >'
-      do i=1,numpoints,6
-         k1 = i
-         k2 = k1 + 5
-         if (k2>numpoints) k2 = numpoints
-         write(unitvtk,'(8x,6(3(1x,ES12.4E3)))')                               &
-            (pg(finger(k))%B_ren_divu(1,1),pg(finger(k))%B_ren_divu(1,2),    &
-            pg(finger(k))%B_ren_divu(1,3),k=k1,k2)
-      enddo
-      write(unitvtk,'(a)') '      </DataArray>'
+         do i=1,numpoints,6
+            k1 = i
+            k2 = k1 + 5
+            if (k2>numpoints) k2 = numpoints
+            write(unitvtk,'(8x,6(3(1x,ES12.4E3)))')                            &
+               (pg(finger(k))%B_ren_divu(1,1),pg(finger(k))%B_ren_divu(1,2),   &
+               pg(finger(k))%B_ren_divu(1,3),k=k1,k2)
+         enddo
+         write(unitvtk,'(a)') '      </DataArray>'
 ! B_ren_divu(2,1-3)
-      write(unitvtk,'(a)')                                                     &
+         write(unitvtk,'(a)')                                                  &
 '      <DataArray type="Float32" Name="B_ren_divu_2_1-3"  NumberOfComponents="3"  format="ascii" >'
-      do i=1,numpoints,6
-         k1 = i
-         k2 = k1 + 5
-         if (k2>numpoints) k2 = numpoints
-         write(unitvtk,'(8x,6(3(1x,ES12.4E3)))')                               &
-            (pg(finger(k))%B_ren_divu(2,1),pg(finger(k))%B_ren_divu(2,2),    &
-            pg(finger(k))%B_ren_divu(2,3),k=k1,k2)
-      enddo
-      write(unitvtk,'(a)') '      </DataArray>'
+         do i=1,numpoints,6
+            k1 = i
+            k2 = k1 + 5
+            if (k2>numpoints) k2 = numpoints
+            write(unitvtk,'(8x,6(3(1x,ES12.4E3)))')                            &
+               (pg(finger(k))%B_ren_divu(2,1),pg(finger(k))%B_ren_divu(2,2),   &
+               pg(finger(k))%B_ren_divu(2,3),k=k1,k2)
+         enddo
+         write(unitvtk,'(a)') '      </DataArray>'
 ! B_ren_divu(3,1-3)
-      write(unitvtk,'(a)')                                                     &
+         write(unitvtk,'(a)')                                                  &
 '      <DataArray type="Float32" Name="B_ren_divu_3_1-3"  NumberOfComponents="3"  format="ascii" >'
-      do i=1,numpoints,6
-         k1 = i
-         k2 = k1 + 5
-         if (k2>numpoints) k2 = numpoints
-         write(unitvtk,'(8x,6(3(1x,ES12.4E3)))')                               &
-            (pg(finger(k))%B_ren_divu(3,1),pg(finger(k))%B_ren_divu(3,2),    &
-            pg(finger(k))%B_ren_divu(3,3),k=k1,k2)
-      enddo
-      write(unitvtk,'(a)') '      </DataArray>'
+         do i=1,numpoints,6
+            k1 = i
+            k2 = k1 + 5
+            if (k2>numpoints) k2 = numpoints
+            write(unitvtk,'(8x,6(3(1x,ES12.4E3)))')                            &
+               (pg(finger(k))%B_ren_divu(3,1),pg(finger(k))%B_ren_divu(3,2),   &
+               pg(finger(k))%B_ren_divu(3,3),k=k1,k2)
+         enddo
+         write(unitvtk,'(a)') '      </DataArray>'
 ! B_ren_divu_stat
-      write(unitvtk,'(a)')                                                     &
+         write(unitvtk,'(a)')                                                  &
          '      <DataArray type="Float32" Name="B_ren_divu_stat" format="ascii" >'
-      do i=1,numpoints,24
-         k1 = i
-         k2 = k1 + 23
-         if (k2>numpoints) k2 = numpoints
-         write(unitvtk,'(8x,24(1x,i6))') (pg(finger(k))%B_ren_divu_stat,      &
-            k=k1,k2)
-      enddo
-      write(unitvtk,'(a)') '      </DataArray>'
+         do i=1,numpoints,24
+            k1 = i
+            k2 = k1 + 23
+            if (k2>numpoints) k2 = numpoints
+            write(unitvtk,'(8x,24(1x,i6))') (pg(finger(k))%B_ren_divu_stat,    &
+               k=k1,k2)
+         enddo
+         write(unitvtk,'(a)') '      </DataArray>'
+      endif
    endif
    if (input_any_t%ALE3) then
 ! dvel_ALE1

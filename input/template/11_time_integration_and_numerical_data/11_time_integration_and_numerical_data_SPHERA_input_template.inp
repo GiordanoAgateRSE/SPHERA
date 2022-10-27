@@ -99,6 +99,15 @@
 !    =.true. (1st-order consistency. This option has not to be chosen in the 
 !            presence of: dense granular flows; DBSPH boundaries; explicit RK 
 !            time integration schemes. This option needs ALE3==.true.)
+![?] <C1_divu>: C1-consistency flag for the velocity-divergence term. 
+!    Its value can be effectively modified at any restart time.
+!    =.false. (0th-order consistency)
+!    =.true. (1st-order consistency. This option needs C1_BE==.true.)
+![?] <C1_ALE1eCE>: C1-consistency flag for the ALE1 explicit term in the 
+!    Continuity Equation. 
+!    Its value can be effectively modified at any restart time.
+!    =.false. (0th-order consistency)
+!    =.true. (1st-order consistency. This option needs C1_BE==.true.)
 ![?] <C1_monitors>: C1-consistency flag for the post-processing procedures 
 !    at the monitoring elements
 !    =.false. (0th-order consistency)
@@ -127,14 +136,15 @@
 ![*] <CFL> <vsc_coeff> <Leapfrog_flag> <scheme_order> <factor> <dt_alfa_Mon>
 ![*] <teta_p> <teta_u>
 ![*] <COEFNMAXPARTI> <COEFNMAXPARTJ> <body_part_reorder>
-![*] <ALE3> <C1_BE> <C1_monitors> <invB_det_thresh> <FS_flow>
+![*] <ALE3> <C1_BE> <C1_divu> <C1_ALE1eCE> <C1_monitors> <invB_det_thresh> 
+!    <FS_flow>
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
 ___ ___
 ___ ___ ___ ___ ___ ___
 ___ ___
 ___ ___ ___
-___ ___ ___ ___ ___
+___ ___ ___ ___ ___ ___ ___
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
 ![?] if (3D) then

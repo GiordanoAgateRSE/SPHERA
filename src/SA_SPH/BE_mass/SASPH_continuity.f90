@@ -114,7 +114,7 @@ if (input_any_t%C1_BE) then
 ! collected and before the 1st-order consistency scheme applies to the 
 ! summation of all the particle-boundary contributions (even in the absence of 
 ! SASPH neighbouring frontiers).
-   call B_ren_divu_inversion(npi)
+   if (input_any_t%C1_divu) call B_ren_divu_inversion(npi)
    call B_ren_gradp_inversion(npi)
 endif
 ! SASPH term of the momentum divergence: start
@@ -123,7 +123,7 @@ if (Ncbf>0) then
 #elif defined SPACE_2D
 if ((Ncbs>0).and.(IntNcbs>0)) then
 #endif
-   if (input_any_t%C1_BE) then
+   if ((input_any_t%C1_divu).and.(input_any_t%C1_BE)) then
 ! 1st-order consistency for the SASPH terms
 ! For the velocity-divergence SASPH term: start
       call MatrixProduct(pg(npi)%B_ren_divu,BB=grad_u_SA,CC=aux_vec,nr=3,      &
@@ -140,21 +140,20 @@ if ((Ncbs>0).and.(IntNcbs>0)) then
    endif
 ! For the velocity-divergence SASPH term: end
 ! For the explicit ALE1 SASPH term: start
-!!!test: start
-!   if ((input_any_t%C1_BE).and.(.not.(pg(npi)%p0_neg_ALE))) then
-!      call MatrixProduct(pg(npi)%B_ren_divu,BB=grad_rhod1u_SA,CC=aux_vec,      &
-!         nr=3,nrc=3,nc=1)
-!      grad_rhod1u_SA(1:3) = -aux_vec(1:3)
-!#ifdef SPACE_3D
-!      call MatrixProduct(pg(npi)%B_ren_divu,BB=grad_rhod1v_SA,CC=aux_vec,      &
-!         nr=3,nrc=3,nc=1)
-!      grad_rhod1v_SA(1:3) = -aux_vec(1:3)
-!#endif
-!      call MatrixProduct(pg(npi)%B_ren_divu,BB=grad_rhod1w_SA,CC=aux_vec,      &
-!         nr=3,nrc=3,nc=1)
-!      grad_rhod1w_SA(1:3) = -aux_vec(1:3)
-!   endif
-!!!test: end
+   if ((input_any_t%C1_ALE1eCE).and.(input_any_t%C1_divu).and.                 &
+      (input_any_t%C1_BE).and.(.not.(pg(npi)%p0_neg_ALE))) then
+      call MatrixProduct(pg(npi)%B_ren_divu,BB=grad_rhod1u_SA,CC=aux_vec,      &
+         nr=3,nrc=3,nc=1)
+      grad_rhod1u_SA(1:3) = -aux_vec(1:3)
+#ifdef SPACE_3D
+      call MatrixProduct(pg(npi)%B_ren_divu,BB=grad_rhod1v_SA,CC=aux_vec,      &
+         nr=3,nrc=3,nc=1)
+      grad_rhod1v_SA(1:3) = -aux_vec(1:3)
+#endif
+      call MatrixProduct(pg(npi)%B_ren_divu,BB=grad_rhod1w_SA,CC=aux_vec,      &
+         nr=3,nrc=3,nc=1)
+      grad_rhod1w_SA(1:3) = -aux_vec(1:3)
+   endif
 ! For the explicit ALE1 SASPH term: end
 ! Adding the SASPH boundary term of the momentum divergence to the continuity 
 ! equation
