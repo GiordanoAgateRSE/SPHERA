@@ -70,6 +70,7 @@ double precision,dimension(1:SPACEDIM) :: ALEt_SA
 double precision,dimension(1:SPACEDIM) :: ALEt_SA_0w_loc
 ! ALE SASPH interaction term (global reference system)
 double precision,dimension(1:SPACEDIM) :: ALEt_SA_0w
+double precision,dimension(1:SPACEDIM,1:SPACEDIM) :: aux_mat,aux_mat_2
 character(4) :: stretchtype
 !------------------------
 ! Explicit interfaces
@@ -88,6 +89,12 @@ interface
       double precision,intent(in),dimension(nrc,nc) :: BB
       double precision,intent(inout),dimension(nr,nc) :: CC
    end subroutine MatrixProduct
+   subroutine MatrixTransposition(AA,AAT,m,n) 
+      implicit none
+      integer(4),intent(in) :: m,n
+      double precision,intent(in),dimension(m,n) :: AA
+      double precision,intent(inout),dimension(n,m) :: AAT
+   end subroutine MatrixTransposition
 end interface
 !------------------------
 ! Allocations
@@ -166,8 +173,17 @@ face_loop: do icbf=1,Ncbf
 ! "IntGiWrRdV", or equivalently "J_3,w" is always computed using the 
 ! beta-spline cubic kernel, no matter about the renormalization
 ! Contribution to the renormalization matrix
+! Transposed matrix of the directional cosine matrix
+         call MatrixTransposition(BoundaryFace(iface)%T,aux_mat,3,3)
+! Local value
+         call MatrixProduct(BoundaryDataTab(ibdp)%IntGiWrRdV,BB=aux_mat,       &
+            CC=aux_mat_2,nr=3,nrc=3,nc=3)
+! Global value
+         call MatrixProduct(BoundaryFace(iface)%T,BB=aux_mat_2,                &
+            CC=aux_mat,nr=3,nrc=3,nc=3)
+! Contribution
             pg(npi)%B_ren_gradp(1:3,1:3) = pg(npi)%B_ren_gradp(1:3,1:3) +      &
-               BoundaryDataTab(ibdp)%IntGiWrRdV(1:3,1:3)
+               aux_mat(1:3,1:3)
          endif
 ! Contributions of the neighbouring SASPH frontiers to the inverse of the 
 ! renormalization matrix for grad_p: end
