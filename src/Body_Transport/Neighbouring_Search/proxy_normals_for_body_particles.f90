@@ -133,8 +133,9 @@ do npi=1,n_body_part
             enddo
             if (proxy_normal_bp_f(npartint)==0) then
 ! The fluid particle has neighbouring solid particles, but no visibility check 
-! has been passed: it is probable that the fluid particle has crossed 
-! a fluid-body interface.
+! has been passed or the selection region is too small: it is probable that 
+! the fluid particle has crossed 
+! a fluid-body interface or the selection region here coded is too small.
 ! In case the normal is not yet defined, this means that there is a fluid-solid 
 ! mass penetration or some normals are wrongly defined or dx/dx_s is very large 
 ! so that not all the surface body particles have been considered above or 
@@ -144,15 +145,20 @@ do npi=1,n_body_part
 ! Under these circumstances, the normal vector is taken from the neighbouring 
 ! surface body particle, which is the closest to the computational body 
 ! particle (default choice).
-! If (remove_fluid_in_body) then the closest particle was selected only among 
-! the visible neighbours and this default choice was already avoided.
+! If (remove_fluid_in_body), then the closest particle was selected only among 
+! the visible neighbours and this default condition applies if such 
+! neighbour does not lie in the selection region above.
                   proxy_normal_bp_f(npartint) = closest_f_sbp(npj)
                   else
 ! The normal is not yet defined. Under these cimrcumstances, the normal 
-! vector is zeroed (secondary default choice) by considering the computational 
-! body particle, which here is not on the surface of its body. This default 
+! vector is taken back from the computational 
+! body particle, which here is not on the surface of its body or is not 
+! visible. This default 
 ! option is crucial as also the surface velocity and acceleration refers to 
 ! "proxy_normal_bp_f".
+! If (remove_fluid_in_body), then this default condition never applies, unless 
+! the fluid particle is already non-influential and is going to be removed 
+! from a solid body. 
                      proxy_normal_bp_f(npartint) = npi
                endif
             endif

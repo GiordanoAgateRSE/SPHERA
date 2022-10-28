@@ -311,7 +311,7 @@ if (nag>0) then
       enddo
       write(unitvtk,'(a)') '      </DataArray>'
 ! B_ren_divu(1,1-3)
-      if (input_any_t%C1_ALE1eCE) then
+      if (input_any_t%C1_divu) then
          write(unitvtk,'(a)')                                                  &
 '      <DataArray type="Float32" Name="B_ren_divu_1_1-3"  NumberOfComponents="3"  format="ascii" >'
          do i=1,numpoints,6
