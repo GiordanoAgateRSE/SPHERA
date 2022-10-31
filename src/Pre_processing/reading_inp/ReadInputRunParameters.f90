@@ -38,7 +38,7 @@ character(1) :: comment
 character(len=lencard) :: ainp
 integer(4) :: itmax
 double precision :: tmax,CFL,TetaP,TetaV,COEFNMAXPARTJ,COEFNMAXPARTI,vsc_coeff
-double precision :: invB_det_thresh
+double precision :: invB_det_thresh,max_delta_mass
 integer(4) :: ioerr,time_split,RKscheme,body_part_reorder
 #ifdef SPACE_3D
 integer(4) :: MAXCLOSEBOUNDFACES,MAXNUMCONVEXEDGES,GCBFVecDim_loc,nag_aux
@@ -105,9 +105,9 @@ do while (trim(lcase(ainp))/="##### end run parameters #####")
       ninp,ulog)) return
    call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
    read(ainp,*,iostat=ioerr) ALE3,C1_BE,C1_divu,C1_ALE1eCE,C1_monitors,        &
-      invB_det_thresh,neg_p_FS
+      invB_det_thresh,neg_p_FS,max_delta_mass
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                                   &
-      "ALE3,C1_BE,C1_divu,C1_ALE1eCE,C1_monitors,invB_det_thresh,neg_p_FS",    &
+"ALE3,C1_BE,C1_divu,C1_ALE1eCE,C1_monitors,invB_det_thresh,neg_p_FS,max_delta_mass",&
          ninp,ulog)) return
 #ifdef SPACE_3D
    call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
@@ -158,6 +158,7 @@ if (input_second_read.eqv..true.) then
    input_any_t%C1_monitors = C1_monitors
    input_any_t%invB_det_thresh = invB_det_thresh
    input_any_t%neg_p_FS = neg_p_FS
+   input_any_t%max_delta_mass = max_delta_mass
 #ifdef SPACE_3D
       input_any_t%MAXCLOSEBOUNDFACES = MAXCLOSEBOUNDFACES
       input_any_t%MAXNUMCONVEXEDGES = MAXNUMCONVEXEDGES
@@ -207,6 +208,8 @@ if (input_second_read.eqv..true.) then
       if (input_any_t%ALE3) then
          write(ulog,"(1x,a,1p,l8)")    "neg_p_FS                  : ",         &
             input_any_t%neg_p_FS
+         write(ulog,"(1x,a,1p,e12.4)")    "max_delta_mass            : ",      &
+            input_any_t%max_delta_mass
       endif
 #ifdef SPACE_3D
       write(ulog,"(1x,a,1p,i12)")   "NAG_AUX                    : ",           &

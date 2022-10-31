@@ -69,16 +69,20 @@ do ii=1,indarrayFlu
 ! Mass equation and volume update
    if (Domain%tipo=="semi") then
       if (input_any_t%ALE3) then
-         if (.not.(pg(npi)%p0_neg_ALE)) then
-            dvolume_dt = -pg(npi)%volume / rho_old * (pg(npi)%dden -           &
-                         pg(npi)%dden_ALE12)
-            pg(npi)%dmass_dt = rho_old * dvolume_dt + pg(npi)%volume *         &
-                               pg(npi)%dden
-            pg(npi)%mass = pg(npi)%mass + pg(npi)%dmass_dt * dt
+         if ((pg(npi)%mass_frozen).or.(pg(npi)%p0_neg_ALE)) then
+! Mass unchanged
+            pg(npi)%dmass_dt = 0.d0
             pg(npi)%volume = pg(npi)%mass / pg(npi)%dens
             else
-! Mass unchanged without ALE3-LC
-               pg(npi)%dmass_dt = 0.d0
+! Under ordinary ALE3 formulation
+               dvolume_dt = -pg(npi)%volume / rho_old * (pg(npi)%dden -        &
+                            pg(npi)%dden_ALE12)
+               pg(npi)%dmass_dt = rho_old * dvolume_dt + pg(npi)%volume *      &
+                                  pg(npi)%dden
+               pg(npi)%mass = pg(npi)%mass + pg(npi)%dmass_dt * dt
+! Removed the cumulative mass flux with frozen-mass particles
+               pg(npi)%mass = pg(npi)%mass - pg(npi)%volume *                  &
+                              pg(npi)%dden_ALE12_frozen * dt
                pg(npi)%volume = pg(npi)%mass / pg(npi)%dens
          endif
       endif

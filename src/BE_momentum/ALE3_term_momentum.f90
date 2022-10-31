@@ -63,11 +63,13 @@ do ii = 1,indarrayFlu
    if (pg(npi)%mu>(Med(pg(npi)%imed)%mumx*(1.d0-1.d-9))) then
       cycle
    endif
-   if (.not.(pg(npi)%p0_neg_ALE)) then
+   if ((.not.(pg(npi)%mass_frozen)).and.(.not.(pg(npi)%p0_neg_ALE))) then
       do contj=1,nPartIntorno(npi)
          npartint = (npi - 1) * NMAXPARTJ + contj
          npj = PartIntorno(npartint)
          if (npi==npj) cycle
+! Contributions from neighbouring frozen-mass particles are zeroed
+         if (pg(npj)%mass_frozen) cycle
 ! Update of the ALE3 velocity increment (here expressed as acceleration). BC 
 ! ALE3 terms for ME+CV are null. At this stage ALE1 velocities are still 
 ! saved as accelerations.

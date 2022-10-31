@@ -122,7 +122,7 @@
 !    For those renormalization which are not inverted, renormalization does not 
 !    apply. If ((C1_BE).and.(.not(p_neg_FS))), the solution is unstable if 
 !    "invB_det_thresh" is too small.
-![?] <p_neg_FS>: logical flag to activate or deactivate the differential 
+![?] <neg_p_FS>: logical flag to activate or deactivate the differential 
 !    treatment for negative-pressure particles. This variable is only 
 !    influential if (ALE3) and assumes that negative-pressure particles only 
 !    occur at the free-surface (it can be used for free-surface flows unless 
@@ -130,10 +130,12 @@
 !    be used for confined flows):
 !    =.true. ((.not.(C1_BE)): 100% of the unbalanced ALE1-ME terms apply as 
 !                             representative of the missing BC terms in air, no 
-!                             other ALE terms; unstable solution; 
+!                             other ALE terms; no correction for neighbouring 
+!                             particles; non-conservative and unstable solution;
 !            (C1_BE): no ALE term at all is represented; 1st-order consistency 
 !                     applies if the status of the renormalization matrix 
-!                     is active; unstable solution.)
+!                     is active; no correction for neighbouring particles; 
+!                     non-conservative and unstable solution)
 !    =.false. (no differential treatment for negative pressure; default value; 
 !             (.not.(C1_BE): ALE3 full formulation; stable solution;
 !             (C1_BE): ALE3 full formulation plus possible 1st-order 
@@ -141,20 +143,27 @@
 !                      renormalization matrix; unstable solution requiring 
 !                      "invB_det_thresh" to be large enough to avoid this 
 !                      occurrence).
+![?] <max_delta_mass>: maximum variation of the particle mass (%) with 
+!    respect to the initial homogeneous value. If the bounds are overpassed the 
+!    mass of the selected particles is frozen until the end of the simulation 
+!    (simplified ALE3 volume and momentum equations for the selected particles; 
+!    analogously, some of their contributions to the neighbours are frozen to 
+!    keep global mass and momentum conservative). Any negative value deactivate 
+!    this procedure.
 !-------------------------------------------------------------------------------
 ![*] <final_time> <final_time_step>
 ![*] <CFL> <vsc_coeff> <Leapfrog_flag> <scheme_order> <factor> <dt_alfa_Mon>
 ![*] <teta_p> <teta_u>
 ![*] <COEFNMAXPARTI> <COEFNMAXPARTJ> <body_part_reorder>
 ![*] <ALE3> <C1_BE> <C1_divu> <C1_ALE1eCE> <C1_monitors> <invB_det_thresh> 
-!    <p_neg_FS>
+!    <neg_p_FS> <max_delta_mass>
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
 ___ ___
 ___ ___ ___ ___ ___ ___
 ___ ___
 ___ ___ ___
-___ ___ ___ ___ ___ ___ ___
+___ ___ ___ ___ ___ ___ ___ ___
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
 ![?] if (3D) then

@@ -131,7 +131,7 @@ type input_any_time_der_type
    double precision :: COEFNMAXPARTJ
 ! Output frequency for log file                       
    double precision :: plot_fr
-! Output frequency for restart files 
+! Output frequency for restart files
    double precision :: rest_fr
 ! Frequency for result saving                       
    double precision :: memo_fr
@@ -144,6 +144,9 @@ type input_any_time_der_type
 ! Threshold for the absolute value of the determinant of the inverse of the 
 ! renormalization matrix (ref. input-file template)
    double precision :: invB_det_thresh
+! Maximum variation of the particle mass (%) with respect to the initial 
+! homogeneous value (ref. input-file template)
+   double precision :: max_delta_mass
 ! Type of pressure partial smoothing
    character(1) :: Psurf
 ! Restart information path (influential only in case of authomatic reading of 
@@ -171,6 +174,8 @@ type TyParticle
 ! Flag to define the case of a particle with negative pressure at the beginning 
 ! of assessing the momentum equation RHS to possibly switch ALE formulation
    logical :: p0_neg_ALE
+! Flag to select particles whose mass has just exceeded the ALE3 bounds
+   logical :: mass_frozen
 ! ID of an inlet neighbouring DB-SPH surface element, if any (otherwise it is
 ! null)
    integer(4) :: DBSPH_inlet_ID
@@ -227,6 +232,9 @@ type TyParticle
    double precision :: volume
 ! ALE term in the contiuity equation
    double precision :: dden_ALE12
+! Cumulative ALE term in the contiuity equation due to mass fluxes with 
+! frozen-mass particles (extra mass flux is removed during time integration)
+   double precision :: dden_ALE12_frozen
 ! Pressure                          
    double precision :: pres
 ! Continuity equation LHS                           

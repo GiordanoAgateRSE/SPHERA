@@ -214,6 +214,12 @@ if (Granular_flows_options%KTGF_config.ne.1) then
 ! Update the explicit CE ALE terms
       pg(npi)%dden_ALE12 = pg(npi)%dden_ALE12 + aux_vec_1_ALE(1) +             &
                            aux_vec_2_ALE(2) + aux_vec_3_ALE(3) + ALE2_CE
+! Cumulative controbution with frozen-mass particles
+      if (pg(npj)%mass_frozen) then
+         pg(npi)%dden_ALE12_frozen = pg(npi)%dden_ALE12_frozen +               &
+                                     aux_vec_1_ALE(1) + aux_vec_2_ALE(2) +     &
+                                     aux_vec_3_ALE(3) + ALE2_CE 
+      endif
 ! Update of the RHS of the continuity equation
       pg(npi)%dden = pg(npi)%dden + aux_vec_1_ALE(1) + aux_vec_2_ALE(2) +      &
                      aux_vec_3_ALE(3) + ALE2_CE

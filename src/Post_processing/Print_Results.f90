@@ -517,6 +517,10 @@ if (nag>0) then
    write(ulog,'(a,i9)') 'Fluid particles removed from solid bodies: ',         &
       fluid_in_body_count
 #endif
+   if (input_any_t%ALE3) then
+      write(ulog,'(a,i9)') 'Number of mass-frozen fluid particles: ',          &
+         mass_frozen_count
+   endif
    else
       write(ulog,'(128("."))')
       write(ulog,'(a)') "No particles inside the domain at the moment"
