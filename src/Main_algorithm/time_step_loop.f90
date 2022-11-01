@@ -39,13 +39,11 @@ logical :: done_flag,IC_removal_flag
 #ifdef SPACE_3D
    logical :: BC_zmax_flag
 #endif
-integer(4) :: it,it_print,it_memo,it_rest,num_out,npi,aux_int
+integer(4) :: it,it_print,it_memo,it_rest,num_out,npi
 #ifdef SPACE_3D
    integer(4) :: i_zone,Ncbf_Max
 #endif
 double precision :: dt_previous_step,dtvel
-! Minimum and maximum value for the particle mass (ALE3)
-double precision :: ALE3_min_p_mass,ALE3_max_p_mass
 #ifdef SPACE_3D
    character(len=lencard) :: nomsub = "time_step_loop"
 #endif
@@ -78,16 +76,6 @@ IC_removal_flag = .false.
 #ifdef SPACE_3D
    BC_zmax_flag = .false.
 #endif
-! Initializations for the selection of the frozen-mass particles
-#ifdef SPACE_3D
-aux_int = 3
-#elif defined SPACE_2D
-aux_int = 2
-#endif
-ALE3_min_p_mass = (Domain%dx ** aux_int) * Med(1)%den0 * (1.d0 -               &
-                  input_any_t%max_delta_mass / 100.d0) 
-ALE3_max_p_mass = (Domain%dx ** aux_int) * Med(1)%den0 * (1.d0 +               &
-                  input_any_t%max_delta_mass / 100.d0)
 !------------------------
 ! Statements
 !------------------------
@@ -348,8 +336,7 @@ TIME_STEP_DO: do while (it<=input_any_t%itmax)
 #endif
 ! Loop over all the active particles
 !$omp parallel do default(none)                                                &
-!$omp shared(nag,pg,Domain,mass_frozen_count,ALE3_min_p_mass,ALE3_max_p_mass)  &
-!$omp shared(input_any_t)                                                      &
+!$omp shared(nag,pg,Domain)                                                    &
 #ifdef SPACE_3D
 !$omp shared(Ncbf_Max)                                                         &
 #endif
@@ -358,18 +345,6 @@ TIME_STEP_DO: do while (it<=input_any_t%itmax)
          pg(npi)%dden = 0.d0
          pg(npi)%dden_ALE12 = 0.d0
          pg(npi)%dden_ALE12_frozen = 0.d0
-! Selection of the frozen-mass particles: start
-         if ((input_any_t%max_delta_mass>-1.d-21).and.(input_any_t%ALE3)) then
-            if ((.not.(pg(npi)%mass_frozen)).and.                              &
-               ((pg(npi)%mass<ALE3_min_p_mass).or.                             &
-               (pg(npi)%mass>ALE3_max_p_mass))) then
-               pg(npi)%mass_frozen = .true.
-!$omp critical (omp_mass_frozen_count)
-               mass_frozen_count = mass_frozen_count + 1
-!$omp end critical (omp_mass_frozen_count)
-            endif
-         endif
-! Selection of the frozen-mass particles: end
          if ((Domain%time_stage==1).or.(Domain%time_split==1)) then
             pg(npi)%koddens = 0
          endif
