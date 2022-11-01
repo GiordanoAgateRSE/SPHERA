@@ -37,15 +37,18 @@ use Dynamic_allocation_module
 implicit none
 integer(4),intent(in) :: npi
 integer(4) :: npj,contj,npartint
-double precision :: rhoi,rhoj,amassj,moddervel,appo,ALE2_CE
+double precision :: rhoi,rhoj,amassj,moddervel,appo,ALE2_CE,aux_scal
+double precision :: ALE2_CE_frozen
 #ifdef SPACE_3D
 double precision :: moddia,modout
 #elif defined SPACE_2D
 double precision :: det
 #endif
 double precision,dimension(3) :: pesogradj,dvar,aux_vec,d_rho_dvelALE1
-double precision,dimension(3) :: aux_vec_1,aux_vec_2,aux_vec_3
+double precision,dimension(3) :: aux_vec_1,aux_vec_2,aux_vec_3,aux_vec_4
+double precision,dimension(3) :: aux_vec_5,aux_vec_6,aux_vec_1_ALE_frozen
 double precision,dimension(3) :: aux_vec_1_ALE,aux_vec_2_ALE,aux_vec_3_ALE
+double precision,dimension(3) :: aux_vec_2_ALE_frozen,aux_vec_3_ALE_frozen
 double precision,dimension(9) :: dvdi
 #ifdef SPACE_2D
 double precision,dimension(9) :: aij
@@ -75,6 +78,10 @@ aux_vec_1_ALE(1:3) = 0.d0
 aux_vec_2_ALE(1:3) = 0.d0
 aux_vec_3_ALE(1:3) = 0.d0
 ALE2_CE = 0.d0
+aux_vec_1_ALE_frozen(1:3) = 0.d0
+aux_vec_2_ALE_frozen(1:3) = 0.d0
+aux_vec_3_ALE_frozen(1:3) = 0.d0
+ALE2_CE_frozen = 0.d0
 !------------------------
 ! Statements
 !------------------------
@@ -123,20 +130,32 @@ do contj=1,nPartIntorno(npi)
       if ((input_any_t%ALE3).and.(.not.(pg(npi)%p0_neg_ALE))) then
          d_rho_dvelALE1(1:3) = pg(npj)%dens * pg(npj)%dvel_ALE1(1:3) -         &
                                pg(npi)%dens * pg(npi)%dvel_ALE1(1:3)
-         aux_vec_1_ALE(1:3) = aux_vec_1_ALE(1:3) + (amassj / rhoj)  *          &
-                              PartKernel(1,npartint) * d_rho_dvelALE1(1) *     &
-                              rag(1:3,npartint)
+         aux_vec_4(1:3) = (amassj / rhoj)  * PartKernel(1,npartint) *          &
+                          d_rho_dvelALE1(1) * rag(1:3,npartint)
+         aux_vec_1_ALE(1:3) = aux_vec_1_ALE(1:3) + aux_vec_4(1:3)
 #ifdef SPACE_3D
-         aux_vec_2_ALE(1:3) = aux_vec_2_ALE(1:3) + (amassj / rhoj) *           &
-                              PartKernel(1,npartint) * d_rho_dvelALE1(2) *     &
-                              rag(1:3,npartint)
+         aux_vec_5(1:3) = (amassj / rhoj) * PartKernel(1,npartint) *           &
+                          d_rho_dvelALE1(2) * rag(1:3,npartint)
+         aux_vec_2_ALE(1:3) = aux_vec_2_ALE(1:3) + aux_vec_5(1:3)
 #endif
-         aux_vec_3_ALE(1:3) = aux_vec_3_ALE(1:3) + (amassj / rhoj) *           &
-                              PartKernel(1,npartint) * d_rho_dvelALE1(3) *     &
-                              rag(1:3,npartint)
-         ALE2_CE = ALE2_CE + 2.d0 * pg(npi)%dens * (amassj / rhoj) *           &
+         aux_vec_6(1:3) = (amassj / rhoj) * PartKernel(1,npartint) *           &
+                          d_rho_dvelALE1(3) * rag(1:3,npartint)
+         aux_vec_3_ALE(1:3) = aux_vec_3_ALE(1:3) + aux_vec_6(1:3)
+         aux_scal = 2.d0 * pg(npi)%dens * (amassj / rhoj) *                    &
                    PartKernel(1,npartint) * dot_product(pg(npi)%dvel_ALE1(1:3),&
                    rag(1:3,npartint))
+         ALE2_CE = ALE2_CE + aux_scal
+         if (pg(npj)%mass_frozen) then
+            aux_vec_1_ALE_frozen(1:3) = aux_vec_1_ALE_frozen(1:3) +            &
+                                        aux_vec_4(1:3)
+#ifdef SPACE_3D
+            aux_vec_2_ALE_frozen(1:3) = aux_vec_2_ALE_frozen(1:3) +            &
+                                        aux_vec_5(1:3)
+#endif
+            aux_vec_3_ALE_frozen(1:3) = aux_vec_3_ALE_frozen(1:3) +            &
+                                        aux_vec_6(1:3)
+            ALE2_CE_frozen = ALE2_CE_frozen + aux_scal
+         endif
       endif
       else
 ! Dense granular flows
@@ -196,6 +215,8 @@ if (Granular_flows_options%KTGF_config.ne.1) then
 ! ALE term
    if ((input_any_t%C1_ALE1eCE).and.(input_any_t%C1_divu).and.                 &
       (input_any_t%C1_BE).and.(.not.(pg(npi)%p0_neg_ALE))) then
+! No correction for frozen-mass particles as the C1_ALE1eCE formulation is 
+! already non-conservative
       call MatrixProduct(pg(npi)%B_ren_divu,BB=aux_vec_1_ALE,CC=aux_vec,       &
          nr=3,nrc=3,nc=1)
       aux_vec_1_ALE(1:3) = -aux_vec(1:3)
@@ -214,12 +235,11 @@ if (Granular_flows_options%KTGF_config.ne.1) then
 ! Update the explicit CE ALE terms
       pg(npi)%dden_ALE12 = pg(npi)%dden_ALE12 + aux_vec_1_ALE(1) +             &
                            aux_vec_2_ALE(2) + aux_vec_3_ALE(3) + ALE2_CE
-! Cumulative controbution with frozen-mass particles
-      if (pg(npj)%mass_frozen) then
-         pg(npi)%dden_ALE12_frozen = pg(npi)%dden_ALE12_frozen +               &
-                                     aux_vec_1_ALE(1) + aux_vec_2_ALE(2) +     &
-                                     aux_vec_3_ALE(3) + ALE2_CE 
-      endif
+! Cumulative contribution with frozen-mass particles
+      pg(npi)%dden_ALE12_frozen = pg(npi)%dden_ALE12_frozen +                  &
+                                  aux_vec_1_ALE_frozen(1) +                    &
+                                  aux_vec_2_ALE_frozen(2) +                    &
+                                  aux_vec_3_ALE_frozen(3) + ALE2_CE_frozen
 ! Update of the RHS of the continuity equation
       pg(npi)%dden = pg(npi)%dden + aux_vec_1_ALE(1) + aux_vec_2_ALE(2) +      &
                      aux_vec_3_ALE(3) + ALE2_CE

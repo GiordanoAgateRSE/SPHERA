@@ -76,13 +76,10 @@ do ii=1,indarrayFlu
             else
 ! Under ordinary ALE3 formulation
                dvolume_dt = -pg(npi)%volume / rho_old * (pg(npi)%dden -        &
-                            pg(npi)%dden_ALE12)
+                            pg(npi)%dden_ALE12 + pg(npi)%dden_ALE12_frozen)
                pg(npi)%dmass_dt = rho_old * dvolume_dt + pg(npi)%volume *      &
                                   pg(npi)%dden
                pg(npi)%mass = pg(npi)%mass + pg(npi)%dmass_dt * dt
-! Removed the cumulative mass flux with frozen-mass particles
-               pg(npi)%mass = pg(npi)%mass - pg(npi)%volume *                  &
-                              pg(npi)%dden_ALE12_frozen * dt
                pg(npi)%volume = pg(npi)%mass / pg(npi)%dens
          endif
       endif

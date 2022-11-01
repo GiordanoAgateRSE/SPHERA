@@ -346,8 +346,6 @@ TIME_STEP_DO: do while (it<=input_any_t%itmax)
 #ifdef SPACE_3D
       Ncbf_Max = 0
 #endif
-! Zeroing the count of mass-frozen fluid particles (ALE3)
-      if (input_any_t%ALE3) mass_frozen_count = 0
 ! Loop over all the active particles
 !$omp parallel do default(none)                                                &
 !$omp shared(nag,pg,Domain,mass_frozen_count,ALE3_min_p_mass,ALE3_max_p_mass)  &
@@ -362,10 +360,13 @@ TIME_STEP_DO: do while (it<=input_any_t%itmax)
          pg(npi)%dden_ALE12_frozen = 0.d0
 ! Selection of the frozen-mass particles: start
          if ((input_any_t%max_delta_mass>-1.d-21).and.(input_any_t%ALE3)) then
-            if ((pg(npi)%mass<ALE3_min_p_mass).or.                             &
-               (pg(npi)%mass>ALE3_max_p_mass)) then
+            if ((.not.(pg(npi)%mass_frozen)).and.                              &
+               ((pg(npi)%mass<ALE3_min_p_mass).or.                             &
+               (pg(npi)%mass>ALE3_max_p_mass))) then
                pg(npi)%mass_frozen = .true.
+!$omp critical (omp_mass_frozen_count)
                mass_frozen_count = mass_frozen_count + 1
+!$omp end critical (omp_mass_frozen_count)
             endif
          endif
 ! Selection of the frozen-mass particles: end
