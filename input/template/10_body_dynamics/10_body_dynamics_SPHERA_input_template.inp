@@ -96,7 +96,9 @@
 !    which have crossed a fluid-body interface. These particles are made 
 !    non-influential before their removal, but they affect some renormalization 
 !    matrices of their neighbouring particles during the time step they are 
-!    detected.
+!    detected. The activation of this option is mandatory even without 
+!    particles to be removed as it also assigns the proper proxy surface body 
+!    particles.
 !-------------------------------------------------------------------------------
 ![*] <n_bodies> <dx/dx_body> <friction_angle> <time_max_no_gravity_force> 
 !    <time_max_no_body_frontier_impingements> <body_minimum_pressure_limiter> 
