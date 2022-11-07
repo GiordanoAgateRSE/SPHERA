@@ -421,33 +421,33 @@ aux_vec(1:3) = vtu_grids(i_vtu_grid)%points%vertex(i_vert3)%pos(1:3) -         &
       bp_arr(body_arr(ib)%flip_nz_IDs(ii))%normal(3) =                         &
          -bp_arr(body_arr(ib)%flip_nz_IDs(ii))%normal(3)
    enddo
+! Deallocation of the temporary arrays to test the faces of the 
+! ".vtu" cells to define them as surface or internal.
+   if ((body_arr(ib)%surface_detection==1).or.                                 &
+      (body_arr(ib)%surface_detection==3)) then
+      array_name = "test_surface_faces_1"
+      call allocate_de_log_r2(.false.,test_surface_faces_1,                    &
+         array_name=array_name,ulog_flag=.true.)
+   endif
+   if ((body_arr(ib)%surface_detection==2).or.                                 &
+      (body_arr(ib)%surface_detection==3)) then
+      array_name = "test_surface_faces_2"
+      call allocate_de_log_r2(.false.,test_surface_faces_2,                    &
+         array_name=array_name,ulog_flag=.true.)
+   endif
+   array_name = "flip_nx_IDs"
+   call allocate_de_int4_r1(.false.,body_arr(ib)%flip_nx_IDs,                  &
+      array_name=array_name,ulog_flag=.true.)
+   array_name = "flip_ny_IDs"
+   call allocate_de_int4_r1(.false.,body_arr(ib)%flip_ny_IDs,                  &
+      array_name=array_name,ulog_flag=.true.)
+   array_name = "flip_nz_IDs"
+   call allocate_de_int4_r1(.false.,body_arr(ib)%flip_nz_IDs,                  &
+      array_name=array_name,ulog_flag=.true.)
 enddo
 !------------------------
 ! Deallocations
 !------------------------
-! Deallocation of the temporary arrays to test the faces of the 
-! ".vtu" cells to define them as surface or internal.
-if ((body_arr(ib)%surface_detection==1).or.                                    &
-   (body_arr(ib)%surface_detection==3)) then
-   array_name = "test_surface_faces_1"
-   call allocate_de_log_r2(.false.,test_surface_faces_1,array_name=array_name, &
-      ulog_flag=.true.)
-endif
-if ((body_arr(ib)%surface_detection==2).or.                                    &
-   (body_arr(ib)%surface_detection==3)) then
-   array_name = "test_surface_faces_2"
-   call allocate_de_log_r2(.false.,test_surface_faces_2,array_name=array_name, &
-      ulog_flag=.true.)
-endif
-array_name = "flip_nx_IDs"
-call allocate_de_int4_r1(.false.,body_arr(ib)%flip_nx_IDs,                     &
-   array_name=array_name,ulog_flag=.true.)
-array_name = "flip_ny_IDs"
-call allocate_de_int4_r1(.false.,body_arr(ib)%flip_ny_IDs,                     &
-   array_name=array_name,ulog_flag=.true.)
-array_name = "flip_nz_IDs"
-call allocate_de_int4_r1(.false.,body_arr(ib)%flip_nz_IDs,                     &
-   array_name=array_name,ulog_flag=.true.)
 return
 end subroutine IC_CAE_body_particles
 #endif
