@@ -95,7 +95,7 @@ do npi=1,n_body_part
             dvar(1:3) = 2.d0 * aux_vec(1:3)
          case(2,3)
 ! mirror velocity as solid velocity
-            dvar(1:3) = bp_arr(npi)%vel(1:3) - pg(npj)%vel(:)
+            dvar(1:3) = bp_arr(npi)%vel(1:3) - pg(npj)%vel(1:3)
       endselect
       if ((input_any_t%ALE3).and.(.not.(pg(npj)%p0_neg_ALE))) then
 ! For the ALE2-CE term (valid for any slip condition)
@@ -120,6 +120,11 @@ do npi=1,n_body_part
 ! no-slip conditions require no correction.
                dvar(1:3) = dvar(1:3) - (pg(npj)%dvel_ALE1(1:3) +               &
                            pg(npj)%dvel_ALE3(1:3))
+         endif
+         if (input_any_t%ALE3_vol_corr) then
+! Volume correction for the explicit ALE3-CE boundary terms
+            dvar(1:3) = dvar(1:3) + pg(npj)%dvel_ALE1(1:3) +                   &
+                        pg(npj)%dvel_ALE3(1:3)
          endif
       endif
       dis = dsqrt(dot_product(rag_bp_f(:,npartint),rag_bp_f(:,npartint)))

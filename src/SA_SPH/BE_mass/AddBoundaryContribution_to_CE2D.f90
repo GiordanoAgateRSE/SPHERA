@@ -118,6 +118,11 @@ do icbs=1,IntNcbs
             endif
             return
       endselect
+      if ((input_any_t%ALE3_vol_corr).and.(input_any_t%ALE3).and.              &
+         (.not.(pg(npi)%p0_neg_ALE))) then
+! Volume correction for the explicit ALE3-CE boundary terms
+         dvel(1:3) = dvel(1:3) + pg(npi)%dvel_ALE1(1:3) + pg(npi)%dvel_ALE3(1:3)
+      endif
  ! Summations of the SASPH terms for grad_u_SA and grad_w_SA: start
       do ii=1,PLANEDIM
          grad_u_SA(acix(ii)) = grad_u_SA(acix(ii)) - dvel(1) *                 &

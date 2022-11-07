@@ -132,6 +132,11 @@ do icbf=1,Ncbf
             endif
             dvel(1:3) = dvel(1:3) - 2.d0 * dot_product(aux_vec_3,tau_s) *      &
                         tau_s(1:3)
+            if (input_any_t%ALE3_vol_corr) then
+! Volume correction for the explicit ALE3-CE boundary terms
+               dvel(1:3) = dvel(1:3) + pg(npi)%dvel_ALE1(1:3) +                &
+                           pg(npi)%dvel_ALE3(1:3)
+            endif
          endif
          call MatrixProduct(BoundaryFace(iface)%T,                             &
             BB=BoundaryDataTab(ibdp)%BoundaryIntegral(4:6),CC=aux_vec,nr=3,    &

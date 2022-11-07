@@ -32,7 +32,7 @@ use Hybrid_allocation_module
 ! Declarations
 !------------------------
 implicit none
-logical :: ALE3,C1_BE,C1_monitors,neg_p_FS,C1_divu,C1_ALE1eCE
+logical :: ALE3,C1_BE,C1_monitors,neg_p_FS,C1_divu,C1_ALE1eCE,ALE3_vol_corr
 integer(4) :: nrighe,ier,ninp,ulog,uerr
 character(1) :: comment
 character(len=lencard) :: ainp
@@ -105,9 +105,9 @@ do while (trim(lcase(ainp))/="##### end run parameters #####")
       ninp,ulog)) return
    call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
    read(ainp,*,iostat=ioerr) ALE3,C1_BE,C1_divu,C1_ALE1eCE,C1_monitors,        &
-      invB_det_thresh,neg_p_FS,max_delta_mass
+      invB_det_thresh,neg_p_FS,max_delta_mass,ALE3_vol_corr
    if (.not.ReadCheck(ioerr,ier,nrighe,ainp,                                   &
-"ALE3,C1_BE,C1_divu,C1_ALE1eCE,C1_monitors,invB_det_thresh,neg_p_FS,max_delta_mass",&
+"ALE3,C1_BE,C1_divu,C1_ALE1eCE,C1_monitors,invB_det_thresh,neg_p_FS,max_delta_mass,ALE3_vol_corr",&
          ninp,ulog)) return
 #ifdef SPACE_3D
    call ReadRiga(ninp,ainp,ioerr,comment_sym=comment,lines_treated=nrighe)
@@ -158,6 +158,7 @@ if (input_second_read.eqv..true.) then
    input_any_t%C1_monitors = C1_monitors
    input_any_t%invB_det_thresh = invB_det_thresh
    input_any_t%neg_p_FS = neg_p_FS
+   input_any_t%ALE3_vol_corr = ALE3_vol_corr
    input_any_t%max_delta_mass = max_delta_mass
 #ifdef SPACE_3D
       input_any_t%MAXCLOSEBOUNDFACES = MAXCLOSEBOUNDFACES
@@ -210,6 +211,8 @@ if (input_second_read.eqv..true.) then
             input_any_t%neg_p_FS
          write(ulog,"(1x,a,1p,e12.4)")    "max_delta_mass            : ",      &
             input_any_t%max_delta_mass
+         write(ulog,"(1x,a,1p,l8)")    "ALE3_vol_corr             : ",         &
+            input_any_t%ALE3_vol_corr
       endif
 #ifdef SPACE_3D
       write(ulog,"(1x,a,1p,i12)")   "NAG_AUX                    : ",           &

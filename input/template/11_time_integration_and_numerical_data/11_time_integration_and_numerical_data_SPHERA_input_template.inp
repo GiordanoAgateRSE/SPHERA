@@ -150,20 +150,23 @@
 !    analogously, some of their contributions to the neighbours are frozen to 
 !    keep global mass and momentum conservative). Any negative value deactivate 
 !    this procedure.
+![?] <ALE3_vol_corr>: flag to activate/deactivate the volume correction term for
+!                     the explicit ALE3-CE boundary terms. This applies with 
+!                     any slip condition. 
 !-------------------------------------------------------------------------------
 ![*] <final_time> <final_time_step>
 ![*] <CFL> <vsc_coeff> <Leapfrog_flag> <scheme_order> <factor> <dt_alfa_Mon>
 ![*] <teta_p> <teta_u>
 ![*] <COEFNMAXPARTI> <COEFNMAXPARTJ> <body_part_reorder>
 ![*] <ALE3> <C1_BE> <C1_divu> <C1_ALE1eCE> <C1_monitors> <invB_det_thresh> 
-!    <neg_p_FS> <max_delta_mass>
+!    <neg_p_FS> <max_delta_mass> <ALE3_vol_corr>
 !-------------------------------------------------------------------------------
 !<<<****************************************************************************
 ___ ___
 ___ ___ ___ ___ ___ ___
 ___ ___
 ___ ___ ___
-___ ___ ___ ___ ___ ___ ___ ___
+___ ___ ___ ___ ___ ___ ___ ___ ___
 !>>>****************************************************************************
 !-------------------------------------------------------------------------------
 ![?] if (3D) then
