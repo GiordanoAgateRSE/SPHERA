@@ -116,7 +116,7 @@ endif
 ! Body variables assessed: volume, maximum velocity.
 !$omp parallel do default(none)                                                &
 !$omp shared(vtu_grids,bp_arr,ib,body_arr,i_vtu_grid,aux_int)                  &
-!$omp shared(test_surface_faces_1,test_surface_faces_2)                        &
+!$omp shared(test_surface_faces_1,test_surface_faces_2,Grid)                   &
 !$omp private(i_vtu_cell,i_bp,i_vert2,P1,P2,P3,P4,vec_P1_P2)                   &
 !$omp private(vec_P1_P3,vec_P1_P4,aux_vec,aux_scal,i_vert,j_vtu_cell,test)     &
 !$omp private(shared_face_cell_1,shared_face_cell_2,cell_1,cell_2,aux_int_2)
@@ -237,7 +237,10 @@ endif
 ! Relative position
       bp_arr(i_bp)%rel_pos(1:3) = bp_arr(i_bp)%pos(1:3) - body_arr(ib)%x_CM(1:3)
 ! Particle cell
-      bp_arr(i_bp)%cell = ParticleCellNumber(bp_arr(i_bp)%pos)
+      if (Grid%dcd(1)>1.d-21) then
+! The "if construct" is needed just for a formal assignation in case of restart
+         bp_arr(i_bp)%cell = ParticleCellNumber(bp_arr(i_bp)%pos)
+      endif
 ! Velocity
       call Vector_Product(body_arr(ib)%omega,bp_arr(i_bp)%rel_pos,aux_vec,3)
       bp_arr(i_bp)%vel(1:3) = body_arr(ib)%u_CM(1:3) + aux_vec(1:3)

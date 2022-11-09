@@ -81,7 +81,7 @@ aux_integer = 0
 !------------------------
 ! Loop over the transported bodies
 !$omp parallel do default(none)                                                &
-!$omp shared(n_bodies,body_arr,Domain,n_body_part,dx_dxbodies)                 &
+!$omp shared(n_bodies,body_arr,Domain,n_body_part,dx_dxbodies,Grid)            &
 !$omp private(ib)
 do ib=1,n_bodies
    body_arr(ib)%npart = 0
@@ -310,7 +310,10 @@ do nbi=1,n_bodies
                   bp_arr(npi)%normal(2) = 0.d0
 #endif
 ! Initial cell
-               bp_arr(npi)%cell = ParticleCellNumber(bp_arr(npi)%pos)
+               if (Grid%dcd(1)>1.d-21) then
+! The "if construct" is needed just for a formal assignation in case of restart
+                  bp_arr(npi)%cell = ParticleCellNumber(bp_arr(npi)%pos)
+               endif
 ! Velocity
                call Vector_Product(body_arr(nbi)%omega,bp_arr(npi)%rel_pos,    &
                   vec2_temp,3)
