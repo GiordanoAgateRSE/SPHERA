@@ -166,8 +166,12 @@ do npi=1,n_body_part
 ! Body-particle mirror pressure: start
       if (on_going_time_step==it_start) then
          call body_pressure_mirror_interaction(npi,npj,npartint,pres_mir,W_vol)
-         bp_arr(npi)%pres = bp_arr(npi)%pres + pres_mir * W_vol
-         Sum_W_vol = Sum_W_vol + W_vol
+! Visibility criterion only for the unique value of the body particle
+         aux_scal = dot_product(rag_bp_f(:,npartint),bp_arr(npi)%normal)
+         if (aux_scal>1.d-12) then
+            bp_arr(npi)%pres = bp_arr(npi)%pres + pres_mir * W_vol
+            Sum_W_vol = Sum_W_vol + W_vol
+         endif
       endif
 ! Body-particle mirror pressure: end
    enddo

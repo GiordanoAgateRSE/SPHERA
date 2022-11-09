@@ -288,8 +288,13 @@ do npi=1,n_body_part
 ! Contribution to the "grad_p + ALE term": start
 ! Term for grad_p
       call body_pressure_mirror_interaction(npi,npj,npartint,pres_mir,W_vol)
-      bp_arr(npi)%pres = bp_arr(npi)%pres + pres_mir * W_vol
-      Sum_W_vol = Sum_W_vol + W_vol
+! Visibility criterion to make interaction also contribute to the solid 
+! Momentum Equation
+      aux_scalar = dot_product(rag_bp_f(:,npartint),bp_arr(npi)%normal)
+      if (aux_scalar>1.d-12) then
+         bp_arr(npi)%pres = bp_arr(npi)%pres + pres_mir * W_vol
+         Sum_W_vol = Sum_W_vol + W_vol
+      endif
       aux_scalar = (pres_mir - pg(npj)%pres) / (pg(npj)%dens ** 2)
 ! Term for ALE
       aux_scalar_2 = 2.d0 * pg(npj)%pres / (pg(npj)%dens * pg(npj)%dens)

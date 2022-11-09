@@ -43,7 +43,7 @@ integer(4) :: npi,jj,npartint,npj
 double precision :: W_vol_nb
 ! Weight for neighbouring fluid particles ("nf")
 double precision :: W_vol_nf
-double precision :: dis,pres_mir,Sum_W_vol_nf
+double precision :: dis,pres_mir,Sum_W_vol_nf,aux_scal
 double precision, external :: w
 !------------------------
 ! Explicit interfaces
@@ -62,7 +62,8 @@ double precision, external :: w
 !$omp shared(n_body_part,bp_arr,nPartIntorno_bp_f,NMAXPARTJ,PartIntorno_bp_f)  &
 !$omp shared(rag_bp_f,Domain,AppUnity_vec,sompW_vec,body_arr)                  &
 !$omp shared(body_minimum_pressure_limiter,body_maximum_pressure_limiter,pg)   &
-!$omp private(npi,Sum_W_vol_nf,jj,npartint,npj,dis,W_vol_nb,pres_mir,W_vol_nf)
+!$omp private(npi,Sum_W_vol_nf,jj,npartint,npj,dis,W_vol_nb,pres_mir,W_vol_nf) &
+!$omp private(aux_scal)
 do npi=1,n_body_part
    bp_arr(npi)%pres = 0.d0
    Sum_W_vol_nf = 0.d0
@@ -77,8 +78,12 @@ do npi=1,n_body_part
 !$omp end critical (omp_AppUnity_vec)
 ! Mirror body-particle pressure: start
       call body_pressure_mirror_interaction(npi,npj,npartint,pres_mir,W_vol_nf)
-      bp_arr(npi)%pres = bp_arr(npi)%pres + pres_mir * W_vol_nf
-      Sum_W_vol_nf = Sum_W_vol_nf + W_vol_nf
+! Visibility criterion only for the unique value of the body particle
+      aux_scal = dot_product(rag_bp_f(:,npartint),bp_arr(npi)%normal)
+      if (aux_scal>1.d-12) then
+         bp_arr(npi)%pres = bp_arr(npi)%pres + pres_mir * W_vol_nf
+         Sum_W_vol_nf = Sum_W_vol_nf + W_vol_nf
+      endif
 ! Mirror body-particle pressure: end
 !$omp critical (omp_sompW_vec)
       sompW_vec(npj) = sompW_vec(npj) + (pres_mir - pg(npj)%pres) * W_vol_nb
