@@ -168,12 +168,10 @@ do npi=1,n_body_part
          call body_pressure_mirror_interaction(npi,npj,npartint,pres_mir,W_vol)
 ! Visibility criterion only for the representative pressure value of the 
 ! surface body particles (influence on graphics only)
-         if (bp_arr(npi)%surface) then
-            aux_scal = dot_product(rag_bp_f(:,npartint),bp_arr(npi)%normal)
-            if (aux_scal>1.d-12) then
-               bp_arr(npi)%pres = bp_arr(npi)%pres + pres_mir * W_vol
-               Sum_W_vol = Sum_W_vol + W_vol
-            endif
+         aux_scal = dot_product(rag_bp_f(:,npartint),bp_arr(npi)%normal)
+         if ((aux_scal>1.d-12).or.(.not.(bp_arr(npi)%surface))) then
+            bp_arr(npi)%pres = bp_arr(npi)%pres + pres_mir * W_vol
+            Sum_W_vol = Sum_W_vol + W_vol
          endif
       endif
 ! Body-particle mirror pressure: end
