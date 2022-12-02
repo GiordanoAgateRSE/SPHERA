@@ -27,7 +27,7 @@
 #    CODE VERSION
 #       Suggested values:
 #          " v9_UserInitials_CommitDate"
-VERSION = v9_
+VERSION = v10_
 
 #    COMPILER
 #       Suggested values:
