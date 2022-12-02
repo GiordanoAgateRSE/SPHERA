@@ -1,13 +1,13 @@
 !-------------------------------------------------------------------------------
-! SPHERA v.9.0.0 (Smoothed Particle Hydrodynamics research software; mesh-less
+! SPHERA v.10.0.0 (Smoothed Particle Hydrodynamics research software; mesh-less
 ! Computational Fluid Dynamics code).
 ! Copyright 2005-2022 (RSE SpA -formerly ERSE SpA, formerly CESI RICERCA,
 ! formerly CESI-Ricerca di Sistema)
 !
 ! SPHERA authors and email contact are provided on SPHERA documentation.
 !
-! This file is part of SPHERA v.9.0.0
-! SPHERA v.9.0.0 is free software: you can redistribute it and/or modify
+! This file is part of SPHERA v.10.0.0
+! SPHERA v.10.0.0 is free software: you can redistribute it and/or modify
 ! it under the terms of the GNU General Public License as published by
 ! the Free Software Foundation, either version 3 of the License, or
 ! (at your option) any later version.
@@ -22,7 +22,7 @@
 ! Program unit: Matrix_Inversion_3x3  
 ! Description: Computation of the inverse (inv) of a provided 3x3 matrix (mat).
 !              It is also called in 2D. The program unit "Matrix_Inversion_2x2" 
-!              was available until SPHERA v.9.0.0.   
+!              was available until SPHERA v.10.0.0.   
 !-------------------------------------------------------------------------------
 subroutine Matrix_Inversion_3x3(mat,inv,abs_det_thresh,test)
 !------------------------
