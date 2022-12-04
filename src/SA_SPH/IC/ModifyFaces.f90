@@ -19,9 +19,9 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: ModifyFaces                   
+! Program unit: ModifyFaces
 ! Description: To generate triangles from quadrilaterals (partitioning along the
-!              shortest diagonal)                 
+!              shortest diagonal)
 !-------------------------------------------------------------------------------
 #ifdef SPACE_3D
 subroutine ModifyFaces(NumberEntities)

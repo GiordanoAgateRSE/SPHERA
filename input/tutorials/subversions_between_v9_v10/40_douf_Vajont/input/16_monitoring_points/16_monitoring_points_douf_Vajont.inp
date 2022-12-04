@@ -1,0 +1,60 @@
+!-------------------------------------------------------------------------------
+! Software name and copyright: douf_Vajont
+!    Copyright 2021 (RSE SpA, authored by Andrea Amicarelli)
+! Software description: input file for SPHERA v.9.0.0 (RSE SpA).
+!    Dam-overtopping urban flood of the Vajont disaster (Friuli Venezia Giulia 
+!    and Veneto, Italy). Reference: Amicarelli (2021, SPHERA github repository).
+!
+! This file is part of douf_Vajont.
+! douf_Vajont is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! douf_Vajont is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with douf_Vajont. If not, see <http://www.gnu.org/licenses/>.
+!-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+! Description: 16_monitoring_points_douf_Vajont.inp
+!                   The commented template of the main input file of SPHERA
+!                   v.9.0.0 (RSE SpA) is integrated in this file, in compliance
+!                   with the requirements of the licenses of both the software
+!                   tools.
+!-------------------------------------------------------------------------------
+
+!-------------------------------------------------------------------------------
+! Legend:
+!    !    beginning of a comment line. Additional comment lines are permitted.
+!    ![?] beginning of a definition/guideline
+!    <>   the content within these brackets represents an input variable
+!    ![*] beginning of the structure of a line with the names of the input 
+!         variables
+!    ...  possible repetitions of the above/previous data
+!    !<<< beginning of a section to be filled with input data. The lines of 
+!         this section must be replaced with a "!" if they do not have to be 
+!         filled for the test case chosen (included the start line and the end 
+!         line of the unusable sections).
+!    ___  space to be replaced with an input value
+!    !>>> end of a section to be filled with input data
+!    =    start of a variable value
+!-------------------------------------------------------------------------------
+
+##### control points #####
+!-------------------------------------------------------------------------------
+![?] Input parameters for monitoring points
+![?] The whole section can be effectively modified at any restart time.
+!-------------------------------------------------------------------------------
+![*] <x_monitor_point_1> <y_monitor_point_1> <z_monitor_point_1>
+![*] ...
+![*] <x_monitor_point_n> <y_monitor_point_n> <z_monitor_point_n>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___ ___ ___
+!...
+!___ ___ ___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+##### end control points #####

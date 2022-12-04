@@ -46,11 +46,13 @@ double precision :: det
 #endif
 double precision,dimension(3) :: pesogradj,dvar,aux_vec,d_rho_dvelALE1
 double precision,dimension(3) :: aux_vec_1,aux_vec_2,aux_vec_3,aux_vec_4
-double precision,dimension(3) :: aux_vec_5,aux_vec_6,aux_vec_1_ALE_frozen
+double precision,dimension(3) :: aux_vec_6,aux_vec_1_ALE_frozen
 double precision,dimension(3) :: aux_vec_1_ALE,aux_vec_2_ALE,aux_vec_3_ALE
 double precision,dimension(3) :: aux_vec_2_ALE_frozen,aux_vec_3_ALE_frozen
 double precision,dimension(9) :: dvdi
-#ifdef SPACE_2D
+#ifdef SPACE_3D
+double precision,dimension(3) :: aux_vec_5
+#elif defined SPACE_2D
 double precision,dimension(9) :: aij
 #endif
 !------------------------

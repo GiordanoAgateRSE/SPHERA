@@ -1,0 +1,200 @@
+!-------------------------------------------------------------------------------
+! Software name and copyright: wave_motion_for_WaveSAX
+!    Copyright 2016-2022 (RSE SpA, authored by Andrea Amicarelli)
+! Software description: input file for SPHERA v.10.0.0 (RSE SpA).
+!   Wave motion for WaveSAX (without device). References: Amicarelli et al. 
+!      (2022, preprint); Amicarelli et al. (2020, CPC).
+!
+! This file is part of wave_motion_for_WaveSAX.
+! water_shipping is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! wave_motion_for_WaveSAX is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with wave_motion_for_WaveSAX. If not, see <http://www.gnu.org/licenses/>.
+!-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+! Description: 07_DBSPH_wave_motion_for_WaveSAX.inp
+!              Part of the main input file template of SPHERA. The commented 
+!              template has to be filled in for any particular test case. 
+!              Comment lines and blank lines do not disturb the execution.
+!-------------------------------------------------------------------------------
+
+!-------------------------------------------------------------------------------
+! Legend:
+!    !    beginning of a comment line. Additional comment lines are permitted.
+!    ![?] beginning of a definition/guideline
+!    <>   the content within these brackets represents an input variable
+!    ![*] beginning of the structure of a line with the names of the input 
+!         variables
+!    ...  possible repetitions of the above/previous data
+!    !<<< beginning of a section to be filled with input data. The lines of 
+!         this section must be replaced with a "!" if they do not have to be 
+!         filled for the test case chosen (included the start line and the end 
+!         line of the unusable sections).
+!    ___  space to be replaced with an input value
+!    !>>> end of a section to be filled with input data
+!    =    start of a variable value
+!-------------------------------------------------------------------------------
+
+##### DBSPH #####
+!-------------------------------------------------------------------------------
+![?] Input parameters for the DB-SPH boundary treatment scheme
+![?] <dx_f/dx_w>: ratio between the fluid particle size and the wall element 
+!    size
+![?] <MUSCL_boundary_flag>: logical flag to activate boundary terms for MUSCL
+![?] <k_w>: semi-particle depth coefficient
+![?] <slip_ID>: ID for slip conditions
+!    =0 (free-slip)
+!    =1 (no-slip) 
+!    =2 (run-time choice depending on the inner shear viscosity terms in SPH-NS 
+!    balance equations)
+![?] <Gamma_limiter_flag>: logical variable to activate or deactivate Gamma 
+!    upper limiter
+!    =.true. (default value)
+![?] <negative_wall_p_allowed>: pressure of wall elements can be negative 
+!    (logical)
+![?] <FS_allowed>: free surface detection can be avoided (logical) 
+![?] <n_monitor_regions>
+!    =0
+!    =1 (to estimate the Force along x-direction)
+![?] This folder also contains the file "surface_mesh_list.txt" with the 
+!    following structure: first line: string "surface_mesh_list.txt"; 
+!    following lines: list of of the file names of the surface meshes (one file 
+!    name per line). The file mentioned above is mandatory only when the DB-SPH 
+!    scheme is activated.
+!-------------------------------------------------------------------------------
+![*] <dx_f/dx_w> <MUSCL_boundary_flag> <k_w> <slip_ID> <Gamma_limiter_flag>
+![*] <negative_wall_p_allowed> <FS_allowed>
+![*] <n_monitor_points> <n_monitor_regions>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+1. .false. 0.5 2 .false.
+.false. .true.
+0 0
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] if (n_monitor_points>0) then
+!-------------------------------------------------------------------------------
+![*] <ID_wall_element_monitor_1> ... <ID_wall_element_monitor_n>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___ ... ___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] endif (n_monitor_points>0)
+![?] if (n_monitor_regions>0) then
+![?] <xmin_1>,<xmax_1>,<ymin_1>,<xmax_1>,<zmin_1>,<zmax_1>: vertices of 
+!    monitoring region n.1 
+![?] <xmin_last>,<xmax_last>,<ymin_last>,<xmax_last>,<zmin_last>,<zmax_last>: 
+!    vertices of the last monitoring region
+!-------------------------------------------------------------------------------
+![*] <xmin_1> <xmax_1> <ymin_1> <xmax_1> <zmin_1> <zmax_1>
+![*] ...
+![*] <xmin_last> <xmax_last> <ymin_last> <xmax_last> <zmin_last> <zmax_last>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___ ___ ___ ___ ___ ___
+!...
+!___ ___ ___ ___ ___ ___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] endif (n_monitor_regions>0)
+![?] <surface_mesh_files>: number of files of the DBSPH surface meshes
+![?] <flag_in-built_monitors>: logical; flag for in-built motion of control 
+!    lines and DB-SPH frontiers
+!-------------------------------------------------------------------------------
+![*] <surface_mesh_files> <flag_in-built_monitors>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+0 .false.
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] NUMBER_OF_SURFACE_MESHES: do i=1,surface_mesh_file
+!-------------------------------------------------------------------------------
+![?] <imposed_kinematics_i_records>: number of records which describe a 
+!    possible imposed kinematics for the i-th DBSPH surface mesh file
+![?] <rotation_centre_i>: centre of rotation for DB-SPH frontiers for the i-th 
+!    DBSPH surface mesh file)
+!-------------------------------------------------------------------------------
+![*] <imposed_kinematics_i_records> <rotation_centre_i_x> <rotation_centre_i_y> 
+!    <rotation_centre_i_z>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___ ___ ___ ___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] if (imposed_kinematics_i_records>0) then
+![?] <i_time_last>,<i_velocity_x_last>,<i_velocity_y_last>,<i_velocity_z_last>, 
+!    <i_omega_x_last>,<i_omega_y_last>,<i_omega_z_last>: records for the 
+!    imposed kinematics to frontiers for the i-th DBSPH surface mesh file); 
+!    time of the last record should be slightly higher than time at the end of 
+!    the simulation. 
+!-------------------------------------------------------------------------------
+![*] <i_time_1> <i_velocity_x_1> <i_velocity_y_1> <i_velocity_z_1> 
+!    <i_omega_x_1> <i_omega_y_1> <i_omega_z_1>
+![*] ...
+![*] <i_time_last> <i_velocity_x_last> <i_velocity_y_last> <i_velocity_z_last> 
+!    <i_omega_x_last> <i_omega_y_last> <i_omega_z_last>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___ ___ ___ ___ ___ ___ ___
+!...
+!___ ___ ___ ___ ___ ___ ___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] endif (imposed_kinematics_i_records>0)
+!-------------------------------------------------------------------------------
+![?] enddo NUMBER_OF_SURFACE_MESHES
+!-------------------------------------------------------------------------------
+![?] <n_inlet>: number of inlet sections
+![?] <n_outlet>: number of outlet sections
+![?] <ply_n_face_vert>: maximum number of vertices of the DB-SPH faces as 
+!    represented in the ".ply" input files(3/4/5/6 in 3D, 4 in 2D)
+!-------------------------------------------------------------------------------
+![*] <n_inlet> <n_outlet> <ply_n_face_vert>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+0 0 3
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] if (n_inlet>0) then
+![?] inlet section data: position, normal, velocity, length.
+!-------------------------------------------------------------------------------
+![*] <x_inlet_1> <y_inlet_1> <z_inlet_1> <n_x_inlet_1> <n_y_inlet_1> 
+!    <n_z_inlet_1> <velocity_x_inlet_1> <velocity_y_inlet_1> 
+!    <velocity_z_inlet_1> <L_inlet_1>
+![*] ...
+![*] <x_inlet_last> <y_inlet_last> <z_inlet_last> <n_x_inlet_last> 
+!    <n_y_inlet_last> <n_z_inlet_last> <velocity_x_inlet_last> 
+!    <velocity_y_inlet_last> <velocity_z_inlet_last> <L_inlet_last>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___ ___ ___ ___ ___ ___ ___ ___ ___ ___
+!...
+!___ ___ ___ ___ ___ ___ ___ ___ ___ ___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] endif (n_inlet>0)
+![?] if (n_outlet>0) then
+![?] outlet section data: position, normal, length, pressure
+!-------------------------------------------------------------------------------
+![*] <x_outlet_1> <y_outlet_1> <z_outlet_1> <n_x_outlet_1> <n_y_outlet_1> 
+!    <n_z_outlet_1> <L_outlet_1> <p_outlet_1>
+![*] ...
+![*] <x_outlet_last> <y_outlet_last> <z_outlet_last> <n_x_outlet_last> 
+!    <n_y_outlet_last> <n_z_outlet_last> <L_outlet_last> <p_outlet_last>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___ ___ ___ ___ ___ ___ ___ ___
+!...
+!___ ___ ___ ___ ___ ___ ___ ___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] if (n_outlet>0): end
+!-------------------------------------------------------------------------------
+##### END DBSPH #####

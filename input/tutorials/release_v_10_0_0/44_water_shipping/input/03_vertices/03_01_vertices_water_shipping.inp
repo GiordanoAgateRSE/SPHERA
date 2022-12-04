@@ -1,0 +1,106 @@
+!-------------------------------------------------------------------------------
+! Software name and copyright: water_shipping
+!    Copyright 2022 (RSE SpA, authored by Andrea Amicarelli)
+! Software description: input file for SPHERA v.10.0.0 (RSE SpA).
+!    SPH simulation reproducing the water shipping scaled experiment of 
+!    Kawamura et. al 2016 (Ocean Engineering). Reference: RSE, Ricerca di 
+!    Sistema, 2022.
+!
+! This file is part of water_shipping.
+! water_shipping is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! water_shipping is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with water_shipping. If not, see <http://www.gnu.org/licenses/>.
+!-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+! Description: 03_01_vertices_water_shipping.inp
+!              Part of the main input file template of SPHERA. The commented 
+!              template has to be filled in for any particular test case. 
+!              Comment lines and blank lines do not disturb the execution.
+!-------------------------------------------------------------------------------
+
+!-------------------------------------------------------------------------------
+! Legend:
+!    !    beginning of a comment line. Additional comment lines are permitted.
+!    ![?] beginning of a definition/guideline
+!    <>   the content within these brackets represents an input variable
+!    ![*] beginning of the structure of a line with the names of the input 
+!         variables
+!    ...  possible repetitions of the above/previous data
+!    !<<< beginning of a section to be filled with input data. The lines of 
+!         this section must be replaced with a "!" if they do not have to be 
+!         filled for the test case chosen (included the start line and the end 
+!         line of the unusable sections).
+!    ___  space to be replaced with an input value
+!    !>>> end of a section to be filled with input data
+!    =    start of a variable value
+!-------------------------------------------------------------------------------
+
+![?] Input parameters for the boundary vertices of the fluid domain  
+![?] The DB-SPH boundary treatment scheme requires the vertices of the 
+!    parallelepiped domain as a "contour" and the "fictitious air reservoirs" 
+![?] The SA-SPH boundary treatment scheme requires the vertices of the wall 
+!    frontiers
+![?] At least one SA-SPH frontier is requested to define the edges of the 
+!    numerical domain. This frontier is possibly fictitious and does not 
+!    interact with the SPH particles.
+![?] No gaps on vertex IDs are permitted
+![?] <Vertex_x>,<Vertex_y>,<Vertex_z>: first vertex coordinates starting from 
+!    the possible topography from which reservoirs are possibly extruded
+![?] <Last_vertex_ID>,<Last_vertex_x>,<Last_vertex_y>,<Last_vertex_z>: last 
+!    vertex data
+![?] The numerical inlet section is the physical inlet section moved upstream 
+!    for a distance of 2h, with the possible wet walls of the same section.
+!-------------------------------------------------------------------------------
+![*] <First_vertex_ID> <Vertex_x> <Vertex_y> <Vertex_z>
+![*] ...
+![*] <Last_vertex_ID> <Vertex_x> <Vertex_y> <Vertex_z>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+! Original vertex pattern from the SPHERA tutorial wave_motion_for_WaveSAX.inp  
+! Tank
+ 1  0.000 -0.750 0.000
+ 2 14.490 -0.750 0.000
+ 3 14.490  0.750 0.000
+ 4  0.000  0.750 0.000
+ 5  0.000 -0.750 2.160
+ 6 14.490 -0.750 2.160
+ 7 14.490  0.750 2.160
+ 8  0.000  0.750 2.160
+! Additional points for the water body
+ 9  0.000 -0.750 1.200
+10  0.000  0.750 1.200
+11 14.490 -0.750 0.000
+12 14.490 -0.750 1.200
+13 14.490  0.750 0.000
+14 14.490  0.750 1.200
+! Additional points for possible bottom slope change
+15  1.000 -0.750 0.000
+16  1.000  0.750 0.000
+! Additional points below the wavemaker
+17 15.000 -0.750 0.000
+18 15.000  0.750 0.000
+! Additional points by the wavemaker
+19 15.000 -0.750 2.160
+20 15.000  0.750 2.160
+! Additional points below the wavemaker and the reservoir at the monitoring 
+! line for the undisturbed wave
+21 13.917 -0.750 0.000
+22 13.917  0.750 0.000
+! Additional points for the open sections
+23 -0.001 -0.751 -0.001
+24 15.001 -0.751 -0.001
+25 15.001  0.751 -0.001
+26 -0.001  0.751 -0.001
+27 -0.001 -0.751  2.161
+28 15.001 -0.751  2.161
+29 15.001  0.751  2.161
+30 -0.001  0.751  2.161
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------

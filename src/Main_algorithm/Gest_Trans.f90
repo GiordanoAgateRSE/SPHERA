@@ -40,6 +40,8 @@ integer(4),parameter :: ner0 = 0
 integer(4) :: npi,i,ier,k,k1,k2,nlinee,nvalori,alloc_stat
 #ifdef SPACE_3D
 integer(4) :: n_vertices_main_wall,NumCellmax,kk
+#endif
+#if (defined SPACE_3D) || (defined SOLID_BODIES) 
 character(100) :: array_name
 #endif
 character(len=lencard) :: nomsub = "GEST_TRANS"

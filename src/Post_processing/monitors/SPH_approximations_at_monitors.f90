@@ -367,12 +367,17 @@ if (pglocal%sigma_fp<1.d-1) then
    else
 ! 0th-order consistency SPH approximations: temporary variables
       dens_cons0 = dens_cons0 / pglocal%sigma_fp
+#ifdef SOLID_BODIES      
       if (bp_for_pres) then
          pres_cons0 = pres_cons0 / pglocal%sigma_fp_bp
          else
             pres_cons0 = pres_cons0 / pglocal%sigma_fp
       endif
       vel_cons0(1:3) = vel_cons0(1:3) / pglocal%sigma_fp_sbp
+#else      
+      pres_cons0 = pres_cons0 / pglocal%sigma_fp
+      vel_cons0(1:3) = vel_cons0(1:3) / pglocal%sigma_fp
+#endif
       if (.not.input_any_t%C1_monitors) then
 ! 0th-order consistency SPH approximations
 ! rho

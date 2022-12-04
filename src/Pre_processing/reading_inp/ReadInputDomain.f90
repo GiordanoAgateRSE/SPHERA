@@ -19,8 +19,8 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: ReadInputDomain                       
-! Description:                        
+! Program unit: ReadInputDomain
+! Description: Reading input data to define the numerical domain
 !-------------------------------------------------------------------------------
 subroutine ReadInputDomain(ainp,comment,nrighe,ier,ninp,ulog)
 !------------------------

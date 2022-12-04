@@ -30,7 +30,7 @@
 !              coordinates (x,y,z) of each point are stored; in the forth column
 !              the relative d_alpha (portion of solid angle relative to the
 !              point, necessary for integrations) is stored. BITcols = 4.
-!              (Di Monaco et al., 2011, EACFM)                        
+!              (Di Monaco et al., 2011, EACFM)
 !-------------------------------------------------------------------------------
 #ifdef SPACE_3D
 subroutine ComputeBoundaryIntegralTab

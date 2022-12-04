@@ -21,7 +21,7 @@
 !-------------------------------------------------------------------------------
 ! Program unit: DefineBoundarySideRelativeAngles2D                                      
 ! Description: Detection of the previous adjacent side and associated relative
-!              angle (for each boundary side). (Di Monaco et al., 2011, EACFM)                        
+!              angle (for each boundary side). (Di Monaco et al., 2011, EACFM)
 !-------------------------------------------------------------------------------
 #ifdef SPACE_2D
 subroutine DefineBoundarySideRelativeAngles2D

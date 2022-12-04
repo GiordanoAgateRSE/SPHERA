@@ -79,6 +79,13 @@ interface
          double precision,intent(in) :: u_t_0,d_50,r_0w
          double precision,intent(out) :: slip_coefficient_0w,ni_T_0w
    end subroutine wall_function_for_SASPH
+   subroutine MatrixProduct(AA,BB,CC,nr,nrc,nc)
+      implicit none
+      integer(4),intent(in) :: nr,nrc,nc
+      double precision,intent(in),dimension(nr,nrc) :: AA
+      double precision,intent(in),dimension(nrc,nc) :: BB
+      double precision,intent(inout),dimension(nr,nc) :: CC
+   end subroutine MatrixProduct
 end interface
 !------------------------
 ! Allocations

@@ -19,14 +19,11 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: WIntegr                                          
-! Description: Computing the definite integral  
-!2h
-!S W(r,h)rdr
-!ri
-!              (Di Monaco et al., 2011, EACFM) . The constant "KERNELCONST2D" 
-!              refers to the beta-spline cubic kernel, which always applies 
-!              to "J_3,w" also for the 2D pressure-gradient term.                      
+! Program unit: WIntegr
+! Description: Computing the definite integral WIntegr (Di Monaco et al., 2011, 
+!              EACFM) . The constant "KERNELCONST2D" refers to the beta-spline 
+!              cubic kernel, which always applies to "J_3,w" also for the 2D 
+!              pressure-gradient term.
 !-------------------------------------------------------------------------------
 #ifdef SPACE_2D
 double precision function WIntegr(ri,hh) 

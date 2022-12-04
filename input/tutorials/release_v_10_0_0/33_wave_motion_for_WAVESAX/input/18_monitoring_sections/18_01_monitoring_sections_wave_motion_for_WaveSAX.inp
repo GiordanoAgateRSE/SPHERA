@@ -1,0 +1,76 @@
+!-------------------------------------------------------------------------------
+! Software name and copyright: wave_motion_for_WaveSAX
+!    Copyright 2016-2022 (RSE SpA, authored by Andrea Amicarelli)
+! Software description: input file for SPHERA v.10.0.0 (RSE SpA).
+!   Wave motion for WaveSAX (without device). References: Amicarelli et al. 
+!      (2022, preprint); Amicarelli et al. (2020, CPC).
+!
+! This file is part of wave_motion_for_WaveSAX.
+! water_shipping is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! wave_motion_for_WaveSAX is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with wave_motion_for_WaveSAX. If not, see <http://www.gnu.org/licenses/>.
+!-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+! Description: 18_01_monitoring_sections_wave_motion_for_WaveSAX.inp
+!              Part of the main input file template of SPHERA. The commented 
+!              template has to be filled in for any particular test case. 
+!              Comment lines and blank lines do not disturb the execution.
+!-------------------------------------------------------------------------------
+
+!-------------------------------------------------------------------------------
+! Legend:
+!    !    beginning of a comment line. Additional comment lines are permitted.
+!    ![?] beginning of a definition/guideline
+!    <>   the content within these brackets represents an input variable
+!    ![*] beginning of the structure of a line with the names of the input 
+!         variables
+!    ...  possible repetitions of the above/previous data
+!    !<<< beginning of a section to be filled with input data. The lines of 
+!         this section must be replaced with a "!" if they do not have to be 
+!         filled for the test case chosen (included the start line and the end 
+!         line of the unusable sections).
+!    ___  space to be replaced with an input value
+!    !>>> end of a section to be filled with input data
+!    =    start of a variable value
+!-------------------------------------------------------------------------------
+
+![?] <n_vertices>: number of vertices describing a monitoring section for the 
+!    flow rate (current section)
+!    =3
+!    =4
+![?] <vertex_1_x>, <vertex_1_y>, <vertex_1_z>, <vertex_2_x>, <vertex_2_y>,
+!    <vertex_2_z>, <vertex_3_x>, <vertex_3_y>, <vertex_3_z>, <vertex_4_x>,
+!    <vertex_4_y>, <vertex_4_z>: vertices of the current section (anti-clockwise 
+!    order viewing the section face from downstream)
+!-------------------------------------------------------------------------------
+![*] <section_ID>
+![*] <n_vertices>
+![*] <vertex_1_x> <vertex_1_y> <vertex_1_z>
+![*] <vertex_2_x> <vertex_2_y> <vertex_2_z>
+![*] <vertex_3_x> <vertex_3_y> <vertex_3_z>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+1
+4
+2.8 4.25 20.40
+2.8 5.   21.80
+2.8 5.75 20.40 
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] if (n_vertices==4) then
+!-------------------------------------------------------------------------------
+![*] <vertex_4_x> <vertex_4_y> <vertex_4_z>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+2.8 5. 19.
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] endif (n_vertices==4)
+!-------------------------------------------------------------------------------

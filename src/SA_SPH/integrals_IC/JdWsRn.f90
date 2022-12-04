@@ -26,7 +26,7 @@
 !              JdWsRn(n=2): Integral (dW_norm/dq * q**2 * dq) * h**2 
 !                           (from q_0b to 2)
 !              JdWsRn(n=3): Integral (dW_norm/dq * q**3 * dq) * h**2 
-!                           (from q_0b to 2)             
+!                           (from q_0b to 2)
 !-------------------------------------------------------------------------------
 #ifdef SPACE_3D
 double precision function JdWsRn(ro,n,kernel)

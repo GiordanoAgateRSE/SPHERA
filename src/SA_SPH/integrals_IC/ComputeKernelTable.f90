@@ -19,9 +19,9 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: ComputeKernelTable                                   
+! Program unit: ComputeKernelTable
 ! Description: To compute and save in kerneltab(0:ktrows,0:ktcols) the 
-!              following values (Di Monaco et al., 201, EACFM):
+!              following values (Di Monaco et al., 2011, EACFM):
 !                 kerneltab(0:ktrows,0) = rob = r_0b/h = q_0b
 !                 kerneltab(0:ktrows,1) = Integral (W_norm * q**2 * dq) 
 !                                         (from q_0b to 2)

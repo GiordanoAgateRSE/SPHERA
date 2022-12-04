@@ -23,14 +23,12 @@
 ! Description: 3D erosion criterion based on the formulation of both Shields-van
 !              Rijn 2D criterion and Seminara et al.(2002) 3D criterion.
 !              2D Shields erosion criterion based on pure fluid - fixed bed 
-!              interactions  (Manenti et al., 2012, JHE). 
-!              Extension for bed load transport layer - fixed bed interactions 
-!              (Amicarelli et al., CAF, submitted).
-!              Extension to the third dimension (Amicarelli et al., CAF, 
-!              submitted).
-!              k=3d_90 (Manenti et al., 2012, JHE; Amicarelli et al., CAF, 
-!              submitted).
-!              Shields threshold for low Re* (Amicarelli et al., CAF,submitted).  
+!              interactions (Manenti et al., 2012, JHE). Extension for 
+!              bed-load transport layer - fixed bed interactions (Amicarelli & 
+!              Agate, 2014, SPHERIC). Extension to the third dimension 
+!              (Amicarelli & Agate, 2014, SPHERIC). k=3d_90 (Manenti et al., 
+!              2012, JHE; Amicarelli & Agate, 2014, SPHERIC). Shields threshold 
+!              for low Re* (Amicarelli & Agate, 2014, SPHERIC).  
 !-------------------------------------------------------------------------------
 subroutine Shields(npi)
 !------------------------

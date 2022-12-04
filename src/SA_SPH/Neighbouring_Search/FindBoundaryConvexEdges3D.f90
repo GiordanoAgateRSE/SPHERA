@@ -23,7 +23,7 @@
 ! Description: To look for possible edges with an associated convex geometry. 
 !              Their geometrical data are saved in BoundaryConvexEdge as 
 !              TyBoundaryConvexEdge.
-!              (Di Monaco et al., 2011, EACFM)                      
+!              (Di Monaco et al., 2011, EACFM)
 !-------------------------------------------------------------------------------
 #ifdef SPACE_3D
 subroutine FindBoundaryConvexEdges3D

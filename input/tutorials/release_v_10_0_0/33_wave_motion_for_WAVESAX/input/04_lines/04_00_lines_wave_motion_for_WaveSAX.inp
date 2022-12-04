@@ -1,0 +1,76 @@
+!-------------------------------------------------------------------------------
+! Software name and copyright: wave_motion_for_WaveSAX
+!    Copyright 2016-2022 (RSE SpA, authored by Andrea Amicarelli)
+! Software description: input file for SPHERA v.10.0.0 (RSE SpA).
+!   Wave motion for WaveSAX (without device). References: Amicarelli et al. 
+!      (2022, preprint); Amicarelli et al. (2020, CPC).
+!
+! This file is part of wave_motion_for_WaveSAX.
+! water_shipping is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! wave_motion_for_WaveSAX is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with wave_motion_for_WaveSAX. If not, see <http://www.gnu.org/licenses/>.
+!-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+! Description: 04_00_lines_wave_motion_for_WaveSAX.inp
+!              Part of the main input file template of SPHERA. The commented 
+!              template has to be filled in for any particular test case. 
+!              Comment lines and blank lines do not disturb the execution.
+!-------------------------------------------------------------------------------
+
+!-------------------------------------------------------------------------------
+! Legend:
+!    !    beginning of a comment line. Additional comment lines are permitted.
+!    ![?] beginning of a definition/guideline
+!    <>   the content within these brackets represents an input variable
+!    ![*] beginning of the structure of a line with the names of the input 
+!         variables
+!    ...  possible repetitions of the above/previous data
+!    !<<< beginning of a section to be filled with input data. The lines of 
+!         this section must be replaced with a "!" if they do not have to be 
+!         filled for the test case chosen (included the start line and the end 
+!         line of the unusable sections).
+!    ___  space to be replaced with an input value
+!    !>>> end of a section to be filled with input data
+!    =    start of a variable value
+!-------------------------------------------------------------------------------
+
+!-------------------------------------------------------------------------------
+![?] if (2D) then
+!-------------------------------------------------------------------------------
+!##### LINES #####
+![?] 2D input parameters for the boundary lines of the fluid domain
+![?] 2D boundary lines for wall frontiers, inlet/outlet sections, fluid 
+!    reservoirs.
+![?] In case of DB-SPH boundary treatment scheme, the code requires the lines of 
+!    the parallelepiped domain as a "perimeter" and the "fictitious reservoirs".
+![?] In case of SA-SPH boundary treatment scheme, the code requires the lines 
+!    of the boundaries
+![?] Add the token "&" or ">" at the end of a line for continuation lines
+![?] No gaps on line IDs are permitted
+![?] <line_1_vertex_1>,...,<line_1_vertex_last>: first line vertices
+![?] <line_last_ID>,<line_last_vertex_1>,...,<line_last_vertex_last>: last line 
+!    data
+![?] The first vertex of an inlet section is the highest one: its height is 
+!    time-dependent in run-time.
+!-------------------------------------------------------------------------------
+![*] <line_first_ID> <line_first_vertex_1> ... <line_first_vertex_last>
+![*] ...
+![*] <line_last_ID> <line_last_vertex_1> ... <line_last_vertex_last>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___ ___ ... ___
+!...
+!___ ___ ... ___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+!##### END LINES #####
+!-------------------------------------------------------------------------------
+![?] endif (2D)
+!-------------------------------------------------------------------------------

@@ -1,0 +1,129 @@
+!-------------------------------------------------------------------------------
+! Software name and copyright: wave_motion_for_WaveSAX
+!    Copyright 2016-2022 (RSE SpA, authored by Andrea Amicarelli)
+! Software description: input file for SPHERA v.10.0.0 (RSE SpA).
+!   Wave motion for WaveSAX (without device). References: Amicarelli et al. 
+!      (2022, preprint); Amicarelli et al. (2020, CPC).
+!
+! This file is part of wave_motion_for_WaveSAX.
+! water_shipping is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! wave_motion_for_WaveSAX is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with wave_motion_for_WaveSAX. If not, see <http://www.gnu.org/licenses/>.
+!-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+! Description: 05_01_faces_wave_motion_for_WaveSAX.inp
+!              Part of the main input file template of SPHERA. The commented 
+!              template has to be filled in for any particular test case. 
+!              Comment lines and blank lines do not disturb the execution.
+!-------------------------------------------------------------------------------
+
+!-------------------------------------------------------------------------------
+! Legend:
+!    !    beginning of a comment line. Additional comment lines are permitted.
+!    ![?] beginning of a definition/guideline
+!    <>   the content within these brackets represents an input variable
+!    ![*] beginning of the structure of a line with the names of the input 
+!         variables
+!    ...  possible repetitions of the above/previous data
+!    !<<< beginning of a section to be filled with input data. The lines of 
+!         this section must be replaced with a "!" if they do not have to be 
+!         filled for the test case chosen (included the start line and the end 
+!         line of the unusable sections).
+!    ___  space to be replaced with an input value
+!    !>>> end of a section to be filled with input data
+!    =    start of a variable value
+!-------------------------------------------------------------------------------
+
+![?] 3D input parameters for the boundary faces of the fluid domain
+![?] 3D boundary faces for wall frontiers, inlet/outlet sections, fluid 
+!    reservoirs.
+![?] In case of DB-SPH boundary treatment scheme, the code requires the faces of 
+!    the parallelepiped domain as a "perimeter" and the "fictitious reservoirs".
+![?] In case of SA-SPH boundary treatment scheme, the code requires the 
+!    actual boundary faces.
+![?] In case a fluid reservoir needs to be partitioned, then each partition 
+!    needs a dedicated "perimeter" item.
+![?] The last 1/2/3 vertex IDs are 0 in case of pentagonal / quadrilateral / 
+!    triangular faces.
+![?] SA-SPH boundary normal vectors and reservoir face normal vectors point 
+!    inward the fluid domain: not the best convention (clockwise list of points 
+!    if looking from outside the fluid domain).
+![?] For "perimeter" boundaries: the vertices have to be adjacent, but there is 
+!    no rule about the vertex order (better clockwise to keep coherence with 
+!    SA-SPH walls).
+![?] Faces can only be triangles or rectangles (generic quadrilaterals are not 
+!    permitted). As an exception, "perimeter" faces can also be planar 
+!    (i.e., non-skew) quadrilaterals, planar pentagons and planar hexagons.
+![?] No gaps on face IDs are permitted
+![?] <face_1_vertex_1>,...,<face_1_vertex_6>,<face_1_zone_ID>: first face 
+!    data. The value "-1" is mandatory for meaningless vertex IDs (e.g., 5th 
+!    and 6th vertices of a quadrilateral).
+![?] <face_last_ID>,<face_last_vertex_1>,...,<face_last_vertex_6>,
+!    <face_last_zone_ID>: last face data
+![?] The first two vertices of an inlet section are the highest ones: their 
+!    height is time-dependent in run-time. 
+!-------------------------------------------------------------------------------
+![*] 1 <face_first_vertex_1> ... <face_1_vertex_6> <face_1_zone_ID>
+![*] ...
+![*] <face_last_ID> <face_last_vertex_1> ... <face_last_vertex_6> 
+!    <face_last_zone_ID>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+! Tank
+! Lateral walls
+ 1 15  1  5 -1 -1 -1 1
+ 2  5  6 15 -1 -1 -1 1
+ 3  6  2 21 -1 -1 -1 1
+ 4 21 15  6 -1 -1 -1 1
+ 5  7  8  4 -1 -1 -1 1
+ 6  4 16  7 -1 -1 -1 1
+! 7 16 22  3 -1 -1 -1 1
+ 7  3  7 16 -1 -1 -1 1
+! Coast face
+ 8  1  4  8  5 -1 -1 1
+! Bottom inclined face
+ 9 15 21 22 16 -1 -1 1
+! Bottom flat face
+10  1 15 16  4 -1 -1 1
+! Face below the wavemaker
+11 21 17 18 22 -1 -1 1
+! Additional lateral walls by the wavemaker
+12 19 17  2  6 -1 -1 1
+13  7  3 18 20 -1 -1 1
+! Water body: lateral walls
+14 15  1  9 12 -1 -1 2
+15 14 10  4 16 -1 -1 2
+16 12  2 21 15 -1 -1 2
+17 16 22  3 14 -1 -1 2
+! Water body: coast face
+18  1  4 10  9 -1 -1 2
+! Water body: bottom inclined face
+19 15 21 22 16 -1 -1 2
+! Water body: bottom flat face
+20  1 15 16  4 -1 -1 2
+! Water body: part of the face below the wavemaker
+21 21  2  3 22 -1 -1 2
+! Water body: top face
+22 14 12  9 10 -1 -1 2
+! Water body: face in contact with the wavemaker
+23 11 12 14 13 -1 -1 2
+! Open_section_top
+24 30 29 28 27 -1 -1 3
+! Open_section_bottom
+25 23 24 25 26 -1 -1 4
+! Open_section_wavemaker
+26 24 28 29 25 -1 -1 5
+! Open_section_coast
+27 27 30 26 23 -1 -1 6
+! Open_section_left
+28 23 27 28 24 -1 -1 7
+! Open_section_right
+29 25 29 30 26 -1 -1 8
+!>>>****************************************************************************

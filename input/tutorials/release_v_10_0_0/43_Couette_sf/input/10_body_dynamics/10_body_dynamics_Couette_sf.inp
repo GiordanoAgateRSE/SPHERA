@@ -1,0 +1,528 @@
+!-------------------------------------------------------------------------------
+! Software name and copyright: Couette_sf
+!    Copyright 2022 (RSE SpA, authored by Andrea Amicarelli)
+! Software description: input file for SPHERA v.10.0.0 (RSE SpA).
+!    Reference: Amicarelli et al. (preprint, 2022)
+!
+! This file is part of Couette_sf.
+! Couette_sf is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! Couette_sf is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with Couette_sf. If not, see <http://www.gnu.org/licenses/>.
+!-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+! Description: 10_body_dynamics_Couette_sf.inp
+!              The commented template of the main input file of SPHERA
+!              v.10.0.0 (RSE SpA) is integrated in this file, in compliance
+!              with the requirements of the licenses of both the software
+!              tools.
+!-------------------------------------------------------------------------------
+
+!-------------------------------------------------------------------------------
+! Legend:
+!    !    beginning of a comment line. Additional comment lines are permitted.
+!    ![?] beginning of a definition/guideline
+!    <>   the content within these brackets represents an input variable
+!    ![*] beginning of the structure of a line with the names of the input 
+!         variables
+!    ...  possible repetitions of the above/previous data
+!    !<<< beginning of a section to be filled with input data. The lines of 
+!         this section must be replaced with a "!" if they do not have to be 
+!         filled for the test case chosen (included the start line and the end 
+!         line of the unusable sections).
+!    ___  space to be replaced with an input value
+!    !>>> end of a section to be filled with input data
+!    =    start of a variable value
+!-------------------------------------------------------------------------------
+
+!-------------------------------------------------------------------------------
+![?] if (n_bodies>0) then
+!-------------------------------------------------------------------------------
+##### BODY DYNAMICS #####
+!-------------------------------------------------------------------------------
+![?] Input parameters for the scheme on body transport in fluid flows. 
+![?] Bodies with imposed kinematics are listed after all the bodies with 
+!    computed dynamics.
+![?] Body particles cannot exit the numerical domain.
+![?] <n_bodies>: number of transported solid bodies (both meshed and handmade 
+!                bodies)
+![?] <dx/dx_body>: ratio between fluid particle size and body particle size 
+!                  for hand-made solid bodies
+![?] <friction_angle>: in radians
+!    >=0. (friction angle for body-frontier interactions)
+!    <0. (sliding friction depends on the local slope angle instead of the 
+!         friction angle);
+![?] <time_max_no_gravity_force>
+!    >=0. (gravity force is deactivated until this time)
+!    <0. (no deactivation)
+![?] <time_max_no_body_frontier_impingements>
+!    >=0. (body-frontier impingements are deactivated until this time)
+!    <0. (no deactivation)
+![?] <body_minimum_pressure_limiter>
+!    =.true. (no negative pressure on the body surface)
+!    =.false. (no limiter)
+![?] <body_maximum_pressure_limiter>
+!    =.true. (maximum pressure on the body surface is limited by physical
+!             constraints)
+!    =.false. (no limiter);
+![?] <FSI_slip_conditions>
+!    =0 (free-slip conditions for FSI)
+!    =1 (no-slip conditions for FSI)
+!    =2 (free-slip conditions for the Momentum Equation; mirror velocity as 
+!        solid velocity for the Continuity Equation)
+!    =3 (no-slip conditions for the Momentum Equation; mirror velocity as 
+!        solid velocity for the Continuity Equation)
+![?] <thin_walls>
+!    =.true. (treatment for submerged boundary thin walls, far from other 
+!    boundary types)
+!    =.false. (no treatment for submerged boundary thin walls, far from other 
+!    boundary types)
+![?] <c_ini_rem_fp_sb>: coefficient for the initial removal of fluid particles 
+!    within solid bodies. This only refine the initial geometry of the fluid 
+!    bodies around the surfaces of solid bodies.
+!    =1. (default value)
+![?] <remove_fluid_in_body>: logical flag to remove/keep fluid particles 
+!    which have crossed a fluid-body interface
+!-------------------------------------------------------------------------------
+![*] <n_bodies> <dx/dx_body> <friction_angle> <time_max_no_gravity_force> 
+!    <time_max_no_body_frontier_impingements> <body_minimum_pressure_limiter> 
+!    <body_maximum_pressure_limiter> <FSI_slip_conditions> <thin_walls> 
+!    <c_ini_rem_fp_sb> <remove_fluid_in_body>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+2 2.58 0. -999. -999. .false. .false. 3 .false. 0.5 .true.
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] <ID_body>: body ID
+!    =1,2,...,n (without missing values between the first and last IDs)
+![?] <n_elem>: number of elements of the body
+!    =0 (for CAE-made bodies)
+![?] <CAE>
+!    =.true. (CAE-made body read from a ".vtu" file)
+!    =.false. (handmade body whose body elements are declared in this file)
+!    CAE-made bodies IDs follow the handmade bodies (if any) at the end of the 
+!    list. CAE-made body IDs follow the alphabetic order of the ".vtu" files in 
+!    the "vtu" folder.
+![*] <body_mass>: in case of imposed kinematics, the body mass is not 
+!    influential
+![?] <pos_CM>: position of the centre of mass (Initial Conditions)
+![?] <Ic_flag>
+!    =0 (mass moment of inertia is computed)
+!    =1 (mass moment of inertia is imposed; in case of imposed kinematics, "Ic" 
+!       values are not influential)
+!-------------------------------------------------------------------------------
+![*] <ID_body> <n_elem> <CAE>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+1 0 .true.
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] if (CAE.and.3D) then
+![?] <vec_bp_CAE_trans(1:3)>: vector (x,y,z) added to the positions of the body 
+!    particles of the current CAE-made solid body. Instead, the centre of mass 
+!    of the body has to be translated via the vector 
+!    (<pos_CM_x>, <pos_CM_y>, <pos_CM_z>). The input positions 
+!    <vec_bp_CAE_trans(1:3)> and 
+!    (<pos_CM_x>, <pos_CM_y>, <pos_CM_z>) have to be consistent.
+!-------------------------------------------------------------------------------
+![*] <vec_bp_CAE_trans(1:3)>
+!-------------------------------------------------------------------------------
+0. 0. 0.
+!-------------------------------------------------------------------------------
+![?] <surface_detection>
+!    =1: Surface body particles are detected from the definition of vertices 
+!        and cells. E.g., this option is useful in the absence of any input 
+!        value for "nSurfaceLayers".
+!    =2: Surface body particles are detected from the input values of the 
+!        variable "nSurfaceLayers" in the ".vtu" file. E.g., this option is 
+!        useful if the mesh boundary-refinement single-level completely wraps 
+!        the solid body.
+!    =3: Surface body particles are detected if any of the above criteria are 
+!        respected. E.g., this option is useful if the mesh boundary-refinement 
+!        single-level does not completely wrap the solid body.
+![?] <n_flip_normals_ni_IDs>: number of surface body particles whose 
+!        normal component "n_i" needs to be flipped (due to unfixable bugs in 
+!        the input mesh). They are detected by the particle IDs provided as 
+!        input data after analyzing the output of the initial conditions.
+!-------------------------------------------------------------------------------
+![*] <surface_detection> <n_flip_normals_nx_IDs> <n_flip_normals_ny_IDs> 
+!    <n_flip_normals_nz_IDs>
+!-------------------------------------------------------------------------------
+2 0 0 0
+!-------------------------------------------------------------------------------
+![?] NUMBER_OF_FLIP_NORMALS_NX_IDS: do i=1,n_flip_normals_nx_IDs
+!-------------------------------------------------------------------------------
+![*] <particle_ID_i>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] enddo NUMBER_OF_FLIP_NORMALS_NX_IDS
+!-------------------------------------------------------------------------------
+![?] NUMBER_OF_FLIP_NORMALS_NY_IDS: do i=1,n_flip_normals_ny_IDs
+!-------------------------------------------------------------------------------
+![*] <particle_ID_i>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] enddo NUMBER_OF_FLIP_NORMALS_NY_IDS
+!-------------------------------------------------------------------------------
+![?] enddo NUMBER_OF_FLIP_NORMALS_NZ_IDS
+!-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+![?] NUMBER_OF_FLIP_NORMALS_NY_IDS: do i=1,n_flip_normals_nz_IDs
+!-------------------------------------------------------------------------------
+![*] <particle_ID_i>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] enddo NUMBER_OF_FLIP_NORMALS_NZ_IDS
+!-------------------------------------------------------------------------------
+![?] endif (CAE.and.3D)
+!-------------------------------------------------------------------------------
+![*] <body_mass>
+![*] <pos_CM_x> <pos_CM_y> <pos_CM_z>
+![*] <Ic_flag>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+0.
+0. 0. 0.
+1
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] if (Ic_flag==1) then
+!-------------------------------------------------------------------------------
+![*] <Ic(1,1)> <Ic(1,2)> <Ic(1,3)>
+![*] <Ic(2,1)> <Ic(2,2)> <Ic(2,3)>
+![*] <Ic(3,1)> <Ic(3,2)> <Ic(3,3)>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+0. 0. 0.
+0. 0. 0.
+0. 0. 0.
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] endif (Ic_flag==1)
+![?] Rotation of the body with respect to the reference system at "t=0". This 
+!    rotation is cumulative with respect to the element initial rotation. This 
+!    rotation is relevant only for IC and I/O purposes.
+![?] <n_R_IO>: rotation axis (unit vector)
+![?] <teta_R_IO>: rotation angle
+![?] <pos_rotC>: centre of rotation for the vector alfa just to configure the 
+!    initial orientation in the global reference system
+![?] <vel_CM>: velocity of the centre of mass at "t=0"
+![?] <omega>: angular velocity of the body at "t=0"
+![?] <imposed_kinematics_flag>
+!    =0 (no imposed kinematics; dynamics is computed)
+!    =1 (kinematics is imposed)
+![?] <n_records>: number of records which describe the imposed kinematics
+!-------------------------------------------------------------------------------
+![*] <n_R_IO_x> <n_R_IO_y> <n_R_IO_z> <teta_R_IO>
+![*] <pos_rotC_x> <pos_rotC_y> <pos_rotC_z>
+![*] <vel_CM_x> <vel_CM_y> <vel_CM_z>
+![*] <omega_x> <omega_y> <omega_z>
+![*] <imposed_kinematics_flag> <n_records>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+0. 0. 1. 0.
+0. 0. 0.
+0. 0. 0.
+0. 0. 2.98038E-3
+1 2
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] NUMBER_OF_BODY_DYNAMICS_KINEMATICS_RECORDS: do i=1,n_records
+!-------------------------------------------------------------------------------
+![?] i-th record for the imposed kinematics of the body (the time of the last 
+!    record should be slightly higher than time at the end of the simulation) 
+!-------------------------------------------------------------------------------
+![*] <time_i> <velocity_x_i> <velocity_y_i> <velocity_z_i> <omega_x_i> 
+!    <omega_y_i> <omega_z_i>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+   0.00000     0.00000     0.00000     0.00000     0.00000     0.00000     2.98038E-3
+3000.00000     0.00000     0.00000     0.00000     0.00000     0.00000     2.98038E-3
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] enddo NUMBER_OF_BODY_DYNAMICS_KINEMATICS_RECORDS
+!-------------------------------------------------------------------------------
+![?] NUMBER_OF_BODY_ELEMENTS: do i=1,n_body_elements
+!-------------------------------------------------------------------------------
+![?] <element_ID>: ID of the current element of the body
+![?] <L_x>,<L_y>,<L_z>: side lengths of the element
+![?] <pos_CM_elem>: position of the centre of mass of the element at "t=0"
+![?] Rotation of the body element with respect to the reference system at 
+!    "t=0". This rotation is cumulative with respect to the body IC rotation. 
+!    This rotation is relevant only for IC and I/O purposes.
+![?] <n_R_IO_elem>: rotation axis (unit vector)
+![?] <teta_R_IO_elem>: rotation angle
+!    =0 (for CAE-made body particles) 
+![?] <face_zmin_flag>,<face_zmax_flag>,<face_ymin_flag>,<face_ymax_flag>, 
+!    <face_xmin_flag>,<face_xmax_flag>: integer flags to activate the normal 
+!    vectors of surface body particles only if "face_..._flag=1"; x/y/z_min/max 
+!    indicates the 6 faces of the element (parallelepiped)
+![?] <xmin>, <xmax>, <ymin>, <ymax>, <zmin>, <zmax>: spatial limits (in the 
+!    global reference system before the initial rotation) to deactivate 
+!    particle masses if ((x>=xmin).or.(x<=xmax).or.(y>=ymin).or.(y<=ymax).or.
+!    (z>=zmin).or(z<=zmax)) foor boolean operations on elements/body
+!-------------------------------------------------------------------------------
+![*] <element_ID>
+![*] <L_x> <L_y> <L_z>
+![*] <pos_CM_elem_x> <pos_CM_elem_y> <pos_CM_elem_z>
+![*] <n_R_IO_elem_x> <n_R_IO_elem_y> <n_R_IO_elem_z> <teta_R_IO_elem>
+![*] <face_zmin_flag> <face_zmax_flag> <face_ymin_flag> <face_ymax_flag> 
+!    <face_xmin_flag> <face_xmax_flag>
+![*] <xmin> <xmax> <ymin> <ymax> <zmin> <zmax>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___
+!___ ___ ___
+!___ ___ ___
+!___ ___ ___ ___
+!___ ___ ___ ___ ___ ___
+!___ ___ ___ ___ ___ ___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] enddo NUMBER_OF_BODY_ELEMENTS
+!-------------------------------------------------------------------------------
+![?] other body records
+!-------------------------------------------------------------------------------
+![*] ...
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!-------------------------------------------------------------------------------
+![?] <ID_body>: body ID
+!    =1,2,...,n (without missing values between the first and last IDs)
+![?] <n_elem>: number of elements of the body
+!    =0 (for CAE-made bodies)
+![?] <CAE>
+!    =.true. (CAE-made body read from a ".vtu" file)
+!    =.false. (handmade body whose body elements are declared in this file)
+!    CAE-made bodies IDs follow the handmade bodies (if any) at the end of the
+!    list. CAE-made body IDs follow the alphabetic order of the ".vtu" files in
+!    the "vtu" folder.
+![*] <body_mass>: in case of imposed kinematics, the body mass is not
+!    influential
+![?] <pos_CM>: position of the centre of mass (Initial Conditions)
+![?] <Ic_flag>
+!    =0 (mass moment of inertia is computed)
+!    =1 (mass moment of inertia is imposed; in case of imposed kinematics, "Ic"
+!       values are not influential)
+!-------------------------------------------------------------------------------
+![*] <ID_body> <n_elem> <CAE>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+2 0 .true.
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] if (CAE.and.3D) then
+![?] <vec_bp_CAE_trans(1:3)>: vector (x,y,z) added to the positions of the body 
+!    particles of the current CAE-made solid body. Instead, the centre of mass 
+!    of the body has to be translated via the vector 
+!    (<pos_CM_x>, <pos_CM_y>, <pos_CM_z>). The input positions 
+!    <vec_bp_CAE_trans(1:3)> and 
+!    (<pos_CM_x>, <pos_CM_y>, <pos_CM_z>) have to be consistent.
+!-------------------------------------------------------------------------------
+![*] <vec_bp_CAE_trans(1:3)>
+!-------------------------------------------------------------------------------
+0. 0. 0.
+!-------------------------------------------------------------------------------
+![?] <surface_detection>
+!    =1: Surface body particles are detected from the definition of vertices 
+!        and cells. E.g., this option is useful in the absence of any input 
+!        value for "nSurfaceLayers".
+!    =2: Surface body particles are detected from the input values of the 
+!        variable "nSurfaceLayers" in the ".vtu" file. E.g., this option is 
+!        useful if the mesh boundary-refinement single-level completely wraps 
+!        the solid body.
+!    =3: Surface body particles are detected if any of the above criteria are 
+!        respected. E.g., this option is useful if the mesh boundary-refinement 
+!        single-level does not completely wrap the solid body.
+![?] <n_flip_normals_ni_IDs>: number of surface body particles whose 
+!        normal component "n_i" needs to be flipped (due to unfixable bugs in 
+!        the input mesh). They are detected by the particle IDs provided as 
+!        input data after analyzing the output of the initial conditions.
+!-------------------------------------------------------------------------------
+![*] <surface_detection> <n_flip_normals_nx_IDs> <n_flip_normals_ny_IDs> 
+!    <n_flip_normals_nz_IDs>
+!-------------------------------------------------------------------------------
+2 0 0 0
+!-------------------------------------------------------------------------------
+![?] NUMBER_OF_FLIP_NORMALS_NX_IDS: do i=1,n_flip_normals_nx_IDs
+!-------------------------------------------------------------------------------
+![*] <particle_ID_i>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] enddo NUMBER_OF_FLIP_NORMALS_NX_IDS
+!-------------------------------------------------------------------------------
+![?] NUMBER_OF_FLIP_NORMALS_NY_IDS: do i=1,n_flip_normals_ny_IDs
+!-------------------------------------------------------------------------------
+![*] <particle_ID_i>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] enddo NUMBER_OF_FLIP_NORMALS_NY_IDS
+!-------------------------------------------------------------------------------
+![?] enddo NUMBER_OF_FLIP_NORMALS_NZ_IDS
+!-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+![?] NUMBER_OF_FLIP_NORMALS_NY_IDS: do i=1,n_flip_normals_nz_IDs
+!-------------------------------------------------------------------------------
+![*] <particle_ID_i>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] enddo NUMBER_OF_FLIP_NORMALS_NZ_IDS
+!-------------------------------------------------------------------------------
+![?] endif (CAE.and.3D)
+!-------------------------------------------------------------------------------
+![*] <body_mass>
+![*] <pos_CM_x> <pos_CM_y> <pos_CM_z>
+![*] <Ic_flag>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+0.
+0. 0. 0.
+1
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] if (Ic_flag==1) then
+!-------------------------------------------------------------------------------
+![*] <Ic(1,1)> <Ic(1,2)> <Ic(1,3)>
+![*] <Ic(2,1)> <Ic(2,2)> <Ic(2,3)>
+![*] <Ic(3,1)> <Ic(3,2)> <Ic(3,3)>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+0. 0. 0.
+0. 0. 0.
+0. 0. 0.
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] endif (Ic_flag==1)
+![?] Rotation of the body with respect to the reference system at "t=0". This
+!    rotation is cumulative with respect to the element initial rotation. This
+!    rotation is relevant only for IC and I/O purposes.
+![?] <n_R_IO>: rotation axis (unit vector)
+![?] <teta_R_IO>: rotation angle
+![?] <pos_rotC>: centre of rotation for the vector alfa just to configure the
+!    initial orientation in the global reference system
+![?] <vel_CM>: velocity of the centre of mass at "t=0"
+![?] <omega>: angular velocity of the body at "t=0"
+![?] <imposed_kinematics_flag>
+!    =0 (no imposed kinematics; dynamics is computed)
+!    =1 (kinematics is imposed)
+![?] <n_records>: number of records which describe the imposed kinematics
+!-------------------------------------------------------------------------------
+![*] <n_R_IO_x> <n_R_IO_y> <n_R_IO_z> <teta_R_IO>
+![*] <pos_rotC_x> <pos_rotC_y> <pos_rotC_z>
+![*] <vel_CM_x> <vel_CM_y> <vel_CM_z>
+![*] <omega_x> <omega_y> <omega_z>
+![*] <imposed_kinematics_flag> <n_records>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+0. 0. 1. 0.
+0. 0. 0.
+0. 0. 0.
+0. 0. 2.98038E-3
+1 2
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] NUMBER_OF_BODY_DYNAMICS_KINEMATICS_RECORDS: do i=1,n_records
+!-------------------------------------------------------------------------------
+![?] i-th record for the imposed kinematics of the body (the time of the last
+!    record should be slightly higher than time at the end of the simulation)
+!-------------------------------------------------------------------------------
+![*] <time_i> <velocity_x_i> <velocity_y_i> <velocity_z_i> <omega_x_i>
+!    <omega_y_i> <omega_z_i>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+   0.00000     0.00000     0.00000     0.00000     0.00000     0.00000     2.98038E-3
+3000.00000     0.00000     0.00000     0.00000     0.00000     0.00000     2.98038E-3
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] enddo NUMBER_OF_BODY_DYNAMICS_KINEMATICS_RECORDS
+!-------------------------------------------------------------------------------
+![?] NUMBER_OF_BODY_ELEMENTS: do i=1,n_body_elements
+!-------------------------------------------------------------------------------
+![?] <element_ID>: ID of the current element of the body
+![?] <L_x>,<L_y>,<L_z>: side lengths of the element
+![?] <pos_CM_elem>: position of the centre of mass of the element at "t=0"
+![?] Rotation of the body element with respect to the reference system at
+!    "t=0". This rotation is cumulative with respect to the body IC rotation.
+!    This rotation is relevant only for IC and I/O purposes.
+![?] <n_R_IO_elem>: rotation axis (unit vector)
+![?] <teta_R_IO_elem>: rotation angle
+!    =0 (for CAE-made body particles)
+![?] <face_zmin_flag>,<face_zmax_flag>,<face_ymin_flag>,<face_ymax_flag>,
+!    <face_xmin_flag>,<face_xmax_flag>: integer flags to activate the normal
+!    vectors of surface body particles only if "face_..._flag=1"; x/y/z_min/max
+!    indicates the 6 faces of the element (parallelepiped)
+![?] <xmin>, <xmax>, <ymin>, <ymax>, <zmin>, <zmax>: spatial limits (in the
+!    global reference system before the initial rotation) to deactivate
+!    particle masses if ((x>=xmin).or.(x<=xmax).or.(y>=ymin).or.(y<=ymax).or.
+!    (z>=zmin).or(z<=zmax)) foor boolean operations on elements/body
+!-------------------------------------------------------------------------------
+![*] <element_ID>
+![*] <L_x> <L_y> <L_z>
+![*] <pos_CM_elem_x> <pos_CM_elem_y> <pos_CM_elem_z>
+![*] <n_R_IO_elem_x> <n_R_IO_elem_y> <n_R_IO_elem_z> <teta_R_IO_elem>
+![*] <face_zmin_flag> <face_zmax_flag> <face_ymin_flag> <face_ymax_flag>
+!    <face_xmin_flag> <face_xmax_flag>
+![*] <xmin> <xmax> <ymin> <ymax> <zmin> <zmax>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___
+!___ ___ ___
+!___ ___ ___
+!___ ___ ___ ___
+!___ ___ ___ ___ ___ ___
+!___ ___ ___ ___ ___ ___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] enddo NUMBER_OF_BODY_ELEMENTS
+!-------------------------------------------------------------------------------
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] CAE-made solid bodies can be managed for 3D simulations. 
+![?] The "input/10_body_dynamics/vtu" folder hosts the possible 
+![?] tetrahedral meshes for the 
+![?] initial conditions of the CAE-made SPH body particles. Each volume mesh is 
+![?] associated with a solid body. The IDs of the CAE-made solid bodies 
+![?] follow the IDs of the handmade bodies defined above, if any. For 
+![?] the CAE-made bodies, the ".vtu" file replaces the above sub-section on 
+![?] the body elements. Each CAE-made solid body is 
+![?] represented by no body element by definition. 
+![?] Each “.vtu” file has to contain the following variables: "types" 
+![?] (“CellData”, ".vtu" cell type); "connectivity" (“CellData”): vertex ID 
+![?] belonging to the ".vtu" cell; "Points" ("PointData"): ".vtu" point 
+![?] position.
+![?] The CAE-made meshes for solid bodies are produced by SnappyHexMesh 
+![?] (OpenFOAM, OpenCFD Ltd). The normals 
+![?] of the resulting ".vtu" input files to SPHERA point outward the solid 
+![?] bodies. SPHERA flips the normal vectors for the SPH solid 
+![?] particles starting from the vertex order of the face vertices, not 
+![?] directly from the original face normals, which in general, are unavailable 
+![?] in the ".vtu" mesh file (the normals are recomputed).
+!-------------------------------------------------------------------------------
+##### end BODY DYNAMICS #####
+!-------------------------------------------------------------------------------
+! endif (n_bodies>0)
+!-------------------------------------------------------------------------------

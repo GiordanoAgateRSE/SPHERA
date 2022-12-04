@@ -20,8 +20,8 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: Leapfrog_continuity
-! Description: Leapfrog time integration scheme for: the continuity equation; 
-!              the volume balance equation. Mass update.
+! Description: Leapfrog time integration scheme for mass-related balance 
+!              equations.
 !-------------------------------------------------------------------------------
 subroutine Leapfrog_continuity
 !------------------------

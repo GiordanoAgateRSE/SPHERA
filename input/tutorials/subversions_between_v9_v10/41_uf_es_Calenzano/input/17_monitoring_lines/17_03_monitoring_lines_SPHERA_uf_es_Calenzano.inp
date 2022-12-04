@@ -1,0 +1,82 @@
+!-------------------------------------------------------------------------------
+! Software name and copyright: uf_es_Calenzano
+!    Copyright 2020 (RSE SpA, authored by Andrea Amicarelli)
+! Software description: input file for SPHERA v.9.0.0 (RSE SpA).
+!    Urban flood demonstrative scenario in Calenzano (Firenze, Italy) with 
+!    damage to an electrical substation. Reference: Amicarelli (2020, 
+!    SPHERA github repository).
+!
+! This file is part of uf_es_Calenzano.
+! uf_es_Calenzano is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! uf_es_Calenzano is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with uf_es_Calenzano. If not, see <http://www.gnu.org/licenses/>.
+!-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+! File description: 17_03_monitoring_lines_uf_es_Calenzano.inp
+!                   The commented template of the main input file of SPHERA  
+!                   v.9.0.0 (RSE SpA) is integrated in this file, in compliance 
+!                   with the requirements of the licenses of both the software 
+!                   tools.
+!-------------------------------------------------------------------------------
+
+!-------------------------------------------------------------------------------
+! Legend:
+!    !    beginning of a comment line. Additional comment lines are permitted.
+!    ![?] beginning of a definition/guideline
+!    <>   the content within these brackets represents an input variable
+!    ![*] beginning of the structure of a line with the names of the input 
+!         variables
+!    ...  possible repetitions of the above/previous data
+!    !<<< beginning of a section to be filled with input data. The lines of 
+!         this section must be replaced with a "!" if they do not have to be 
+!         filled for the test case chosen (included the start line and the end 
+!         line of the unusable sections).
+!    ___  space to be replaced with an input value
+!    !>>> end of a section to be filled with input data
+!    =    start of a variable value
+!-------------------------------------------------------------------------------
+
+![*] <line_name>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+H3_outlet_downstream
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] if (2D) then
+![?] The edge order is not arbitrary to detect the free surface. Edge 1 is the 
+!    farest from the free surface.  
+!-------------------------------------------------------------------------------
+![*] <edge_1_x> <edge_1_z>
+![*] <edge_2_x> <edge_2_z>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___ ___
+!___ ___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] endif (2D)
+![?] if (3D) then
+!-------------------------------------------------------------------------------
+![*] <edge_1_x> <edge_1_y> <edge_1_z>
+![*] <edge_2_x> <edge_1_y> <edge_2_z>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+549.500 440.500 45.620
+549.500 440.500 55.620
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] endif (3D)
+!-------------------------------------------------------------------------------
+![*] <number_of_discretization_points>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+200
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------

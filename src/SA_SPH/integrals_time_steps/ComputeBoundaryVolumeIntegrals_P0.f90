@@ -20,7 +20,8 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: ComputeBoundaryVolumeIntegrals_P0
-! Description: (only in 3D) (Di Monaco et al., 2011, EACFM)
+! Description: Computation of boundary volume integrals in 3D (Di Monaco et 
+!              al., 2011, EACFM)
 !-------------------------------------------------------------------------------
 #ifdef SPACE_3D
 subroutine ComputeBoundaryVolumeIntegrals_P0(icbf,Clobface,LocX,IntWdV,        &

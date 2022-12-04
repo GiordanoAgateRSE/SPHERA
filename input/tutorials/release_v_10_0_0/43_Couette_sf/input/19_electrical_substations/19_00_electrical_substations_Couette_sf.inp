@@ -1,0 +1,61 @@
+!-------------------------------------------------------------------------------
+! Software name and copyright: Couette_sf
+!    Copyright 2022 (RSE SpA, authored by Andrea Amicarelli)
+! Software description: input file for SPHERA v.10.0.0 (RSE SpA).
+!    Reference: Amicarelli et al. (preprint, 2022)
+!
+! This file is part of Couette_sf.
+! Couette_sf is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! Couette_sf is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with Couette_sf. If not, see <http://www.gnu.org/licenses/>.
+!-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+! Description: 19_00_electrical_substations_Couette_sf.inp
+!              The commented template of the main input file of SPHERA 
+!              v.10.0.0 (RSE SpA) is integrated in this file, in compliance
+!              with the requirements of the licenses of both the software
+!              tools.
+!-------------------------------------------------------------------------------
+
+!-------------------------------------------------------------------------------
+! Legend:
+!    !    beginning of a comment line. Additional comment lines are permitted.
+!    ![?] beginning of a definition/guideline
+!    <>   the content within these brackets represents an input variable
+!    ![*] beginning of the structure of a line with the names of the input 
+!         variables
+!    ...  possible repetitions of the above/previous data
+!    !<<< beginning of a section to be filled with input data. The lines of 
+!         this section must be replaced with a "!" if they do not have to be 
+!         filled for the test case chosen (included the start line and the end 
+!         line of the unusable sections).
+!    ___  space to be replaced with an input value
+!    !>>> end of a section to be filled with input data
+!    =    start of a variable value
+!-------------------------------------------------------------------------------
+
+##### substations #####
+!-------------------------------------------------------------------------------
+![?] Input variables for monitoring the electrical substations (both 
+!    high-voltage transmission substations, medium-voltage distribution 
+!    substations and low-voltage distribution substations).
+![?] From a plan view, each substation is described by a polygon (either 
+!    triangle, quadrilateral, pentagon or hexagon).
+![?] <n_sub>: number of the substations
+![?] <dt_out_sub>: writing time step duration for monitoring the substations
+!-------------------------------------------------------------------------------
+![*] <n_sub> <dt_out_sub>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+0 0.
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] NUMBER_OF_SUBSTATIONS: do i=1,NUMBER_OF_SUBSTATIONS
+!-------------------------------------------------------------------------------

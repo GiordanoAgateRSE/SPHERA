@@ -22,7 +22,7 @@
 ! Program unit: BoundaryMassForceMatrix3D                                
 ! Description: Generation of the generalized boundary mass force matrix RN, on 
 !              the base of the cosine matrix T and the parameter Fi. (Di Monaco 
-!              et al., 2011, EACFM)                        
+!              et al., 2011, EACFM)
 !-------------------------------------------------------------------------------
 #ifdef SPACE_3D
 subroutine BoundaryMassForceMatrix3D(T,RMF,Fi)

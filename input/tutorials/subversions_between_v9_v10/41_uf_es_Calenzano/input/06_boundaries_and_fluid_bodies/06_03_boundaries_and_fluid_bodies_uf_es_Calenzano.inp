@@ -1,0 +1,318 @@
+!-------------------------------------------------------------------------------
+! Software name and copyright: uf_es_Calenzano
+!    Copyright 2020 (RSE SpA, authored by Andrea Amicarelli)
+! Software description: input file for SPHERA v.9.0.0 (RSE SpA).
+!    Urban flood demonstrative scenario in Calenzano (Firenze, Italy) with 
+!    damage to an electrical substation. Reference: Amicarelli (2020, 
+!    SPHERA github repository).
+!
+! This file is part of uf_es_Calenzano.
+! uf_es_Calenzano is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! uf_es_Calenzano is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with uf_es_Calenzano. If not, see <http://www.gnu.org/licenses/>.
+!-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+! File description: 06_03_boundaries_and_fluid_bodies_uf_es_Calenzano.inp
+!                   The commented template of the main input file of SPHERA  
+!                   v.9.0.0 (RSE SpA) is integrated in this file, in compliance 
+!                   with the requirements of the licenses of both the software 
+!                   tools.
+!-------------------------------------------------------------------------------
+
+!-------------------------------------------------------------------------------
+! Legend:
+!    !    beginning of a comment line. Additional comment lines are permitted.
+!    ![?] beginning of a definition/guideline
+!    <>   the content within these brackets represents an input variable
+!    ![*] beginning of the structure of a line with the names of the input 
+!         variables
+!    ...  possible repetitions of the above/previous data
+!    !<<< beginning of a section to be filled with input data. The lines of 
+!         this section must be replaced with a "!" if they do not have to be 
+!         filled for the test case chosen (included the start line and the end 
+!         line of the unusable sections).
+!    ___  space to be replaced with an input value
+!    !>>> end of a section to be filled with input data
+!    =    start of a variable value
+!-------------------------------------------------------------------------------
+
+!-------------------------------------------------------------------------------
+![?] <Boundary_type>
+!    =fixed (wall frontier)
+!    =perimeter (fluid reservoir)
+!    =source(inlet section)
+!    =open (only removal of the particles crossing the boundary)
+!    =tapis (not recommended)
+!    =leve (not recommended)
+!    =pool (not recommended)
+!    =flow (not recommended)
+!    =crit (not recommended)
+!    =velo (not recommended)
+!-------------------------------------------------------------------------------
+![*] Boundary_name
+![*] Boundary_ID
+![*] Boundary_type
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+outlet_downstream_left
+3
+open
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] if (Boundary_type=="fixed") then
+![?] <slip_coefficient_mode>
+!    =1 (slip coefficient from input)
+!    =2 (slip coefficient computed to impose the correct boundary shear stress, 
+!        as function of the Neutral Surface Boundary Layer velocity profile and 
+!        the active viscosity)
+![?] <laminar_flag_check>
+!    =.true. (check on laminar regime to activate shear stress terms at 
+!             boundaries in case of no-slip conditions; laminar regime check 
+!             has no effect in the inner domain)
+!    =.false. (no check: it always imposes no-slip conditions in case 
+!              "slip_coefficient" is 1.)
+!-------------------------------------------------------------------------------
+![*] <slip_coefficient_mode> <laminar_flag_check>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___ ___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] if (slip_coefficient_mode==1) then
+![?] <slip_coefficient>
+!    =1. (no-slip conditions; default choice for: laminar flows included dense 
+!        granular flows; 2D turbulent flows with very fine spatial resolution)
+!    =0. (free-slip conditions; default choice for turbulent flows)
+!-------------------------------------------------------------------------------
+![*] <slip_coefficient>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] endif (slip_coefficient_mode==1)
+![?] if (slip_coefficient_mode==2) then
+![?] Slip coefficient is computed accoding to the mixing-length turbulent 
+![?]    viscosity and the wall function velocity of the Surface Neutral 
+![?]    Boundary Layer (SNBL) for rough walls. Advanced choice for turbulent 
+![?]    flows.
+![?] <d_50>: mean diameter of the wall roughness elements around the wall 
+![?]         faces/lines.
+!-------------------------------------------------------------------------------
+![*] <d_50>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] endif (slip_Coefficient_mode==2)
+!-------------------------------------------------------------------------------
+![*] <RGBColor>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] endif (Boundary_type=="fixed")
+![?] if (Boundary_type=="perimeter") then
+![?] <colour_pattern>
+!    =uniform
+!    =bends
+![?] <colour_ID>
+!    =009EA8
+!-------------------------------------------------------------------------------
+![*] <fluid_ID>
+![*] <colour_pattern> <colour_ID>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___
+!___ ___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] if (motion_type=std) then
+![?] <motion_type>
+!    =std (computational particles)
+![?] <slip_condition>
+!    =0. (computational particles)
+!-------------------------------------------------------------------------------
+![*] <motion_type> <IC_velocity_x> <IC_velocity_y> <IC_velocity_z> 
+!    <slip_condition>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!std ___ ___ ___ ___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] endif (motion_type=std)
+![?] if (motion_type=law) then
+![?] <motion_type>
+!    =law (imposed kinematics; this value is converted in "fix" during the 
+!       simulation)
+![?] <n_records>: number of records for the imposed kinematics
+!-------------------------------------------------------------------------------
+![*] <motion_type> <n_records>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!law ___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] It follows the list of records for the imposed 3D translational 
+!    kinematics: time, vector velocity, record_ID
+!-------------------------------------------------------------------------------
+![?] NUMBER_OF_RECORDS_PARTICLE_KINEMATICS: do i=1,NUM_REC_PAR_KIN
+!-------------------------------------------------------------------------------
+![*] <time> <u> <v> <w> <record_ID>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___ ___ ___ ___ ___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] enddo NUMBER_OF_RECORDS_PARTICLE_KINEMATICS
+!-------------------------------------------------------------------------------
+![?] endif (motion_type=law)
+![?] <IC_pressure_type>
+!    =pa (homogeneous conditions)
+!    =qp (hydrostatic conditions with equivalent free surface level as input)
+!    =pl (hydrostatic conditions with equivalent free surface level equal to 
+!         the particle maximum height of a subset of boundaries)
+![?] <IC_pressure_value>: uniform pressure value (IC_pressure_type=pa), 
+!    equivalent free surface level (IC_pressure_type=qp; it is influential only 
+!    if there is no other medium along the vertical above the current medium), 
+!    ID indicating a subset of boundaries (IC_pressure_type=pl; only one subset 
+!    is allowed; real input datum then treated as an integer)
+!-------------------------------------------------------------------------------
+![*] <IC_pressure_type> <IC_pressure_value>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___ ___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] <IC_reservoir_type>
+!    =1 (vertices and faces)
+!    =2 (from Cartesian topography)
+![?] <Car_top_zone>: boundary ID of the underlying topography (influence only 
+!    if IC_reservoir_type==2)
+![?] <DBSPH_fictitious_reservoir_flag>
+!    =.true. (DB-SPH fictitious fluid particles to complete the kernel support 
+!             at the free-surface, in pre-processing)
+!    =.false. (no fictitious fluid particles)
+!-------------------------------------------------------------------------------
+![*] <IC_reservoir_type> <Car_top_zone> <DBSPH_fictitious_reservoir_flag>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___ ___ ___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] if ((IC_reservoir_type==2).and.(3D)) then
+![?] <dx_CartTopog>: spatial resolution of the Cartesian topography; 
+!    dx_CartTopog>=dx
+![?] <H_res>: height of the reservoir free surface
+![?] <ID_first_vertex>,<ID_last_vertex>: IDs of the first and and the last 
+!    vertices of the reference topography
+!-------------------------------------------------------------------------------
+![*] <dx_CartTopog> <H_res>
+![*] <ID_first_vertex>,<ID_last_vertex>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___ ___
+!___ ___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] <n_circum>: number of vertices circumscribing the horizontal projection of 
+!    the reservoir)=3,4
+![?] <circum_1_x>,<circum_1_y>: coordinates of the first point of the 2D figure 
+!    circumscribing the horizontal projection of the reservoir. Admitted 
+!    figures: triangles and convex non-degenerate quadrilateral (otherwise the 
+!    subroutine call for "point_inout_convex_non_degenerate_polygon" must be 
+!    replaced with other calls to subroutines such as 
+!    "point_inout_quadrilateral").
+![?] <circum_last_x>,<circum_last_y>: coordinates of the last point of the 2D 
+!    figure above
+!-------------------------------------------------------------------------------
+![*] <n_circum>
+![*] <circum_1_x> <circum_1_y>
+![*] ...
+![*] <circum_last_x> <circum_last_y>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___
+!___ ___
+!...
+!___ ___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] <dam_zone_n_vertices>: number of vertices of the 2D figure circumscribing 
+!    the horizontal projection of the dam zone)
+!    =3
+!    =4
+![?] Admitted figures: triangles and convex non-degenerate quadrilateral 
+!    (otherwise the subroutine call for 
+!    "point_inout_convex_non_degenerate_polygon" must be replaced with other 
+!    calls to subroutines such as "point_inout_quadrilateral"). From a plan 
+!    view, the vertices are provided anticlockwise.                    
+!-------------------------------------------------------------------------------
+![*] <dam_zone_ID> <dam_zone_n_vertices>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___ ___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] if (dam_zone_ID>0) then
+![?] <circum_dam_1_x>,<circum_dam_1_y>: first point of the 2D figure 
+!    circumscribing the horizontal projection of the dam zone
+![?] <circum_dam_last_x>,<circum_dam_last_y>: last point of the 2D figure above
+!-------------------------------------------------------------------------------
+![*] <circum_dam_1_x> <circum_dam_1_y>
+![*] ...
+![*] <circum_dam_last_x> <circum_dam_last_y>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___ ___
+!...
+!___ ___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] endif (dam_zone_ID>0)
+![?] endif (IC_reservoir_type==2) (3D)
+![?] endif (Boundary_type=="perimeter")
+![?] if (Boundary_type=="open") then
+![?] In case particles exit the numerical domain without passing through an 
+!    open section, the simulation slows down (beyond possible errors associated 
+!    with the particles above).
+!-------------------------------------------------------------------------------
+![*] <RGBColor>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+FF0000
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] endif (Boundary_type=="open")
+![?] if (Boundary_type=="source") then
+![?] <flowrate>: inlet velocity * inlet area
+![?] <BC_pressure_type>
+!    =pa (homogeneous conditions)
+!    =qp (hydrostatic conditions with equivalent free surface level as input)
+![?] <BC_pressure_value>: uniform pressure value (BC_pressure_type=pa), 
+!    equivalent free surface level (BC_pressure_type=qp; it is influential only 
+!    if there is no other medium along the vertical above the current medium)
+!-------------------------------------------------------------------------------
+![*] <fluid_ID>
+![*] <flowrate>
+![*] <BC_pressure_type> <BC_pressure_value>
+![*] <RGBColor>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___
+!___
+!___ ___
+!___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] endif (Boundary_type=="source")
+!-------------------------------------------------------------------------------

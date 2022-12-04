@@ -19,8 +19,8 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: ReadInputDrawOptions                       
-! Description:                        
+! Program unit: ReadInputDrawOptions
+! Description: Reading the output time step for the 3D fields
 !-------------------------------------------------------------------------------
 subroutine ReadInputDrawOptions(ainp,comment,nrighe,ier,ninp,ulog)
 !------------------------

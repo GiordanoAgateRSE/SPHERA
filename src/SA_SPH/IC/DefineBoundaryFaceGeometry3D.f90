@@ -19,9 +19,9 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: DefineBoundaryFaceGeometry3D                                    
+! Program unit: DefineBoundaryFaceGeometry3D
 ! Description: To define boundary faces from 3D geometry.
-!              (Di Monaco et al., 2011, EACFM)                        
+!              (Di Monaco et al., 2011, EACFM)
 !-------------------------------------------------------------------------------
 #ifdef SPACE_3D
 subroutine DefineBoundaryFaceGeometry3D

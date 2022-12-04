@@ -1,0 +1,101 @@
+!-------------------------------------------------------------------------------
+! Software name and copyright: water_shipping
+!    Copyright 2022 (RSE SpA, authored by Andrea Amicarelli)
+! Software description: input file for SPHERA v.10.0.0 (RSE SpA).
+!    SPH simulation reproducing the water shipping scaled experiment of 
+!    Kawamura et. al 2016 (Ocean Engineering). Reference: RSE, Ricerca di 
+!    Sistema, 2022.
+!
+! This file is part of water_shipping.
+! water_shipping is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! water_shipping is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with water_shipping. If not, see <http://www.gnu.org/licenses/>.
+!-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+! Description: 13_restart_water_shipping.inp
+!              Part of the main input file template of SPHERA. The commented 
+!              template has to be filled in for any particular test case. 
+!              Comment lines and blank lines do not disturb the execution.
+!-------------------------------------------------------------------------------
+
+!-------------------------------------------------------------------------------
+! Legend:
+!    !    beginning of a comment line. Additional comment lines are permitted.
+!    ![?] beginning of a definition/guideline
+!    <>   the content within these brackets represents an input variable
+!    ![*] beginning of the structure of a line with the names of the input 
+!         variables
+!    ...  possible repetitions of the above/previous data
+!    !<<< beginning of a section to be filled with input data. The lines of 
+!         this section must be replaced with a "!" if they do not have to be 
+!         filled for the test case chosen (included the start line and the end 
+!         line of the unusable sections).
+!    ___  space to be replaced with an input value
+!    !>>> end of a section to be filled with input data
+!    =    start of a variable value
+!-------------------------------------------------------------------------------
+
+##### restart #####
+!-------------------------------------------------------------------------------
+![?] The whole section can be effectively modified at any restart time.
+![?] <restart_mode>
+!    =time
+!    =step
+!    =last_time
+!-------------------------------------------------------------------------------
+![*] <restart_mode>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] if (<restart_mode>=="time") then
+![?] <restart_time>: positive time value in seconds; it has to be smaller than 
+!    the time value of the last restart output. As "restart_time_value" has to 
+!    be positive, restart from the very initial conditions is not possible at 
+!    the moment.
+!-------------------------------------------------------------------------------
+![*] <restart_time>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] endif (<restart_mode>=="time")
+![?] if (<restart_mode>=="step") then
+![?] <restart_step>: step number
+!-------------------------------------------------------------------------------
+![*] <restart_step>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] endif (<restart_mode>=="step")
+![?] if (<restart_mode>=="last_time") then
+![?] <restart_path>: path under which both the restart last time and the 
+!    restart data file are searched. Replace the token "/" with "*".
+!-------------------------------------------------------------------------------
+![*] <restart_path>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] endif (<restart_mode>=="last_time")
+![?] <restart_file>: restart file name (with file extension)
+!-------------------------------------------------------------------------------
+![*] <restart_file>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+##### end restart #####

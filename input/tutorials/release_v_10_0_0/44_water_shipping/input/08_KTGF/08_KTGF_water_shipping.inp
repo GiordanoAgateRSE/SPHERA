@@ -1,0 +1,160 @@
+!-------------------------------------------------------------------------------
+! Software name and copyright: water_shipping
+!    Copyright 2022 (RSE SpA, authored by Andrea Amicarelli)
+! Software description: input file for SPHERA v.10.0.0 (RSE SpA).
+!    SPH simulation reproducing the water shipping scaled experiment of 
+!    Kawamura et. al 2016 (Ocean Engineering). Reference: RSE, Ricerca di 
+!    Sistema, 2022.
+!
+! This file is part of water_shipping.
+! water_shipping is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! water_shipping is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with water_shipping. If not, see <http://www.gnu.org/licenses/>.
+!-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+! Description: 08_KTGF_water_shipping.inp
+!              Part of the main input file template of SPHERA. The commented 
+!              template has to be filled in for any particular test case. 
+!              Comment lines and blank lines do not disturb the execution.
+!-------------------------------------------------------------------------------
+
+!-------------------------------------------------------------------------------
+! Legend:
+!    !    beginning of a comment line. Additional comment lines are permitted.
+!    ![?] beginning of a definition/guideline
+!    <>   the content within these brackets represents an input variable
+!    ![*] beginning of the structure of a line with the names of the input 
+!         variables
+!    ...  possible repetitions of the above/previous data
+!    !<<< beginning of a section to be filled with input data. The lines of 
+!         this section must be replaced with a "!" if they do not have to be 
+!         filled for the test case chosen (included the start line and the end 
+!         line of the unusable sections).
+!    ___  space to be replaced with an input value
+!    !>>> end of a section to be filled with input data
+!    =    start of a variable value
+!-------------------------------------------------------------------------------
+
+##### BED LOAD TRANSPORT #####
+!-------------------------------------------------------------------------------
+![?] Input parameters for bed-load transport ("blt") scheme
+![?] <KTGF_config> (Kinetic Theory of Granular Flow configuration)
+!    =0 (KTGF scheme deactivated)
+!    =1 (KTGF scheme activated with possible use of the 3D 2-interface 
+!       erosion criterion)
+!    =2 (KTGF scheme activated with possible use of the 2D 1-interface erosion 
+!       criterion)
+![?] <ID_main_fluid>: medium of the main fluid
+![?] <saturation_scheme>
+!    =0 (dry soil)
+!    =1 (fully saturated soil)
+!    =2 (saturation zones depepending on "time_minimum_saturation" and 
+!        "time_maximum_saturation")
+!    =3 (Lagrangian scheme for saturation conditions; mixture particles are 
+!        either fully saturated or dry)
+![?] <time_minimum_saturation>: time related to a relative minimum saturation 
+!    of the granular material.
+![?] <time_maximum_saturation>: time related to a relative maximum saturation 
+!    of the granular material. So far, "time_minimum_saturation" has to be 
+!    smaller than (or equal to) "time_maximum_saturation". When "t<=t_min_sat",
+!    there is always phreatic zone below the free surface and dry soil 
+!    elsewhere. When "t>=t_max_sat", the saturation zones are freezed at 
+!    "t=t_max_sat".
+!-------------------------------------------------------------------------------
+![*] <KTGF_config> <ID_main_fluid>
+![*] <saturation_scheme> <time_minimum_saturation> <time_maximum_saturation>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+0 1
+1 0. 0.
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] if (KTGF_config>0) then
+![?] <velocity_fixed_bed>: velocity threshold (e.g. equal to velocity scale 
+!    divided by 100) to detect the fixed bed
+![?] <erosion_flag>
+!    =0 (erosion scheme activated far from fronts)
+!    =1 (erosion scheme inactive)
+!    =2 (erosion scheme active everywhere)
+!-------------------------------------------------------------------------------
+![*] <velocity_fixed_bed> <erosion_flag>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___ ___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] if (3D) then
+![?] <deposition_at_frontiers>
+!    =1 (imposed)
+!    =0 (not imposed)
+![?] <Gamma_slope_flag>
+!    =1 (Gamma slope angle computed)
+!    =0 (null Gamma slope angle)
+!-------------------------------------------------------------------------------
+![*] <deposition_at_frontiers> <Gamma_slope_flag>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___ ___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] endif (3D)
+![?] if (2D) then
+![?] <deposition_at_frontiers>
+!    =1 (imposed)
+!    =0 (not imposed)
+!-------------------------------------------------------------------------------
+![*] <deposition_at_frontiers>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] endif (2D)
+![?] <n_monitor_lines>: number of monitoring lines aligned with x- or y-axis)
+![?] <dt_out>: writing time step
+![?] <erosion_convergence_criterion>: convergence criterion for the erosion 
+!    scheme
+![?] <n_max_iterations>: maximum number of iterations for the erosion criterion
+!-------------------------------------------------------------------------------
+![*] <n_monitor_lines> <dt_out> <erosion_convergence_criterion> 
+!    <n_max_iterations>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___ ___ ___ ___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] <x_min_dt>,<x_max_dt>,<y_min_dt>,<y_max_dt>,<z_min_dt>,<z_max_dt>:
+!    vertices of the parallelepiped, within which the mixture particles can 
+!    influence the time step estimation
+![?] <t_q0>: quake start time
+![?] <t_liq>: liquefaction time
+![?] <line_ID>: monitoring line ID for blt
+![?] <x_line>,<y_line>: monitoring line defined by variable or fixed (-999.) x- 
+!    and y-coordinates
+!-------------------------------------------------------------------------------
+![*] <x_min_dt> <x_max_dt>
+![*] <y_min_dt> <y_max_dt>
+![*] <z_min_dt> <z_max_dt>
+![*] <t_q0> <t_liq>
+![*] <line_ID>
+![*] <x_line> <y_line>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+!___ ___
+!___ ___
+!___ ___
+!___ ___
+!___
+!___ ___
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] endif (KTGF_config>0)
+!-------------------------------------------------------------------------------
+##### end BED LOAD TRANSPORT #####

@@ -19,7 +19,7 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: InterpolateBoundaryIntegrals2D                                       
+! Program unit: InterpolateBoundaryIntegrals2D
 ! Description:  Interpolation in table "BoundIntegralTab(:,:)", defined in
 !               module "SA_SPH_module", the values in columns "Colmn(nc), nc=1,
 !               Ncols" corresponding to the input value "x" to be interpolated,

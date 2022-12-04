@@ -19,10 +19,9 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: ComputeBoundaryDataTab_2D                                  
+! Program unit: ComputeBoundaryDataTab_2D
 ! Description: To calculate the array to store close boundaries and integrals 
-!              in 2D
-!              (Di Monaco et al., 2011, EACFM)                        
+!              in 2D (Di Monaco et al., 2011, EACFM)
 !-------------------------------------------------------------------------------
 #ifdef SPACE_2D
 subroutine ComputeBoundaryDataTab_2D

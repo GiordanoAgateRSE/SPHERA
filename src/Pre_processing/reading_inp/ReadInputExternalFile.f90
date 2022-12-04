@@ -20,7 +20,7 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: ReadInputExternalFile                       
-! Description:                        
+! Description: Reading external files on vertices and faces
 !-------------------------------------------------------------------------------
 #ifdef SPACE_3D
 subroutine ReadInputExternalFile(NumberEntities,ainp,comment,nrighe,ier,       &

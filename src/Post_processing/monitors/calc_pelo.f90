@@ -20,7 +20,7 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: calc_pelo
-! Description: Post-processing to write the the time evolution of the free 
+! Description: Post-processing to write the time evolution of the free 
 !              surface height at the monitoring lines. Filtering atomization of 
 !              the fluid domain. The “lower fluid top height” 
 !              (“z_lower_fluid_top”) is suitable to estimate the liquid depth 

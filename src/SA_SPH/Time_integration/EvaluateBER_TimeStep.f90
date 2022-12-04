@@ -20,7 +20,8 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: EvaluateBER_TimeStep                                      
-! Description: (Di Monaco et al., 2011, EACFM)                        
+! Description: Stability criterion for the SASPH elastic reaction (Di Monaco et 
+!              al., 2011, EACFM)                        
 !-------------------------------------------------------------------------------
 subroutine EvaluateBER_TimeStep
 !------------------------

@@ -20,7 +20,7 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: ReadInputVertices                              
-! Description:                        
+! Description: Reading the input vertices
 !-------------------------------------------------------------------------------
 subroutine ReadInputVertices(NumberEntities,Vertice,ainp,comment,nrighe,ier,   &
                              prtopt,ninp,ulog)

@@ -1,0 +1,57 @@
+!-------------------------------------------------------------------------------
+! Software name and copyright: water_shipping
+!    Copyright 2022 (RSE SpA, authored by Andrea Amicarelli)
+! Software description: input file for SPHERA v.10.0.0 (RSE SpA).
+!    SPH simulation reproducing the water shipping scaled experiment of 
+!    Kawamura et. al 2016 (Ocean Engineering). Reference: RSE, Ricerca di 
+!    Sistema, 2022.
+!
+! This file is part of water_shipping.
+! water_shipping is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! water_shipping is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with water_shipping. If not, see <http://www.gnu.org/licenses/>.
+!-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+! Description: 20_00_CLC_water_shipping.txt
+!              Part of the main input file template of SPHERA. The commented 
+!              template has to be filled in for any particular test case. 
+!              Comment lines and blank lines do not disturb the execution.
+!-------------------------------------------------------------------------------
+
+!-------------------------------------------------------------------------------
+! Legend:
+!    !    beginning of a comment line. Additional comment lines are permitted.
+!    ![?] beginning of a definition/guideline
+!    <>   the content within these brackets represents an input variable
+!    ![*] beginning of the structure of a line with the names of the input 
+!         variables
+!    ...  possible repetitions of the above/previous data
+!    !<<< beginning of a section to be filled with input data. The lines of 
+!         this section must be replaced with a "!" if they do not have to be 
+!         filled for the test case chosen (included the start line and the end 
+!         line of the unusable sections).
+!    ___  space to be replaced with an input value
+!    !>>> end of a section to be filled with input data
+!    =    start of a variable value
+!-------------------------------------------------------------------------------
+
+!-------------------------------------------------------------------------------
+![?] The CLC input folder is relevant only in the absence of DEM and contains:
+![?] the «CLC_*.txt» file with: CLC block number of CLC polygons (assigned by 
+![?] Paraview), CLC class of CLC polygons. The CLC block number is the ID of  
+![?] the CLC polygon (assigned by Paraview in the ".tar." archive) plus 1 
+![?] (at least two records are requested, records can be repeated);
+![?] the «CLC_polygons_ply.tar» archive containing the folder 
+![?] «CLC_polygons_ply» with the files "CLC_<ID>.ply" of the CLC polygons;
+![?] the "z0_default.txt" file with only a default z0 value to be applied 
+![?] where no CLC class is defined;
+![?] the possible restart file for z0: "z0.res".
+![?] The CLC polygons have to be partitioned in triangles only.
+!-------------------------------------------------------------------------------

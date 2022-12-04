@@ -20,7 +20,7 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: ReadInputOutputRegulation                          
-! Description:                        
+! Description: Reading the output time steps
 !-------------------------------------------------------------------------------
 
 subroutine ReadInputOutputRegulation(Med,ainp,comment,nrighe,ier,ninp,ulog)

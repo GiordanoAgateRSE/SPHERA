@@ -1,0 +1,215 @@
+!-------------------------------------------------------------------------------
+! Software name and copyright: Couette_sf
+!    Copyright 2022 (RSE SpA, authored by Andrea Amicarelli)
+! Software description: input file for SPHERA v.10.0.0 (RSE SpA).
+!    Reference: Amicarelli et al. (preprint, 2022)
+!
+! This file is part of Couette_sf.
+! Couette_sf is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! Couette_sf is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with Couette_sf. If not, see <http://www.gnu.org/licenses/>.
+!-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+! Description: 11_time_integration_and_numerical_data_Couette_sf.inp
+!              The commented template of the main input file of SPHERA 
+!              v.10.0.0 (RSE SpA) is integrated in this file, in compliance
+!              with the requirements of the licenses of both the software
+!              tools.
+!-------------------------------------------------------------------------------
+
+!-------------------------------------------------------------------------------
+! Legend:
+!    !    beginning of a comment line. Additional comment lines are permitted.
+!    ![?] beginning of a definition/guideline
+!    <>   the content within these brackets represents an input variable
+!    ![*] beginning of the structure of a line with the names of the input 
+!         variables
+!    ...  possible repetitions of the above/previous data
+!    !<<< beginning of a section to be filled with input data. The lines of 
+!         this section must be replaced with a "!" if they do not have to be 
+!         filled for the test case chosen (included the start line and the end 
+!         line of the unusable sections).
+!    ___  space to be replaced with an input value
+!    !>>> end of a section to be filled with input data
+!    =    start of a variable value
+!-------------------------------------------------------------------------------
+
+##### RUN PARAMETERS #####
+!-------------------------------------------------------------------------------
+![?] Input parameters for time integration, partial smoothing and memory 
+!    management
+![?] The run stops when reaching either the final time or the final time step; 
+!    in case of a restarted simulation, these values are reported in the log 
+!    file, but they are actually overwritten by the values read from the input 
+!    restart file (these data have no influence in case of restart)
+![?] <final_time>: its value can be effectively modified at any restart time.
+![?] <final_time_step>: its value can be effectively modified at any restart 
+!    time.
+![?] <CFL>: its value can be effectively modified at any restart time.
+![?] <vsc_coeff>: viscous stability condition coefficient; its value can be 
+!    effectively modified at any restart time.
+!    =0.05 (default value)
+![?] <Leapfrog_flag>
+!    =1 (Leapfrog time integration scheme)
+!    =0 (explicit RK time integration schemes)
+![?] <scheme_order>: time integration scheme order (but for Leapfrog is "1")
+![?] <factor>: weighting factor to estimate dt (draft variable)
+!    =0. (recommended value)
+![?] <dt_alfa_Mon>: logical flag possibly making Monaghan artificial viscosity 
+!    coefficient to influence dt; its value can be effectively modified at any 
+!    restart time.
+![?] <teta_p>, <teta_u>: coefficients for partial smoothing of pressure and 
+!    velocity); their values can be effectively modified at any restart time.
+!    <teta_p>=0.3+-0.1; <teta_u>=0
+![?] <var>; its value can be effectively modified at any restart time.
+!    =A (recommended value)
+![?] <COEFNMAXPARTI>: max number of fluid particles max0 = COEFNMAXPARTI * 
+!    nag; COEFNMAXPARTI considers that the number of particles inside the 
+!    domain can be higher than the first assessment of the number of SPH 
+!    particles (initial particles or reservoir particles; in case reservoir is 
+!    derived from topography, COEFNMAXPARTI takes into account contributions 
+!    from inlet sections and, in case of reservoir derived from topography, 
+!    also the particles of the mixture dam/reservoir (beyond the main water 
+!    reservoir). The way the restart file is read permits to change the input 
+!    value of COEFNMAXPARTI in the input file of a restarted run. It is not 
+!    necessary to run again the whole sequence of jobs. Its value can be 
+!    effectively modified at any restart time.
+![?] <COEFNMAXPARTJ>: max number of neighbours maxb = COEFNMAXPARTJ * (4h/dx)
+!    ^ D; the same number applies both for fluid neighbours and DB-SPH wall 
+!    element neighbours. Its value can be effectively modified at any restart 
+!    time.
+![?] <body_part_reorder>: for DB-SPH; its value can be effectively modified at 
+!    any restart time.
+!    =0 (fixed frontiers)
+!    =1 (mobile frontiers)
+![?] <ALE3>: ALE3 flag
+!    =.false. (SPH-ALE1 C0 unbalanced)
+!    =.true. (SPH-ALE3-LC)
+![?] <C1_BE>: C1-consistency flag for the Balance Equations. Its value can be
+!    effectively modified at any restart time.
+!    =.false. (0th-order consistency)
+!    =.true. (1st-order consistency. This option has not to be chosen in the
+!            presence of: dense granular flows; DBSPH boundaries; explicit RK
+!            time integration schemes. This option needs ALE3==.true.)
+![?] <C1_divu>: C1-consistency flag for the velocity-divergence term. 
+!    Its value can be effectively modified at any restart time.
+!    =.false. (0th-order consistency)
+!    =.true. (1st-order consistency. This option needs C1_BE==.true.)
+![?] <C1_ALE1eCE>: C1-consistency flag for the ALE1 explicit term in the 
+!    Continuity Equation. 
+!    Its value can be effectively modified at any restart time.
+!    =.false. (0th-order consistency)
+!    =.true. (1st-order consistency. This option needs C1_BE==.true.)
+![?] <C1_monitors>: C1-consistency flag for the post-processing procedures 
+!    at the monitoring elements
+!    =.false. (0th-order consistency)
+!    =.true. (1st-order consistency; no constraint: it also works in the 
+!            presence of: dense granular flows; DBSPH boundaries; explicit RK 
+!            time integration schemes. This option does not need ALE3==.true.)
+![?] <invB_det_thresh>: minimum threshold for the absolute value of the 
+!    determinant of the inverse of the renormalization matrix. This threshold 
+!    is used as a high-pass filter to invert the two renormalization 
+!    matrices in the balance equations (not the renormalization matrix for 
+!    post-processing at monitors). This value is influential only if (C1_BE).
+!    For those renormalization which are not inverted, renormalization does not 
+!    apply. If ((C1_BE).and.(.not(p_neg_FS))), the solution is unstable if 
+!    "invB_det_thresh" is too small.
+![?] <neg_p_FS>: logical flag to activate or deactivate the differential 
+!    treatment for negative-pressure particles. This variable is only 
+!    influential if (ALE3) and assumes that negative-pressure particles only 
+!    occur at the free-surface (it can be used for free-surface flows unless 
+!    too many negative-pressure particles intrude the inner domain; it cannot 
+!    be used for confined flows):
+!    =.true. ((.not.(C1_BE)): 100% of the unbalanced ALE1-ME terms apply as 
+!                             representative of the missing BC terms in air, no 
+!                             other ALE terms; no correction for neighbouring 
+!                             particles; non-conservative and unstable solution;
+!            (C1_BE): no ALE term at all is represented; 1st-order consistency 
+!                     applies if the status of the renormalization matrix 
+!                     is active; no correction for neighbouring particles; 
+!                     non-conservative and unstable solution)
+!    =.false. (no differential treatment for negative pressure; default value; 
+!             (.not.(C1_BE): ALE3 full formulation; stable solution;
+!             (C1_BE): ALE3 full formulation plus possible 1st-order 
+!                      consistency depending on the status of the 
+!                      renormalization matrix; unstable solution requiring 
+!                      "invB_det_thresh" to be large enough to avoid this 
+!                      occurrence).
+![?] <max_delta_mass>: maximum variation of the particle mass (%) with 
+!    respect to the initial homogeneous value. If the bounds are overpassed the 
+!    mass of the selected particles is frozen until the end of the simulation 
+!    (simplified ALE3 volume and momentum equations for the selected particles; 
+!    analogously, some of their contributions to the neighbours are frozen to 
+!    keep global mass and momentum conservative). Any negative value deactivate 
+!    this procedure.
+![?] <ALE3_vol_corr>: flag to activate/deactivate the volume correction term for
+!                     the explicit ALE3-CE boundary terms. This applies with 
+!                     any slip condition. 
+!-------------------------------------------------------------------------------
+![*] <final_time> <final_time_step>
+![*] <CFL> <vsc_coeff> <Leapfrog_flag> <scheme_order> <factor> <dt_alfa_Mon>
+![*] <teta_p> <teta_u> <var> 
+![*] <COEFNMAXPARTI> <COEFNMAXPARTJ> <body_part_reorder>
+![*] <ALE3> <C1_BE> <C1_divu> <C1_ALE1eCE> <C1_monitors> <invB_det_thresh> 
+!    <neg_p_FS> <max_delta_mass> <ALE3_vol_corr>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+1360. 10000000
+0.15 0.05 1 1 0. .false.
+0.3 0. A
+1.1 2. 0
+.true. .false. .false. .false. .true. 0.614 .false. 50. .true.
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] if (3D) then
+![?] <nag_aux>: rough overestimation of the number of fluid particles in the 
+!    domain, it is only related to the very first allocation of the particle 
+!    array, it is influential only in case of reservoir extruded from 
+!    topography
+![?] <MAXCLOSEBOUNDFACES>: max number of neighbouring boundary face per fluid 
+!    particle; its value can be effectively modified at any restart time. 
+!    Normally, this appreciably affects the total virtual memory, not the 
+!    computational time.
+![?] <MAXNUMCONVEXEDGES>: max number of edges; its value can be effectively 
+!    modified at any restart time. Normally, it appreciably affects the total 
+!    virtual memory, not the computational time.
+![?] <GCBFVecDim>: rough overestimation of the number of Grid Cell - Boundary 
+!    Face intersections  (SA-SPH). In case of restart, this value is only read, 
+!    not used; in case its value is too little, crashes occur without code 
+!    warnings/errors; "GCBFVecDim" only occupies 4B times the number of 
+!    elements, thus, it is sufficient to overestimate this number as the number 
+!    of faces times the number of the positioning grid cells, further, reducing 
+!    "GCBFVecDim" does not imply any appreciable variation in the computational
+!    time). The positioning grid is made of cubes whose side length is 2h. Its 
+!    input value is read and then updated during the Initial Condition setting.
+!    In case of restart, this quantity has to be read from the restart file.
+!-------------------------------------------------------------------------------
+![*] <nag_aux> <MAXCLOSEBOUNDFACES> <MAXNUMCONVEXEDGES> <GCBFVecDim>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+100000 9 10000 512000
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] endif (3D)
+!-------------------------------------------------------------------------------
+![?] <density_thresholds_flag>: its value can be effectively modified at any 
+!    restart time.
+!    =0 (default value, no density limiters)
+!    =1 (density limiters for debug)
+!    Density limiters do not apply to the mixture particles which are held 
+!    fixed (elasto-plastic strain rate regime)
+!-------------------------------------------------------------------------------
+![*] <density_thresholds_flag>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+0
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+##### end RUN PARAMETERS #####

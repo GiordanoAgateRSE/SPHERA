@@ -19,8 +19,8 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: J2Wro2                                         
-! Description: (Di Monaco et al., 2011, EACFM)                        
+! Program unit: J2Wro2
+! Description: To compute the integral J2Wro2 (Di Monaco et al., 2011, EACFM)                        
 !-------------------------------------------------------------------------------
 #ifdef SPACE_2D
 double precision function J2Wro2(ro)

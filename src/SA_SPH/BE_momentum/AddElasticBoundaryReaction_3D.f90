@@ -31,7 +31,7 @@
 !                zi is the distance of the particle Pi from the boundary face;
 !                d is a reference distance from which the reaction is added.
 !              Check that the elastic boundary reaction never works.
-!              (Di Monaco et al., 2011, EACFM).                        
+!              (Di Monaco et al., 2011, EACFM).
 !-------------------------------------------------------------------------------
 #ifdef SPACE_3D
 subroutine AddElasticBoundaryReaction_3D(npi,Ncbf,BoundReaction)

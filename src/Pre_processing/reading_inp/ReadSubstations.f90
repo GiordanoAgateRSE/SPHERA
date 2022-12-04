@@ -20,8 +20,7 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: ReadSubstations                               
-! Description: Input management for monitoring the electrical substations (ref. 
-!              template input file)                  
+! Description: Input management for monitoring the electrical substations
 !-------------------------------------------------------------------------------
 #ifdef SPACE_3D
 subroutine ReadSubstations(ainp,comment,nrighe,ier)

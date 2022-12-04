@@ -1,0 +1,70 @@
+!-------------------------------------------------------------------------------
+! Software name and copyright: uf_es_Calenzano
+!    Copyright 2020 (RSE SpA, authored by Andrea Amicarelli)
+! Software description: input file for SPHERA v.9.0.0 (RSE SpA).
+!    Urban flood demonstrative scenario in Calenzano (Firenze, Italy) with 
+!    damage to an electrical substation. Reference: Amicarelli (2020, 
+!    SPHERA github repository).
+!
+! This file is part of uf_es_Calenzano.
+! uf_es_Calenzano is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! uf_es_Calenzano is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with uf_es_Calenzano. If not, see <http://www.gnu.org/licenses/>.
+!-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+! File description: 05_02_faces_uf_es_Calenzano.inp
+!                   The commented template of the main input file of SPHERA  
+!                   v.9.0.0 (RSE SpA) is integrated in this file, in compliance 
+!                   with the requirements of the licenses of both the software 
+!                   tools.
+!-------------------------------------------------------------------------------
+
+!-------------------------------------------------------------------------------
+! Legend:
+!    !    beginning of a comment line. Additional comment lines are permitted.
+!    ![?] beginning of a definition/guideline
+!    <>   the content within these brackets represents an input variable
+!    ![*] beginning of the structure of a line with the names of the input 
+!         variables
+!    ...  possible repetitions of the above/previous data
+!    !<<< beginning of a section to be filled with input data. The lines of 
+!         this section must be replaced with a "!" if they do not have to be 
+!         filled for the test case chosen (included the start line and the end 
+!         line of the unusable sections).
+!    ___  space to be replaced with an input value
+!    !>>> end of a section to be filled with input data
+!    =    start of a variable value
+!-------------------------------------------------------------------------------
+
+! Inlet_section_Nuovo_Garille
+! Inlet_section_Nuovo_Garille
+ 1106433   554374   554375   554376   554377       -1       -1        2
+! Outlet_downstream_left
+ 1106434   554342   554343   554409   554405       -1       -1        3
+! Outlet_left1
+ 1106435   554368   554369   554366   554367       -1       -1        4
+! Outlet_left2
+ 1106436   554349   554348   554347   554346       -1       -1        5
+! Outlet_right1
+ 1106437   554353   554352   554351   554350       -1       -1        6
+! Outlet_bottom
+ 1106438   554372   554373   554371   554370       -1       -1        7
+! Outlet_right2
+ 1106439   554354   554355   554357   554356       -1       -1        8
+! Outlet_right3
+ 1106440   554358   554359   554361   554360       -1       -1        9
+! Outlet_right4
+ 1106441   554362   554363   554365   554364       -1       -1       10
+! outlet_upstream
+ 1106442   554378   554379   554380   554381       -1       -1       11
+! outlet_top
+ 1106443   554382   554383   554385   554384       -1       -1       12
+! Wall_left1
+ 1106444   554368   554369   554366   554367       -1       -1       13

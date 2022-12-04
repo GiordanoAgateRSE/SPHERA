@@ -210,8 +210,6 @@ integer(4) :: FSI_slip_conditions
 ! Number of fluid particles removed from solid bodies after the initial 
 ! conditions
 integer(4) :: fluid_in_body_count
-! Number of mass-frozen fluid particles (ALE3)
-integer(4) :: mass_frozen_count = 0
 #ifdef SPACE_3D
 ! Number of CAE-made solid bodies
 integer(4) :: n_bodies_CAE
@@ -221,6 +219,8 @@ integer(4) :: n_bodies_CAE
 ! Number of convex edges
 integer(4) :: NumBEdges
 #endif
+! Number of mass-frozen fluid particles (ALE3)
+integer(4) :: mass_frozen_count = 0
 ! Input variable
 double precision :: friction_angle
 ! 0.001 * Domain%h 

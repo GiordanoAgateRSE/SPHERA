@@ -20,7 +20,7 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: ReadInputFaces                         
-! Description:                        
+! Description: Reading input faces
 !-------------------------------------------------------------------------------
 #ifdef SPACE_3D
 subroutine ReadInputFaces(NumberEntities,ainp,comment,nrighe,ier,prtopt,ninp,  &

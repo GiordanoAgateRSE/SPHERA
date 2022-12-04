@@ -1,0 +1,104 @@
+!-------------------------------------------------------------------------------
+! Software name and copyright: douf_Vajont
+!    Copyright 2021 (RSE SpA, authored by Andrea Amicarelli)
+! Software description: input file for SPHERA v.9.0.0 (RSE SpA).
+!    Dam-overtopping urban flood of the Vajont disaster (Friuli Venezia Giulia 
+!    and Veneto, Italy). Reference: Amicarelli (2021, SPHERA github repository).
+!
+! This file is part of douf_Vajont.
+! douf_Vajont is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! douf_Vajont is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with douf_Vajont. If not, see <http://www.gnu.org/licenses/>.
+!-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+! Description: 05_08_faces_douf_Vajont.inp
+!                   The commented template of the main input file of SPHERA
+!                   v.9.0.0 (RSE SpA) is integrated in this file, in compliance
+!                   with the requirements of the licenses of both the software
+!                   tools.
+!-------------------------------------------------------------------------------
+
+!-------------------------------------------------------------------------------
+! Legend:
+!    !    beginning of a comment line. Additional comment lines are permitted.
+!    ![?] beginning of a definition/guideline
+!    <>   the content within these brackets represents an input variable
+!    ![*] beginning of the structure of a line with the names of the input 
+!         variables
+!    ...  possible repetitions of the above/previous data
+!    !<<< beginning of a section to be filled with input data. The lines of 
+!         this section must be replaced with a "!" if they do not have to be 
+!         filled for the test case chosen (included the start line and the end 
+!         line of the unusable sections).
+!    ___  space to be replaced with an input value
+!    !>>> end of a section to be filled with input data
+!    =    start of a variable value
+!-------------------------------------------------------------------------------
+
+![?] 3D input parameters for the boundary faces of the fluid domain
+![?] 3D boundary faces for wall frontiers, inlet/outlet sections, fluid 
+!    reservoirs.
+![?] In case of DB-SPH boundary treatment scheme, the code requires the faces of 
+!    the parallelepiped domain as a "perimeter" and the "fictitious reservoirs".
+![?] In case of SA-SPH boundary treatment scheme, the code requires the 
+!    actual boundary faces.
+![?] In case a fluid reservoir needs to be partitioned, then each partition 
+!    needs a dedicated "perimeter" item.
+![?] The last 1/2/3 vertex IDs are 0 in case of pentagonal / quadrilateral / 
+!    triangular faces.
+![?] SA-SPH boundary normal vectors and reservoir face normal vectors point 
+!    inward the fluid domain: not the best convention (clockwise list of points 
+!    if looking from outside the fluid domain).
+![?] For "perimeter" boundaries: the vertices have to be adjacent, but there is 
+!    no rule about the vertex order (better clockwise to keep coherence with 
+!    SA-SPH walls).
+![?] Faces can only be triangles or rectangles (generic quadrilaterals are not 
+!    permitted), but only "perimeter" faces can also be generic quadrilaterals 
+!    (not only rectangles), pentagons and hexagons.
+![?] No gaps on face IDs are permitted
+![?] <face_1_vertex_1>,...,<face_1_vertex_6>,<face_1_zone_ID>: first face 
+!    data. The value "-1" is mandatory for meaningless vertex IDs (e.g., 5th 
+!    and 6th vertices of a quadrilateral).
+![?] <face_last_ID>,<face_last_vertex_1>,...,<face_last_vertex_6>,
+!    <face_last_zone_ID>: last face data
+![?] The first two vertices of an inlet section are the highest ones: their 
+!    height is time-dependent in run-time. 
+!-------------------------------------------------------------------------------
+![*] 1 <face_first_vertex_1> ... <face_1_vertex_6> <face_1_zone_ID>
+![*] ...
+![*] <face_last_ID> <face_last_vertex_1> ... <face_last_vertex_6> 
+!    <face_last_zone_ID>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+! inlet_section_centre
+  314582   159024   159025   159026   159027       -1       -1        2
+! Open_section_Vajont_reservoir
+  314583   159028   159029   159030   159031       -1       -1        3
+! Open_section_Belluno
+  314584   159032   159033   159034   159035       -1       -1        4
+! Open_section_top
+  314585   159036   159037   159038   159039       -1       -1        5
+! Open_section_bottom
+  314586   159040   159041   159042   159043       -1       -1        6
+! Open_section_N
+  314587   159039   159040   159043   159036       -1       -1        7
+! Open_section_E
+  314588   159036   159043   159042   159037       -1       -1        8
+! Open_section_S
+  314589   159037   159042   159041   159038       -1       -1        9
+! Open_section_W
+  314590   159038   159041   159040   159039       -1       -1       10
+! Open_section_Rio_MaE
+  314591   159044   159045   159046   159047       -1       -1       11
+! inlet_section_right
+  314592   159048   159049   159050   159051       -1       -1       12
+! inlet_section_left
+  314593   159052   159053   159054   159055       -1       -1       13
+!>>>****************************************************************************

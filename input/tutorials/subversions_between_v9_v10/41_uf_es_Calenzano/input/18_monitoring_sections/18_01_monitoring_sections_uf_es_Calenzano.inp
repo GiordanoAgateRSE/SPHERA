@@ -1,0 +1,79 @@
+!-------------------------------------------------------------------------------
+! Software name and copyright: uf_es_Calenzano
+!    Copyright 2020 (RSE SpA, authored by Andrea Amicarelli)
+! Software description: input file for SPHERA v.9.0.0 (RSE SpA).
+!    Urban flood demonstrative scenario in Calenzano (Firenze, Italy) with 
+!    damage to an electrical substation. Reference: Amicarelli (2020, 
+!    SPHERA github repository).
+!
+! This file is part of uf_es_Calenzano.
+! uf_es_Calenzano is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! uf_es_Calenzano is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with uf_es_Calenzano. If not, see <http://www.gnu.org/licenses/>.
+!-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+! File description: 18_01_monitoring_sections_uf_es_Calenzano.inp
+!                   The commented template of the main input file of SPHERA  
+!                   v.9.0.0 (RSE SpA) is integrated in this file, in compliance 
+!                   with the requirements of the licenses of both the software 
+!                   tools.
+!-------------------------------------------------------------------------------
+
+!-------------------------------------------------------------------------------
+! Legend:
+!    !    beginning of a comment line. Additional comment lines are permitted.
+!    ![?] beginning of a definition/guideline
+!    <>   the content within these brackets represents an input variable
+!    ![*] beginning of the structure of a line with the names of the input 
+!         variables
+!    ...  possible repetitions of the above/previous data
+!    !<<< beginning of a section to be filled with input data. The lines of 
+!         this section must be replaced with a "!" if they do not have to be 
+!         filled for the test case chosen (included the start line and the end 
+!         line of the unusable sections).
+!    ___  space to be replaced with an input value
+!    !>>> end of a section to be filled with input data
+!    =    start of a variable value
+!-------------------------------------------------------------------------------
+
+![?] <n_vertices>: number of vertices describing a monitoring section for the 
+!    flow rate (first section)
+!    =3
+!    =4
+![?] <vertex_1_x>, <vertex_1_y>, <vertex_1_z>, <vertex_2_x>, <vertex_2_y>,
+!    <vertex_2_z>, <vertex_3_x>, <vertex_3_y>, <vertex_3_z>, <vertex_4_x>,
+!    <vertex_4_y>, <vertex_4_z>: vertices of the first section (anti-clockwise 
+!    order viewing the section face from downstream)
+!-------------------------------------------------------------------------------
+![*] <section_ID>
+![*] <n_vertices>
+![*] <vertex_1_x> <vertex_1_y> <vertex_1_z>
+![*] <vertex_2_x> <vertex_2_y> <vertex_2_z>
+![*] <vertex_3_x> <vertex_3_y> <vertex_3_z>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+! NGarille_es  
+1
+4
+936.5 1109.5 51.12
+936.5 1109.5 61.12
+928.5 1114.5 61.12
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] if (n_vertices==4) then
+!-------------------------------------------------------------------------------
+![*] <vertex_4_x> <vertex_4_y> <vertex_4_z>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+928.5 1114.5 51.12
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------
+![?] endif (n_vertices==4)
+!-------------------------------------------------------------------------------

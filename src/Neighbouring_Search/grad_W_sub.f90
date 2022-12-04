@@ -22,11 +22,9 @@
 ! Program unit: grad_W_sub
 ! Description: Gradient of the kernel function. kernel_ID:
 !              =1 cubic beta-spline cubic kernel as defined in the paper of 
-!                 Monaghan & Lattanzio (1985); first used by SPHERA for a 
-!                 journal paper in Di Monaco et al. (2011, IJNME);
+!                 Monaghan & Lattanzio (1985)
 !              =2 anti-cluster cubic kernel as defined in the paper of Gallati 
-!                 & Braschi (2000, "L'Acqua"); first used by SPHERA for a 
-!                 journal paper in Amicarelli et al. (2015, CAF).
+!                 & Braschi (2000, "L'Acqua")
 !-------------------------------------------------------------------------------
 subroutine grad_W_sub(kernel_ID,r_vec,grad_W)
 !------------------------

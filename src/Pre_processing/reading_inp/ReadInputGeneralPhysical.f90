@@ -20,7 +20,7 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: ReadInputGeneralPhysical                          
-! Description:                        
+! Description: Reading gravity and background pressure                       
 !-------------------------------------------------------------------------------
 subroutine ReadInputGeneralPhysical(ainp,comment,nrighe,ier,ninp,ulog)
 !------------------------

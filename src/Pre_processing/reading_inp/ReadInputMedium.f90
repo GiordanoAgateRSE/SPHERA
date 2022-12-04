@@ -19,9 +19,9 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: ReadInputMedium                          
+! Program unit: ReadInputMedium
 ! Description: to read the input data from the section "medium" of SPHERA main 
-!              input file.                       
+!              input file. 
 !-------------------------------------------------------------------------------
 subroutine ReadInputMedium(NumberEntities,Med,ainp,comment,nrighe,ier,ninp,    &
                            ulog)

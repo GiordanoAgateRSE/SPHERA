@@ -34,7 +34,10 @@ use Memory_I_O_interface_module
 ! Declarations
 !------------------------
 implicit none
-integer(4) :: i_zone,i_sub,isQ
+integer(4) :: i_zone
+#ifdef SPACE_3D
+integer(4) :: i_sub,isQ
+#endif
 #ifdef SOLID_BODIES
 integer(4) :: ib
 #endif

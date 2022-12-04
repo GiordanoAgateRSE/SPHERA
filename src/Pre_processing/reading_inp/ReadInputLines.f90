@@ -20,7 +20,7 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: ReadInputLines                          
-! Description:                        
+! Description: Reading input lines
 !-------------------------------------------------------------------------------
 #ifdef SPACE_2D
 subroutine ReadInputLines(NumberEntities,BoundaryVertex,Tratto,ainp,comment,   &

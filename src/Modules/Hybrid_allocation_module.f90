@@ -21,9 +21,7 @@
 !-------------------------------------------------------------------------------
 ! Program unit: Hybrid_allocation_module          
 ! Description: Module to define derived types of both dynamically and statically
-!              allocated variables (Di Monaco et al., 2011, EACFM; Manenti et 
-!              al., 2012; JHE; Amicarelli et al., 2013, IJNME; Amicarelli et 
-!              al., 2015, CAF; Amicarelli et al., 2017, IJCFD).                    
+!              allocated variables
 !-------------------------------------------------------------------------------
 module Hybrid_allocation_module
 use Static_allocation_module

@@ -21,7 +21,7 @@
 !-------------------------------------------------------------------------------
 ! Program unit: ReadInputBoundaries                    
 ! Description: Reading input data for the boundary treatment scheme SA-SPH 
-!              (semi-analytic approach; Di Monaco et al., 2011, EACFM).                      
+!              (Semi-Analytical approach; Di Monaco et al., 2011, EACFM).                      
 !-------------------------------------------------------------------------------
 subroutine ReadInputBoundaries(NumberEntities,Partz,Tratto,                    &
 #ifdef SPACE_2D

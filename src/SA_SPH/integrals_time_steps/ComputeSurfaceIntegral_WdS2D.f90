@@ -20,11 +20,11 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: ComputeSurfaceIntegral_WdS2D                                   
-! Description:  Computing the surface integral of kernel W along the segments 
-!               intercepted by the kernel support (radius=2h) of the particle i,
-!               whose local coordinates are xpi=LocXY(1,icbs) and 
-!               ypi=LocXY(2,icbs), on the adjacent boundary side icbs.
-!              (Di Monaco et al., 2011, EACFM)                        
+! Description: Computing the surface integral of kernel W along the segments 
+!              intercepted by the kernel support (radius=2h) of the particle i,
+!              whose local coordinates are xpi=LocXY(1,icbs) and 
+!              ypi=LocXY(2,icbs), on the adjacent boundary side icbs.
+!              (Di Monaco et al., 2011, EACFM)
 !-------------------------------------------------------------------------------
 #ifdef SPACE_2D
 subroutine ComputeSurfaceIntegral_WdS2D(icbs,LocXY,xpmin,interlen,SIntWds)

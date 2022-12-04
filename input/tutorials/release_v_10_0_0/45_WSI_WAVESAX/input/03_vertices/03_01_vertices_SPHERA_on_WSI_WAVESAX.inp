@@ -1,0 +1,111 @@
+!-------------------------------------------------------------------------------
+! Software name and copyright: SPHERA_on_WSI_WAVESAX
+!    Copyright 2022 (RSE SpA, authored by Andrea Amicarelli)
+! Software description: input file for SPHERA v.10.0.0 (RSE SpA). 
+!    SPH demonstrative simulation of the Wave-Structure Interactions of the 
+!     wave-energy device WAVESAX (RSE SpA). 
+!    Reference: RSE SpA, Ricerca di Sistema, 2022.
+!    The device geometry is elaborated by means of Paraview (Kitware) starting 
+!    from the geometry of a device version of 2013 produced for CFD 
+!    simulations (Ricerca di Sistema, 2013, RSE SpA). 
+!    Preliminary demo: virtual wave, no IC corrections for normals and fluid 
+!    positions.
+!
+! This file is part of SPHERA_on_WSI_WAVESAX.
+! SPHERA_on_WSI_WAVESAX is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! SPHERA_on_WSI_WAVESAX is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with SPHERA_on_WSI_WAVESAX. If not, see <http://www.gnu.org/licenses/>.
+!-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+! Description: 03_01_vertices_SPHERA_on_WSI_WAVESAX.inp
+!              Part of the main input file template of SPHERA. The commented 
+!              template has to be filled in for any particular test case. 
+!              Comment lines and blank lines do not disturb the execution.
+!-------------------------------------------------------------------------------
+
+!-------------------------------------------------------------------------------
+! Legend:
+!    !    beginning of a comment line. Additional comment lines are permitted.
+!    ![?] beginning of a definition/guideline
+!    <>   the content within these brackets represents an input variable
+!    ![*] beginning of the structure of a line with the names of the input 
+!         variables
+!    ...  possible repetitions of the above/previous data
+!    !<<< beginning of a section to be filled with input data. The lines of 
+!         this section must be replaced with a "!" if they do not have to be 
+!         filled for the test case chosen (included the start line and the end 
+!         line of the unusable sections).
+!    ___  space to be replaced with an input value
+!    !>>> end of a section to be filled with input data
+!    =    start of a variable value
+!-------------------------------------------------------------------------------
+
+![?] Input parameters for the boundary vertices of the fluid domain  
+![?] The DB-SPH boundary treatment scheme requires the vertices of the 
+!    parallelepiped domain as a "contour" and the "fictitious air reservoirs" 
+![?] The SA-SPH boundary treatment scheme requires the vertices of the wall 
+!    frontiers
+![?] At least one SA-SPH frontier is requested to define the edges of the 
+!    numerical domain. This frontier is possibly fictitious and does not 
+!    interact with the SPH particles.
+![?] No gaps on vertex IDs are permitted
+![?] <Vertex_x>,<Vertex_y>,<Vertex_z>: first vertex coordinates starting from 
+!    the possible topography from which reservoirs are possibly extruded
+![?] <Last_vertex_ID>,<Last_vertex_x>,<Last_vertex_y>,<Last_vertex_z>: last 
+!    vertex data
+![?] The numerical inlet section is the physical inlet section moved upstream 
+!    for a distance of 2h, with the possible wet walls of the same section.
+!-------------------------------------------------------------------------------
+![*] <First_vertex_ID> <Vertex_x> <Vertex_y> <Vertex_z>
+![*] ...
+![*] <Last_vertex_ID> <Vertex_x> <Vertex_y> <Vertex_z>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+! Original vertex pattern from the SPHERA tutorial water_shipping.inp  
+! Tank
+ 1  0.000 -1.000 0.000
+ 2  5.500 -1.000 0.000
+ 3  5.500  1.000 0.000
+ 4  0.000  1.000 0.000
+ 5  0.000 -1.000 8.000
+ 6  5.500 -1.000 8.000
+ 7  5.500  1.000 8.000
+ 8  0.000  1.000 8.000
+! Additional points for the water body
+ 9  0.000 -1.000 6.500
+10  0.000  1.000 6.500
+11  5.500 -1.000 0.000
+12  5.500 -1.000 6.500
+13  5.500  1.000 0.000
+14  5.500  1.000 6.500
+! Additional points for possible bottom slope change
+15  1.000 -1.000 0.000
+16  1.000  1.000 0.000
+! Additional points below the wavemaker
+17  6.000 -1.000 0.000
+18  6.000  1.000 0.000
+! Additional points by the wavemaker
+19  6.000 -1.000 8.000
+20  6.000  1.000 8.000
+! Additional points below the wavemaker and the reservoir at the monitoring 
+! line for the undisturbed wave
+21  4.917 -1.000 0.000
+22  4.917  1.000 0.000
+! Additional points for the open sections
+23 -0.001 -1.001 -0.001
+24  6.001 -1.001 -0.001
+25  6.001  1.001 -0.001
+26 -0.001  1.001 -0.001
+27 -0.001 -1.001  8.001
+28  6.001 -1.001  8.001
+29  6.001  1.001  8.001
+30 -0.001  1.001  8.001
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------

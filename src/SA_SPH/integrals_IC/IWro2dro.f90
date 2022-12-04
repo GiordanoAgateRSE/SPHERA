@@ -19,12 +19,9 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: IWro2dro                                        
-! Description: Computes the definite integral
-!2
-!S W*(ro')ro2' dro'
-!ro
-!               (Di Monaco et al., 2011, EACFM)                        
+! Program unit: IWro2dro
+! Description: To compute the definite integral IWro2dro 
+!              (Di Monaco et al., 2011, EACFM)
 !-------------------------------------------------------------------------------
 #ifdef SPACE_3D
 double precision function IWro2dro(ro)

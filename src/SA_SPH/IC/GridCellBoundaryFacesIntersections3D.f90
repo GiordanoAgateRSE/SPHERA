@@ -37,7 +37,7 @@
 !                               8 cell vertices belong to one of the semispaces 
 !                               defined by the plane containing the face. In the
 !                               positive case, the face is excluded.  
-!              (Di Monaco et al., 2011, EACFM)                        
+!              (Di Monaco et al., 2011, EACFM)
 !-------------------------------------------------------------------------------
 #ifdef SPACE_3D
 subroutine GridCellBoundaryFacesIntersections3D(NumCellmax)

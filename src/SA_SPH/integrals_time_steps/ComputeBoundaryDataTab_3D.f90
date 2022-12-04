@@ -21,8 +21,7 @@
 !-------------------------------------------------------------------------------
 ! Program unit: ComputeBoundaryDataTab_3D                                 
 ! Description: To calculate the array to store close boundaries and integrals
-!              in 3D
-!              (Di Monaco et al., 2011, EACFM)                        
+!              in 3D (Di Monaco et al., 2011, EACFM)
 !-------------------------------------------------------------------------------
 #ifdef SPACE_3D
 subroutine ComputeBoundaryDataTab_3D

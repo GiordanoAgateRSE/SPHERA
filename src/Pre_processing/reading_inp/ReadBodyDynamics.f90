@@ -38,8 +38,10 @@ use Memory_I_O_interface_module
 implicit none
 logical :: CAE
 integer(4) :: nrighe,ier,ninp,ulog,ioerr,i,Id_body,n_elem,j,Id_elem,alloc_stat
-integer(4) :: imposed_kinematics,n_records,Ic_imposed,surface_detection,jj
-integer(4) :: n_flip_nx_IDs,n_flip_ny_IDs,n_flip_nz_IDs
+integer(4) :: imposed_kinematics,n_records,Ic_imposed
+#ifdef SPACE_3D
+integer(4) :: n_flip_nx_IDs,n_flip_ny_IDs,n_flip_nz_IDs,jj,surface_detection
+#endif
 double precision :: mass,teta_R_IO
 integer(4) :: normal_act(6)
 double precision :: L_geom(3),x_CM(3),n_R_IO(3),u_CM(3),omega(3),x_rotC(3)
@@ -49,7 +51,10 @@ double precision :: vec_bp_CAE_trans(3)
 double precision :: mass_deact(6)
 double precision :: Ic(3,3)
 character(1) :: comment
-character(100) :: lcase,array_name
+character(100) :: lcase
+#ifdef SPACE_3D
+character(100) :: array_name
+#endif
 character(len=lencard) :: ainp
 logical,external :: ReadCheck
 !------------------------

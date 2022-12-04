@@ -20,7 +20,7 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: ReadInputRunParameters                            
-! Description:                        
+! Description: Reading time-integration and other numerical quantities
 !-------------------------------------------------------------------------------
 subroutine ReadInputRunParameters(ainp,comment,nrighe,ier,ninp,ulog,uerr)
 !------------------------

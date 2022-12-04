@@ -20,8 +20,7 @@
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 ! Program unit: FindLine
-! Description: Finds extremes of the rectangular frame which contains the
-!              boundary mib.
+! Description: To find the rectangular frame of a line
 !-------------------------------------------------------------------------------
 #ifdef SPACE_2D
 subroutine FindLine (Xmin,Xmax,Nt)

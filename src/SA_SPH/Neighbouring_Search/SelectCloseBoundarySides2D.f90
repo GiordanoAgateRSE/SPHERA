@@ -29,7 +29,7 @@
 !                  IntLocXY(1:PLANEDIM,1:Ncbs): local coordinates of particle np
 !                                               with respect each boundary side,
 !                                               which gives contribution                                
-!               (Di Monaco et al., 2011, EACFM)           
+!               (Di Monaco et al., 2011, EACFM)
 !-------------------------------------------------------------------------------
 #ifdef SPACE_2D
 subroutine SelectCloseBoundarySides2D(npi,Ncbs,Cloboside,LocXY,IntNcbs,        &

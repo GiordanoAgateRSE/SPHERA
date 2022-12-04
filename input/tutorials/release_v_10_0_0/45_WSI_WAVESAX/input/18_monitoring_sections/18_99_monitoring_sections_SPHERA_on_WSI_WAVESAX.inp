@@ -1,0 +1,52 @@
+!-------------------------------------------------------------------------------
+! Software name and copyright: SPHERA_on_WSI_WAVESAX
+!    Copyright 2022 (RSE SpA, authored by Andrea Amicarelli)
+! Software description: input file for SPHERA v.10.0.0 (RSE SpA). 
+!    SPH demonstrative simulation of the Wave-Structure Interactions of the 
+!     wave-energy device WAVESAX (RSE SpA). 
+!    Reference: RSE SpA, Ricerca di Sistema, 2022.
+!    The device geometry is elaborated by means of Paraview (Kitware) starting 
+!    from the geometry of a device version of 2013 produced for CFD 
+!    simulations (Ricerca di Sistema, 2013, RSE SpA). 
+!    Preliminary demo: virtual wave, no IC corrections for normals and fluid 
+!    positions.
+!
+! This file is part of SPHERA_on_WSI_WAVESAX.
+! SPHERA_on_WSI_WAVESAX is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! SPHERA_on_WSI_WAVESAX is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with SPHERA_on_WSI_WAVESAX. If not, see <http://www.gnu.org/licenses/>.
+!-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+! Description: 18_99_monitoring_sections_SPHERA_on_WSI_WAVESAX.inp
+!              Part of the main input file template of SPHERA. The commented 
+!              template has to be filled in for any particular test case. 
+!              Comment lines and blank lines do not disturb the execution.
+!-------------------------------------------------------------------------------
+
+!-------------------------------------------------------------------------------
+! Legend:
+!    !    beginning of a comment line. Additional comment lines are permitted.
+!    ![?] beginning of a definition/guideline
+!    <>   the content within these brackets represents an input variable
+!    ![*] beginning of the structure of a line with the names of the input 
+!         variables
+!    ...  possible repetitions of the above/previous data
+!    !<<< beginning of a section to be filled with input data. The lines of 
+!         this section must be replaced with a "!" if they do not have to be 
+!         filled for the test case chosen (included the start line and the end 
+!         line of the unusable sections).
+!    ___  space to be replaced with an input value
+!    !>>> end of a section to be filled with input data
+!    =    start of a variable value
+!-------------------------------------------------------------------------------
+
+![?] enddo NUMBER_OF_SECTIONS
+!-------------------------------------------------------------------------------
+##### end section flow rate #####

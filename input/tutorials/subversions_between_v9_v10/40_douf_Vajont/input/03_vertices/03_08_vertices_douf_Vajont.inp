@@ -1,0 +1,107 @@
+!-------------------------------------------------------------------------------
+! Software name and copyright: douf_Vajont
+!    Copyright 2021 (RSE SpA, authored by Andrea Amicarelli)
+! Software description: input file for SPHERA v.9.0.0 (RSE SpA).
+!    Dam-overtopping urban flood of the Vajont disaster (Friuli Venezia Giulia 
+!    and Veneto, Italy). Reference: Amicarelli (2021, SPHERA github repository).
+!
+! This file is part of douf_Vajont.
+! douf_Vajont is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! douf_Vajont is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with douf_Vajont. If not, see <http://www.gnu.org/licenses/>.
+!-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+! Description: 03_08_vertices_douf_Vajont.inp
+!                   The commented template of the main input file of SPHERA
+!                   v.9.0.0 (RSE SpA) is integrated in this file, in compliance
+!                   with the requirements of the licenses of both the software
+!                   tools.
+!-------------------------------------------------------------------------------
+
+!-------------------------------------------------------------------------------
+! Legend:
+!    !    beginning of a comment line. Additional comment lines are permitted.
+!    ![?] beginning of a definition/guideline
+!    <>   the content within these brackets represents an input variable
+!    ![*] beginning of the structure of a line with the names of the input 
+!         variables
+!    ...  possible repetitions of the above/previous data
+!    !<<< beginning of a section to be filled with input data. The lines of 
+!         this section must be replaced with a "!" if they do not have to be 
+!         filled for the test case chosen (included the start line and the end 
+!         line of the unusable sections).
+!    ___  space to be replaced with an input value
+!    !>>> end of a section to be filled with input data
+!    =    start of a variable value
+!-------------------------------------------------------------------------------
+
+![?] Input parameters for the boundary vertices of the fluid domain  
+![?] The DB-SPH boundary treatment scheme requires the vertices of the 
+!    parallelepiped domain as a "contour" and the "fictitious air reservoirs" 
+![?] The SA-SPH boundary treatment scheme requires the vertices of the wall 
+!    frontiers
+![?] At least one SA-SPH frontier is requested to define the edges of the 
+!    numerical domain. This frontier is possibly fictitious and does not 
+!    interact with the SPH particles.
+![?] No gaps on vertex IDs are permitted
+![?] <Vertex_x>,<Vertex_y>,<Vertex_z>: first vertex coordinates starting from 
+!    the possible topography from which reservoirs are possibly extruded
+![?] <Last_vertex_ID>,<Last_vertex_x>,<Last_vertex_y>,<Last_vertex_z>: last 
+!    vertex data
+![?] The numerical inlet section is the physical inlet section moved upstream 
+!    for a distance of 2h, with the possible wet walls of the same section.
+!-------------------------------------------------------------------------------
+![*] <First_vertex_ID> <Vertex_x> <Vertex_y> <Vertex_z>
+![*] ...
+![*] <Last_vertex_ID> <Vertex_x> <Vertex_y> <Vertex_z>
+!-------------------------------------------------------------------------------
+!<<<****************************************************************************
+! inlet_section_centre
+      159024      12074.252      19152.596        918.937
+      159025      12036.596      19269.748        918.937
+      159026      12036.596      19269.748        718.937
+      159027      12074.252      19152.596        718.937
+! Open_section_Vajont_reservoir
+      159028      12190.000      19673.000        919.000
+      159029      12190.000      19673.000        317.840
+      159030      12190.000      18200.000        317.840
+      159031      12190.000      18200.000        919.000
+! Open_section_Belluno
+      159032       2879.000       2449.000        919.000
+      159033       2879.000       2449.000        317.840
+      159034       2074.000       3236.000        317.840
+      159035       2074.000       3236.000        919.000
+! Open_section_top
+      159036      13115.000      26555.000        919.000
+      159037      13115.000        962.000        919.000
+      159038       1770.000        962.000        919.000
+      159039       1770.000      26555.000        919.000
+! Open_section_bottom
+      159040       1770.000      26555.000        317.840
+      159041       1770.000        962.000        317.840
+      159042      13115.000        962.000        317.840
+      159043      13115.000      26555.000        317.840
+! Open_section_Rio_MaE
+      159044       9340.000      17100.000        919.000
+      159045       9340.000      17100.000        418.000
+      159046       9340.000      21200.000        418.000
+      159047       9340.000      21200.000        919.000
+! inlet_section_right
+      159048      11988.596      19257.748        918.937
+      159049      11927.069      19257.748        918.937
+      159050      11927.069      19257.748        718.937
+      159051      11988.596      19257.748        718.937
+! inlet_section_left
+      159052      11927.069      19152.596        918.937
+      159053      11988.596      19152.596        918.937
+      159054      11988.596      19152.596        718.937
+      159055      11927.069      19152.596        718.937
+!>>>****************************************************************************
+!-------------------------------------------------------------------------------

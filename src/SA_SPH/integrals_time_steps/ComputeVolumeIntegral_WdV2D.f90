@@ -24,7 +24,7 @@
 !              the kernel support (radius=2h) of the particle i, whose local
 !              coordinates are xpi=LocXY(1,icbs) and ypi=LocXY(2,icbs), and the
 !              adjacent boundary side icbs.
-!              (Di Monaco et al., 2011, EACFM)                        
+!              (Di Monaco et al., 2011, EACFM)
 !-------------------------------------------------------------------------------
 #ifdef SPACE_2D
 subroutine ComputeVolumeIntegral_WdV2D(icbs,Ncbslocal,Cloboside,LocXY,         &

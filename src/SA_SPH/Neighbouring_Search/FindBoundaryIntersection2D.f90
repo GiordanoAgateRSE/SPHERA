@@ -19,7 +19,7 @@
 ! along with SPHERA. If not, see <http://www.gnu.org/licenses/>.
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
-! Program unit: FindBoundaryIntersection2D                                       
+! Program unit: FindBoundaryIntersection2D
 ! Description: To find the intersection segment between the kernel support of 
 !              particle "i", whose local coordinates are xpi=LocXY(1,icbs) and
 !              ypi=LocXY(2,icbs), and the straight boundary side
@@ -28,7 +28,7 @@
 !                 xpmin: minimum abscissa of intersected segment
 !                 xpmax: maximum abscissa of intersected segment
 !                 interlen: length of the intersected segment 
-!              (Di Monaco et al., 2011, EACFM)                        
+!              (Di Monaco et al., 2011, EACFM)
 !-------------------------------------------------------------------------------
 #ifdef SPACE_2D
 subroutine FindBoundaryIntersection2D(icbs,Cloboside,LocXY,BoundarySide,xpmin, &

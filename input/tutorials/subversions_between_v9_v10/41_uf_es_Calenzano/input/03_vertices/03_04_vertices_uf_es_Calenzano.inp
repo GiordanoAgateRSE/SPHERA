@@ -1,0 +1,61 @@
+!-------------------------------------------------------------------------------
+! Software name and copyright: uf_es_Calenzano
+!    Copyright 2020 (RSE SpA, authored by Andrea Amicarelli)
+! Software description: input file for SPHERA v.9.0.0 (RSE SpA).
+!    Urban flood demonstrative scenario in Calenzano (Firenze, Italy) with 
+!    damage to an electrical substation. Reference: Amicarelli (2020, 
+!    SPHERA github repository).
+!
+! This file is part of uf_es_Calenzano.
+! uf_es_Calenzano is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+! uf_es_Calenzano is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+! GNU General Public License for more details.
+! You should have received a copy of the GNU General Public License
+! along with uf_es_Calenzano. If not, see <http://www.gnu.org/licenses/>.
+!-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+! File description: 03_04_vertices_uf_es_Calenzano.inp
+!                   The commented template of the main input file of SPHERA  
+!                   v.9.0.0 (RSE SpA) is integrated in this file, in compliance 
+!                   with the requirements of the licenses of both the software 
+!                   tools.
+!-------------------------------------------------------------------------------
+
+!-------------------------------------------------------------------------------
+! Legend:
+!    !    beginning of a comment line. Additional comment lines are permitted.
+!    ![?] beginning of a definition/guideline
+!    <>   the content within these brackets represents an input variable
+!    ![*] beginning of the structure of a line with the names of the input 
+!         variables
+!    ...  possible repetitions of the above/previous data
+!    !<<< beginning of a section to be filled with input data. The lines of 
+!         this section must be replaced with a "!" if they do not have to be 
+!         filled for the test case chosen (included the start line and the end 
+!         line of the unusable sections).
+!    ___  space to be replaced with an input value
+!    !>>> end of a section to be filled with input data
+!    =    start of a variable value
+!-------------------------------------------------------------------------------
+
+!-------------------------------------------------------------------------------
+! BC_zmax_for_outlet (P1_open,P2_open,P3outlet_zone,P4_outlet_zone; at z_dom_max)
+      554403        546.305        450.011         64.000
+      554404        559.184        443.572         64.000
+      554405        554.712        434.628         64.000
+      554406        541.833        441.067         64.000
+! BC_zmax_for_outlet (P1_open,P2_open,P3outlet_zone,P4_outlet_zone; at z_dom_min)
+      554407        546.305        450.011         39.700
+      554408        559.184        443.572         39.700
+      554409        554.712        434.628         39.700
+      554410        541.833        441.067         39.700
+! BC_zmax_for_outlet (P1_open,P2_open,P3outlet_zone,P4_outlet_zone; at zmax_BC)
+      554411        546.305        450.011         49.600
+      554412        559.184        443.572         49.600
+      554413        554.712        434.628         49.600
+      554414        541.833        441.067         49.600
